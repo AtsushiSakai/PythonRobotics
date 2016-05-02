@@ -50,9 +50,9 @@ def CreateMeshData():
     Z=[HimmelblauFunction(x,y) for (x,y) in zip(X,Y)]
     return(X,Y,Z)
 
-def SteepestDescentMethod(start,Jacob):
+def NewtonMethod(start,Jacob):
     u"""
-    Steepest Descent Method Optimization
+    Newton Method Optimization
     """
 
     result=start
@@ -78,7 +78,7 @@ def SteepestDescentMethod(start,Jacob):
 # Main
 start=np.array([random.uniform(minXY,maxXY),random.uniform(minXY,maxXY)])
 
-result=SteepestDescentMethod(start,Jacob)
+result=NewtonMethod(start,Jacob)
 (X,Y,Z)=CreateMeshData()
 CS = plt.contour(X, Y, Z,nContour)
 #  plt.clabel(CS, inline=1, fontsize=10)
