@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 import matplotlib.pyplot as plt
 import numpy as np
 import random
+import math
 
 delta = 0.1
 minXY=-5.0
@@ -15,11 +15,11 @@ def Jacob(state):
     u"""
     jacobi matrix of Himmelblau's function
     """
-    x=state[0]
-    y=state[1]
+    x=state[0,0]
+    y=state[0,1]
     dx=4*x**3+4*x*y-44*x+2*x+2*y**2-14
     dy=2*x**2+4*x*y+4*y**3-26*y-22
-    J=[dx,dy]
+    J=np.matrix([dx,dy])
     return J
 
 def HimmelblauFunction(x,y):
@@ -29,6 +29,9 @@ def HimmelblauFunction(x,y):
     http://en.wikipedia.org/wiki/Himmelblau%27s_function
     """
     return (x**2+y-11)**2+(x+y**2-7)**2
+
+def ConstrainFunction(x):
+    return (2.0*x+1.0)
 
 def CreateMeshData():
     x = np.arange(minXY, maxXY, delta)
@@ -47,31 +50,30 @@ def SteepestDescentMethod(start,Jacob):
 
     while 1:
         J=Jacob(x)
-        sumJ=sum([abs(alpha*j) for j in J])
+        sumJ=np.sum(abs(alpha*J))
         if sumJ<=0.01:
             print("OK")
             break
 
-        x=x-[alpha*j for j in J]
-        
+        x=x-alpha*J
         result=np.vstack((result,x))
 
     return result
 
 # Main
-start=np.array([random.uniform(minXY,maxXY),random.uniform(minXY,maxXY)])
+start=np.matrix([random.uniform(minXY,maxXY),random.uniform(minXY,maxXY)])
 
 result=SteepestDescentMethod(start,Jacob)
 (X,Y,Z)=CreateMeshData()
 CS = plt.contour(X, Y, Z,nContour)
-#  plt.clabel(CS, inline=1, fontsize=10)
-#  plt.title('Simplest default with labels')
 
-plt.plot(start[0],start[1],"xr");
+Xc=np.arange(minXY,maxXY,delta)
+Yc=[ConstrainFunction(x) for x in Xc]
 
-optX=[x[0] for x in result]
-optY=[x[1] for x in result]
-plt.plot(optX,optY,"-r");
+plt.plot(start[0,0],start[0,1],"xr");
+plt.plot(Xc,Yc,"-r");
 
+plt.plot(result[:,0],result[:,1],"-r");
+
+plt.axis([minXY, maxXY, minXY, maxXY])
 plt.show()
-
