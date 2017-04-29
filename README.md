@@ -3,7 +3,11 @@ Python sample code for robotics
 
 # Path Planning
 
+Path Planning Sample.
+
 ## RRT 
+
+Rapidly Randamized Tree Path plainning sample.
 
 ### simple_rrt.py
 
@@ -15,3 +19,16 @@ see (in Japanese) :
 
 ![PythonによるRapidly-Exploring Random Trees (RRT)パスプランニングサンプルプログラム - MyEnigma](http://myenigma.hatenablog.com/entry/2016/03/23/092002) 
 
+# Optimization
+
+Nonlinear Optimization Sample codes.
+
+## ConjugateGradientMethod
+
+## LagrangeMultiplierMethod
+
+## NewtonMethod
+
+## QuasiNewtonMethod
+
+## SteepestDescentMethod
