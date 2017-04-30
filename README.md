@@ -17,7 +17,15 @@ This script is a simple rrt planning code with Rapidly-Exploring Random Trees (R
 
 see (in Japanese) :
 
-![PythonによるRapidly-Exploring Random Trees (RRT)パスプランニングサンプルプログラム - MyEnigma](http://myenigma.hatenablog.com/entry/2016/03/23/092002) 
+[PythonによるRapidly-Exploring Random Trees (RRT)パスプランニングサンプルプログラム - MyEnigma](http://myenigma.hatenablog.com/entry/2016/03/23/092002) 
+
+
+### Dubins path planning
+
+A sample code for Dubins path planning.
+
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/DubinsPath/figures/figure_1.png)
+
 
 # Optimization
 
