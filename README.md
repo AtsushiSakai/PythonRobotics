@@ -1,5 +1,5 @@
 # PythonRobotics
-Python sample code for robotics
+Python sample codes for robotics algorithm.
 
 # Path Planning
 
