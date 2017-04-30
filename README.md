@@ -24,7 +24,10 @@ see (in Japanese) :
 
 A sample code for Dubins path planning.
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/DubinsPath/figures/figure_1.png)
+[Dubins path - Wikipedia](https://en.wikipedia.org/wiki/Dubins_path)
+
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/DubinsPath/figures/figure_15.png)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/DubinsPath/figures/figure_13.png)
 
 
 # Optimization
