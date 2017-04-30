@@ -36,10 +36,41 @@ Nonlinear Optimization Sample codes.
 
 ## ConjugateGradientMethod
 
+A conjugate gradient method sample for non linear optimiztion.
+
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/optimization/ConjugateGradientMethod/figure/figure_1.png)
+
 ## LagrangeMultiplierMethod
+
+A lagrange multiplier method sample for non linear optimiztion.
+
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/optimization/LagrangeMultiplierMethod/figure/figure_1.png)
+
 
 ## NewtonMethod
 
+A Newton method sample for non linear optimiztion.
+
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/optimization/NewtonMethod/figure/figure_1.png)
+
 ## QuasiNewtonMethod
 
+A Quasi Newton method sample for non linear optimiztion.
+
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/optimization/QuasiNewtonMethod/figure/figure_1.png)
+
 ## SteepestDescentMethod
+
+A Steepest Descent method sample for non linear optimiztion.
+
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/optimization/SteepestDescentMethod/figure/figure_1.png)
+
+
+# License 
+
+MIT
+
+# Author
+
+Atsushi Sakai ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
+
