@@ -12,12 +12,8 @@ Liscense MIT
 import math
 
 
-def fmodr(x, y):
-    return x - y * math.floor(x / y)
-
-
 def mod2pi(theta):
-    return fmodr(theta, 2 * math.pi)
+    return theta - 2.0 * math.pi * math.floor(theta / 2.0 / math.pi)
 
 
 def LSL(alpha, beta, d):
@@ -28,16 +24,16 @@ def LSL(alpha, beta, d):
     c_ab = math.cos(alpha - beta)
 
     tmp0 = d + sa - sb
+
+    mode = ["L", "S", "L"]
     p_squared = 2 + (d * d) - (2 * c_ab) + (2 * d * (sa - sb))
     if p_squared < 0:
-        return 0
+        return None, None, None, mode
     tmp1 = math.atan2((cb - ca), tmp0)
     t = mod2pi(-alpha + tmp1)
     p = math.sqrt(p_squared)
     q = mod2pi(beta - tmp1)
     #  print(math.degrees(t), p, math.degrees(q))
-
-    mode = ["L", "S", "L"]
 
     return t, p, q, mode
 
@@ -50,15 +46,14 @@ def RSR(alpha, beta, d):
     c_ab = math.cos(alpha - beta)
 
     tmp0 = d - sa + sb
+    mode = ["R", "S", "R"]
     p_squared = 2 + (d * d) - (2 * c_ab) + (2 * d * (sb - sa))
     if p_squared < 0:
-        return 0.0
+        return None, None, None, mode
     tmp1 = math.atan2((ca - cb), tmp0)
     t = mod2pi(alpha - tmp1)
     p = math.sqrt(p_squared)
     q = mod2pi(-beta + tmp1)
-
-    mode = ["R", "S", "R"]
 
     return t, p, q, mode
 
@@ -71,12 +66,14 @@ def LSR(alpha, beta, d):
     c_ab = math.cos(alpha - beta)
 
     p_squared = -2 + (d * d) + (2 * c_ab) + (2 * d * (sa + sb))
+    mode = ["L", "S", "R"]
+    if p_squared < 0:
+        return None, None, None, mode
     p = math.sqrt(p_squared)
     tmp2 = math.atan2((-ca - cb), (d + sa + sb)) - math.atan2(-2.0, p)
     t = mod2pi(-alpha + tmp2)
     q = mod2pi(-mod2pi(beta) + tmp2)
 
-    mode = ["L", "S", "R"]
     return t, p, q, mode
 
 
@@ -88,12 +85,14 @@ def RSL(alpha, beta, d):
     c_ab = math.cos(alpha - beta)
 
     p_squared = (d * d) - 2 + (2 * c_ab) - (2 * d * (sa + sb))
+    mode = ["R", "S", "L"]
+    if p_squared < 0:
+        return None, None, None, mode
     p = math.sqrt(p_squared)
     tmp2 = math.atan2((ca + cb), (d - sa - sb)) - math.atan2(2.0, p)
     t = mod2pi(alpha - tmp2)
     q = mod2pi(beta - tmp2)
 
-    mode = ["R", "S", "L"]
     return t, p, q, mode
 
 
@@ -147,7 +146,10 @@ def dubins_path_planning(sx, sy, syaw, ex, ey, eyaw, c):
         c curvature [1/m]
 
     output:
-        path [x,y...]
+        px
+        py
+        pyaw
+        mode
 
     """
 
@@ -165,15 +167,26 @@ def dubins_path_planning(sx, sy, syaw, ex, ey, eyaw, c):
 
     planners = [LSL, RSR, LSR, RSL, RLR, LRL]
 
+    bcost = float("inf")
+    bt, bp, bq, bmode = None, None, None, None
+
     for planner in planners:
         t, p, q, mode = planner(alpha, beta, d)
         if t is None:
             print("".join(mode) + " cannot generate path")
             continue
-        px, py, pyaw = generate_course([t, p, q], mode, c)
-        plt.plot(px, py, label=("".join(mode)))
+        #  px, py, pyaw = generate_course([t, p, q], mode, c)
+        #  plt.plot(px, py, label=("".join(mode)))
 
-    return px, py, pyaw
+        cost = (abs(t) + abs(p) + abs(q))
+        if bcost > cost:
+            bt, bp, bq, bmode = t, p, q, mode
+            bcost = cost
+
+    #  print(bmode)
+    px, py, pyaw = generate_course([bt, bp, bq], bmode, c)
+
+    return px, py, pyaw, bmode
 
 
 def generate_course(length, mode, c):
@@ -204,14 +217,14 @@ def generate_course(length, mode, c):
     return px, py, pyaw
 
 
-def __plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
+def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
     u"""
     Plot arrow
     """
 
     if not isinstance(x, float):
         for (ix, iy, iyaw) in zip(x, y, yaw):
-            __plot_arrow(ix, iy, iyaw)
+            plot_arrow(ix, iy, iyaw)
     else:
         plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),
                   fc=fc, ec=ec, head_width=width, head_length=width)
@@ -226,20 +239,20 @@ if __name__ == '__main__':
     start_y = 0.0  # [m]
     start_yaw = math.radians(0.0)  # [rad]
 
-    end_x = -10.0  # [m]
-    end_y = 10.0  # [m]
-    end_yaw = math.radians(35.0)  # [rad]
+    end_x = -1.0  # [m]
+    end_y = 1.0  # [m]
+    end_yaw = math.radians(165.0)  # [rad]
 
-    curvature = 2.0
+    curvature = 1.0
 
-    px, py, pyaw = dubins_path_planning(start_x, start_y, start_yaw,
-                                        end_x, end_y, end_yaw, curvature)
+    px, py, pyaw, mode = dubins_path_planning(start_x, start_y, start_yaw,
+                                              end_x, end_y, end_yaw, curvature)
 
-    #  print(px, py)
+    plt.plot(px, py, label="final course " + "".join(mode))
+
     # plotting
-    __plot_arrow(start_x, start_y, start_yaw)
-    __plot_arrow(end_x, end_y, end_yaw)
-
+    plot_arrow(start_x, start_y, start_yaw)
+    plot_arrow(end_x, end_y, end_yaw)
     plt.legend()
     plt.grid(True)
     plt.axis("equal")
