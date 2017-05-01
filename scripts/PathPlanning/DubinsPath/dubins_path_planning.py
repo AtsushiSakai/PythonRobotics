@@ -6,7 +6,7 @@ Dubins path planner sample code
 
 author Atsushi Sakai(@Atsushi_twi)
 
-Liscense MIT
+License MIT
 
 """
 import math
