@@ -205,19 +205,6 @@ def dubins_path_planning(sx, sy, syaw, ex, ey, eyaw, c):
     py = [- math.sin(-syaw) * x + math.cos(-syaw) *
           y + sy for x, y in zip(lpx, lpy)]
     pyaw = leyaw - syaw
-    #  px = [math.cos(-syaw) * (x + sx) + math.sin(-syaw) * (y + sy)
-    #  for x, y in zip(lpx, lpy)]
-    #  py = [- math.sin(-syaw) * (x + sx) + math.cos(-syaw) * (y + sy)
-    #  for x, y in zip(lpx, lpy)]
-    #  pyaw = leyaw + syaw
-
-    #  px = [x + sx for x in lpx]
-    #  py = [y + sy for y in lpy]
-    #  pyaw = lpyaw
-
-    #  px = lpx
-    #  py = lpy
-    #  pyaw = lpyaw
 
     return px, py, pyaw, mode
 
@@ -273,8 +260,8 @@ if __name__ == '__main__':
     start_yaw = math.radians(45.0)  # [rad]
 
     end_x = -3.0  # [m]
-    end_y = 3.0  # [m]
-    end_yaw = math.radians(45.0)  # [rad]
+    end_y = -3.0  # [m]
+    end_yaw = math.radians(-45.0)  # [rad]
 
     curvature = 1.0
 
