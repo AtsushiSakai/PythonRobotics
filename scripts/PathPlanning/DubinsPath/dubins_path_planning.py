@@ -132,36 +132,16 @@ def LRL(alpha, beta, d):
     return t, p, q, mode
 
 
-def dubins_path_planning(sx, sy, syaw, ex, ey, eyaw, c):
-    """
-    Dubins path plannner
-
-    input:
-        sx x position of start point [m]
-        sy y position of start point [m]
-        syaw yaw angle of start point [rad]
-        ex x position of end point [m]
-        ey y position of end point [m]
-        eyaw yaw angle of end point [rad]
-        c curvature [1/m]
-
-    output:
-        px
-        py
-        pyaw
-        mode
-
-    """
-
+def dubins_path_planning_from_origin(ex, ey, eyaw, c):
     # nomalize
-    dx = ex - sx
-    dy = ey - sy
+    dx = ex
+    dy = ey
     D = math.sqrt(dx ** 2.0 + dy ** 2.0)
     d = D / c
     #  print(dx, dy, D, d)
 
     theta = mod2pi(math.atan2(dy, dx))
-    alpha = mod2pi(syaw - theta)
+    alpha = mod2pi(- theta)
     beta = mod2pi(eyaw - theta)
     #  print(theta, alpha, beta, d)
 
@@ -187,6 +167,59 @@ def dubins_path_planning(sx, sy, syaw, ex, ey, eyaw, c):
     px, py, pyaw = generate_course([bt, bp, bq], bmode, c)
 
     return px, py, pyaw, bmode
+
+
+def dubins_path_planning(sx, sy, syaw, ex, ey, eyaw, c):
+    """
+    Dubins path plannner
+
+    input:
+        sx x position of start point [m]
+        sy y position of start point [m]
+        syaw yaw angle of start point [rad]
+        ex x position of end point [m]
+        ey y position of end point [m]
+        eyaw yaw angle of end point [rad]
+        c curvature [1/m]
+
+    output:
+        px
+        py
+        pyaw
+        mode
+
+    """
+
+    ex = ex - sx
+    ey = ey - sy
+
+    lex = math.cos(syaw) * ex + math.sin(syaw) * ey
+    ley = - math.sin(syaw) * ex + math.cos(syaw) * ey
+    leyaw = eyaw - syaw
+
+    lpx, lpy, lpyaw, mode = dubins_path_planning_from_origin(
+        lex, ley, leyaw, c)
+
+    px = [math.cos(-syaw) * x + math.sin(-syaw) *
+          y + sx for x, y in zip(lpx, lpy)]
+    py = [- math.sin(-syaw) * x + math.cos(-syaw) *
+          y + sy for x, y in zip(lpx, lpy)]
+    pyaw = leyaw - syaw
+    #  px = [math.cos(-syaw) * (x + sx) + math.sin(-syaw) * (y + sy)
+    #  for x, y in zip(lpx, lpy)]
+    #  py = [- math.sin(-syaw) * (x + sx) + math.cos(-syaw) * (y + sy)
+    #  for x, y in zip(lpx, lpy)]
+    #  pyaw = leyaw + syaw
+
+    #  px = [x + sx for x in lpx]
+    #  py = [y + sy for y in lpy]
+    #  pyaw = lpyaw
+
+    #  px = lpx
+    #  py = lpy
+    #  pyaw = lpyaw
+
+    return px, py, pyaw, mode
 
 
 def generate_course(length, mode, c):
@@ -235,13 +268,13 @@ if __name__ == '__main__':
     print("Dubins path planner sample start!!")
     import matplotlib.pyplot as plt
 
-    start_x = 0.0  # [m]
-    start_y = 0.0  # [m]
-    start_yaw = math.radians(0.0)  # [rad]
+    start_x = 1.0  # [m]
+    start_y = 1.0  # [m]
+    start_yaw = math.radians(45.0)  # [rad]
 
-    end_x = -1.0  # [m]
-    end_y = 1.0  # [m]
-    end_yaw = math.radians(165.0)  # [rad]
+    end_x = -3.0  # [m]
+    end_y = 3.0  # [m]
+    end_yaw = math.radians(45.0)  # [rad]
 
     curvature = 1.0
 
