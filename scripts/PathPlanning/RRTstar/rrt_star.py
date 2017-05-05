@@ -13,6 +13,8 @@ u"""
 import random
 import math
 import copy
+import numpy as np
+from numba import jit
 
 
 class RRT():
@@ -21,7 +23,7 @@ class RRT():
     """
 
     def __init__(self, start, goal, obstacleList, randArea,
-                 expandDis=0.5, goalSampleRate=5, maxIter=500):
+                 expandDis=0.5, goalSampleRate=50, maxIter=10000):
         u"""
         Setting Parameter
 
@@ -45,9 +47,10 @@ class RRT():
 
         animation: flag for animation on or off
         """
+        animation = False
 
         self.nodeList = [self.start]
-        while True:
+        for i in range(self.maxIter):
             # Random Sampling
             if random.randint(0, 100) > self.goalSampleRate:
                 rnd = [random.uniform(self.minrand, self.maxrand),
@@ -65,7 +68,8 @@ class RRT():
             newNode = copy.deepcopy(nearestNode)
             newNode.x += self.expandDis * math.cos(theta)
             newNode.y += self.expandDis * math.sin(theta)
-            newNode.cost += self.expandDis
+            newNode.cost += self.expandDis + \
+                self.calc_dist_to_goal(newNode.x, newNode.y)
             newNode.parent = nind
             #  print(newNode.cost)
 
@@ -80,7 +84,7 @@ class RRT():
             d = math.sqrt(dx * dx + dy * dy)
             if d <= self.expandDis:
                 print("Goal!!")
-                break
+                #  break
 
             self.rewire(newNode)
 
@@ -88,19 +92,41 @@ class RRT():
                 self.DrawGraph(rnd)
 
         # generate coruse
-        path = [[self.end.x, self.end.y]]
-        lastIndex = len(self.nodeList) - 1
-        while self.nodeList[lastIndex].parent is not None:
-            node = self.nodeList[lastIndex]
-            path.append([node.x, node.y])
-            lastIndex = node.parent
-        path.append([self.start.x, self.start.y])
-
+        lastIndex = self.get_best_last_index()
+        path = self.gen_final_course(lastIndex)
         return path
+
+    def get_best_last_index(self):
+
+        disglist = [self.calc_dist_to_goal(
+            node.x, node.y) for node in self.nodeList]
+        goalinds = [disglist.index(i) for i in disglist if i <= self.expandDis]
+        #  print(goalinds)
+
+        mincost = min([self.nodeList[i].cost for i in goalinds])
+        for i in goalinds:
+            if self.nodeList[i].cost == mincost:
+                return i
+
+        return None
+
+    def gen_final_course(self, goalind):
+        path = [[self.end.x, self.end.y]]
+        while self.nodeList[goalind].parent is not None:
+            node = self.nodeList[goalind]
+            path.append([node.x, node.y])
+            goalind = node.parent
+        path.append([self.start.x, self.start.y])
+        return path
+
+    def calc_dist_to_goal(self, x, y):
+        return np.linalg.norm([x - self.end.x, y - self.end.y])
 
     def rewire(self, newNode):
         #  print("rewire")
-        r = 5
+        nnode = len(self.nodeList)
+        #  r = 50.0 * math.sqrt((math.log(nnode) / nnode))
+        r = self.expandDis * 2.0
         dlist = [math.sqrt((node.x - newNode.x) ** 2 +
                            (node.y - newNode.y) ** 2) for node in self.nodeList]
         nearinds = [dlist.index(i) for i in dlist if i <= r]
@@ -111,13 +137,15 @@ class RRT():
             dx = nearNode.x - newNode.x
             dy = nearNode.y - newNode.y
 
-            scost = newNode.cost + math.sqrt(dx ** 2 + dy ** 2)
+            scost = newNode.cost + \
+                math.sqrt(dx ** 2 + dy ** 2) + \
+                self.calc_dist_to_goal(nearNode.x, nearNode.y)
 
             if nearNode.cost > scost:
                 #  print("rewire")
-                nearNode.parent = len(self.nodeList) - 1
+                nearNode.parent = nnode - 1
                 nearNode.cost = scost
-                #  print(nearNode)
+                #  input()
 
     def DrawGraph(self, rnd=None):
         u"""
