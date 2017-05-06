@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 u"""
-@brief: Path Planning Sample Code with Randamized Rapidly-Exploring Random Trees (RRT) 
+@brief: Path Planning Sample Code with Randamized Rapidly-Exploring Random Trees (RRT)
 
 @author: AtsushiSakai
 
@@ -14,12 +14,14 @@ import random
 import math
 import copy
 
+
 class RRT():
     u"""
     Class for RRT Planning
     """
 
-    def __init__(self, start, goal, obstacleList,randArea,expandDis=1.0,goalSampleRate=5,maxIter=500):
+    def __init__(self, start, goal, obstacleList,
+                 randArea, expandDis=1.0, goalSampleRate=5, maxIter=500):
         u"""
         Setting Parameter
 
@@ -29,17 +31,17 @@ class RRT():
         randArea:Ramdom Samping Area [min,max]
 
         """
-        self.start=Node(start[0],start[1])
-        self.end=Node(goal[0],goal[1])
+        self.start = Node(start[0], start[1])
+        self.end = Node(goal[0], goal[1])
         self.minrand = randArea[0]
         self.maxrand = randArea[1]
         self.expandDis = expandDis
         self.goalSampleRate = goalSampleRate
         self.maxIter = maxIter
 
-    def Planning(self,animation=True):
+    def Planning(self, animation=True):
         u"""
-        Pathplanning 
+        Pathplanning
 
         animation: flag for animation on or off
         """
@@ -48,7 +50,8 @@ class RRT():
         while True:
             # Random Sampling
             if random.randint(0, 100) > self.goalSampleRate:
-                rnd = [random.uniform(self.minrand, self.maxrand), random.uniform(self.minrand, self.maxrand)]
+                rnd = [random.uniform(self.minrand, self.maxrand), random.uniform(
+                    self.minrand, self.maxrand)]
             else:
                 rnd = [self.end.x, self.end.y]
 
@@ -57,7 +60,7 @@ class RRT():
             # print(nind)
 
             # expand tree
-            nearestNode =self.nodeList[nind]
+            nearestNode = self.nodeList[nind]
             theta = math.atan2(rnd[1] - nearestNode.y, rnd[0] - nearestNode.x)
 
             newNode = copy.deepcopy(nearestNode)
@@ -81,18 +84,17 @@ class RRT():
             if animation:
                 self.DrawGraph(rnd)
 
-            
-        path=[[self.end.x,self.end.y]]
+        path = [[self.end.x, self.end.y]]
         lastIndex = len(self.nodeList) - 1
         while self.nodeList[lastIndex].parent is not None:
             node = self.nodeList[lastIndex]
-            path.append([node.x,node.y])
+            path.append([node.x, node.y])
             lastIndex = node.parent
         path.append([self.start.x, self.start.y])
 
         return path
 
-    def DrawGraph(self,rnd=None):
+    def DrawGraph(self, rnd=None):
         u"""
         Draw Graph
         """
@@ -102,8 +104,12 @@ class RRT():
             plt.plot(rnd[0], rnd[1], "^k")
         for node in self.nodeList:
             if node.parent is not None:
-                plt.plot([node.x, self.nodeList[node.parent].x], [node.y, self.nodeList[node.parent].y], "-g")
-        plt.plot([ox for (ox,oy,size) in obstacleList],[oy for (ox,oy,size) in obstacleList], "ok", ms=size * 20)
+                plt.plot([node.x, self.nodeList[node.parent].x], [
+                         node.y, self.nodeList[node.parent].y], "-g")
+
+        for (ox, oy, size) in obstacleList:
+            plt.plot(ox, oy, "ok", ms=30 * size)
+
         plt.plot(self.start.x, self.start.y, "xr")
         plt.plot(self.end.x, self.end.y, "xr")
         plt.axis([-2, 15, -2, 15])
@@ -111,7 +117,8 @@ class RRT():
         plt.pause(0.01)
 
     def GetNearestListIndex(self, nodeList, rnd):
-        dlist = [(node.x - rnd[0]) ** 2 + (node.y - rnd[1]) ** 2 for node in nodeList]
+        dlist = [(node.x - rnd[0]) ** 2 + (node.y - rnd[1])
+                 ** 2 for node in nodeList]
         minind = dlist.index(min(dlist))
         return minind
 
@@ -126,6 +133,7 @@ class RRT():
 
         return True  # safe
 
+
 class Node():
     u"""
     RRT Node
@@ -136,9 +144,10 @@ class Node():
         self.y = y
         self.parent = None
 
+
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
-    #====Search Path with RRT====
+    # ====Search Path with RRT====
     obstacleList = [
         (5, 5, 1),
         (3, 6, 2),
@@ -147,13 +156,14 @@ if __name__ == '__main__':
         (7, 5, 2),
         (9, 5, 2)
     ]  # [x,y,size]
-    #Set Initial parameters
-    rrt=RRT(start=[0,0],goal=[5,10],randArea=[-2,15],obstacleList=obstacleList)
-    path=rrt.Planning(animation=True)
+    # Set Initial parameters
+    rrt = RRT(start=[0, 0], goal=[5, 10],
+              randArea=[-2, 15], obstacleList=obstacleList)
+    path = rrt.Planning(animation=True)
 
     # Draw final path
     rrt.DrawGraph()
-    plt.plot([x for (x,y) in path], [y for (x,y) in path],'-r')
+    plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
     plt.grid(True)
     plt.pause(0.01)  # Need for Mac
     plt.show()

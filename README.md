@@ -23,6 +23,8 @@ see (in Japanese) :
 
 This script is a  path planning code with RRT \*
 
+- [Incremental Sampling-based Algorithms for Optimal Motion Planning](https://arxiv.org/abs/1005.0416)
+
 
 ## Dubins path planning
 
