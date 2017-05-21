@@ -13,6 +13,8 @@ import random
 import math
 import copy
 import numpy as np
+import matplotrecorder
+matplotrecorder.donothing = False
 
 
 class RRT():
@@ -21,7 +23,7 @@ class RRT():
     """
 
     def __init__(self, start, goal, obstacleList, randArea,
-                 expandDis=0.5, goalSampleRate=20, maxIter=5000):
+                 expandDis=0.5, goalSampleRate=20, maxIter=1000):
         u"""
         Setting Parameter
 
@@ -45,7 +47,6 @@ class RRT():
 
         animation: flag for animation on or off
         """
-        animation = False
 
         self.nodeList = [self.start]
         for i in range(self.maxIter):
@@ -204,6 +205,7 @@ class RRT():
         plt.axis([-2, 15, -2, 15])
         plt.grid(True)
         plt.pause(0.01)
+        matplotrecorder.save_frame()  # save each frame
 
     def GetNearestListIndex(self, nodeList, rnd):
         dlist = [(node.x - rnd[0]) ** 2 + (node.y - rnd[1])
@@ -258,4 +260,9 @@ if __name__ == '__main__':
     plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
     plt.grid(True)
     plt.pause(0.01)  # Need for Mac
+    for i in range(10):
+        matplotrecorder.save_frame()  # save each frame
+
     plt.show()
+
+    matplotrecorder.save_movie("animation.gif", 0.1)

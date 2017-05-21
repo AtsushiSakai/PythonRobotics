@@ -20,7 +20,7 @@ Path Planning Samples.
 
 Rapidly Randamized Tree Path plainning sample.
 
-![PythonによるRapidly-Exploring Random Trees (RRT)パスプランニングサンプルプログラム - MyEnigma](http://cdn-ak.f.st-hatena.com/images/fotolife/m/meison_amsl/20160320/20160320175657.png)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/RRT/animation.gif)
 
 This script is a simple path planning code with Rapidly-Exploring Random Trees (RRT)
 
@@ -30,7 +30,7 @@ see (in Japanese) :
 
 ## RRTStar
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/RRTstar/figure_1.png)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/RRTStar/animation.gif)
 
 This script is a  path planning code with RRT \*
 

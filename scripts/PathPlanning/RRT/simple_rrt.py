@@ -13,6 +13,8 @@ u"""
 import random
 import math
 import copy
+import matplotrecorder
+matplotrecorder.donothing = True
 
 
 class RRT():
@@ -115,6 +117,7 @@ class RRT():
         plt.axis([-2, 15, -2, 15])
         plt.grid(True)
         plt.pause(0.01)
+        matplotrecorder.save_frame()  # save each frame
 
     def GetNearestListIndex(self, nodeList, rnd):
         dlist = [(node.x - rnd[0]) ** 2 + (node.y - rnd[1])
@@ -166,4 +169,8 @@ if __name__ == '__main__':
     plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
     plt.grid(True)
     plt.pause(0.01)  # Need for Mac
-    plt.show()
+    #  plt.show()
+    for i in range(10):
+        matplotrecorder.save_frame()  # save each frame
+
+    matplotrecorder.save_movie("animation.gif", 0.1)
