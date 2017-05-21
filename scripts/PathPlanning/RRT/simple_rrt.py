@@ -13,8 +13,6 @@ u"""
 import random
 import math
 import copy
-import matplotrecorder
-matplotrecorder.donothing = True
 
 
 class RRT():
@@ -149,7 +147,11 @@ class Node():
 
 
 if __name__ == '__main__':
+    print("start RRT path planning")
     import matplotlib.pyplot as plt
+    import matplotrecorder
+    matplotrecorder.donothing = True
+
     # ====Search Path with RRT====
     obstacleList = [
         (5, 5, 1),

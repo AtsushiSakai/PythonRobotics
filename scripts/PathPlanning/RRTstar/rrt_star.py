@@ -13,8 +13,6 @@ import random
 import math
 import copy
 import numpy as np
-import matplotrecorder
-matplotrecorder.donothing = False
 
 
 class RRT():
@@ -238,8 +236,11 @@ class Node():
 
 
 if __name__ == '__main__':
-    print("Start rrt start planning")
+    print("Start rrt planning")
     import matplotlib.pyplot as plt
+    import matplotrecorder
+    matplotrecorder.donothing = True
+
     # ====Search Path with RRT====
     obstacleList = [
         (5, 5, 1),
@@ -253,7 +254,7 @@ if __name__ == '__main__':
     # Set Initial parameters
     rrt = RRT(start=[0, 0], goal=[5, 10],
               randArea=[-2, 15], obstacleList=obstacleList)
-    path = rrt.Planning(animation=True)
+    path = rrt.Planning(animation=False)
 
     # Draw final path
     rrt.DrawGraph()

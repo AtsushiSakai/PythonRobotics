@@ -14,7 +14,6 @@ import math
 import copy
 import numpy as np
 import dubins_path_planning
-#  import matplotrecorder
 
 
 class RRT():
@@ -188,7 +187,7 @@ class RRT():
         plt.axis([-2, 15, -2, 15])
         plt.grid(True)
         plt.pause(0.01)
-        #  matplotrecorder.save_frame()  # save each frame
+        matplotrecorder.save_frame()  # save each frame
 
     def GetNearestListIndex(self, nodeList, rnd):
         dlist = [(node.x - rnd[0]) ** 2 +
@@ -228,8 +227,10 @@ class Node():
 
 
 if __name__ == '__main__':
-    print("Start rrt start planning")
+    print("Start rrt planning")
     import matplotlib.pyplot as plt
+    import matplotrecorder
+    matplotrecorder.donothing = True
     # ====Search Path with RRT====
     obstacleList = [
         (5, 5, 1),
@@ -254,7 +255,7 @@ if __name__ == '__main__':
     plt.pause(0.001)
     plt.show()
 
-    #  for i in range(10):
-    #  matplotrecorder.save_frame()  # save each frame
+    for i in range(10):
+        matplotrecorder.save_frame()  # save each frame
 
-    #  matplotrecorder.save_movie("animation.gif", 0.1)
+    matplotrecorder.save_movie("animation.gif", 0.1)
