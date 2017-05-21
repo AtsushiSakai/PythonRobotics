@@ -3,7 +3,7 @@ Python sample codes for robotics algorithm.
 
 # Path Planning
 
-Path Planning Sample.
+Path Planning Samples.
 
 ## RRT 
 
@@ -25,6 +25,12 @@ This script is a  path planning code with RRT \*
 
 - [Incremental Sampling-based Algorithms for Optimal Motion Planning](https://arxiv.org/abs/1005.0416)
 
+
+## RRT Car 
+
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/RRTCar/figure_1.png)
+
+Path planning for car like robot with RRT and dubins path planner.
 
 ## Dubins path planning
 
