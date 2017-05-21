@@ -30,7 +30,7 @@ see (in Japanese) :
 
 ## RRTStar
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/RRTStar/animation.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/RRTstar/animation.gif)
 
 This script is a  path planning code with RRT \*
 
