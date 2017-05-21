@@ -39,7 +39,8 @@ This script is a  path planning code with RRT \*
 
 ## RRT Car 
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/RRTCar/figure_1.png)
+<!-- ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/RRTCar/figure_1.png) -->
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/RRTCar/animation.gif)
 
 Path planning for a car robot with RRT and dubins path planner.
 
