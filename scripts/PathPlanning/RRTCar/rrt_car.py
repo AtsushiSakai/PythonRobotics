@@ -14,7 +14,7 @@ import math
 import copy
 import numpy as np
 import dubins_path_planning
-import matplotrecorder
+#  import matplotrecorder
 
 
 class RRT():
@@ -57,7 +57,7 @@ class RRT():
             if self.__CollisionCheck(newNode, obstacleList):
                 self.nodeList.append(newNode)
 
-            if animation:
+            if animation and i % 5 == 0:
                 self.DrawGraph(rnd=rnd)
 
         # generate coruse
@@ -188,7 +188,7 @@ class RRT():
         plt.axis([-2, 15, -2, 15])
         plt.grid(True)
         plt.pause(0.01)
-        matplotrecorder.save_frame()  # save each frame
+        #  matplotrecorder.save_frame()  # save each frame
 
     def GetNearestListIndex(self, nodeList, rnd):
         dlist = [(node.x - rnd[0]) ** 2 +
@@ -245,7 +245,7 @@ if __name__ == '__main__':
     goal = [10.0, 10.0, math.radians(0.0)]
 
     rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
-    path = rrt.Planning(animation=True)
+    path = rrt.Planning(animation=False)
 
     # Draw final path
     rrt.DrawGraph()
@@ -254,4 +254,7 @@ if __name__ == '__main__':
     plt.pause(0.001)
     plt.show()
 
-    matplotrecorder.save_movie("animation.gif", 0.1)
+    #  for i in range(10):
+    #  matplotrecorder.save_frame()  # save each frame
+
+    #  matplotrecorder.save_movie("animation.gif", 0.1)
