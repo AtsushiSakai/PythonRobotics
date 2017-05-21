@@ -1,9 +1,20 @@
 # PythonRobotics
+
 Python sample codes for robotics algorithm.
+
+
+# Requirements
+
+- numpy
+
+- scipy
+
+- matplotlib
 
 # Path Planning
 
 Path Planning Samples.
+
 
 ## RRT 
 
@@ -30,7 +41,7 @@ This script is a  path planning code with RRT \*
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/RRTCar/figure_1.png)
 
-Path planning for car like robot with RRT and dubins path planner.
+Path planning for a car robot with RRT and dubins path planner.
 
 ## Dubins path planning
 
