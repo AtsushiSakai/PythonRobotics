@@ -16,6 +16,16 @@ def mod2pi(theta):
     return theta - 2.0 * math.pi * math.floor(theta / 2.0 / math.pi)
 
 
+def pi_2_pi(angle):
+    while(angle >= math.pi):
+        angle = angle - 2.0 * math.pi
+
+    while(angle <= -math.pi):
+        angle = angle + 2.0 * math.pi
+
+    return angle
+
+
 def LSL(alpha, beta, d):
     sa = math.sin(alpha)
     sb = math.sin(beta)
@@ -155,8 +165,6 @@ def dubins_path_planning_from_origin(ex, ey, eyaw, c):
         if t is None:
             #  print("".join(mode) + " cannot generate path")
             continue
-        #  px, py, pyaw = generate_course([t, p, q], mode, c)
-        #  plt.plot(px, py, label=("".join(mode)))
 
         cost = (abs(t) + abs(p) + abs(q))
         if bcost > cost:
@@ -204,7 +212,15 @@ def dubins_path_planning(sx, sy, syaw, ex, ey, eyaw, c):
           y + sx for x, y in zip(lpx, lpy)]
     py = [- math.sin(-syaw) * x + math.cos(-syaw) *
           y + sy for x, y in zip(lpx, lpy)]
-    pyaw = [iyaw - syaw for iyaw in lpyaw]
+    pyaw = [pi_2_pi(iyaw + syaw) for iyaw in lpyaw]
+    #  print(syaw)
+    #  pyaw = lpyaw
+
+    #  plt.plot(pyaw, "-r")
+    #  plt.plot(lpyaw, "-b")
+    #  plt.plot(eyaw, "*r")
+    #  plt.plot(syaw, "*b")
+    #  plt.show()
 
     return px, py, pyaw, mode, clen
 
@@ -215,11 +231,14 @@ def generate_course(length, mode, c):
     py = [0.0]
     pyaw = [0.0]
 
-    d = 0.001
-
     for m, l in zip(mode, length):
         pd = 0.0
-        while pd <= abs(l):
+        if m is "S":
+            d = 1.0 / c
+        else:  # turning couse
+            d = math.radians(3.0)
+
+        while pd < abs(l - d):
             #  print(pd, l)
             px.append(px[-1] + d * c * math.cos(pyaw[-1]))
             py.append(py[-1] + d * c * math.sin(pyaw[-1]))
@@ -231,8 +250,18 @@ def generate_course(length, mode, c):
             elif m is "R":  # right turn
                 pyaw.append(pyaw[-1] - d)
             pd += d
+        else:
+            d = l - pd
+            px.append(px[-1] + d * c * math.cos(pyaw[-1]))
+            py.append(py[-1] + d * c * math.sin(pyaw[-1]))
 
-    #  print(px, py, pyaw)
+            if m is "L":  # left turn
+                pyaw.append(pyaw[-1] + d)
+            elif m is "S":  # Straight
+                pyaw.append(pyaw[-1])
+            elif m is "R":  # right turn
+                pyaw.append(pyaw[-1] - d)
+            pd += d
 
     return px, py, pyaw
 
@@ -256,28 +285,13 @@ if __name__ == '__main__':
     print("Dubins path planner sample start!!")
     import matplotlib.pyplot as plt
 
-    #  start_x = 12.50448605843218
-    #  start_y = 0.081546724750168
-    #  start_yaw = 1.9789999999998602
+    start_x = 1.0  # [m]
+    start_y = 1.0  # [m]
+    start_yaw = math.radians(45.0)  # [rad]
 
-    #  end_x = 14.42965160407553
-    #  end_y = 7.971199401268141
-    #  end_yaw = 2.5221853071798117
-
-    start_x = 2.379024570195084
-    start_y = 1.087711940696707
-    start_yaw = -2.2749999999998605
-    end_x = 12.50448605843218
-    end_y = 0.081546724750168
-    end_yaw = 1.9789999999998602
-
-    #  start_x = 1.0  # [m]
-    #  start_y = 1.0  # [m]
-    #  start_yaw = math.radians(45.0)  # [rad]
-
-    #  end_x = -3.0  # [m]
-    #  end_y = -3.0  # [m]
-    #  end_yaw = math.radians(-45.0)  # [rad]
+    end_x = -3.0  # [m]
+    end_y = -3.0  # [m]
+    end_yaw = math.radians(-45.0)  # [rad]
 
     curvature = 1.0
 
@@ -289,6 +303,10 @@ if __name__ == '__main__':
     # plotting
     plot_arrow(start_x, start_y, start_yaw)
     plot_arrow(end_x, end_y, end_yaw)
+
+    #  for (ix, iy, iyaw) in zip(px, py, pyaw):
+    #  plot_arrow(ix, iy, iyaw, fc="b")
+
     plt.legend()
     plt.grid(True)
     plt.axis("equal")

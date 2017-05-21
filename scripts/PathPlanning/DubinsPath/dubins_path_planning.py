@@ -16,6 +16,16 @@ def mod2pi(theta):
     return theta - 2.0 * math.pi * math.floor(theta / 2.0 / math.pi)
 
 
+def pi_2_pi(angle):
+    while(angle >= math.pi):
+        angle = angle - 2.0 * math.pi
+
+    while(angle <= -math.pi):
+        angle = angle + 2.0 * math.pi
+
+    return angle
+
+
 def LSL(alpha, beta, d):
     sa = math.sin(alpha)
     sb = math.sin(beta)
@@ -153,10 +163,8 @@ def dubins_path_planning_from_origin(ex, ey, eyaw, c):
     for planner in planners:
         t, p, q, mode = planner(alpha, beta, d)
         if t is None:
-            print("".join(mode) + " cannot generate path")
+            #  print("".join(mode) + " cannot generate path")
             continue
-        #  px, py, pyaw = generate_course([t, p, q], mode, c)
-        #  plt.plot(px, py, label=("".join(mode)))
 
         cost = (abs(t) + abs(p) + abs(q))
         if bcost > cost:
@@ -166,7 +174,7 @@ def dubins_path_planning_from_origin(ex, ey, eyaw, c):
     #  print(bmode)
     px, py, pyaw = generate_course([bt, bp, bq], bmode, c)
 
-    return px, py, pyaw, bmode
+    return px, py, pyaw, bmode, bcost
 
 
 def dubins_path_planning(sx, sy, syaw, ex, ey, eyaw, c):
@@ -197,16 +205,24 @@ def dubins_path_planning(sx, sy, syaw, ex, ey, eyaw, c):
     ley = - math.sin(syaw) * ex + math.cos(syaw) * ey
     leyaw = eyaw - syaw
 
-    lpx, lpy, lpyaw, mode = dubins_path_planning_from_origin(
+    lpx, lpy, lpyaw, mode, clen = dubins_path_planning_from_origin(
         lex, ley, leyaw, c)
 
     px = [math.cos(-syaw) * x + math.sin(-syaw) *
           y + sx for x, y in zip(lpx, lpy)]
     py = [- math.sin(-syaw) * x + math.cos(-syaw) *
           y + sy for x, y in zip(lpx, lpy)]
-    pyaw = leyaw - syaw
+    pyaw = [pi_2_pi(iyaw + syaw) for iyaw in lpyaw]
+    #  print(syaw)
+    #  pyaw = lpyaw
 
-    return px, py, pyaw, mode
+    #  plt.plot(pyaw, "-r")
+    #  plt.plot(lpyaw, "-b")
+    #  plt.plot(eyaw, "*r")
+    #  plt.plot(syaw, "*b")
+    #  plt.show()
+
+    return px, py, pyaw, mode, clen
 
 
 def generate_course(length, mode, c):
@@ -215,11 +231,14 @@ def generate_course(length, mode, c):
     py = [0.0]
     pyaw = [0.0]
 
-    d = 0.001
-
     for m, l in zip(mode, length):
         pd = 0.0
-        while pd <= abs(l):
+        if m is "S":
+            d = 1.0 / c
+        else:  # turning couse
+            d = math.radians(3.0)
+
+        while pd < abs(l - d):
             #  print(pd, l)
             px.append(px[-1] + d * c * math.cos(pyaw[-1]))
             py.append(py[-1] + d * c * math.sin(pyaw[-1]))
@@ -231,8 +250,18 @@ def generate_course(length, mode, c):
             elif m is "R":  # right turn
                 pyaw.append(pyaw[-1] - d)
             pd += d
+        else:
+            d = l - pd
+            px.append(px[-1] + d * c * math.cos(pyaw[-1]))
+            py.append(py[-1] + d * c * math.sin(pyaw[-1]))
 
-    #  print(px, py, pyaw)
+            if m is "L":  # left turn
+                pyaw.append(pyaw[-1] + d)
+            elif m is "S":  # Straight
+                pyaw.append(pyaw[-1])
+            elif m is "R":  # right turn
+                pyaw.append(pyaw[-1] - d)
+            pd += d
 
     return px, py, pyaw
 
@@ -241,6 +270,7 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
     u"""
     Plot arrow
     """
+    import matplotlib.pyplot as plt
 
     if not isinstance(x, float):
         for (ix, iy, iyaw) in zip(x, y, yaw):
@@ -265,14 +295,18 @@ if __name__ == '__main__':
 
     curvature = 1.0
 
-    px, py, pyaw, mode = dubins_path_planning(start_x, start_y, start_yaw,
-                                              end_x, end_y, end_yaw, curvature)
+    px, py, pyaw, mode, clen = dubins_path_planning(start_x, start_y, start_yaw,
+                                                    end_x, end_y, end_yaw, curvature)
 
     plt.plot(px, py, label="final course " + "".join(mode))
 
     # plotting
     plot_arrow(start_x, start_y, start_yaw)
     plot_arrow(end_x, end_y, end_yaw)
+
+    #  for (ix, iy, iyaw) in zip(px, py, pyaw):
+    #  plot_arrow(ix, iy, iyaw, fc="b")
+
     plt.legend()
     plt.grid(True)
     plt.axis("equal")

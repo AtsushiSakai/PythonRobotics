@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-u"""
-@brief: Path Planning Sample Code with Randamized Rapidly-Exploring Random Trees (RRT)
+"""
+@brief: Path Planning Sample Code with RRT for car like robot.
 
 @author: AtsushiSakai(@Atsushi_twi)
 
@@ -12,9 +12,9 @@ u"""
 import random
 import math
 import copy
-import dubins_path_planning
 import numpy as np
-import matplotlib.pyplot as plt
+import dubins_path_planning
+import matplotrecorder
 
 
 class RRT():
@@ -53,13 +53,9 @@ class RRT():
             nind = self.GetNearestListIndex(self.nodeList, rnd)
 
             newNode = self.steer(rnd, nind)
-            #  print(newNode.cost)
 
             if self.__CollisionCheck(newNode, obstacleList):
-                #  nearinds = self.find_near_nodes(newNode)
-                #  newNode = self.choose_parent(newNode, nearinds)
                 self.nodeList.append(newNode)
-                #  self.rewire(newNode, nearinds)
 
             if animation:
                 self.DrawGraph(rnd=rnd)
@@ -98,11 +94,6 @@ class RRT():
         return newNode
 
     def pi_2_pi(self, angle):
-        u"""
-        """
-
-        #  angle = float(angle)
-
         while(angle >= math.pi):
             angle = angle - 2.0 * math.pi
 
@@ -121,21 +112,15 @@ class RRT():
             nearestNode.x, nearestNode.y, nearestNode.yaw, rnd[0], rnd[1], rnd[2], curvature)
 
         newNode = copy.deepcopy(nearestNode)
-        newNode.x = rnd[0]
-        newNode.y = rnd[1]
-        newNode.yaw = rnd[2]
+        newNode.x = px[-1]
+        newNode.y = py[-1]
+        newNode.yaw = pyaw[-1]
+
         newNode.path_x = px
         newNode.path_y = py
         newNode.path_yaw = pyaw
         newNode.cost += clen
         newNode.parent = nind
-        #  print(py)
-        #  print(nearestNode.x, nearestNode.y, nearestNode.yaw)
-        #  print(newNode.x, newNode.y, newNode.yaw)
-        #  dubins_path_planning.plot_arrow(
-        #  nearestNode.x, nearestNode.y, nearestNode.yaw)
-        #  dubins_path_planning.plot_arrow(newNode.x, newNode.y, newNode.yaw)
-        #  dubins_path_planning.plot_arrow(rnd[0], rnd[1], rnd[2], fc="b")
 
         return newNode
 
@@ -156,7 +141,7 @@ class RRT():
 
         disglist = [self.calc_dist_to_goal(
             node.x, node.y) for node in self.nodeList]
-        goalinds = [disglist.index(i) for i in disglist if i <= 0.5]
+        goalinds = [disglist.index(i) for i in disglist if i <= 0.1]
         #  print(goalinds)
 
         mincost = min([self.nodeList[i].cost for i in goalinds])
@@ -180,32 +165,6 @@ class RRT():
     def calc_dist_to_goal(self, x, y):
         return np.linalg.norm([x - self.end.x, y - self.end.y])
 
-    def find_near_nodes(self, newNode):
-        nnode = len(self.nodeList)
-        r = 50.0 * math.sqrt((math.log(nnode) / nnode))
-        #  r = self.expandDis * 5.0
-        dlist = [(node.x - newNode.x) ** 2 +
-                 (node.y - newNode.y) ** 2 for node in self.nodeList]
-        nearinds = [dlist.index(i) for i in dlist if i <= r ** 2]
-        return nearinds
-
-    def rewire(self, newNode, nearinds):
-        nnode = len(self.nodeList)
-        for i in nearinds:
-            nearNode = self.nodeList[i]
-
-            dx = newNode.x - nearNode.x
-            dy = newNode.y - nearNode.y
-            d = math.sqrt(dx ** 2 + dy ** 2)
-
-            scost = newNode.cost + d
-
-            if nearNode.cost > scost:
-                theta = math.atan2(dy, dx)
-                if self.check_collision_extend(nearNode, theta, d):
-                    nearNode.parent = nnode - 1
-                    nearNode.cost = scost
-
     def DrawGraph(self, rnd=None):
         u"""
         Draw Graph
@@ -217,19 +176,19 @@ class RRT():
         for node in self.nodeList:
             if node.parent is not None:
                 plt.plot(node.path_x, node.path_y, "-g")
-                #  plt.plot([node.x, self.nodeList[node.parent].x], [
-                #  node.y, self.nodeList[node.parent].y], "-g")
 
         for (ox, oy, size) in obstacleList:
             plt.plot(ox, oy, "ok", ms=30 * size)
 
-        plt.plot(self.start.x, self.start.y, "xr")
-        plt.plot(self.end.x, self.end.y, "xr")
+        dubins_path_planning.plot_arrow(
+            self.start.x, self.start.y, self.start.yaw)
+        dubins_path_planning.plot_arrow(
+            self.end.x, self.end.y, self.end.yaw)
+
         plt.axis([-2, 15, -2, 15])
         plt.grid(True)
         plt.pause(0.01)
-        #  plt.show()
-        #  input()
+        matplotrecorder.save_frame()  # save each frame
 
     def GetNearestListIndex(self, nodeList, rnd):
         dlist = [(node.x - rnd[0]) ** 2 +
@@ -270,6 +229,7 @@ class Node():
 
 if __name__ == '__main__':
     print("Start rrt start planning")
+    import matplotlib.pyplot as plt
     # ====Search Path with RRT====
     obstacleList = [
         (5, 5, 1),
@@ -281,13 +241,17 @@ if __name__ == '__main__':
     ]  # [x,y,size(radius)]
 
     # Set Initial parameters
-    rrt = RRT(start=[0.0, 0.0, math.radians(0.0)], goal=[10.0, 10.0, math.radians(0.0)],
-              randArea=[-2.0, 15.0], obstacleList=obstacleList)
-    path = rrt.Planning(animation=False)
+    start = [0.0, 0.0, math.radians(0.0)]
+    goal = [10.0, 10.0, math.radians(0.0)]
+
+    rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
+    path = rrt.Planning(animation=True)
 
     # Draw final path
     rrt.DrawGraph()
     plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
     plt.grid(True)
-    plt.pause(0.01)  # Need for Mac
+    plt.pause(0.001)
     plt.show()
+
+    matplotrecorder.save_movie("animation.gif", 0.1)
