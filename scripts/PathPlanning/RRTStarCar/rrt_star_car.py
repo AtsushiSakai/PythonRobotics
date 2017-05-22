@@ -272,7 +272,7 @@ if __name__ == '__main__':
     print("Start rrt start planning")
     import matplotlib.pyplot as plt
     import matplotrecorder
-    matplotrecorder.donothing = True
+    matplotrecorder.donothing = False
 
     # ====Search Path with RRT====
     obstacleList = [
@@ -296,9 +296,10 @@ if __name__ == '__main__':
     plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
     plt.grid(True)
     plt.pause(0.001)
-    plt.show()
 
     for i in range(10):
         matplotrecorder.save_frame()  # save each frame
+
+    plt.show()
 
     matplotrecorder.save_movie("animation.gif", 0.1)
