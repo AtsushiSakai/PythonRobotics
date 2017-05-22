@@ -272,7 +272,7 @@ if __name__ == '__main__':
     print("Start rrt start planning")
     import matplotlib.pyplot as plt
     import matplotrecorder
-    matplotrecorder.donothing = False
+    matplotrecorder.donothing = True
 
     # ====Search Path with RRT====
     obstacleList = [
