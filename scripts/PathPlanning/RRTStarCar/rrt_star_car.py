@@ -60,10 +60,9 @@ class RRT():
                 self.nodeList.append(newNode)
                 self.rewire(newNode, nearinds)
 
-            if animation:
+            if animation and i % 5 == 0:
                 self.DrawGraph(rnd=rnd)
-                if i % 5 == 0:
-                    matplotrecorder.save_frame()  # save each frame
+                matplotrecorder.save_frame()  # save each frame
 
         # generate coruse
         lastIndex = self.get_best_last_index()

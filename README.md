@@ -44,7 +44,16 @@ This script is a  path planning code with RRT \*
 
 Path planning for a car robot with RRT and dubins path planner.
 
+
+## RRTStarCar
+
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/RRTStarCar/animation.gif)
+
+Path planning for a car robot with RRT\* and ducings path planner.
+
+
 ## Dubins path planning
+
 
 A sample code for Dubins path planning.
 
