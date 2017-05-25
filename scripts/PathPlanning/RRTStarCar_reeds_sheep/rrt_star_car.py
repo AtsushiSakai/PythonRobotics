@@ -142,7 +142,7 @@ class RRT():
         #  print("get_best_last_index")
 
         YAWTH = math.radians(3.0)
-        XYTH = 0.5
+        XYTH = 1.0
 
         goalinds = []
         for (i, node) in enumerate(self.nodeList):
