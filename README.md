@@ -11,7 +11,7 @@ Python sample codes for robotics algorithm.
 
 - matplotlib
 
-- [pyReedsShepp](https://github.com/ghliu/pyReedsShepp)) (Only for reeds sheep path and RRT Star Car)
+- [pyReedsShepp](https://github.com/ghliu/pyReedsShepp) (Only for reeds sheep path and RRTStarCar_reeds_sheep)
 
 # Path Planning
 
@@ -55,6 +55,8 @@ Path planning for a car robot with RRT\* and dubings path planner.
 
 
 ## RRTStarCar_reeds_sheep
+
+![Robotics/animation.gif at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/RRTStarCar_reeds_sheep/animation.gif))
 
 Path planning for a car robot with RRT\* and reeds sheep path planner.
 
