@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-@brief: Path Planning Sample Code with RRT for car like robot.
+@brief: Path Planning Sample Code with RRT* for car like robot with reeds shepp curve.
 
 @author: AtsushiSakai(@Atsushi_twi)
 
@@ -22,7 +22,7 @@ class RRT():
     """
 
     def __init__(self, start, goal, obstacleList, randArea,
-                 goalSampleRate=10, maxIter=2000):
+                 goalSampleRate=10, maxIter=1000):
         u"""
         Setting Parameter
 
@@ -293,7 +293,7 @@ if __name__ == '__main__':
     goal = [5.5, 10.0, math.radians(0.0)]
 
     rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
-    path = rrt.Planning(animation=False)
+    path = rrt.Planning(animation=True)
 
     # Draw final path
     rrt.DrawGraph()
