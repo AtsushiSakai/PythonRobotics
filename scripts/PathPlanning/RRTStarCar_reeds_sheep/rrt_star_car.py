@@ -22,7 +22,7 @@ class RRT():
     """
 
     def __init__(self, start, goal, obstacleList, randArea,
-                 goalSampleRate=10, maxIter=1000):
+                 goalSampleRate=10, maxIter=2000):
         u"""
         Setting Parameter
 
@@ -290,7 +290,7 @@ if __name__ == '__main__':
 
     # Set Initial parameters
     start = [0.0, 0.0, math.radians(0.0)]
-    goal = [5.0, 10.0, math.radians(0.0)]
+    goal = [5.5, 10.0, math.radians(0.0)]
 
     rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
     path = rrt.Planning(animation=False)
