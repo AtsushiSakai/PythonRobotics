@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-@brief: Path Planning Sample Code with RRT* for car like robot with reeds shepp curve.
+@brief: Path Planning Sample Code with RRT for car like robot.
 
 @author: AtsushiSakai(@Atsushi_twi)
 
@@ -22,7 +22,7 @@ class RRT():
     """
 
     def __init__(self, start, goal, obstacleList, randArea,
-                 goalSampleRate=10, maxIter=1000):
+                 goalSampleRate=10, maxIter=2000):
         u"""
         Setting Parameter
 
@@ -94,10 +94,10 @@ class RRT():
         return newNode
 
     def pi_2_pi(self, angle):
-        while(angle >= math.pi):
+        while(angle > math.pi):
             angle = angle - 2.0 * math.pi
 
-        while(angle <= -math.pi):
+        while(angle < -math.pi):
             angle = angle + 2.0 * math.pi
 
         return angle
@@ -142,7 +142,7 @@ class RRT():
         #  print("get_best_last_index")
 
         YAWTH = math.radians(3.0)
-        XYTH = 1.0
+        XYTH = 0.5
 
         goalinds = []
         for (i, node) in enumerate(self.nodeList):
@@ -279,21 +279,32 @@ if __name__ == '__main__':
     matplotrecorder.donothing = True
 
     # ====Search Path with RRT====
+    #  obstacleList = [
+    #  (5, 5, 1),
+    #  (3, 6, 2),
+    #  (3, 8, 2),
+    #  (3, 10, 2),
+    #  (7, 5, 2),
+    #  (9, 5, 2)
+    #  ]  # [x,y,size(radius)]
     obstacleList = [
         (5, 5, 1),
-        (3, 6, 2),
-        (3, 8, 2),
-        (3, 10, 2),
-        (7, 5, 2),
-        (9, 5, 2)
+        (4, 6, 1),
+        (4, 8, 1),
+        (4, 10, 1),
+        (6, 5, 1),
+        (7, 5, 1),
+        (8, 6, 1),
+        (8, 8, 1),
+        (8, 10, 1)
     ]  # [x,y,size(radius)]
 
     # Set Initial parameters
     start = [0.0, 0.0, math.radians(0.0)]
-    goal = [5.5, 10.0, math.radians(0.0)]
+    goal = [6.0, 7.0, math.radians(90.0)]
 
     rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
-    path = rrt.Planning(animation=True)
+    path = rrt.Planning(animation=False)
 
     # Draw final path
     rrt.DrawGraph()
