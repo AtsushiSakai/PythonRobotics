@@ -22,7 +22,7 @@ Path Planning Samples.
 
 Rapidly Randamized Tree Path plainning sample.
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/RRT/animation.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRT/animation.gif)
 
 This script is a simple path planning code with Rapidly-Exploring Random Trees (RRT)
 
@@ -32,7 +32,7 @@ see (in Japanese) :
 
 ## RRTStar
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/RRTstar/animation.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTstar/animation.gif)
 
 This script is a  path planning code with RRT \*
 
@@ -41,22 +41,22 @@ This script is a  path planning code with RRT \*
 
 ## RRT Car 
 
-<!-- ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/RRTCar/figure_1.png) -->
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/RRTCar/animation.gif)
+<!-- ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTCar/figure_1.png) -->
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTCar/animation.gif)
 
 Path planning for a car robot with RRT and dubins path planner.
 
 
 ## RRTStarCar
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/RRTStarCar/animation.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTStarCar/animation.gif)
 
 Path planning for a car robot with RRT\* and dubings path planner.
 
 
 ## RRTStarCar_reeds_sheep
 
-![Robotics/animation.gif at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/RRTStarCar_reeds_sheep/animation.gif))
+![Robotics/animation.gif at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTStarCar_reeds_sheep/animation.gif))
 
 Path planning for a car robot with RRT\* and reeds sheep path planner.
 
@@ -66,17 +66,17 @@ A sample code for Dubins path planning.
 
 [Dubins path - Wikipedia](https://en.wikipedia.org/wiki/Dubins_path)
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/DubinsPath/figures/figure_1.png)
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/DubinsPath/figures/figure_13.png)
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/DubinsPath/figures/figure_15.png)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DubinsPath/figures/figure_1.png)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DubinsPath/figures/figure_13.png)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DubinsPath/figures/figure_15.png)
 
 ## Reeds Shepp planning
 
 A sample code with Reeds Shepp path planning.
 
-![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/ReedsSheppPath/figure_1-4.png?raw=true)
-![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/ReedsSheppPath/figure_1-5.png?raw=true)
-![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/scripts/PathPlanning/ReedsSheppPath/figure_1-7.png?raw=true)
+![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-4.png?raw=true)
+![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-5.png?raw=true)
+![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-7.png?raw=true)
 
 
 # License 
