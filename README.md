@@ -15,7 +15,7 @@ Python sample codes for robotics algorithm.
 
 # Path Planning
 
-Path Planning Samples.
+Path planning algorithm samples.
 
 
 ## RRT 
@@ -77,6 +77,20 @@ A sample code with Reeds Shepp path planning.
 ![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-4.png?raw=true)
 ![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-5.png?raw=true)
 ![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-7.png?raw=true)
+
+
+# Path tracking
+
+Path tracking algorithm samples.
+
+# Pure pursuit
+
+Path tracking simulation with pure pursuit steering control and PID speed control.
+
+![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/pure_pursuit/Figure_1-3.png)
+![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/pure_pursuit/2Figure_1-2.png)
+![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/pure_pursuit/4Figure_1-2.png)
+
 
 
 # License 
