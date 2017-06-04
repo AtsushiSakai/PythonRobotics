@@ -83,7 +83,7 @@ A sample code with Reeds Shepp path planning.
 
 Path tracking algorithm samples.
 
-# Pure pursuit
+# Pure pursuit tracking
 
 Path tracking simulation with pure pursuit steering control and PID speed control.
 
