@@ -8,7 +8,7 @@ author Atsushi Sakai
 
 import math
 
-dt = 0.1  # [s]
+dt = 0.05  # [s]
 L = 2.9  # [m]
 
 

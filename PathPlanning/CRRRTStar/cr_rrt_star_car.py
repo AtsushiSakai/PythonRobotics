@@ -12,8 +12,9 @@
 import random
 import math
 import copy
+import pandas as pd
 import numpy as np
-import dubins_path_planning
+import reeds_shepp_path_planning
 import pure_pursuit
 import unicycle_model
 
@@ -74,21 +75,51 @@ class RRT():
         for ind in path_indexs:
             path = self.gen_final_course(ind)
 
-            flag, x, y, yaw, v, t = self.check_tracking_path_is_feasible(path)
+            flag, x, y, yaw, v, t, a, d = self.check_tracking_path_is_feasible(
+                path)
 
             if flag:
                 print("feasible path is found")
                 break
 
-        return x, y, yaw, v, t
+        return x, y, yaw, v, t, a, d
+
+    def calc_tracking_path(self, path):
+        path = np.matrix(path[::-1])
+        ds = 0.2
+        for i in range(10):
+            lx = path[-1, 0]
+            ly = path[-1, 1]
+            lyaw = path[-1, 2]
+            move_yaw = math.atan2(path[-2, 1] - ly, path[-2, 0] - lx)
+            if abs(lyaw - move_yaw) >= math.pi / 2.0:
+                print("back")
+                ds *= -1
+
+            lstate = np.matrix(
+                [lx + ds * math.cos(lyaw), ly + ds * math.sin(lyaw), lyaw])
+            #  print(lstate)
+
+            path = np.vstack((path, lstate))
+
+        return path
 
     def check_tracking_path_is_feasible(self, path):
         print("check_tracking_path_is_feasible")
 
         init_speed = 0.0
-        target_speed = 10.0 / 3.6
+        max_speed = 10.0 / 3.6
 
-        path = np.matrix(path[::-1])
+        path = self.calc_tracking_path(path)
+        #  speed_profile = self.calc_speed_profile(path, max_speed)
+
+        #  plt.plot(path[:, 0], path[:, 1], '-xg')
+        # save csv
+        df = pd.DataFrame()
+        df["x"] = np.array(path[:, 0]).flatten()
+        df["y"] = np.array(path[:, 1]).flatten()
+        df["yaw"] = np.array(path[:, 2]).flatten()
+        df.to_csv("rrt_course.csv", index=None)
 
         state = unicycle_model.State(
             x=self.start.x, y=self.start.y, yaw=self.start.yaw, v=init_speed)
@@ -108,8 +139,8 @@ class RRT():
         time = 0.0
 
         while lastIndex > target_ind:
-            print(lastIndex, target_ind)
-            ai = pure_pursuit.PIDControl(target_speed, state.v)
+            #  print(lastIndex, target_ind)
+            ai = pure_pursuit.PIDControl(max_speed, state.v)
             di, target_ind = pure_pursuit.pure_pursuit_control(
                 state, path[:, 0], path[:, 1], target_ind)
             state = unicycle_model.update(state, ai, di)
@@ -161,21 +192,21 @@ class RRT():
         return newNode
 
     def pi_2_pi(self, angle):
-        while(angle >= math.pi):
+        while(angle > math.pi):
             angle = angle - 2.0 * math.pi
 
-        while(angle <= -math.pi):
+        while(angle < -math.pi):
             angle = angle + 2.0 * math.pi
 
         return angle
 
     def steer(self, rnd, nind):
         #  print(rnd)
-        curvature = 1.0
+        curvature = 5.0
 
         nearestNode = self.nodeList[nind]
 
-        px, py, pyaw, mode, clen = dubins_path_planning.dubins_path_planning(
+        px, py, pyaw, mode, clen = reeds_shepp_path_planning.reeds_shepp_path_planning(
             nearestNode.x, nearestNode.y, nearestNode.yaw, rnd.x, rnd.y, rnd.yaw, curvature)
 
         newNode = copy.deepcopy(nearestNode)
@@ -215,31 +246,31 @@ class RRT():
         for (i, node) in enumerate(self.nodeList):
             if self.calc_dist_to_goal(node.x, node.y) <= XYTH:
                 goalinds.append(i)
+        print("OK XY TH num is")
+        print(len(goalinds))
 
         # angle check
         fgoalinds = []
         for i in goalinds:
             if abs(self.nodeList[i].yaw - self.end.yaw) <= YAWTH:
                 fgoalinds.append(i)
+        print("OK YAW TH num is")
+        print(len(fgoalinds))
 
         return fgoalinds
 
-        #  mincost = min([self.nodeList[i].cost for i in fgoalinds])
-        #  for i in fgoalinds:
-        #  if self.nodeList[i].cost == mincost:
-        #  return i
-
-        #  return None
-
     def gen_final_course(self, goalind):
-        path = [[self.end.x, self.end.y]]
+        path = [[self.end.x, self.end.y, self.end.yaw]]
         while self.nodeList[goalind].parent is not None:
             node = self.nodeList[goalind]
-            for (ix, iy) in zip(reversed(node.path_x), reversed(node.path_y)):
-                path.append([ix, iy])
+            path_x = reversed(node.path_x)
+            path_y = reversed(node.path_y)
+            path_yaw = reversed(node.path_yaw)
+            for (ix, iy, iyaw) in zip(path_x, path_y, path_yaw):
+                path.append([ix, iy, iyaw])
             #  path.append([node.x, node.y])
             goalind = node.parent
-        path.append([self.start.x, self.start.y])
+        path.append([self.start.x, self.start.y, self.start.yaw])
         return path
 
     def calc_dist_to_goal(self, x, y):
@@ -288,9 +319,9 @@ class RRT():
         for (ox, oy, size) in obstacleList:
             plt.plot(ox, oy, "ok", ms=30 * size)
 
-        dubins_path_planning.plot_arrow(
+        reeds_shepp_path_planning.plot_arrow(
             self.start.x, self.start.y, self.start.yaw)
-        dubins_path_planning.plot_arrow(
+        reeds_shepp_path_planning.plot_arrow(
             self.end.x, self.end.y, self.end.yaw)
 
         plt.axis([-2, 15, -2, 15])
@@ -370,9 +401,9 @@ if __name__ == '__main__':
     goal = [10.0, 10.0, math.radians(0.0)]
 
     rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
-    x, y, yaw, v, t = rrt.Planning(animation=False)
+    x, y, yaw, v, t, a, d = rrt.Planning(animation=False)
 
-    flg, ax = plt.subplots(1)
+    #  flg, ax = plt.subplots(1)
     # Draw final path
     rrt.DrawGraph()
     plt.plot(x, y, '-r')
@@ -383,10 +414,29 @@ if __name__ == '__main__':
         matplotrecorder.save_frame()  # save each frame
 
     flg, ax = plt.subplots(1)
-    plt.plot(t, yaw, '-r')
+    plt.plot(t, [math.degrees(iyaw) for iyaw in yaw], '-r')
+    plt.xlabel("time[s]")
+    plt.ylabel("Yaw[deg]")
+    plt.grid(True)
 
     flg, ax = plt.subplots(1)
-    plt.plot(t, v, '-r')
+    plt.plot(t, [iv * 3.6 for iv in v], '-r')
+
+    plt.xlabel("time[s]")
+    plt.ylabel("velocity[km/h]")
+    plt.grid(True)
+
+    flg, ax = plt.subplots(1)
+    plt.plot(t, a, '-r')
+    plt.xlabel("time[s]")
+    plt.ylabel("input[m/s]")
+    plt.grid(True)
+
+    flg, ax = plt.subplots(1)
+    plt.plot(t, [math.degrees(td) for td in d], '-r')
+    plt.xlabel("time[s]")
+    plt.ylabel("Steering angle[deg]")
+    plt.grid(True)
 
     plt.show()
 
