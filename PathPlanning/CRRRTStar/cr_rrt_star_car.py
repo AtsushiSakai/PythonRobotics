@@ -12,11 +12,15 @@
 import random
 import math
 import copy
-import pandas as pd
 import numpy as np
 import reeds_shepp_path_planning
 import pure_pursuit
-import unicycle_model
+import pandas as pd
+
+
+target_speed = 10.0 / 3.6
+accel = 0.1
+curvature = 10.0
 
 
 class RRT():
@@ -82,7 +86,7 @@ class RRT():
                 print("feasible path is found")
                 break
 
-        return x, y, yaw, v, t, a, d
+        return flag, x, y, yaw, v, t, a, d
 
     def calc_tracking_path(self, path):
         path = np.matrix(path[::-1])
@@ -106,14 +110,8 @@ class RRT():
 
     def check_tracking_path_is_feasible(self, path):
         print("check_tracking_path_is_feasible")
+        path = np.matrix(path[::-1])
 
-        init_speed = 0.0
-        max_speed = 10.0 / 3.6
-
-        path = self.calc_tracking_path(path)
-        #  speed_profile = self.calc_speed_profile(path, max_speed)
-
-        #  plt.plot(path[:, 0], path[:, 1], '-xg')
         # save csv
         df = pd.DataFrame()
         df["x"] = np.array(path[:, 0]).flatten()
@@ -121,52 +119,34 @@ class RRT():
         df["yaw"] = np.array(path[:, 2]).flatten()
         df.to_csv("rrt_course.csv", index=None)
 
-        state = unicycle_model.State(
-            x=self.start.x, y=self.start.y, yaw=self.start.yaw, v=init_speed)
+        cx = np.array(path[:, 0])
+        cy = np.array(path[:, 1])
+        cyaw = np.array(path[:, 2])
 
-        target_ind = pure_pursuit.calc_nearest_index(
-            state, path[:, 0], path[:, 1])
+        goal = [cx[-1], cy[-1], cyaw[-1]]
 
-        lastIndex = len(path[:, 0]) - 2
+        cx, cy, cyaw = pure_pursuit.extend_path(cx, cy, cyaw)
 
-        x = [state.x]
-        y = [state.y]
-        yaw = [state.yaw]
-        v = [state.v]
-        t = [0.0]
-        a = [0.0]
-        d = [0.0]
-        time = 0.0
+        speed_profile = pure_pursuit.calc_speed_profile(
+            cx, cy, cyaw, target_speed, accel)
 
-        while lastIndex > target_ind:
-            #  print(lastIndex, target_ind)
-            ai = pure_pursuit.PIDControl(max_speed, state.v)
-            di, target_ind = pure_pursuit.pure_pursuit_control(
-                state, path[:, 0], path[:, 1], target_ind)
-            state = unicycle_model.update(state, ai, di)
+        t, x, y, yaw, v, a, d, find_goal = pure_pursuit.closed_loop_prediction(
+            cx, cy, cyaw, speed_profile, goal)
 
-            time = time + unicycle_model.dt
+        if abs(yaw[-1] - goal[2]) >= math.pi / 2.0:
+            print(yaw[-1], goal[2])
+            find_goal = False
+        if not find_goal:
+            print("This path is bad")
 
-            x.append(state.x)
-            y.append(state.y)
-            yaw.append(state.yaw)
-            v.append(state.v)
-            t.append(time)
-            a.append(ai)
-            d.append(di)
+        plt.clf
+        plt.plot(x, y, '-r')
+        plt.plot(path[:, 0], path[:, 1], '-g')
+        plt.grid(True)
+        plt.axis("equal")
+        plt.show()
 
-        if self.CollisionCheckWithXY(path[:, 0], path[:, 1], self.obstacleList):
-            #  print("OK")
-            return True, x, y, yaw, v, t, a, d
-        else:
-            #  print("NG")
-            return False, x, y, yaw, v, t, a, d
-
-        #  plt.plot(x, y, '-r')
-        #  plt.plot(path[:, 0], path[:, 1], '-g')
-        #  plt.show()
-
-        #  return True
+        return find_goal, x, y, yaw, v, t, a, d
 
     def choose_parent(self, newNode, nearinds):
         if len(nearinds) == 0:
@@ -202,7 +182,6 @@ class RRT():
 
     def steer(self, rnd, nind):
         #  print(rnd)
-        curvature = 5.0
 
         nearestNode = self.nodeList[nind]
 
@@ -313,6 +292,7 @@ class RRT():
         for node in self.nodeList:
             if node.parent is not None:
                 plt.plot(node.path_x, node.path_y, "-g")
+                pass
                 #  plt.plot([node.x, self.nodeList[node.parent].x], [
                 #  node.y, self.nodeList[node.parent].y], "-g")
 
@@ -401,7 +381,11 @@ if __name__ == '__main__':
     goal = [10.0, 10.0, math.radians(0.0)]
 
     rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
-    x, y, yaw, v, t, a, d = rrt.Planning(animation=False)
+    flag, x, y, yaw, v, t, a, d = rrt.Planning(animation=False)
+
+    if not flag:
+        print("cannot find feasible path")
+        exit()
 
     #  flg, ax = plt.subplots(1)
     # Draw final path
@@ -429,7 +413,7 @@ if __name__ == '__main__':
     flg, ax = plt.subplots(1)
     plt.plot(t, a, '-r')
     plt.xlabel("time[s]")
-    plt.ylabel("input[m/s]")
+    plt.ylabel("accel[m/ss]")
     plt.grid(True)
 
     flg, ax = plt.subplots(1)
