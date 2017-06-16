@@ -26,9 +26,20 @@ def update(state, a, delta):
     state.x = state.x + state.v * math.cos(state.yaw) * dt
     state.y = state.y + state.v * math.sin(state.yaw) * dt
     state.yaw = state.yaw + state.v / L * math.tan(delta) * dt
+    state.yaw = pi_2_pi(state.yaw)
     state.v = state.v + a * dt
 
     return state
+
+
+def pi_2_pi(angle):
+    while(angle > math.pi):
+        angle = angle - 2.0 * math.pi
+
+    while(angle < -math.pi):
+        angle = angle + 2.0 * math.pi
+
+    return angle
 
 
 if __name__ == '__main__':

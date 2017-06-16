@@ -14,7 +14,7 @@ import unicycle_model
 
 Kp = 2.0  # speed propotional gain
 Lf = 1.0  # look-ahead distance
-T = 1000.0  # max simulation time
+T = 100.0  # max simulation time
 goal_dis = 0.5
 stop_speed = 0.1
 
@@ -47,11 +47,11 @@ def pure_pursuit_control(state, cx, cy, pind):
     alpha = math.atan2(ty - state.y, tx - state.x) - state.yaw
 
     if state.v <= 0.0:  # back
+        alpha = math.pi - alpha
+        #  if alpha > 0:
         #  alpha = math.pi - alpha
-        if alpha > 0:
-            alpha = math.pi - alpha
-        else:
-            alpha = math.pi + alpha
+        #  else:
+        #  alpha = math.pi + alpha
 
     delta = math.atan2(2.0 * unicycle_model.L * math.sin(alpha) / Lf, 1.0)
 
@@ -118,7 +118,7 @@ def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
         a.append(ai)
         d.append(di)
 
-        if target_ind % 20 == 0 and animation:
+        if target_ind % 1 == 0 and animation:
             plt.cla()
             plt.plot(cx, cy, "-r", label="course")
             plt.plot(x, y, "ob", label="trajectory")
@@ -177,40 +177,40 @@ def calc_speed_profile(cx, cy, cyaw, target_speed, a):
 
     speed_profile, d = set_stop_point(target_speed, cx, cy, cyaw)
 
-    nsp = len(speed_profile)
+    #  nsp = len(speed_profile)
 
     if animation:
         plt.plot(speed_profile, "xb")
 
     # forward integration
-    for i in range(nsp - 1):
+    #  for i in range(nsp - 1):
 
-        if speed_profile[i + 1] >= 0:  # forward
-            tspeed = speed_profile[i] + a * d[i]
-            if tspeed <= speed_profile[i + 1]:
-                speed_profile[i + 1] = tspeed
-        else:
-            tspeed = speed_profile[i] - a * d[i]
-            if tspeed >= speed_profile[i + 1]:
-                speed_profile[i + 1] = tspeed
+        #  if speed_profile[i + 1] >= 0:  # forward
+        #  tspeed = speed_profile[i] + a * d[i]
+        #  if tspeed <= speed_profile[i + 1]:
+        #  speed_profile[i + 1] = tspeed
+        #  else:
+        #  tspeed = speed_profile[i] - a * d[i]
+        #  if tspeed >= speed_profile[i + 1]:
+        #  speed_profile[i + 1] = tspeed
 
-    if animation:
-        plt.plot(speed_profile, "ok")
+    #  if animation:
+        #  plt.plot(speed_profile, "ok")
 
-    # back integration
-    for i in range(nsp - 1):
-        if speed_profile[- i - 1] >= 0:  # forward
-            tspeed = speed_profile[-i] + a * d[-i]
-            if tspeed <= speed_profile[-i - 1]:
-                speed_profile[-i - 1] = tspeed
-        else:
-            tspeed = speed_profile[-i] - a * d[-i]
-            if tspeed >= speed_profile[-i - 1]:
-                speed_profile[-i - 1] = tspeed
+    #  # back integration
+    #  for i in range(nsp - 1):
+        #  if speed_profile[- i - 1] >= 0:  # forward
+        #  tspeed = speed_profile[-i] + a * d[-i]
+        #  if tspeed <= speed_profile[-i - 1]:
+        #  speed_profile[-i - 1] = tspeed
+        #  else:
+        #  tspeed = speed_profile[-i] - a * d[-i]
+        #  if tspeed >= speed_profile[-i - 1]:
+        #  speed_profile[-i - 1] = tspeed
 
-    if animation:
-        plt.plot(speed_profile, "-r")
-        plt.show()
+    #  if animation:
+        #  plt.plot(speed_profile, "-r")
+        #  plt.show()
 
     return speed_profile
 

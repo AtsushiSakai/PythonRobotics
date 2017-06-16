@@ -16,6 +16,7 @@ import numpy as np
 import reeds_shepp_path_planning
 import pure_pursuit
 import pandas as pd
+import unicycle_model
 
 
 target_speed = 10.0 / 3.6
@@ -133,18 +134,30 @@ class RRT():
         t, x, y, yaw, v, a, d, find_goal = pure_pursuit.closed_loop_prediction(
             cx, cy, cyaw, speed_profile, goal)
 
+        yaw = [self.pi_2_pi(iyaw) for iyaw in yaw]
+
         if abs(yaw[-1] - goal[2]) >= math.pi / 2.0:
-            print(yaw[-1], goal[2])
             find_goal = False
+
+        travel = sum([abs(iv) * unicycle_model.dt for iv in v])
+        #  print(travel)
+        origin_travel = sum([math.sqrt(dx ** 2 + dy ** 2)
+                             for (dx, dy) in zip(np.diff(cx), np.diff(cy))])
+        #  print(origin_travel)
+
+        if (travel / origin_travel) >= 2.0:
+            print("path is too long")
+            #  find_goal = False
+
         if not find_goal:
             print("This path is bad")
 
-        plt.clf
-        plt.plot(x, y, '-r')
-        plt.plot(path[:, 0], path[:, 1], '-g')
-        plt.grid(True)
-        plt.axis("equal")
-        plt.show()
+        #  plt.clf
+        #  plt.plot(x, y, '-r')
+        #  plt.plot(path[:, 0], path[:, 1], '-g')
+        #  plt.grid(True)
+        #  plt.axis("equal")
+        #  plt.show()
 
         return find_goal, x, y, yaw, v, t, a, d
 
