@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-@brief: Path Planning Sample Code with RRT for car like robot.
+@brief: Path Planning Sample Code with Closed roop RRT for car like robot.
 
 @author: AtsushiSakai(@Atsushi_twi)
 
@@ -22,6 +22,9 @@ import unicycle_model
 target_speed = 10.0 / 3.6
 accel = 0.1
 curvature = 10.0
+
+# TODO
+# 制約条件をいれる
 
 
 class RRT():
@@ -48,6 +51,16 @@ class RRT():
         self.obstacleList = obstacleList
         self.maxIter = maxIter
 
+    def try_goal_path(self):
+
+        goal = Node(self.end.x, self.end.y, self.end.yaw)
+
+        newNode = self.steer(goal, len(self.nodeList) - 1)
+
+        if self.CollisionCheck(newNode, obstacleList):
+            #  print("goal path is OK")
+            self.nodeList.append(newNode)
+
     def Planning(self, animation=True):
         u"""
         Pathplanning
@@ -56,6 +69,9 @@ class RRT():
         """
 
         self.nodeList = [self.start]
+
+        self.try_goal_path()
+
         for i in range(self.maxIter):
             rnd = self.get_random_point()
             nind = self.GetNearestListIndex(self.nodeList, rnd)
@@ -66,8 +82,11 @@ class RRT():
             if self.CollisionCheck(newNode, obstacleList):
                 nearinds = self.find_near_nodes(newNode)
                 newNode = self.choose_parent(newNode, nearinds)
+
                 self.nodeList.append(newNode)
                 self.rewire(newNode, nearinds)
+
+                self.try_goal_path()
 
             if animation and i % 5 == 0:
                 self.DrawGraph(rnd=rnd)
@@ -76,6 +95,15 @@ class RRT():
         # generate coruse
         path_indexs = self.get_best_last_indexs()
 
+        flag, x, y, yaw, v, t, a, d = self.search_best_feasible_path(
+            path_indexs)
+
+        return flag, x, y, yaw, v, t, a, d
+
+    def search_best_feasible_path(self, path_indexs):
+
+        best_time = float("inf")
+
         # pure pursuit tracking
         for ind in path_indexs:
             path = self.gen_final_course(ind)
@@ -83,11 +111,23 @@ class RRT():
             flag, x, y, yaw, v, t, a, d = self.check_tracking_path_is_feasible(
                 path)
 
-            if flag:
-                print("feasible path is found")
-                break
+            #  print(t[-1])
+            #  print(ind)
 
-        return flag, x, y, yaw, v, t, a, d
+            if flag and best_time >= t[-1]:
+                print("feasible path is found")
+                best_time = t[-1]
+                fx, fy, fyaw, fv, ft, fa, fd = x, y, yaw, v, t, a, d
+
+        #  plt.show()
+
+        print("best time is")
+        print(best_time)
+
+        if fx:
+            return True, fx, fy, fyaw, fv, ft, fa, fd
+        else:
+            return False, None, None, None, None, None, None, None
 
     def calc_tracking_path(self, path):
         path = np.matrix(path[::-1])
@@ -110,8 +150,7 @@ class RRT():
         return path
 
     def check_tracking_path_is_feasible(self, path):
-        print("check_tracking_path_is_feasible")
-        path = np.matrix(path[::-1])
+        #  print("check_tracking_path_is_feasible")
 
         # save csv
         df = pd.DataFrame()
@@ -137,6 +176,7 @@ class RRT():
         yaw = [self.pi_2_pi(iyaw) for iyaw in yaw]
 
         if abs(yaw[-1] - goal[2]) >= math.pi / 2.0:
+            print("final angle is bad")
             find_goal = False
 
         travel = sum([abs(iv) * unicycle_model.dt for iv in v])
@@ -147,10 +187,11 @@ class RRT():
 
         if (travel / origin_travel) >= 2.0:
             print("path is too long")
-            #  find_goal = False
+            find_goal = False
 
-        if not find_goal:
+        if not self.CollisionCheckWithXY(x, y, obstacleList):
             print("This path is bad")
+            find_goal = False
 
         #  plt.clf
         #  plt.plot(x, y, '-r')
@@ -216,13 +257,13 @@ class RRT():
 
     def get_random_point(self):
 
-        if random.randint(0, 100) > self.goalSampleRate:
-            rnd = [random.uniform(self.minrand, self.maxrand),
-                   random.uniform(self.minrand, self.maxrand),
-                   random.uniform(-math.pi, math.pi)
-                   ]
-        else:  # goal point sampling
-            rnd = [self.end.x, self.end.y, self.end.yaw]
+        #  if random.randint(0, 100) > self.goalSampleRate:
+        rnd = [random.uniform(self.minrand, self.maxrand),
+               random.uniform(self.minrand, self.maxrand),
+               random.uniform(-math.pi, math.pi)
+               ]
+        #  else:  # goal point sampling
+        #  rnd = [self.end.x, self.end.y, self.end.yaw]
 
         node = Node(rnd[0], rnd[1], rnd[2])
 
@@ -263,6 +304,8 @@ class RRT():
             #  path.append([node.x, node.y])
             goalind = node.parent
         path.append([self.start.x, self.start.y, self.start.yaw])
+
+        path = np.matrix(path[::-1])
         return path
 
     def calc_dist_to_goal(self, x, y):
