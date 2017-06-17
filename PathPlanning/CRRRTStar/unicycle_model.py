@@ -10,6 +10,12 @@ import math
 
 dt = 0.05  # [s]
 L = 2.9  # [m]
+steer_max = math.radians(40.0)
+curvature_max = math.tan(steer_max) / L
+curvature_max = 1.0 / curvature_max
+#  print(curvature_max)
+
+accel_max = 5.0
 
 
 class State:

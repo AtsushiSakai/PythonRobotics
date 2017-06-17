@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import unicycle_model
 
 Kp = 2.0  # speed propotional gain
-Lf = 1.0  # look-ahead distance
+Lf = 0.5  # look-ahead distance
 T = 100.0  # max simulation time
 goal_dis = 0.5
 stop_speed = 0.1
@@ -24,6 +24,11 @@ animation = False
 
 def PIDControl(target, current):
     a = Kp * (target - current)
+
+    if a > unicycle_model.accel_max:
+        a = unicycle_model.accel_max
+    elif a < -unicycle_model.accel_max:
+        a = -unicycle_model.accel_max
 
     return a
 
@@ -54,6 +59,11 @@ def pure_pursuit_control(state, cx, cy, pind):
         #  alpha = math.pi + alpha
 
     delta = math.atan2(2.0 * unicycle_model.L * math.sin(alpha) / Lf, 1.0)
+
+    if delta > unicycle_model.steer_max:
+        delta = unicycle_model.steer_max
+    elif delta < - unicycle_model.steer_max:
+        delta = -unicycle_model.steer_max
 
     return delta, ind
 

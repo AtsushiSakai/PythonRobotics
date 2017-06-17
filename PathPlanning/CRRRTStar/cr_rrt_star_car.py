@@ -21,7 +21,6 @@ import unicycle_model
 
 target_speed = 10.0 / 3.6
 accel = 0.1
-curvature = 10.0
 
 # TODO
 # 制約条件をいれる
@@ -33,7 +32,7 @@ class RRT():
     """
 
     def __init__(self, start, goal, obstacleList, randArea,
-                 goalSampleRate=10, maxIter=100):
+                 maxIter=100):
         u"""
         Setting Parameter
 
@@ -47,7 +46,6 @@ class RRT():
         self.end = Node(goal[0], goal[1], goal[2])
         self.minrand = randArea[0]
         self.maxrand = randArea[1]
-        self.goalSampleRate = goalSampleRate
         self.obstacleList = obstacleList
         self.maxIter = maxIter
 
@@ -125,6 +123,9 @@ class RRT():
         print(best_time)
 
         if fx:
+            fx.append(self.end.x)
+            fy.append(self.end.y)
+            fyaw.append(self.end.yaw)
             return True, fx, fy, fyaw, fv, ft, fa, fd
         else:
             return False, None, None, None, None, None, None, None
@@ -175,7 +176,7 @@ class RRT():
 
         yaw = [self.pi_2_pi(iyaw) for iyaw in yaw]
 
-        if abs(yaw[-1] - goal[2]) >= math.pi / 2.0:
+        if abs(yaw[-1] - goal[2]) >= math.pi / 4.0:
             print("final angle is bad")
             find_goal = False
 
@@ -185,20 +186,20 @@ class RRT():
                              for (dx, dy) in zip(np.diff(cx), np.diff(cy))])
         #  print(origin_travel)
 
-        if (travel / origin_travel) >= 2.0:
+        if (travel / origin_travel) >= 5.0:
             print("path is too long")
             find_goal = False
 
         if not self.CollisionCheckWithXY(x, y, obstacleList):
-            print("This path is bad")
+            print("This path is collision")
             find_goal = False
 
-        #  plt.clf
-        #  plt.plot(x, y, '-r')
-        #  plt.plot(path[:, 0], path[:, 1], '-g')
-        #  plt.grid(True)
-        #  plt.axis("equal")
-        #  plt.show()
+        plt.clf
+        plt.plot(x, y, '-r')
+        plt.plot(path[:, 0], path[:, 1], '-g')
+        plt.grid(True)
+        plt.axis("equal")
+        plt.show()
 
         return find_goal, x, y, yaw, v, t, a, d
 
@@ -240,7 +241,8 @@ class RRT():
         nearestNode = self.nodeList[nind]
 
         px, py, pyaw, mode, clen = reeds_shepp_path_planning.reeds_shepp_path_planning(
-            nearestNode.x, nearestNode.y, nearestNode.yaw, rnd.x, rnd.y, rnd.yaw, curvature)
+            nearestNode.x, nearestNode.y, nearestNode.yaw,
+            rnd.x, rnd.y, rnd.yaw, unicycle_model.curvature_max)
 
         newNode = copy.deepcopy(nearestNode)
         newNode.x = px[-1]
@@ -257,13 +259,10 @@ class RRT():
 
     def get_random_point(self):
 
-        #  if random.randint(0, 100) > self.goalSampleRate:
         rnd = [random.uniform(self.minrand, self.maxrand),
                random.uniform(self.minrand, self.maxrand),
                random.uniform(-math.pi, math.pi)
                ]
-        #  else:  # goal point sampling
-        #  rnd = [self.end.x, self.end.y, self.end.yaw]
 
         node = Node(rnd[0], rnd[1], rnd[2])
 
@@ -454,7 +453,7 @@ if __name__ == '__main__':
         matplotrecorder.save_frame()  # save each frame
 
     flg, ax = plt.subplots(1)
-    plt.plot(t, [math.degrees(iyaw) for iyaw in yaw], '-r')
+    plt.plot(t, [math.degrees(iyaw) for iyaw in yaw[:-1]], '-r')
     plt.xlabel("time[s]")
     plt.ylabel("Yaw[deg]")
     plt.grid(True)
