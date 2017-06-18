@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-@brief: Path Planning Sample Code with Closed roop RRT for car like robot.
+@brief: Path Planning Sample Code with Closed loop RRT for car like robot.
 
 @author: AtsushiSakai(@Atsushi_twi)
 
@@ -20,10 +20,6 @@ import unicycle_model
 
 
 target_speed = 10.0 / 3.6
-accel = 0.1
-
-# TODO
-# 制約条件をいれる
 
 
 class RRT():
@@ -32,7 +28,7 @@ class RRT():
     """
 
     def __init__(self, start, goal, obstacleList, randArea,
-                 maxIter=100):
+                 maxIter=200):
         u"""
         Setting Parameter
 
@@ -109,9 +105,6 @@ class RRT():
             flag, x, y, yaw, v, t, a, d = self.check_tracking_path_is_feasible(
                 path)
 
-            #  print(t[-1])
-            #  print(ind)
-
             if flag and best_time >= t[-1]:
                 print("feasible path is found")
                 best_time = t[-1]
@@ -169,12 +162,14 @@ class RRT():
         cx, cy, cyaw = pure_pursuit.extend_path(cx, cy, cyaw)
 
         speed_profile = pure_pursuit.calc_speed_profile(
-            cx, cy, cyaw, target_speed, accel)
+            cx, cy, cyaw, target_speed)
 
         t, x, y, yaw, v, a, d, find_goal = pure_pursuit.closed_loop_prediction(
             cx, cy, cyaw, speed_profile, goal)
-
         yaw = [self.pi_2_pi(iyaw) for iyaw in yaw]
+
+        if not find_goal:
+            print("cannot reach goal")
 
         if abs(yaw[-1] - goal[2]) >= math.pi / 4.0:
             print("final angle is bad")
@@ -194,12 +189,12 @@ class RRT():
             print("This path is collision")
             find_goal = False
 
-        plt.clf
-        plt.plot(x, y, '-r')
-        plt.plot(path[:, 0], path[:, 1], '-g')
-        plt.grid(True)
-        plt.axis("equal")
-        plt.show()
+        #  plt.clf
+        #  plt.plot(x, y, '-r')
+        #  plt.plot(path[:, 0], path[:, 1], '-g')
+        #  plt.grid(True)
+        #  plt.axis("equal")
+        #  plt.show()
 
         return find_goal, x, y, yaw, v, t, a, d
 
@@ -430,12 +425,24 @@ if __name__ == '__main__':
         (7, 5, 2),
         (9, 5, 2)
     ]  # [x,y,size(radius)]
+    obstacleList = [
+        (5, 5, 1),
+        (4, 6, 1),
+        (4, 8, 1),
+        (4, 10, 1),
+        (6, 5, 1),
+        (7, 5, 1),
+        (8, 6, 1),
+        (8, 8, 1),
+        (8, 10, 1)
+    ]  # [x,y,size(radius)]
 
     # Set Initial parameters
     start = [0.0, 0.0, math.radians(0.0)]
-    goal = [10.0, 10.0, math.radians(0.0)]
+    #  goal = [10.0, 10.0, math.radians(0.0)]
+    goal = [6.0, 7.0, math.radians(90.0)]
 
-    rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
+    rrt = RRT(start, goal, randArea=[-2.0, 20.0], obstacleList=obstacleList)
     flag, x, y, yaw, v, t, a, d = rrt.Planning(animation=False)
 
     if not flag:

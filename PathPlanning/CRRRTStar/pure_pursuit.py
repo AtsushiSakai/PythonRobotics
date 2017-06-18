@@ -16,7 +16,7 @@ Kp = 2.0  # speed propotional gain
 Lf = 0.5  # look-ahead distance
 T = 100.0  # max simulation time
 goal_dis = 0.5
-stop_speed = 0.1
+stop_speed = 0.5
 
 #  animation = True
 animation = False
@@ -35,7 +35,7 @@ def PIDControl(target, current):
 
 def pure_pursuit_control(state, cx, cy, pind):
 
-    ind = calc_target_index(state, cx, cy)
+    ind, dis = calc_target_index(state, cx, cy)
 
     if pind >= ind:
         ind = pind
@@ -53,10 +53,6 @@ def pure_pursuit_control(state, cx, cy, pind):
 
     if state.v <= 0.0:  # back
         alpha = math.pi - alpha
-        #  if alpha > 0:
-        #  alpha = math.pi - alpha
-        #  else:
-        #  alpha = math.pi + alpha
 
     delta = math.atan2(2.0 * unicycle_model.L * math.sin(alpha) / Lf, 1.0)
 
@@ -65,7 +61,7 @@ def pure_pursuit_control(state, cx, cy, pind):
     elif delta < - unicycle_model.steer_max:
         delta = -unicycle_model.steer_max
 
-    return delta, ind
+    return delta, ind, dis
 
 
 def calc_target_index(state, cx, cy):
@@ -73,8 +69,9 @@ def calc_target_index(state, cx, cy):
     dy = [state.y - icy for icy in cy]
 
     d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
+    mindis = min(d)
 
-    ind = d.index(min(d))
+    ind = d.index(mindis)
 
     L = 0.0
 
@@ -84,7 +81,8 @@ def calc_target_index(state, cx, cy):
         L += math.sqrt(dx ** 2 + dy ** 2)
         ind += 1
 
-    return ind
+    #  print(mindis)
+    return ind, mindis
 
 
 def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
@@ -100,15 +98,22 @@ def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
     t = [0.0]
     a = [0.0]
     d = [0.0]
-    target_ind = calc_target_index(state, cx, cy)
+    target_ind, mindis = calc_target_index(state, cx, cy)
     find_goal = False
 
+    maxdis = 0.5
+
     while T >= time:
-        di, target_ind = pure_pursuit_control(state, cx, cy, target_ind)
-        ai = PIDControl(speed_profile[target_ind], state.v)
+        di, target_ind, dis = pure_pursuit_control(state, cx, cy, target_ind)
+
+        target_speed = speed_profile[target_ind]
+        target_speed = target_speed * \
+            (maxdis - min(dis, maxdis - 0.1)) / maxdis
+
+        ai = PIDControl(target_speed, state.v)
         state = unicycle_model.update(state, ai, di)
 
-        if abs(state.v) <= stop_speed:
+        if abs(state.v) <= stop_speed and target_ind <= len(cx) - 2:
             target_ind += 1
 
         time = time + unicycle_model.dt
@@ -138,6 +143,9 @@ def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
             plt.title("speed:" + str(round(state.v, 2)) +
                       "tind:" + str(target_ind))
             plt.pause(0.0001)
+
+    else:
+        print("Time out!!")
 
     return t, x, y, yaw, v, a, d, find_goal
 
@@ -176,51 +184,22 @@ def set_stop_point(target_speed, cx, cy, cyaw):
             #  plt.plot(cx[i], cy[i], "xb")
             #  print(iyaw, move_direction, dx, dy)
     speed_profile[0] = 0.0
-    speed_profile[-1] = 0.0
+    if is_back:
+        speed_profile[-1] = -stop_speed
+    else:
+        speed_profile[-1] = stop_speed
 
     d.append(d[-1])
 
     return speed_profile, d
 
 
-def calc_speed_profile(cx, cy, cyaw, target_speed, a):
+def calc_speed_profile(cx, cy, cyaw, target_speed):
 
     speed_profile, d = set_stop_point(target_speed, cx, cy, cyaw)
 
-    #  nsp = len(speed_profile)
-
     if animation:
         plt.plot(speed_profile, "xb")
-
-    # forward integration
-    #  for i in range(nsp - 1):
-
-        #  if speed_profile[i + 1] >= 0:  # forward
-        #  tspeed = speed_profile[i] + a * d[i]
-        #  if tspeed <= speed_profile[i + 1]:
-        #  speed_profile[i + 1] = tspeed
-        #  else:
-        #  tspeed = speed_profile[i] - a * d[i]
-        #  if tspeed >= speed_profile[i + 1]:
-        #  speed_profile[i + 1] = tspeed
-
-    #  if animation:
-        #  plt.plot(speed_profile, "ok")
-
-    #  # back integration
-    #  for i in range(nsp - 1):
-        #  if speed_profile[- i - 1] >= 0:  # forward
-        #  tspeed = speed_profile[-i] + a * d[-i]
-        #  if tspeed <= speed_profile[-i - 1]:
-        #  speed_profile[-i - 1] = tspeed
-        #  else:
-        #  tspeed = speed_profile[-i] - a * d[-i]
-        #  if tspeed >= speed_profile[-i - 1]:
-        #  speed_profile[-i - 1] = tspeed
-
-    #  if animation:
-        #  plt.plot(speed_profile, "-r")
-        #  plt.show()
 
     return speed_profile
 
@@ -228,9 +207,9 @@ def calc_speed_profile(cx, cy, cyaw, target_speed, a):
 def extend_path(cx, cy, cyaw):
 
     dl = 0.1
-    dl_list = [dl] * (int(Lf / dl) + 10)
+    dl_list = [dl] * (int(Lf / dl) + 1)
 
-    move_direction = math.atan2(cy[-1] - cy[-2], cx[-1] - cx[-2])
+    move_direction = math.atan2(cy[-1] - cy[-3], cx[-1] - cx[-3])
     is_back = abs(move_direction - cyaw[-1]) >= math.pi / 2.0
 
     for idl in dl_list:
@@ -317,13 +296,12 @@ def main2():
     cyaw = np.array(data["yaw"])
 
     target_speed = 10.0 / 3.6
-    a = 2.0
 
     goal = [cx[-1], cy[-1]]
 
     cx, cy, cyaw = extend_path(cx, cy, cyaw)
 
-    speed_profile = calc_speed_profile(cx, cy, cyaw, target_speed, a)
+    speed_profile = calc_speed_profile(cx, cy, cyaw, target_speed)
 
     t, x, y, yaw, v, a, d, flag = closed_loop_prediction(
         cx, cy, cyaw, speed_profile, goal)
