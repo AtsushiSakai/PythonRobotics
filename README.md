@@ -80,7 +80,7 @@ A sample code with Reeds Shepp path planning.
 
 ## Closed Loop RRT\*
 
-A sample code with closed loop RRT\*
+A sample code with closed loop RRT\*.
 
 ![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CRRRTStar/Figure_1.png)
 ![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CRRRTStar/Figure_4.png)
