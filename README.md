@@ -78,6 +78,23 @@ A sample code with Reeds Shepp path planning.
 ![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-5.png?raw=true)
 ![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-7.png?raw=true)
 
+## Closed Loop RRT\*
+
+A sample code with closed loop RRT\*
+
+![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CRRRTStar/Figure_1.png)
+![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CRRRTStar/Figure_4.png)
+![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CRRRTStar/Figure_5.png)
+
+see:
+
+- [Motion Planning in Complex Environments
+using Closed-loop Prediction](http://acl.mit.edu/papers/KuwataGNC08.pdf)
+
+- [Real-time Motion Planning with Applications to
+Autonomous Urban Driving](http://acl.mit.edu/papers/KuwataTCST09.pdf)
+
+- [[1601.06326] Sampling-based Algorithms for Optimal Motion Planning Using Closed-loop Prediction](https://arxiv.org/abs/1601.06326)
 
 # Path tracking
 
@@ -90,7 +107,6 @@ Path tracking simulation with pure pursuit steering control and PID speed contro
 ![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/pure_pursuit/Figure_1-3.png)
 ![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/pure_pursuit/2Figure_1-2.png)
 ![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/pure_pursuit/4Figure_1-2.png)
-![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/pure_pursuit/Figure1.png)
 
 
 
