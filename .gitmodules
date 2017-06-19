@@ -1,0 +1,3 @@
+[submodule "PathTracking/rear_wheel_feedback/pycubicspline"]
+	path = PathTracking/rear_wheel_feedback/pycubicspline
+	url = https://github.com/AtsushiSakai/pycubicspline.git
