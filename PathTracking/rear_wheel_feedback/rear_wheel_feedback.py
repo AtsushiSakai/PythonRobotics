@@ -10,10 +10,16 @@ import math
 import matplotlib.pyplot as plt
 import unicycle_model
 from pycubicspline import pycubicspline
+from matplotrecorder import matplotrecorder
 
 Kp = 1.0  # speed propotional gain
-animation = True
-#  animation = False
+# steering control parameter
+KTH = 1.0
+KE = 0.5
+
+
+#  animation = True
+animation = False
 
 
 def PIDControl(target, current):
@@ -33,9 +39,6 @@ def pi_2_pi(angle):
 
 
 def rear_wheel_feedback_control(state, cx, cy, cyaw, ck, preind):
-    KTH = 1.0
-    KE = 0.5
-
     ind, e = calc_nearest_index(state, cx, cy, cyaw)
 
     k = ck[ind]
@@ -44,13 +47,11 @@ def rear_wheel_feedback_control(state, cx, cy, cyaw, ck, preind):
 
     omega = v * k * math.cos(th_e) / (1.0 - k * e) - \
         KTH * abs(v) * th_e - KE * v * math.sin(th_e) * e / th_e
-    #  pass
 
     if th_e == 0.0 or omega == 0.0:
         return 0.0, ind
 
     delta = math.atan2(unicycle_model.L * omega / v, 1.0)
-
     #  print(k, v, e, th_e, omega, delta)
 
     return delta, ind
@@ -123,25 +124,23 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
             plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")
             plt.axis("equal")
             plt.grid(True)
-            plt.title("speed:" + str(round(state.v, 2)) +
-                      "tind:" + str(target_ind))
+            plt.title("speed[km/h]:" + str(round(state.v * 3.6, 2)) +
+                      ",target index:" + str(target_ind))
             plt.pause(0.0001)
+            matplotrecorder.save_frame()  # save each frame
 
+    plt.close()
     return t, x, y, yaw, v
 
 
-def set_stop_point(target_speed, cx, cy, cyaw):
+def calc_speed_profile(cx, cy, cyaw, target_speed):
+
     speed_profile = [target_speed] * len(cx)
 
-    d = []
     direction = 1.0
 
     # Set stop point
     for i in range(len(cx) - 1):
-        dx = cx[i + 1] - cx[i]
-        dy = cy[i + 1] - cy[i]
-        td = math.sqrt(dx ** 2.0 + dy ** 2.0)
-        d.append(td)
         dyaw = cyaw[i + 1] - cyaw[i]
         switch = math.pi / 4.0 <= dyaw < math.pi / 2.0
 
@@ -157,15 +156,6 @@ def set_stop_point(target_speed, cx, cy, cyaw):
             speed_profile[i] = 0.0
 
     speed_profile[-1] = 0.0
-
-    d.append(d[-1])
-
-    return speed_profile, d
-
-
-def calc_speed_profile(cx, cy, cyaw, target_speed):
-
-    speed_profile, d = set_stop_point(target_speed, cx, cy, cyaw)
 
     #  flg, ax = plt.subplots(1)
     #  plt.plot(speed_profile, "-r")
@@ -187,8 +177,10 @@ def main():
 
     t, x, y, yaw, v = closed_loop_prediction(cx, cy, cyaw, ck, sp, goal)
 
+    if animation:
+        matplotrecorder.save_movie("animation.gif", 0.1)  # gif is ok.
+
     flg, _ = plt.subplots(1)
-    print(len(ax), len(ay))
     plt.plot(ax, ay, "xb", label="input")
     plt.plot(cx, cy, "-r", label="spline")
     plt.plot(x, y, "-g", label="tracking")
