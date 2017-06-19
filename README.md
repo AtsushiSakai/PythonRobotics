@@ -100,7 +100,7 @@ Autonomous Urban Driving](http://acl.mit.edu/papers/KuwataTCST09.pdf)
 
 Path tracking algorithm samples.
 
-# Pure pursuit tracking
+## Pure pursuit tracking
 
 Path tracking simulation with pure pursuit steering control and PID speed control.
 
@@ -109,6 +109,11 @@ Path tracking simulation with pure pursuit steering control and PID speed contro
 ![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/pure_pursuit/4Figure_1-2.png)
 
 
+## Rear wheel feedback control
+
+Path tracking simulation with rear wheel feedback steering control and PID speed control.
+
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/rear_wheel_feedback/animation.gif)
 
 # License 
 
