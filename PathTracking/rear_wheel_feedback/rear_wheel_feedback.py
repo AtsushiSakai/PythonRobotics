@@ -1,21 +1,19 @@
 #! /usr/bin/python
 """
 
-Path tracking simulation with pure pursuit steering control and PID speed control.
+Path tracking simulation with rear wheel feedback steering control and PID speed control.
 
 author: Atsushi Sakai
 
 """
-#  import numpy as np
 import math
 import matplotlib.pyplot as plt
 import unicycle_model
 from pycubicspline import pycubicspline
 
 Kp = 1.0  # speed propotional gain
-Lf = 1.0  # look-ahead distance
-#  animation = True
-animation = False
+animation = True
+#  animation = False
 
 
 def PIDControl(target, current):
@@ -24,56 +22,61 @@ def PIDControl(target, current):
     return a
 
 
-def pure_pursuit_control(state, cx, cy, pind):
+def pi_2_pi(angle):
+    while(angle > math.pi):
+        angle = angle - 2.0 * math.pi
 
-    ind = calc_target_index(state, cx, cy)
+    while(angle < -math.pi):
+        angle = angle + 2.0 * math.pi
 
-    if pind >= ind:
-        ind = pind
+    return angle
 
-    #  print(pind, ind)
-    if ind < len(cx):
-        tx = cx[ind]
-        ty = cy[ind]
-    else:
-        tx = cx[-1]
-        ty = cy[-1]
-        ind = len(cx) - 1
 
-    alpha = math.atan2(ty - state.y, tx - state.x) - state.yaw
+def rear_wheel_feedback_control(state, cx, cy, cyaw, ck, preind):
+    KTH = 1.0
+    KE = 0.5
 
-    if state.v < 0:  # back
-        alpha = math.pi - alpha
-        #  if alpha > 0:
-        #  alpha = math.pi - alpha
-        #  else:
-        #  alpha = math.pi + alpha
+    ind, e = calc_nearest_index(state, cx, cy, cyaw)
 
-    delta = math.atan2(2.0 * unicycle_model.L * math.sin(alpha) / Lf, 1.0)
+    k = ck[ind]
+    v = state.v
+    th_e = pi_2_pi(state.yaw - cyaw[ind])
+
+    omega = v * k * math.cos(th_e) / (1.0 - k * e) - \
+        KTH * abs(v) * th_e - KE * v * math.sin(th_e) * e / th_e
+    #  pass
+
+    if th_e == 0.0 or omega == 0.0:
+        return 0.0, ind
+
+    delta = math.atan2(unicycle_model.L * omega / v, 1.0)
+
+    #  print(k, v, e, th_e, omega, delta)
 
     return delta, ind
 
 
-def calc_target_index(state, cx, cy):
+def calc_nearest_index(state, cx, cy, cyaw):
     dx = [state.x - icx for icx in cx]
     dy = [state.y - icy for icy in cy]
 
     d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
 
-    ind = d.index(min(d))
+    mind = min(d)
 
-    L = 0.0
+    ind = d.index(mind)
 
-    while Lf > L and (ind + 1) < len(cx):
-        dx = cx[ind + 1] - cx[ind]
-        dy = cx[ind + 1] - cx[ind]
-        L += math.sqrt(dx ** 2 + dy ** 2)
-        ind += 1
+    dxl = cx[ind] - state.x
+    dyl = cy[ind] - state.y
 
-    return ind
+    angle = pi_2_pi(cyaw[ind] - math.atan2(dyl, dxl))
+    if angle < 0:
+        mind *= -1
+
+    return ind, mind
 
 
-def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
+def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
 
     T = 500.0  # max simulation time
     goal_dis = 0.3
@@ -81,17 +84,17 @@ def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
 
     state = unicycle_model.State(x=-0.0, y=-0.0, yaw=0.0, v=0.0)
 
-    #  lastIndex = len(cx) - 1
     time = 0.0
     x = [state.x]
     y = [state.y]
     yaw = [state.yaw]
     v = [state.v]
     t = [0.0]
-    target_ind = calc_target_index(state, cx, cy)
+    target_ind = calc_nearest_index(state, cx, cy, cyaw)
 
     while T >= time:
-        di, target_ind = pure_pursuit_control(state, cx, cy, target_ind)
+        di, target_ind = rear_wheel_feedback_control(
+            state, cx, cy, cyaw, ck, target_ind)
         ai = PIDControl(speed_profile[target_ind], state.v)
         state = unicycle_model.update(state, ai, di)
 
@@ -113,7 +116,7 @@ def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
         v.append(state.v)
         t.append(time)
 
-        if target_ind % 20 == 0 and animation:
+        if target_ind % 1 == 0 and animation:
             plt.cla()
             plt.plot(cx, cy, "-r", label="course")
             plt.plot(x, y, "ob", label="trajectory")
@@ -153,7 +156,6 @@ def set_stop_point(target_speed, cx, cy, cyaw):
         if switch:
             speed_profile[i] = 0.0
 
-    speed_profile[0] = 0.0
     speed_profile[-1] = 0.0
 
     d.append(d[-1])
@@ -175,7 +177,7 @@ def calc_speed_profile(cx, cy, cyaw, target_speed):
 def main():
     print("rear wheel feedback tracking start!!")
     ax = [0.0, 6.0, 12.5, 5.0, 7.5, 3.0, -1.0]
-    ay = [0.0, 0.0, 5.0, 6.5, 0.0, 5.0, -2.0]
+    ay = [0.0, 0.0, 5.0, 6.5, 3.0, 5.0, -2.0]
     goal = [ax[-1], ay[-1]]
 
     cx, cy, cyaw, ck, s = pycubicspline.calc_spline_course(ax, ay, ds=0.1)
@@ -183,7 +185,7 @@ def main():
 
     sp = calc_speed_profile(cx, cy, cyaw, target_speed)
 
-    t, x, y, yaw, v = closed_loop_prediction(cx, cy, cyaw, sp, goal)
+    t, x, y, yaw, v = closed_loop_prediction(cx, cy, cyaw, ck, sp, goal)
 
     flg, _ = plt.subplots(1)
     print(len(ax), len(ay))
