@@ -8,7 +8,7 @@ import numpy as np
 import scipy.interpolate
 import matplotlib.pyplot as plt
 import math
-#  import unicycle_model
+from matplotrecorder import matplotrecorder
 
 L = 1.0
 ds = 0.1
@@ -88,20 +88,23 @@ def calc_diff(target, x, y, yaw):
 def calc_J(target, p, h, k0):
     xp, yp, yawp = generate_trajectory(p[0, 0] + h[0, 0], p[1, 0], p[2, 0], k0)
     dp = calc_diff(target, xp, yp, yawp)
+    #  xn, yn, yawn = generate_trajectory(p[0, 0] - h[0, 0], p[1, 0], p[2, 0], k0)
+    #  dn = calc_diff(target, xn, yn, yawn)
+    #  d1 = np.matrix((dp - dn) / (2.0 * h[1, 0])).T
     d1 = np.matrix(dp / h[0, 0]).T
 
     xp, yp, yawp = generate_trajectory(p[0, 0], p[1, 0] + h[1, 0], p[2, 0], k0)
     dp = calc_diff(target, xp, yp, yawp)
     #  xn, yn, yawn = generate_trajectory(p[0, 0], p[1, 0] - h[1, 0], p[2, 0], k0)
     #  dn = calc_diff(target, xn, yn, yawn)
-    #  d2 = np.matrix((dp - dn) / 2.0 * h[1, 0]).T
+    #  d2 = np.matrix((dp - dn) / (2.0 * h[2, 0])).T
     d2 = np.matrix(dp / h[1, 0]).T
 
     xp, yp, yawp = generate_trajectory(p[0, 0], p[1, 0], p[2, 0] + h[2, 0], k0)
     dp = calc_diff(target, xp, yp, yawp)
     #  xn, yn, yawn = generate_trajectory(p[0, 0], p[1, 0], p[2, 0] - h[2, 0], k0)
     #  dn = calc_diff(target, xn, yn, yawn)
-    #  d3 = np.matrix((dp - dn) / 2.0 * h[2, 0]).T
+    #  d3 = np.matrix((dp - dn) / (2.0 * h[2, 0])).T
     d3 = np.matrix(dp / h[2, 0]).T
     #  print(d1, d2, d3)
 
@@ -111,37 +114,63 @@ def calc_J(target, p, h, k0):
     return J
 
 
+def selection_learning_param(dp, p, k0, target):
+
+    mincost = float("inf")
+    mina = 1.0
+
+    for a in np.arange(1.0, 10.0, 0.5):
+        tp = p[:, :] + a * dp
+        xc, yc, yawc = generate_trajectory(tp[0], tp[1], tp[2], k0)
+        dc = np.matrix(calc_diff(target, xc, yc, yawc)).T
+        cost = np.linalg.norm(dc)
+        #  print(a, cost)
+
+        if cost <= mincost:
+            mina = a
+            mincost = cost
+
+    #  print(mincost, mina)
+    #  input()
+
+    return mina
+
+
 def optimize_trajectory(target, k0):
 
-    p = np.matrix([5.0, 0.0, 0.0]).T
-    h = np.matrix([0.1, 0.003, 0.003]).T
+    p = np.matrix([6.0, 0.0, 0.0]).T
+    h = np.matrix([0.1, 0.002, 0.002]).T
 
     for i in range(1000):
         xc, yc, yawc = generate_trajectory(p[0], p[1], p[2], k0)
         dc = np.matrix(calc_diff(target, xc, yc, yawc)).T
 
-        if np.linalg.norm(dc) <= 0.1:
+        cost = np.linalg.norm(dc)
+        if cost <= 0.05:
+            print("cost is:" + str(cost))
             break
 
         J = calc_J(target, p, h, k0)
-
         dp = - np.linalg.inv(J) * dc
+        alpha = selection_learning_param(dp, p, k0, target)
 
-        p += np.array(dp)
+        p += alpha * np.array(dp)
+        #  print(p.T)
 
-        #  print(p)
-        #  plt.clf()
-        #  plot_arrow(target.x, target.y, target.yaw)
-        #  plt.plot(xc, yc, "-r")
-        #  plt.axis("equal")
-        #  plt.grid(True)
-        #  #  plt.show()
-        #  plt.pause(0.1)
+        plt.clf()
+        plot_arrow(target.x, target.y, target.yaw)
+        plt.plot(xc, yc, "-r")
+        plt.axis("equal")
+        plt.grid(True)
+        plt.pause(0.1)
+        matplotrecorder.save_frame()
 
+    plt.clf()
     plot_arrow(target.x, target.y, target.yaw)
     plt.plot(xc, yc, "-r")
     plt.axis("equal")
     plt.grid(True)
+    matplotrecorder.save_frame()
 
     print("done")
 
@@ -149,14 +178,10 @@ def optimize_trajectory(target, k0):
 def test_optimize_trajectory():
 
     target = State(x=5.0, y=2.0, yaw=math.radians(00.0))
-    k0 = 0.0
-    #  s = 5.0  # [m]
-    #  km = math.radians(30.0)
-    #  kf = math.radians(-30.0)
+    k0 = -0.3
 
     optimize_trajectory(target, k0)
-
-    #  x, y = generate_trajectory(s, km, kf, k0)
+    matplotrecorder.save_movie("animation.gif", 0.1)
 
     #  plt.plot(x, y, "-r")
     plot_arrow(target.x, target.y, target.yaw)

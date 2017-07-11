@@ -4,3 +4,6 @@
 [submodule "PathTracking/rear_wheel_feedback/matplotrecorder"]
 	path = PathTracking/rear_wheel_feedback/matplotrecorder
 	url = https://github.com/AtsushiSakai/matplotrecorder.git
+[submodule "PathPlanning/LatticePlanner/matplotrecorder"]
+	path = PathPlanning/LatticePlanner/matplotrecorder
+	url = https://github.com/AtsushiSakai/matplotrecorder.git
