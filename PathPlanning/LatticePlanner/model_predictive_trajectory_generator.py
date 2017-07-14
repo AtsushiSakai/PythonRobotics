@@ -5,69 +5,16 @@ author: Atsushi Sakai
 """
 
 import numpy as np
-import scipy.interpolate
 import matplotlib.pyplot as plt
 import math
+import motion_model
 from matplotrecorder import matplotrecorder
 
-L = 1.0
-ds = 0.1
+# optimization parameter
+maxiter = 1000
+h = np.matrix([0.1, 0.002, 0.002]).T  # parameter sampling distanse
 
-
-class State:
-
-    def __init__(self, x=0.0, y=0.0, yaw=0.0, v=0.0):
-        self.x = x
-        self.y = y
-        self.yaw = yaw
-        self.v = v
-
-
-def generate_trajectory(s, km, kf, k0):
-
-    n = s / ds
-    v = 10.0 / 3.6  # [m/s]
-    time = s / v  # [s]
-    tk = np.array([0.0, time / 2.0, time])
-    kk = np.array([k0, km, kf])
-    t = np.arange(0.0, time, time / n)
-    kp = scipy.interpolate.spline(tk, kk, t, order=2)
-    dt = time / n
-
-    #  plt.plot(t, kp)
-    #  plt.show()
-
-    state = State()
-    x, y, yaw = [state.x], [state.y], [state.yaw]
-
-    for ikp in kp:
-        state = update(state, v, ikp, dt, L)
-        x.append(state.x)
-        y.append(state.y)
-        yaw.append(state.yaw)
-
-    return x, y, yaw
-
-
-def update(state, v, delta, dt, L):
-
-    state.v = v
-    state.x = state.x + state.v * math.cos(state.yaw) * dt
-    state.y = state.y + state.v * math.sin(state.yaw) * dt
-    state.yaw = state.yaw + state.v / L * math.tan(delta) * dt
-    state.yaw = pi_2_pi(state.yaw)
-
-    return state
-
-
-def pi_2_pi(angle):
-    while(angle > math.pi):
-        angle = angle - 2.0 * math.pi
-
-    while(angle < -math.pi):
-        angle = angle + 2.0 * math.pi
-
-    return angle
+#  matplotrecorder.donothing = True
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
@@ -81,35 +28,39 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
 
 
 def calc_diff(target, x, y, yaw):
-    d = np.array([x[-1] - target.x, y[-1] - target.y, yaw[-1] - target.yaw])
+    d = np.array([target.x - x[-1],
+                  target.y - y[-1],
+                  motion_model.pi_2_pi(target.yaw - yaw[-1])])
+
     return d
 
 
 def calc_J(target, p, h, k0):
-    xp, yp, yawp = generate_trajectory(p[0, 0] + h[0, 0], p[1, 0], p[2, 0], k0)
-    dp = calc_diff(target, xp, yp, yawp)
-    #  xn, yn, yawn = generate_trajectory(p[0, 0] - h[0, 0], p[1, 0], p[2, 0], k0)
-    #  dn = calc_diff(target, xn, yn, yawn)
-    #  d1 = np.matrix((dp - dn) / (2.0 * h[1, 0])).T
-    d1 = np.matrix(dp / h[0, 0]).T
+    xp, yp, yawp = motion_model.generate_last_state(
+        p[0, 0] + h[0, 0], p[1, 0], p[2, 0], k0)
+    dp = calc_diff(target, [xp], [yp], [yawp])
+    xn, yn, yawn = motion_model.generate_last_state(
+        p[0, 0] - h[0, 0], p[1, 0], p[2, 0], k0)
+    dn = calc_diff(target, [xn], [yn], [yawn])
+    d1 = np.matrix((dp - dn) / (2.0 * h[1, 0])).T
 
-    xp, yp, yawp = generate_trajectory(p[0, 0], p[1, 0] + h[1, 0], p[2, 0], k0)
-    dp = calc_diff(target, xp, yp, yawp)
-    #  xn, yn, yawn = generate_trajectory(p[0, 0], p[1, 0] - h[1, 0], p[2, 0], k0)
-    #  dn = calc_diff(target, xn, yn, yawn)
-    #  d2 = np.matrix((dp - dn) / (2.0 * h[2, 0])).T
-    d2 = np.matrix(dp / h[1, 0]).T
+    xp, yp, yawp = motion_model.generate_last_state(
+        p[0, 0], p[1, 0] + h[1, 0], p[2, 0], k0)
+    dp = calc_diff(target, [xp], [yp], [yawp])
+    xn, yn, yawn = motion_model.generate_last_state(
+        p[0, 0], p[1, 0] - h[1, 0], p[2, 0], k0)
+    dn = calc_diff(target, [xn], [yn], [yawn])
+    d2 = np.matrix((dp - dn) / (2.0 * h[2, 0])).T
 
-    xp, yp, yawp = generate_trajectory(p[0, 0], p[1, 0], p[2, 0] + h[2, 0], k0)
-    dp = calc_diff(target, xp, yp, yawp)
-    #  xn, yn, yawn = generate_trajectory(p[0, 0], p[1, 0], p[2, 0] - h[2, 0], k0)
-    #  dn = calc_diff(target, xn, yn, yawn)
-    #  d3 = np.matrix((dp - dn) / (2.0 * h[2, 0])).T
-    d3 = np.matrix(dp / h[2, 0]).T
-    #  print(d1, d2, d3)
+    xp, yp, yawp = motion_model.generate_last_state(
+        p[0, 0], p[1, 0], p[2, 0] + h[2, 0], k0)
+    dp = calc_diff(target, [xp], [yp], [yawp])
+    xn, yn, yawn = motion_model.generate_last_state(
+        p[0, 0], p[1, 0], p[2, 0] - h[2, 0], k0)
+    dn = calc_diff(target, [xn], [yn], [yawn])
+    d3 = np.matrix((dp - dn) / (2.0 * h[2, 0])).T
 
     J = np.hstack((d1, d2, d3))
-    #  print(J)
 
     return J
 
@@ -118,15 +69,17 @@ def selection_learning_param(dp, p, k0, target):
 
     mincost = float("inf")
     mina = 1.0
+    maxa = 5.0
+    da = 0.5
 
-    for a in np.arange(1.0, 10.0, 0.5):
+    for a in np.arange(mina, maxa, da):
         tp = p[:, :] + a * dp
-        xc, yc, yawc = generate_trajectory(tp[0], tp[1], tp[2], k0)
-        dc = np.matrix(calc_diff(target, xc, yc, yawc)).T
+        xc, yc, yawc = motion_model.generate_last_state(
+            tp[0], tp[1], tp[2], k0)
+        dc = np.matrix(calc_diff(target, [xc], [yc], [yawc])).T
         cost = np.linalg.norm(dc)
-        #  print(a, cost)
 
-        if cost <= mincost:
+        if cost <= mincost and a != 0.0:
             mina = a
             mincost = cost
 
@@ -136,18 +89,29 @@ def selection_learning_param(dp, p, k0, target):
     return mina
 
 
-def optimize_trajectory(target, k0):
+def show_trajectory(target, xc, yc):
 
-    p = np.matrix([6.0, 0.0, 0.0]).T
-    h = np.matrix([0.1, 0.002, 0.002]).T
+    plt.clf()
+    plot_arrow(target.x, target.y, target.yaw)
+    plt.plot(xc, yc, "-r")
+    plt.axis("equal")
+    plt.grid(True)
+    plt.pause(0.1)
+    matplotrecorder.save_frame()
 
-    for i in range(1000):
-        xc, yc, yawc = generate_trajectory(p[0], p[1], p[2], k0)
+
+def optimize_trajectory(target, k0, p):
+
+    for i in range(maxiter):
+        xc, yc, yawc = motion_model.generate_trajectory(p[0], p[1], p[2], k0)
         dc = np.matrix(calc_diff(target, xc, yc, yawc)).T
+        #  print(dc.T)
 
         cost = np.linalg.norm(dc)
+        print("cost is:" + str(cost))
         if cost <= 0.05:
             print("cost is:" + str(cost))
+            print(p)
             break
 
         J = calc_J(target, p, h, k0)
@@ -157,30 +121,22 @@ def optimize_trajectory(target, k0):
         p += alpha * np.array(dp)
         #  print(p.T)
 
-        plt.clf()
-        plot_arrow(target.x, target.y, target.yaw)
-        plt.plot(xc, yc, "-r")
-        plt.axis("equal")
-        plt.grid(True)
-        plt.pause(0.1)
-        matplotrecorder.save_frame()
+        show_trajectory(target, xc, yc)
 
-    plt.clf()
-    plot_arrow(target.x, target.y, target.yaw)
-    plt.plot(xc, yc, "-r")
-    plt.axis("equal")
-    plt.grid(True)
-    matplotrecorder.save_frame()
+    show_trajectory(target, xc, yc)
 
     print("done")
 
 
 def test_optimize_trajectory():
 
-    target = State(x=5.0, y=2.0, yaw=math.radians(00.0))
-    k0 = -0.3
+    #  target = motion_model.State(x=5.0, y=2.0, yaw=math.radians(00.0))
+    target = motion_model.State(x=5.0, y=2.0, yaw=math.radians(90.0))
+    k0 = 0.0
 
-    optimize_trajectory(target, k0)
+    init_p = np.matrix([6.0, 0.0, 0.0]).T
+
+    optimize_trajectory(target, k0, init_p)
     matplotrecorder.save_movie("animation.gif", 0.1)
 
     #  plt.plot(x, y, "-r")
@@ -200,7 +156,7 @@ def test_trajectory_generate():
     #  plt.plot(t, kp)
     #  plt.show()
 
-    x, y = generate_trajectory(s, km, kf, k0)
+    x, y = motion_model.generate_trajectory(s, km, kf, k0)
 
     plt.plot(x, y, "-r")
     plt.axis("equal")
