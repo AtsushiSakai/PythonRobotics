@@ -14,7 +14,7 @@ from matplotrecorder import matplotrecorder
 maxiter = 1000
 h = np.matrix([0.1, 0.002, 0.002]).T  # parameter sampling distanse
 
-#  matplotrecorder.donothing = True
+matplotrecorder.donothing = True
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
