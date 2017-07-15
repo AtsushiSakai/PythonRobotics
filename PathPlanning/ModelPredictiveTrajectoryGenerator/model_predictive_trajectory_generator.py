@@ -11,10 +11,11 @@ import motion_model
 from matplotrecorder import matplotrecorder
 
 # optimization parameter
-maxiter = 1000
-h = np.matrix([0.1, 0.002, 0.002]).T  # parameter sampling distanse
+maxiter = 100
+h = np.matrix([0.1, 0.001, 0.001]).T  # parameter sampling distanse
 
 matplotrecorder.donothing = True
+show_graph = False
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
@@ -69,7 +70,7 @@ def selection_learning_param(dp, p, k0, target):
 
     mincost = float("inf")
     mina = 1.0
-    maxa = 5.0
+    maxa = 2.0
     da = 0.5
 
     for a in np.arange(mina, maxa, da):
@@ -108,24 +109,29 @@ def optimize_trajectory(target, k0, p):
         #  print(dc.T)
 
         cost = np.linalg.norm(dc)
-        print("cost is:" + str(cost))
         if cost <= 0.05:
-            print("cost is:" + str(cost))
-            print(p)
+            print("path is ok cost is:" + str(cost))
             break
 
         J = calc_J(target, p, h, k0)
-        dp = - np.linalg.inv(J) * dc
+        try:
+            dp = - np.linalg.inv(J) * dc
+        except np.linalg.linalg.LinAlgError:
+            print("cannot calc path LinAlgError")
+            xc, yc, yawc, p = None, None, None, None
+            break
         alpha = selection_learning_param(dp, p, k0, target)
 
         p += alpha * np.array(dp)
         #  print(p.T)
 
-        show_trajectory(target, xc, yc)
+        if show_graph:
+            show_trajectory(target, xc, yc)
+    else:
+        xc, yc, yawc, p = None, None, None, None
+        print("cannot calc path")
 
-    show_trajectory(target, xc, yc)
-
-    print("done")
+    return xc, yc, yawc, p
 
 
 def test_optimize_trajectory():
@@ -136,7 +142,9 @@ def test_optimize_trajectory():
 
     init_p = np.matrix([6.0, 0.0, 0.0]).T
 
-    optimize_trajectory(target, k0, init_p)
+    x, y, yaw, p = optimize_trajectory(target, k0, init_p)
+
+    show_trajectory(target, x, y)
     matplotrecorder.save_movie("animation.gif", 0.1)
 
     #  plt.plot(x, y, "-r")

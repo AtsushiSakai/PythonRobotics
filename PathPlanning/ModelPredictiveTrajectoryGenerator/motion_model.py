@@ -46,7 +46,7 @@ def generate_trajectory(s, km, kf, k0):
     kk = np.array([k0, km, kf])
     t = np.arange(0.0, time, time / n)
     kp = scipy.interpolate.spline(tk, kk, t, order=2)
-    dt = time / n
+    dt = float(time / n)
 
     #  plt.plot(t, kp)
     #  plt.show()
