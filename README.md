@@ -2,7 +2,6 @@
 
 Python sample codes for robotics algorithm.
 
-
 # Requirements
 
 - numpy
@@ -15,8 +14,17 @@ Python sample codes for robotics algorithm.
 
 # Path Planning
 
-Path planning algorithm samples.
+Path planning algorithm.
 
+# Model Predictive Trajectry Generator
+
+This script is a path planning code with model predictive trajectry generator.
+
+
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ModelPredictiveTrajectoryGenerator/kn05animation.gif)
+
+see: 
+- [Optimal rough terrain trajectory generation for wheeled mobile robots](http://journals.sagepub.com/doi/pdf/10.1177/0278364906075328)
 
 ## RRT 
 
