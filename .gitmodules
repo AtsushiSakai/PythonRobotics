@@ -7,3 +7,6 @@
 [submodule "PathPlanning/LatticePlanner/matplotrecorder"]
 	path = PathPlanning/LatticePlanner/matplotrecorder
 	url = https://github.com/AtsushiSakai/matplotrecorder.git
+[submodule "PathPlanning/ModelPredictiveTrajectoryGenerator/matplotrecorder"]
+	path = PathPlanning/ModelPredictiveTrajectoryGenerator/matplotrecorder
+	url = https://github.com/AtsushiSakai/matplotrecorder
