@@ -16,9 +16,9 @@ Python sample codes for robotics algorithm.
 
 Path planning algorithm.
 
-# Model Predictive Trajectry Generator
+# Model Predictive Trajectory Generator
 
-This script is a path planning code with model predictive trajectry generator.
+This script is a path planning code with model predictive trajectory generator.
 
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ModelPredictiveTrajectoryGenerator/kn05animation.gif)
@@ -28,7 +28,7 @@ see:
 
 ## RRT 
 
-Rapidly Randamized Tree Path plainning sample.
+Rapidly Randamized Tree Path planning sample.
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRT/animation.gif)
 
@@ -49,7 +49,6 @@ This script is a  path planning code with RRT \*
 
 ## RRT Car 
 
-<!-- ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTCar/figure_1.png) -->
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTCar/animation.gif)
 
 Path planning for a car robot with RRT and dubins path planner.
