@@ -1,31 +1,14 @@
 """
-State lattice planner
+State lattice planner with model predictive trajectory generator
 
 author: Atsushi Sakai
 """
 from matplotlib import pyplot as plt
 import numpy as np
 import math
+import pandas as pd
 import model_predictive_trajectory_generator as planner
 import motion_model
-import pandas as pd
-
-
-def calc_states_list():
-    maxyaw = math.radians(-30.0)
-
-    x = np.arange(1.0, 30.0, 5.0)
-    y = np.arange(0.0, 20.0, 2.0)
-    yaw = np.arange(-maxyaw, maxyaw, maxyaw)
-
-    states = []
-    for iyaw in yaw:
-        for iy in y:
-            for ix in x:
-                states.append([ix, iy, iyaw])
-    # print(len(states))
-
-    return states
 
 
 def search_nearest_one_from_lookuptable(tx, ty, tyaw, lookuptable):
@@ -42,19 +25,16 @@ def search_nearest_one_from_lookuptable(tx, ty, tyaw, lookuptable):
             minid = i
             mind = d
 
-
     return lookuptable[minid]
 
 
 def get_lookup_table():
-
     data = pd.read_csv("lookuptable.csv")
 
     return np.array(data)
 
 
 def generate_path(states, k0):
-
     # x, y, yaw, s, km, kf
     lookup_table = get_lookup_table()
     result = []
@@ -78,8 +58,36 @@ def generate_path(states, k0):
     return result
 
 
+def calc_uniform_states(np, nh, d, a_min, a_max, p_min, p_max):
+    """
 
-def calc_uniform_states():
+    calc uniform state
+
+    :param np: number of position sampling
+    :param nh: number of heading sampleing
+    :param d: distance of terminal state
+    :param a_min: position sampling min angle
+    :param a_max: position sampling max angle
+    :param p_min: heading sampling min angle
+    :param p_max: heading sampling max angle
+    :return:
+    """
+    states = []
+
+    for i in range(np):
+        a = a_min + (a_max - a_min) * i / (np - 1)
+        print(a)
+        for j in range(nh):
+            xf = d * math.cos(a)
+            yf = d * math.sin(a)
+            yawf = p_min + (p_max - p_min) * j / (nh - 1) + a
+            states.append([xf, yf, yawf])
+
+    return states
+
+
+def uniform_terminal_state_sampling1():
+    k0 = 0.0
     np = 5
     nh = 3
     d = 20
@@ -87,38 +95,36 @@ def calc_uniform_states():
     a_max = math.radians(45.0)
     p_min = - math.radians(45.0)
     p_max = math.radians(45.0)
-    x0 = 0.0
-    y0 = 0.0
-    yaw0 = 0.0
-
-    states = []
-
-    for i in range(np):
-        for j in range(nh):
-            n = i * nh + j
-            a = a_min + (a_max - a_min) * i / (np - 1)
-            xf = x0 + d * math.cos(a + yaw0)
-            yf = y0 + d * math.sin(a + yaw0)
-            yawf = yaw0+p_min+(p_max-p_min)*j/(nh-1)+a
-            states.append([xf, yf, yawf])
-
-    # print(states)
-    # print(len(states))
-
-    return states
-
-
-def uniform_terminal_state_sampling():
-    k0 = 0.0
-    states = calc_uniform_states()
+    states = calc_uniform_states(np, nh, d, a_min, a_max, p_min, p_max)
     result = generate_path(states, k0)
 
     for table in result:
         xc, yc, yawc = motion_model.generate_trajectory(
             table[3], table[4], table[5], k0)
         plt.plot(xc, yc, "-r")
+
+    plt.grid(True)
+    plt.axis("equal")
+    plt.show()
+
+    print("Done")
+
+
+def uniform_terminal_state_sampling2():
+    k0 = 0.1
+    np = 6
+    nh = 3
+    d = 20
+    a_min = - math.radians(-10.0)
+    a_max = math.radians(45.0)
+    p_min = - math.radians(20.0)
+    p_max = math.radians(20.0)
+    states = calc_uniform_states(np, nh, d, a_min, a_max, p_min, p_max)
+    result = generate_path(states, k0)
+
+    for table in result:
         xc, yc, yawc = motion_model.generate_trajectory(
-            table[3], -table[4], -table[5], k0)
+            table[3], table[4], table[5], k0)
         plt.plot(xc, yc, "-r")
 
     plt.grid(True)
@@ -130,7 +136,8 @@ def uniform_terminal_state_sampling():
 
 
 def main():
-    uniform_terminal_state_sampling()
+    # uniform_terminal_state_sampling1()
+    uniform_terminal_state_sampling2()
 
 
 if __name__ == '__main__':

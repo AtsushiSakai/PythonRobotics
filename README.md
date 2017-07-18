@@ -31,6 +31,21 @@ Lookup table generation sample:
 see: 
 - [Optimal rough terrain trajectory generation for wheeled mobile robots](http://journals.sagepub.com/doi/pdf/10.1177/0278364906075328)
 
+# State Lattice Planning
+
+This script is a path planning code with state lattice planning.
+
+This code uses the model predictive trajectory generator to solve boundary problem.
+
+
+Uniform polar sampling results:
+
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/Figure_1.png)
+
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/Figure_2.png)
+
+
+
 ## RRT 
 
 Rapidly Randamized Tree Path planning sample.
