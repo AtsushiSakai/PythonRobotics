@@ -46,6 +46,12 @@ This code uses the model predictive trajectory generator to solve boundary probl
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/Figure_2.png)
 
+### Biased polar sampling results:
+
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/Figure_3.png)
+
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/Figure_4.png)
+
 
 
 ## RRT 
