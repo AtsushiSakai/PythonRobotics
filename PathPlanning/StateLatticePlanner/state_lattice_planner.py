@@ -1,5 +1,5 @@
 """
-Lookup Table generation for model predictive trajectory generator
+State lattice planner
 
 author: Atsushi Sakai
 """
@@ -42,37 +42,26 @@ def search_nearest_one_from_lookuptable(tx, ty, tyaw, lookuptable):
             minid = i
             mind = d
 
-    # print(minid)
 
     return lookuptable[minid]
 
 
-def save_lookup_table(fname, table):
-    mt = np.array(table)
-    print(mt)
-    # save csv
-    df = pd.DataFrame()
-    df["x"] = mt[:, 0]
-    df["y"] = mt[:, 1]
-    df["yaw"] = mt[:, 2]
-    df["s"] = mt[:, 3]
-    df["km"] = mt[:, 4]
-    df["kf"] = mt[:, 5]
-    df.to_csv(fname, index=None)
+def get_lookup_table():
 
-    print("lookup table file is saved as " + fname)
+    data = pd.read_csv("lookuptable.csv")
+
+    return np.array(data)
 
 
-def generate_lookup_table():
-    states = calc_states_list()
-    k0 = 0.0
+def generate_path(states, k0):
 
     # x, y, yaw, s, km, kf
-    lookuptable = [[1.0, 0.0, 0.0, 1.0, 0.0, 0.0]]
+    lookup_table = get_lookup_table()
+    result = []
 
     for state in states:
         bestp = search_nearest_one_from_lookuptable(
-            state[0], state[1], state[2], lookuptable)
+            state[0], state[1], state[2], lookup_table)
 
         target = motion_model.State(x=state[0], y=state[1], yaw=state[2])
         init_p = np.matrix(
@@ -82,14 +71,49 @@ def generate_lookup_table():
 
         if x is not None:
             print("find good path")
-            lookuptable.append(
+            result.append(
                 [x[-1], y[-1], yaw[-1], float(p[0]), float(p[1]), float(p[2])])
 
-    print("finish lookup table generation")
+    print("finish path generation")
+    return result
 
-    save_lookup_table("lookuptable.csv", lookuptable)
 
-    for table in lookuptable:
+
+def calc_uniform_states():
+    np = 5
+    nh = 3
+    d = 20
+    a_min = - math.radians(45.0)
+    a_max = math.radians(45.0)
+    p_min = - math.radians(45.0)
+    p_max = math.radians(45.0)
+    x0 = 0.0
+    y0 = 0.0
+    yaw0 = 0.0
+
+    states = []
+
+    for i in range(np):
+        for j in range(nh):
+            n = i * nh + j
+            a = a_min + (a_max - a_min) * i / (np - 1)
+            xf = x0 + d * math.cos(a + yaw0)
+            yf = y0 + d * math.sin(a + yaw0)
+            yawf = yaw0+p_min+(p_max-p_min)*j/(nh-1)+a
+            states.append([xf, yf, yawf])
+
+    # print(states)
+    # print(len(states))
+
+    return states
+
+
+def uniform_terminal_state_sampling():
+    k0 = 0.0
+    states = calc_uniform_states()
+    result = generate_path(states, k0)
+
+    for table in result:
         xc, yc, yawc = motion_model.generate_trajectory(
             table[3], table[4], table[5], k0)
         plt.plot(xc, yc, "-r")
@@ -104,8 +128,9 @@ def generate_lookup_table():
     print("Done")
 
 
+
 def main():
-    generate_lookup_table()
+    uniform_terminal_state_sampling()
 
 
 if __name__ == '__main__':
