@@ -11,11 +11,11 @@ import model_predictive_trajectory_generator as planner
 import motion_model
 
 
-def search_nearest_one_from_lookuptable(tx, ty, tyaw, lookuptable):
+def search_nearest_one_from_lookuptable(tx, ty, tyaw, lookup_table):
     mind = float("inf")
     minid = -1
 
-    for (i, table) in enumerate(lookuptable):
+    for (i, table) in enumerate(lookup_table):
 
         dx = tx - table[0]
         dy = ty - table[1]
@@ -25,7 +25,7 @@ def search_nearest_one_from_lookuptable(tx, ty, tyaw, lookuptable):
             minid = i
             mind = d
 
-    return lookuptable[minid]
+    return lookup_table[minid]
 
 
 def get_lookup_table():
@@ -34,12 +34,12 @@ def get_lookup_table():
     return np.array(data)
 
 
-def generate_path(states, k0):
+def generate_path(target_states, k0):
     # x, y, yaw, s, km, kf
     lookup_table = get_lookup_table()
     result = []
 
-    for state in states:
+    for state in target_states:
         bestp = search_nearest_one_from_lookuptable(
             state[0], state[1], state[2], lookup_table)
 
@@ -58,11 +58,11 @@ def generate_path(states, k0):
     return result
 
 
-def calc_uniform_states(np, nh, d, a_min, a_max, p_min, p_max):
+def calc_uniform_polar_states(nxy, nh, d, a_min, a_max, p_min, p_max):
     """
     calc uniform state
 
-    :param np: number of position sampling
+    :param nxy: number of position sampling
     :param nh: number of heading sampleing
     :param d: distance of terminal state
     :param a_min: position sampling min angle
@@ -71,24 +71,14 @@ def calc_uniform_states(np, nh, d, a_min, a_max, p_min, p_max):
     :param p_max: heading sampling max angle
     :return: states list
     """
-    states = []
 
-    for i in range(np):
-        a = a_min + (a_max - a_min) * i / (np - 1)
-        for j in range(nh):
-            xf = d * math.cos(a)
-            yf = d * math.sin(a)
-            if nh == 1:
-                yawf = (p_max - p_min) / 2 + a
-            else:
-                yawf = p_min + (p_max - p_min) * j / (nh - 1) + a
-
-            states.append([xf, yf, yawf])
+    angle_samples = [i / (nxy - 1) for i in range(nxy)]
+    states = sample_states(angle_samples, a_min, a_max, d, p_max, p_min, nh)
 
     return states
 
 
-def calc_biased_states(goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max):
+def calc_biased_polar_states(goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max):
     """
     calc biased state
 
@@ -105,29 +95,33 @@ def calc_biased_states(goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max):
     :return: states list
     """
 
-    cnav = []
-    for i in range(ns - 1):
-        asi = a_min + (a_max - a_min) * i / (ns - 1)
-        cnavi = math.pi - abs(asi - goal_angle)
-        cnav.append(cnavi)
+    asi = [a_min + (a_max - a_min) * i / (ns - 1) for i in range(ns - 1)]
+    cnav = [math.pi - abs(i - goal_angle) for i in asi]
 
     cnav_sum = sum(cnav)
     cnav_max = max(cnav)
 
     # normalize
-    for i in range(ns - 1):
-        cnav[i] = (cnav_max - cnav[i]) / (cnav_max * ns - cnav_sum)
+    cnav = [(cnav_max - cnav[i]) / (cnav_max * ns - cnav_sum) for i in range(ns - 1)]
 
     csumnav = np.cumsum(cnav)
     di = []
+    li = 0
     for i in range(nxy):
-        for ii in range(ns - 1):
+        for ii in range(li, ns - 1):
             if ii / ns >= i / (nxy - 1):
                 di.append(csumnav[ii])
+                li = ii - 1
                 break
 
+    states = sample_states(di, a_min, a_max, d, p_max, p_min, nh)
+
+    return states
+
+
+def sample_states(angle_samples, a_min, a_max, d, p_max, p_min, nh):
     states = []
-    for i in di:
+    for i in angle_samples:
         a = a_min + (a_max - a_min) * i
 
         for j in range(nh):
@@ -142,7 +136,6 @@ def calc_biased_states(goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max):
     return states
 
 
-
 def uniform_terminal_state_sampling1():
     k0 = 0.0
     nxy = 5
@@ -152,7 +145,7 @@ def uniform_terminal_state_sampling1():
     a_max = math.radians(45.0)
     p_min = - math.radians(45.0)
     p_max = math.radians(45.0)
-    states = calc_uniform_states(nxy, nh, d, a_min, a_max, p_min, p_max)
+    states = calc_uniform_polar_states(nxy, nh, d, a_min, a_max, p_min, p_max)
     result = generate_path(states, k0)
 
     for table in result:
@@ -176,7 +169,7 @@ def uniform_terminal_state_sampling2():
     a_max = math.radians(45.0)
     p_min = - math.radians(20.0)
     p_max = math.radians(20.0)
-    states = calc_uniform_states(nxy, nh, d, a_min, a_max, p_min, p_max)
+    states = calc_uniform_polar_states(nxy, nh, d, a_min, a_max, p_min, p_max)
     result = generate_path(states, k0)
 
     for table in result:
@@ -202,7 +195,7 @@ def biased_terminal_state_sampling1():
     p_max = math.radians(20.0)
     ns = 100
     goal_angle = math.radians(0.0)
-    states = calc_biased_states(goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max)
+    states = calc_biased_polar_states(goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max)
     result = generate_path(states, k0)
 
     for table in result:
@@ -226,7 +219,7 @@ def biased_terminal_state_sampling2():
     p_max = math.radians(20.0)
     ns = 100
     goal_angle = math.radians(30.0)
-    states = calc_biased_states(goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max)
+    states = calc_biased_polar_states(goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max)
     result = generate_path(states, k0)
 
     for table in result:
@@ -237,7 +230,6 @@ def biased_terminal_state_sampling2():
     plt.grid(True)
     plt.axis("equal")
     plt.show()
-
 
 
 def main():
