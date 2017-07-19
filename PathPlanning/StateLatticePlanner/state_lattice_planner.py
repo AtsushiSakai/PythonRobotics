@@ -119,6 +119,33 @@ def calc_biased_polar_states(goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_
     return states
 
 
+def calc_lane_states(l_center, l_heading, l_width, v_width, d, nxy):
+    """
+
+    calc lane states
+
+    :param l_center: lane lateral position
+    :param l_heading:  lane heading
+    :param l_width:  lane width
+    :param v_width: vehicle width
+    :param d: longitudinal position
+    :param nxy: sampling number
+    :return: state list
+    """
+    xc = math.cos(l_heading) * d + math.sin(l_heading) * l_center
+    yc = math.sin(l_heading) * d + math.cos(l_heading) * l_center
+
+    states = []
+    for i in range(nxy):
+        delta = -0.5 * (l_width - v_width) + (l_width - v_width) * i / (nxy - 1)
+        xf = xc - delta * math.sin(l_heading)
+        yf = yc + delta * math.cos(l_heading)
+        yawf = l_heading
+        states.append([xf, yf, yawf])
+
+    return states
+
+
 def sample_states(angle_samples, a_min, a_max, d, p_max, p_min, nh):
     states = []
     for i in angle_samples:
@@ -136,7 +163,7 @@ def sample_states(angle_samples, a_min, a_max, d, p_max, p_min, nh):
     return states
 
 
-def uniform_terminal_state_sampling1():
+def uniform_terminal_state_sampling_test1():
     k0 = 0.0
     nxy = 5
     nh = 3
@@ -160,7 +187,7 @@ def uniform_terminal_state_sampling1():
     print("Done")
 
 
-def uniform_terminal_state_sampling2():
+def uniform_terminal_state_sampling_test2():
     k0 = 0.1
     nxy = 6
     nh = 3
@@ -184,7 +211,7 @@ def uniform_terminal_state_sampling2():
     print("Done")
 
 
-def biased_terminal_state_sampling1():
+def biased_terminal_state_sampling_test1():
     k0 = 0.0
     nxy = 30
     nh = 2
@@ -208,7 +235,7 @@ def biased_terminal_state_sampling1():
     plt.show()
 
 
-def biased_terminal_state_sampling2():
+def biased_terminal_state_sampling_test2():
     k0 = 0.0
     nxy = 30
     nh = 1
@@ -232,11 +259,34 @@ def biased_terminal_state_sampling2():
     plt.show()
 
 
+def lane_state_sampling_test1():
+    k0 = 0.0
+
+    l_center = 10.0
+    l_heading = math.radians(90.0)
+    l_width = 3.0
+    v_width = 1.0
+    d = 10
+    nxy = 5
+    states = calc_lane_states(l_center, l_heading, l_width, v_width, d, nxy)
+    result = generate_path(states, k0)
+
+    for table in result:
+        xc, yc, yawc = motion_model.generate_trajectory(
+            table[3], table[4], table[5], k0)
+        plt.plot(xc, yc, "-r")
+
+    plt.grid(True)
+    plt.axis("equal")
+    plt.show()
+
+
 def main():
     # uniform_terminal_state_sampling1()
     # uniform_terminal_state_sampling2()
     # biased_terminal_state_sampling1()
-    biased_terminal_state_sampling2()
+    # biased_terminal_state_sampling2()
+    lane_state_sampling_test1()
 
 
 if __name__ == '__main__':
