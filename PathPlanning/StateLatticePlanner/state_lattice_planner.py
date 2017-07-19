@@ -3,12 +3,17 @@ State lattice planner with model predictive trajectory generator
 
 author: Atsushi Sakai
 """
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from matplotlib import pyplot as plt
 import numpy as np
 import math
 import pandas as pd
-import model_predictive_trajectory_generator as planner
-import motion_model
+import ModelPredictiveTrajectoryGenerator.model_predictive_trajectory_generator as planner
+import ModelPredictiveTrajectoryGenerator.motion_model as motion_model
 
 
 def search_nearest_one_from_lookuptable(tx, ty, tyaw, lookup_table):

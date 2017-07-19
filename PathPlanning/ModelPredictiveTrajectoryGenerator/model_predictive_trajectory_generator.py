@@ -11,8 +11,9 @@ import motion_model
 from matplotrecorder import matplotrecorder
 
 # optimization parameter
-maxiter = 100
-h = np.matrix([0.1, 0.001, 0.001]).T  # parameter sampling distanse
+max_iter = 100
+h = np.matrix([0.5, 0.02, 0.02]).T  # parameter sampling distanse
+cost_th = 0.1
 
 matplotrecorder.donothing = True
 show_graph = False
@@ -102,14 +103,13 @@ def show_trajectory(target, xc, yc):
 
 
 def optimize_trajectory(target, k0, p):
-
-    for i in range(maxiter):
+    for i in range(max_iter):
         xc, yc, yawc = motion_model.generate_trajectory(p[0], p[1], p[2], k0)
         dc = np.matrix(calc_diff(target, xc, yc, yawc)).T
         #  print(dc.T)
 
         cost = np.linalg.norm(dc)
-        if cost <= 0.05:
+        if cost <= cost_th:
             print("path is ok cost is:" + str(cost))
             break
 
@@ -146,7 +146,6 @@ def test_optimize_trajectory():
 
     show_trajectory(target, x, y)
     matplotrecorder.save_movie("animation.gif", 0.1)
-
     #  plt.plot(x, y, "-r")
     plot_arrow(target.x, target.y, target.yaw)
     plt.axis("equal")
