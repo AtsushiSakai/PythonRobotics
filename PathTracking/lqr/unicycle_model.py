@@ -9,7 +9,8 @@ author Atsushi Sakai
 import math
 
 dt = 0.1  # [s]
-L = 2.9  # [m]
+L = 0.5  # [m]
+max_steer = math.radians(45.0)
 
 
 class State:
@@ -21,6 +22,12 @@ class State:
 
 
 def update(state, a, delta):
+
+    if delta >= max_steer:
+        delta = max_steer
+    if delta <= - max_steer:
+        delta = - max_steer
+
     state.x = state.x + state.v * math.cos(state.yaw) * dt
     state.y = state.y + state.v * math.sin(state.yaw) * dt
     state.yaw = state.yaw + state.v / L * math.tan(delta) * dt

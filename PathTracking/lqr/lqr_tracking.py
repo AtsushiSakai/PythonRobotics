@@ -1,7 +1,7 @@
 #! /usr/bin/python
 """
 
-Path tracking simulation with rear wheel feedback steering control and PID speed control.
+Path tracking simulation with LQR steering control and PID speed control.
 
 author: Atsushi Sakai
 
@@ -14,18 +14,16 @@ from pycubicspline import pycubicspline
 from matplotrecorder import matplotrecorder
 import scipy.linalg as la
 
-Kp = 1.0  # speed propotional gain
-# steering control parameter
-KTH = 1.0
-KE = 0.5
+Kp = 1.0  # speed proportional gain
 
+# LQR parameter
 Q = np.eye(4)
 R = np.eye(1)
 
 animation = True
 # animation = False
 
-matplotrecorder.donothing = True
+#matplotrecorder.donothing = True
 
 
 def PIDControl(target, current):
@@ -81,26 +79,7 @@ def dlqr(A, B, Q, R):
     return K, X, eigVals
 
 
-def rear_wheel_feedback_control(state, cx, cy, cyaw, ck, preind):
-    ind, e = calc_nearest_index(state, cx, cy, cyaw)
-
-    k = ck[ind]
-    v = state.v
-    th_e = pi_2_pi(state.yaw - cyaw[ind])
-
-    omega = v * k * math.cos(th_e) / (1.0 - k * e) - \
-            KTH * abs(v) * th_e - KE * v * math.sin(th_e) * e / th_e
-
-    if th_e == 0.0 or omega == 0.0:
-        return 0.0, ind
-
-    delta = math.atan2(unicycle_model.L * omega / v, 1.0)
-    #  print(k, v, e, th_e, omega, delta)
-
-    return delta, ind
-
-
-def lqr_steering_control(state, cx, cy, cyaw, ck, target_ind):
+def lqr_steering_control(state, cx, cy, cyaw, ck, pe, pth_e):
     ind, e = calc_nearest_index(state, cx, cy, cyaw)
 
     k = ck[ind]
@@ -123,19 +102,16 @@ def lqr_steering_control(state, cx, cy, cyaw, ck, target_ind):
     x = np.matrix(np.zeros((4, 1)))
 
     x[0, 0] = e
-    x[1, 0] = 0.0
+    x[1, 0] = (e - pe)/unicycle_model.dt
     x[2, 0] = th_e
-    x[3, 0] = 0.0
+    x[3, 0] = (th_e - pth_e)/unicycle_model.dt
 
     ff = math.atan2(unicycle_model.L * k, 1)
     fb = pi_2_pi((-K * x)[0, 0])
-    print(math.degrees(th_e))
-    # print(K, x)
-    print(math.degrees(ff), math.degrees(fb))
 
     delta = ff + fb
-    # print(delta)
-    return delta
+
+    return delta, ind, e, th_e
 
 
 def calc_nearest_index(state, cx, cy, cyaw):
@@ -173,12 +149,10 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
     t = [0.0]
     target_ind = calc_nearest_index(state, cx, cy, cyaw)
 
-    while T >= time:
-        di, target_ind = rear_wheel_feedback_control(
-            state, cx, cy, cyaw, ck, target_ind)
+    e, e_th  = 0.0, 0.0
 
-        dl = lqr_steering_control(state, cx, cy, cyaw, ck, target_ind)
-        # print(di, dl)
+    while T >= time:
+        dl, target_ind, e, e_th = lqr_steering_control(state, cx, cy, cyaw, ck, e, e_th)
 
         ai = PIDControl(speed_profile[target_ind], state.v)
         # state = unicycle_model.update(state, ai, di)
@@ -249,9 +223,9 @@ def calc_speed_profile(cx, cy, cyaw, target_speed):
 
 
 def main():
-    print("rear wheel feedback tracking start!!")
-    ax = [0.0, 6.0, 12.5, 5.0, 7.5, 3.0, -1.0]
-    ay = [0.0, 0.0, 5.0, 6.5, 3.0, 5.0, -2.0]
+    print("LQR steering control tracking start!!")
+    ax = [0.0, 6.0, 12.5, 10.0, 7.5, 3.0, -1.0]
+    ay = [0.0, -3.0, -5.0, 6.5, 3.0, 5.0, -2.0]
     goal = [ax[-1], ay[-1]]
 
     cx, cy, cyaw, ck, s = pycubicspline.calc_spline_course(ax, ay, ds=0.1)
