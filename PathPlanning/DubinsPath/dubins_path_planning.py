@@ -132,11 +132,11 @@ def LRL(alpha, beta, d):
     c_ab = math.cos(alpha - beta)
 
     mode = ["L", "R", "L"]
-    tmp_lrl = (6. - d * d + 2 * c_ab + 2 * d * (- sa + sb)) / 8.
+    tmp_lrl = (6.0 - d * d + 2.0 * c_ab + 2.0 * d * (- sa + sb)) / 8.0
     if abs(tmp_lrl) > 1:
         return None, None, None, mode
     p = mod2pi(2 * math.pi - math.acos(tmp_lrl))
-    t = mod2pi(-alpha - math.atan2(ca - cb, d + sa - sb) + p / 2.)
+    t = mod2pi(-alpha - math.atan2(ca - cb, d + sa - sb) + p / 2.0)
     q = mod2pi(mod2pi(beta) - alpha - t + mod2pi(p))
 
     return t, p, q, mode

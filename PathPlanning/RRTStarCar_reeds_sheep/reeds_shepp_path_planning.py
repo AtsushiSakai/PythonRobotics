@@ -30,10 +30,10 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
 
 def reeds_shepp_path_planning(start_x, start_y, start_yaw,
                               end_x, end_y, end_yaw, curvature):
+    step_size = 0.1
     q0 = [start_x, start_y, start_yaw]
     q1 = [end_x, end_y, end_yaw]
-    step_size = 0.1
-    qs = reeds_shepp.path_sample(q0, q1, curvature, step_size)
+    qs = reeds_shepp.path_sample(q0, q1, 1.0 / curvature, step_size)
     xs = [q[0] for q in qs]
     ys = [q[1] for q in qs]
     yaw = [q[2] for q in qs]
@@ -42,8 +42,8 @@ def reeds_shepp_path_planning(start_x, start_y, start_yaw,
     ys.append(end_y)
     yaw.append(end_yaw)
 
-    clen = reeds_shepp.path_length(q0, q1, curvature)
-    pathtypeTuple = reeds_shepp.path_type(q0, q1, curvature)
+    clen = reeds_shepp.path_length(q0, q1, 1.0 / curvature)
+    pathtypeTuple = reeds_shepp.path_type(q0, q1, 1.0 / curvature)
 
     ptype = ""
     for t in pathtypeTuple:

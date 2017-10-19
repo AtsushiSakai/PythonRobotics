@@ -22,7 +22,7 @@ class RRT():
     """
 
     def __init__(self, start, goal, obstacleList, randArea,
-                 goalSampleRate=10, maxIter=2000):
+                 goalSampleRate=10, maxIter=1000):
         u"""
         Setting Parameter
 
@@ -48,6 +48,7 @@ class RRT():
 
         self.nodeList = [self.start]
         for i in range(self.maxIter):
+            print(i)
             rnd = self.get_random_point()
             nind = self.GetNearestListIndex(self.nodeList, rnd)
 
@@ -317,4 +318,4 @@ if __name__ == '__main__':
 
     plt.show()
 
-    matplotrecorder.save_movie("animation.gif", 0.1)
+    #  matplotrecorder.save_movie("animation.gif", 0.1)
