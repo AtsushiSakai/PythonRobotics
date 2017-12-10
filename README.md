@@ -18,9 +18,11 @@ Path planning algorithm.
 
 ## Dijkstra grid search
 
-This is a 2D grid based shortest path planning with Dijkstra method.
+This is a 2D grid based shortest path planning with Dijkstra's algorithm.
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/Dijkstra/animation.gif)
+
+In the animation, cyan points are searched nodes.
 
 ## Model Predictive Trajectory Generator
 
