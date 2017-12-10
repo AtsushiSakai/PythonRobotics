@@ -24,6 +24,17 @@ This is a 2D grid based shortest path planning with Dijkstra's algorithm.
 
 In the animation, cyan points are searched nodes.
 
+## A star grid search
+
+This h a 2D grid based shortest path planning with A star algorithm.
+
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/AStar/animation.gif)
+
+In the animation, cyan points are searched nodes.
+
+It's heuristic is 2D Euclid distance.
+
+
 ## Model Predictive Trajectory Generator
 
 This script is a path planning code with model predictive trajectory generator.
