@@ -51,7 +51,7 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
         #  print("current", current)
 
         # show graph
-        plt.plot(current.x, current.y, "xc")
+        plt.plot(current.x * reso, current.y * reso, "xc")
         if len(closedset.keys()) % 10 == 0:
             plt.pause(0.001)
             matplotrecorder.save_frame()
@@ -87,12 +87,12 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
                 openset[n_id] = node
 
     # generate final course
-    rx, ry = [ngoal.x], [ngoal.y]
+    rx, ry = [ngoal.x * reso], [ngoal.y * reso]
     pind = ngoal.pind
     while pind != -1:
         n = closedset[pind]
-        rx.append(n.x)
-        ry.append(n.y)
+        rx.append(n.x * reso)
+        ry.append(n.y * reso)
         pind = n.pind
 
     return rx, ry
@@ -106,16 +106,16 @@ def calc_h(ngoal, x, y):
 
 def verify_node(node, obmap, minx, miny, maxx, maxy):
 
-    if obmap[node.x][node.y]:
-        return False
-
     if node.x < minx:
         return False
     elif node.y < miny:
         return False
-    elif node.x > maxx:
+    elif node.x >= maxx:
         return False
-    elif node.y > maxy:
+    elif node.y >= maxy:
+        return False
+
+    if obmap[node.x][node.y]:
         return False
 
     return True
