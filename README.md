@@ -16,6 +16,12 @@ Python sample codes for robotics algorithm.
 
 Path planning algorithm.
 
+## Dijkstra grid search
+
+This is a 2D grid based shortest path planning with Dijkstra method.
+
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/Dijkstra/animation.gif)
+
 ## Model Predictive Trajectory Generator
 
 This script is a path planning code with model predictive trajectory generator.
