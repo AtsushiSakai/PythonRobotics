@@ -17,6 +17,9 @@ class Node:
         self.cost = cost
         self.pind = pind
 
+    def __str__(self):
+        return str(self.x) + "," + str(self.y) + "," + str(self.cost) + "," + str(self.pind)
+
 
 def dijkstra_planning(sx, sy, gx, gy, ox, oy, reso, rr):
     """
@@ -28,28 +31,126 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, reso, rr):
     rr: robot radius[m]
     """
 
+    nstart = Node(round(sx / reso), round(sy / reso), 0.0, -1)
     ngoal = Node(round(gx / reso), round(gy / reso), 0.0, -1)
     ox = [iox / reso for iox in ox]
     oy = [ioy / reso for ioy in oy]
 
+    obmap, minx, miny, maxx, maxy, xw, yw = calc_obstacle_map(ox, oy, reso, rr)
+
     motion = get_motion_model()
     #  print(motion)
 
-    opened, closed = [], []
-    opened.append(ngoal)
+    openset = dict()
+    closedset = dict()
+    openset[calc_index(nstart, xw, minx, miny)] = nstart
 
-    while True:
-        if len(opened) == 0:
-            print("Finish Search")
+    plt.plot(ox, oy, ".k")
+
+    while 1:
+        current = openset[min(openset, key=lambda o: openset[o].cost)]
+        c_id = calc_index(current, xw, minx, miny)
+        print("current", current)
+
+        #  plt.plot(current.x, current.y, "xr")
+        #  plt.pause(0.001)
+
+        if current.x == ngoal.x and current.y == ngoal.y:
+            print("Find goal")
+            ngoal.pind = current.pind
+            ngoal.cost = current.cost
             break
+
+        # Remove the item from the open set
+        del openset[c_id]
+        # Add it to the closed set
+        closedset[c_id] = current
 
         # expand search grid based on motion model
         for i in range(len(motion)):
-            pass
+            node = Node(current.x + motion[i][0], current.y + motion[i][1],
+                        current.cost + motion[i][2], c_id)
+            n_id = calc_index(node, xw, minx, miny)
 
-    rx, ry = [], []
+            if not verify_node(node, obmap, minx, miny, maxx, maxy):
+                continue
+
+            # If it is already in the closed set, skip it
+            if n_id in closedset:
+                continue
+            # Otherwise if it is already in the open set
+            if n_id in openset:
+                # Check if we beat the G score
+                if openset[n_id].cost > node.cost:
+                    # If so, update the node to have a new parent
+                    openset[n_id].cost = node.cost
+                    openset[n_id].pind = c_id
+            else:
+                # If it isn't in the open set, calculate the G and H score for the node
+                openset[n_id] = node
+
+    rx, ry = [ngoal.x], [ngoal.y]
+    pind = ngoal.pind
+    while pind != -1:
+        n = closedset[pind]
+        rx.append(n.x)
+        ry.append(n.y)
+        pind = n.pind
 
     return rx, ry
+
+
+def verify_node(node, obmap, minx, miny, maxx, maxy):
+
+    if obmap[node.x][node.y]:
+        return False
+
+    if node.x < minx:
+        return False
+    elif node.y < miny:
+        return False
+    elif node.x > maxx:
+        return False
+    elif node.y > maxy:
+        return False
+
+    return True
+
+
+def calc_obstacle_map(ox, oy, reso, vr):
+
+    minx = round(min(ox))
+    miny = round(min(oy))
+    maxx = round(max(ox))
+    maxy = round(max(oy))
+    print("minx:", minx)
+    print("miny:", miny)
+    print("maxx:", maxx)
+    print("maxy:", maxy)
+
+    xwidth = round(maxx - minx)
+    ywidth = round(maxy - miny)
+    print("xwidth:", xwidth)
+    print("ywidth:", ywidth)
+
+    obmap = [[False for i in range(xwidth)] for i in range(ywidth)]
+
+    for ix in range(xwidth):
+        x = ix + minx
+        for iy in range(ywidth):
+            y = iy + miny
+            #  print(x, y)
+            for iox, ioy in zip(ox, oy):
+                d = math.sqrt((iox - x)**2 + (ioy - y)**2)
+                if d <= vr / reso:
+                    obmap[ix][iy] = True
+                    break
+
+    return obmap, minx, miny, maxx, maxy, xwidth, ywidth
+
+
+def calc_index(node, xwidth, xmin, ymin):
+    return (node.y - ymin) * xwidth + (node.x - xmin)
 
 
 def get_motion_model():
@@ -104,6 +205,7 @@ def main():
     plt.plot(ox, oy, ".k")
     plt.plot(sx, sy, "xr")
     plt.plot(gx, gy, "xb")
+    plt.plot(rx, ry, "-r")
     plt.grid(True)
     plt.axis("equal")
     plt.show()
