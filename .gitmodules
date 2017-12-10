@@ -13,3 +13,6 @@
 [submodule "PathPlanning/Dijkstra/matplotrecorder"]
 	path = PathPlanning/Dijkstra/matplotrecorder
 	url = https://github.com/AtsushiSakai/matplotrecorder
+[submodule "PathPlanning/AStar/matplotrecorder"]
+	path = PathPlanning/AStar/matplotrecorder
+	url = https://github.com/AtsushiSakai/matplotrecorder
