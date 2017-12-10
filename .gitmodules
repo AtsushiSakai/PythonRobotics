@@ -10,3 +10,6 @@
 [submodule "PathPlanning/ModelPredictiveTrajectoryGenerator/matplotrecorder"]
 	path = PathPlanning/ModelPredictiveTrajectoryGenerator/matplotrecorder
 	url = https://github.com/AtsushiSakai/matplotrecorder
+[submodule "PathPlanning/Dijkstra/matplotrecorder"]
+	path = PathPlanning/Dijkstra/matplotrecorder
+	url = https://github.com/AtsushiSakai/matplotrecorder

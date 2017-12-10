@@ -1,5 +1,4 @@
 """
-
 Dijkstra grid based planning
 
 author: Atsushi Sakai
@@ -7,6 +6,8 @@ author: Atsushi Sakai
 
 import matplotlib.pyplot as plt
 import math
+from matplotrecorder import matplotrecorder
+matplotrecorder.donothing = True
 
 
 class Node:
@@ -39,21 +40,20 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, reso, rr):
     obmap, minx, miny, maxx, maxy, xw, yw = calc_obstacle_map(ox, oy, reso, rr)
 
     motion = get_motion_model()
-    #  print(motion)
 
-    openset = dict()
-    closedset = dict()
+    openset, closedset = dict(), dict()
     openset[calc_index(nstart, xw, minx, miny)] = nstart
 
-    plt.plot(ox, oy, ".k")
-
     while 1:
-        current = openset[min(openset, key=lambda o: openset[o].cost)]
-        c_id = calc_index(current, xw, minx, miny)
-        print("current", current)
+        c_id = min(openset, key=lambda o: openset[o].cost)
+        current = openset[c_id]
+        #  print("current", current)
 
-        #  plt.plot(current.x, current.y, "xr")
-        #  plt.pause(0.001)
+        # show graph
+        plt.plot(current.x, current.y, "xc")
+        if len(closedset.keys()) % 10 == 0:
+            plt.pause(0.001)
+            matplotrecorder.save_frame()
 
         if current.x == ngoal.x and current.y == ngoal.y:
             print("Find goal")
@@ -75,20 +75,17 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, reso, rr):
             if not verify_node(node, obmap, minx, miny, maxx, maxy):
                 continue
 
-            # If it is already in the closed set, skip it
             if n_id in closedset:
                 continue
             # Otherwise if it is already in the open set
             if n_id in openset:
-                # Check if we beat the G score
                 if openset[n_id].cost > node.cost:
-                    # If so, update the node to have a new parent
                     openset[n_id].cost = node.cost
                     openset[n_id].pind = c_id
             else:
-                # If it isn't in the open set, calculate the G and H score for the node
                 openset[n_id] = node
 
+    # generate final course
     rx, ry = [ngoal.x], [ngoal.y]
     pind = ngoal.pind
     while pind != -1:
@@ -123,18 +120,18 @@ def calc_obstacle_map(ox, oy, reso, vr):
     miny = round(min(oy))
     maxx = round(max(ox))
     maxy = round(max(oy))
-    print("minx:", minx)
-    print("miny:", miny)
-    print("maxx:", maxx)
-    print("maxy:", maxy)
+    #  print("minx:", minx)
+    #  print("miny:", miny)
+    #  print("maxx:", maxx)
+    #  print("maxy:", maxy)
 
     xwidth = round(maxx - minx)
     ywidth = round(maxy - miny)
-    print("xwidth:", xwidth)
-    print("ywidth:", ywidth)
+    #  print("xwidth:", xwidth)
+    #  print("ywidth:", ywidth)
 
+    # obstacle map generation
     obmap = [[False for i in range(xwidth)] for i in range(ywidth)]
-
     for ix in range(xwidth):
         x = ix + minx
         for iy in range(ywidth):
@@ -187,10 +184,10 @@ def main():
     for i in range(60):
         ox.append(60.0)
         oy.append(i)
-    for i in range(60):
+    for i in range(61):
         ox.append(i)
         oy.append(60.0)
-    for i in range(60):
+    for i in range(61):
         ox.append(0.0)
         oy.append(i)
     for i in range(40):
@@ -200,15 +197,21 @@ def main():
         ox.append(40.0)
         oy.append(60.0 - i)
 
-    rx, ry = dijkstra_planning(sx, sy, gx, gy, ox, oy, grid_size, robot_size)
-
     plt.plot(ox, oy, ".k")
     plt.plot(sx, sy, "xr")
     plt.plot(gx, gy, "xb")
-    plt.plot(rx, ry, "-r")
     plt.grid(True)
     plt.axis("equal")
+
+    rx, ry = dijkstra_planning(sx, sy, gx, gy, ox, oy, grid_size, robot_size)
+
+    plt.plot(rx, ry, "-r")
+
+    for i in range(10):
+        matplotrecorder.save_frame()
     plt.show()
+
+    matplotrecorder.save_movie("animation.gif", 0.1)
 
 
 if __name__ == '__main__':
