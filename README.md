@@ -3,9 +3,7 @@
 Python sample codes for robotics algorithm.
 
 # Table of Contents
-=================
 
-   * [PythonRobotics](#pythonrobotics)
    * [Requirements](#requirements)
    * [Path Planning](#path-planning)
       * [Dijkstra grid search](#dijkstra-grid-search)
@@ -22,9 +20,9 @@ Python sample codes for robotics algorithm.
       * [RRT Car](#rrt-car)
       * [RRTStarCar](#rrtstarcar)
       * [RRTStarCar_reeds_sheep](#rrtstarcar_reeds_sheep)
+      * [Closed Loop RRT*](#closed-loop-rrt)
       * [Dubins path planning](#dubins-path-planning)
       * [Reeds Shepp planning](#reeds-shepp-planning)
-      * [Closed Loop RRT*](#closed-loop-rrt)
    * [Path tracking](#path-tracking)
       * [Pure pursuit tracking](#pure-pursuit-tracking)
       * [Rear wheel feedback control](#rear-wheel-feedback-control)
@@ -108,7 +106,6 @@ This code uses the model predictive trajectory generator to solve boundary probl
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/Figure_6.png)
 
 
-
 ## RRT 
 
 Rapidly Randamized Tree Path planning sample.
@@ -150,24 +147,6 @@ Path planning for a car robot with RRT\* and dubings path planner.
 
 Path planning for a car robot with RRT\* and reeds sheep path planner.
 
-## Dubins path planning
-
-A sample code for Dubins path planning.
-
-[Dubins path - Wikipedia](https://en.wikipedia.org/wiki/Dubins_path)
-
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DubinsPath/figures/figure_1.png?raw=True)
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DubinsPath/figures/figure_13.png?raw=True)
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DubinsPath/figures/figure_15.png?raw=True)
-
-## Reeds Shepp planning
-
-A sample code with Reeds Shepp path planning.
-
-![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-4.png?raw=true)
-![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-5.png?raw=true)
-![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-7.png?raw=true)
-
 ## Closed Loop RRT\*
 
 A sample code with closed loop RRT\*.
@@ -185,6 +164,25 @@ using Closed-loop Prediction](http://acl.mit.edu/papers/KuwataGNC08.pdf)
 Autonomous Urban Driving](http://acl.mit.edu/papers/KuwataTCST09.pdf)
 
 - [[1601.06326] Sampling-based Algorithms for Optimal Motion Planning Using Closed-loop Prediction](https://arxiv.org/abs/1601.06326)
+
+
+## Dubins path planning
+
+A sample code for Dubins path planning.
+
+[Dubins path - Wikipedia](https://en.wikipedia.org/wiki/Dubins_path)
+
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DubinsPath/figures/figure_1.png?raw=True)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DubinsPath/figures/figure_13.png?raw=True)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DubinsPath/figures/figure_15.png?raw=True)
+
+## Reeds Shepp planning
+
+A sample code with Reeds Shepp path planning.
+
+![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-4.png?raw=true)
+![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-5.png?raw=true)
+![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-7.png?raw=true)
 
 # Path tracking
 
