@@ -105,8 +105,9 @@ This code uses the model predictive trajectory generator to solve boundary probl
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/Figure_6.png)
 
+## Rapidly-Exploring Random Trees (RRT)
 
-## RRT 
+### Basic RRT 
 
 Rapidly Randamized Tree Path planning sample.
 
@@ -114,11 +115,7 @@ Rapidly Randamized Tree Path planning sample.
 
 This script is a simple path planning code with Rapidly-Exploring Random Trees (RRT)
 
-see (in Japanese) :
-
-[PythonによるRapidly-Exploring Random Trees (RRT)パスプランニングサンプルプログラム - MyEnigma](http://myenigma.hatenablog.com/entry/2016/03/23/092002) 
-
-## RRTStar
+### RRT\*
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTstar/animation.gif)
 
@@ -127,27 +124,27 @@ This script is a  path planning code with RRT \*
 - [Incremental Sampling-based Algorithms for Optimal Motion Planning](https://arxiv.org/abs/1005.0416)
 
 
-## RRT Car 
+### RRT with bubins path planner 
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTCar/animation.gif)
 
 Path planning for a car robot with RRT and dubins path planner.
 
 
-## RRTStarCar
+### RRT\* with dubins path
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTStarCar/animation.gif)
 
-Path planning for a car robot with RRT\* and dubings path planner.
+Path planning for a car robot with RRT\* and dubins path planner.
 
 
-## RRTStarCar_reeds_sheep
+### RRT\* with reeds-sheep path
 
 ![Robotics/animation.gif at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTStarCar_reeds_sheep/animation.gif))
 
 Path planning for a car robot with RRT\* and reeds sheep path planner.
 
-## Closed Loop RRT\*
+### Closed Loop RRT\*
 
 A sample code with closed loop RRT\*.
 
@@ -164,6 +161,14 @@ using Closed-loop Prediction](http://acl.mit.edu/papers/KuwataGNC08.pdf)
 Autonomous Urban Driving](http://acl.mit.edu/papers/KuwataTCST09.pdf)
 
 - [[1601.06326] Sampling-based Algorithms for Optimal Motion Planning Using Closed-loop Prediction](https://arxiv.org/abs/1601.06326)
+
+## Cubic spline planning
+
+A sample code for cubic path planning.
+
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CubicSpline/Figure_1.png?raw=True)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CubicSpline/Figure_2.png?raw=True)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CubicSpline/Figure_3.png?raw=True)
 
 
 ## Dubins path planning
