@@ -15,12 +15,14 @@ Python sample codes for robotics algorithm.
          * [Uniform polar sampling results:](#uniform-polar-sampling-results)
          * [Biased polar sampling results:](#biased-polar-sampling-results)
          * [Lane sampling results:](#lane-sampling-results)
-      * [RRT](#rrt)
-      * [RRTStar](#rrtstar)
-      * [RRT Car](#rrt-car)
-      * [RRTStarCar](#rrtstarcar)
-      * [RRTStarCar_reeds_sheep](#rrtstarcar_reeds_sheep)
-      * [Closed Loop RRT*](#closed-loop-rrt)
+      * [Rapidly-Exploring Random Trees (RRT)](#rapidly-exploring-random-trees-rrt)
+         * [Basic RRT](#basic-rrt)
+         * [RRT*](#rrt)
+         * [RRT with dubins path planner](#rrt-with-dubins-path-planner)
+         * [RRT* with dubins path](#rrt-with-dubins-path)
+         * [RRT* with reeds-sheep path](#rrt-with-reeds-sheep-path)
+         * [Closed Loop RRT*](#closed-loop-rrt)
+      * [Cubic spline planning](#cubic-spline-planning)
       * [Dubins path planning](#dubins-path-planning)
       * [Reeds Shepp planning](#reeds-shepp-planning)
    * [Path tracking](#path-tracking)
@@ -124,7 +126,7 @@ This script is a  path planning code with RRT \*
 - [Incremental Sampling-based Algorithms for Optimal Motion Planning](https://arxiv.org/abs/1005.0416)
 
 
-### RRT with bubins path planner 
+### RRT with dubins path planner 
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTCar/animation.gif)
 
@@ -165,6 +167,10 @@ Autonomous Urban Driving](http://acl.mit.edu/papers/KuwataTCST09.pdf)
 ## Cubic spline planning
 
 A sample code for cubic path planning.
+
+This code generates a curvature continious path based on x-y waypoints with cubic spline.
+
+Heading angle of each point can be also calculated analytically.
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CubicSpline/Figure_1.png?raw=True)
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CubicSpline/Figure_2.png?raw=True)
