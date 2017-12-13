@@ -195,6 +195,25 @@ A sample code with Reeds Shepp path planning.
 ![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-5.png?raw=true)
 ![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-7.png?raw=true)
 
+## Mix Integer Optimization based model predictive planning and control
+
+![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/MixIntegerPathPlanning/animation.gif)
+
+A model predictive planning and control code with mixed integer programming.
+
+It is based on this paper.
+
+- [MIXED INTEGER PROGRAMMING FOR MULTI-VEHICLE PATH PLANNING](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.4.2591&rep=rep1&type=pdf)
+
+This code used cvxpy as optimization modeling tool,
+
+- [Welcome to CVXPY 1\.0 — CVXPY 1\.0\.0 documentation](https://cvxgrp.github.io/cvxpy/index.html)
+
+and Gurobi is used as a solver for mix integer optimization problem.
+
+- [Gurobi Optimization \- The State\-of\-the\-Art Mathematical Programming Solver](http://www.gurobi.com/)
+ 
+
 # Path tracking
 
 Path tracking algorithm samples.
