@@ -43,7 +43,7 @@ Python sample codes for robotics algorithm.
 
 - [pyReedsShepp](https://github.com/ghliu/pyReedsShepp) (Only for reeds sheep path and RRTStarCar_reeds_sheep)
 
-- [cvxpy](https://cvxgrp.github.io/cvxpy/index.html) (For mix integer optimization based model predictive planning and control)
+- [cvxpy](https://cvxgrp.github.io/cvxpy/index.html) (Only for mix integer optimization based model predictive planning and control)
 
 # Path Planning
 
