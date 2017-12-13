@@ -25,6 +25,7 @@ Python sample codes for robotics algorithm.
       * [Cubic spline planning](#cubic-spline-planning)
       * [Dubins path planning](#dubins-path-planning)
       * [Reeds Shepp planning](#reeds-shepp-planning)
+      * [Mix Integer Optimization based model predictive planning and control](#mix-integer-optimization-based-model-predictive-planning-and-control)
    * [Path tracking](#path-tracking)
       * [Pure pursuit tracking](#pure-pursuit-tracking)
       * [Rear wheel feedback control](#rear-wheel-feedback-control)
@@ -41,6 +42,8 @@ Python sample codes for robotics algorithm.
 - matplotlib
 
 - [pyReedsShepp](https://github.com/ghliu/pyReedsShepp) (Only for reeds sheep path and RRTStarCar_reeds_sheep)
+
+- [cvxpy](https://cvxgrp.github.io/cvxpy/index.html) (For mix integer optimization based model predictive planning and control)
 
 # Path Planning
 
