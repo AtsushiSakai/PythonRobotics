@@ -16,3 +16,6 @@
 [submodule "PathPlanning/AStar/matplotrecorder"]
 	path = PathPlanning/AStar/matplotrecorder
 	url = https://github.com/AtsushiSakai/matplotrecorder
+[submodule "PathPlanning/MixIntegerPathPlanning/matplotrecorder"]
+	path = PathPlanning/MixIntegerPathPlanning/matplotrecorder
+	url = https://github.com/AtsushiSakai/matplotrecorder
