@@ -1,6 +1,7 @@
 <img src="https://github.com/AtsushiSakai/PythonRobotics/blob/master/icon.png?raw=true" align="right" width="300"/>
 
 # PythonRobotics
+[![Build Status](https://travis-ci.org/AtsushiSakai/PythonRobotics.svg?branch=master)](https://travis-ci.org/AtsushiSakai/PythonRobotics)
 
 Python sample codes for robotics algorithm.
 
