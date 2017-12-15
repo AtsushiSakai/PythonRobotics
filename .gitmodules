@@ -6,7 +6,7 @@
 	url = https://github.com/AtsushiSakai/matplotrecorder.git
 [submodule "PathTracking/lqr/matplotrecorder"]
 	path = PathTracking/lqr/matplotrecorder
-	url = https://github.com/AtsushiSakai/matplotrecorder.git
+	url = https://github.com/AtsushiSakai/matplotrecorder
 [submodule "PathTracking/lqr/pycubicspline"]
 	path = PathTracking/lqr/pycubicspline
 	url = https://github.com/AtsushiSakai/pycubicspline.git

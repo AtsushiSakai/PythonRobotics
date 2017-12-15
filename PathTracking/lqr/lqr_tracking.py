@@ -20,10 +20,7 @@ Kp = 1.0  # speed proportional gain
 Q = np.eye(4)
 R = np.eye(1)
 
-animation = True
-# animation = False
-
-#matplotrecorder.donothing = True
+matplotrecorder.donothing = True
 
 
 def PIDControl(target, current):
@@ -52,7 +49,7 @@ def solve_DARE(A, B, Q, R):
 
     for i in range(maxiter):
         Xn = A.T * X * A - A.T * X * B * \
-                           la.inv(R + B.T * X * B) * B.T * X * A + Q
+            la.inv(R + B.T * X * B) * B.T * X * A + Q
         if (abs(Xn - X)).max() < eps:
             X = Xn
             break
@@ -102,9 +99,9 @@ def lqr_steering_control(state, cx, cy, cyaw, ck, pe, pth_e):
     x = np.matrix(np.zeros((4, 1)))
 
     x[0, 0] = e
-    x[1, 0] = (e - pe)/unicycle_model.dt
+    x[1, 0] = (e - pe) / unicycle_model.dt
     x[2, 0] = th_e
-    x[3, 0] = (th_e - pth_e)/unicycle_model.dt
+    x[3, 0] = (th_e - pth_e) / unicycle_model.dt
 
     ff = math.atan2(unicycle_model.L * k, 1)
     fb = pi_2_pi((-K * x)[0, 0])
@@ -149,10 +146,11 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
     t = [0.0]
     target_ind = calc_nearest_index(state, cx, cy, cyaw)
 
-    e, e_th  = 0.0, 0.0
+    e, e_th = 0.0, 0.0
 
     while T >= time:
-        dl, target_ind, e, e_th = lqr_steering_control(state, cx, cy, cyaw, ck, e, e_th)
+        dl, target_ind, e, e_th = lqr_steering_control(
+            state, cx, cy, cyaw, ck, e, e_th)
 
         ai = PIDControl(speed_profile[target_ind], state.v)
         # state = unicycle_model.update(state, ai, di)
@@ -176,7 +174,7 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
         v.append(state.v)
         t.append(time)
 
-        if target_ind % 1 == 0 and animation:
+        if target_ind % 1 == 0:
             plt.cla()
             plt.plot(cx, cy, "-r", label="course")
             plt.plot(x, y, "ob", label="trajectory")
@@ -235,8 +233,7 @@ def main():
 
     t, x, y, yaw, v = closed_loop_prediction(cx, cy, cyaw, ck, sp, goal)
 
-    if animation:
-        matplotrecorder.save_movie("animation.gif", 0.1)  # gif is ok.
+    matplotrecorder.save_movie("animation.gif", 0.1)  # gif is ok.
 
     flg, _ = plt.subplots(1)
     plt.plot(ax, ay, "xb", label="input")
