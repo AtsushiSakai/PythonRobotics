@@ -211,7 +211,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def plot_arrow(x, y, yaw, length=1.0, width=0.5):
+class Config():
+
+    def __init__(self):
+        # robot parameter
+        self.max_speed = 1.0
+        self.min_speed = -0.5
+        self.max_yawrate = 40.0 * math.pi / 180.0
+        self.max_accel = 0.2
+        self.max_dyawrate = 40.0 * math.pi / 180.0
+        self.v_reso = 0.1
+        self.yawrate_reso = 0.1 * math.pi / 180.0
+
+        self.dt = 0.1  # [s]
+        self.predict_time = 5.0  # [s]
+
+
+def plot_arrow(x, y, yaw, length=0.5, width=0.1):
     plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),
               head_length=width, head_width=width)
     plt.plot(x, y)
@@ -222,19 +238,78 @@ def motion(x, u, dt):
     x[0] += u[0] * math.cos(x[2]) * dt
     x[1] += u[0] * math.sin(x[2]) * dt
     x[2] += u[1] * dt
+    x[3] = u[0]
+    x[4] = u[1]
 
     return x
+
+
+def calc_dynamic_window(x, rspec, dt):
+
+    # Dynamic window from robot specification
+    Vs = [rspec.min_speed, rspec.max_speed,
+          -rspec.max_yawrate, rspec.max_yawrate]
+
+    # Dynamic window from motion model
+    Vd = [x[3] - rspec.max_accel * dt,
+          x[3] + rspec.max_accel * dt,
+          x[4] - rspec.max_dyawrate * dt,
+          x[4] + rspec.max_dyawrate * dt]
+    print(Vs, Vd)
+
+    #  [vmin,vmax, yawrate min, yawrate max]
+    dw = [max(Vs[0], Vd[0]), min(Vs[1], Vd[1]),
+          max(Vs[2], Vd[2]), min(Vs[3], Vd[3])]
+    print(dw)
+
+    return dw
+
+
+def calc_trajectory(xinit, v, y, config):
+
+    x = np.array(xinit)
+    traj = np.array(x)
+    time = 0
+    while time <= config.predict_time:
+        x = motion(x, [v, y], config.dt)
+        traj = np.vstack((traj, x))
+        time += config.dt
+
+    #  print(len(traj))
+    return traj
+
+
+def calc_cost(x, dw, rspec, dt):
+
+    xinit = x[:]
+
+    for v in np.arange(dw[0], dw[1], rspec.v_reso):
+        for y in np.arange(dw[2], dw[3], rspec.yawrate_reso):
+            traj = calc_trajectory(xinit, v, y, rspec)
+            plt.plot(traj[:, 0], traj[:, 1])
+
+
+def dwa_control(x, u, rspec, dt):
+
+    dw = calc_dynamic_window(x, rspec, dt)
+
+    calc_cost(x, dw, rspec, dt)
+
+    u = np.array([0.5, 0.0])
+
+    return u
 
 
 def main():
     print(__file__ + " start!!")
 
     # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
-    x = np.array([0.0, 0.0, math.pi / 4.0])
+    x = np.array([0.0, 0.0, math.pi / 4.0, 0.0, 0.0])
     # goal position [x(m), y(m)]
     goal = np.array([10, 10])
     # obstacles [x(m) y(m), ....]
-    ob = np.matrix([[0, 2],
+    ob = np.matrix([[-1, -1],
+                    [0, 2],
                     [4.0, 2.0],
                     [5.0, 4.0],
                     [5.0, 5.0],
@@ -242,17 +317,20 @@ def main():
                     [5.0, 9.0],
                     [8.0, 8.0],
                     [8.0, 9.0],
-                    [7.0, 9.0]
-                    ])  # 4 4
+                    [7.0, 9.0],
+                    [12.0, 12.0]
+                    ])
 
     dt = 0.1
-    u = np.array([1.0, 0.1])
+    u = np.array([0.0, 0.0])
+    rspec = Config()
 
     for i in range(100):
+        plt.cla()
+        u = dwa_control(x, u, rspec, dt)
 
         x = motion(x, u, dt)
 
-        plt.cla()
         plt.plot(x[0], x[1], "xr")
         plt.plot(goal[0], goal[1], "xb")
         plt.plot(ob[:, 0], ob[:, 1], "ok")
@@ -261,6 +339,7 @@ def main():
         plt.grid(True)
         plt.pause(0.0001)
 
+    print("Done")
     plt.show()
 
 
