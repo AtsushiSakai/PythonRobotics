@@ -9,20 +9,21 @@ Python sample codes for robotics algorithm.
 
    * [Requirements](#requirements)
    * [Path Planning](#path-planning)
-      * [Dijkstra grid search](#dijkstra-grid-search)
-      * [A star grid search](#a-star-grid-search)
+      * [Grid based search](#grid-based-search)
+         * [Dijkstra algorithm](#dijkstra-algorithm)
+         * [A* algorithm](#a-algorithm)
       * [Model Predictive Trajectory Generator](#model-predictive-trajectory-generator)
-         * [Path optimization sample:](#path-optimization-sample)
-         * [Lookup table generation sample:](#lookup-table-generation-sample)
+         * [Path optimization sample](#path-optimization-sample)
+         * [Lookup table generation sample](#lookup-table-generation-sample)
       * [State Lattice Planning](#state-lattice-planning)
-         * [Uniform polar sampling results:](#uniform-polar-sampling-results)
-         * [Biased polar sampling results:](#biased-polar-sampling-results)
-         * [Lane sampling results:](#lane-sampling-results)
+         * [Uniform polar sampling](#uniform-polar-sampling)
+         * [Biased polar sampling](#biased-polar-sampling)
+         * [Lane sampling](#lane-sampling)
       * [Rapidly-Exploring Random Trees (RRT)](#rapidly-exploring-random-trees-rrt)
          * [Basic RRT](#basic-rrt)
          * [RRT*](#rrt)
-         * [RRT with dubins path planner](#rrt-with-dubins-path-planner)
-         * [RRT* with dubins path](#rrt-with-dubins-path)
+         * [RRT with dubins path](#rrt-with-dubins-path)
+         * [RRT* with dubins path](#rrt-with-dubins-path-1)
          * [RRT* with reeds-sheep path](#rrt-with-reeds-sheep-path)
          * [Closed Loop RRT*](#closed-loop-rrt)
       * [Cubic spline planning](#cubic-spline-planning)
@@ -38,6 +39,8 @@ Python sample codes for robotics algorithm.
 
 # Requirements
 
+- Python 3.6.x
+
 - numpy
 
 - scipy
@@ -52,7 +55,9 @@ Python sample codes for robotics algorithm.
 
 Path planning algorithm.
 
-## Dijkstra grid search
+## Grid based search
+
+### Dijkstra algorithm
 
 This is a 2D grid based shortest path planning with Dijkstra's algorithm.
 
@@ -60,7 +65,7 @@ This is a 2D grid based shortest path planning with Dijkstra's algorithm.
 
 In the animation, cyan points are searched nodes.
 
-## A star grid search
+### A\* algorithm
 
 This is a 2D grid based shortest path planning with A star algorithm.
 
@@ -75,11 +80,11 @@ It's heuristic is 2D Euclid distance.
 
 This script is a path planning code with model predictive trajectory generator.
 
-### Path optimization sample:
+### Path optimization sample
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ModelPredictiveTrajectoryGenerator/kn05animation.gif)
 
-### Lookup table generation sample:
+### Lookup table generation sample
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ModelPredictiveTrajectoryGenerator/lookuptable.png?raw=True)
 
@@ -95,19 +100,19 @@ This script is a path planning code with state lattice planning.
 This code uses the model predictive trajectory generator to solve boundary problem.
 
 
-### Uniform polar sampling results:
+### Uniform polar sampling
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/Figure_1.png)
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/Figure_2.png)
 
-### Biased polar sampling results:
+### Biased polar sampling
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/Figure_3.png)
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/Figure_4.png)
 
-### Lane sampling results:
+### Lane sampling
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/Figure_5.png)
 
@@ -132,7 +137,7 @@ This script is a  path planning code with RRT \*
 - [Incremental Sampling-based Algorithms for Optimal Motion Planning](https://arxiv.org/abs/1005.0416)
 
 
-### RRT with dubins path planner 
+### RRT with dubins path 
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTCar/animation.gif)
 
