@@ -10,7 +10,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotrecorder import matplotrecorder
-matplotrecorder.donothing = False
+matplotrecorder.donothing = True
 
 
 class Config():
