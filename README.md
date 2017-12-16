@@ -9,6 +9,7 @@ Python sample codes for robotics algorithm.
 
    * [Requirements](#requirements)
    * [Path Planning](#path-planning)
+      * [Dynamic Window Approach](#dynamic-window-approach)
       * [Grid based search](#grid-based-search)
          * [Dijkstra algorithm](#dijkstra-algorithm)
          * [A* algorithm](#a-algorithm)
@@ -59,7 +60,11 @@ Path planning algorithm.
 
 This is a 2D navigation sample code with Dynamic Window Approach.
 
+- [The Dynamic Window Approach to Collision Avoidance](https://www.ri.cmu.edu/pub_files/pub1/fox_dieter_1997_1/fox_dieter_1997_1.pdf)
+
 ![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DynamicWindowApproach/animation.gif)
+
+ 
 
 ## Grid based search
 
