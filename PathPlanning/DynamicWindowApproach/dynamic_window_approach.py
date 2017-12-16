@@ -6,66 +6,6 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 
 bstacleR=0.5;%衝突判定用の障害物の半径
-global dt; dt=0.1;%刻み時間[s]
-
-
-%Dynamic Window[vmin,vmax,ωmin,ωmax]の作成
-Vr=CalcDynamicWindow(x,model);
-%評価関数の計算
-[evalDB,trajDB]=Evaluation(x,Vr,goal,ob,R,model,evalParam);
-
-%各評価関数の正規化
-evalDB=NormalizeEval(evalDB);
-
-%最終評価値の計算
-feval=[];
-for id=1:length(evalDB(:,1))
-    feval=[feval;evalParam(1:3)*evalDB(id,3:5)'];
-end
-evalDB=[evalDB feval];
-
-[maxv,ind]=max(feval);%最も評価値が大きい入力値のインデックスを計算
-u=evalDB(ind,1:2)';%評価値が高い入力値を返す
-
-function [evalDB,trajDB]=Evaluation(x,Vr,goal,ob,R,model,evalParam)
-%各パスに対して評価値を計算する関数
-evalDB=[];
-trajDB=[];
-
-for vt=Vr(1):model(5):Vr(2)
-    for ot=Vr(3):model(6):Vr(4)
-        %軌跡の推定
-        [xt,traj]=GenerateTrajectory(x,vt,ot,evalParam(4),model);
-        %各評価関数の計算
-        heading=CalcHeadingEval(xt,goal);
-        dist=CalcDistEval(xt,ob,R);
-        vel=abs(vt);
-
-        evalDB=[evalDB;[vt ot heading dist vel]];
-        trajDB=[trajDB;traj];
-    end
-end
-
-function EvalDB=NormalizeEval(EvalDB)
-%評価値を正規化する関数
-if sum(EvalDB(:,3))~=0
-    EvalDB(:,3)=EvalDB(:,3)/sum(EvalDB(:,3));
-end
-if sum(EvalDB(:,4))~=0
-    EvalDB(:,4)=EvalDB(:,4)/sum(EvalDB(:,4));
-end
-if sum(EvalDB(:,5))~=0
-    EvalDB(:,5)=EvalDB(:,5)/sum(EvalDB(:,5));
-end
-
-function stopDist=CalcBreakingDist(vel,model)
-%現在の速度から力学モデルに従って制動距離を計算する関数
-global dt;
-stopDist=0;
-while vel>0
-    stopDist=stopDist+vel*dt;%制動距離の計算
-    vel=vel-model(3)*dt;%最高原則
-end
 
 function dist=CalcDistEval(x,ob,R)
 %障害物との距離評価値を計算する関数
@@ -77,20 +17,6 @@ for io=1:length(ob(:,1))
         dist=disttmp;
     end
 end
-
-function heading=CalcHeadingEval(x,goal)
-%headingの評価関数を計算する関数
-
-theta=toDegree(x(3));%ロボットの方位
-goalTheta=toDegree(atan2(goal(2)-x(2),goal(1)-x(1)));%ゴールの方位
-
-if goalTheta>theta
-    targetTheta=goalTheta-theta;%ゴールまでの方位差分[deg]
-else
-    targetTheta=theta-goalTheta;%ゴールまでの方位差分[deg]
-end
-
-heading=180-targetTheta;
 
 """
 
@@ -106,14 +32,16 @@ class Config():
         self.max_speed = 1.0
         self.min_speed = -0.5
         self.max_yawrate = 40.0 * math.pi / 180.0
-        self.max_accel = 0.2
+        self.max_accel = 0.5
         self.max_dyawrate = 40.0 * math.pi / 180.0
         self.v_reso = 0.01
         self.yawrate_reso = 0.1 * math.pi / 180.0
 
         self.dt = 0.1  # [s]
-        self.predict_time = 5.0  # [s]
+        self.predict_time = 2.0  # [s]
         self.to_goal_cost_gain = 1.0  # [s]
+        self.speed_cost_gain = 1.0  # [s]
+        self.robot_radius = 1.0  # [s]
 
 
 def plot_arrow(x, y, yaw, length=0.5, width=0.1):
@@ -168,33 +96,53 @@ def calc_trajectory(xinit, v, y, config):
     return traj
 
 
-def evaluate_path(x, dw, config, goal):
+def evaluate_path(x, dw, config, goal, ob):
 
     xinit = x[:]
-
-    min_cost = float("Inf")
+    min_cost = 10000.0
     min_u = [0.0, 0.0]
-
-    #  print(dw)
+    best_traj = None
 
     for v in np.arange(dw[0], dw[1], config.v_reso):
         for y in np.arange(dw[2], dw[3], config.yawrate_reso):
             traj = calc_trajectory(xinit, v, y, config)
-            #  plt.plot(traj[:, 0], traj[:, 1])
             #  print(v, ",", y)
 
-            angle_cost = calc_to_goal_cost(traj, goal, config)
+            to_goal_cost = calc_to_goal_cost(traj, goal, config)
+            speed_cost = config.speed_cost_gain * \
+                (config.max_speed - traj[-1, 3])
+            ob_cost = calc_obstacle_cost(traj, ob, config)
+            #  print(ob_cost)
 
-            final_cost = angle_cost
+            final_cost = to_goal_cost + speed_cost + ob_cost
 
             if min_cost >= final_cost:
                 min_cost = final_cost
                 min_u = [v, y]
+                best_traj = traj
 
+    if best_traj is not None:
+        plt.plot(best_traj[:, 0], best_traj[:, 1])
     #  print(min_u)
     #  input()
 
     return min_u
+
+
+def calc_obstacle_cost(traj, ob, config):
+
+    for ii in range(len(traj[:, 1])):
+        for i in range(len(ob[:, 0])):
+            ox = ob[i, 0]
+            oy = ob[i, 1]
+            dx = traj[ii, 0] - ox
+            dy = traj[ii, 1] - oy
+
+            r = math.sqrt(dx**2 + dy**2)
+            if r <= config.robot_radius:
+                return float("Inf")
+
+    return 0.0
 
 
 def calc_to_goal_cost(traj, goal, config):
@@ -216,11 +164,11 @@ def calc_to_goal_cost(traj, goal, config):
     return cost
 
 
-def dwa_control(x, u, config, dt, goal):
+def dwa_control(x, u, config, dt, goal, ob):
 
     dw = calc_dynamic_window(x, config)
 
-    u = evaluate_path(x, dw, config, goal)
+    u = evaluate_path(x, dw, config, goal, ob)
 
     return u
 
@@ -240,7 +188,6 @@ def main():
                     [5.0, 5.0],
                     [5.0, 6.0],
                     [5.0, 9.0],
-                    [8.0, 8.0],
                     [8.0, 9.0],
                     [7.0, 9.0],
                     [12.0, 12.0]
@@ -252,7 +199,7 @@ def main():
 
     for i in range(1000):
         plt.cla()
-        u = dwa_control(x, u, config, dt, goal)
+        u = dwa_control(x, u, config, dt, goal, ob)
 
         x = motion(x, u, dt)
 
