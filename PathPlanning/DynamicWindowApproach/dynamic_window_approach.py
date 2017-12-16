@@ -9,6 +9,8 @@ author: Atsushi Sakai (@Atsushi_twi)
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotrecorder import matplotrecorder
+matplotrecorder.donothing = False
 
 
 class Config():
@@ -19,13 +21,12 @@ class Config():
         self.max_speed = 1.0  # [m/s]
         self.min_speed = -0.5  # [m/s]
         self.max_yawrate = 40.0 * math.pi / 180.0  # [rad/s]
-        self.max_accel = 0.3  # [m/ss]
-        self.max_dyawrate = 20.0 * math.pi / 180.0  # [rad/ss]
+        self.max_accel = 0.2  # [m/ss]
+        self.max_dyawrate = 40.0 * math.pi / 180.0  # [rad/ss]
         self.v_reso = 0.01  # [m/s]
         self.yawrate_reso = 0.1 * math.pi / 180.0  # [rad/s]
-
         self.dt = 0.1  # [s]
-        self.predict_time = 2.0  # [s]
+        self.predict_time = 3.0  # [s]
         self.to_goal_cost_gain = 1.0
         self.speed_cost_gain = 1.0
         self.robot_radius = 1.0  # [m]
@@ -115,7 +116,10 @@ def calc_final_input(x, u, dw, config, goal, ob):
 def calc_obstacle_cost(traj, ob, config):
     # calc obstacle cost inf: collistion, 0:free
 
-    for ii in range(0, len(traj[:, 1]), 1):
+    skip_n = 2
+    minr = float("inf")
+
+    for ii in range(0, len(traj[:, 1]), skip_n):
         for i in range(len(ob[:, 0])):
             ox = ob[i, 0]
             oy = ob[i, 1]
@@ -126,7 +130,10 @@ def calc_obstacle_cost(traj, ob, config):
             if r <= config.robot_radius:
                 return float("Inf")  # collisiton
 
-    return 0.0  # OK
+            if minr >= r:
+                minr = r
+
+    return 1.0 / minr  # OK
 
 
 def calc_to_goal_cost(traj, goal, config):
@@ -194,6 +201,7 @@ def main():
         plt.axis("equal")
         plt.grid(True)
         plt.pause(0.0001)
+        matplotrecorder.save_frame()
 
         # check goal
         if math.sqrt((x[0] - goal[0])**2 + (x[1] - goal[1])**2) <= config.robot_radius:
@@ -202,6 +210,8 @@ def main():
 
     print("Done")
     plt.plot(traj[:, 0], traj[:, 1], "-r")
+    matplotrecorder.save_frame()
+    matplotrecorder.save_movie("animation.gif", 0.1)
     plt.show()
 
 

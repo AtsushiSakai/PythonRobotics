@@ -55,6 +55,12 @@ Python sample codes for robotics algorithm.
 
 Path planning algorithm.
 
+## Dynamic Window Approach
+
+This is a 2D navigation sample code with Dynamic Window Approach.
+
+![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DynamicWindowApproach/animation.gif)
+
 ## Grid based search
 
 ### Dijkstra algorithm

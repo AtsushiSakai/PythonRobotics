@@ -25,3 +25,6 @@
 [submodule "PathPlanning/MixIntegerPathPlanning/matplotrecorder"]
 	path = PathPlanning/MixIntegerPathPlanning/matplotrecorder
 	url = https://github.com/AtsushiSakai/matplotrecorder
+[submodule "PathPlanning/DynamicWindowApproach/matplotrecorder"]
+	path = PathPlanning/DynamicWindowApproach/matplotrecorder
+	url = https://github.com/AtsushiSakai/matplotrecorder
