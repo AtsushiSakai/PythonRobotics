@@ -1,9 +1,8 @@
-#! /usr/bin/python
 """
 
 Path tracking simulation with LQR steering control and PID speed control.
 
-author: Atsushi Sakai
+author Atsushi Sakai (@Atsushi_twi)
 
 """
 import numpy as np
@@ -197,7 +196,7 @@ def calc_speed_profile(cx, cy, cyaw, target_speed):
 
     # Set stop point
     for i in range(len(cx) - 1):
-        dyaw = cyaw[i + 1] - cyaw[i]
+        dyaw = abs(cyaw[i + 1] - cyaw[i])
         switch = math.pi / 4.0 <= dyaw < math.pi / 2.0
 
         if switch:
@@ -227,7 +226,7 @@ def main():
     goal = [ax[-1], ay[-1]]
 
     cx, cy, cyaw, ck, s = pycubicspline.calc_spline_course(ax, ay, ds=0.1)
-    target_speed = 10.0 / 3.6
+    target_speed = 10.0 / 3.6  # simulation parameter km/h -> m/s
 
     sp = calc_speed_profile(cx, cy, cyaw, target_speed)
 

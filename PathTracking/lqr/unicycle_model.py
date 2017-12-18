@@ -1,19 +1,21 @@
 #! /usr/bin/python
-# -*- coding: utf-8 -*-
 """
 
+Unicycle Model of robot
 
-author Atsushi Sakai
+author Atsushi Sakai (@Atsushi_twi)
 """
 
 import math
 
-dt = 0.1  # [s]
-L = 0.5  # [m]
-max_steer = math.radians(45.0)
+# parameters
+dt = 0.1  # time tick[s]
+L = 0.5  # Wheel base of the vehicle [m]
+max_steer = math.radians(45.0)  # maximum steering angle[rad]
 
 
 class State:
+
     def __init__(self, x=0.0, y=0.0, yaw=0.0, v=0.0):
         self.x = x
         self.y = y
