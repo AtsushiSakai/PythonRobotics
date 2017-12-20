@@ -1,5 +1,4 @@
 #! /usr/bin/python
-# -*- coding: utf-8 -*-
 """
 
 Reeds Shepp path planner sample code
