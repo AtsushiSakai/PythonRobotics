@@ -28,3 +28,6 @@
 [submodule "PathPlanning/DynamicWindowApproach/matplotrecorder"]
 	path = PathPlanning/DynamicWindowApproach/matplotrecorder
 	url = https://github.com/AtsushiSakai/matplotrecorder
+[submodule "PathPlanning/ProbablisticRoadMap/matplotrecorder"]
+	path = PathPlanning/ProbablisticRoadMap/matplotrecorder
+	url = https://github.com/AtsushiSakai/matplotrecorder
