@@ -31,3 +31,6 @@
 [submodule "PathPlanning/ProbablisticRoadMap/matplotrecorder"]
 	path = PathPlanning/ProbablisticRoadMap/matplotrecorder
 	url = https://github.com/AtsushiSakai/matplotrecorder
+[submodule "PathPlanning/ProbablisticRoadMap/pyfastnns"]
+	path = PathPlanning/ProbablisticRoadMap/pyfastnns
+	url = https://github.com/AtsushiSakai/pyfastnns
