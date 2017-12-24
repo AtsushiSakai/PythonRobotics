@@ -263,6 +263,20 @@ Path tracking simulation with pure pursuit steering control and PID speed contro
 
 ![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/pure_pursuit/animation.gif)
 
+## Stanley control
+
+Path tracking simulation with Stanley steering control and PID speed control.
+
+![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/stanley_controller/animation.gif)
+
+Ref:
+
+- [Stanley: The robot that won the DARPA grand challenge](http://robots.stanford.edu/papers/thrun.stanley05.pdf)
+
+- [Automatic Steering Methods for Autonomous Automobile Path Tracking](https://www.ri.cmu.edu/pub_files/2009/2/Automatic_Steering_Methods_for_Autonomous_Automobile_Path_Tracking.pdf)
+
+
+
 ## Rear wheel feedback control
 
 Path tracking simulation with rear wheel feedback steering control and PID speed control.
