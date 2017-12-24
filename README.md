@@ -129,6 +129,22 @@ This code uses the model predictive trajectory generator to solve boundary probl
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/Figure_6.png)
 
+## Probabilistic Road-Map (PRM) planning 
+
+This PRM planner uses Dijkstra method for graph search.
+
+![PRM](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ProbabilisticRoadMap/animation.gif)
+
+In the animation, blue points are sampled points,
+
+Cyan cross means searched with Dijkstra method,
+
+The final red line is the final path from PRM.
+
+- [Probabilistic roadmap \- Wikipedia](https://en.wikipedia.org/wiki/Probabilistic_roadmap)
+
+　　
+
 ## Rapidly-Exploring Random Trees (RRT)
 
 ### Basic RRT 
