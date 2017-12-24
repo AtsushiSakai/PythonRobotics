@@ -3,7 +3,7 @@
 # PythonRobotics
 [![Build Status](https://travis-ci.org/AtsushiSakai/PythonRobotics.svg?branch=master)](https://travis-ci.org/AtsushiSakai/PythonRobotics)
 
-Python sample codes for robotics algorithm.
+Python codes for robotics algorithm.
 
 # Table of Contents
 
@@ -20,6 +20,7 @@ Python sample codes for robotics algorithm.
          * [Uniform polar sampling](#uniform-polar-sampling)
          * [Biased polar sampling](#biased-polar-sampling)
          * [Lane sampling](#lane-sampling)
+      * [Probabilistic Road-Map (PRM) planning](#probabilistic-road-map-prm-planning)
       * [Rapidly-Exploring Random Trees (RRT)](#rapidly-exploring-random-trees-rrt)
          * [Basic RRT](#basic-rrt)
          * [RRT*](#rrt)
@@ -137,9 +138,9 @@ This PRM planner uses Dijkstra method for graph search.
 
 In the animation, blue points are sampled points,
 
-Cyan cross means searched with Dijkstra method,
+Cyan crosses means searched points with Dijkstra method,
 
-The final red line is the final path from PRM.
+The final red line is the final path of PRM.
 
 - [Probabilistic roadmap \- Wikipedia](https://en.wikipedia.org/wiki/Probabilistic_roadmap)
 
