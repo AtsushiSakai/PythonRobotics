@@ -298,19 +298,19 @@ def main():
         ox.append(40.0)
         oy.append(60.0 - i)
 
-    plt.plot(ox, oy, ".k")
-    plt.plot(sx, sy, "^r")
-    plt.plot(gx, gy, "^c")
-    plt.grid(True)
-    plt.axis("equal")
+    if show_animation:
+        plt.plot(ox, oy, ".k")
+        plt.plot(sx, sy, "^r")
+        plt.plot(gx, gy, "^c")
+        plt.grid(True)
+        plt.axis("equal")
 
     rx, ry = PRM_planning(sx, sy, gx, gy, ox, oy, robot_size)
-
-    plt.plot(rx, ry, "-r")
 
     assert len(rx) != 0, 'Cannot found path'
 
     if show_animation:
+        plt.plot(rx, ry, "-r")
         plt.show()
 
 
