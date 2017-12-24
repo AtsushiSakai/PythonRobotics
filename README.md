@@ -34,6 +34,7 @@ Python codes for robotics algorithm.
       * [Mix Integer Optimization based model predictive planning and control](#mix-integer-optimization-based-model-predictive-planning-and-control)
    * [Path tracking](#path-tracking)
       * [Pure pursuit tracking](#pure-pursuit-tracking)
+      * [Stanley control](#stanley-control)
       * [Rear wheel feedback control](#rear-wheel-feedback-control)
       * [Linear–quadratic regulator (LQR) control](#linearquadratic-regulator-lqr-control)
    * [License](#license)
