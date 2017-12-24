@@ -261,10 +261,7 @@ Path tracking algorithm samples.
 
 Path tracking simulation with pure pursuit steering control and PID speed control.
 
-![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/pure_pursuit/Figure_1-3.png?raw=True)
-![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/pure_pursuit/2Figure_1-2.png?raw=True)
-![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/pure_pursuit/4Figure_1-2.png?raw=True)
-
+![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/pure_pursuit/animation.gif)
 
 ## Rear wheel feedback control
 
