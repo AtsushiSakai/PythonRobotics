@@ -1,6 +1,8 @@
 language: python
 python:
   - 3.6
+install:
+  - "pip install scipy"
 script:
   - python --version
   - python -m unittest discover tests
