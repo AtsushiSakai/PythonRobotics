@@ -5,13 +5,13 @@ Path tracking simulation with Stanley steering control and PID speed control.
 author: Atsushi Sakai (@Atsushi_twi)
 
 """
-#  import numpy as np
 import math
 import matplotlib.pyplot as plt
 
 from pycubicspline import pycubicspline
 
-k = 0.5  # look forward gain
+
+k = 0.5  # control gain
 Kp = 1.0  # speed propotional gain
 dt = 0.1  # [s] time difference
 L = 2.9  # [m] Wheel base of vehicle
@@ -62,9 +62,6 @@ def stanley_control(state, cx, cy, cyaw, pind):
     theta_d = math.atan2(k * efa, state.v)
     delta = theta_e + theta_d
 
-    print(delta, theta_e, theta_d, state.yaw, cyaw[ind], efa)
-    #  input()
-
     return delta, ind
 
 
@@ -91,8 +88,7 @@ def calc_target_index(state, cx, cy):
     mind = min(d)
     ind = d.index(mind)
 
-    tyaw = math.atan2(fy - cy[ind], fx - cx[ind]) - state.yaw
-    print(tyaw)
+    tyaw = pi_2_pi(math.atan2(fy - cy[ind], fx - cx[ind]) - state.yaw)
     if tyaw > 0.0:
         mind = - mind
 
@@ -101,8 +97,8 @@ def calc_target_index(state, cx, cy):
 
 def main():
     #  target course
-    ax = [0.0, 100.0, 100.0, 50.0]
-    ay = [0.0, 0.0, -30.0, -20.0]
+    ax = [0.0, 100.0, 100.0, 50.0, 60.0]
+    ay = [0.0, 0.0, -30.0, -20.0, 0.0]
 
     cx, cy, cyaw, ck, s = pycubicspline.calc_spline_course(ax, ay, ds=0.1)
 
