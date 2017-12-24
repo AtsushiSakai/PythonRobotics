@@ -1,20 +1,21 @@
 """
 
-Path tracking simulation with pure pursuit steering control and PID speed control.
+Path tracking simulation with Stanley steering control and PID speed control.
 
 author: Atsushi Sakai (@Atsushi_twi)
 
 """
-import numpy as np
+#  import numpy as np
 import math
 import matplotlib.pyplot as plt
 
-k = 0.1  # look forward gain
-Lfc = 1.0  # look-ahead distance
-Kp = 1.0  # speed propotional gain
-dt = 0.1  # [s]
-L = 2.9  # [m] wheel base of vehicle
+from pycubicspline import pycubicspline
 
+k = 0.5  # look forward gain
+Kp = 1.0  # speed propotional gain
+dt = 0.1  # [s] time difference
+L = 2.9  # [m] Wheel base of vehicle
+max_steer = math.radians(30.0)  # [rad] max steering angle
 
 show_animation = True
 
@@ -30,9 +31,15 @@ class State:
 
 def update(state, a, delta):
 
+    if delta >= max_steer:
+        delta = max_steer
+    elif delta <= -max_steer:
+        delta = -max_steer
+
     state.x = state.x + state.v * math.cos(state.yaw) * dt
     state.y = state.y + state.v * math.sin(state.yaw) * dt
     state.yaw = state.yaw + state.v / L * math.tan(delta) * dt
+    state.yaw = pi_2_pi(state.yaw)
     state.v = state.v + a * dt
 
     return state
@@ -44,65 +51,67 @@ def PIDControl(target, current):
     return a
 
 
-def pure_pursuit_control(state, cx, cy, pind):
+def stanley_control(state, cx, cy, cyaw, pind):
 
-    ind = calc_target_index(state, cx, cy)
+    ind, efa = calc_target_index(state, cx, cy)
 
     if pind >= ind:
         ind = pind
 
-    if ind < len(cx):
-        tx = cx[ind]
-        ty = cy[ind]
-    else:
-        tx = cx[-1]
-        ty = cy[-1]
-        ind = len(cx) - 1
+    theta_e = pi_2_pi(cyaw[ind] - state.yaw)
+    theta_d = math.atan2(k * efa, state.v)
+    delta = theta_e + theta_d
 
-    alpha = math.atan2(ty - state.y, tx - state.x) - state.yaw
-
-    if state.v < 0:  # back
-        alpha = math.pi - alpha
-
-    Lf = k * state.v + Lfc
-
-    delta = math.atan2(2.0 * L * math.sin(alpha) / Lf, 1.0)
+    print(delta, theta_e, theta_d, state.yaw, cyaw[ind], efa)
+    #  input()
 
     return delta, ind
 
 
+def pi_2_pi(angle):
+    while (angle > math.pi):
+        angle = angle - 2.0 * math.pi
+
+    while (angle < -math.pi):
+        angle = angle + 2.0 * math.pi
+
+    return angle
+
+
 def calc_target_index(state, cx, cy):
 
+    # calc frant axle position
+    fx = state.x + L * math.cos(state.yaw)
+    fy = state.y + L * math.sin(state.yaw)
+
     # search nearest point index
-    dx = [state.x - icx for icx in cx]
-    dy = [state.y - icy for icy in cy]
-    d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
-    ind = d.index(min(d))
-    L = 0.0
+    dx = [fx - icx for icx in cx]
+    dy = [fy - icy for icy in cy]
+    d = [math.sqrt(idx ** 2 + idy ** 2) for (idx, idy) in zip(dx, dy)]
+    mind = min(d)
+    ind = d.index(mind)
 
-    Lf = k * state.v + Lfc
+    tyaw = math.atan2(fy - cy[ind], fx - cx[ind]) - state.yaw
+    print(tyaw)
+    if tyaw > 0.0:
+        mind = - mind
 
-    # search look ahead target point index
-    while Lf > L and (ind + 1) < len(cx):
-        dx = cx[ind + 1] - cx[ind]
-        dy = cx[ind + 1] - cx[ind]
-        L += math.sqrt(dx ** 2 + dy ** 2)
-        ind += 1
-
-    return ind
+    return ind, mind
 
 
 def main():
     #  target course
-    cx = np.arange(0, 50, 0.1)
-    cy = [math.sin(ix / 5.0) * ix / 2.0 for ix in cx]
+    ax = [0.0, 100.0, 100.0, 50.0]
+    ay = [0.0, 0.0, -30.0, -20.0]
 
-    target_speed = 10.0 / 3.6  # [m/s]
+    cx, cy, cyaw, ck, s = pycubicspline.calc_spline_course(ax, ay, ds=0.1)
+
+    target_speed = 30.0 / 3.6  # [m/s]
 
     T = 100.0  # max simulation time
 
     # initial state
-    state = State(x=-0.0, y=-3.0, yaw=0.0, v=0.0)
+    state = State(x=-0.0, y=5.0, yaw=math.radians(20.0), v=0.0)
 
     lastIndex = len(cx) - 1
     time = 0.0
@@ -111,11 +120,11 @@ def main():
     yaw = [state.yaw]
     v = [state.v]
     t = [0.0]
-    target_ind = calc_target_index(state, cx, cy)
+    target_ind, mind = calc_target_index(state, cx, cy)
 
     while T >= time and lastIndex > target_ind:
         ai = PIDControl(target_speed, state.v)
-        di, target_ind = pure_pursuit_control(state, cx, cy, target_ind)
+        di, target_ind = stanley_control(state, cx, cy, cyaw, target_ind)
         state = update(state, ai, di)
 
         time = time + dt
@@ -157,5 +166,4 @@ def main():
 
 
 if __name__ == '__main__':
-    print("Pure pursuit path tracking simulation start")
     main()
