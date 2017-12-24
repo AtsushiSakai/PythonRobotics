@@ -3,6 +3,8 @@ python:
   - 3.6
 install:
   - "pip install scipy"
+  - "pip install numpy"
+  - "pip install matplotlib"
 script:
   - python --version
   - python -m unittest discover tests
