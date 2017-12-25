@@ -241,6 +241,7 @@ def plot_road_map(road_map, sample_x, sample_y):
 def sample_points(sx, sy, gx, gy, rr, ox, oy, obkdtree):
     oxy = np.vstack((ox, oy)).T
 
+    # generate voronoi point
     vor = scipy.spatial.Voronoi(oxy)
     sample_x = [ix for [ix, iy] in vor.vertices]
     sample_y = [iy for [ix, iy] in vor.vertices]
