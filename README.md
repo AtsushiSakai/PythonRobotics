@@ -21,6 +21,7 @@ Python codes for robotics algorithm.
          * [Biased polar sampling](#biased-polar-sampling)
          * [Lane sampling](#lane-sampling)
       * [Probabilistic Road-Map (PRM) planning](#probabilistic-road-map-prm-planning)
+      * [Voronoi Road-Map planning](#voronoi-road-map-planning)
       * [Rapidly-Exploring Random Trees (RRT)](#rapidly-exploring-random-trees-rrt)
          * [Basic RRT](#basic-rrt)
          * [RRT*](#rrt)
@@ -148,7 +149,7 @@ The red line is the final path of PRM.
 　　
 ## Voronoi Road-Map planning 
 
-![PRM](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/VornoiRoadMap/animation.gif)
+![VRM](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/VoronoiRoadMap/animation.gif)
 
 This Voronoi road-map planner uses Dijkstra method for graph search.
 

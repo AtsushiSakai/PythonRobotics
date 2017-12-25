@@ -1,9 +1,5 @@
 from unittest import TestCase
-
-import sys
-sys.path.append("./PathTracking/stanley_controller/")
-
-from PathTracking.stanley_controller import stanley_controller as m
+from PathPlanning.VoronoiRoadMap import voronoi_road_map as m
 
 print(__file__)
 
