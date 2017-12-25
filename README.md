@@ -133,19 +133,33 @@ This code uses the model predictive trajectory generator to solve boundary probl
 
 ## Probabilistic Road-Map (PRM) planning 
 
-This PRM planner uses Dijkstra method for graph search.
-
 ![PRM](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ProbabilisticRoadMap/animation.gif)
+
+This PRM planner uses Dijkstra method for graph search.
 
 In the animation, blue points are sampled points,
 
 Cyan crosses means searched points with Dijkstra method,
 
-The final red line is the final path of PRM.
+The red line is the final path of PRM.
 
 - [Probabilistic roadmap \- Wikipedia](https://en.wikipedia.org/wiki/Probabilistic_roadmap)
 
 　　
+## Voronoi Road-Map planning 
+
+![PRM](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/VornoiRoadMap/animation.gif)
+
+This Voronoi road-map planner uses Dijkstra method for graph search.
+
+In the animation, blue points are Voronoi points,
+
+Cyan crosses means searched points with Dijkstra method,
+
+The red line is the final path of Vornoi Road-Map.
+
+- [Robotic Motion Planning](https://www.cs.cmu.edu/~motionplanning/lecture/Chap5-RoadMap-Methods_howie.pdf)
+
 
 ## Rapidly-Exploring Random Trees (RRT)
 
