@@ -8,6 +8,7 @@ Python codes for robotics algorithm.
 # Table of Contents
 
    * [Requirements](#requirements)
+   * [How to use](#how-to-use)
    * [Path Planning](#path-planning)
       * [Dynamic Window Approach](#dynamic-window-approach)
       * [Grid based search](#grid-based-search)
@@ -54,6 +55,17 @@ Python codes for robotics algorithm.
 - [pyReedsShepp](https://github.com/ghliu/pyReedsShepp) (Only for reeds sheep path and RRTStarCar_reeds_sheep)
 
 - [cvxpy](https://cvxgrp.github.io/cvxpy/index.html) (Only for mix integer optimization based model predictive planning and control)
+
+# How to use
+
+1. Install the required libraries.
+
+2. Clone this repo.
+
+3. Execute python script in each dir.
+
+4. Add star to this repo if you like it :). 
+
 
 # Path Planning
 
@@ -144,6 +156,8 @@ Cyan crosses means searched points with Dijkstra method,
 
 The red line is the final path of PRM.
 
+Ref:
+
 - [Probabilistic roadmap \- Wikipedia](https://en.wikipedia.org/wiki/Probabilistic_roadmap)
 
 　　
@@ -158,6 +172,8 @@ In the animation, blue points are Voronoi points,
 Cyan crosses means searched points with Dijkstra method,
 
 The red line is the final path of Vornoi Road-Map.
+
+Ref:
 
 - [Robotic Motion Planning](https://www.cs.cmu.edu/~motionplanning/lecture/Chap5-RoadMap-Methods_howie.pdf)
 
