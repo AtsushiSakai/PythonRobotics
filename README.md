@@ -64,7 +64,7 @@ Python codes for robotics algorithm.
 
 3. Execute python script in each dir.
 
-4. Add star to this repo if you like it :). 
+4. Add star to this repo if you like it :smiley:. 
 
 
 # Path Planning
