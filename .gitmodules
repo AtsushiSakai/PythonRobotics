@@ -1,9 +1,6 @@
 [submodule "PathTracking/rear_wheel_feedback/pycubicspline"]
 	path = PathTracking/rear_wheel_feedback/pycubicspline
 	url = https://github.com/AtsushiSakai/pycubicspline.git
-[submodule "PathTracking/rear_wheel_feedback/matplotrecorder"]
-	path = PathTracking/rear_wheel_feedback/matplotrecorder
-	url = https://github.com/AtsushiSakai/matplotrecorder.git
 [submodule "PathTracking/lqr/matplotrecorder"]
 	path = PathTracking/lqr/matplotrecorder
 	url = https://github.com/AtsushiSakai/matplotrecorder

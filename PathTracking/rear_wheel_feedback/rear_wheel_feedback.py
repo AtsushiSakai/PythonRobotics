@@ -1,25 +1,43 @@
-#! /usr/bin/python
 """
 
 Path tracking simulation with rear wheel feedback steering control and PID speed control.
 
-author: Atsushi Sakai
+author: Atsushi Sakai(@Atsushi_twi)
 
 """
 import math
 import matplotlib.pyplot as plt
-import unicycle_model
 from pycubicspline import pycubicspline
-from matplotrecorder import matplotrecorder
 
 Kp = 1.0  # speed propotional gain
 # steering control parameter
 KTH = 1.0
 KE = 0.5
 
+dt = 0.1  # [s]
+L = 2.9  # [m]
 
-#  animation = True
-animation = False
+show_animation = True
+#  show_animation = False
+
+
+class State:
+
+    def __init__(self, x=0.0, y=0.0, yaw=0.0, v=0.0):
+        self.x = x
+        self.y = y
+        self.yaw = yaw
+        self.v = v
+
+
+def update(state, a, delta):
+
+    state.x = state.x + state.v * math.cos(state.yaw) * dt
+    state.y = state.y + state.v * math.sin(state.yaw) * dt
+    state.yaw = state.yaw + state.v / L * math.tan(delta) * dt
+    state.v = state.v + a * dt
+
+    return state
 
 
 def PIDControl(target, current):
@@ -51,7 +69,7 @@ def rear_wheel_feedback_control(state, cx, cy, cyaw, ck, preind):
     if th_e == 0.0 or omega == 0.0:
         return 0.0, ind
 
-    delta = math.atan2(unicycle_model.L * omega / v, 1.0)
+    delta = math.atan2(L * omega / v, 1.0)
     #  print(k, v, e, th_e, omega, delta)
 
     return delta, ind
@@ -83,7 +101,7 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
     goal_dis = 0.3
     stop_speed = 0.05
 
-    state = unicycle_model.State(x=-0.0, y=-0.0, yaw=0.0, v=0.0)
+    state = State(x=-0.0, y=-0.0, yaw=0.0, v=0.0)
 
     time = 0.0
     x = [state.x]
@@ -91,24 +109,26 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
     yaw = [state.yaw]
     v = [state.v]
     t = [0.0]
+    goal_flag = False
     target_ind = calc_nearest_index(state, cx, cy, cyaw)
 
     while T >= time:
         di, target_ind = rear_wheel_feedback_control(
             state, cx, cy, cyaw, ck, target_ind)
         ai = PIDControl(speed_profile[target_ind], state.v)
-        state = unicycle_model.update(state, ai, di)
+        state = update(state, ai, di)
 
         if abs(state.v) <= stop_speed:
             target_ind += 1
 
-        time = time + unicycle_model.dt
+        time = time + dt
 
         # check goal
         dx = state.x - goal[0]
         dy = state.y - goal[1]
         if math.sqrt(dx ** 2 + dy ** 2) <= goal_dis:
             print("Goal")
+            goal_flag = True
             break
 
         x.append(state.x)
@@ -117,7 +137,7 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
         v.append(state.v)
         t.append(time)
 
-        if target_ind % 1 == 0 and animation:
+        if target_ind % 1 == 0 and show_animation:
             plt.cla()
             plt.plot(cx, cy, "-r", label="course")
             plt.plot(x, y, "ob", label="trajectory")
@@ -127,10 +147,8 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
             plt.title("speed[km/h]:" + str(round(state.v * 3.6, 2)) +
                       ",target index:" + str(target_ind))
             plt.pause(0.0001)
-            matplotrecorder.save_frame()  # save each frame
 
-    plt.close()
-    return t, x, y, yaw, v
+    return t, x, y, yaw, v, goal_flag
 
 
 def calc_speed_profile(cx, cy, cyaw, target_speed):
@@ -175,36 +193,39 @@ def main():
 
     sp = calc_speed_profile(cx, cy, cyaw, target_speed)
 
-    t, x, y, yaw, v = closed_loop_prediction(cx, cy, cyaw, ck, sp, goal)
+    t, x, y, yaw, v, goal_flag = closed_loop_prediction(
+        cx, cy, cyaw, ck, sp, goal)
 
-    if animation:
-        matplotrecorder.save_movie("animation.gif", 0.1)  # gif is ok.
+    # Test
+    assert goal_flag, "Cannot goal"
 
-    flg, _ = plt.subplots(1)
-    plt.plot(ax, ay, "xb", label="input")
-    plt.plot(cx, cy, "-r", label="spline")
-    plt.plot(x, y, "-g", label="tracking")
-    plt.grid(True)
-    plt.axis("equal")
-    plt.xlabel("x[m]")
-    plt.ylabel("y[m]")
-    plt.legend()
+    if show_animation:
+        plt.close()
+        flg, _ = plt.subplots(1)
+        plt.plot(ax, ay, "xb", label="input")
+        plt.plot(cx, cy, "-r", label="spline")
+        plt.plot(x, y, "-g", label="tracking")
+        plt.grid(True)
+        plt.axis("equal")
+        plt.xlabel("x[m]")
+        plt.ylabel("y[m]")
+        plt.legend()
 
-    flg, ax = plt.subplots(1)
-    plt.plot(s, [math.degrees(iyaw) for iyaw in cyaw], "-r", label="yaw")
-    plt.grid(True)
-    plt.legend()
-    plt.xlabel("line length[m]")
-    plt.ylabel("yaw angle[deg]")
+        flg, ax = plt.subplots(1)
+        plt.plot(s, [math.degrees(iyaw) for iyaw in cyaw], "-r", label="yaw")
+        plt.grid(True)
+        plt.legend()
+        plt.xlabel("line length[m]")
+        plt.ylabel("yaw angle[deg]")
 
-    flg, ax = plt.subplots(1)
-    plt.plot(s, ck, "-r", label="curvature")
-    plt.grid(True)
-    plt.legend()
-    plt.xlabel("line length[m]")
-    plt.ylabel("curvature [1/m]")
+        flg, ax = plt.subplots(1)
+        plt.plot(s, ck, "-r", label="curvature")
+        plt.grid(True)
+        plt.legend()
+        plt.xlabel("line length[m]")
+        plt.ylabel("curvature [1/m]")
 
-    plt.show()
+        plt.show()
 
 
 if __name__ == '__main__':
