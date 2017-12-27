@@ -8,10 +8,8 @@ author Atsushi Sakai (@Atsushi_twi)
 import numpy as np
 import math
 import matplotlib.pyplot as plt
-import unicycle_model
-from pycubicspline import pycubicspline
-from matplotrecorder import matplotrecorder
 import scipy.linalg as la
+from pycubicspline import pycubicspline
 
 Kp = 1.0  # speed proportional gain
 
@@ -19,7 +17,37 @@ Kp = 1.0  # speed proportional gain
 Q = np.eye(4)
 R = np.eye(1)
 
-matplotrecorder.donothing = True
+# parameters
+dt = 0.1  # time tick[s]
+L = 0.5  # Wheel base of the vehicle [m]
+max_steer = math.radians(45.0)  # maximum steering angle[rad]
+
+show_animation = True
+#  show_animation = False
+
+
+class State:
+
+    def __init__(self, x=0.0, y=0.0, yaw=0.0, v=0.0):
+        self.x = x
+        self.y = y
+        self.yaw = yaw
+        self.v = v
+
+
+def update(state, a, delta):
+
+    if delta >= max_steer:
+        delta = max_steer
+    if delta <= - max_steer:
+        delta = - max_steer
+
+    state.x = state.x + state.v * math.cos(state.yaw) * dt
+    state.y = state.y + state.v * math.sin(state.yaw) * dt
+    state.yaw = state.yaw + state.v / L * math.tan(delta) * dt
+    state.v = state.v + a * dt
+
+    return state
 
 
 def PIDControl(target, current):
@@ -84,25 +112,25 @@ def lqr_steering_control(state, cx, cy, cyaw, ck, pe, pth_e):
 
     A = np.matrix(np.zeros((4, 4)))
     A[0, 0] = 1.0
-    A[0, 1] = unicycle_model.dt
+    A[0, 1] = dt
     A[1, 2] = v
     A[2, 2] = 1.0
-    A[2, 3] = unicycle_model.dt
+    A[2, 3] = dt
     # print(A)
 
     B = np.matrix(np.zeros((4, 1)))
-    B[3, 0] = v / unicycle_model.L
+    B[3, 0] = v / L
 
     K, _, _ = dlqr(A, B, Q, R)
 
     x = np.matrix(np.zeros((4, 1)))
 
     x[0, 0] = e
-    x[1, 0] = (e - pe) / unicycle_model.dt
+    x[1, 0] = (e - pe) / dt
     x[2, 0] = th_e
-    x[3, 0] = (th_e - pth_e) / unicycle_model.dt
+    x[3, 0] = (th_e - pth_e) / dt
 
-    ff = math.atan2(unicycle_model.L * k, 1)
+    ff = math.atan2(L * k, 1)
     fb = pi_2_pi((-K * x)[0, 0])
 
     delta = ff + fb
@@ -135,7 +163,7 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
     goal_dis = 0.3
     stop_speed = 0.05
 
-    state = unicycle_model.State(x=-0.0, y=-0.0, yaw=0.0, v=0.0)
+    state = State(x=-0.0, y=-0.0, yaw=0.0, v=0.0)
 
     time = 0.0
     x = [state.x]
@@ -152,13 +180,12 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
             state, cx, cy, cyaw, ck, e, e_th)
 
         ai = PIDControl(speed_profile[target_ind], state.v)
-        # state = unicycle_model.update(state, ai, di)
-        state = unicycle_model.update(state, ai, dl)
+        state = update(state, ai, dl)
 
         if abs(state.v) <= stop_speed:
             target_ind += 1
 
-        time = time + unicycle_model.dt
+        time = time + dt
 
         # check goal
         dx = state.x - goal[0]
@@ -173,7 +200,7 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
         v.append(state.v)
         t.append(time)
 
-        if target_ind % 1 == 0:
+        if target_ind % 1 == 0 and show_animation:
             plt.cla()
             plt.plot(cx, cy, "-r", label="course")
             plt.plot(x, y, "ob", label="trajectory")
@@ -183,9 +210,7 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
             plt.title("speed[km/h]:" + str(round(state.v * 3.6, 2)) +
                       ",target index:" + str(target_ind))
             plt.pause(0.0001)
-            matplotrecorder.save_frame()  # save each frame
 
-    plt.close()
     return t, x, y, yaw, v
 
 
@@ -232,33 +257,33 @@ def main():
 
     t, x, y, yaw, v = closed_loop_prediction(cx, cy, cyaw, ck, sp, goal)
 
-    matplotrecorder.save_movie("animation.gif", 0.1)  # gif is ok.
+    if show_animation:
+        plt.close()
+        flg, _ = plt.subplots(1)
+        plt.plot(ax, ay, "xb", label="input")
+        plt.plot(cx, cy, "-r", label="spline")
+        plt.plot(x, y, "-g", label="tracking")
+        plt.grid(True)
+        plt.axis("equal")
+        plt.xlabel("x[m]")
+        plt.ylabel("y[m]")
+        plt.legend()
 
-    flg, _ = plt.subplots(1)
-    plt.plot(ax, ay, "xb", label="input")
-    plt.plot(cx, cy, "-r", label="spline")
-    plt.plot(x, y, "-g", label="tracking")
-    plt.grid(True)
-    plt.axis("equal")
-    plt.xlabel("x[m]")
-    plt.ylabel("y[m]")
-    plt.legend()
+        flg, ax = plt.subplots(1)
+        plt.plot(s, [math.degrees(iyaw) for iyaw in cyaw], "-r", label="yaw")
+        plt.grid(True)
+        plt.legend()
+        plt.xlabel("line length[m]")
+        plt.ylabel("yaw angle[deg]")
 
-    flg, ax = plt.subplots(1)
-    plt.plot(s, [math.degrees(iyaw) for iyaw in cyaw], "-r", label="yaw")
-    plt.grid(True)
-    plt.legend()
-    plt.xlabel("line length[m]")
-    plt.ylabel("yaw angle[deg]")
+        flg, ax = plt.subplots(1)
+        plt.plot(s, ck, "-r", label="curvature")
+        plt.grid(True)
+        plt.legend()
+        plt.xlabel("line length[m]")
+        plt.ylabel("curvature [1/m]")
 
-    flg, ax = plt.subplots(1)
-    plt.plot(s, ck, "-r", label="curvature")
-    plt.grid(True)
-    plt.legend()
-    plt.xlabel("line length[m]")
-    plt.ylabel("curvature [1/m]")
-
-    plt.show()
+        plt.show()
 
 
 if __name__ == '__main__':
