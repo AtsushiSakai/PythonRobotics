@@ -114,7 +114,8 @@ This script is a path planning code with model predictive trajectory generator.
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ModelPredictiveTrajectoryGenerator/lookuptable.png?raw=True)
 
-see: 
+Ref: 
+
 - [Optimal rough terrain trajectory generation for wheeled mobile robots](http://journals.sagepub.com/doi/pdf/10.1177/0278364906075328)
 
 　
@@ -194,7 +195,11 @@ This script is a simple path planning code with Rapidly-Exploring Random Trees (
 
 This script is a  path planning code with RRT \*
 
+Ref:
+
 - [Incremental Sampling-based Algorithms for Optimal Motion Planning](https://arxiv.org/abs/1005.0416)
+
+- [Sampling-based Algorithms for Optimal Motion Planningj](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.419.5503&rep=rep1&type=pdf)
 
 
 ### RRT with dubins path 
@@ -225,7 +230,7 @@ A sample code with closed loop RRT\*.
 ![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CRRRTStar/Figure_4.png?raw=True)
 ![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CRRRTStar/Figure_5.png?raw=True)
 
-see:
+Ref:
 
 - [Motion Planning in Complex Environments
 using Closed-loop Prediction](http://acl.mit.edu/papers/KuwataGNC08.pdf)
@@ -252,11 +257,14 @@ Heading angle of each point can be also calculated analytically.
 
 A sample code for Dubins path planning.
 
-[Dubins path - Wikipedia](https://en.wikipedia.org/wiki/Dubins_path)
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DubinsPath/figures/figure_1.png?raw=True)
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DubinsPath/figures/figure_13.png?raw=True)
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DubinsPath/figures/figure_15.png?raw=True)
+
+Ref:
+
+- [Dubins path - Wikipedia](https://en.wikipedia.org/wiki/Dubins_path)
 
 ## Reeds Shepp planning
 
@@ -265,6 +273,16 @@ A sample code with Reeds Shepp path planning.
 ![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-4.png?raw=true)
 ![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-5.png?raw=true)
 ![PythonRobotics/figure_1-5.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ReedsSheppPath/figure_1-7.png?raw=true)
+
+Ref:
+
+- [15.3.2 Reeds\-Shepp Curves](http://planning.cs.uiuc.edu/node822.html) 
+
+- [optimal paths for a car that goes both forwards and backwards](https://pdfs.semanticscholar.org/932e/c495b1d0018fd59dee12a0bf74434fac7af4.pdf)
+
+- [ghliu/pyReedsShepp: Implementation of Reeds Shepp curve\.](https://github.com/ghliu/pyReedsShepp)
+
+　
 
 ## Mix Integer Optimization based model predictive planning and control
 
