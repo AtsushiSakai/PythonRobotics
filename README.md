@@ -31,6 +31,7 @@ Python codes for robotics algorithm.
          * [RRT* with reeds-sheep path](#rrt-with-reeds-sheep-path)
          * [Closed Loop RRT*](#closed-loop-rrt)
       * [Cubic spline planning](#cubic-spline-planning)
+      * [Bezier path planning](#bezier-path-planning)
       * [Dubins path planning](#dubins-path-planning)
       * [Reeds Shepp planning](#reeds-shepp-planning)
       * [Mix Integer Optimization based model predictive planning and control](#mix-integer-optimization-based-model-predictive-planning-and-control)
@@ -254,9 +255,23 @@ Heading angle of each point can be also calculated analytically.
 
 ## Bezier path planning
 
-![Bezier1](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/BezierPath/Figure1.png?raw=True)
+A sample code of Bezier path planning.
 
-![Bezier2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/BezierPath/Figure1.png?raw=True)
+It is based on 4 control points Beier path.
+
+![Bezier1](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/BezierPath/Figure_1.png?raw=True)
+
+If you change the offset distance from start and end point,
+
+You can get different Beizer course:
+
+![Bezier2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/BezierPath/Figure_2.png?raw=True)
+
+ 
+
+Ref:
+
+- [Continuous Curvature Path Generation Based on B ́ezier Curves for Autonomous Vehicles](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.294.6438&rep=rep1&type=pdf)
 
 
 ## Dubins path planning
