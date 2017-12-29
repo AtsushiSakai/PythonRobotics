@@ -252,6 +252,12 @@ Heading angle of each point can be also calculated analytically.
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CubicSpline/Figure_2.png?raw=True)
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CubicSpline/Figure_3.png?raw=True)
 
+## Bezier path planning
+
+![Bezier1](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/BezierPath/Figure1.png?raw=True)
+
+![Bezier2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/BezierPath/Figure1.png?raw=True)
+
 
 ## Dubins path planning
 
