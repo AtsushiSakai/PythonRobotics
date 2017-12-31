@@ -6,10 +6,12 @@ author: Atsushi Sakai(@Atsushi_twi)
 
 """
 
-import scipy.misc as scm
+import scipy.special
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+
+show_animation = True
 
 
 def calc_4point_bezier_path(sx, sy, syaw, ex, ey, eyaw, offset):
@@ -29,7 +31,7 @@ def calc_4point_bezier_path(sx, sy, syaw, ex, ey, eyaw, offset):
 
 
 def bernstein(n, i, t):
-    return scm.comb(n, i) * t**i * (1 - t)**(n - i)
+    return scipy.special.comb(n, i) * t**i * (1 - t)**(n - i)
 
 
 def bezier(n, t, q):
@@ -66,14 +68,20 @@ def main():
     P, cp = calc_4point_bezier_path(
         start_x, start_y, start_yaw, end_x, end_y, end_yaw, offset)
 
-    plt.plot(P.T[0], P.T[1], label="Bezier Path")
-    plt.plot(cp.T[0], cp.T[1], '--o', label="Control Points")
-    plot_arrow(start_x, start_y, start_yaw)
-    plot_arrow(end_x, end_y, end_yaw)
-    plt.legend()
-    plt.axis("equal")
-    plt.grid(True)
-    plt.show()
+    assert P.T[0][0] == start_x, "path is invalid"
+    assert P.T[1][0] == start_y, "path is invalid"
+    assert P.T[0][-1] == end_x, "path is invalid"
+    assert P.T[1][-1] == end_y, "path is invalid"
+
+    if show_animation:
+        plt.plot(P.T[0], P.T[1], label="Bezier Path")
+        plt.plot(cp.T[0], cp.T[1], '--o', label="Control Points")
+        plot_arrow(start_x, start_y, start_yaw)
+        plot_arrow(end_x, end_y, end_yaw)
+        plt.legend()
+        plt.axis("equal")
+        plt.grid(True)
+        plt.show()
 
 
 def main2():
@@ -89,13 +97,21 @@ def main2():
     for offset in np.arange(1.0, 5.0, 1.0):
         P, cp = calc_4point_bezier_path(
             start_x, start_y, start_yaw, end_x, end_y, end_yaw, offset)
-        plt.plot(P.T[0], P.T[1], label="Offset=" + str(offset))
-    plot_arrow(start_x, start_y, start_yaw)
-    plot_arrow(end_x, end_y, end_yaw)
-    plt.legend()
-    plt.axis("equal")
-    plt.grid(True)
-    plt.show()
+        assert P.T[0][0] == start_x, "path is invalid"
+        assert P.T[1][0] == start_y, "path is invalid"
+        assert P.T[0][-1] == end_x, "path is invalid"
+        assert P.T[1][-1] == end_y, "path is invalid"
+
+        if show_animation:
+            plt.plot(P.T[0], P.T[1], label="Offset=" + str(offset))
+
+    if show_animation:
+        plot_arrow(start_x, start_y, start_yaw)
+        plot_arrow(end_x, end_y, end_yaw)
+        plt.legend()
+        plt.axis("equal")
+        plt.grid(True)
+        plt.show()
 
 
 if __name__ == '__main__':
