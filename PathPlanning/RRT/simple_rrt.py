@@ -1,28 +1,26 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-u"""
-@brief: Path Planning Sample Code with Randamized Rapidly-Exploring Random Trees (RRT)
+"""
+Path Planning Sample Code with Randamized Rapidly-Exploring Random Trees (RRT)
 
-@author: AtsushiSakai
-
-@license: MIT
+author: AtsushiSakai(@Atsushi_twi)
 
 """
 
-
+import matplotlib.pyplot as plt
 import random
 import math
 import copy
 
+show_animation = True
+
 
 class RRT():
-    u"""
+    """
     Class for RRT Planning
     """
 
     def __init__(self, start, goal, obstacleList,
                  randArea, expandDis=1.0, goalSampleRate=5, maxIter=500):
-        u"""
+        """
         Setting Parameter
 
         start:Start Position [x,y]
@@ -38,6 +36,7 @@ class RRT():
         self.expandDis = expandDis
         self.goalSampleRate = goalSampleRate
         self.maxIter = maxIter
+        self.obstacleList = obstacleList
 
     def Planning(self, animation=True):
         u"""
@@ -68,7 +67,7 @@ class RRT():
             newNode.y += self.expandDis * math.sin(theta)
             newNode.parent = nind
 
-            if not self.__CollisionCheck(newNode, obstacleList):
+            if not self.__CollisionCheck(newNode, self.obstacleList):
                 continue
 
             self.nodeList.append(newNode)
@@ -98,7 +97,6 @@ class RRT():
         u"""
         Draw Graph
         """
-        import matplotlib.pyplot as plt
         plt.clf()
         if rnd is not None:
             plt.plot(rnd[0], rnd[1], "^k")
@@ -107,7 +105,7 @@ class RRT():
                 plt.plot([node.x, self.nodeList[node.parent].x], [
                          node.y, self.nodeList[node.parent].y], "-g")
 
-        for (ox, oy, size) in obstacleList:
+        for (ox, oy, size) in self.obstacleList:
             plt.plot(ox, oy, "ok", ms=30 * size)
 
         plt.plot(self.start.x, self.start.y, "xr")
@@ -115,7 +113,6 @@ class RRT():
         plt.axis([-2, 15, -2, 15])
         plt.grid(True)
         plt.pause(0.01)
-        matplotrecorder.save_frame()  # save each frame
 
     def GetNearestListIndex(self, nodeList, rnd):
         dlist = [(node.x - rnd[0]) ** 2 + (node.y - rnd[1])
@@ -146,11 +143,8 @@ class Node():
         self.parent = None
 
 
-if __name__ == '__main__':
+def main():
     print("start RRT path planning")
-    import matplotlib.pyplot as plt
-    import matplotrecorder
-    matplotrecorder.donothing = True
 
     # ====Search Path with RRT====
     obstacleList = [
@@ -164,15 +158,15 @@ if __name__ == '__main__':
     # Set Initial parameters
     rrt = RRT(start=[0, 0], goal=[5, 10],
               randArea=[-2, 15], obstacleList=obstacleList)
-    path = rrt.Planning(animation=True)
+    path = rrt.Planning(animation=show_animation)
 
     # Draw final path
-    rrt.DrawGraph()
-    plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
-    plt.grid(True)
-    plt.pause(0.01)  # Need for Mac
-    #  plt.show()
-    for i in range(10):
-        matplotrecorder.save_frame()  # save each frame
+    if show_animation:
+        rrt.DrawGraph()
+        plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
+        plt.grid(True)
+        plt.show()
 
-    matplotrecorder.save_movie("animation.gif", 0.1)
+
+if __name__ == '__main__':
+    main()
