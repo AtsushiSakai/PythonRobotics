@@ -14,6 +14,7 @@ Python codes for robotics algorithm.
       * [Grid based search](#grid-based-search)
          * [Dijkstra algorithm](#dijkstra-algorithm)
          * [A* algorithm](#a-algorithm)
+         * [Potential Field algorithm](#potential-field-algorithm)
       * [Model Predictive Trajectory Generator](#model-predictive-trajectory-generator)
          * [Path optimization sample](#path-optimization-sample)
          * [Lookup table generation sample](#lookup-table-generation-sample)
@@ -108,7 +109,7 @@ This is a 2D grid based path planning with Potential Field algorithm.
 
 ![PotentialField](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/PotentialFieldPlanning/animation.gif)
 
-In the animation, the bule heat map means potential valude on each grid.
+In the animation, the blue heat map shows potential value on each grid.
 
 Ref:
 
