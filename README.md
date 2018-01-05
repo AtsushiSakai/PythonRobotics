@@ -105,7 +105,9 @@ It's heuristic is 2D Euclid distance.
 
 ## Model Predictive Trajectory Generator
 
-This script is a path planning code with model predictive trajectory generator.
+This is a path optimization sample on model predictive trajectory generator.
+
+This algorithm is used for state lattice planner. 
 
 ### Path optimization sample
 

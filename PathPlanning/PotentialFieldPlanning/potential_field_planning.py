@@ -4,6 +4,9 @@ Potential Field based path planner
 
 author: Atsushi Sakai (@Atsushi_twi)
 
+Ref:
+https://www.cs.cmu.edu/~motionplanning/lecture/Chap4-Potential-Field_howie.pdf
+
 """
 
 import numpy as np
@@ -12,7 +15,7 @@ import matplotlib.pyplot as plt
 # Parameters
 KP = 5.0  # attractive potential gain
 ETA = 100.0  # repulsive potential gain
-AREA_WIDTH = 70.0  # potential area width [m]
+AREA_WIDTH = 30.0  # potential area width [m]
 
 show_animation = True
 
@@ -84,11 +87,19 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
 
     # calc potential field
     pmap, minx, miny = calc_potential_field(gx, gy, ox, oy, reso, rr)
+    draw_heatmap(pmap)
 
     # search path
     d = np.hypot(sx - gx, sy - gy)
     ix = round((sx - minx) / reso)
     iy = round((sy - miny) / reso)
+    gix = round((gx - minx) / reso)
+    giy = round((gy - miny) / reso)
+
+    if show_animation:
+        plt.plot(ix, iy, "*k")
+        plt.plot(gix, giy, "*m")
+
     rx, ry = [sx], [sy]
     motion = get_motion_model()
     while d >= reso:
@@ -110,20 +121,25 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
         xp = ix * reso + minx
         yp = iy * reso + miny
         d = np.hypot(gx - xp, gy - yp)
-
-        if show_animation:
-            plt.plot(rx, ry, "-r")
-            plt.pause(0.01)
-
         rx.append(xp)
         ry.append(yp)
+
+        if show_animation:
+            plt.plot(ix, iy, ".r")
+            plt.pause(0.01)
 
     print("Goal!!")
 
     return rx, ry
 
 
+def draw_heatmap(data):
+    data = np.array(data).T
+    plt.pcolor(data, vmax=100.0, cmap=plt.cm.Blues)
+
+
 def main():
+    print("potential_field_planning start")
 
     sx = 0.0  # start x position [m]
     sy = 10.0  # start y positon [m]
@@ -136,9 +152,6 @@ def main():
     oy = [25.0, 15.0, 26.0, 25.0]  # obstacle y position list [m]
 
     if show_animation:
-        plt.plot(ox, oy, "ok")
-        plt.plot(sx, sy, "*c")
-        plt.plot(gx, gy, "*c")
         plt.grid(True)
         plt.axis("equal")
 
@@ -147,7 +160,6 @@ def main():
         sx, sy, gx, gy, ox, oy, grid_size, robot_radius)
 
     if show_animation:
-        plt.plot(rx, ry, "-r")
         plt.show()
 
 
