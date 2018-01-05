@@ -102,6 +102,19 @@ In the animation, cyan points are searched nodes.
 
 It's heuristic is 2D Euclid distance.
 
+### Potential Field algorithm
+
+This is a 2D grid based path planning with Potential Field algorithm.
+
+![PotentialField](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/PotentialFieldPlanning/animation.gif)
+
+In the animation, the bule heat map means potential valude on each grid.
+
+Ref:
+
+- [Robotic Motion Planning:Potential Functions](https://www.cs.cmu.edu/~motionplanning/lecture/Chap4-Potential-Field_howie.pdf)
+
+
 
 ## Model Predictive Trajectory Generator
 
