@@ -87,7 +87,6 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
 
     # calc potential field
     pmap, minx, miny = calc_potential_field(gx, gy, ox, oy, reso, rr)
-    draw_heatmap(pmap)
 
     # search path
     d = np.hypot(sx - gx, sy - gy)
@@ -97,6 +96,7 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
     giy = round((gy - miny) / reso)
 
     if show_animation:
+        draw_heatmap(pmap)
         plt.plot(ix, iy, "*k")
         plt.plot(gix, giy, "*m")
 
