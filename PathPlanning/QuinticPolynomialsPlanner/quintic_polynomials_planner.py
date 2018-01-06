@@ -10,6 +10,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
+show_animation = True
+
 
 class quinic_polynomial:
 
@@ -44,6 +46,17 @@ class quinic_polynomial:
 
         return xt
 
+    def calc_first_derivative(self, t):
+        xt = self.a1 + 2 * self.a2 * t + \
+            3 * self.a3 * t**2 + 4 * self.a4 * t**3 + 5 * self.a5 * t**4
+
+        return xt
+
+    def calc_second_derivative(self, t):
+        xt = 2 * self.a2 + 6 * self.a3 * t + 12 * self.a4 * t**2 + 20 * self.a5 * t**3
+
+        return xt
+
 
 def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga):
 
@@ -63,12 +76,37 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga):
     xqp = quinic_polynomial(sx, vxs, axs, gx, vxg, axg, T)
     yqp = quinic_polynomial(sy, vys, ays, gy, vyg, ayg, T)
 
-    rx, ry = [], []
+    rx, ry, ryaw, rv, ra = [], [], [], [], []
     for t in np.arange(0.0, T + dt, dt):
         rx.append(xqp.calc_point(t))
         ry.append(yqp.calc_point(t))
 
-    return rx, ry
+        vx = xqp.calc_first_derivative(t)
+        vy = yqp.calc_first_derivative(t)
+        v = np.hypot(vx, vy)
+        yaw = math.atan2(vy, vx)
+        rv.append(v)
+        ryaw.append(yaw)
+
+        ax = xqp.calc_second_derivative(t)
+        ay = yqp.calc_second_derivative(t)
+        a = np.hypot(ax, ay)
+        if len(rv) >= 2 and rv[-1] - rv[-2] < 0.0:
+            a *= -1
+        ra.append(a)
+
+        if show_animation:
+            plt.cla()
+            plt.grid(True)
+            plt.axis("equal")
+            plot_arrow(sx, sy, syaw)
+            plot_arrow(gx, gy, gyaw)
+            plot_arrow(rx[-1], ry[-1], ryaw[-1])
+            plt.title("v[m/s]:" + str(rv[-1])[0:4] +
+                      " a[m/s]:" + str(ra[-1])[0:4])
+            plt.pause(0.001)
+
+    return rx, ry, ryaw, rv, ra
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
@@ -88,27 +126,33 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
 def main():
     print(__file__ + " start!!")
 
-    sx = 10.0
-    sy = 10.0
-    syaw = math.radians(10.0)
-    sv = 10.0  # [m/s]
-    sa = 0.0
-    gx = 30.0
-    gy = -10.0
-    gyaw = math.radians(20.0)
-    gv = 1.0  # [m/s]
-    ga = 0.0
+    sx = 10.0  # start x position [m]
+    sy = 10.0  # start y position [m]
+    syaw = math.radians(10.0)  # start yaw angle [rad]
+    sv = 1.0  # start speed [m/s]
+    sa = 0.1  # start accel [m/ss]
+    gx = 30.0  # goal x position [m]
+    gy = -10.0  # goal y position [m]
+    gyaw = math.radians(20.0)  # goal yaw angle [rad]
+    gv = 1.0  # goal speed [m/s]
+    ga = 0.1  # goal accel [m/ss]
 
-    rx, ry = quinic_polynomials_planner(
+    rx, ry, ryaw, rv, ra = quinic_polynomials_planner(
         sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga)
 
-    plt.plot(rx, ry, "-r")
-    plot_arrow(sx, sy, syaw)
-    plot_arrow(gx, gy, gyaw)
-    plt.grid(True)
-    plt.axis("equal")
+    if show_animation:
+        plt.plot(rx, ry, "-r")
 
-    plt.show()
+        plt.subplots()
+        plt.plot(ryaw, "-r")
+
+        plt.subplots()
+        plt.plot(rv, "-r")
+
+        plt.subplots()
+        plt.plot(ra, "-r")
+
+        plt.show()
 
 
 if __name__ == '__main__':
