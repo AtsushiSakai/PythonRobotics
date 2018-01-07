@@ -33,6 +33,7 @@ Python codes for robotics algorithm.
          * [Closed Loop RRT*](#closed-loop-rrt)
       * [Cubic spline planning](#cubic-spline-planning)
       * [Bezier path planning](#bezier-path-planning)
+      * [Quintic polynomials planning](#quintic-polynomials-planning)
       * [Dubins path planning](#dubins-path-planning)
       * [Reeds Shepp planning](#reeds-shepp-planning)
       * [Mix Integer Optimization based model predictive planning and control](#mix-integer-optimization-based-model-predictive-planning-and-control)
