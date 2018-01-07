@@ -289,10 +289,17 @@ Ref:
 
 - [Continuous Curvature Path Generation Based on B ́ezier Curves for Autonomous Vehicles](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.294.6438&rep=rep1&type=pdf)
 
-## Quadratic polynomials planning
+## Quintic polynomials planning
 
-![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/QuickPolynomialsPlanner/animation.gif)
+Motion planning with quintic polynomials.
 
+![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/QuinticPolynomialsPlanner/animation.gif)
+
+It can calculate 2D path, velocity, and accelaration profile based on quintic polynomials.
+
+Ref:
+
+- [Local Path Planning And Motion Control For Agv In Positioning](http://ieeexplore.ieee.org/document/637936/)
 
 
 ## Dubins path planning
