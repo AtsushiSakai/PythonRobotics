@@ -4,11 +4,19 @@ Quinitc Polynomials Planner
 
 author: Atsushi Sakai (@Atsushi_twi)
 
+Ref:
+
+- [Local Path Planning And Motion Control For Agv In Positioning](http://ieeexplore.ieee.org/document/637936/)
+
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+
+# parameter
+MAX_T = 100.0
+MIN_T = 5.0
 
 show_animation = True
 
@@ -16,6 +24,8 @@ show_animation = True
 class quinic_polynomial:
 
     def __init__(self, xs, vxs, axs, xe, vxe, axe, T):
+
+        # calc coefficient of quinic polynomial
         self.xs = xs
         self.vxs = vxs
         self.axs = axs
@@ -30,12 +40,11 @@ class quinic_polynomial:
         A = np.array([[T**3, T**4, T**5],
                       [3 * T ** 2, 4 * T ** 3, 5 * T ** 4],
                       [6 * T, 12 * T ** 2, 20 * T ** 3]])
-        #  print(A)
         b = np.array([xe - self.a0 - self.a1 * T - self.a2 * T**2,
                       vxe - self.a1 - 2 * self.a2 * T,
                       axe - 2 * self.a2])
         x = np.linalg.solve(A, b)
-        #  print(x)
+
         self.a3 = x[0]
         self.a4 = x[1]
         self.a5 = x[2]
@@ -58,7 +67,31 @@ class quinic_polynomial:
         return xt
 
 
-def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga):
+def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_accel, dt):
+    """
+    quinic polynomial planner
+
+    input
+        sx: start x position [m]
+        sy: start y position [m]
+        syaw: start yaw angle [rad]
+        sa: start accel [m/ss]
+        gx: goal x position [m]
+        gy: goal y position [m]
+        gyaw: goal yaw angle [rad]
+        ga: goal accel [m/ss]
+        max_accel: maximum accel [m/ss]
+        dt: time tick [s]
+
+    return
+        time: time result
+        rx: x position result list
+        ry: y position result list
+        ryaw: yaw angle result list
+        rv: velocity result list
+        ra: accel result list
+
+    """
 
     vxs = sv * math.cos(syaw)
     vys = sv * math.sin(syaw)
@@ -70,43 +103,50 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga):
     axg = ga * math.cos(gyaw)
     ayg = ga * math.sin(gyaw)
 
-    T = 10.0
-    dt = 0.1
+    for T in np.arange(MIN_T, MAX_T, MIN_T):
+        xqp = quinic_polynomial(sx, vxs, axs, gx, vxg, axg, T)
+        yqp = quinic_polynomial(sy, vys, ays, gy, vyg, ayg, T)
 
-    xqp = quinic_polynomial(sx, vxs, axs, gx, vxg, axg, T)
-    yqp = quinic_polynomial(sy, vys, ays, gy, vyg, ayg, T)
+        time, rx, ry, ryaw, rv, ra = [], [], [], [], [], []
 
-    rx, ry, ryaw, rv, ra = [], [], [], [], []
-    for t in np.arange(0.0, T + dt, dt):
-        rx.append(xqp.calc_point(t))
-        ry.append(yqp.calc_point(t))
+        for t in np.arange(0.0, T + dt, dt):
+            time.append(t)
+            rx.append(xqp.calc_point(t))
+            ry.append(yqp.calc_point(t))
 
-        vx = xqp.calc_first_derivative(t)
-        vy = yqp.calc_first_derivative(t)
-        v = np.hypot(vx, vy)
-        yaw = math.atan2(vy, vx)
-        rv.append(v)
-        ryaw.append(yaw)
+            vx = xqp.calc_first_derivative(t)
+            vy = yqp.calc_first_derivative(t)
+            v = np.hypot(vx, vy)
+            yaw = math.atan2(vy, vx)
+            rv.append(v)
+            ryaw.append(yaw)
 
-        ax = xqp.calc_second_derivative(t)
-        ay = yqp.calc_second_derivative(t)
-        a = np.hypot(ax, ay)
-        if len(rv) >= 2 and rv[-1] - rv[-2] < 0.0:
-            a *= -1
-        ra.append(a)
+            ax = xqp.calc_second_derivative(t)
+            ay = yqp.calc_second_derivative(t)
+            a = np.hypot(ax, ay)
+            if len(rv) >= 2 and rv[-1] - rv[-2] < 0.0:
+                a *= -1
+                pass
+            ra.append(a)
 
-        if show_animation:
+        if max([abs(i) for i in ra]) <= max_accel:
+            print("find path!!")
+            break
+
+    if show_animation:
+        for i in range(len(rx)):
             plt.cla()
             plt.grid(True)
             plt.axis("equal")
             plot_arrow(sx, sy, syaw)
             plot_arrow(gx, gy, gyaw)
-            plot_arrow(rx[-1], ry[-1], ryaw[-1])
-            plt.title("v[m/s]:" + str(rv[-1])[0:4] +
-                      " a[m/s]:" + str(ra[-1])[0:4])
+            plot_arrow(rx[i], ry[i], ryaw[i])
+            plt.title("Time[s]:" + str(time[i])[0:4] +
+                      " v[m/s]:" + str(rv[i])[0:4] +
+                      " a[m/ss]:" + str(ra[i])[0:4])
             plt.pause(0.001)
 
-    return rx, ry, ryaw, rv, ra
+    return time, rx, ry, ryaw, rv, ra
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
@@ -136,21 +176,32 @@ def main():
     gyaw = math.radians(20.0)  # goal yaw angle [rad]
     gv = 1.0  # goal speed [m/s]
     ga = 0.1  # goal accel [m/ss]
+    max_accel = 1.0  # max accel [m/ss]
+    dt = 0.1  # time tick [s]
 
-    rx, ry, ryaw, rv, ra = quinic_polynomials_planner(
-        sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga)
+    time, x, y, yaw, v, a = quinic_polynomials_planner(
+        sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_accel, dt)
 
     if show_animation:
-        plt.plot(rx, ry, "-r")
+        plt.plot(x, y, "-r")
 
         plt.subplots()
-        plt.plot(ryaw, "-r")
+        plt.plot(time, [math.degrees(i) for i in yaw], "-r")
+        plt.xlabel("Time[s]")
+        plt.ylabel("Yaw[deg]")
+        plt.grid(True)
 
         plt.subplots()
-        plt.plot(rv, "-r")
+        plt.plot(time, v, "-r")
+        plt.xlabel("Time[s]")
+        plt.ylabel("Speed[m/s]")
+        plt.grid(True)
 
         plt.subplots()
-        plt.plot(ra, "-r")
+        plt.plot(time, a, "-r")
+        plt.xlabel("Time[s]")
+        plt.ylabel("accel[m/ss]")
+        plt.grid(True)
 
         plt.show()
 
