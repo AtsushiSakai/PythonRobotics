@@ -65,7 +65,7 @@ Python codes for robotics algorithm.
 
 2. Clone this repo.
 
-3. Execute python script in each dir.
+3. Execute python script in each directory.
 
 4. Add star to this repo if you like it :smiley:. 
 
@@ -262,7 +262,7 @@ Autonomous Urban Driving](http://acl.mit.edu/papers/KuwataTCST09.pdf)
 
 A sample code for cubic path planning.
 
-This code generates a curvature continious path based on x-y waypoints with cubic spline.
+This code generates a curvature continuous path based on x-y waypoints with cubic spline.
 
 Heading angle of each point can be also calculated analytically.
 
@@ -296,7 +296,7 @@ Motion planning with quintic polynomials.
 
 ![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/QuinticPolynomialsPlanner/animation.gif)
 
-It can calculate 2D path, velocity, and accelaration profile based on quintic polynomials.
+It can calculate 2D path, velocity, and acceleration profile based on quintic polynomials.
 
 Ref:
 
@@ -348,7 +348,7 @@ This code used cvxpy as optimization modeling tool,
 
 - [Welcome to CVXPY 1\.0 — CVXPY 1\.0\.0 documentation](https://cvxgrp.github.io/cvxpy/index.html)
 
-and Gurobi is used as a solver for mix integer optimization problem.
+Gurobi is used as a solver for mix integer optimization problem.
 
 - [Gurobi Optimization \- The State\-of\-the\-Art Mathematical Programming Solver](http://www.gurobi.com/)
  
