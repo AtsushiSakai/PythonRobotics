@@ -289,6 +289,11 @@ Ref:
 
 - [Continuous Curvature Path Generation Based on B ́ezier Curves for Autonomous Vehicles](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.294.6438&rep=rep1&type=pdf)
 
+## Quadratic polynomials planning
+
+![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/QuickPolynomialsPlanner/animation.gif)
+
+
 
 ## Dubins path planning
 
