@@ -270,6 +270,21 @@ Heading angle of each point can be also calculated analytically.
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CubicSpline/Figure_2.png?raw=True)
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CubicSpline/Figure_3.png?raw=True)
 
+
+## B-Spline planning
+
+![B-Spline](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/BSplinePath/Figure_1.png?raw=True)
+
+This is a path planning with B-Spline curse.
+
+If you input waypoints, it generates a smooth path with B-Spline curve.
+
+The final course should be on the first and last waypoints. 
+
+Ref: 
+
+- [B\-spline \- Wikipedia](https://en.wikipedia.org/wiki/B-spline)
+
 ## Bezier path planning
 
 A sample code of Bezier path planning.
