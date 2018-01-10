@@ -211,7 +211,9 @@ Black circles are obstacles, green line is a searched tree, red crosses are star
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTstar/animation.gif)
 
-This script is a  path planning code with RRT \*
+This script is a  path planning code with RRT\*
+
+Black circles are obstacles, green line is a searched tree, red crosses are start and goal positions.
 
 Ref:
 
