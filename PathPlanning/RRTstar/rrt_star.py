@@ -37,6 +37,7 @@ class RRT():
         self.expandDis = expandDis
         self.goalSampleRate = goalSampleRate
         self.maxIter = maxIter
+        self.obstacleList = obstacleList
 
     def Planning(self, animation=True):
         """
@@ -53,7 +54,7 @@ class RRT():
             newNode = self.steer(rnd, nind)
             #  print(newNode.cost)
 
-            if self.__CollisionCheck(newNode, obstacleList):
+            if self.__CollisionCheck(newNode, self.obstacleList):
                 nearinds = self.find_near_nodes(newNode)
                 newNode = self.choose_parent(newNode, nearinds)
                 self.nodeList.append(newNode)
@@ -176,7 +177,7 @@ class RRT():
         for i in range(int(d / self.expandDis)):
             tmpNode.x += self.expandDis * math.cos(theta)
             tmpNode.y += self.expandDis * math.sin(theta)
-            if not self.__CollisionCheck(tmpNode, obstacleList):
+            if not self.__CollisionCheck(tmpNode, self.obstacleList):
                 return False
 
         return True
@@ -193,7 +194,7 @@ class RRT():
                 plt.plot([node.x, self.nodeList[node.parent].x], [
                          node.y, self.nodeList[node.parent].y], "-g")
 
-        for (ox, oy, size) in obstacleList:
+        for (ox, oy, size) in self.obstacleList:
             plt.plot(ox, oy, "ok", ms=30 * size)
 
         plt.plot(self.start.x, self.start.y, "xr")
@@ -232,7 +233,7 @@ class Node():
         self.parent = None
 
 
-if __name__ == '__main__':
+def main():
     print("Start rrt planning")
 
     # ====Search Path with RRT====
@@ -251,9 +252,13 @@ if __name__ == '__main__':
     path = rrt.Planning(animation=show_animation)
 
     # Draw final path
-    rrt.DrawGraph()
-    plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
-    plt.grid(True)
-    plt.pause(0.01)  # Need for Mac
+    if show_animation:
+        rrt.DrawGraph()
+        plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
+        plt.grid(True)
+        plt.pause(0.01)  # Need for Mac
+        plt.show()
 
-    plt.show()
+
+if __name__ == '__main__':
+    main()
