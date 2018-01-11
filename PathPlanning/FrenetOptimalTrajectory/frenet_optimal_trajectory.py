@@ -1,6 +1,5 @@
 """
-
-
+Frenet optimal trajectory generator
 
 author: Atsushi Sakai (@Atsushi_twi)
 
@@ -56,10 +55,20 @@ class quinic_polynomial:
         return xt
 
 
-def frenet_optimal_planning():
+max_speed = 15.0 / 3.6
 
-    for di in np.arange(-5.0, 5.0, 1.0):
-        for Ti in np.arange(1.0, 10.0, 1.0):
+
+def frenet_optimal_planning():
+    maxd = 5.0
+    dd = 1.0
+    dt = 1.0
+    T = 10.0
+    max_s = max_speed * T
+    ds = 10.0
+    target_speed = 5.0 / 3.6
+
+    for di in np.arange(-maxd, maxd, dd):
+        for Ti in np.arange(dt, T, dt):
             lat_qp = quinic_polynomial(0.0, 0.0, 0.0, di, 0.0, 0.0, Ti)
 
             time = []
@@ -69,13 +78,25 @@ def frenet_optimal_planning():
                 time.append(t)
                 d.append(lat_qp.calc_point(t))
 
-            plt.plot(time, d)
+            for si in np.arange(ds, max_s, ds):
+                lon_qp = quinic_polynomial(
+                    0.0, 0.0, 0.0, si, target_speed, 0.0, Ti)
+
+                s = []
+
+                for t in time:
+                    s.append(lon_qp.calc_point(t))
+
+                plt.plot(s, d)
+                #  plt.plot(d)
 
 
 def main():
     print(__file__ + " start!!")
 
     frenet_optimal_planning()
+
+    plt.axis("equal")
 
     plt.show()
 
