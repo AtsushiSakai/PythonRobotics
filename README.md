@@ -224,14 +224,14 @@ Ref:
 
 ### RRT with dubins path 
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTCar/animation.gif)
+![PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTDubins/animation.gif)
 
 Path planning for a car robot with RRT and dubins path planner.
 
 
 ### RRT\* with dubins path
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTStarCar/animation.gif)
+![AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTStarCar/animation.gif)
 
 Path planning for a car robot with RRT\* and dubins path planner.
 
