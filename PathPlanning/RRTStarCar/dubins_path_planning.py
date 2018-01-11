@@ -1,12 +1,8 @@
-#! /usr/bin/python
-# -*- coding: utf-8 -*-
 """
 
 Dubins path planner sample code
 
-author Atsushi Sakai(@Atsushi_twi)
-
-License MIT
+author Atsushi Sakai (@Atsushi_twi)
 
 """
 import math

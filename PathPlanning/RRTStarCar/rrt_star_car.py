@@ -1,11 +1,7 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
-@brief: Path Planning Sample Code with RRT for car like robot.
+Path Planning Sample Code with RRT and Dubins path
 
-@author: AtsushiSakai(@Atsushi_twi)
-
-@license: MIT
+author: AtsushiSakai(@Atsushi_twi)
 
 """
 
@@ -17,13 +13,13 @@ import dubins_path_planning
 
 
 class RRT():
-    u"""
+    """
     Class for RRT Planning
     """
 
     def __init__(self, start, goal, obstacleList, randArea,
                  goalSampleRate=10, maxIter=1000):
-        u"""
+        """
         Setting Parameter
 
         start:Start Position [x,y]
@@ -40,7 +36,7 @@ class RRT():
         self.maxIter = maxIter
 
     def Planning(self, animation=True):
-        u"""
+        """
         Pathplanning
 
         animation: flag for animation on or off
@@ -62,7 +58,6 @@ class RRT():
 
             if animation and i % 5 == 0:
                 self.DrawGraph(rnd=rnd)
-                matplotrecorder.save_frame()  # save each frame
 
         # generate coruse
         lastIndex = self.get_best_last_index()
@@ -253,7 +248,7 @@ class RRT():
 
 
 class Node():
-    u"""
+    """
     RRT Node
     """
 
@@ -271,8 +266,6 @@ class Node():
 if __name__ == '__main__':
     print("Start rrt start planning")
     import matplotlib.pyplot as plt
-    import matplotrecorder
-    matplotrecorder.donothing = True
 
     # ====Search Path with RRT====
     obstacleList = [
@@ -297,9 +290,4 @@ if __name__ == '__main__':
     plt.grid(True)
     plt.pause(0.001)
 
-    for i in range(10):
-        matplotrecorder.save_frame()  # save each frame
-
     plt.show()
-
-    matplotrecorder.save_movie("animation.gif", 0.1)
