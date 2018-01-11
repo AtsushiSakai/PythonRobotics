@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import copy
 import math
+import cubic_spline_planner
 
 
 class quinic_polynomial:
@@ -160,12 +161,21 @@ def calc_frenet_paths(c_speed, c_d):
     return frenet_paths
 
 
-def calc_global_paths(fplist):
+def calc_global_paths(fplist, csp):
 
     for fp in fplist:
-        fp.x = fp.s
-        fp.y = fp.d
 
+        # calc global positions
+        for i in range(len(fp.s)):
+            ix, iy = csp.calc_position(fp.s[i])
+            iyaw = csp.calc_yaw(fp.s[i])
+            di = fp.d[i]
+            fx = ix + di * math.cos(iyaw + math.pi / 2.0)
+            fy = iy + di * math.sin(iyaw + math.pi / 2.0)
+            fp.x.append(fx)
+            fp.y.append(fy)
+
+        # calc yaw and ds
         for i in range(len(fp.x) - 1):
             dx = fp.x[i + 1] - fp.x[i]
             dy = fp.y[i + 1] - fp.y[i]
@@ -198,10 +208,10 @@ def check_paths(fplist):
     return [fplist[i] for i in okind]
 
 
-def frenet_optimal_planning(c_speed, c_d):
+def frenet_optimal_planning(csp, c_speed, c_d):
 
     fplist = calc_frenet_paths(c_speed, c_d)
-    fplist = calc_global_paths(fplist)
+    fplist = calc_global_paths(fplist, csp)
     fplist = check_paths(fplist)
 
     for fp in fplist:
@@ -211,10 +221,26 @@ def frenet_optimal_planning(c_speed, c_d):
 def main():
     print(__file__ + " start!!")
 
+    x = [0.0, 10.0, 20.5, 35.0, 70.5]
+    y = [0.0, -6.0, 5.0, 6.5, 0.0]
+
+    csp = cubic_spline_planner.Spline2D(x, y)
+    s = np.arange(0, csp.s[-1], 0.1)
+
+    rx, ry, ryaw, rk = [], [], [], []
+    for i_s in s:
+        ix, iy = csp.calc_position(i_s)
+        rx.append(ix)
+        ry.append(iy)
+        ryaw.append(csp.calc_yaw(i_s))
+        rk.append(csp.calc_curvature(i_s))
+
     c_speed = 10.0 / 3.6  # m/s
     c_d = 1.0  # [m]
 
-    frenet_optimal_planning(c_speed, c_d)
+    plt.plot(rx, ry)
+
+    frenet_optimal_planning(csp, c_speed, c_d)
 
     plt.axis("equal")
     plt.grid(True)
