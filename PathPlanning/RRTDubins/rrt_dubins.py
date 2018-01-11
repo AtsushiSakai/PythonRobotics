@@ -1,11 +1,7 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
-@brief: Path Planning Sample Code with RRT for car like robot.
+Path Planning Sample Code with RRT for car like robot.
 
-@author: AtsushiSakai(@Atsushi_twi)
-
-@license: MIT
+author: AtsushiSakai(@Atsushi_twi)
 
 """
 
@@ -14,16 +10,19 @@ import math
 import copy
 import numpy as np
 import dubins_path_planning
+import matplotlib.pyplot as plt
+
+show_animation = True
 
 
 class RRT():
-    u"""
+    """
     Class for RRT Planning
     """
 
     def __init__(self, start, goal, obstacleList, randArea,
                  goalSampleRate=10, maxIter=1000):
-        u"""
+        """
         Setting Parameter
 
         start:Start Position [x,y]
@@ -38,9 +37,10 @@ class RRT():
         self.maxrand = randArea[1]
         self.goalSampleRate = goalSampleRate
         self.maxIter = maxIter
+        self.obstacleList = obstacleList
 
-    def Planning(self, animation=True):
-        u"""
+    def Planning(self, animation=False):
+        """
         Pathplanning
 
         animation: flag for animation on or off
@@ -53,7 +53,7 @@ class RRT():
 
             newNode = self.steer(rnd, nind)
 
-            if self.__CollisionCheck(newNode, obstacleList):
+            if self.__CollisionCheck(newNode, self.obstacleList):
                 self.nodeList.append(newNode)
 
             if animation and i % 5 == 0:
@@ -165,10 +165,6 @@ class RRT():
         return np.linalg.norm([x - self.end.x, y - self.end.y])
 
     def DrawGraph(self, rnd=None):
-        u"""
-        Draw Graph
-        """
-        import matplotlib.pyplot as plt
         plt.clf()
         if rnd is not None:
             plt.plot(rnd[0], rnd[1], "^k")
@@ -176,7 +172,7 @@ class RRT():
             if node.parent is not None:
                 plt.plot(node.path_x, node.path_y, "-g")
 
-        for (ox, oy, size) in obstacleList:
+        for (ox, oy, size) in self.obstacleList:
             plt.plot(ox, oy, "ok", ms=30 * size)
 
         dubins_path_planning.plot_arrow(
@@ -187,7 +183,6 @@ class RRT():
         plt.axis([-2, 15, -2, 15])
         plt.grid(True)
         plt.pause(0.01)
-        matplotrecorder.save_frame()  # save each frame
 
     def GetNearestListIndex(self, nodeList, rnd):
         dlist = [(node.x - rnd[0]) ** 2 +
@@ -211,7 +206,7 @@ class RRT():
 
 
 class Node():
-    u"""
+    """
     RRT Node
     """
 
@@ -226,11 +221,8 @@ class Node():
         self.parent = None
 
 
-if __name__ == '__main__':
+def main():
     print("Start rrt planning")
-    import matplotlib.pyplot as plt
-    import matplotrecorder
-    matplotrecorder.donothing = True
     # ====Search Path with RRT====
     obstacleList = [
         (5, 5, 1),
@@ -246,16 +238,16 @@ if __name__ == '__main__':
     goal = [10.0, 10.0, math.radians(0.0)]
 
     rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
-    path = rrt.Planning(animation=False)
+    path = rrt.Planning(animation=show_animation)
 
     # Draw final path
-    rrt.DrawGraph()
-    plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
-    plt.grid(True)
-    plt.pause(0.001)
-    plt.show()
+    if show_animation:
+        rrt.DrawGraph()
+        plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
+        plt.grid(True)
+        plt.pause(0.001)
+        plt.show()
 
-    for i in range(10):
-        matplotrecorder.save_frame()  # save each frame
 
-    matplotrecorder.save_movie("animation.gif", 0.1)
+if __name__ == '__main__':
+    main()
