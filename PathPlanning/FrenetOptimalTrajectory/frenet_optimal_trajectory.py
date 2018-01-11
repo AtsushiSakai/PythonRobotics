@@ -8,6 +8,7 @@ author: Atsushi Sakai (@Atsushi_twi)
 import numpy as np
 import matplotlib.pyplot as plt
 import copy
+import math
 
 
 class quinic_polynomial:
@@ -112,6 +113,7 @@ class Frenet_path:
         self.x = []
         self.y = []
         self.yaw = []
+        self.ds = []
         self.c = []
 
 
@@ -164,6 +166,19 @@ def calc_global_paths(fplist):
         fp.x = fp.s
         fp.y = fp.d
 
+        for i in range(len(fp.x) - 1):
+            dx = fp.x[i + 1] - fp.x[i]
+            dy = fp.y[i + 1] - fp.y[i]
+            fp.yaw.append(math.atan2(dy, dx))
+            fp.ds.append(math.sqrt(dx**2 + dy**2))
+
+        fp.yaw.append(fp.yaw[-1])
+        fp.ds.append(fp.ds[-1])
+
+        # calc curvature
+        for i in range(len(fp.yaw) - 1):
+            fp.c.append((fp.yaw[i + 1] - fp.yaw[i]) / fp.ds[i])
+
     return fplist
 
 
@@ -171,10 +186,11 @@ def check_paths(fplist):
 
     okind = []
     for i in range(len(fplist)):
-        # speed check
-        if any([v > max_speed for v in fplist[i].s_d]):
+        if any([v > max_speed for v in fplist[i].s_d]):  # Max speed check
             continue
-        elif any([abs(a) > max_accel for a in fplist[i].s_dd]):
+        elif any([abs(a) > max_accel for a in fplist[i].s_dd]):  # Max accel check
+            continue
+        elif any([abs(c) > max_curvature for c in fplist[i].c]):  # Max curvature check
             continue
 
         okind.append(i)
@@ -182,10 +198,7 @@ def check_paths(fplist):
     return [fplist[i] for i in okind]
 
 
-def frenet_optimal_planning():
-
-    c_speed = 0.0
-    c_d = 1.0
+def frenet_optimal_planning(c_speed, c_d):
 
     fplist = calc_frenet_paths(c_speed, c_d)
     fplist = calc_global_paths(fplist)
@@ -198,7 +211,10 @@ def frenet_optimal_planning():
 def main():
     print(__file__ + " start!!")
 
-    frenet_optimal_planning()
+    c_speed = 10.0 / 3.6  # m/s
+    c_d = 1.0  # [m]
+
+    frenet_optimal_planning(c_speed, c_d)
 
     plt.axis("equal")
     plt.grid(True)
