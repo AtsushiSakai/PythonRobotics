@@ -1,4 +1,5 @@
 """
+
 Frenet optimal trajectory generator
 
 author: Atsushi Sakai (@Atsushi_twi)
@@ -126,6 +127,7 @@ dd = 1.0
 dt = 1.0
 T = 10.0
 target_speed = 30.0 / 3.6
+robot_radius = 2.0
 dv = 5.0 / 3.6
 nv = 2
 
@@ -192,7 +194,21 @@ def calc_global_paths(fplist, csp):
     return fplist
 
 
-def check_paths(fplist):
+def check_collision(fp, ob):
+
+    for i in range(len(ob[:, 0])):
+        d = [((ix - ob[i, 0])**2 + (iy - ob[i, 1])**2)
+             for (ix, iy) in zip(fp.x, fp.y)]
+
+        collision = any([di <= robot_radius**2 for di in d])
+
+        if collision:
+            return False
+
+    return True
+
+
+def check_paths(fplist, ob):
 
     okind = []
     for i in range(len(fplist)):
@@ -202,17 +218,19 @@ def check_paths(fplist):
             continue
         elif any([abs(c) > max_curvature for c in fplist[i].c]):  # Max curvature check
             continue
+        elif not check_collision(fplist[i], ob):
+            continue
 
         okind.append(i)
 
     return [fplist[i] for i in okind]
 
 
-def frenet_optimal_planning(csp, c_speed, c_d):
+def frenet_optimal_planning(csp, c_speed, c_d, ob):
 
     fplist = calc_frenet_paths(c_speed, c_d)
     fplist = calc_global_paths(fplist, csp)
-    fplist = check_paths(fplist)
+    fplist = check_paths(fplist, ob)
 
     for fp in fplist:
         plt.plot(fp.x, fp.y)
@@ -223,6 +241,8 @@ def main():
 
     x = [0.0, 10.0, 20.5, 35.0, 70.5]
     y = [0.0, -6.0, 5.0, 6.5, 0.0]
+    ob = np.array([[20.0, 10.0],
+                   [30.0, 5.0]])
 
     csp = cubic_spline_planner.Spline2D(x, y)
     s = np.arange(0, csp.s[-1], 0.1)
@@ -239,8 +259,9 @@ def main():
     c_d = 1.0  # [m]
 
     plt.plot(rx, ry)
+    plt.plot(ob[:, 0], ob[:, 1], "xk")
 
-    frenet_optimal_planning(csp, c_speed, c_d)
+    frenet_optimal_planning(csp, c_speed, c_d, ob)
 
     plt.axis("equal")
     plt.grid(True)
