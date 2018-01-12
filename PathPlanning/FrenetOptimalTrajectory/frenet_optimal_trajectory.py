@@ -111,6 +111,9 @@ class Frenet_path:
         self.s = []
         self.s_d = []
         self.s_dd = []
+        self.cd = 0.0
+        self.cv = 0.0
+        self.cf = 0.0
 
         self.x = []
         self.y = []
@@ -131,8 +134,14 @@ robot_radius = 2.0
 dv = 5.0 / 3.6
 nv = 2
 
+kj = 1.0
+kt = 0.1
+kd = 1.0
+klat = 1.0
+klon = 1.0
 
-def calc_frenet_paths(c_speed, c_d):
+
+def calc_frenet_paths(c_speed, c_d, s0):
 
     frenet_paths = []
 
@@ -151,12 +160,17 @@ def calc_frenet_paths(c_speed, c_d):
             for tv in np.arange(target_speed - dv * nv, target_speed + dv * nv, dv):
                 tfp = copy.deepcopy(fp)
                 lon_qp = quartic_polynomial(
-                    0.0, c_speed, 0.0, tv, 0.0, Ti)
+                    s0, c_speed, 0.0, tv, 0.0, Ti)
 
                 for t in fp.t:
                     tfp.s.append(lon_qp.calc_point(t))
                     tfp.s_d.append(lon_qp.calc_first_derivative(t))
                     tfp.s_dd.append(lon_qp.calc_second_derivative(t))
+
+                tfp.cd = kj * sum(tfp.d_dd) + kt * Ti + kd * tfp.d[-1]**2
+                tfp.cv = kj * sum(tfp.s_dd) + kt * Ti + kd * \
+                    (target_speed - tfp.s_d[-1])**2
+                tfp.cf = klat * tfp.cd + klon * tfp.cv
 
                 frenet_paths.append(tfp)
 
@@ -226,14 +240,22 @@ def check_paths(fplist, ob):
     return [fplist[i] for i in okind]
 
 
-def frenet_optimal_planning(csp, c_speed, c_d, ob):
+def frenet_optimal_planning(csp, s0, c_speed, c_d, ob):
 
-    fplist = calc_frenet_paths(c_speed, c_d)
+    fplist = calc_frenet_paths(c_speed, c_d, s0)
     fplist = calc_global_paths(fplist, csp)
     fplist = check_paths(fplist, ob)
 
+    # find minimum cost path
+    mincost = float("inf")
+    bestpath = None
     for fp in fplist:
-        plt.plot(fp.x, fp.y)
+        #  plt.plot(fp.x, fp.y)
+        if mincost >= fp.cf:
+            mincost = fp.cf
+            bestpath = fp
+
+    return bestpath
 
 
 def main():
@@ -256,15 +278,30 @@ def main():
         rk.append(csp.calc_curvature(i_s))
 
     c_speed = 10.0 / 3.6  # m/s
-    c_d = 1.0  # [m]
+    c_d = 5.0  # [m]
+    s0 = 0.0
 
-    plt.plot(rx, ry)
-    plt.plot(ob[:, 0], ob[:, 1], "xk")
+    print(s0, c_d, c_speed)
 
-    frenet_optimal_planning(csp, c_speed, c_d, ob)
+    for i in range(100):
+        plt.cla()
+        plt.plot(rx, ry)
+        plt.plot(ob[:, 0], ob[:, 1], "xk")
 
-    plt.axis("equal")
-    plt.grid(True)
+        path = frenet_optimal_planning(csp, s0, c_speed, c_d, ob)
+
+        s0 = path.s[1]
+        c_d = path.d[1]
+        c_speed = path.s_d[1]
+        print(s0, c_d, c_speed)
+
+        plt.plot(path.x, path.y, "-or")
+
+        plt.axis("equal")
+        plt.grid(True)
+        plt.pause(0.0001)
+        #  input()
+
     plt.show()
 
 
