@@ -10,6 +10,9 @@ import math
 import copy
 import numpy as np
 import dubins_path_planning
+import matplotlib.pyplot as plt
+
+show_animation = True
 
 
 class RRT():
@@ -18,7 +21,7 @@ class RRT():
     """
 
     def __init__(self, start, goal, obstacleList, randArea,
-                 goalSampleRate=10, maxIter=1000):
+                 goalSampleRate=10, maxIter=100):
         """
         Setting Parameter
 
@@ -34,6 +37,7 @@ class RRT():
         self.maxrand = randArea[1]
         self.goalSampleRate = goalSampleRate
         self.maxIter = maxIter
+        self.obstacleList = obstacleList
 
     def Planning(self, animation=True):
         """
@@ -50,7 +54,7 @@ class RRT():
             newNode = self.steer(rnd, nind)
             #  print(newNode.cost)
 
-            if self.CollisionCheck(newNode, obstacleList):
+            if self.CollisionCheck(newNode, self.obstacleList):
                 nearinds = self.find_near_nodes(newNode)
                 newNode = self.choose_parent(newNode, nearinds)
                 self.nodeList.append(newNode)
@@ -72,7 +76,7 @@ class RRT():
         dlist = []
         for i in nearinds:
             tNode = self.steer(newNode, i)
-            if self.CollisionCheck(tNode, obstacleList):
+            if self.CollisionCheck(tNode, self.obstacleList):
                 dlist.append(tNode.cost)
             else:
                 dlist.append(float("inf"))
@@ -190,7 +194,7 @@ class RRT():
             nearNode = self.nodeList[i]
             tNode = self.steer(nearNode, nnode - 1)
 
-            obstacleOK = self.CollisionCheck(tNode, obstacleList)
+            obstacleOK = self.CollisionCheck(tNode, self.obstacleList)
             imporveCost = nearNode.cost > tNode.cost
 
             if obstacleOK and imporveCost:
@@ -201,7 +205,6 @@ class RRT():
         u"""
         Draw Graph
         """
-        import matplotlib.pyplot as plt
         plt.clf()
         if rnd is not None:
             plt.plot(rnd.x, rnd.y, "^k")
@@ -211,7 +214,7 @@ class RRT():
                 #  plt.plot([node.x, self.nodeList[node.parent].x], [
                 #  node.y, self.nodeList[node.parent].y], "-g")
 
-        for (ox, oy, size) in obstacleList:
+        for (ox, oy, size) in self.obstacleList:
             plt.plot(ox, oy, "ok", ms=30 * size)
 
         dubins_path_planning.plot_arrow(
@@ -263,9 +266,8 @@ class Node():
         self.parent = None
 
 
-if __name__ == '__main__':
-    print("Start rrt start planning")
-    import matplotlib.pyplot as plt
+def main():
+    print("Start rrt star with dubins planning")
 
     # ====Search Path with RRT====
     obstacleList = [
@@ -282,12 +284,17 @@ if __name__ == '__main__':
     goal = [10.0, 10.0, math.radians(0.0)]
 
     rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
-    path = rrt.Planning(animation=True)
+    path = rrt.Planning(animation=show_animation)
 
     # Draw final path
-    rrt.DrawGraph()
-    plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
-    plt.grid(True)
-    plt.pause(0.001)
+    if show_animation:
+        rrt.DrawGraph()
+        plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
+        plt.grid(True)
+        plt.pause(0.001)
 
-    plt.show()
+        plt.show()
+
+
+if __name__ == '__main__':
+    main()
