@@ -12,6 +12,26 @@ import copy
 import math
 import cubic_spline_planner
 
+# parameter
+max_speed = 50.0 / 3.6
+max_accel = 2.0
+max_curvature = 1.0
+maxd = 7.0
+dd = 1.0
+dt = 0.2
+maxT = 5.0
+minT = 4.0
+target_speed = 30.0 / 3.6
+robot_radius = 2.0
+dv = 5.0 / 3.6
+nv = 1
+
+kj = 0.1
+kt = 0.1
+kd = 1.0
+klat = 1.0
+klon = 1.0
+
 
 class quinic_polynomial:
 
@@ -122,50 +142,29 @@ class Frenet_path:
         self.c = []
 
 
-max_speed = 50.0 / 3.6
-max_accel = 2.0
-max_curvature = 1.0
-maxd = 5.0
-dd = 1.0
-dt = 1.0
-T = 10.0
-target_speed = 30.0 / 3.6
-robot_radius = 2.0
-dv = 5.0 / 3.6
-nv = 2
-
-kj = 1.0
-kt = 0.1
-kd = 1.0
-klat = 1.0
-klon = 1.0
-
-
-def calc_frenet_paths(c_speed, c_d, s0):
+def calc_frenet_paths(c_speed, c_d, c_d_d, c_d_dd, s0):
 
     frenet_paths = []
 
     for di in np.arange(-maxd, maxd, dd):
-        for Ti in np.arange(dt, T, dt):
+        for Ti in np.arange(minT, maxT, dt):
             fp = Frenet_path()
 
-            lat_qp = quinic_polynomial(c_d, 0.0, 0.0, di, 0.0, 0.0, Ti)
+            lat_qp = quinic_polynomial(c_d, c_d_d, c_d_dd, di, 0.0, 0.0, Ti)
 
-            for t in np.arange(0.0, Ti, 0.1):
-                fp.t.append(t)
-                fp.d.append(lat_qp.calc_point(t))
-                fp.d_d.append(lat_qp.calc_first_derivative(t))
-                fp.d_dd.append(lat_qp.calc_second_derivative(t))
+            fp.t = [t for t in np.arange(0.0, Ti, dt)]
+            fp.d = [lat_qp.calc_point(t) for t in fp.t]
+            fp.d_d = [lat_qp.calc_first_derivative(t) for t in fp.t]
+            fp.d_dd = [lat_qp.calc_second_derivative(t) for t in fp.t]
 
             for tv in np.arange(target_speed - dv * nv, target_speed + dv * nv, dv):
                 tfp = copy.deepcopy(fp)
                 lon_qp = quartic_polynomial(
                     s0, c_speed, 0.0, tv, 0.0, Ti)
 
-                for t in fp.t:
-                    tfp.s.append(lon_qp.calc_point(t))
-                    tfp.s_d.append(lon_qp.calc_first_derivative(t))
-                    tfp.s_dd.append(lon_qp.calc_second_derivative(t))
+                tfp.s = [lon_qp.calc_point(t) for t in fp.t]
+                tfp.s_d = [lon_qp.calc_first_derivative(t) for t in fp.t]
+                tfp.s_dd = [lon_qp.calc_second_derivative(t) for t in fp.t]
 
                 tfp.cd = kj * sum(tfp.d_dd) + kt * Ti + kd * tfp.d[-1]**2
                 tfp.cv = kj * sum(tfp.s_dd) + kt * Ti + kd * \
@@ -184,6 +183,8 @@ def calc_global_paths(fplist, csp):
         # calc global positions
         for i in range(len(fp.s)):
             ix, iy = csp.calc_position(fp.s[i])
+            if ix is None:
+                break
             iyaw = csp.calc_yaw(fp.s[i])
             di = fp.d[i]
             fx = ix + di * math.cos(iyaw + math.pi / 2.0)
@@ -240,9 +241,9 @@ def check_paths(fplist, ob):
     return [fplist[i] for i in okind]
 
 
-def frenet_optimal_planning(csp, s0, c_speed, c_d, ob):
+def frenet_optimal_planning(csp, s0, c_speed, c_d, c_d_d, c_d_dd, ob):
 
-    fplist = calc_frenet_paths(c_speed, c_d, s0)
+    fplist = calc_frenet_paths(c_speed, c_d, c_d_d, c_d_dd, s0)
     fplist = calc_global_paths(fplist, csp)
     fplist = check_paths(fplist, ob)
 
@@ -250,7 +251,6 @@ def frenet_optimal_planning(csp, s0, c_speed, c_d, ob):
     mincost = float("inf")
     bestpath = None
     for fp in fplist:
-        #  plt.plot(fp.x, fp.y)
         if mincost >= fp.cf:
             mincost = fp.cf
             bestpath = fp
@@ -264,7 +264,11 @@ def main():
     x = [0.0, 10.0, 20.5, 35.0, 70.5]
     y = [0.0, -6.0, 5.0, 6.5, 0.0]
     ob = np.array([[20.0, 10.0],
-                   [30.0, 5.0]])
+                   [30.0, 6.0],
+                   [30.0, 8.0],
+                   [35.0, 8.0],
+                   [50.0, 3.0]
+                   ])
 
     csp = cubic_spline_planner.Spline2D(x, y)
     s = np.arange(0, csp.s[-1], 0.1)
@@ -277,31 +281,47 @@ def main():
         ryaw.append(csp.calc_yaw(i_s))
         rk.append(csp.calc_curvature(i_s))
 
+    # initial value
     c_speed = 10.0 / 3.6  # m/s
-    c_d = 5.0  # [m]
+    c_d = 2.0  # [m]
+    c_d_d = 0.0
+    c_d_dd = 0.0
     s0 = 0.0
 
-    print(s0, c_d, c_speed)
+    area = 15.0
 
-    for i in range(100):
+    for i in range(500):
         plt.cla()
         plt.plot(rx, ry)
         plt.plot(ob[:, 0], ob[:, 1], "xk")
 
-        path = frenet_optimal_planning(csp, s0, c_speed, c_d, ob)
+        path = frenet_optimal_planning(
+            csp, s0, c_speed, c_d, c_d_d, c_d_dd, ob)
 
-        s0 = path.s[1]
-        c_d = path.d[1]
-        c_speed = path.s_d[1]
-        print(s0, c_d, c_speed)
+        cind = 1
+        s0 = path.s[cind]
+        c_d = path.d[cind]
+        c_d_d = path.d_d[cind]
+        c_d_dd = path.d_dd[cind]
+        c_speed = path.s_d[cind]
 
-        plt.plot(path.x, path.y, "-or")
+        plt.plot(path.x[cind:], path.y[cind:], "-or")
+        plt.plot(path.x[cind], path.y[cind], "vc")
 
-        plt.axis("equal")
+        plt.xlim(path.x[cind] - area, path.x[cind] + area)
+        plt.ylim(path.y[cind] - area, path.y[cind] + area)
+
+        if np.hypot(path.x[cind] - x[-1], path.y[cind] - y[-1]) <= 1.0:
+            print("Goal")
+            break
+
+        plt.title("v[km/h]:" + str(c_speed * 3.6)[0:4])
         plt.grid(True)
         plt.pause(0.0001)
-        #  input()
 
+    print("Finish")
+    plt.grid(True)
+    plt.pause(0.0001)
     plt.show()
 
 
