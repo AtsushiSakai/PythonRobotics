@@ -354,12 +354,11 @@ Ref:
 
 ![3](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/FrenetOptimalTrajectory/animation.gif)
 
-It is a optimal trajectory generation in a Frenet Frame.
+This is optimal trajectory generation in a Frenet Frame.
 
 The cyan line is the target course and black crosses are obstacles.
 
 The red line is predicted path.
-
 　
 Ref:
 
