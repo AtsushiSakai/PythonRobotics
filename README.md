@@ -239,7 +239,7 @@ Path planning for a car robot with RRT\* and dubins path planner.
 
 ### RRT\* with reeds-sheep path
 
-![Robotics/animation.gif at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTStarCar_reeds_sheep/animation.gif))
+![Robotics/animation.gif at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/RRTStarReedsShepp/animation.gif))
 
 Path planning for a car robot with RRT\* and reeds sheep path planner.
 
