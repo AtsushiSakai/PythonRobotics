@@ -300,11 +300,12 @@ def main():
     path = rrt.Planning(animation=show_animation)
 
     # Draw final path
-    rrt.DrawGraph()
-    plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
-    plt.grid(True)
-    plt.pause(0.001)
-    plt.show()
+    if show_animation:
+        rrt.DrawGraph()
+        plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
+        plt.grid(True)
+        plt.pause(0.001)
+        plt.show()
 
 
 if __name__ == '__main__':
