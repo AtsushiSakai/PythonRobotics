@@ -333,9 +333,10 @@ def main():
             plt.pause(0.0001)
 
     print("Finish")
-    plt.grid(True)
-    plt.pause(0.0001)
-    plt.show()
+    if show_animation:
+        plt.grid(True)
+        plt.pause(0.0001)
+        plt.show()
 
 
 if __name__ == '__main__':
