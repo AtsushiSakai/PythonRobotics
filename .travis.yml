@@ -6,7 +6,8 @@ install:
   - "pip install numpy"
   - "pip install matplotlib"
   - "git clone https://github.com/ghliu/pyReedsShepp"
-  - "sudo python ./pyReedsShepp/setup.py install"
+  - "cd ./pyReedsShepp"
+  - "sudo python setup.py install"
 script:
   - python --version
   - python -m unittest discover tests
