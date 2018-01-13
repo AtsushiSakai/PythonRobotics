@@ -9,6 +9,7 @@ Ref:
 - [Optimal Trajectory Generation for Dynamic Street Scenarios in a Frenet Frame](https://www.researchgate.net/profile/Moritz_Werling/publication/224156269_Optimal_Trajectory_Generation_for_Dynamic_Street_Scenarios_in_a_Frenet_Frame/links/54f749df0cf210398e9277af.pdf)
 
 - [Optimal trajectory generation for dynamic street scenarios in a Frenet Frame](https://www.youtube.com/watch?v=Cj6tAQe7UCY)
+
 """
 
 import numpy as np
@@ -21,23 +22,24 @@ import cubic_spline_planner
 MAX_SPEED = 50.0 / 3.6  # maximum speed [m/s]
 MAX_ACCEL = 2.0  # maximum acceleration [m/ss]
 MAX_CURVATURE = 1.0  # maximum curvature [1/m]
-maxd = 7.0  # maximum road width [m]
-dd = 1.0  # road width sampling length [m]
-dt = 0.2  # time tick [s]
-maxT = 5.0  # max prediction time [m]
-minT = 4.0  # min prediction time [m]
-target_speed = 30.0 / 3.6
-robot_radius = 2.0
-dv = 5.0 / 3.6
-nv = 1
+MAX_ROAD_WIDTH = 7.0  # maximum road width [m]
+D_ROAD_W = 1.0  # road width sampling length [m]
+DT = 0.2  # time tick [s]
+MAXT = 5.0  # max prediction time [m]
+MINT = 4.0  # min prediction time [m]
+TARGET_SPEED = 30.0 / 3.6  # target speed [m/s]
+D_T_S = 5.0 / 3.6  # target speed sampling length [m/s]
+N_S_SAMPLE = 1  # sampling number of target speed
+ROBOT_RADIUS = 2.0  # robot radius [m]
 
-kj = 0.1
-kt = 0.1
-kd = 1.0
-klat = 1.0
-klon = 1.0
+# cost weights
+KJ = 0.1
+KT = 0.1
+KD = 1.0
+KLAT = 1.0
+KLON = 1.0
 
-area = 20.0
+show_animation = True
 
 
 class quinic_polynomial:
@@ -153,30 +155,29 @@ def calc_frenet_paths(c_speed, c_d, c_d_d, c_d_dd, s0):
 
     frenet_paths = []
 
-    for di in np.arange(-maxd, maxd, dd):
-        for Ti in np.arange(minT, maxT, dt):
+    for di in np.arange(-MAX_ROAD_WIDTH, MAX_ROAD_WIDTH, D_ROAD_W):
+        for Ti in np.arange(MINT, MAXT, DT):
             fp = Frenet_path()
 
             lat_qp = quinic_polynomial(c_d, c_d_d, c_d_dd, di, 0.0, 0.0, Ti)
 
-            fp.t = [t for t in np.arange(0.0, Ti, dt)]
+            fp.t = [t for t in np.arange(0.0, Ti, DT)]
             fp.d = [lat_qp.calc_point(t) for t in fp.t]
             fp.d_d = [lat_qp.calc_first_derivative(t) for t in fp.t]
             fp.d_dd = [lat_qp.calc_second_derivative(t) for t in fp.t]
 
-            for tv in np.arange(target_speed - dv * nv, target_speed + dv * nv, dv):
+            for tv in np.arange(TARGET_SPEED - D_T_S * N_S_SAMPLE, TARGET_SPEED + D_T_S * N_S_SAMPLE, D_T_S):
                 tfp = copy.deepcopy(fp)
-                lon_qp = quartic_polynomial(
-                    s0, c_speed, 0.0, tv, 0.0, Ti)
+                lon_qp = quartic_polynomial(s0, c_speed, 0.0, tv, 0.0, Ti)
 
                 tfp.s = [lon_qp.calc_point(t) for t in fp.t]
                 tfp.s_d = [lon_qp.calc_first_derivative(t) for t in fp.t]
                 tfp.s_dd = [lon_qp.calc_second_derivative(t) for t in fp.t]
 
-                tfp.cd = kj * sum(tfp.d_dd) + kt * Ti + kd * tfp.d[-1]**2
-                tfp.cv = kj * sum(tfp.s_dd) + kt * Ti + kd * \
-                    (target_speed - tfp.s_d[-1])**2
-                tfp.cf = klat * tfp.cd + klon * tfp.cv
+                tfp.cd = KJ * sum(tfp.d_dd) + KT * Ti + KD * tfp.d[-1]**2
+                tfp.cv = KJ * sum(tfp.s_dd) + KT * Ti + KD * \
+                    (TARGET_SPEED - tfp.s_d[-1])**2
+                tfp.cf = KLAT * tfp.cd + KLON * tfp.cv
 
                 frenet_paths.append(tfp)
 
@@ -222,7 +223,7 @@ def check_collision(fp, ob):
         d = [((ix - ob[i, 0])**2 + (iy - ob[i, 1])**2)
              for (ix, iy) in zip(fp.x, fp.y)]
 
-        collision = any([di <= robot_radius**2 for di in d])
+        collision = any([di <= ROBOT_RADIUS**2 for di in d])
 
         if collision:
             return False
@@ -265,18 +266,7 @@ def frenet_optimal_planning(csp, s0, c_speed, c_d, c_d_d, c_d_dd, ob):
     return bestpath
 
 
-def main():
-    print(__file__ + " start!!")
-
-    x = [0.0, 10.0, 20.5, 35.0, 70.5]
-    y = [0.0, -6.0, 5.0, 6.5, 0.0]
-    ob = np.array([[20.0, 10.0],
-                   [30.0, 6.0],
-                   [30.0, 8.0],
-                   [35.0, 8.0],
-                   [50.0, 3.0]
-                   ])
-
+def generate_target_course(x, y):
     csp = cubic_spline_planner.Spline2D(x, y)
     s = np.arange(0, csp.s[-1], 0.1)
 
@@ -288,41 +278,59 @@ def main():
         ryaw.append(csp.calc_yaw(i_s))
         rk.append(csp.calc_curvature(i_s))
 
-    # initial value
-    c_speed = 10.0 / 3.6  # m/s
-    c_d = 2.0  # [m]
-    c_d_d = 0.0
-    c_d_dd = 0.0
-    s0 = 0.0
+    return rx, ry, ryaw, rk, csp
+
+
+def main():
+    print(__file__ + " start!!")
+
+    # way points
+    wx = [0.0, 10.0, 20.5, 35.0, 70.5]
+    wy = [0.0, -6.0, 5.0, 6.5, 0.0]
+    # obstacle lists
+    ob = np.array([[20.0, 10.0],
+                   [30.0, 6.0],
+                   [30.0, 8.0],
+                   [35.0, 8.0],
+                   [50.0, 3.0]
+                   ])
+
+    tx, ty, tyaw, tc, csp = generate_target_course(wx, wy)
+
+    # initial state
+    c_speed = 10.0 / 3.6  # current speed [m/s]
+    c_d = 2.0  # current lateral position [m]
+    c_d_d = 0.0  # current lateral speed [m/s]
+    c_d_dd = 0.0  # current latral acceleration [m/s]
+    s0 = 0.0  # current course position
+
+    area = 20.0  # animation area length [m]
 
     for i in range(500):
-        plt.cla()
-        plt.plot(rx, ry)
-        plt.plot(ob[:, 0], ob[:, 1], "xk")
-
         path = frenet_optimal_planning(
             csp, s0, c_speed, c_d, c_d_d, c_d_dd, ob)
 
-        cind = 1
-        s0 = path.s[cind]
-        c_d = path.d[cind]
-        c_d_d = path.d_d[cind]
-        c_d_dd = path.d_dd[cind]
-        c_speed = path.s_d[cind]
+        s0 = path.s[1]
+        c_d = path.d[1]
+        c_d_d = path.d_d[1]
+        c_d_dd = path.d_dd[1]
+        c_speed = path.s_d[1]
 
-        plt.plot(path.x[cind:], path.y[cind:], "-or")
-        plt.plot(path.x[cind], path.y[cind], "vc")
-
-        plt.xlim(path.x[cind] - area, path.x[cind] + area)
-        plt.ylim(path.y[cind] - area, path.y[cind] + area)
-
-        if np.hypot(path.x[cind] - x[-1], path.y[cind] - y[-1]) <= 1.0:
+        if np.hypot(path.x[1] - tx[-1], path.y[1] - ty[-1]) <= 1.0:
             print("Goal")
             break
 
-        plt.title("v[km/h]:" + str(c_speed * 3.6)[0:4])
-        plt.grid(True)
-        plt.pause(0.0001)
+        if show_animation:
+            plt.cla()
+            plt.plot(tx, ty)
+            plt.plot(ob[:, 0], ob[:, 1], "xk")
+            plt.plot(path.x[1:], path.y[1:], "-or")
+            plt.plot(path.x[1], path.y[1], "vc")
+            plt.xlim(path.x[1] - area, path.x[1] + area)
+            plt.ylim(path.y[1] - area, path.y[1] + area)
+            plt.title("v[km/h]:" + str(c_speed * 3.6)[0:4])
+            plt.grid(True)
+            plt.pause(0.0001)
 
     print("Finish")
     plt.grid(True)
