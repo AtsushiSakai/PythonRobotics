@@ -4,6 +4,11 @@ Frenet optimal trajectory generator
 
 author: Atsushi Sakai (@Atsushi_twi)
 
+Ref:
+
+- [Optimal Trajectory Generation for Dynamic Street Scenarios in a Frenet Frame](https://www.researchgate.net/profile/Moritz_Werling/publication/224156269_Optimal_Trajectory_Generation_for_Dynamic_Street_Scenarios_in_a_Frenet_Frame/links/54f749df0cf210398e9277af.pdf)
+
+- [Optimal trajectory generation for dynamic street scenarios in a Frenet Frame](https://www.youtube.com/watch?v=Cj6tAQe7UCY)
 """
 
 import numpy as np
@@ -12,15 +17,15 @@ import copy
 import math
 import cubic_spline_planner
 
-# parameter
-max_speed = 50.0 / 3.6
-max_accel = 2.0
-max_curvature = 1.0
-maxd = 7.0
-dd = 1.0
-dt = 0.2
-maxT = 5.0
-minT = 4.0
+# Parameter
+MAX_SPEED = 50.0 / 3.6  # maximum speed [m/s]
+MAX_ACCEL = 2.0  # maximum acceleration [m/ss]
+MAX_CURVATURE = 1.0  # maximum curvature [1/m]
+maxd = 7.0  # maximum road width [m]
+dd = 1.0  # road width sampling length [m]
+dt = 0.2  # time tick [s]
+maxT = 5.0  # max prediction time [m]
+minT = 4.0  # min prediction time [m]
 target_speed = 30.0 / 3.6
 robot_radius = 2.0
 dv = 5.0 / 3.6
@@ -31,6 +36,8 @@ kt = 0.1
 kd = 1.0
 klat = 1.0
 klon = 1.0
+
+area = 20.0
 
 
 class quinic_polynomial:
@@ -227,11 +234,11 @@ def check_paths(fplist, ob):
 
     okind = []
     for i in range(len(fplist)):
-        if any([v > max_speed for v in fplist[i].s_d]):  # Max speed check
+        if any([v > MAX_SPEED for v in fplist[i].s_d]):  # Max speed check
             continue
-        elif any([abs(a) > max_accel for a in fplist[i].s_dd]):  # Max accel check
+        elif any([abs(a) > MAX_ACCEL for a in fplist[i].s_dd]):  # Max accel check
             continue
-        elif any([abs(c) > max_curvature for c in fplist[i].c]):  # Max curvature check
+        elif any([abs(c) > MAX_CURVATURE for c in fplist[i].c]):  # Max curvature check
             continue
         elif not check_collision(fplist[i], ob):
             continue
@@ -287,8 +294,6 @@ def main():
     c_d_d = 0.0
     c_d_dd = 0.0
     s0 = 0.0
-
-    area = 15.0
 
     for i in range(500):
         plt.cla()
