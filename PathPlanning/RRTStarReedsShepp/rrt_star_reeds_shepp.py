@@ -1,11 +1,8 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
-@brief: Path Planning Sample Code with RRT for car like robot.
 
-@author: AtsushiSakai(@Atsushi_twi)
+Path Planning Sample Code with RRT for car like robot.
 
-@license: MIT
+author: AtsushiSakai(@Atsushi_twi)
 
 """
 
@@ -14,16 +11,19 @@ import math
 import copy
 import numpy as np
 import reeds_shepp_path_planning
+import matplotlib.pyplot as plt
+
+show_animation = True
 
 
 class RRT():
-    u"""
+    """
     Class for RRT Planning
     """
 
     def __init__(self, start, goal, obstacleList, randArea,
-                 goalSampleRate=10, maxIter=1000):
-        u"""
+                 goalSampleRate=10, maxIter=200):
+        """
         Setting Parameter
 
         start:Start Position [x,y]
@@ -38,9 +38,10 @@ class RRT():
         self.maxrand = randArea[1]
         self.goalSampleRate = goalSampleRate
         self.maxIter = maxIter
+        self.obstacleList = obstacleList
 
     def Planning(self, animation=True):
-        u"""
+        """
         Pathplanning
 
         animation: flag for animation on or off
@@ -48,14 +49,12 @@ class RRT():
 
         self.nodeList = [self.start]
         for i in range(self.maxIter):
-            print(i)
             rnd = self.get_random_point()
             nind = self.GetNearestListIndex(self.nodeList, rnd)
 
             newNode = self.steer(rnd, nind)
-            #  print(newNode.cost)
 
-            if self.CollisionCheck(newNode, obstacleList):
+            if self.CollisionCheck(newNode, self.obstacleList):
                 nearinds = self.find_near_nodes(newNode)
                 newNode = self.choose_parent(newNode, nearinds)
                 self.nodeList.append(newNode)
@@ -63,11 +62,9 @@ class RRT():
 
             if animation and i % 5 == 0:
                 self.DrawGraph(rnd=rnd)
-                matplotrecorder.save_frame()  # save each frame
 
         # generate coruse
         lastIndex = self.get_best_last_index()
-        #  print(lastIndex)
         path = self.gen_final_course(lastIndex)
         return path
 
@@ -78,7 +75,7 @@ class RRT():
         dlist = []
         for i in nearinds:
             tNode = self.steer(newNode, i)
-            if self.CollisionCheck(tNode, obstacleList):
+            if self.CollisionCheck(tNode, self.obstacleList):
                 dlist.append(tNode.cost)
             else:
                 dlist.append(float("inf"))
@@ -104,7 +101,6 @@ class RRT():
         return angle
 
     def steer(self, rnd, nind):
-        #  print(rnd)
         curvature = 1.0
 
         nearestNode = self.nodeList[nind]
@@ -149,16 +145,16 @@ class RRT():
         for (i, node) in enumerate(self.nodeList):
             if self.calc_dist_to_goal(node.x, node.y) <= XYTH:
                 goalinds.append(i)
-        print("OK XY TH num is")
-        print(len(goalinds))
+        #  print("OK XY TH num is")
+        #  print(len(goalinds))
 
         # angle check
         fgoalinds = []
         for i in goalinds:
             if abs(self.nodeList[i].yaw - self.end.yaw) <= YAWTH:
                 fgoalinds.append(i)
-        print("OK YAW TH num is")
-        print(len(fgoalinds))
+        #  print("OK YAW TH num is")
+        #  print(len(fgoalinds))
 
         mincost = min([self.nodeList[i].cost for i in fgoalinds])
         for i in fgoalinds:
@@ -200,7 +196,7 @@ class RRT():
             nearNode = self.nodeList[i]
             tNode = self.steer(nearNode, nnode - 1)
 
-            obstacleOK = self.CollisionCheck(tNode, obstacleList)
+            obstacleOK = self.CollisionCheck(tNode, self.obstacleList)
             imporveCost = nearNode.cost > tNode.cost
 
             if obstacleOK and imporveCost:
@@ -208,10 +204,9 @@ class RRT():
                 self.nodeList[i] = tNode
 
     def DrawGraph(self, rnd=None):
-        u"""
+        """
         Draw Graph
         """
-        import matplotlib.pyplot as plt
         plt.clf()
         if rnd is not None:
             plt.plot(rnd.x, rnd.y, "^k")
@@ -221,7 +216,7 @@ class RRT():
                 #  plt.plot([node.x, self.nodeList[node.parent].x], [
                 #  node.y, self.nodeList[node.parent].y], "-g")
 
-        for (ox, oy, size) in obstacleList:
+        for (ox, oy, size) in self.obstacleList:
             plt.plot(ox, oy, "ok", ms=30 * size)
 
         reeds_shepp_path_planning.plot_arrow(
@@ -258,7 +253,7 @@ class RRT():
 
 
 class Node():
-    u"""
+    """
     RRT Node
     """
 
@@ -273,11 +268,8 @@ class Node():
         self.parent = None
 
 
-if __name__ == '__main__':
+def main():
     print("Start rrt start planning")
-    import matplotlib.pyplot as plt
-    import matplotrecorder
-    matplotrecorder.donothing = True
 
     # ====Search Path with RRT====
     #  obstacleList = [
@@ -305,17 +297,15 @@ if __name__ == '__main__':
     goal = [6.0, 7.0, math.radians(90.0)]
 
     rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
-    path = rrt.Planning(animation=False)
+    path = rrt.Planning(animation=show_animation)
 
     # Draw final path
     rrt.DrawGraph()
     plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
     plt.grid(True)
     plt.pause(0.001)
-
-    for i in range(10):
-        matplotrecorder.save_frame()  # save each frame
-
     plt.show()
 
-    #  matplotrecorder.save_movie("animation.gif", 0.1)
+
+if __name__ == '__main__':
+    main()

@@ -1,4 +1,3 @@
-#! /usr/bin/python
 """
 
 Reeds Shepp path planner sample code

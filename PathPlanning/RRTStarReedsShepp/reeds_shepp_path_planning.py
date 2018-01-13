@@ -1,23 +1,19 @@
-#! /usr/bin/python
-# -*- coding: utf-8 -*-
 """
 
 Reeds Shepp path planner sample code
 
 author Atsushi Sakai(@Atsushi_twi)
 
-License MIT
-
 """
 import reeds_shepp
 import math
+import matplotlib.pyplot as plt
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
-    u"""
+    """
     Plot arrow
     """
-    import matplotlib.pyplot as plt
 
     if not isinstance(x, float):
         for (ix, iy, iyaw) in zip(x, y, yaw):
@@ -57,9 +53,8 @@ def reeds_shepp_path_planning(start_x, start_y, start_yaw,
     return xs, ys, yaw, ptype, clen
 
 
-if __name__ == '__main__':
+def main():
     print("Reeds Shepp path planner sample start!!")
-    import matplotlib.pyplot as plt
 
     start_x = 1.0  # [m]
     start_y = 1.0  # [m]
@@ -88,3 +83,7 @@ if __name__ == '__main__':
     plt.grid(True)
     plt.axis("equal")
     plt.show()
+
+
+if __name__ == '__main__':
+    main()
