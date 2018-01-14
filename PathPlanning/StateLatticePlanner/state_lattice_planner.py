@@ -1,19 +1,24 @@
 """
+
 State lattice planner with model predictive trajectory generator
 
-author: Atsushi Sakai
+author: Atsushi Sakai(Atsushi_twi)
+
 """
 import sys
-import os
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append("../ModelPredictiveTrajectoryGenerator")
 
 from matplotlib import pyplot as plt
 import numpy as np
 import math
 import pandas as pd
-import ModelPredictiveTrajectoryGenerator.model_predictive_trajectory_generator as planner
-import ModelPredictiveTrajectoryGenerator.motion_model as motion_model
+import model_predictive_trajectory_generator as planner
+import motion_model
+
+table_path = "./lookuptable.csv"
+
+show_animation = True
 
 
 def search_nearest_one_from_lookuptable(tx, ty, tyaw, lookup_table):
@@ -34,7 +39,7 @@ def search_nearest_one_from_lookuptable(tx, ty, tyaw, lookup_table):
 
 
 def get_lookup_table():
-    data = pd.read_csv("lookuptable.csv")
+    data = pd.read_csv(table_path)
 
     return np.array(data)
 
@@ -107,7 +112,8 @@ def calc_biased_polar_states(goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_
     cnav_max = max(cnav)
 
     # normalize
-    cnav = [(cnav_max - cnav[i]) / (cnav_max * ns - cnav_sum) for i in range(ns - 1)]
+    cnav = [(cnav_max - cnav[i]) / (cnav_max * ns - cnav_sum)
+            for i in range(ns - 1)]
 
     csumnav = np.cumsum(cnav)
     di = []
@@ -142,7 +148,8 @@ def calc_lane_states(l_center, l_heading, l_width, v_width, d, nxy):
 
     states = []
     for i in range(nxy):
-        delta = -0.5 * (l_width - v_width) + (l_width - v_width) * i / (nxy - 1)
+        delta = -0.5 * (l_width - v_width) + \
+            (l_width - v_width) * i / (nxy - 1)
         xf = xc - delta * math.sin(l_heading)
         yf = yc + delta * math.cos(l_heading)
         yawf = l_heading
@@ -183,11 +190,14 @@ def uniform_terminal_state_sampling_test1():
     for table in result:
         xc, yc, yawc = motion_model.generate_trajectory(
             table[3], table[4], table[5], k0)
-        plt.plot(xc, yc, "-r")
 
-    plt.grid(True)
-    plt.axis("equal")
-    plt.show()
+        if show_animation:
+            plt.plot(xc, yc, "-r")
+
+    if show_animation:
+        plt.grid(True)
+        plt.axis("equal")
+        plt.show()
 
     print("Done")
 
@@ -207,11 +217,14 @@ def uniform_terminal_state_sampling_test2():
     for table in result:
         xc, yc, yawc = motion_model.generate_trajectory(
             table[3], table[4], table[5], k0)
-        plt.plot(xc, yc, "-r")
 
-    plt.grid(True)
-    plt.axis("equal")
-    plt.show()
+        if show_animation:
+            plt.plot(xc, yc, "-r")
+
+    if show_animation:
+        plt.grid(True)
+        plt.axis("equal")
+        plt.show()
 
     print("Done")
 
@@ -227,17 +240,20 @@ def biased_terminal_state_sampling_test1():
     p_max = math.radians(20.0)
     ns = 100
     goal_angle = math.radians(0.0)
-    states = calc_biased_polar_states(goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max)
+    states = calc_biased_polar_states(
+        goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max)
     result = generate_path(states, k0)
 
     for table in result:
         xc, yc, yawc = motion_model.generate_trajectory(
             table[3], table[4], table[5], k0)
-        plt.plot(xc, yc, "-r")
+        if show_animation:
+            plt.plot(xc, yc, "-r")
 
-    plt.grid(True)
-    plt.axis("equal")
-    plt.show()
+    if show_animation:
+        plt.grid(True)
+        plt.axis("equal")
+        plt.show()
 
 
 def biased_terminal_state_sampling_test2():
@@ -251,17 +267,21 @@ def biased_terminal_state_sampling_test2():
     p_max = math.radians(20.0)
     ns = 100
     goal_angle = math.radians(30.0)
-    states = calc_biased_polar_states(goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max)
+    states = calc_biased_polar_states(
+        goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max)
     result = generate_path(states, k0)
 
     for table in result:
         xc, yc, yawc = motion_model.generate_trajectory(
             table[3], table[4], table[5], k0)
-        plt.plot(xc, yc, "-r")
 
-    plt.grid(True)
-    plt.axis("equal")
-    plt.show()
+        if show_animation:
+            plt.plot(xc, yc, "-r")
+
+    if show_animation:
+        plt.grid(True)
+        plt.axis("equal")
+        plt.show()
 
 
 def lane_state_sampling_test1():
@@ -279,18 +299,21 @@ def lane_state_sampling_test1():
     for table in result:
         xc, yc, yawc = motion_model.generate_trajectory(
             table[3], table[4], table[5], k0)
-        plt.plot(xc, yc, "-r")
 
-    plt.grid(True)
-    plt.axis("equal")
-    plt.show()
+        if show_animation:
+            plt.plot(xc, yc, "-r")
+
+    if show_animation:
+        plt.grid(True)
+        plt.axis("equal")
+        plt.show()
 
 
 def main():
-    # uniform_terminal_state_sampling1()
-    # uniform_terminal_state_sampling2()
-    # biased_terminal_state_sampling1()
-    # biased_terminal_state_sampling2()
+    uniform_terminal_state_sampling_test1()
+    uniform_terminal_state_sampling_test2()
+    biased_terminal_state_sampling_test1()
+    biased_terminal_state_sampling_test2()
     lane_state_sampling_test1()
 
 
