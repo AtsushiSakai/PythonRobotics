@@ -5,6 +5,7 @@ install:
   - "pip install scipy"
   - "pip install numpy"
   - "pip install matplotlib"
+  - "pip install pandas"
 script:
   - python --version
   - python -m unittest discover tests
