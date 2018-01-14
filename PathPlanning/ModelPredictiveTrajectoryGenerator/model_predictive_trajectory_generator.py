@@ -8,14 +8,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 import motion_model
-from matplotrecorder import matplotrecorder
 
 # optimization parameter
 max_iter = 100
 h = np.matrix([0.5, 0.02, 0.02]).T  # parameter sampling distanse
 cost_th = 0.1
 
-matplotrecorder.donothing = True
 show_graph = False
 
 
@@ -99,7 +97,6 @@ def show_trajectory(target, xc, yc):
     plt.axis("equal")
     plt.grid(True)
     plt.pause(0.1)
-    matplotrecorder.save_frame()
 
 
 def optimize_trajectory(target, k0, p):
@@ -145,7 +142,6 @@ def test_optimize_trajectory():
     x, y, yaw, p = optimize_trajectory(target, k0, init_p)
 
     show_trajectory(target, x, y)
-    matplotrecorder.save_movie("animation.gif", 0.1)
     #  plt.plot(x, y, "-r")
     plot_arrow(target.x, target.y, target.yaw)
     plt.axis("equal")

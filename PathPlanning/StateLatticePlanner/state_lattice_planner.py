@@ -230,7 +230,7 @@ def uniform_terminal_state_sampling_test2():
 
 
 def biased_terminal_state_sampling_test1():
-    k0 = 0.0
+    lane_state_sampling_test1 = 0.0
     nxy = 30
     nh = 2
     d = 20
