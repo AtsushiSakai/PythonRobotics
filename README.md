@@ -148,21 +148,17 @@ This code uses the model predictive trajectory generator to solve boundary probl
 
 ### Uniform polar sampling
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/Figure_1.png)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/UniformPolarSampling.gif)
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/Figure_2.png)
 
 ### Biased polar sampling
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/Figure_3.png)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/BiasedPolarSampling.gif)
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/Figure_4.png)
 
 ### Lane sampling
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/Figure_5.png)
-
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/Figure_6.png)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/StateLatticePlanner/LaneSampling.gif)
 
 ## Probabilistic Road-Map (PRM) planning 
 
