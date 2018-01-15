@@ -396,6 +396,12 @@ Path tracking simulation with pure pursuit steering control and PID speed contro
 
 ![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/pure_pursuit/animation.gif)
 
+The red line is a target course, the green cross means the target point for pure pursuit control, the blue line is the tracking.
+
+Ref:
+
+- [A Survey of Motion Planning and Control Techniques for Self-driving Urban Vehicles](https://arxiv.org/abs/1604.07446)
+
 ## Stanley control
 
 Path tracking simulation with Stanley steering control and PID speed control.
