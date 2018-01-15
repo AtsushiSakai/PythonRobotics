@@ -418,7 +418,7 @@ Path tracking simulation with rear wheel feedback steering control and PID speed
 
 Path tracking simulation with LQR steering control and PID speed control.
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/lqr/animation.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/lqr_steer_control/animation.gif)
 
 
 # License 
