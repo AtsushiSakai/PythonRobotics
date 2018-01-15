@@ -28,3 +28,6 @@
 [submodule "PathTracking/stanley_controller/pycubicspline"]
 	path = PathTracking/stanley_controller/pycubicspline
 	url = https://github.com/AtsushiSakai/pycubicspline
+[submodule "PathTracking/lqr_steer_control/pycubicspline"]
+	path = PathTracking/lqr_steer_control/pycubicspline
+	url = https://github.com/AtsushiSakai/pycubicspline
