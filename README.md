@@ -56,6 +56,8 @@ Python codes for robotics algorithm.
 
 - matplotlib
 
+- pandas
+
 - [pyReedsShepp](https://github.com/ghliu/pyReedsShepp) (Only for reeds sheep path and RRTStarCar_reeds_sheep)
 
 - [cvxpy](https://cvxgrp.github.io/cvxpy/index.html) (Only for mix integer optimization based model predictive planning and control)
