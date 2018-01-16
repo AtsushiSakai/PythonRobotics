@@ -22,9 +22,6 @@
 [submodule "PathPlanning/MixIntegerPathPlanning/matplotrecorder"]
 	path = PathPlanning/MixIntegerPathPlanning/matplotrecorder
 	url = https://github.com/AtsushiSakai/matplotrecorder
-[submodule "PathPlanning/DynamicWindowApproach/matplotrecorder"]
-	path = PathPlanning/DynamicWindowApproach/matplotrecorder
-	url = https://github.com/AtsushiSakai/matplotrecorder
 [submodule "PathTracking/stanley_controller/pycubicspline"]
 	path = PathTracking/stanley_controller/pycubicspline
 	url = https://github.com/AtsushiSakai/pycubicspline

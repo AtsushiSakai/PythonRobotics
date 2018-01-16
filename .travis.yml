@@ -5,8 +5,6 @@ before_install:
   - sudo apt-get -qq update
   - sudo apt-get install libboost-dev
   - sudo apt-get install libc++-dev
-  - git clone https://github.com/ghliu/pyReedsShepp
-  - cd pyReedsShepp
 
 install:
   - "pip install scipy"
@@ -14,7 +12,7 @@ install:
   - "pip install matplotlib"
   - "pip install pandas"
   - "pip install Cython"
-  - "python setup.py install"
+  - "pip install git+https://github.com/ghliu/pyReedsShepp"
 
 script:
   - python --version

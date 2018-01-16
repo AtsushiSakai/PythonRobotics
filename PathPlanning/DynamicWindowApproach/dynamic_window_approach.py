@@ -9,8 +9,8 @@ author: Atsushi Sakai (@Atsushi_twi)
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotrecorder import matplotrecorder
-matplotrecorder.donothing = True
+
+show_animation = True
 
 
 class Config():
@@ -187,21 +187,21 @@ def main():
     traj = np.array(x)
 
     for i in range(1000):
-        plt.cla()
         u, ltraj = dwa_control(x, u, config, goal, ob)
 
         x = motion(x, u, config.dt)
         traj = np.vstack((traj, x))  # store state history
 
-        plt.plot(ltraj[:, 0], ltraj[:, 1], "-g")
-        plt.plot(x[0], x[1], "xr")
-        plt.plot(goal[0], goal[1], "xb")
-        plt.plot(ob[:, 0], ob[:, 1], "ok")
-        plot_arrow(x[0], x[1], x[2])
-        plt.axis("equal")
-        plt.grid(True)
-        plt.pause(0.0001)
-        matplotrecorder.save_frame()
+        if show_animation:
+            plt.cla()
+            plt.plot(ltraj[:, 0], ltraj[:, 1], "-g")
+            plt.plot(x[0], x[1], "xr")
+            plt.plot(goal[0], goal[1], "xb")
+            plt.plot(ob[:, 0], ob[:, 1], "ok")
+            plot_arrow(x[0], x[1], x[2])
+            plt.axis("equal")
+            plt.grid(True)
+            plt.pause(0.0001)
 
         # check goal
         if math.sqrt((x[0] - goal[0])**2 + (x[1] - goal[1])**2) <= config.robot_radius:
@@ -209,10 +209,9 @@ def main():
             break
 
     print("Done")
-    plt.plot(traj[:, 0], traj[:, 1], "-r")
-    matplotrecorder.save_frame()
-    matplotrecorder.save_movie("animation.gif", 0.1)
-    plt.show()
+    if show_animation:
+        plt.plot(traj[:, 0], traj[:, 1], "-r")
+        plt.show()
 
 
 if __name__ == '__main__':
