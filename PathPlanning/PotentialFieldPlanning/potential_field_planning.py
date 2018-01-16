@@ -29,11 +29,11 @@ def calc_potential_field(gx, gy, ox, oy, reso, rr):
     yw = round((maxy - miny) / reso)
 
     # calc each potential
-    pmap = [[0.0 for i in range(yw)] for i in range(xw)]
+    pmap = [[0.0 for i in range(int(yw))] for i in range(int(xw))]
 
-    for ix in range(xw):
+    for ix in range(int(xw)):
         x = ix * reso + minx
-        for iy in range(yw):
+        for iy in range(int(yw)):
             y = iy * reso + miny
             ug = calc_attractive_potential(x, y, gx, gy)
             uo = calc_repulsive_potential(x, y, ox, oy, rr)
@@ -111,7 +111,7 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
             if inx >= len(pmap) or iny >= len(pmap[0]):
                 p = float("inf")  # outside area
             else:
-                p = pmap[inx][iny]
+                p = pmap[int(inx)][int(iny)]
             if minp > p:
                 minp = p
                 minix = inx
