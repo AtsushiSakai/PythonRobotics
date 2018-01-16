@@ -245,7 +245,7 @@ Path planning for a car robot with RRT\* and reeds sheep path planner.
 
 A vehicle model based path planning with closed loop RRT\*.
 
-![CLRRT](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/CLRRTStar/animation.gif)
+![CLRRT](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ClosedLoopRRTStar/animation.gif)
 
 In this code, pure-pursuit algorithm is used for steering control, 
 
