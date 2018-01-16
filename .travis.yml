@@ -1,11 +1,18 @@
 language: python
 python:
   - 3.6
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install libboost-dev
+  - sudo apt-get install libc++-dev
+
 install:
   - "pip install scipy"
   - "pip install numpy"
   - "pip install matplotlib"
   - "pip install pandas"
+  - "pip install Cython"
+
 script:
   - python --version
   - python -m unittest discover tests
