@@ -1,11 +1,7 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
-@brief: Path Planning Sample Code with Closed loop RRT for car like robot.
+Path Planning Sample Code with Closed loop RRT for car like robot.
 
-@author: AtsushiSakai(@Atsushi_twi)
-
-@license: MIT
+author: AtsushiSakai(@Atsushi_twi)
 
 """
 
@@ -15,21 +11,21 @@ import copy
 import numpy as np
 import reeds_shepp_path_planning
 import pure_pursuit
-import pandas as pd
 import unicycle_model
+import matplotlib.pyplot as plt
 
 
 target_speed = 10.0 / 3.6
 
 
 class RRT():
-    u"""
+    """
     Class for RRT Planning
     """
 
     def __init__(self, start, goal, obstacleList, randArea,
                  maxIter=200):
-        u"""
+        """
         Setting Parameter
 
         start:Start Position [x,y]
@@ -51,12 +47,12 @@ class RRT():
 
         newNode = self.steer(goal, len(self.nodeList) - 1)
 
-        if self.CollisionCheck(newNode, obstacleList):
+        if self.CollisionCheck(newNode, self.obstacleList):
             #  print("goal path is OK")
             self.nodeList.append(newNode)
 
     def Planning(self, animation=True):
-        u"""
+        """
         Pathplanning
 
         animation: flag for animation on or off
@@ -73,7 +69,7 @@ class RRT():
             newNode = self.steer(rnd, nind)
             #  print(newNode.cost)
 
-            if self.CollisionCheck(newNode, obstacleList):
+            if self.CollisionCheck(newNode, self.obstacleList):
                 nearinds = self.find_near_nodes(newNode)
                 newNode = self.choose_parent(newNode, nearinds)
 
@@ -84,7 +80,6 @@ class RRT():
 
             if animation and i % 5 == 0:
                 self.DrawGraph(rnd=rnd)
-                matplotrecorder.save_frame()  # save each frame
 
         # generate coruse
         path_indexs = self.get_best_last_indexs()
@@ -145,14 +140,6 @@ class RRT():
 
     def check_tracking_path_is_feasible(self, path):
         #  print("check_tracking_path_is_feasible")
-
-        # save csv
-        df = pd.DataFrame()
-        df["x"] = np.array(path[:, 0]).flatten()
-        df["y"] = np.array(path[:, 1]).flatten()
-        df["yaw"] = np.array(path[:, 2]).flatten()
-        df.to_csv("rrt_course.csv", index=None)
-
         cx = np.array(path[:, 0])
         cy = np.array(path[:, 1])
         cyaw = np.array(path[:, 2])
@@ -185,7 +172,7 @@ class RRT():
             print("path is too long")
             find_goal = False
 
-        if not self.CollisionCheckWithXY(x, y, obstacleList):
+        if not self.CollisionCheckWithXY(x, y, self.obstacleList):
             print("This path is collision")
             find_goal = False
 
@@ -205,7 +192,7 @@ class RRT():
         dlist = []
         for i in nearinds:
             tNode = self.steer(newNode, i)
-            if self.CollisionCheck(tNode, obstacleList):
+            if self.CollisionCheck(tNode, self.obstacleList):
                 dlist.append(tNode.cost)
             else:
                 dlist.append(float("inf"))
@@ -324,7 +311,7 @@ class RRT():
             nearNode = self.nodeList[i]
             tNode = self.steer(nearNode, nnode - 1)
 
-            obstacleOK = self.CollisionCheck(tNode, obstacleList)
+            obstacleOK = self.CollisionCheck(tNode, self.obstacleList)
             imporveCost = nearNode.cost > tNode.cost
 
             if obstacleOK and imporveCost:
@@ -335,7 +322,6 @@ class RRT():
         u"""
         Draw Graph
         """
-        import matplotlib.pyplot as plt
         #  plt.clf()
         if rnd is not None:
             plt.plot(rnd.x, rnd.y, "^k")
@@ -346,10 +332,10 @@ class RRT():
                 #  plt.plot([node.x, self.nodeList[node.parent].x], [
                 #  node.y, self.nodeList[node.parent].y], "-g")
 
-        for (ox, oy, size) in obstacleList:
+        for (ox, oy, size) in self.obstacleList:
             plt.plot(ox, oy, "ok", ms=30 * size)
 
-        reeds_shepp_path_planning.plot_arro/Users/atsushisakai/Dropbox/Program/berkeley/RacerCourseOptimization/cvxpy/stanford/mpc_path_planner_common.pyw(
+        reeds_shepp_path_planning.plot_arrow(
             self.start.x, self.start.y, self.start.yaw)
         reeds_shepp_path_planning.plot_arrow(
             self.end.x, self.end.y, self.end.yaw)
@@ -410,12 +396,8 @@ class Node():
         self.parent = None
 
 
-if __name__ == '__main__':
+def main():
     print("Start rrt start planning")
-    import matplotlib.pyplot as plt
-    import matplotrecorder
-    matplotrecorder.donothing = True
-
     # ====Search Path with RRT====
     obstacleList = [
         (5, 5, 1),
@@ -439,11 +421,10 @@ if __name__ == '__main__':
 
     # Set Initial parameters
     start = [0.0, 0.0, math.radians(0.0)]
-    #  goal = [10.0, 10.0, math.radians(0.0)]
     goal = [6.0, 7.0, math.radians(90.0)]
 
     rrt = RRT(start, goal, randArea=[-2.0, 20.0], obstacleList=obstacleList)
-    flag, x, y, yaw, v, t, a, d = rrt.Planning(animation=False)
+    flag, x, y, yaw, v, t, a, d = rrt.Planning(animation=True)
 
     if not flag:
         print("cannot find feasible path")
@@ -455,9 +436,6 @@ if __name__ == '__main__':
     plt.plot(x, y, '-r')
     plt.grid(True)
     plt.pause(0.001)
-
-    for i in range(10):
-        matplotrecorder.save_frame()  # save each frame
 
     flg, ax = plt.subplots(1)
     plt.plot(t, [math.degrees(iyaw) for iyaw in yaw[:-1]], '-r')
@@ -486,4 +464,6 @@ if __name__ == '__main__':
 
     plt.show()
 
-    matplotrecorder.save_movie("animation.gif", 0.1)
+
+if __name__ == '__main__':
+    main()
