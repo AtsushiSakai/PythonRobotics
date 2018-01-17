@@ -33,6 +33,7 @@ def calc_potential_field(gx, gy, ox, oy, reso, rr):
 
     for ix in range(xw):
         x = ix * reso + minx
+
         for iy in range(yw):
             y = iy * reso + miny
             ug = calc_attractive_potential(x, y, gx, gy)
