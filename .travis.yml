@@ -16,4 +16,4 @@ install:
 
 script:
   - python --version
-  - python -m unittest discover tests
+  - ./runtests.sh
