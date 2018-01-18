@@ -22,7 +22,7 @@ class RRT():
     """
 
     def __init__(self, start, goal, obstacleList, randArea,
-                 goalSampleRate=10, maxIter=200):
+                 goalSampleRate=10, maxIter=400):
         """
         Setting Parameter
 

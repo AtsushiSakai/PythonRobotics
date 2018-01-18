@@ -9,6 +9,8 @@ import reeds_shepp
 import math
 import matplotlib.pyplot as plt
 
+show_animation = True
+
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
     """
@@ -69,20 +71,21 @@ def main():
     px, py, pyaw, mode, clen = reeds_shepp_path_planning(
         start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature)
 
-    plt.plot(px, py, label="final course " + str(mode))
+    if show_animation:
+        plt.plot(px, py, label="final course " + str(mode))
 
-    # plotting
-    plot_arrow(start_x, start_y, start_yaw)
-    plot_arrow(end_x, end_y, end_yaw)
+        # plotting
+        plot_arrow(start_x, start_y, start_yaw)
+        plot_arrow(end_x, end_y, end_yaw)
 
-    for (ix, iy, iyaw) in zip(px, py, pyaw):
-        plot_arrow(ix, iy, iyaw, fc="b")
-    #  print(clen)
+        for (ix, iy, iyaw) in zip(px, py, pyaw):
+            plot_arrow(ix, iy, iyaw, fc="b")
+        #  print(clen)
 
-    plt.legend()
-    plt.grid(True)
-    plt.axis("equal")
-    plt.show()
+        plt.legend()
+        plt.grid(True)
+        plt.axis("equal")
+        plt.show()
 
 
 if __name__ == '__main__':

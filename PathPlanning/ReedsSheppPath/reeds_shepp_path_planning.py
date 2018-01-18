@@ -4,18 +4,18 @@ Reeds Shepp path planner sample code
 
 author Atsushi Sakai(@Atsushi_twi)
 
-License MIT
-
 """
 import reeds_shepp
 import math
+import matplotlib.pyplot as plt
+
+show_animation = True
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
-    u"""
+    """
     Plot arrow
     """
-    import matplotlib.pyplot as plt
 
     if not isinstance(x, float):
         for (ix, iy, iyaw) in zip(x, y, yaw):
@@ -28,10 +28,10 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
 
 def reeds_shepp_path_planning(start_x, start_y, start_yaw,
                               end_x, end_y, end_yaw, curvature):
+    step_size = 0.1
     q0 = [start_x, start_y, start_yaw]
     q1 = [end_x, end_y, end_yaw]
-    step_size = 0.1
-    qs = reeds_shepp.path_sample(q0, q1, curvature, step_size)
+    qs = reeds_shepp.path_sample(q0, q1, 1.0 / curvature, step_size)
     xs = [q[0] for q in qs]
     ys = [q[1] for q in qs]
     yaw = [q[2] for q in qs]
@@ -40,8 +40,8 @@ def reeds_shepp_path_planning(start_x, start_y, start_yaw,
     ys.append(end_y)
     yaw.append(end_yaw)
 
-    clen = reeds_shepp.path_length(q0, q1, curvature)
-    pathtypeTuple = reeds_shepp.path_type(q0, q1, curvature)
+    clen = reeds_shepp.path_length(q0, q1, 1.0 / curvature)
+    pathtypeTuple = reeds_shepp.path_type(q0, q1, 1.0 / curvature)
 
     ptype = ""
     for t in pathtypeTuple:
@@ -55,13 +55,12 @@ def reeds_shepp_path_planning(start_x, start_y, start_yaw,
     return xs, ys, yaw, ptype, clen
 
 
-if __name__ == '__main__':
+def main():
     print("Reeds Shepp path planner sample start!!")
-    import matplotlib.pyplot as plt
 
-    start_x = 10.0  # [m]
+    start_x = 1.0  # [m]
     start_y = 1.0  # [m]
-    start_yaw = math.radians(180.0)  # [rad]
+    start_yaw = math.radians(0.0)  # [rad]
 
     end_x = -0.0  # [m]
     end_y = -3.0  # [m]
@@ -72,17 +71,22 @@ if __name__ == '__main__':
     px, py, pyaw, mode, clen = reeds_shepp_path_planning(
         start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature)
 
-    plt.plot(px, py, label="final course " + str(mode))
+    if show_animation:
+        plt.plot(px, py, label="final course " + str(mode))
 
-    # plotting
-    plot_arrow(start_x, start_y, start_yaw)
-    plot_arrow(end_x, end_y, end_yaw)
+        # plotting
+        plot_arrow(start_x, start_y, start_yaw)
+        plot_arrow(end_x, end_y, end_yaw)
 
-    #  for (ix, iy, iyaw) in zip(px, py, pyaw):
-    #  plot_arrow(ix, iy, iyaw, fc="b")
-    #  print(clen)
+        for (ix, iy, iyaw) in zip(px, py, pyaw):
+            plot_arrow(ix, iy, iyaw, fc="b")
+        #  print(clen)
 
-    plt.legend()
-    plt.grid(True)
-    plt.axis("equal")
-    plt.show()
+        plt.legend()
+        plt.grid(True)
+        plt.axis("equal")
+        plt.show()
+
+
+if __name__ == '__main__':
+    main()
