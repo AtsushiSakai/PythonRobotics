@@ -1,7 +1,7 @@
 """
 Model trajectory generator
 
-author: Atsushi Sakai
+author: Atsushi Sakai(@Atsushi_twi)
 """
 
 import numpy as np
@@ -14,7 +14,7 @@ max_iter = 100
 h = np.matrix([0.5, 0.02, 0.02]).T  # parameter sampling distanse
 cost_th = 0.1
 
-show_graph = False
+show_animation = False
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
@@ -122,7 +122,7 @@ def optimize_trajectory(target, k0, p):
         p += alpha * np.array(dp)
         #  print(p.T)
 
-        if show_graph:
+        if show_animation:
             show_trajectory(target, xc, yc)
     else:
         xc, yc, yawc, p = None, None, None, None

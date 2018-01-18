@@ -45,7 +45,8 @@ def generate_trajectory(s, km, kf, k0):
     tk = np.array([0.0, time / 2.0, time])
     kk = np.array([k0, km, kf])
     t = np.arange(0.0, time, time / n)
-    kp = scipy.interpolate.spline(tk, kk, t, order=2)
+    fkp = scipy.interpolate.interp1d(tk, kk, kind="quadratic")
+    kp = [fkp(ti) for ti in t]
     dt = float(time / n)
 
     #  plt.plot(t, kp)
@@ -70,7 +71,8 @@ def generate_last_state(s, km, kf, k0):
     tk = np.array([0.0, time / 2.0, time])
     kk = np.array([k0, km, kf])
     t = np.arange(0.0, time, time / n)
-    kp = scipy.interpolate.spline(tk, kk, t, order=2)
+    fkp = scipy.interpolate.interp1d(tk, kk, kind="quadratic")
+    kp = [fkp(ti) for ti in t]
     dt = time / n
 
     #  plt.plot(t, kp)
