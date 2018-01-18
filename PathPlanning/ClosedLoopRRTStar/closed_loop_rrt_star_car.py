@@ -14,6 +14,8 @@ import pure_pursuit
 import unicycle_model
 import matplotlib.pyplot as plt
 
+show_animation = True
+
 
 target_speed = 10.0 / 3.6
 
@@ -105,8 +107,6 @@ class RRT():
                 best_time = t[-1]
                 fx, fy, fyaw, fv, ft, fa, fd = x, y, yaw, v, t, a, d
 
-        #  plt.show()
-
         print("best time is")
         print(best_time)
 
@@ -175,13 +175,6 @@ class RRT():
         if not self.CollisionCheckWithXY(x, y, self.obstacleList):
             print("This path is collision")
             find_goal = False
-
-        #  plt.clf
-        #  plt.plot(x, y, '-r')
-        #  plt.plot(path[:, 0], path[:, 1], '-g')
-        #  plt.grid(True)
-        #  plt.axis("equal")
-        #  plt.show()
 
         return find_goal, x, y, yaw, v, t, a, d
 
@@ -424,7 +417,7 @@ def main():
     goal = [6.0, 7.0, math.radians(90.0)]
 
     rrt = RRT(start, goal, randArea=[-2.0, 20.0], obstacleList=obstacleList)
-    flag, x, y, yaw, v, t, a, d = rrt.Planning(animation=True)
+    flag, x, y, yaw, v, t, a, d = rrt.Planning(animation=show_animation)
 
     if not flag:
         print("cannot find feasible path")
@@ -432,37 +425,38 @@ def main():
 
     #  flg, ax = plt.subplots(1)
     # Draw final path
-    rrt.DrawGraph()
-    plt.plot(x, y, '-r')
-    plt.grid(True)
-    plt.pause(0.001)
+    if show_animation:
+        rrt.DrawGraph()
+        plt.plot(x, y, '-r')
+        plt.grid(True)
+        plt.pause(0.001)
 
-    flg, ax = plt.subplots(1)
-    plt.plot(t, [math.degrees(iyaw) for iyaw in yaw[:-1]], '-r')
-    plt.xlabel("time[s]")
-    plt.ylabel("Yaw[deg]")
-    plt.grid(True)
+        flg, ax = plt.subplots(1)
+        plt.plot(t, [math.degrees(iyaw) for iyaw in yaw[:-1]], '-r')
+        plt.xlabel("time[s]")
+        plt.ylabel("Yaw[deg]")
+        plt.grid(True)
 
-    flg, ax = plt.subplots(1)
-    plt.plot(t, [iv * 3.6 for iv in v], '-r')
+        flg, ax = plt.subplots(1)
+        plt.plot(t, [iv * 3.6 for iv in v], '-r')
 
-    plt.xlabel("time[s]")
-    plt.ylabel("velocity[km/h]")
-    plt.grid(True)
+        plt.xlabel("time[s]")
+        plt.ylabel("velocity[km/h]")
+        plt.grid(True)
 
-    flg, ax = plt.subplots(1)
-    plt.plot(t, a, '-r')
-    plt.xlabel("time[s]")
-    plt.ylabel("accel[m/ss]")
-    plt.grid(True)
+        flg, ax = plt.subplots(1)
+        plt.plot(t, a, '-r')
+        plt.xlabel("time[s]")
+        plt.ylabel("accel[m/ss]")
+        plt.grid(True)
 
-    flg, ax = plt.subplots(1)
-    plt.plot(t, [math.degrees(td) for td in d], '-r')
-    plt.xlabel("time[s]")
-    plt.ylabel("Steering angle[deg]")
-    plt.grid(True)
+        flg, ax = plt.subplots(1)
+        plt.plot(t, [math.degrees(td) for td in d], '-r')
+        plt.xlabel("time[s]")
+        plt.ylabel("Steering angle[deg]")
+        plt.grid(True)
 
-    plt.show()
+        plt.show()
 
 
 if __name__ == '__main__':
