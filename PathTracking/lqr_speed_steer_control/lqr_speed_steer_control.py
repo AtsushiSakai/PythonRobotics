@@ -11,11 +11,9 @@ import matplotlib.pyplot as plt
 import scipy.linalg as la
 from pycubicspline import pycubicspline
 
-Kp = 1.0  # speed proportional gain
-
 # LQR parameter
-Q = np.eye(4)
-R = np.eye(1)
+Q = np.eye(5)
+R = np.eye(2)
 
 # parameters
 dt = 0.1  # time tick[s]
@@ -23,7 +21,6 @@ L = 0.5  # Wheel base of the vehicle [m]
 max_steer = math.radians(45.0)  # maximum steering angle[rad]
 
 show_animation = True
-#  show_animation = False
 
 
 class State:
@@ -48,12 +45,6 @@ def update(state, a, delta):
     state.v = state.v + a * dt
 
     return state
-
-
-def PIDControl(target, current):
-    a = Kp * (target - current)
-
-    return a
 
 
 def pi_2_pi(angle):
@@ -103,39 +94,51 @@ def dlqr(A, B, Q, R):
     return K, X, eigVals
 
 
-def lqr_steering_control(state, cx, cy, cyaw, ck, pe, pth_e):
+def lqr_steering_control(state, cx, cy, cyaw, ck, pe, pth_e, sp):
     ind, e = calc_nearest_index(state, cx, cy, cyaw)
+
+    tv = sp[ind]
 
     k = ck[ind]
     v = state.v
     th_e = pi_2_pi(state.yaw - cyaw[ind])
 
-    A = np.matrix(np.zeros((4, 4)))
+    A = np.matrix(np.zeros((5, 5)))
     A[0, 0] = 1.0
     A[0, 1] = dt
     A[1, 2] = v
     A[2, 2] = 1.0
     A[2, 3] = dt
+    A[4, 4] = 1.0
     # print(A)
 
-    B = np.matrix(np.zeros((4, 1)))
+    B = np.matrix(np.zeros((5, 2)))
     B[3, 0] = v / L
+    B[4, 1] = dt
 
     K, _, _ = dlqr(A, B, Q, R)
 
-    x = np.matrix(np.zeros((4, 1)))
+    x = np.matrix(np.zeros((5, 1)))
 
     x[0, 0] = e
     x[1, 0] = (e - pe) / dt
     x[2, 0] = th_e
     x[3, 0] = (th_e - pth_e) / dt
+    x[4, 0] = v - tv
+
+    ustar = -K * x
+
+    # calc steering input
 
     ff = math.atan2(L * k, 1)
-    fb = pi_2_pi((-K * x)[0, 0])
+    fb = pi_2_pi(ustar[0, 0])
+
+    # calc accel input
+    ai = ustar[1, 0]
 
     delta = ff + fb
 
-    return delta, ind, e, th_e
+    return delta, ind, e, th_e, ai
 
 
 def calc_nearest_index(state, cx, cy, cyaw):
@@ -176,10 +179,9 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
     e, e_th = 0.0, 0.0
 
     while T >= time:
-        dl, target_ind, e, e_th = lqr_steering_control(
-            state, cx, cy, cyaw, ck, e, e_th)
+        dl, target_ind, e, e_th, ai = lqr_steering_control(
+            state, cx, cy, cyaw, ck, e, e_th, speed_profile)
 
-        ai = PIDControl(speed_profile[target_ind], state.v)
         state = update(state, ai, dl)
 
         if abs(state.v) <= stop_speed:
@@ -235,19 +237,19 @@ def calc_speed_profile(cx, cy, cyaw, target_speed):
         if switch:
             speed_profile[i] = 0.0
 
-    speed_profile[-1] = 0.0
-
-    #  flg, ax = plt.subplots(1)
-    #  plt.plot(speed_profile, "-r")
-    #  plt.show()
+    # speed down
+    for i in range(40):
+        speed_profile[-i] = target_speed / (50 - i)
+        if speed_profile[-i] <= 1.0 / 3.6:
+            speed_profile[-i] = 1.0 / 3.6
 
     return speed_profile
 
 
 def main():
     print("LQR steering control tracking start!!")
-    ax = [0.0, 6.0, 12.5, 10.0, 7.5, 3.0, -1.0]
-    ay = [0.0, -3.0, -5.0, 6.5, 3.0, 5.0, -2.0]
+    ax = [0.0, 6.0, 12.5, 10.0, 17.5, 20.0, 25.0]
+    ay = [0.0, -3.0, -5.0, 6.5, 3.0, 0.0, 0.0]
     goal = [ax[-1], ay[-1]]
 
     cx, cy, cyaw, ck, s = pycubicspline.calc_spline_course(ax, ay, ds=0.1)
@@ -260,8 +262,8 @@ def main():
     if show_animation:
         plt.close()
         flg, _ = plt.subplots(1)
-        plt.plot(ax, ay, "xb", label="input")
-        plt.plot(cx, cy, "-r", label="spline")
+        plt.plot(ax, ay, "xb", label="waypoints")
+        plt.plot(cx, cy, "-r", label="target course")
         plt.plot(x, y, "-g", label="tracking")
         plt.grid(True)
         plt.axis("equal")
