@@ -42,7 +42,8 @@ Python codes for robotics algorithm.
       * [Pure pursuit tracking](#pure-pursuit-tracking)
       * [Stanley control](#stanley-control)
       * [Rear wheel feedback control](#rear-wheel-feedback-control)
-      * [Linear–quadratic regulator (LQR) control](#linearquadratic-regulator-lqr-control)
+      * [Linear–quadratic regulator (LQR) steering control](#linearquadratic-regulator-lqr-steering-control)
+      * [Linear–quadratic regulator (LQR) speed and steering control](#linearquadratic-regulator-lqr-speed-and-steering-control)
    * [License](#license)
    * [Author](#author)
 
