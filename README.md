@@ -59,9 +59,9 @@ Python codes for robotics algorithm.
 
 - pandas
 
-- [pyReedsShepp](https://github.com/ghliu/pyReedsShepp) (Only for reeds sheep path and RRTStarCar_reeds_sheep)
+- [pyReedsShepp](https://github.com/ghliu/pyReedsShepp) 
 
-- [cvxpy](https://cvxgrp.github.io/cvxpy/index.html) (Only for mix integer optimization based model predictive planning and control)
+- [cvxpy](https://cvxgrp.github.io/cvxpy/index.html) 
 
 # How to use
 
@@ -436,6 +436,17 @@ Path tracking simulation with LQR steering control and PID speed control.
 Path tracking simulation with LQR speed and steering control.
 
 ![3](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/lqr_speed_steer_control/animation.gif)
+
+
+## Model predictive speed and steering control
+
+Path tracking simulation with iterative linear model predictive speed and steering control.
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif)
+
+This code used cvxpy as optimization modeling tool,
+
+- [Welcome to CVXPY 1\.0 — CVXPY 1\.0\.0 documentation](https://cvxgrp.github.io/cvxpy/index.html)
 
 
 # License 
