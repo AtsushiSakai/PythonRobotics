@@ -44,6 +44,7 @@ Python codes for robotics algorithm.
       * [Rear wheel feedback control](#rear-wheel-feedback-control)
       * [Linear–quadratic regulator (LQR) steering control](#linearquadratic-regulator-lqr-steering-control)
       * [Linear–quadratic regulator (LQR) speed and steering control](#linearquadratic-regulator-lqr-speed-and-steering-control)
+      * [Model predictive speed and steering control](#model-predictive-speed-and-steering-control)
    * [License](#license)
    * [Author](#author)
 
