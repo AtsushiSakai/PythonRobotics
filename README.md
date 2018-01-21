@@ -381,7 +381,7 @@ It is based on this paper.
 
 - [MIXED INTEGER PROGRAMMING FOR MULTI-VEHICLE PATH PLANNING](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.4.2591&rep=rep1&type=pdf)
 
-This code used cvxpy as optimization modeling tool,
+This code uses cvxpy as an optimization modeling tool,
 
 - [Welcome to CVXPY 1\.0 — CVXPY 1\.0\.0 documentation](https://cvxgrp.github.io/cvxpy/index.html)
 
@@ -445,7 +445,7 @@ Path tracking simulation with iterative linear model predictive speed and steeri
 
 ![3](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif)
 
-This code used cvxpy as optimization modeling tool,
+This code uses cvxpy as an optimization modeling tool,
 
 - [Welcome to CVXPY 1\.0 — CVXPY 1\.0\.0 documentation](https://cvxgrp.github.io/cvxpy/index.html)
 
