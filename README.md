@@ -5,8 +5,8 @@
 
 Python codes for robotics algorithm.
 
-# Table of Contents
 
+# Table of Contents
    * [Requirements](#requirements)
    * [How to use](#how-to-use)
    * [Path Planning](#path-planning)
@@ -32,6 +32,7 @@ Python codes for robotics algorithm.
          * [RRT* with reeds-sheep path](#rrt-with-reeds-sheep-path)
          * [Closed Loop RRT*](#closed-loop-rrt)
       * [Cubic spline planning](#cubic-spline-planning)
+      * [B-Spline planning](#b-spline-planning)
       * [Bezier path planning](#bezier-path-planning)
       * [Quintic polynomials planning](#quintic-polynomials-planning)
       * [Dubins path planning](#dubins-path-planning)
@@ -457,4 +458,5 @@ MIT
 # Author
 
 Atsushi Sakai ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
+
 
