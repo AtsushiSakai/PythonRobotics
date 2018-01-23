@@ -156,6 +156,9 @@ class RRT():
         #  print("OK YAW TH num is")
         #  print(len(fgoalinds))
 
+        if len(fgoalinds) == 0:
+            return None
+
         mincost = min([self.nodeList[i].cost for i in fgoalinds])
         for i in fgoalinds:
             if self.nodeList[i].cost == mincost:
