@@ -10,13 +10,16 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
-# Estimation parameter
-Q = np.diag([0.5, 0.5])**2
-R = np.diag([1.0, math.radians(30.0)])**2
+# Estimation parameter of EKF
+Q = np.diag([0.1, 0.1, math.radians(1.0), 1.0])**2
+R = np.diag([2.0, math.radians(40.0)])**2
 
 #  Simulation parameter
 Qsim = np.diag([0.5, 0.5])**2
 Rsim = np.diag([1.0, math.radians(30.0)])**2
+
+DT = 0.1  # time tick [s]
+SIM_TIME = 60.0  # simulation time [s]
 
 
 #  function ShowErrorEllipse(xEst,PEst)
@@ -51,67 +54,6 @@ Rsim = np.diag([1.0, math.radians(30.0)])**2
 #  -sin(angle) cos(angle)];
 #  x=R*x;
 #  plot(x(1,:)+xEst(1),x(2,:)+xEst(2))
-
-
-#  function x = f(x, u)
-#  % Motion Model
-#  global dt;
-
-#  F = [1 0 0 0
-#  0 1 0 0
-#  0 0 1 0
-#  0 0 0 0];
-
-#  B = [
-#  dt*cos(x(3)) 0
-#  dt*sin(x(3)) 0
-#  0 dt
-#  1 0];
-
-#  x= F*x+B*u;
-
-#  function jF = jacobF(x, u)
-#  % Jacobian of Motion Model
-#  global dt;
-
-#  jF=[
-#  1 0 0 0
-#  0 1 0 0
-#  -dt*u(1)*sin(x(3)) dt*u(1)*cos(x(3)) 1 0
-#  dt*cos(x(3)) dt*sin(x(3)) 0 1];
-
-#  function z = h(x)
-#  %Observation Model
-
-#  H = [1 0 0 0
-#  0 1 0 0
-#  0 0 1 0
-#  0 0 0 1 ];
-
-#  z=H*x;
-
-#  function jH = jacobH(x)
-#  %Jacobian of Observation Model
-
-#  jH =[1 0 0 0
-#  0 1 0 0
-#  0 0 1 0
-#  0 0 0 1];
-
-
-#  function angle=Pi2Pi(angle)
-#  %ロボットの角度を-pi~piの範囲に補正する関数
-#  angle = mod(angle, 2*pi);
-
-#  i = find(angle>pi);
-#  angle(i) = angle(i) - 2*pi;
-
-#  i = find(angle<-pi);
-#  angle(i) = angle(i) + 2*pi;
-
-
-DT = 0.1  # time tick [s]
-SIM_TIME = 60.0  # simulation time [s]
 
 
 def do_control():
@@ -157,23 +99,59 @@ def motion_model(x, u):
     return x
 
 
-def ekf_estimation(xEst, PEst, u):
+def observation_model(x):
+    #  Observation Model
+
+    H = np.matrix([
+        [1, 0, 0, 0],
+        [0, 1, 0, 0]
+    ])
+
+    z = H * x
+
+    return z
+
+
+def jacobF(x, u):
+    # Jacobian of Motion Model
+    yaw = x[2, 0]
+    u1 = u[0, 0]
+    jF = np.matrix([
+        [1, 0, 0, 0],
+        [0, 1, 0, 0],
+        [-DT * u1 * math.sin(yaw), DT * u1 * math.cos(yaw), 1, 0],
+        [DT * math.cos(yaw), DT * math.sin(yaw), 0, 1]])
+
+    return jF
+
+
+def jacobH(x):
+    # Jacobian of Observation Model
+    jH = np.matrix([
+        [1, 0, 0, 0],
+        [0, 1, 0, 0]
+    ])
+
+    return jH
+
+
+def ekf_estimation(xEst, PEst, z, u):
 
     #  Predict
     xPred = motion_model(xEst, u)
-    #  F=jacobF(xPred, u);
-    #  PPred= F*PEst*F' + Q;
+    jF = jacobF(xPred, u)
+    PPred = jF * PEst * jF.T + Q
 
     #  Update
-    #  H=jacobH(xPred);
-    #  y = z - h(xPred);
-    #  S = H*PPred*H' + R;
-    #  K = PPred*H'*inv(S);
-    #  xEst = xPred + K*y;
-    xEst = xPred
-    #  PEst = (eye(size(xEst,1)) - K*H)*PPred;
+    jH = jacobH(xPred)
+    zPred = observation_model(xPred)
+    y = z.T - zPred
+    S = jH * PPred * jH.T + R
+    K = PPred * jH.T * np.linalg.inv(S)
+    xEst = xPred + K * y
+    PEst = (np.eye(len(xEst)) - K * jH) * PPred
 
-    return xEst
+    return xEst, PEst
 
 
 def main():
@@ -194,7 +172,7 @@ def main():
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u)
 
-        xEst = ekf_estimation(xEst, PEst, ud)
+        xEst, PEst = ekf_estimation(xEst, PEst, z, ud)
 
         plt.plot(xTrue[0, 0], xTrue[1, 0], ".b")
         plt.plot(xDR[0, 0], xDR[1, 0], ".k")
