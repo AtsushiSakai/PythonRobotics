@@ -79,7 +79,7 @@ Python codes for robotics algorithm.
 
 ## Extended Kalman Filter localization
 
-![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/Localization/extended_kalman_filter/animation.gif)
+![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/Localization/extended_kalman_filter/animation.gif =480x)
 
 # Path Planning
 
