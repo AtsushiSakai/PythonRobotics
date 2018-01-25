@@ -5,8 +5,6 @@
 
 Python codes for robotics algorithm.
 
-
-
 # Table of Contents
    * [Requirements](#requirements)
    * [How to use](#how-to-use)
@@ -90,12 +88,10 @@ The blue line is true trajectory, the black line is dead reckoning trajectory,
 
 the gren point is positioning observation (ex. GPS), and the red line is estimated trajectory with EKF.
 
-The read ellipse is estimated covariance ellipse with EKF.
+The red ellipse is estimated covariance ellipse with EKF.
 
 
 # Path Planning
-
-Path planning algorithm.
 
 ## Dynamic Window Approach
 
@@ -409,8 +405,6 @@ Gurobi is used as a solver for mix integer optimization problem.
  
 
 # Path tracking
-
-Path tracking algorithm samples.
 
 ## Pure pursuit tracking
 
