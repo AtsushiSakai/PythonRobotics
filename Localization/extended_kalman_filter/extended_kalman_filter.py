@@ -12,56 +12,22 @@ import matplotlib.pyplot as plt
 
 # Estimation parameter of EKF
 Q = np.diag([0.1, 0.1, math.radians(1.0), 1.0])**2
-R = np.diag([2.0, math.radians(40.0)])**2
+R = np.diag([1.0, math.radians(40.0)])**2
 
 #  Simulation parameter
 Qsim = np.diag([0.5, 0.5])**2
 Rsim = np.diag([1.0, math.radians(30.0)])**2
 
 DT = 0.1  # time tick [s]
-SIM_TIME = 60.0  # simulation time [s]
+SIM_TIME = 50.0  # simulation time [s]
+
+show_animation = True
 
 
-#  function ShowErrorEllipse(xEst,PEst)
-#  %誤差分散円を計算し、表示する関数
-#  Pxy=PEst(1:2,1:2);%x,yの共分散を取得
-#  [eigvec, eigval]=eig(Pxy);%固有値と固有ベクトルの計算
-#  %固有値の大きい方のインデックスを探す
-#  if eigval(1,1)>=eigval(2,2)
-#  bigind=1;
-#  smallind=2;
-#  else
-#  bigind=2;
-#  smallind=1;
-#  end
-
-#  chi=9.21;%誤差楕円のカイの二乗分布値　99%
-
-#  %楕円描写
-#  t=0:10:360;
-#  a=sqrt(eigval(bigind,bigind)*chi);
-#  b=sqrt(eigval(smallind,smallind)*chi);
-#  x=[a*cosd(t);
-#  b*sind(t)];
-#  %誤差楕円の角度を計算
-#  angle = atan2(eigvec(bigind,2),eigvec(bigind,1));
-#  if(angle < 0)
-#  angle = angle + 2*pi;
-#  end
-
-#  %誤差楕円の回転
-#  R=[cos(angle) sin(angle);
-#  -sin(angle) cos(angle)];
-#  x=R*x;
-#  plot(x(1,:)+xEst(1),x(2,:)+xEst(2))
-
-
-def do_control():
+def calc_input():
     v = 1.0  # [m/s]
     yawrate = 0.1  # [rad/s]
-
     u = np.matrix([v, yawrate]).T
-
     return u
 
 
@@ -69,10 +35,12 @@ def observation(xTrue, xd, u):
 
     xTrue = motion_model(xTrue, u)
 
+    # add noise to gps x-y
     zx = xTrue[0, 0] + np.random.randn() * Qsim[0, 0]
     zy = xTrue[1, 0] + np.random.randn() * Qsim[1, 1]
     z = np.matrix([zx, zy])
 
+    # add noise to input
     ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
     ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1]
     ud = np.matrix([ud1, ud2]).T
@@ -101,7 +69,6 @@ def motion_model(x, u):
 
 def observation_model(x):
     #  Observation Model
-
     H = np.matrix([
         [1, 0, 0, 0],
         [0, 1, 0, 0]
@@ -117,10 +84,10 @@ def jacobF(x, u):
     yaw = x[2, 0]
     u1 = u[0, 0]
     jF = np.matrix([
-        [1, 0, 0, 0],
-        [0, 1, 0, 0],
-        [-DT * u1 * math.sin(yaw), DT * u1 * math.cos(yaw), 1, 0],
-        [DT * math.cos(yaw), DT * math.sin(yaw), 0, 1]])
+        [1.0, 0.0, -DT * u1 * math.sin(yaw), DT * u1 * math.cos(yaw)],
+        [0.0, 1.0, DT * math.cos(yaw), DT * math.sin(yaw)],
+        [0.0, 0.0, 1.0, 0.0],
+        [0.0, 0.0, 0.0, 1.0]])
 
     return jF
 
@@ -154,33 +121,76 @@ def ekf_estimation(xEst, PEst, z, u):
     return xEst, PEst
 
 
+def plot_covariance_ellipse(xEst, PEst):
+    Pxy = PEst[0:2, 0:2]
+    eigval, eigvec = np.linalg.eig(Pxy)
+
+    if eigval[0] >= eigval[1]:
+        bigind = 0
+        smallind = 1
+    else:
+        bigind = 1
+        smallind = 0
+
+    t = np.arange(0, 2 * math.pi + 0.1, 0.1)
+    a = math.sqrt(eigval[bigind])
+    b = math.sqrt(eigval[smallind])
+    x = [a * math.cos(it) for it in t]
+    y = [b * math.sin(it) for it in t]
+    angle = math.atan2(eigvec[bigind, 1], eigvec[bigind, 0])
+    R = np.matrix([[math.cos(angle), math.sin(angle)],
+                   [-math.sin(angle), math.cos(angle)]])
+    fx = R * np.matrix([x, y])
+    px = np.array(fx[0, :] + xEst[0, 0]).flatten()
+    py = np.array(fx[1, :] + xEst[1, 0]).flatten()
+    plt.plot(px, py, "--r")
+
+
 def main():
     print(__file__ + " start!!")
 
     time = 0.0
+
     # State Vector [x y yaw v]'
     xEst = np.matrix(np.zeros((4, 1)))
     xTrue = np.matrix(np.zeros((4, 1)))
     PEst = np.eye(4)
 
-    # Dead Reckoning
-    xDR = np.matrix(np.zeros((4, 1)))
+    xDR = np.matrix(np.zeros((4, 1)))  # Dead reckoning
+
+    # history
+    hxEst = xEst
+    hxTrue = xTrue
+    hxDR = xTrue
+    hz = np.zeros((1, 2))
 
     while SIM_TIME >= time:
         time += DT
-        u = do_control()
+        u = calc_input()
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u)
 
         xEst, PEst = ekf_estimation(xEst, PEst, z, ud)
 
-        plt.plot(xTrue[0, 0], xTrue[1, 0], ".b")
-        plt.plot(xDR[0, 0], xDR[1, 0], ".k")
-        plt.plot(z[0, 0], z[0, 1], ".g")
-        plt.plot(xEst[0, 0], xEst[1, 0], ".r")
-        plt.axis("equal")
-        plt.grid(True)
-        plt.pause(0.001)
+        # store data history
+        hxEst = np.hstack((hxEst, xEst))
+        hxDR = np.hstack((hxDR, xDR))
+        hxTrue = np.hstack((hxTrue, xTrue))
+        hz = np.vstack((hz, z))
+
+        if show_animation:
+            plt.cla()
+            plt.plot(hz[:, 0], hz[:, 1], ".g")
+            plt.plot(np.array(hxTrue[0, :]).flatten(),
+                     np.array(hxTrue[1, :]).flatten(), "-b")
+            plt.plot(np.array(hxDR[0, :]).flatten(),
+                     np.array(hxDR[1, :]).flatten(), "-k")
+            plt.plot(np.array(hxEst[0, :]).flatten(),
+                     np.array(hxEst[1, :]).flatten(), "-r")
+            plot_covariance_ellipse(xEst, PEst)
+            plt.axis("equal")
+            plt.grid(True)
+            plt.pause(0.001)
 
 
 if __name__ == '__main__':
