@@ -6,9 +6,12 @@
 Python codes for robotics algorithm.
 
 
+
 # Table of Contents
    * [Requirements](#requirements)
    * [How to use](#how-to-use)
+   * [Localization](#localization)
+      * [Extended Kalman Filter localization](#extended-kalman-filter-localization)
    * [Path Planning](#path-planning)
       * [Dynamic Window Approach](#dynamic-window-approach)
       * [Grid based search](#grid-based-search)
@@ -85,9 +88,9 @@ This is a sensor fusion localization with Extended Kalman Filter(EKF).
 
 The blue line is true trajectory, the black line is dead reckoning trajectory,
 
-the gren point is positioning observation (ex. GPS), and the red line is an estimated trajectory with EKF.
+the gren point is positioning observation (ex. GPS), and the red line is estimated trajectory with EKF.
 
-The read ellipse is an estimated covariance ellipse with EKF.
+The read ellipse is estimated covariance ellipse with EKF.
 
 
 # Path Planning
@@ -458,7 +461,7 @@ Path tracking simulation with LQR speed and steering control.
 
 Path tracking simulation with iterative linear model predictive speed and steering control.
 
-![3](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif)
+<img src="https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif" width="640">
 
 This code uses cvxpy as an optimization modeling tool,
 
@@ -472,5 +475,6 @@ MIT
 # Author
 
 Atsushi Sakai ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
+
 
 
