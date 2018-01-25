@@ -125,6 +125,9 @@ class RRT():
         goalinds = [disglist.index(i) for i in disglist if i <= self.expandDis]
         #  print(goalinds)
 
+        if len(goalinds) == 0:
+            return None
+
         mincost = min([self.nodeList[i].cost for i in goalinds])
         for i in goalinds:
             if self.nodeList[i].cost == mincost:
