@@ -75,6 +75,11 @@ Python codes for robotics algorithm.
 
 4. Add star to this repo if you like it :smiley:. 
 
+# Localization
+
+## Extended Kalman Filter localization
+
+![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/Localization/extended_kalman_filter/animation.gif)
 
 # Path Planning
 
