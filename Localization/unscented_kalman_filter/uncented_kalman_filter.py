@@ -5,6 +5,104 @@ Uncented kalman filter (UKF) localization sample
 author: Atsushi Sakai (@Atsushi_twi)
 
 """
+#  % UKF Parameter
+#  alpha=0.001;
+#  beta =2;
+#  kappa=0;
+
+#  n=length(xEst);%size of state vector
+#  lamda=alpha^2*(n+kappa)-n;
+
+#  %calculate weights
+#  wm=[lamda/(lamda+n)];
+#  wc=[(lamda/(lamda+n))+(1-alpha^2+beta)];
+#  for i=1:2*n
+#  wm=[wm 1/(2*(n+lamda))];
+#  wc=[wc 1/(2*(n+lamda))];
+#  end
+#  gamma=sqrt(n+lamda);
+
+#  PEst = eye(4);
+#  %movcount=0;
+#  tic;
+#  % Main loop
+#  for i=1 : nSteps
+#  time = time + dt;
+#  % Input
+#  u=doControl(time);
+#  % Observation
+#  [z,xTrue,xd,u]=Observation(xTrue, xd, u);
+
+#  % ------ Unscented Kalman Filter --------
+#  % Predict
+#  sigma=GenerateSigmaPoints(xEst,PEst,gamma);
+#  sigma=PredictMotion(sigma,u);
+#  xPred=(wm*sigma')';
+#  PPred=CalcSimgaPointsCovariance(xPred,sigma,wc,Q);
+
+#  % Update
+#  y = z - h(xPred);
+#  sigma=GenerateSigmaPoints(xPred,PPred,gamma);
+#  zSigma=PredictObservation(sigma);
+#  zb=(wm*sigma')';
+#  St=CalcSimgaPointsCovariance(zb,zSigma,wc,R);
+#  Pxz=CalcPxz(sigma,xPred,zSigma,zb,wc);
+#  K=Pxz*inv(St);
+#  xEst = xPred + K*y;
+#  PEst=PPred-K*St*K';
+
+#  function sigma=PredictMotion(sigma,u)
+#  % Sigma Points predition with motion model
+#  for i=1:length(sigma(1,:))
+#  sigma(:,i)=f(sigma(:,i),u);
+#  end
+
+#  function sigma=PredictObservation(sigma)
+#  % Sigma Points predition with observation model
+#  for i=1:length(sigma(1,:))
+#  sigma(:,i)=h(sigma(:,i));
+#  end
+
+#  function P=CalcSimgaPointsCovariance(xPred,sigma,wc,N)
+#  nSigma=length(sigma(1,:));
+#  d=sigma-repmat(xPred,1,nSigma);
+#  P=N;
+#  for i=1:nSigma
+#  P=P+wc(i)*d(:,i)*d(:,i)';
+#  end
+
+#  function P=CalcPxz(sigma,xPred,zSigma,zb,wc)
+#  nSigma=length(sigma(1,:));
+#  dx=sigma-repmat(xPred,1,nSigma);
+#  dz=zSigma-repmat(zb,1,nSigma);
+#  P=zeros(length(sigma(:,1)));
+#  for i=1:nSigma
+#  P=P+wc(i)*dx(:,i)*dz(:,i)';
+#  end
+
+#  function sigma=GenerateSigmaPoints(xEst,PEst,gamma)
+#  sigma=xEst;
+#  Psqrt=sqrtm(PEst);
+#  n=length(xEst);
+#  %Positive direction
+#  for ip=1:n
+#  sigma=[sigma xEst+gamma*Psqrt(:,ip)];
+#  end
+#  %Negative direction
+#  for in=1:n
+#  sigma=[sigma xEst-gamma*Psqrt(:,in)];
+#  end
+
+#  %Calc Observation from noise prameter
+#  function [z, x, xd, u] = Observation(x, xd, u)
+#  global Qsigma;
+#  global Rsigma;
+
+#  x=f(x, u);% Ground Truth
+#  u=u+Qsigma*randn(2,1);%add Process Noise
+#  xd=f(xd, u);% Dead Reckoning
+#  z=h(x+Rsigma*randn(4,1));%Simulate Observation
+
 
 import numpy as np
 import math
