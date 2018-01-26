@@ -154,6 +154,9 @@ class RRT():
             if abs(self.nodeList[i].yaw - self.end.yaw) <= YAWTH:
                 fgoalinds.append(i)
 
+        if len(fgoalinds) == 0:
+            return None
+
         mincost = min([self.nodeList[i].cost for i in fgoalinds])
         for i in fgoalinds:
             if self.nodeList[i].cost == mincost:
