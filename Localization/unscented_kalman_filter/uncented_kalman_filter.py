@@ -5,41 +5,6 @@ Uncented kalman filter (UKF) localization sample
 author: Atsushi Sakai (@Atsushi_twi)
 
 """
-#  % UKF Parameter
-#  alpha=0.001;
-#  beta =2;
-#  kappa=0;
-
-#  n=length(xEst);%size of state vector
-#  lamda=alpha^2*(n+kappa)-n;
-
-#  %calculate weights
-#  wm=[lamda/(lamda+n)];
-#  wc=[(lamda/(lamda+n))+(1-alpha^2+beta)];
-#  for i=1:2*n
-#  wm=[wm 1/(2*(n+lamda))];
-#  wc=[wc 1/(2*(n+lamda))];
-#  end
-#  gamma=sqrt(n+lamda);
-
-#  PEst = eye(4);
-#  %movcount=0;
-#  tic;
-#  % Main loop
-#  for i=1 : nSteps
-#  time = time + dt;
-#  % Input
-#  u=doControl(time);
-#  % Observation
-#  [z,xTrue,xd,u]=Observation(xTrue, xd, u);
-
-#  % ------ Unscented Kalman Filter --------
-#  % Predict
-#  sigma=GenerateSigmaPoints(xEst,PEst,gamma);
-#  sigma=PredictMotion(sigma,u);
-#  xPred=(wm*sigma')';
-#  PPred=CalcSimgaPointsCovariance(xPred,sigma,wc,Q);
-
 #  % Update
 #  y = z - h(xPred);
 #  sigma=GenerateSigmaPoints(xPred,PPred,gamma);
@@ -80,31 +45,9 @@ author: Atsushi Sakai (@Atsushi_twi)
 #  P=P+wc(i)*dx(:,i)*dz(:,i)';
 #  end
 
-#  function sigma=GenerateSigmaPoints(xEst,PEst,gamma)
-#  sigma=xEst;
-#  Psqrt=sqrtm(PEst);
-#  n=length(xEst);
-#  %Positive direction
-#  for ip=1:n
-#  sigma=[sigma xEst+gamma*Psqrt(:,ip)];
-#  end
-#  %Negative direction
-#  for in=1:n
-#  sigma=[sigma xEst-gamma*Psqrt(:,in)];
-#  end
-
-#  %Calc Observation from noise prameter
-#  function [z, x, xd, u] = Observation(x, xd, u)
-#  global Qsigma;
-#  global Rsigma;
-
-#  x=f(x, u);% Ground Truth
-#  u=u+Qsigma*randn(2,1);%add Process Noise
-#  xd=f(xd, u);% Dead Reckoning
-#  z=h(x+Rsigma*randn(4,1));%Simulate Observation
-
 
 import numpy as np
+import scipy.linalg
 import math
 import matplotlib.pyplot as plt
 
@@ -118,6 +61,12 @@ Rsim = np.diag([1.0, math.radians(30.0)])**2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
+
+#  UKF Parameter
+ALPHA = 0.001
+BETA = 2
+KAPPA = 0
+
 
 show_animation = True
 
@@ -200,12 +149,34 @@ def jacobH(x):
     return jH
 
 
-def ukf_estimation(xEst, PEst, z, u):
+def generate_sigma_points(xEst, PEst, gamma):
+
+    sigma = xEst
+    Psqrt = scipy.linalg.sqrtm(PEst)
+    n = len(xEst[:, 0])
+    # Positive direction
+    for i in range(n):
+        #  sigma = [sigma xEst + gamma * Psqrt(:, i)]
+        pass
+    # Negative direction
+    for i in range(n):
+        #  sigma=[sigma xEst-gamma*Psqrt(:,in)];
+        pass
+
+    return sigma
+
+
+def ukf_estimation(xEst, PEst, z, u, gamma):
 
     #  Predict
     xPred = motion_model(xEst, u)
     jF = jacobF(xPred, u)
     PPred = jF * PEst * jF.T + Q
+
+    sigma = generate_sigma_points(xEst, PEst, gamma)
+    #  sigma=PredictMotion(sigma,u);
+    #  xPred=(wm*sigma')';
+    #  PPred=CalcSimgaPointsCovariance(xPred,sigma,wc,Q);
 
     #  Update
     jH = jacobH(xPred)
@@ -244,17 +215,33 @@ def plot_covariance_ellipse(xEst, PEst):
     plt.plot(px, py, "--r")
 
 
+def setup_ukf(nx):
+    lamda = ALPHA ** 2 * (nx + KAPPA) - nx
+    # calculate weights
+    wm = [lamda / (lamda + nx)]
+    wc = [(lamda / (lamda + nx)) + (1 - ALPHA ** 2 + BETA)]
+    for i in range(2 * nx):
+        wm.append(1.0 / (2 * (nx + lamda)))
+        wc.append(1.0 / (2 * (nx + lamda)))
+    gamma = math.sqrt(nx + lamda)
+
+    return wm, wc, gamma
+
+
 def main():
     print(__file__ + " start!!")
 
     time = 0.0
 
     # State Vector [x y yaw v]'
-    xEst = np.matrix(np.zeros((4, 1)))
-    xTrue = np.matrix(np.zeros((4, 1)))
-    PEst = np.eye(4)
+    nx = 4
+    xEst = np.matrix(np.zeros((nx, 1)))
+    xTrue = np.matrix(np.zeros((nx, 1)))
+    PEst = np.eye(nx)
 
-    xDR = np.matrix(np.zeros((4, 1)))  # Dead reckoning
+    xDR = np.matrix(np.zeros((nx, 1)))  # Dead reckoning
+
+    wm, wc, gamma = setup_ukf(nx)
 
     # history
     hxEst = xEst
@@ -268,7 +255,7 @@ def main():
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u)
 
-        xEst, PEst = ukf_estimation(xEst, PEst, z, ud)
+        xEst, PEst = ukf_estimation(xEst, PEst, z, ud, gamma)
 
         # store data history
         hxEst = np.hstack((hxEst, xEst))
