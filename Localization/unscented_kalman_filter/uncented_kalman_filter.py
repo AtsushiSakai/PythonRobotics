@@ -5,51 +5,13 @@ Uncented kalman filter (UKF) localization sample
 author: Atsushi Sakai (@Atsushi_twi)
 
 """
-#  % Update
-#  y = z - h(xPred);
-#  sigma=GenerateSigmaPoints(xPred,PPred,gamma);
-#  zSigma=PredictObservation(sigma);
-#  zb=(wm*sigma')';
-#  St=CalcSimgaPointsCovariance(zb,zSigma,wc,R);
-#  Pxz=CalcPxz(sigma,xPred,zSigma,zb,wc);
-#  K=Pxz*inv(St);
-#  xEst = xPred + K*y;
-#  PEst=PPred-K*St*K';
-
-#  function sigma=PredictMotion(sigma,u)
-#  % Sigma Points predition with motion model
-#  for i=1:length(sigma(1,:))
-#  sigma(:,i)=f(sigma(:,i),u);
-#  end
-
-#  function sigma=PredictObservation(sigma)
-#  % Sigma Points predition with observation model
-#  for i=1:length(sigma(1,:))
-#  sigma(:,i)=h(sigma(:,i));
-#  end
-
-#  function P=CalcSimgaPointsCovariance(xPred,sigma,wc,N)
-#  nSigma=length(sigma(1,:));
-#  d=sigma-repmat(xPred,1,nSigma);
-#  P=N;
-#  for i=1:nSigma
-#  P=P+wc(i)*d(:,i)*d(:,i)';
-#  end
-
-#  function P=CalcPxz(sigma,xPred,zSigma,zb,wc)
-#  nSigma=length(sigma(1,:));
-#  dx=sigma-repmat(xPred,1,nSigma);
-#  dz=zSigma-repmat(zb,1,nSigma);
-#  P=zeros(length(sigma(:,1)));
-#  for i=1:nSigma
-#  P=P+wc(i)*dx(:,i)*dz(:,i)';
-#  end
-
 
 import numpy as np
 import scipy.linalg
 import math
 import matplotlib.pyplot as plt
+
+from matplotrecorder import matplotrecorder
 
 # Estimation parameter of UKF
 Q = np.diag([0.1, 0.1, math.radians(1.0), 1.0])**2
@@ -60,13 +22,12 @@ Qsim = np.diag([0.5, 0.5])**2
 Rsim = np.diag([1.0, math.radians(30.0)])**2
 
 DT = 0.1  # time tick [s]
-SIM_TIME = 50.0  # simulation time [s]
+SIM_TIME = 10.0  # simulation time [s]
 
 #  UKF Parameter
 ALPHA = 0.001
 BETA = 2
 KAPPA = 0
-
 
 show_animation = True
 
@@ -126,66 +87,79 @@ def observation_model(x):
     return z
 
 
-def jacobF(x, u):
-    # Jacobian of Motion Model
-    yaw = x[2, 0]
-    u1 = u[0, 0]
-    jF = np.matrix([
-        [1.0, 0.0, -DT * u1 * math.sin(yaw), DT * u1 * math.cos(yaw)],
-        [0.0, 1.0, DT * math.cos(yaw), DT * math.sin(yaw)],
-        [0.0, 0.0, 1.0, 0.0],
-        [0.0, 0.0, 0.0, 1.0]])
-
-    return jF
-
-
-def jacobH(x):
-    # Jacobian of Observation Model
-    jH = np.matrix([
-        [1, 0, 0, 0],
-        [0, 1, 0, 0]
-    ])
-
-    return jH
-
-
 def generate_sigma_points(xEst, PEst, gamma):
-
     sigma = xEst
-    Psqrt = scipy.linalg.sqrtm(PEst)
+    Psqrt = np.matrix(scipy.linalg.sqrtm(PEst))
     n = len(xEst[:, 0])
     # Positive direction
     for i in range(n):
-        #  sigma = [sigma xEst + gamma * Psqrt(:, i)]
-        pass
+        sigma = np.hstack((sigma, xEst + gamma * Psqrt[:, i]))
+
     # Negative direction
     for i in range(n):
-        #  sigma=[sigma xEst-gamma*Psqrt(:,in)];
-        pass
+        sigma = np.hstack((sigma, xEst - gamma * Psqrt[:, i]))
 
     return sigma
 
 
-def ukf_estimation(xEst, PEst, z, u, gamma):
+def predict_sigma_motion(sigma, u):
+    #  Sigma Points predition with motion model
+    for i in range(sigma.shape[1]):
+        sigma[:, i] = motion_model(sigma[:, i], u)
+
+    return sigma
+
+
+def predict_sigma_observation(sigma):
+    # Sigma Points predition with observation model
+    for i in range(sigma.shape[1]):
+        sigma[0:2, i] = observation_model(sigma[:, i])
+
+    sigma = sigma[0:2, :]
+
+    return sigma
+
+
+def calc_sigma_covariance(x, sigma, wc, Pi):
+    nSigma = sigma.shape[1]
+    d = sigma - x[0:sigma.shape[0], :]
+    P = Pi
+    for i in range(nSigma):
+        P = P + wc[0, i] * d[:, i] * d[:, i].T
+    return P
+
+
+def calc_pxz(sigma, x, z_sigma, zb, wc):
+    #  function P=CalcPxz(sigma,xPred,zSigma,zb,wc)
+    nSigma = sigma.shape[1]
+    dx = np.matrix(sigma - x)
+    dz = np.matrix(z_sigma - zb[0:2, :])
+    P = np.matrix(np.zeros((dx.shape[0], dz.shape[0])))
+    for i in range(nSigma):
+        P = P + wc[0, i] * dx[:, i] * dz[:, i].T
+
+    return P
+
+
+def ukf_estimation(xEst, PEst, z, u, wm, wc, gamma):
 
     #  Predict
-    xPred = motion_model(xEst, u)
-    jF = jacobF(xPred, u)
-    PPred = jF * PEst * jF.T + Q
-
     sigma = generate_sigma_points(xEst, PEst, gamma)
-    #  sigma=PredictMotion(sigma,u);
-    #  xPred=(wm*sigma')';
-    #  PPred=CalcSimgaPointsCovariance(xPred,sigma,wc,Q);
+    sigma = predict_sigma_motion(sigma, u)
+    xPred = (wm * sigma.T).T
+    PPred = calc_sigma_covariance(xPred, sigma, wc, Q)
 
     #  Update
-    jH = jacobH(xPred)
     zPred = observation_model(xPred)
     y = z.T - zPred
-    S = jH * PPred * jH.T + R
-    K = PPred * jH.T * np.linalg.inv(S)
+    sigma = generate_sigma_points(xPred, PPred, gamma)
+    zb = (wm * sigma.T).T
+    z_sigma = predict_sigma_observation(sigma)
+    st = calc_sigma_covariance(zb, z_sigma, wc, R)
+    Pxz = calc_pxz(sigma, xPred, z_sigma, zb, wc)
+    K = Pxz * np.linalg.inv(st)
     xEst = xPred + K * y
-    PEst = (np.eye(len(xEst)) - K * jH) * PPred
+    PEst = PPred - K * st * K.T
 
     return xEst, PEst
 
@@ -225,20 +199,19 @@ def setup_ukf(nx):
         wc.append(1.0 / (2 * (nx + lamda)))
     gamma = math.sqrt(nx + lamda)
 
+    wm = np.matrix(wm)
+    wc = np.matrix(wc)
+
     return wm, wc, gamma
 
 
 def main():
     print(__file__ + " start!!")
 
-    time = 0.0
-
-    # State Vector [x y yaw v]'
-    nx = 4
+    nx = 4  # State Vector [x y yaw v]'
     xEst = np.matrix(np.zeros((nx, 1)))
     xTrue = np.matrix(np.zeros((nx, 1)))
     PEst = np.eye(nx)
-
     xDR = np.matrix(np.zeros((nx, 1)))  # Dead reckoning
 
     wm, wc, gamma = setup_ukf(nx)
@@ -249,13 +222,15 @@ def main():
     hxDR = xTrue
     hz = np.zeros((1, 2))
 
+    time = 0.0
+
     while SIM_TIME >= time:
         time += DT
         u = calc_input()
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u)
 
-        xEst, PEst = ukf_estimation(xEst, PEst, z, ud, gamma)
+        xEst, PEst = ukf_estimation(xEst, PEst, z, ud, wm, wc, gamma)
 
         # store data history
         hxEst = np.hstack((hxEst, xEst))
@@ -276,6 +251,9 @@ def main():
             plt.axis("equal")
             plt.grid(True)
             plt.pause(0.001)
+            matplotrecorder.save_frame()
+
+    matplotrecorder.save_movie("animation.gif", 0.1)
 
 
 if __name__ == '__main__':
