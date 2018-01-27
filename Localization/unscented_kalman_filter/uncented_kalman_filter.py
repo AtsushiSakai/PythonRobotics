@@ -11,8 +11,6 @@ import scipy.linalg
 import math
 import matplotlib.pyplot as plt
 
-from matplotrecorder import matplotrecorder
-
 # Estimation parameter of UKF
 Q = np.diag([0.1, 0.1, math.radians(1.0), 1.0])**2
 R = np.diag([1.0, math.radians(40.0)])**2
@@ -22,7 +20,7 @@ Qsim = np.diag([0.5, 0.5])**2
 Rsim = np.diag([1.0, math.radians(30.0)])**2
 
 DT = 0.1  # time tick [s]
-SIM_TIME = 10.0  # simulation time [s]
+SIM_TIME = 50.0  # simulation time [s]
 
 #  UKF Parameter
 ALPHA = 0.001
@@ -251,9 +249,6 @@ def main():
             plt.axis("equal")
             plt.grid(True)
             plt.pause(0.001)
-            matplotrecorder.save_frame()
-
-    matplotrecorder.save_movie("animation.gif", 0.1)
 
 
 if __name__ == '__main__':
