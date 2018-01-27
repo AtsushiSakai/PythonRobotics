@@ -11,7 +11,7 @@ Python codes for robotics algorithm.
    * [How to use](#how-to-use)
    * [Localization](#localization)
       * [Extended Kalman Filter localization](#extended-kalman-filter-localization)
-      * [Unscented Kalman Filter local](#unscented-kalman-filter-local)
+      * [Unscented Kalman Filter localization](#unscented-kalman-filter-localization)
    * [Path Planning](#path-planning)
       * [Dynamic Window Approach](#dynamic-window-approach)
       * [Grid based search](#grid-based-search)
@@ -92,7 +92,7 @@ the gren point is positioning observation (ex. GPS), and the red line is estimat
 
 The red ellipse is estimated covariance ellipse with EKF.
 
-## Unscented Kalman Filter local
+## Unscented Kalman Filter localization
 
 ![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/Localization/unscented_kalman_filter/animation.gif)
 
@@ -102,7 +102,7 @@ The lines and points are same meaning of the EKF simulation.
 
 Ref:
 
-- [Discriminatively Trained Unscented Kalman Filter for Mobile Robot Localization](http://search.ebscohost.com/login.aspx?direct=true&profile=ehost&scope=site&authtype=crawler&jrnl=17379318&AN=52739994&h=B0C6Ho6FxXnBPLmrwbtA0Vs7SjkGX1Wtd5thi9v8kcEuQDJsCm934YHgbgDQX%2BdsZKlKdXcPgOgzIDtjWltfHg%3D%3D&crl=f)
+- [Discriminatively Trained Unscented Kalman Filter for Mobile Robot Localization](https://www.researchgate.net/publication/267963417_Discriminatively_Trained_Unscented_Kalman_Filter_for_Mobile_Robot_Localization)
 
 # Path Planning
 
@@ -482,6 +482,7 @@ MIT
 # Author
 
 Atsushi Sakai ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
+
 
 
 
