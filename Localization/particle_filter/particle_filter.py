@@ -6,6 +6,124 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
+#  MAX_RANGE=20;%最大観測距離
+#  NP=100;%パーティクル数
+#  NTh=NP/2.0;%リサンプリングを実施する有効パーティクル数
+
+#  px=repmat(xEst,1,NP);%パーティクル格納変数
+#  pw=zeros(1,NP)+1/NP;%重み変数
+
+#  tic;
+#  %movcount=0;
+#  % Main loop
+#  for i=1 : nSteps
+#  time = time + dt;
+#  % Input
+#  u=doControl(time);
+#  % Observation
+#  [z,xTrue,xd,u]=Observation(xTrue, xd, u, RFID, MAX_RANGE);
+
+#  % ------ Particle Filter --------
+#  for ip=1:NP
+#  x=px(:,ip);
+#  w=pw(ip);
+
+#  % Dead Reckoning and random sampling
+#  x=f(x, u)+sqrt(Q)*randn(3,1);
+
+#  % Calc Inportance Weight
+#  for iz=1:length(z(:,1))
+#  pz=norm(x(1:2)'-z(iz,2:3));
+#  dz=pz-z(iz,1);
+#  w=w*Gauss(dz,0,sqrt(R));
+#  end
+#  px(:,ip)=x;%格納
+#  pw(ip)=w;
+#  end
+
+#  pw=Normalize(pw,NP);%正規化
+#  [px,pw]=Resampling(px,pw,NTh,NP);%リサンプリング
+#  xEst=px*pw';%最終推定値は期待値
+
+#  % Simulation Result
+#  result.time=[result.time; time];
+#  result.xTrue=[result.xTrue; xTrue'];
+#  result.xd=[result.xd; xd'];
+#  result.xEst=[result.xEst;xEst'];
+#  result.u=[result.u; u'];
+
+#  %Animation (remove some flames)
+#  if rem(i,5)==0
+#  hold off;
+#  arrow=0.5;
+#  %パーティクル表示
+#  for ip=1:NP
+#  quiver(px(1,ip),px(2,ip),arrow*cos(px(3,ip)),arrow*sin(px(3,ip)),'ok');hold on;
+#  end
+#  plot(result.xTrue(:,1),result.xTrue(:,2),'.b');hold on;
+#  plot(RFID(:,1),RFID(:,2),'pk','MarkerSize',10);hold on;
+#  %観測線の表示
+#  if~isempty(z)
+#  for iz=1:length(z(:,1))
+#  ray=[xTrue(1:2)';z(iz,2:3)];
+#  plot(ray(:,1),ray(:,2),'-r');hold on;
+#  end
+#  end
+#  plot(result.xd(:,1),result.xd(:,2),'.k');hold on;
+#  plot(result.xEst(:,1),result.xEst(:,2),'.r');hold on;
+#  axis equal;
+#  grid on;
+#  drawnow;
+#
+#  function [px,pw]=Resampling(px,pw,NTh,NP)
+#  %リサンプリングを実施する関数
+#  %アルゴリズムはLow Variance Sampling
+#  Neff=1.0/(pw*pw');
+#  if Neff<NTh %リサンプリング
+#  wcum=cumsum(pw);
+#  base=cumsum(pw*0+1/NP)-1/NP;%乱数を加える前のbase
+#  resampleID=base+rand/NP;%ルーレットを乱数分増やす
+#  ppx=px;%データ格納用
+#  ind=1;%新しいID
+#  for ip=1:NP
+#  while(resampleID(ip)>wcum(ind))
+#  ind=ind+1;
+#  end
+#  px(:,ip)=ppx(:,ind);%LVSで選ばれたパーティクルに置き換え
+#  pw(ip)=1/NP;%尤度は初期化
+#  end
+#  end
+
+#  function pw=Normalize(pw,NP)
+#  %重みベクトルを正規化する関数
+#  sumw=sum(pw);
+#  if sumw~=0
+#  pw=pw/sum(pw);%正規化
+#  else
+#  pw=zeros(1,NP)+1/NP;
+#  end
+
+
+#  function p=Gauss(x,u,sigma)
+#  %ガウス分布の確率密度を計算する関数
+#  p=1/sqrt(2*pi*sigma^2)*exp(-(x-u)^2/(2*sigma^2));
+
+#  %Calc Observation from noise prameter
+#  function [z, x, xd, u] = Observation(x, xd, u, RFID,MAX_RANGE)
+#  global Qsigma;
+#  global Rsigma;
+
+#  x=f(x, u);% Ground Truth
+#  u=u+sqrt(Qsigma)*randn(2,1);%add Process Noise
+#  xd=f(xd, u);% Dead Reckoning
+#  %Simulate Observation
+#  z=[];
+#  for iz=1:length(RFID(:,1))
+#  d=norm(RFID(iz,:)-x(1:2)');
+#  if d<MAX_RANGE %観測範囲内
+#  z=[z;[d+sqrt(Rsigma)*randn(1,1) RFID(iz,:)]];
+#  end
+
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -102,7 +220,7 @@ def jacobH(x):
     return jH
 
 
-def ekf_estimation(xEst, PEst, z, u):
+def pf_estimation(xEst, PEst, z, u):
 
     #  Predict
     xPred = motion_model(xEst, u)
@@ -151,6 +269,12 @@ def main():
 
     time = 0.0
 
+    # RFID positions [x, y]
+    RFID = np.array([[10.0, 0.0],
+                     [10.0, 10.0],
+                     [0.0, 15.0],
+                     [-5.0, 20.0]])
+
     # State Vector [x y yaw v]'
     xEst = np.matrix(np.zeros((4, 1)))
     xTrue = np.matrix(np.zeros((4, 1)))
@@ -170,7 +294,7 @@ def main():
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u)
 
-        xEst, PEst = ekf_estimation(xEst, PEst, z, ud)
+        xEst, PEst = pf_estimation(xEst, PEst, z, ud)
 
         # store data history
         hxEst = np.hstack((hxEst, xEst))
@@ -181,6 +305,7 @@ def main():
         if show_animation:
             plt.cla()
             plt.plot(hz[:, 0], hz[:, 1], ".g")
+            plt.plot(RFID[:, 0], RFID[:, 1], "*k")
             plt.plot(np.array(hxTrue[0, :]).flatten(),
                      np.array(hxTrue[1, :]).flatten(), "-b")
             plt.plot(np.array(hxDR[0, :]).flatten(),
