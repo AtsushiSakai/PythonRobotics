@@ -6,13 +6,6 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-#  MAX_RANGE=20;%最大観測距離
-#  NP=100;%パーティクル数
-#  NTh=NP/2.0;%リサンプリングを実施する有効パーティクル数
-
-#  px=repmat(xEst,1,NP);%パーティクル格納変数
-#  pw=zeros(1,NP)+1/NP;%重み変数
-
 #  tic;
 #  %movcount=0;
 #  % Main loop
@@ -138,6 +131,11 @@ Rsim = np.diag([1.0, math.radians(30.0)])**2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
+MAX_RANGE = 20.0  # maximum observation range
+
+# Particle filter parameter
+NP = 100  # Number of Particle
+NTh = NP / 2.0  # Number of particle for re-sampling
 
 show_animation = True
 
@@ -279,6 +277,11 @@ def main():
     xEst = np.matrix(np.zeros((4, 1)))
     xTrue = np.matrix(np.zeros((4, 1)))
     PEst = np.eye(4)
+
+    px = np.matrix(np.zeros((4, NP)))  # Particle store
+    pw = np.matrix(np.zeros((1, NP))) + 1.0 / NP  # Particle weight
+    #  print(px)
+    #  print(pw)
 
     xDR = np.matrix(np.zeros((4, 1)))  # Dead reckoning
 
