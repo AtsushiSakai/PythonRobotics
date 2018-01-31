@@ -42,7 +42,7 @@ def calc_J(target, p, h, k0):
     xn, yn, yawn = motion_model.generate_last_state(
         p[0, 0] - h[0, 0], p[1, 0], p[2, 0], k0)
     dn = calc_diff(target, [xn], [yn], [yawn])
-    d1 = np.matrix((dp - dn) / (2.0 * h[1, 0])).T
+    d1 = np.matrix((dp - dn) / (2.0 * h[0, 0])).T
 
     xp, yp, yawp = motion_model.generate_last_state(
         p[0, 0], p[1, 0] + h[1, 0], p[2, 0], k0)
@@ -50,7 +50,7 @@ def calc_J(target, p, h, k0):
     xn, yn, yawn = motion_model.generate_last_state(
         p[0, 0], p[1, 0] - h[1, 0], p[2, 0], k0)
     dn = calc_diff(target, [xn], [yn], [yawn])
-    d2 = np.matrix((dp - dn) / (2.0 * h[2, 0])).T
+    d2 = np.matrix((dp - dn) / (2.0 * h[1, 0])).T
 
     xp, yp, yawp = motion_model.generate_last_state(
         p[0, 0], p[1, 0], p[2, 0] + h[2, 0], k0)
