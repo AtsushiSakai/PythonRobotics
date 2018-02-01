@@ -6,44 +6,9 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-#  tic;
-#  %movcount=0;
-#  % Main loop
-#  for i=1 : nSteps
-#  time = time + dt;
-#  % Input
-#  u=doControl(time);
-#  % Observation
-#  [z,xTrue,xd,u]=Observation(xTrue, xd, u, RFID, MAX_RANGE);
-
-#  % ------ Particle Filter --------
-#  for ip=1:NP
-#  x=px(:,ip);
-#  w=pw(ip);
-
-#  % Dead Reckoning and random sampling
-#  x=f(x, u)+sqrt(Q)*randn(3,1);
-
-#  % Calc Inportance Weight
-#  for iz=1:length(z(:,1))
-#  pz=norm(x(1:2)'-z(iz,2:3));
-#  dz=pz-z(iz,1);
-#  w=w*Gauss(dz,0,sqrt(R));
-#  end
-#  px(:,ip)=x;%格納
-#  pw(ip)=w;
-#  end
-
 #  pw=Normalize(pw,NP);%正規化
 #  [px,pw]=Resampling(px,pw,NTh,NP);%リサンプリング
 #  xEst=px*pw';%最終推定値は期待値
-
-#  % Simulation Result
-#  result.time=[result.time; time];
-#  result.xTrue=[result.xTrue; xTrue'];
-#  result.xd=[result.xd; xd'];
-#  result.xEst=[result.xEst;xEst'];
-#  result.u=[result.u; u'];
 
 #  %Animation (remove some flames)
 #  if rem(i,5)==0
@@ -147,14 +112,21 @@ def calc_input():
     return u
 
 
-def observation(xTrue, xd, u):
+def observation(xTrue, xd, u, RFID):
 
     xTrue = motion_model(xTrue, u)
 
     # add noise to gps x-y
-    zx = xTrue[0, 0] + np.random.randn() * Qsim[0, 0]
-    zy = xTrue[1, 0] + np.random.randn() * Qsim[1, 1]
-    z = np.matrix([zx, zy])
+    z = np.matrix(np.zeros((0, 3)))
+
+    for i in range(len(RFID[:, 0])):
+
+        dx = xTrue[0, 0] - RFID[i, 0]
+        dy = xTrue[1, 0] - RFID[i, 1]
+        d = math.sqrt(dx**2 + dy**2)
+        if d <= MAX_RANGE:
+            zi = np.matrix([d, RFID[i, 0], RFID[i, 1]])
+            z = np.vstack((z, zi))
 
     # add noise to input
     ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
@@ -195,46 +167,36 @@ def observation_model(x):
     return z
 
 
-def jacobF(x, u):
-    # Jacobian of Motion Model
-    yaw = x[2, 0]
-    u1 = u[0, 0]
-    jF = np.matrix([
-        [1.0, 0.0, -DT * u1 * math.sin(yaw), DT * u1 * math.cos(yaw)],
-        [0.0, 1.0, DT * math.cos(yaw), DT * math.sin(yaw)],
-        [0.0, 0.0, 1.0, 0.0],
-        [0.0, 0.0, 0.0, 1.0]])
-
-    return jF
-
-
-def jacobH(x):
-    # Jacobian of Observation Model
-    jH = np.matrix([
-        [1, 0, 0, 0],
-        [0, 1, 0, 0]
-    ])
-
-    return jH
-
-
-def pf_estimation(xEst, PEst, z, u):
+def pf_estimation(px, pw, xEst, PEst, z, u):
 
     #  Predict
-    xPred = motion_model(xEst, u)
-    jF = jacobF(xPred, u)
-    PPred = jF * PEst * jF.T + Q
+    for ip in range(NP):
+        x = px[:, ip]
+        #  w = pw[ip]
 
-    #  Update
-    jH = jacobH(xPred)
-    zPred = observation_model(xPred)
-    y = z.T - zPred
-    S = jH * PPred * jH.T + R
-    K = PPred * jH.T * np.linalg.inv(S)
-    xEst = xPred + K * y
-    PEst = (np.eye(len(xEst)) - K * jH) * PPred
+        ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
+        ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1]
+        ud = np.matrix([ud1, ud2]).T
 
-    return xEst, PEst
+        x = motion_model(x, ud)
+
+        px[:, ip] = x
+
+        #  Calc Inportance Weight
+        for i in range(len(z[:, 0])):
+            dx = x[0, 0] - z[i, 1]
+            dy = x[1, 0] - z[i, 2]
+            prez = math.sqrt(dx**2 + dy**2)
+            dz = prez - z[i, 0]
+            #  w=w*Gauss(dz,0,sqrt(R));
+            #  end
+            #  px(:,ip)=x;%格納
+            #  pw(ip)=w;
+            #  end
+
+    xEst = px * pw.T
+
+    return xEst, PEst, px, pw
 
 
 def plot_covariance_ellipse(xEst, PEst):
@@ -280,8 +242,6 @@ def main():
 
     px = np.matrix(np.zeros((4, NP)))  # Particle store
     pw = np.matrix(np.zeros((1, NP))) + 1.0 / NP  # Particle weight
-    #  print(px)
-    #  print(pw)
 
     xDR = np.matrix(np.zeros((4, 1)))  # Dead reckoning
 
@@ -289,26 +249,27 @@ def main():
     hxEst = xEst
     hxTrue = xTrue
     hxDR = xTrue
-    hz = np.zeros((1, 2))
 
     while SIM_TIME >= time:
         time += DT
         u = calc_input()
 
-        xTrue, z, xDR, ud = observation(xTrue, xDR, u)
+        xTrue, z, xDR, ud = observation(xTrue, xDR, u, RFID)
 
-        xEst, PEst = pf_estimation(xEst, PEst, z, ud)
+        xEst, PEst, px, pw = pf_estimation(px, pw, xEst, PEst, z, ud)
 
         # store data history
         hxEst = np.hstack((hxEst, xEst))
         hxDR = np.hstack((hxDR, xDR))
         hxTrue = np.hstack((hxTrue, xTrue))
-        hz = np.vstack((hz, z))
 
         if show_animation:
             plt.cla()
-            plt.plot(hz[:, 0], hz[:, 1], ".g")
+
+            for i in range(len(z[:, 0])):
+                plt.plot([xTrue[0, 0], z[i, 1]], [xTrue[1, 0], z[i, 2]], "-k")
             plt.plot(RFID[:, 0], RFID[:, 1], "*k")
+            plt.plot(px[0, :], px[1, :], ".r")
             plt.plot(np.array(hxTrue[0, :]).flatten(),
                      np.array(hxTrue[1, :]).flatten(), "-b")
             plt.plot(np.array(hxDR[0, :]).flatten(),
