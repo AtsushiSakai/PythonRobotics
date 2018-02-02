@@ -6,92 +6,16 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-#  pw=Normalize(pw,NP);%正規化
-#  [px,pw]=Resampling(px,pw,NTh,NP);%リサンプリング
-#  xEst=px*pw';%最終推定値は期待値
-
-#  %Animation (remove some flames)
-#  if rem(i,5)==0
-#  hold off;
-#  arrow=0.5;
-#  %パーティクル表示
-#  for ip=1:NP
-#  quiver(px(1,ip),px(2,ip),arrow*cos(px(3,ip)),arrow*sin(px(3,ip)),'ok');hold on;
-#  end
-#  plot(result.xTrue(:,1),result.xTrue(:,2),'.b');hold on;
-#  plot(RFID(:,1),RFID(:,2),'pk','MarkerSize',10);hold on;
-#  %観測線の表示
-#  if~isempty(z)
-#  for iz=1:length(z(:,1))
-#  ray=[xTrue(1:2)';z(iz,2:3)];
-#  plot(ray(:,1),ray(:,2),'-r');hold on;
-#  end
-#  end
-#  plot(result.xd(:,1),result.xd(:,2),'.k');hold on;
-#  plot(result.xEst(:,1),result.xEst(:,2),'.r');hold on;
-#  axis equal;
-#  grid on;
-#  drawnow;
-#
-#  function [px,pw]=Resampling(px,pw,NTh,NP)
-#  %リサンプリングを実施する関数
-#  %アルゴリズムはLow Variance Sampling
-#  Neff=1.0/(pw*pw');
-#  if Neff<NTh %リサンプリング
-#  wcum=cumsum(pw);
-#  base=cumsum(pw*0+1/NP)-1/NP;%乱数を加える前のbase
-#  resampleID=base+rand/NP;%ルーレットを乱数分増やす
-#  ppx=px;%データ格納用
-#  ind=1;%新しいID
-#  for ip=1:NP
-#  while(resampleID(ip)>wcum(ind))
-#  ind=ind+1;
-#  end
-#  px(:,ip)=ppx(:,ind);%LVSで選ばれたパーティクルに置き換え
-#  pw(ip)=1/NP;%尤度は初期化
-#  end
-#  end
-
-#  function pw=Normalize(pw,NP)
-#  %重みベクトルを正規化する関数
-#  sumw=sum(pw);
-#  if sumw~=0
-#  pw=pw/sum(pw);%正規化
-#  else
-#  pw=zeros(1,NP)+1/NP;
-#  end
-
-
-#  function p=Gauss(x,u,sigma)
-#  %ガウス分布の確率密度を計算する関数
-#  p=1/sqrt(2*pi*sigma^2)*exp(-(x-u)^2/(2*sigma^2));
-
-#  %Calc Observation from noise prameter
-#  function [z, x, xd, u] = Observation(x, xd, u, RFID,MAX_RANGE)
-#  global Qsigma;
-#  global Rsigma;
-
-#  x=f(x, u);% Ground Truth
-#  u=u+sqrt(Qsigma)*randn(2,1);%add Process Noise
-#  xd=f(xd, u);% Dead Reckoning
-#  %Simulate Observation
-#  z=[];
-#  for iz=1:length(RFID(:,1))
-#  d=norm(RFID(iz,:)-x(1:2)');
-#  if d<MAX_RANGE %観測範囲内
-#  z=[z;[d+sqrt(Rsigma)*randn(1,1) RFID(iz,:)]];
-#  end
-
 import numpy as np
 import math
 import matplotlib.pyplot as plt
 
 # Estimation parameter of EKF
-Q = np.diag([0.1, 0.1, math.radians(1.0), 1.0])**2
+Q = np.diag([0.1])**2  # range error
 R = np.diag([1.0, math.radians(40.0)])**2
 
 #  Simulation parameter
-Qsim = np.diag([0.5, 0.5])**2
+Qsim = np.diag([0.2])**2
 Rsim = np.diag([1.0, math.radians(30.0)])**2
 
 DT = 0.1  # time tick [s]
@@ -125,7 +49,8 @@ def observation(xTrue, xd, u, RFID):
         dy = xTrue[1, 0] - RFID[i, 1]
         d = math.sqrt(dx**2 + dy**2)
         if d <= MAX_RANGE:
-            zi = np.matrix([d, RFID[i, 0], RFID[i, 1]])
+            dn = d + np.random.randn() * Qsim[0, 0]  # add noise
+            zi = np.matrix([dn, RFID[i, 0], RFID[i, 1]])
             z = np.vstack((z, zi))
 
     # add noise to input
@@ -155,32 +80,37 @@ def motion_model(x, u):
     return x
 
 
-def observation_model(x):
-    #  Observation Model
-    H = np.matrix([
-        [1, 0, 0, 0],
-        [0, 1, 0, 0]
-    ])
+def gauss_likelihood(x, sigma):
+    p = 1.0 / math.sqrt(2.0 * math.pi * sigma ** 2) * \
+        math.exp(-x ** 2 / (2 * sigma ** 2))
 
-    z = H * x
-
-    return z
+    return p
 
 
-def pf_estimation(px, pw, xEst, PEst, z, u):
+def calc_covariance(xEst, px, pw):
+    cov = np.matrix(np.zeros((3, 3)))
 
-    #  Predict
+    for i in range(px.shape[1]):
+        dx = (px[:, i] - xEst)[0:3]
+        cov += pw[0, i] * dx * dx.T
+
+    return cov
+
+
+def pf_localization(px, pw, xEst, PEst, z, u):
+    """
+    Localization with Particle filter
+    """
+
     for ip in range(NP):
         x = px[:, ip]
-        #  w = pw[ip]
+        w = pw[0, ip]
 
+        #  Predict with ramdom input sampling
         ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
         ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1]
         ud = np.matrix([ud1, ud2]).T
-
         x = motion_model(x, ud)
-
-        px[:, ip] = x
 
         #  Calc Inportance Weight
         for i in range(len(z[:, 0])):
@@ -188,15 +118,43 @@ def pf_estimation(px, pw, xEst, PEst, z, u):
             dy = x[1, 0] - z[i, 2]
             prez = math.sqrt(dx**2 + dy**2)
             dz = prez - z[i, 0]
-            #  w=w*Gauss(dz,0,sqrt(R));
-            #  end
-            #  px(:,ip)=x;%格納
-            #  pw(ip)=w;
-            #  end
+            w = w * gauss_likelihood(dz, math.sqrt(Q[0, 0]))
+
+        px[:, ip] = x
+        pw[0, ip] = w
+
+    pw = pw / pw.sum()  # normalize
 
     xEst = px * pw.T
+    PEst = calc_covariance(xEst, px, pw)
+
+    px, pw = resampling(px, pw)
 
     return xEst, PEst, px, pw
+
+
+def resampling(px, pw):
+    """
+    low variance re-sampling
+    """
+
+    Neff = 1.0 / (pw * pw.T)[0, 0]  # Effective particle number
+    if Neff < NTh:
+        wcum = np.cumsum(pw)
+        base = np.cumsum(pw * 0.0 + 1 / NP) - 1 / NP
+        resampleid = base + np.random.rand(base.shape[1]) / NP
+
+        inds = []
+        ind = 0
+        for ip in range(NP):
+            while resampleid[0, ip] > wcum[0, ind]:
+                ind += 1
+            inds.append(ind)
+
+        px = px[:, inds]
+        pw = np.matrix(np.zeros((1, NP))) + 1.0 / NP  # init weight
+
+    return px, pw
 
 
 def plot_covariance_ellipse(xEst, PEst):
@@ -242,7 +200,6 @@ def main():
 
     px = np.matrix(np.zeros((4, NP)))  # Particle store
     pw = np.matrix(np.zeros((1, NP))) + 1.0 / NP  # Particle weight
-
     xDR = np.matrix(np.zeros((4, 1)))  # Dead reckoning
 
     # history
@@ -256,7 +213,7 @@ def main():
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u, RFID)
 
-        xEst, PEst, px, pw = pf_estimation(px, pw, xEst, PEst, z, ud)
+        xEst, PEst, px, pw = pf_localization(px, pw, xEst, PEst, z, ud)
 
         # store data history
         hxEst = np.hstack((hxEst, xEst))
