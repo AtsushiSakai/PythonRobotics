@@ -10,9 +10,9 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
-# Estimation parameter of EKF
+# Estimation parameter of PF
 Q = np.diag([0.1])**2  # range error
-R = np.diag([1.0, math.radians(40.0)])**2
+R = np.diag([1.0, math.radians(40.0)])**2  # input error
 
 #  Simulation parameter
 Qsim = np.diag([0.2])**2
