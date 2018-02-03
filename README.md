@@ -5,13 +5,13 @@
 
 Python codes for robotics algorithm.
 
-
 # Table of Contents
    * [Requirements](#requirements)
    * [How to use](#how-to-use)
    * [Localization](#localization)
       * [Extended Kalman Filter localization](#extended-kalman-filter-localization)
       * [Unscented Kalman Filter localization](#unscented-kalman-filter-localization)
+      * [Particle Filter localization](#particle-filter-localization)
    * [Path Planning](#path-planning)
       * [Dynamic Window Approach](#dynamic-window-approach)
       * [Grid based search](#grid-based-search)
@@ -103,6 +103,20 @@ The lines and points are same meaning of the EKF simulation.
 Ref:
 
 - [Discriminatively Trained Unscented Kalman Filter for Mobile Robot Localization](https://www.researchgate.net/publication/267963417_Discriminatively_Trained_Unscented_Kalman_Filter_for_Mobile_Robot_Localization)
+
+## Particle Filter localization
+
+![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/Localization/particle_filter/animation.gif)
+
+This is a sensor fusion localization with Particle Filter(PF).
+
+The blue line is true trajectory, the black line is dead reckoning trajectory,
+
+and the red line is estimated trajectory with PF.
+
+It is assumued that the robot can measure a distance from landmarks (RFID).
+
+This measurements are used for PF localization.
 
 # Path Planning
 
@@ -482,6 +496,7 @@ MIT
 # Author
 
 Atsushi Sakai ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
+
 
 
 
