@@ -121,76 +121,105 @@ def generate_path(q0, q1, maxc):
     return paths
 
 
-#  def generate_local_course(L: : Float64,
-    #  lengths: : Array{Float64},
-    #  mode: : Array{String},
-    #  maxc: : Float64,
-    #  step_size: : Float64)
-    #  npoint = trunc(Int64, L / step_size) + length(lengths) + 3
-    #  # println(npoint, ",", L, ",", step_size, ",", L/step_size)
+def interpolate(ind, l, m, maxc, ox, oy, oyaw, px, py, pyaw, directions):
+    print(ind, len(px), l)
 
-    #  px = fill(0.0, npoint)
-    #  py = fill(0.0, npoint)
-    #  pyaw = fill(0.0, npoint)
-    #  directions = fill(0, npoint)
-    #  ind = 2
+    if m == "S":
+        px[ind] = ox + l / maxc * math.cos(oyaw)
+        py[ind] = oy + l / maxc * math.sin(oyaw)
+        pyaw[ind] = oyaw
+    else:  # curve
+        ldx = math.sin(l) / maxc
+        if m == "L":  # left turn
+            ldy = (1.0 - math.cos(l)) / maxc
+        elif m == "R":  # right turn
+            ldy = (1.0 - math.cos(l)) / -maxc
+        gdx = math.cos(-oyaw) * ldx + math.sin(-oyaw) * ldy
+        gdy = -math.sin(-oyaw) * ldx + math.cos(-oyaw) * ldy
+        px[ind] = ox + gdx
+        py[ind] = oy + gdy
 
-    #  if lengths[1] > 0.0
-    #  directions[1] = 1
-    #  else
-    #  directions[1] = -1
-    #  end
+    if m == "L":  # left turn
+        pyaw[ind] = oyaw + l
+    elif m == "R":  # right turn
+        pyaw[ind] = oyaw - l
 
-    #  if lengths[1] > 0.0
-    #  d = step_size
-    #  else
-    #  d = -step_size
-    #  end
+    if l > 0.0:
+        directions[ind] = 1
+    else:
+        directions[ind] = -1
 
-    #  pd = d
-    #  ll = 0.0
+    return px, py, pyaw, directions
 
-    #  for (m, l, i) in zip(mode, lengths, 1: length(mode))
 
-    #  if l > 0.0
-    #  d = step_size
-    #  else
-    #  d = -step_size
-    #  end
+def generate_local_course(L, lengths, mode, maxc, step_size):
+    npoint = math.trunc(L / step_size) + len(lengths) + 4
+    # println(npoint, ",", L, ",", step_size, ",", L/step_size)
 
-    #  # set prigin state
-    #  ox, oy, oyaw = px[ind], py[ind], pyaw[ind]
+    px = [0.0 for i in range(npoint)]
+    py = [0.0 for i in range(npoint)]
+    pyaw = [0.0 for i in range(npoint)]
+    directions = [0.0 for i in range(npoint)]
+    ind = 1
 
-    #  ind -= 1
-    #  if i >= 2 & & (lengths[i - 1] * lengths[i]) > 0
-    #  pd = - d - ll
-    #  else
-    #  pd = d - ll
-    #  end
+    if lengths[0] > 0.0:
+        directions[0] = 1
+    else:
+        directions[0] = -1
 
-    #  while abs(pd) <= abs(l)
-    #  ind += 1
-    #  px, py, pyaw, directions = interpolate(
-    #  ind, pd, m, maxc, ox, oy, oyaw, px, py, pyaw, directions)
-    #  pd += d
-    #  end
+    if lengths[0] > 0.0:
+        d = step_size
+    else:
+        d = -step_size
 
-    #  ll = l - pd - d  # calc remain length
+    pd = d
+    ll = 0.0
 
-    #  ind += 1
-    #  px, py, pyaw, directions = interpolate(
-    #  ind, l, m, maxc, ox, oy, oyaw, px, py, pyaw, directions)
-    #  end
+    for (m, l, i) in zip(mode, lengths, range(len(mode))):
+        if l > 0.0:
+            d = step_size
+        else:
+            d = -step_size
 
-    #  # remove unused data
-    #  while px[end] == 0.0
-    #  pop!(px)
-    #  pop!(py)
-    #  pop!(pyaw)
-    #  pop!(directions)
-    #  end
+        # set origin state
+        ox, oy, oyaw = px[ind], py[ind], pyaw[ind]
 
-    #  return px, py, pyaw, directions
+        ind -= 1
+        if i >= 1 and (lengths[i - 1] * lengths[i]) > 0:
+            pd = - d - ll
+        else:
+            pd = d - ll
+
+        while abs(pd) <= abs(l):
+            ind += 1
+            px, py, pyaw, directions = interpolate(
+                ind, pd, m, maxc, ox, oy, oyaw, px, py, pyaw, directions)
+            pd += d
+
+        ll = l - pd - d  # calc remain length
+
+        ind += 1
+        px, py, pyaw, directions = interpolate(
+            ind, l, m, maxc, ox, oy, oyaw, px, py, pyaw, directions)
+
+    # remove unused data
+    while px[-1] == 0.0:
+        px.pop()
+        py.pop()
+        pyaw.pop()
+        directions.pop()
+
+    return px, py, pyaw, directions
+
+
+def pi_2_pi(angle):
+    while(angle > math.pi):
+        angle = angle - 2.0 * math.pi
+
+    while(angle < -math.pi):
+        angle = angle + 2.0 * math.pi
+
+    return angle
 
 
 def calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size):
@@ -199,17 +228,20 @@ def calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size):
 
     paths = generate_path(q0, q1, maxc)
     for path in paths:
-        #  x, y, yaw, directions = generate_local_course(
-        #  path.L, path.lengths, path.ctypes, maxc, step_size * maxc)
-        pass
+        x, y, yaw, directions = generate_local_course(
+            path.L, path.lengths, path.ctypes, maxc, step_size * maxc)
 
-    #  # convert global coordinate
-    #  path.x = [cos(-q0[3]) * ix + sin(-q0[3]) * iy + q0[1] for (ix, iy) in zip(x, y)]
-    #  path.y = [-sin(-q0[3]) * ix + cos(-q0[3]) * iy + q0[2] for (ix, iy) in zip(x, y)]
-    #  path.yaw = common_func.pi_2_pi.([iyaw + q0[3] for iyaw in yaw])
-    #  path.directions = directions
-    #  path.lengths = [l/maxc for l in path.lengths]
-    #  path.L = path.L/maxc
+        # convert global coordinate
+        path.x = [math.cos(-q0[2]) * ix + math.sin(-q0[2])
+                  * iy + q0[0] for (ix, iy) in zip(x, y)]
+        path.y = [-math.sin(-q0[2]) * ix + math.cos(-q0[2])
+                  * iy + q0[1] for (ix, iy) in zip(x, y)]
+        path.yaw = [pi_2_pi(iyaw + q0[2]) for iyaw in yaw]
+        path.directions = directions
+        path.lengths = [l / maxc for l in path.lengths]
+        path.L = path.L / maxc
+
+    #  print(paths)
 
     return paths
 
