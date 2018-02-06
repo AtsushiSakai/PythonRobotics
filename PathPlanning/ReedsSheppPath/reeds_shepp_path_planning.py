@@ -50,21 +50,18 @@ def mod2pi(x):
 
 
 def SLS(x, y, phi):
-    # println(x,",", y,",", phi, ",", mod2pi(phi))
     phi = mod2pi(phi)
     if y > 0.0 and phi > 0.0 and phi < math.pi * 0.99:
         xd = - y / math.tan(phi) + x
         t = xd - math.tan(phi / 2.0)
         u = phi
         v = math.sqrt((x - xd) ** 2 + y ** 2) - math.tan(phi / 2.0)
-        # println("1,",t,",",u,",",v)
         return True, t, u, v
     elif y < 0.0 and phi > 0.0 and phi < math.pi * 0.99:
         xd = - y / math.tan(phi) + x
         t = xd - math.tan(phi / 2.0)
         u = phi
-        v = -math.sqrt((x - xd) ^ 2 + y ^ 2) - math.tan(phi / 2.0)
-        # println("2,",t,",",u,",",v)
+        v = -math.sqrt((x - xd) ** 2 + y ** 2) - math.tan(phi / 2.0)
         return True, t, u, v
 
     return False, 0.0, 0.0, 0.0
@@ -80,7 +77,7 @@ def set_path(paths, lengths, ctypes):
     for tpath in paths:
         typeissame = (tpath.ctypes == path.ctypes)
         if typeissame:
-            if sum(tpath.lengths - path.lengths) <= 0.01:
+            if sum(tpath.lengths) - sum(path.lengths) <= 0.01:
                 return paths  # not insert path
 
     path.L = sum([abs(i) for i in lengths])
@@ -104,6 +101,73 @@ def SCS(x, y, phi, paths):
     return paths
 
 
+def polar(x, y):
+    r = math.sqrt(x ** 2 + y ** 2)
+    theta = math.atan2(y, x)
+    return r, theta
+
+
+def LSL(x, y, phi):
+    u, t = polar(x - math.sin(phi), y - 1.0 + math.cos(phi))
+    if t >= 0.0:
+        v = mod2pi(phi - t)
+        if v >= 0.0:
+            return True, t, u, v
+
+    return False, 0.0, 0.0, 0.0
+
+
+def CSC(x, y, phi, paths):
+    flag, t, u, v = LSL(x, y, phi)
+    if flag:
+        paths = set_path(paths, [t, u, v], ["L", "S", "L"])
+
+    flag, t, u, v = LSL(-x, y, -phi)
+    if flag:
+        paths = set_path(paths, [-t, -u, -v], ["L", "S", "L"])
+
+    flag, t, u, v = LSL(x, -y, -phi)
+    if flag:
+        paths = set_path(paths, [t, u, v], ["R", "S", "R"])
+
+    flag, t, u, v = LSL(-x, -y, phi)
+    if flag:
+        paths = set_path(paths, [-t, -u, -v], ["R", "S", "R"])
+
+    flag, t, u, v = LSR(x, y, phi)
+    if flag:
+        paths = set_path(paths, [t, u, v], ["L", "S", "R"])
+
+    flag, t, u, v = LSR(-x, y, -phi)
+    if flag:
+        paths = set_path(paths, [-t, -u, -v], ["L", "S", "R"])
+
+    flag, t, u, v = LSR(x, -y, -phi)
+    if flag:
+        paths = set_path(paths, [t, u, v], ["R", "S", "L"])
+
+    flag, t, u, v = LSR(-x, -y, phi)
+    if flag:
+        paths = set_path(paths, [-t, -u, -v], ["R", "S", "L"])
+
+    return paths
+
+
+def LSR(x, y, phi):
+    u1, t1 = polar(x + math.sin(phi), y - 1.0 - math.cos(phi))
+    u1 = u1 ** 2
+    if u1 >= 4.0:
+        u = math.sqrt(u1 - 4.0)
+        theta = math.atan2(2.0, u)
+        t = mod2pi(t1 + theta)
+        v = mod2pi(t - phi)
+
+        if t >= 0.0 and v >= 0.0:
+            return True, t, u, v
+
+    return False, 0.0, 0.0, 0.0
+
+
 def generate_path(q0, q1, maxc):
     dx = q1[0] - q0[0]
     dy = q1[1] - q0[1]
@@ -115,14 +179,13 @@ def generate_path(q0, q1, maxc):
 
     paths = []
     paths = SCS(x, y, dth, paths)
-    #  paths = CSC(x, y, dth, paths)
+    paths = CSC(x, y, dth, paths)
     #  paths = CCC(x, y, dth, paths)
 
     return paths
 
 
 def interpolate(ind, l, m, maxc, ox, oy, oyaw, px, py, pyaw, directions):
-    print(ind, len(px), l)
 
     if m == "S":
         px[ind] = ox + l / maxc * math.cos(oyaw)
@@ -154,7 +217,6 @@ def interpolate(ind, l, m, maxc, ox, oy, oyaw, px, py, pyaw, directions):
 
 def generate_local_course(L, lengths, mode, maxc, step_size):
     npoint = math.trunc(L / step_size) + len(lengths) + 4
-    # println(npoint, ",", L, ",", step_size, ",", L/step_size)
 
     px = [0.0 for i in range(npoint)]
     py = [0.0 for i in range(npoint)]
@@ -251,6 +313,10 @@ def reeds_shepp_path_planning2(sx, sy, syaw,
 
     paths = calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size)
 
+    if len(paths) == 0:
+        print("No path")
+        return None, None, None, None, None
+
     minL = float("Inf")
     best_path_index = -1
     for i in range(len(paths)):
@@ -260,12 +326,7 @@ def reeds_shepp_path_planning2(sx, sy, syaw,
 
     bpath = paths[best_path_index]
 
-    xs = bpath.x
-    ys = bpath.y
-    yaw = bpath.yaw
-    ptype = bpath.ctypes
-    clen = bpath.lengths
-    return xs, ys, yaw, ptype, clen
+    return bpath.x, bpath.y, bpath.yaw, bpath.ctypes, bpath.lengths
 
 
 def reeds_shepp_path_planning(start_x, start_y, start_yaw,
@@ -301,18 +362,21 @@ def main():
     print("Reeds Shepp path planner sample start!!")
 
     start_x = 1.0  # [m]
-    start_y = 1.0  # [m]
-    start_yaw = math.radians(0.0)  # [rad]
+    start_y = 14.0  # [m]
+    start_yaw = math.radians(-20.0)  # [rad]
 
     end_x = 5.0  # [m]
-    end_y = 10.0  # [m]
-    end_yaw = math.radians(45.0)  # [rad]
+    end_y = 5.0  # [m]
+    end_yaw = math.radians(25.0)  # [rad]
 
     curvature = 1.0
     step_size = 0.1
 
     px, py, pyaw, mode, clen = reeds_shepp_path_planning2(
         start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature, step_size)
+
+    if not px:
+        assert False, "No path"
 
     #  px, py, pyaw, mode, clen = reeds_shepp_path_planning(
     #  start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature)
@@ -324,8 +388,8 @@ def main():
         plot_arrow(start_x, start_y, start_yaw)
         plot_arrow(end_x, end_y, end_yaw)
 
-        for (ix, iy, iyaw) in zip(px, py, pyaw):
-            plot_arrow(ix, iy, iyaw, fc="b")
+        #  for (ix, iy, iyaw) in zip(px, py, pyaw):
+        #  plot_arrow(ix, iy, iyaw, fc="b")
         #  print(clen)
 
         plt.legend()
