@@ -5,7 +5,6 @@ Reeds Shepp path planner sample code
 author Atsushi Sakai(@Atsushi_twi)
 
 """
-import reeds_shepp
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -117,6 +116,62 @@ def LSL(x, y, phi):
     return False, 0.0, 0.0, 0.0
 
 
+def LRL(x, y, phi):
+    u1, t1 = polar(x - math.sin(phi), y - 1.0 + math.cos(phi))
+
+    if u1 <= 4.0:
+        u = -2.0 * math.asin(0.25 * u1)
+        t = mod2pi(t1 + 0.5 * u + math.pi)
+        v = mod2pi(phi - t + u)
+
+        if t >= 0.0 and u <= 0.0:
+            return True, t, u, v
+
+    return False, 0.0, 0.0, 0.0
+
+
+def CCC(x, y, phi, paths):
+
+    flag, t, u, v = LRL(x, y, phi)
+    if flag:
+        paths = set_path(paths, [t, u, v], ["L", "R", "L"])
+
+    flag, t, u, v = LRL(-x, y, -phi)
+    if flag:
+        paths = set_path(paths, [-t, -u, -v], ["L", "R", "L"])
+
+    flag, t, u, v = LRL(x, -y, -phi)
+    if flag:
+        paths = set_path(paths, [t, u, v], ["R", "L", "R"])
+
+    flag, t, u, v = LRL(-x, -y, phi)
+    if flag:
+        paths = set_path(paths, [-t, -u, -v], ["R", "L", "R"])
+
+    # backwards
+    xb = x * math.cos(phi) + y * math.sin(phi)
+    yb = x * math.sin(phi) - y * math.cos(phi)
+    # println(xb, ",", yb,",",x,",",y)
+
+    flag, t, u, v = LRL(xb, yb, phi)
+    if flag:
+        paths = set_path(paths, [v, u, t], ["L", "R", "L"])
+
+    flag, t, u, v = LRL(-xb, yb, -phi)
+    if flag:
+        paths = set_path(paths, [-v, -u, -t], ["L", "R", "L"])
+
+    flag, t, u, v = LRL(xb, -yb, -phi)
+    if flag:
+        paths = set_path(paths, [v, u, t], ["R", "L", "R"])
+
+    flag, t, u, v = LRL(-xb, -yb, phi)
+    if flag:
+        paths = set_path(paths, [-v, -u, -t], ["R", "L", "R"])
+
+    return paths
+
+
 def CSC(x, y, phi, paths):
     flag, t, u, v = LSL(x, y, phi)
     if flag:
@@ -180,7 +235,7 @@ def generate_path(q0, q1, maxc):
     paths = []
     paths = SCS(x, y, dth, paths)
     paths = CSC(x, y, dth, paths)
-    #  paths = CCC(x, y, dth, paths)
+    paths = CCC(x, y, dth, paths)
 
     return paths
 
@@ -308,8 +363,8 @@ def calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size):
     return paths
 
 
-def reeds_shepp_path_planning2(sx, sy, syaw,
-                               gx, gy, gyaw, maxc, step_size):
+def reeds_shepp_path_planning(sx, sy, syaw,
+                              gx, gy, gyaw, maxc, step_size):
 
     paths = calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size)
 
@@ -329,40 +384,52 @@ def reeds_shepp_path_planning2(sx, sy, syaw,
     return bpath.x, bpath.y, bpath.yaw, bpath.ctypes, bpath.lengths
 
 
-def reeds_shepp_path_planning(start_x, start_y, start_yaw,
-                              end_x, end_y, end_yaw, curvature):
-    step_size = 0.1
-    q0 = [start_x, start_y, start_yaw]
-    q1 = [end_x, end_y, end_yaw]
-    qs = reeds_shepp.path_sample(q0, q1, 1.0 / curvature, step_size)
-    xs = [q[0] for q in qs]
-    ys = [q[1] for q in qs]
-    yaw = [q[2] for q in qs]
+def test():
 
-    xs.append(end_x)
-    ys.append(end_y)
-    yaw.append(end_yaw)
+    NTEST = 100
 
-    clen = reeds_shepp.path_length(q0, q1, 1.0 / curvature)
-    pathtypeTuple = reeds_shepp.path_type(q0, q1, 1.0 / curvature)
+    for i in range(NTEST):
+        start_x = (np.random.rand() - 0.5) * 100.0  # [m]
+        start_y = (np.random.rand() - 0.5) * 100.0  # [m]
+        start_yaw = math.radians((np.random.rand() - 0.5) * 180.0)  # [rad]
 
-    ptype = ""
-    for t in pathtypeTuple:
-        if t == 1:
-            ptype += "L"
-        elif t == 2:
-            ptype += "S"
-        elif t == 3:
-            ptype += "R"
+        end_x = (np.random.rand() - 0.5) * 100.0  # [m]
+        end_y = (np.random.rand() - 0.5) * 100.0  # [m]
+        end_yaw = math.radians((np.random.rand() - 0.5) * 180.0)  # [rad]
 
-    return xs, ys, yaw, ptype, clen
+        curvature = 1.0 / (np.random.rand() * 20.0)
+        #  print(curvature)
+        step_size = 0.1
+
+        #  print(start_x, start_y, start_yaw)
+        #  print(end_x, end_y, end_yaw)
+
+        px, py, pyaw, mode, clen = reeds_shepp_path_planning(
+            start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature, step_size)
+
+        #  print(len(px))
+        #  plt.plot(px, py, label="final course " + str(mode))
+
+        # plotting
+        #  plot_arrow(start_x, start_y, start_yaw)
+        #  plot_arrow(end_x, end_y, end_yaw)
+
+        #  plt.legend()
+        #  plt.grid(True)
+        #  plt.axis("equal")
+        #  plt.show()
+
+        if not px:
+            assert False, "No path"
+
+    print("Test done")
 
 
 def main():
     print("Reeds Shepp path planner sample start!!")
 
-    start_x = 1.0  # [m]
-    start_y = 14.0  # [m]
+    start_x = -1.0  # [m]
+    start_y = -4.0  # [m]
     start_yaw = math.radians(-20.0)  # [rad]
 
     end_x = 5.0  # [m]
@@ -372,14 +439,8 @@ def main():
     curvature = 1.0
     step_size = 0.1
 
-    px, py, pyaw, mode, clen = reeds_shepp_path_planning2(
+    px, py, pyaw, mode, clen = reeds_shepp_path_planning(
         start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature, step_size)
-
-    if not px:
-        assert False, "No path"
-
-    #  px, py, pyaw, mode, clen = reeds_shepp_path_planning(
-    #  start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature)
 
     if show_animation:
         plt.plot(px, py, label="final course " + str(mode))
@@ -388,15 +449,15 @@ def main():
         plot_arrow(start_x, start_y, start_yaw)
         plot_arrow(end_x, end_y, end_yaw)
 
-        #  for (ix, iy, iyaw) in zip(px, py, pyaw):
-        #  plot_arrow(ix, iy, iyaw, fc="b")
-        #  print(clen)
-
         plt.legend()
         plt.grid(True)
         plt.axis("equal")
         plt.show()
 
+    if not px:
+        assert False, "No path"
+
 
 if __name__ == '__main__':
+    test()
     main()
