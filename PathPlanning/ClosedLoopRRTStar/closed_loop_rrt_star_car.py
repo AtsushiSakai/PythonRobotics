@@ -5,6 +5,9 @@ author: AtsushiSakai(@Atsushi_twi)
 
 """
 
+import sys
+sys.path.append("../ReedsSheppPath/")
+
 import random
 import math
 import copy
@@ -18,6 +21,7 @@ show_animation = True
 
 
 target_speed = 10.0 / 3.6
+STEP_SIZE = 0.5
 
 
 class RRT():
@@ -217,7 +221,7 @@ class RRT():
 
         px, py, pyaw, mode, clen = reeds_shepp_path_planning.reeds_shepp_path_planning(
             nearestNode.x, nearestNode.y, nearestNode.yaw,
-            rnd.x, rnd.y, rnd.yaw, unicycle_model.curvature_max)
+            rnd.x, rnd.y, rnd.yaw, unicycle_model.curvature_max, STEP_SIZE)
 
         newNode = copy.deepcopy(nearestNode)
         newNode.x = px[-1]
@@ -227,7 +231,7 @@ class RRT():
         newNode.path_x = px
         newNode.path_y = py
         newNode.path_yaw = pyaw
-        newNode.cost += clen
+        newNode.cost += sum(clen)
         newNode.parent = nind
 
         return newNode
