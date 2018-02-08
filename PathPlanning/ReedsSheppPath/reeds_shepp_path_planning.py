@@ -9,6 +9,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
+
 show_animation = True
 
 
@@ -387,41 +388,39 @@ def reeds_shepp_path_planning(sx, sy, syaw,
 
 def test():
 
-    NTEST = 100
+    NTEST = 5
 
     for i in range(NTEST):
-        start_x = (np.random.rand() - 0.5) * 100.0  # [m]
-        start_y = (np.random.rand() - 0.5) * 100.0  # [m]
+        start_x = (np.random.rand() - 0.5) * 10.0  # [m]
+        start_y = (np.random.rand() - 0.5) * 10.0  # [m]
         start_yaw = math.radians((np.random.rand() - 0.5) * 180.0)  # [rad]
 
-        end_x = (np.random.rand() - 0.5) * 100.0  # [m]
-        end_y = (np.random.rand() - 0.5) * 100.0  # [m]
+        end_x = (np.random.rand() - 0.5) * 10.0  # [m]
+        end_y = (np.random.rand() - 0.5) * 10.0  # [m]
         end_yaw = math.radians((np.random.rand() - 0.5) * 180.0)  # [rad]
 
         curvature = 1.0 / (np.random.rand() * 20.0)
-        #  print(curvature)
         step_size = 0.1
-
-        #  print(start_x, start_y, start_yaw)
-        #  print(end_x, end_y, end_yaw)
 
         px, py, pyaw, mode, clen = reeds_shepp_path_planning(
             start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature, step_size)
 
-        #  print(len(px))
-        #  plt.plot(px, py, label="final course " + str(mode))
+        if show_animation:
+            plt.cla()
+            plt.plot(px, py, label="final course " + str(mode))
 
-        # plotting
-        #  plot_arrow(start_x, start_y, start_yaw)
-        #  plot_arrow(end_x, end_y, end_yaw)
+            #  plotting
+            plot_arrow(start_x, start_y, start_yaw)
+            plot_arrow(end_x, end_y, end_yaw)
 
-        #  plt.legend()
-        #  plt.grid(True)
-        #  plt.axis("equal")
-        #  plt.show()
+            plt.legend()
+            plt.grid(True)
+            plt.axis("equal")
+            plt.xlim(-10, 10)
+            plt.ylim(-10, 10)
+            plt.pause(1.0)
 
-        if not px:
-            assert False, "No path"
+            #  plt.show()
 
     print("Test done")
 
@@ -444,7 +443,8 @@ def main():
         start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature, step_size)
 
     if show_animation:
-        #  plt.plot(px, py, label="final course " + str(mode))
+        plt.cla()
+        plt.plot(px, py, label="final course " + str(mode))
 
         # plotting
         plot_arrow(start_x, start_y, start_yaw)
