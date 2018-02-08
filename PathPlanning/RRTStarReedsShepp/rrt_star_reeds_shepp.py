@@ -6,6 +6,9 @@ author: AtsushiSakai(@Atsushi_twi)
 
 """
 
+import sys
+sys.path.append("../ReedsSheppPath/")
+
 import random
 import math
 import copy
@@ -14,6 +17,8 @@ import reeds_shepp_path_planning
 import matplotlib.pyplot as plt
 
 show_animation = True
+STEP_SIZE = 0.1
+curvature = 1.0
 
 
 class RRT():
@@ -53,10 +58,14 @@ class RRT():
             nind = self.GetNearestListIndex(self.nodeList, rnd)
 
             newNode = self.steer(rnd, nind)
+            if newNode is None:
+                continue
 
             if self.CollisionCheck(newNode, self.obstacleList):
                 nearinds = self.find_near_nodes(newNode)
                 newNode = self.choose_parent(newNode, nearinds)
+                if newNode is None:
+                    continue
                 self.nodeList.append(newNode)
                 self.rewire(newNode, nearinds)
 
@@ -77,6 +86,9 @@ class RRT():
         dlist = []
         for i in nearinds:
             tNode = self.steer(newNode, i)
+            if tNode is None:
+                continue
+
             if self.CollisionCheck(tNode, self.obstacleList):
                 dlist.append(tNode.cost)
             else:
@@ -103,12 +115,14 @@ class RRT():
         return angle
 
     def steer(self, rnd, nind):
-        curvature = 1.0
 
         nearestNode = self.nodeList[nind]
 
         px, py, pyaw, mode, clen = reeds_shepp_path_planning.reeds_shepp_path_planning(
-            nearestNode.x, nearestNode.y, nearestNode.yaw, rnd.x, rnd.y, rnd.yaw, curvature)
+            nearestNode.x, nearestNode.y, nearestNode.yaw, rnd.x, rnd.y, rnd.yaw, curvature, STEP_SIZE)
+
+        if px is None:
+            return None
 
         newNode = copy.deepcopy(nearestNode)
         newNode.x = px[-1]
@@ -118,7 +132,7 @@ class RRT():
         newNode.path_x = px
         newNode.path_y = py
         newNode.path_yaw = pyaw
-        newNode.cost += clen
+        newNode.cost += sum([abs(c) for c in clen])
         newNode.parent = nind
 
         return newNode
@@ -200,6 +214,8 @@ class RRT():
         for i in nearinds:
             nearNode = self.nodeList[i]
             tNode = self.steer(nearNode, nnode - 1)
+            if tNode is None:
+                continue
 
             obstacleOK = self.CollisionCheck(tNode, self.obstacleList)
             imporveCost = nearNode.cost > tNode.cost
