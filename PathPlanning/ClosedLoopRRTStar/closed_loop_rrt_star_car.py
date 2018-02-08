@@ -21,7 +21,7 @@ show_animation = True
 
 
 target_speed = 10.0 / 3.6
-STEP_SIZE = 0.5
+STEP_SIZE = 0.1
 
 
 class RRT():
@@ -52,6 +52,8 @@ class RRT():
         goal = Node(self.end.x, self.end.y, self.end.yaw)
 
         newNode = self.steer(goal, len(self.nodeList) - 1)
+        if newNode is None:
+            return
 
         if self.CollisionCheck(newNode, self.obstacleList):
             #  print("goal path is OK")
@@ -74,10 +76,14 @@ class RRT():
 
             newNode = self.steer(rnd, nind)
             #  print(newNode.cost)
+            if newNode is None:
+                continue
 
             if self.CollisionCheck(newNode, self.obstacleList):
                 nearinds = self.find_near_nodes(newNode)
                 newNode = self.choose_parent(newNode, nearinds)
+                if newNode is None:
+                    continue
 
                 self.nodeList.append(newNode)
                 self.rewire(newNode, nearinds)
@@ -96,6 +102,8 @@ class RRT():
         return flag, x, y, yaw, v, t, a, d
 
     def search_best_feasible_path(self, path_indexs):
+
+        print("Start search feasible path")
 
         best_time = float("inf")
 
@@ -189,6 +197,9 @@ class RRT():
         dlist = []
         for i in nearinds:
             tNode = self.steer(newNode, i)
+            if tNode is None:
+                continue
+
             if self.CollisionCheck(tNode, self.obstacleList):
                 dlist.append(tNode.cost)
             else:
@@ -202,6 +213,8 @@ class RRT():
             return newNode
 
         newNode = self.steer(newNode, minind)
+        if newNode is None:
+            return None
 
         return newNode
 
@@ -223,6 +236,9 @@ class RRT():
             nearestNode.x, nearestNode.y, nearestNode.yaw,
             rnd.x, rnd.y, rnd.yaw, unicycle_model.curvature_max, STEP_SIZE)
 
+        if px is None:
+            return None
+
         newNode = copy.deepcopy(nearestNode)
         newNode.x = px[-1]
         newNode.y = py[-1]
@@ -231,7 +247,7 @@ class RRT():
         newNode.path_x = px
         newNode.path_y = py
         newNode.path_yaw = pyaw
-        newNode.cost += sum(clen)
+        newNode.cost += sum([abs(c) for c in clen])
         newNode.parent = nind
 
         return newNode
@@ -307,6 +323,9 @@ class RRT():
         for i in nearinds:
             nearNode = self.nodeList[i]
             tNode = self.steer(nearNode, nnode - 1)
+
+            if tNode is None:
+                continue
 
             obstacleOK = self.CollisionCheck(tNode, self.obstacleList)
             imporveCost = nearNode.cost > tNode.cost

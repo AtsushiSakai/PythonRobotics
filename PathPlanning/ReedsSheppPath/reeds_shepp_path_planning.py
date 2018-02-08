@@ -369,7 +369,8 @@ def reeds_shepp_path_planning(sx, sy, syaw,
     paths = calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size)
 
     if len(paths) == 0:
-        print("No path")
+        #  print("No path")
+        #  print(sx, sy, syaw, gx, gy, gyaw)
         return None, None, None, None, None
 
     minL = float("Inf")
@@ -443,7 +444,7 @@ def main():
         start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature, step_size)
 
     if show_animation:
-        plt.plot(px, py, label="final course " + str(mode))
+        #  plt.plot(px, py, label="final course " + str(mode))
 
         # plotting
         plot_arrow(start_x, start_y, start_yaw)
