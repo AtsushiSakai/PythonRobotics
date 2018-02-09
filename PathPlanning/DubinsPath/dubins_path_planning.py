@@ -1,15 +1,15 @@
-#! /usr/bin/python
-# -*- coding: utf-8 -*-
 """
 
 Dubins path planner sample code
 
 author Atsushi Sakai(@Atsushi_twi)
 
-License MIT
-
 """
 import math
+import numpy as np
+import matplotlib.pyplot as plt
+
+show_animation = True
 
 
 def mod2pi(theta):
@@ -147,7 +147,7 @@ def dubins_path_planning_from_origin(ex, ey, eyaw, c):
     dx = ex
     dy = ey
     D = math.sqrt(dx ** 2.0 + dy ** 2.0)
-    d = D / c
+    d = D * c
     #  print(dx, dy, D, d)
 
     theta = mod2pi(math.atan2(dy, dx))
@@ -163,7 +163,6 @@ def dubins_path_planning_from_origin(ex, ey, eyaw, c):
     for planner in planners:
         t, p, q, mode = planner(alpha, beta, d)
         if t is None:
-            #  print("".join(mode) + " cannot generate path")
             continue
 
         cost = (abs(t) + abs(p) + abs(q))
@@ -213,14 +212,6 @@ def dubins_path_planning(sx, sy, syaw, ex, ey, eyaw, c):
     py = [- math.sin(-syaw) * x + math.cos(-syaw) *
           y + sy for x, y in zip(lpx, lpy)]
     pyaw = [pi_2_pi(iyaw + syaw) for iyaw in lpyaw]
-    #  print(syaw)
-    #  pyaw = lpyaw
-
-    #  plt.plot(pyaw, "-r")
-    #  plt.plot(lpyaw, "-b")
-    #  plt.plot(eyaw, "*r")
-    #  plt.plot(syaw, "*b")
-    #  plt.show()
 
     return px, py, pyaw, mode, clen
 
@@ -234,14 +225,14 @@ def generate_course(length, mode, c):
     for m, l in zip(mode, length):
         pd = 0.0
         if m is "S":
-            d = 1.0 / c
+            d = 1.0 * c
         else:  # turning couse
             d = math.radians(3.0)
 
         while pd < abs(l - d):
             #  print(pd, l)
-            px.append(px[-1] + d * c * math.cos(pyaw[-1]))
-            py.append(py[-1] + d * c * math.sin(pyaw[-1]))
+            px.append(px[-1] + d / c * math.cos(pyaw[-1]))
+            py.append(py[-1] + d / c * math.sin(pyaw[-1]))
 
             if m is "L":  # left turn
                 pyaw.append(pyaw[-1] + d)
@@ -252,8 +243,8 @@ def generate_course(length, mode, c):
             pd += d
         else:
             d = l - pd
-            px.append(px[-1] + d * c * math.cos(pyaw[-1]))
-            py.append(py[-1] + d * c * math.sin(pyaw[-1]))
+            px.append(px[-1] + d / c * math.cos(pyaw[-1]))
+            py.append(py[-1] + d / c * math.sin(pyaw[-1]))
 
             if m is "L":  # left turn
                 pyaw.append(pyaw[-1] + d)
@@ -267,10 +258,9 @@ def generate_course(length, mode, c):
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
-    u"""
+    """
     Plot arrow
     """
-    import matplotlib.pyplot as plt
 
     if not isinstance(x, float):
         for (ix, iy, iyaw) in zip(x, y, yaw):
@@ -281,9 +271,8 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
         plt.plot(x, y)
 
 
-if __name__ == '__main__':
+def main():
     print("Dubins path planner sample start!!")
-    import matplotlib.pyplot as plt
 
     start_x = 1.0  # [m]
     start_y = 1.0  # [m]
@@ -298,16 +287,58 @@ if __name__ == '__main__':
     px, py, pyaw, mode, clen = dubins_path_planning(start_x, start_y, start_yaw,
                                                     end_x, end_y, end_yaw, curvature)
 
-    plt.plot(px, py, label="final course " + "".join(mode))
+    if show_animation:
+        plt.plot(px, py, label="final course " + "".join(mode))
 
-    # plotting
-    plot_arrow(start_x, start_y, start_yaw)
-    plot_arrow(end_x, end_y, end_yaw)
+        # plotting
+        plot_arrow(start_x, start_y, start_yaw)
+        plot_arrow(end_x, end_y, end_yaw)
 
-    #  for (ix, iy, iyaw) in zip(px, py, pyaw):
-    #  plot_arrow(ix, iy, iyaw, fc="b")
+        #  for (ix, iy, iyaw) in zip(px, py, pyaw):
+        #  plot_arrow(ix, iy, iyaw, fc="b")
 
-    plt.legend()
-    plt.grid(True)
-    plt.axis("equal")
-    plt.show()
+        plt.legend()
+        plt.grid(True)
+        plt.axis("equal")
+        plt.show()
+
+
+def test():
+
+    NTEST = 5
+
+    for i in range(NTEST):
+        start_x = (np.random.rand() - 0.5) * 10.0  # [m]
+        start_y = (np.random.rand() - 0.5) * 10.0  # [m]
+        start_yaw = math.radians((np.random.rand() - 0.5) * 180.0)  # [rad]
+
+        end_x = (np.random.rand() - 0.5) * 10.0  # [m]
+        end_y = (np.random.rand() - 0.5) * 10.0  # [m]
+        end_yaw = math.radians((np.random.rand() - 0.5) * 180.0)  # [rad]
+
+        curvature = 1.0 / (np.random.rand() * 5.0)
+
+        px, py, pyaw, mode, clen = dubins_path_planning(
+            start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature)
+
+        if show_animation:
+            plt.cla()
+            plt.plot(px, py, label="final course " + str(mode))
+
+            #  plotting
+            plot_arrow(start_x, start_y, start_yaw)
+            plot_arrow(end_x, end_y, end_yaw)
+
+            plt.legend()
+            plt.grid(True)
+            plt.axis("equal")
+            plt.xlim(-10, 10)
+            plt.ylim(-10, 10)
+            plt.pause(1.0)
+
+    print("Test done")
+
+
+if __name__ == '__main__':
+    test()
+    main()

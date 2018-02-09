@@ -366,10 +366,7 @@ Ref:
 
 A sample code for Dubins path planning.
 
-
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DubinsPath/figures/figure_1.png?raw=True)
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DubinsPath/figures/figure_13.png?raw=True)
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DubinsPath/figures/figure_15.png?raw=True)
+![dubins](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DubinsPath/animation.gif?raw=True)
 
 Ref:
 
