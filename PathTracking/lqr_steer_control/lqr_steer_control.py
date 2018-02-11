@@ -5,11 +5,15 @@ Path tracking simulation with LQR steering control and PID speed control.
 author Atsushi Sakai (@Atsushi_twi)
 
 """
+
+import sys
+sys.path.append("../../PathPlanning/CubicSpline/")
+
 import numpy as np
 import math
 import matplotlib.pyplot as plt
 import scipy.linalg as la
-from pycubicspline import pycubicspline
+import cubic_spline_planner
 
 Kp = 1.0  # speed proportional gain
 
@@ -250,7 +254,8 @@ def main():
     ay = [0.0, -3.0, -5.0, 6.5, 3.0, 5.0, -2.0]
     goal = [ax[-1], ay[-1]]
 
-    cx, cy, cyaw, ck, s = pycubicspline.calc_spline_course(ax, ay, ds=0.1)
+    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+        ax, ay, ds=0.1)
     target_speed = 10.0 / 3.6  # simulation parameter km/h -> m/s
 
     sp = calc_speed_profile(cx, cy, cyaw, target_speed)
