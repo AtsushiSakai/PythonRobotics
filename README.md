@@ -86,7 +86,7 @@ This is a sensor fusion localization with Extended Kalman Filter(EKF).
 
 The blue line is true trajectory, the black line is dead reckoning trajectory,
 
-the gren point is positioning observation (ex. GPS), and the red line is estimated trajectory with EKF.
+the green point is positioning observation (ex. GPS), and the red line is estimated trajectory with EKF.
 
 The red ellipse is estimated covariance ellipse with EKF.
 
@@ -112,7 +112,7 @@ The blue line is true trajectory, the black line is dead reckoning trajectory,
 
 and the red line is estimated trajectory with PF.
 
-It is assumued that the robot can measure a distance from landmarks (RFID).
+It is assumed that the robot can measure a distance from landmarks (RFID).
 
 This measurements are used for PF localization.
 
@@ -126,7 +126,6 @@ This is a 2D navigation sample code with Dynamic Window Approach.
 
 ![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/DynamicWindowApproach/animation.gif)
 
- 
 
 ## Grid based search
 
@@ -161,7 +160,6 @@ Ref:
 - [Robotic Motion Planning:Potential Functions](https://www.cs.cmu.edu/~motionplanning/lecture/Chap4-Potential-Field_howie.pdf)
 
 
-
 ## Model Predictive Trajectory Generator
 
 This is a path optimization sample on model predictive trajectory generator.
@@ -180,7 +178,6 @@ Ref:
 
 - [Optimal rough terrain trajectory generation for wheeled mobile robots](http://journals.sagepub.com/doi/pdf/10.1177/0278364906075328)
 
-　
 
 ## State Lattice Planning
 
@@ -259,7 +256,7 @@ Ref:
 
 - [Incremental Sampling-based Algorithms for Optimal Motion Planning](https://arxiv.org/abs/1005.0416)
 
-- [Sampling-based Algorithms for Optimal Motion Planningj](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.419.5503&rep=rep1&type=pdf)
+- [Sampling-based Algorithms for Optimal Motion Planning](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.419.5503&rep=rep1&type=pdf)
 
 
 ### RRT with dubins path 
@@ -344,10 +341,9 @@ You can get different Beizer course:
 ![Bezier2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/BezierPath/Figure_2.png?raw=True)
 
  
-
 Ref:
 
-- [Continuous Curvature Path Generation Based on B ́ezier Curves for Autonomous Vehicles](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.294.6438&rep=rep1&type=pdf)
+- [Continuous Curvature Path Generation Based on Bezier Curves for Autonomous Vehicles](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.294.6438&rep=rep1&type=pdf)
 
 ## Quintic polynomials planning
 
@@ -477,7 +473,7 @@ Path tracking simulation with iterative linear model predictive speed and steeri
 
 <img src="https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif" width="640">
 
-This code uses cvxpy as an optimization modeling tool,
+This code uses cvxpy as an optimization modeling tool.
 
 - [Welcome to CVXPY 1\.0 — CVXPY 1\.0\.0 documentation](https://cvxgrp.github.io/cvxpy/index.html)
 
@@ -489,9 +485,5 @@ MIT
 # Author
 
 Atsushi Sakai ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
-
-
-
-
 
 
