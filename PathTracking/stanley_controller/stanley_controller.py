@@ -5,10 +5,12 @@ Path tracking simulation with Stanley steering control and PID speed control.
 author: Atsushi Sakai (@Atsushi_twi)
 
 """
+import sys
+sys.path.append("../../PathPlanning/CubicSpline/")
+
 import math
 import matplotlib.pyplot as plt
-
-from pycubicspline import pycubicspline
+import cubic_spline_planner
 
 
 k = 0.5  # control gain
@@ -100,7 +102,8 @@ def main():
     ax = [0.0, 100.0, 100.0, 50.0, 60.0]
     ay = [0.0, 0.0, -30.0, -20.0, 0.0]
 
-    cx, cy, cyaw, ck, s = pycubicspline.calc_spline_course(ax, ay, ds=0.1)
+    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+        ax, ay, ds=0.1)
 
     target_speed = 30.0 / 3.6  # [m/s]
 

@@ -5,9 +5,13 @@ Path tracking simulation with rear wheel feedback steering control and PID speed
 author: Atsushi Sakai(@Atsushi_twi)
 
 """
+import sys
+sys.path.append("../../PathPlanning/CubicSpline/")
+
 import math
 import matplotlib.pyplot as plt
-from pycubicspline import pycubicspline
+import cubic_spline_planner
+
 
 Kp = 1.0  # speed propotional gain
 # steering control parameter
@@ -188,7 +192,8 @@ def main():
     ay = [0.0, 0.0, 5.0, 6.5, 3.0, 5.0, -2.0]
     goal = [ax[-1], ay[-1]]
 
-    cx, cy, cyaw, ck, s = pycubicspline.calc_spline_course(ax, ay, ds=0.1)
+    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+        ax, ay, ds=0.1)
     target_speed = 10.0 / 3.6
 
     sp = calc_speed_profile(cx, cy, cyaw, target_speed)

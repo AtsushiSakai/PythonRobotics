@@ -5,12 +5,14 @@ Path tracking simulation with iterative linear model predictive control for spee
 author: Atsushi Sakai (@Atsushi_twi)
 
 """
+import sys
+sys.path.append("../../PathPlanning/CubicSpline/")
 
 import numpy as np
 import math
 import cvxpy
 import matplotlib.pyplot as plt
-from pycubicspline import pycubicspline
+import cubic_spline_planner
 
 NX = 4  # x = x, y, v, yaw
 NU = 2  # a = [accel, steer]
@@ -482,7 +484,8 @@ def smooth_yaw(yaw):
 def get_forward_course(dl):
     ax = [0.0, 60.0, 125.0, 50.0, 75.0, 30.0, -10.0]
     ay = [0.0, 0.0, 50.0, 65.0, 30.0, 50.0, -20.0]
-    cx, cy, cyaw, ck, s = pycubicspline.calc_spline_course(ax, ay, ds=dl)
+    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+        ax, ay, ds=dl)
 
     return cx, cy, cyaw, ck
 
@@ -490,10 +493,12 @@ def get_forward_course(dl):
 def get_switch_back_course(dl):
     ax = [0.0, 30.0, 6.0, 20.0, 35.0]
     ay = [0.0, 0.0, 20.0, 35.0, 20.0]
-    cx, cy, cyaw, ck, s = pycubicspline.calc_spline_course(ax, ay, ds=dl)
+    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+        ax, ay, ds=dl)
     ax = [35.0, 10.0, 0.0, 0.0]
     ay = [20.0, 30.0, 5.0, 0.0]
-    cx2, cy2, cyaw2, ck2, s2 = pycubicspline.calc_spline_course(ax, ay, ds=dl)
+    cx2, cy2, cyaw2, ck2, s2 = cubic_spline_planner.calc_spline_course(
+        ax, ay, ds=dl)
     cyaw2 = [i - math.pi for i in cyaw2]
     cx.extend(cx2)
     cy.extend(cy2)
