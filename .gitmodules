@@ -1,12 +1,6 @@
 [submodule "PathTracking/rear_wheel_feedback/pycubicspline"]
 	path = PathTracking/rear_wheel_feedback/pycubicspline
 	url = https://github.com/AtsushiSakai/pycubicspline.git
-[submodule "PathTracking/lqr/matplotrecorder"]
-	path = PathTracking/lqr/matplotrecorder
-	url = https://github.com/AtsushiSakai/matplotrecorder
-[submodule "PathTracking/lqr/pycubicspline"]
-	path = PathTracking/lqr/pycubicspline
-	url = https://github.com/AtsushiSakai/pycubicspline.git
 [submodule "PathPlanning/LatticePlanner/matplotrecorder"]
 	path = PathPlanning/LatticePlanner/matplotrecorder
 	url = https://github.com/AtsushiSakai/matplotrecorder.git
@@ -24,9 +18,6 @@
 	url = https://github.com/AtsushiSakai/matplotrecorder
 [submodule "PathTracking/stanley_controller/pycubicspline"]
 	path = PathTracking/stanley_controller/pycubicspline
-	url = https://github.com/AtsushiSakai/pycubicspline
-[submodule "PathTracking/lqr_steer_control/pycubicspline"]
-	path = PathTracking/lqr_steer_control/pycubicspline
 	url = https://github.com/AtsushiSakai/pycubicspline
 [submodule "PathTracking/lqr_speed_steer_control/pycubicspline"]
 	path = PathTracking/lqr_speed_steer_control/pycubicspline
