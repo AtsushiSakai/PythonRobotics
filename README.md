@@ -5,6 +5,7 @@
 
 Python codes for robotics algorithm.
 
+
 # Table of Contents
    * [Requirements](#requirements)
    * [How to use](#how-to-use)
@@ -50,6 +51,7 @@ Python codes for robotics algorithm.
       * [Linear–quadratic regulator (LQR) speed and steering control](#linearquadratic-regulator-lqr-speed-and-steering-control)
       * [Model predictive speed and steering control](#model-predictive-speed-and-steering-control)
    * [License](#license)
+   * [Contribution](#contribution)
    * [Author](#author)
 
 # Requirements
@@ -482,8 +484,15 @@ This code uses cvxpy as an optimization modeling tool.
 
 MIT
 
+# Contribution
+
+If you have any quesions or problems about this code, feel free to add an issue.
+
+A small PR like bug fix is welcome.
+
 # Author
 
 Atsushi Sakai ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
+
 
 
