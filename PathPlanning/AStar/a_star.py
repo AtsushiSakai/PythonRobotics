@@ -1,13 +1,13 @@
 """
 A* grid based planning
 
-author: Atsushi Sakai
+author: Atsushi Sakai(@Atsushi_twi)
 """
 
 import matplotlib.pyplot as plt
 import math
-from matplotrecorder import matplotrecorder
-matplotrecorder.donothing = True
+
+show_animation = True
 
 
 class Node:
@@ -20,6 +20,19 @@ class Node:
 
     def __str__(self):
         return str(self.x) + "," + str(self.y) + "," + str(self.cost) + "," + str(self.pind)
+
+
+def calc_fianl_path(ngoal, closedset, reso):
+    # generate final course
+    rx, ry = [ngoal.x * reso], [ngoal.y * reso]
+    pind = ngoal.pind
+    while pind != -1:
+        n = closedset[pind]
+        rx.append(n.x * reso)
+        ry.append(n.y * reso)
+        pind = n.pind
+
+    return rx, ry
 
 
 def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
@@ -51,10 +64,10 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
         #  print("current", current)
 
         # show graph
-        plt.plot(current.x * reso, current.y * reso, "xc")
-        if len(closedset.keys()) % 10 == 0:
-            plt.pause(0.001)
-            matplotrecorder.save_frame()
+        if show_animation:
+            plt.plot(current.x * reso, current.y * reso, "xc")
+            if len(closedset.keys()) % 10 == 0:
+                plt.pause(0.001)
 
         if current.x == ngoal.x and current.y == ngoal.y:
             print("Find goal")
@@ -86,14 +99,7 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
             else:
                 openset[n_id] = node
 
-    # generate final course
-    rx, ry = [ngoal.x * reso], [ngoal.y * reso]
-    pind = ngoal.pind
-    while pind != -1:
-        n = closedset[pind]
-        rx.append(n.x * reso)
-        ry.append(n.y * reso)
-        pind = n.pind
+    rx, ry = calc_fianl_path(ngoal, closedset, reso)
 
     return rx, ry
 
@@ -182,8 +188,7 @@ def main():
     grid_size = 1.0  # [m]
     robot_size = 1.0  # [m]
 
-    ox = []
-    oy = []
+    ox, oy = [], []
 
     for i in range(60):
         ox.append(i)
@@ -204,21 +209,18 @@ def main():
         ox.append(40.0)
         oy.append(60.0 - i)
 
-    plt.plot(ox, oy, ".k")
-    plt.plot(sx, sy, "xr")
-    plt.plot(gx, gy, "xb")
-    plt.grid(True)
-    plt.axis("equal")
+    if show_animation:
+        plt.plot(ox, oy, ".k")
+        plt.plot(sx, sy, "xr")
+        plt.plot(gx, gy, "xb")
+        plt.grid(True)
+        plt.axis("equal")
 
     rx, ry = a_star_planning(sx, sy, gx, gy, ox, oy, grid_size, robot_size)
 
-    plt.plot(rx, ry, "-r")
-
-    for i in range(20):
-        matplotrecorder.save_frame()
-    plt.show()
-
-    matplotrecorder.save_movie("animation.gif", 0.1)
+    if show_animation:
+        plt.plot(rx, ry, "-r")
+        plt.show()
 
 
 if __name__ == '__main__':
