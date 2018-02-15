@@ -6,6 +6,9 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
+from scipy.stats import norm
+import math
+
 
 #  function gm=RayCastingUpdate(gm,z)
 #  %レイキャスティングによるGridの更新
@@ -64,85 +67,44 @@ author: Atsushi Sakai (@Atsushi_twi)
 #  end
 #  gm.precasting=precasting;%Grid Mapデータに追加
 
-
-#  function gm=LikelihoodUpdate(gm,z)
-#  %尤度場のGridMapを作る関数
-
-#  for ig=1:(gm.nGrid-1)
-#  gxy=GetXYFromDataIndex(ig,gm);%それぞれのグリッドxyインデックスを取得
-#  zxy=FindNearest(gxy,z);%最近傍の観測値の取得
-#  p=GaussLikelihood(gxy,zxy);%ガウシアン尤度の計算
-#  gm.data(ig)=p*10;%グリッドへの格納
-#  end
-
-#  function p=GaussLikelihood(gxy,zxy)
-#  %ガウス分布の尤度を計算する関数
-#  Sigma=diag([3,3]);%共分散行列
-#  p=det(2*pi*Sigma)^(-0.5)*exp(-0.5*(gxy-zxy)*inv(Sigma)*(gxy-zxy)');
-
-#  function zxy=FindNearest(xy,z)
-#  %ある座標値xyに一番近いzの値を返す関数
-
-#  %すべてのzとxyの差を計算
-#  d=z.data(:,3:4)-repmat(xy,length(z.data(:,1)),1);
-
-#  %ノルム距離の最小値のインデックスを取得
-#  min=inf;%最小値
-#  minid=0;
-#  for id=1:length(d(:,1))
-#  nd=norm(d(id,:));
-#  if min>nd
-#  min=nd;
-#  minid=id;
-#  end
-#  end
-#  zxy=z.data(minid,3:4);
-
-#  function xy=GetXYFromDataIndex(ig,gm)
-#  %Gridのデータインデックスから,そのグリッドのx,y座標を取得する関数
-
-#  %x,yインデックスの取得
-#  indy=rem(ig,gm.WIDTH)-1;
-#  indx=fix(ig/gm.WIDTH);
-
-#  x=GetXYPosition(indx,gm.WIDTH,gm.RESO);
-#  y=GetXYPosition(indy,gm.HEIGHT,gm.RESO);
-#  xy=[x y];
-
-#  function position=GetXYPosition(index, width, resolution)
-#  %x-yインデックスの値から、位置を取得する関数
-#  position=resolution*(index-width/2)+resolution/2;
-
-#  function gm=HitGridUpdate(gm,z)
-#  %観測点がヒットしたグリッドの確率を1にする関数
-
-#  for iz=1:length(z.data(:,1))
-#  zx=z.data(iz,3);
-#  zy=z.data(iz,4);
-#  ind=GetDBIndexFromXY(zx,zy,gm);
-#  gm.data(ind)=1.0;
-#  end
-#  gm.data=Normalize(gm.data);%正規化
-
-#  function z=GetObservation()
-#  %観測点をセンサのモデルに基いて、ランダムに取得する関数
-#  z.data=[];% 観測値[range, angle x y;...]
-#  z.ANGLE_TICK=10;%スキャンレーザの角度解像度[deg]
-#  z.MAX_RANGE=50;%スキャンレーザの最大観測距離[m]
-#  z.MIN_RANGE=5;%スキャンレーザの最小さい観測距離[m]
-
-#  for angle=0:z.ANGLE_TICK:360
-#  range=rand()*(z.MAX_RANGE-z.MIN_RANGE)+z.MIN_RANGE;
-#  rad=toRadian(angle);
-#  x=range*cos(rad);
-#  y=range*sin(rad);
-#  z.data=[z.data;[range rad x y]];
-#  end
-
 import numpy as np
 import matplotlib.pyplot as plt
 
 AREA_WIDTH = 30.0
+
+
+def generate_gaussian_grid_map(ox, oy, reso):
+
+    minx = min(ox) - AREA_WIDTH / 2.0
+    miny = min(oy) - AREA_WIDTH / 2.0
+    maxx = max(ox) + AREA_WIDTH / 2.0
+    maxy = max(oy) + AREA_WIDTH / 2.0
+    xw = round((maxx - minx) / reso)
+    yw = round((maxy - miny) / reso)
+
+    # calc each potential
+    pmap = [[0.0 for i in range(yw)] for i in range(xw)]
+
+    STD = 10.0  # standard diviation
+
+    for ix in range(xw):
+        for iy in range(yw):
+
+            x = ix / reso + minx
+            y = iy / reso + miny
+
+            # Search minimum distance
+            mindis = float("inf")
+            for (iox, ioy) in zip(ox, oy):
+                d = math.sqrt((iox - x)**2 + (ioy - y)**2)
+                if mindis >= d:
+                    mindis = d
+
+            pdf = (1.0 - norm.cdf(mindis, 0.0, STD))
+            pmap[ix][iy] = pdf
+
+    draw_heatmap(pmap)
+    plt.show()
 
 
 def generate_ray_casting_grid_map(ox, oy, reso):
@@ -164,24 +126,27 @@ def generate_ray_casting_grid_map(ox, oy, reso):
 
         pmap[ix][iy] = 100.0
 
+        #  print(norm.cdf(x, mean, std))
+
     draw_heatmap(pmap)
     plt.show()
 
 
 def draw_heatmap(data):
     data = np.array(data).T
-    plt.pcolor(data, vmax=100.0, cmap=plt.cm.Blues)
+    plt.pcolor(data, vmax=1.0, cmap=plt.cm.Blues)
     plt.axis("equal")
 
 
 def main():
     print(__file__ + " start!!")
 
-    ox = [0.0, 5.0]
-    oy = [0.0, 5.0]
+    ox = [0.0, 5.0, 0.0]
+    oy = [0.0, 5.0, 10.0]
     reso = 1.0
 
-    generate_ray_casting_grid_map(ox, oy, reso)
+    generate_gaussian_grid_map(ox, oy, reso)
+    #  generate_ray_casting_grid_map(ox, oy, reso)
 
 
 if __name__ == '__main__':
