@@ -6,69 +6,10 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-from scipy.stats import norm
 import math
-
-
-#  function gm=RayCastingUpdate(gm,z)
-#  %レイキャスティングによるGridの更新
-
-#  %事前レイキャスティングモデルの作成
-#  gm=PreCasting(gm,z.ANGLE_TICK);
-
-#  rayId=0;
-#  %事前レイキャスティングモデルに従ってグリッドの確率の更新
-#  for iz=1:length(z.data(:,1))%それぞれの観測点に対して
-#  range=z.data(iz,1);
-
-#  rayId=rayId+1;%レイキャスティングクラスタにおけるデータID
-#  %各観測点はそれぞれのクラスタから取得できるとする。
-
-#  %クラスタ内の各gridのデータからビームモデルによるupdate
-#  for ir=1:length(gm.precasting(rayId).grid(:,1))
-#  grange=gm.precasting(rayId).grid(ir,1);
-#  gid=gm.precasting(rayId).grid(ir,5);
-
-#  if grange<(range-gm.RESO/2) %free
-#  gm.data(gid)=0;
-#  elseif grange<(range+gm.RESO/2) %hit
-#  gm.data(gid)=1;
-#  end %それ以上の距離のgridはunknownなので何もしない
-#  end
-#  end
-
-#  function gm=PreCasting(gm,angleTick)
-#  %事前レイキャスティングモデルの作成
-
-#  %各角度について対応するグリッドを追加していく
-#  precasting=[];%プレキャスティングの結果 [最小角度,最大角度,中に入るgridのデータ]
-#  for ia=(0-angleTick/2):angleTick:(360+angleTick/2)
-#  %角度範囲の保存
-#  ray.minAngle=ia;
-#  ray.maxAngle=ia+angleTick;
-#  grid=[];%角度範囲に入ったグリッドのデータ
-#  for ig=1:(gm.nGrid)
-#  %各グリッドのxy値を取得
-#  gxy=GetXYFromDataIndex(ig,gm);
-#  range=norm(gxy);
-#  angle=atan2(gxy(2),gxy(1));
-#  if angle<0 %[0 360]度に変換
-#  angle=angle+2*pi;
-#  end
-#  if ray.minAngle<=toDegree(angle) && ray.maxAngle>=toDegree(angle)
-#  grid=[grid;[range,angle,gxy,ig]];
-#  end
-#  end
-#  %rangeの値でソーティングしておく
-#  if ~isempty(grid)
-#  ray.grid=sortrows(grid,1);
-#  end
-#  precasting=[precasting;ray];
-#  end
-#  gm.precasting=precasting;%Grid Mapデータに追加
-
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.stats import norm
 
 AREA_WIDTH = 30.0
 
@@ -107,6 +48,50 @@ def generate_gaussian_grid_map(ox, oy, reso):
     plt.show()
 
 
+class precastDB:
+
+    def __init__(self):
+        self.px = 0.0
+        self.py = 0.0
+        self.d = 0.0
+        self.angle = 0.0
+        self.ix = 0
+        self.iy = 0
+
+    def __str__(self):
+        return str(self.px) + "," + str(self.py) + "," + str(self.d) + "," + str(self.angle)
+
+
+def precasting(minx, miny, xw, yw, reso, yawreso):
+
+    precast = [[] for i in range(round((math.pi * 2.0) / yawreso) + 1)]
+
+    for ix in range(xw):
+        for iy in range(yw):
+            px = ix / reso + minx
+            py = iy / reso + miny
+
+            d = math.sqrt(px**2 + py**2)
+            angle = math.atan2(py, px)
+            if angle < 0.0:
+                angle += math.pi * 2.0
+
+            angleid = round(angle / yawreso)
+
+            pc = precastDB()
+
+            pc.px = px
+            pc.py = py
+            pc.d = d
+            pc.ix = ix
+            pc.iy = iy
+            pc.angle = angle
+
+            precast[angleid].append(pc)
+
+    return precast
+
+
 def generate_ray_casting_grid_map(ox, oy, reso):
 
     minx = min(ox) - AREA_WIDTH / 2.0
@@ -116,17 +101,30 @@ def generate_ray_casting_grid_map(ox, oy, reso):
     xw = round((maxx - minx) / reso)
     yw = round((maxy - miny) / reso)
 
-    # calc each potential
     pmap = [[0.0 for i in range(yw)] for i in range(xw)]
 
+    yawreso = math.radians(10.0)
+
+    precast = precasting(minx, miny, xw, yw, reso, yawreso)
+
     for (x, y) in zip(ox, oy):
+
+        d = math.sqrt(x**2 + y**2)
+        angle = math.atan2(y, x)
+
+        angleid = round(angle / yawreso)
+
+        gridlist = precast[angleid]
 
         ix = round(x * reso - minx)
         iy = round(y * reso - miny)
 
-        pmap[ix][iy] = 100.0
+        for grid in gridlist:
 
-        #  print(norm.cdf(x, mean, std))
+            if ix == grid.ix and iy == grid.iy:
+                pmap[grid.ix][grid.iy] = 1.0
+            elif grid.d > d:
+                pmap[grid.ix][grid.iy] = 0.5
 
     draw_heatmap(pmap)
     plt.show()
@@ -141,12 +139,13 @@ def draw_heatmap(data):
 def main():
     print(__file__ + " start!!")
 
-    ox = [0.0, 5.0, 0.0]
-    oy = [0.0, 5.0, 10.0]
+    # obstacle positions
+    ox = [-5.0, 5.0, 0.0, 10.0]
+    oy = [0.0, 5.0, 10.0, -5.0]
     reso = 1.0
 
-    generate_gaussian_grid_map(ox, oy, reso)
-    #  generate_ray_casting_grid_map(ox, oy, reso)
+    #  generate_gaussian_grid_map(ox, oy, reso)
+    generate_ray_casting_grid_map(ox, oy, reso)
 
 
 if __name__ == '__main__':
