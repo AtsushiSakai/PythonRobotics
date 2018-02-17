@@ -11,22 +11,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 
-AREA_WIDTH = 30.0
+AREA_WIDTH = 10.0
+
+STD = 10.0  # standard diviation
 
 
 def generate_gaussian_grid_map(ox, oy, xyreso):
 
-    minx = min(ox) - AREA_WIDTH / 2.0
-    miny = min(oy) - AREA_WIDTH / 2.0
-    maxx = max(ox) + AREA_WIDTH / 2.0
-    maxy = max(oy) + AREA_WIDTH / 2.0
-    xw = round((maxx - minx) / xyreso)
-    yw = round((maxy - miny) / xyreso)
+    minx, miny, maxx, maxy, xw, yw = calc_grid_map_config(ox, oy, xyreso)
 
     # calc each potential
     pmap = [[0.0 for i in range(yw)] for i in range(xw)]
-
-    STD = 10.0  # standard diviation
 
     for ix in range(xw):
         for iy in range(yw):
@@ -46,7 +41,18 @@ def generate_gaussian_grid_map(ox, oy, xyreso):
 
     draw_heatmap(pmap, minx, maxx, miny, maxy, xyreso)
     plt.plot(ox, oy, "xr")
-    plt.show()
+    plt.plot(0.0, 0.0, "ob")
+
+
+def calc_grid_map_config(ox, oy, xyreso):
+    minx = round(min(ox) - AREA_WIDTH / 2.0)
+    miny = round(min(oy) - AREA_WIDTH / 2.0)
+    maxx = round(max(ox) + AREA_WIDTH / 2.0)
+    maxy = round(max(oy) + AREA_WIDTH / 2.0)
+    xw = int(round((maxx - minx) / xyreso))
+    yw = int(round((maxy - miny) / xyreso))
+
+    return minx, miny, maxx, maxy, xw, yw
 
 
 class precastDB:
@@ -95,12 +101,7 @@ def precasting(minx, miny, xw, yw, xyreso, yawreso):
 
 def generate_ray_casting_grid_map(ox, oy, xyreso):
 
-    minx = min(ox) - AREA_WIDTH / 2.0
-    miny = min(oy) - AREA_WIDTH / 2.0
-    maxx = max(ox) + AREA_WIDTH / 2.0
-    maxy = max(oy) + AREA_WIDTH / 2.0
-    xw = round((maxx - minx) / xyreso)
-    yw = round((maxy - miny) / xyreso)
+    minx, miny, maxx, maxy, xw, yw = calc_grid_map_config(ox, oy, xyreso)
 
     pmap = [[0.0 for i in range(yw)] for i in range(xw)]
 
@@ -119,39 +120,42 @@ def generate_ray_casting_grid_map(ox, oy, xyreso):
 
         gridlist = precast[angleid]
 
-        ix = round((x - minx) / xyreso)
-        iy = round((y - miny) / xyreso)
-
-        pmap[ix][iy] = 1.0
+        ix = int(round((x - minx) / xyreso))
+        iy = int(round((y - miny) / xyreso))
 
         for grid in gridlist:
-
             if grid.d > (d):
                 pmap[grid.ix][grid.iy] = 0.5
 
+        pmap[ix][iy] = 1.0
+
     draw_heatmap(pmap, minx, maxx, miny, maxy, xyreso)
-    plt.show()
+    plt.plot(ox, oy, "xr")
+    plt.plot(0.0, 0.0, "ob")
 
 
 def draw_heatmap(data, minx, maxx, miny, maxy, xyreso):
-    y, x = np.mgrid[slice(minx, maxx + xyreso, xyreso),
-                    slice(miny, maxy + xyreso, xyreso)]
-    #  print(y)
-    #  data = np.array(data).T
-    plt.pcolor(data, vmax=1.0, cmap=plt.cm.Blues)
+    x, y = np.mgrid[slice(minx - xyreso / 2.0, maxx + xyreso / 2.0, xyreso),
+                    slice(miny - xyreso / 2.0, maxy + xyreso / 2.0, xyreso)]
+    plt.pcolor(x, y, data, vmax=1.0, cmap=plt.cm.Blues)
     plt.axis("equal")
 
 
 def main():
     print(__file__ + " start!!")
 
-    # obstacle positions
-    ox = [-5.0, 5.0, 0.0, 10.0]
-    oy = [0.0, 5.0, 10.0, -5.0]
     xyreso = 0.5
 
-    #  generate_gaussian_grid_map(ox, oy, xyreso)
-    generate_ray_casting_grid_map(ox, oy, xyreso)
+    for i in range(5):
+        ox = (np.random.rand(4) - 0.5) * 10.0
+        oy = (np.random.rand(4) - 0.5) * 10.0
+        plt.cla()
+        generate_gaussian_grid_map(ox, oy, xyreso)
+        plt.pause(1.0)
+
+        plt.cla()
+        generate_ray_casting_grid_map(ox, oy, xyreso)
+        plt.pause(1.0)
 
 
 if __name__ == '__main__':
