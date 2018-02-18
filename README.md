@@ -13,6 +13,8 @@ Python codes for robotics algorithm.
       * [Extended Kalman Filter localization](#extended-kalman-filter-localization)
       * [Unscented Kalman Filter localization](#unscented-kalman-filter-localization)
       * [Particle Filter localization](#particle-filter-localization)
+   * [Mapping](#mapping)
+      * [Gaussian Grid Map](#gaussian-grid-map)
    * [Path Planning](#path-planning)
       * [Dynamic Window Approach](#dynamic-window-approach)
       * [Grid based search](#grid-based-search)
@@ -120,7 +122,7 @@ This measurements are used for PF localization.
 
 # Mapping
 
-# Gaussian Grid Map
+## Gaussian Grid Map
 
 This is a 2D gaussian grid mapping example.
 
@@ -501,6 +503,8 @@ A small PR like bug fix is welcome.
 # Author
 
 Atsushi Sakai ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
+
+
 
 
 
