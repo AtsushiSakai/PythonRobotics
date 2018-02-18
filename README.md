@@ -118,6 +118,14 @@ It is assumed that the robot can measure a distance from landmarks (RFID).
 
 This measurements are used for PF localization.
 
+# Mapping
+
+# Gaussian Grid Map
+
+This is a 2D gaussian grid mapping example.
+
+![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/Mapping/gaussian_grid_map/animation.gif)
+
 # Path Planning
 
 ## Dynamic Window Approach
