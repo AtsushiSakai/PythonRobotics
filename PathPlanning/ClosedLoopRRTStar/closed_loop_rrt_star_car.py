@@ -107,6 +107,8 @@ class RRT():
 
         best_time = float("inf")
 
+        fx = None
+
         # pure pursuit tracking
         for ind in path_indexs:
             path = self.gen_final_course(ind)
