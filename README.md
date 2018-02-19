@@ -128,6 +128,14 @@ This is a 2D gaussian grid mapping example.
 
 ![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/Mapping/gaussian_grid_map/animation.gif)
 
+## Ray casting Grid Map
+
+This is a 2D ray casting grid mapping example.
+
+![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/Mapping/raycasting_grid_map/animation.gif)
+
+
+
 # Path Planning
 
 ## Dynamic Window Approach
