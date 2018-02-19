@@ -66,6 +66,10 @@ class RRT():
         # generate coruse
         lastIndex = self.get_best_last_index()
         #  print(lastIndex)
+
+        if lastIndex is None:
+            return None
+
         path = self.gen_final_course(lastIndex)
         return path
 
