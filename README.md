@@ -6,6 +6,7 @@
 Python codes for robotics algorithm.
 
 
+
 # Table of Contents
    * [Requirements](#requirements)
    * [How to use](#how-to-use)
@@ -14,7 +15,8 @@ Python codes for robotics algorithm.
       * [Unscented Kalman Filter localization](#unscented-kalman-filter-localization)
       * [Particle Filter localization](#particle-filter-localization)
    * [Mapping](#mapping)
-      * [Gaussian Grid Map](#gaussian-grid-map)
+      * [Gaussian grid map](#gaussian-grid-map)
+      * [Ray casting grid map](#ray-casting-grid-map)
    * [Path Planning](#path-planning)
       * [Dynamic Window Approach](#dynamic-window-approach)
       * [Grid based search](#grid-based-search)
@@ -122,13 +124,13 @@ This measurements are used for PF localization.
 
 # Mapping
 
-## Gaussian Grid Map
+## Gaussian grid map
 
 This is a 2D gaussian grid mapping example.
 
 ![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/Mapping/gaussian_grid_map/animation.gif)
 
-## Ray casting Grid Map
+## Ray casting grid map
 
 This is a 2D ray casting grid mapping example.
 
@@ -511,6 +513,7 @@ A small PR like bug fix is welcome.
 # Author
 
 Atsushi Sakai ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
+
 
 
 
