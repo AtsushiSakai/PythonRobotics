@@ -6,7 +6,6 @@
 Python codes for robotics algorithm.
 
 
-
 # Table of Contents
    * [Requirements](#requirements)
    * [How to use](#how-to-use)
@@ -469,12 +468,16 @@ Ref:
 - [Automatic Steering Methods for Autonomous Automobile Path Tracking](https://www.ri.cmu.edu/pub_files/2009/2/Automatic_Steering_Methods_for_Autonomous_Automobile_Path_Tracking.pdf)
 
 
-
 ## Rear wheel feedback control
 
 Path tracking simulation with rear wheel feedback steering control and PID speed control.
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/rear_wheel_feedback/animation.gif)
+
+Ref:
+
+- [A Survey of Motion Planning and Control Techniques for Self-driving Urban Vehicles](https://arxiv.org/abs/1604.07446)
+
 
 ## Linear–quadratic regulator (LQR) steering control
 
@@ -482,11 +485,20 @@ Path tracking simulation with LQR steering control and PID speed control.
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/lqr_steer_control/animation.gif)
 
+Ref:
+
+- [ApolloAuto/apollo: An open autonomous driving platform](https://github.com/ApolloAuto/apollo)
+
+
 ## Linear–quadratic regulator (LQR) speed and steering control
 
 Path tracking simulation with LQR speed and steering control.
 
 ![3](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/lqr_speed_steer_control/animation.gif)
+
+Ref:
+
+- [Towards fully autonomous driving: Systems and algorithms \- IEEE Conference Publication](http://ieeexplore.ieee.org/document/5940562/)
 
 
 ## Model predictive speed and steering control
@@ -498,6 +510,12 @@ Path tracking simulation with iterative linear model predictive speed and steeri
 This code uses cvxpy as an optimization modeling tool.
 
 - [Welcome to CVXPY 1\.0 — CVXPY 1\.0\.0 documentation](https://cvxgrp.github.io/cvxpy/index.html)
+
+Ref:
+
+- [Vehicle Dynamics and Control \| Rajesh Rajamani \| Springer](http://www.springer.com/us/book/9781461414322)
+
+- [MPC Course Material \- MPC Lab @ UC\-Berkeley](http://www.mpc.berkeley.edu/mpc-course-material)
 
 
 # License 
