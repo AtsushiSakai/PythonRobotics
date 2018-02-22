@@ -84,10 +84,30 @@ import matplotlib.pyplot as plt
 #  R = (U*V')';%回転行列の計算
 #  t = mm - R*ms;%並進ベクトルの計算
 
+def update_homogenerous_matrix(Hin, R, T):
+    print(R)
+
+    H = np.matrix(np.zeros((3, 3)))  # translation vector
+
+    H[0, 0] = R[0, 0]
+    H[1, 0] = R[1, 0]
+    H[0, 1] = R[0, 1]
+    H[1, 1] = R[1, 1]
+    H[2, 2] = 1.0
+
+    H[0, 2] = T[0, 0]
+    H[1, 2] = T[1, 0]
+
+    if Hin is None:
+        return H
+    else:
+        return Hin * H
+
 
 def ICP_matching(pdata, data):
     R = np.eye(2)  # rotation matrix
     T = np.zeros((2, 1))  # translation vector
+    H = None  # translation vector
 
     #  ICP
     EPS = 0.0001
@@ -102,11 +122,10 @@ def ICP_matching(pdata, data):
 
         error = nearest_neighbor_assosiation(pdata, data)
         Rt, Tt = SVD_motion_estimation(pdata, data)
-        print(error)
 
         data = (Rt * data) + Tt
-        R = R * Rt
-        T = R * T + Tt
+
+        H = update_homogenerous_matrix(H, Rt, Tt)
 
         dError = abs(preError - error)
         preError = error
@@ -117,6 +136,12 @@ def ICP_matching(pdata, data):
             break
         elif maxIter <= count:
             break
+
+    R = np.matrix(H[0:2, 0:2])
+    T = np.matrix(H[0:2, 2])
+    print(H)
+    print(R)
+    print(T)
 
     return R, T
 
@@ -173,10 +198,11 @@ def main():
     #  print(pdata)
     data = np.matrix(np.vstack((cx, cy)))
     #  print(data)
+    odata = data[:, :]
 
     R, T = ICP_matching(pdata, data)
 
-    fdata = (R * data) + T
+    fdata = (R * odata) + T
 
     plt.plot(px, py, ".b")
     plt.plot(cx, cy, ".r")
