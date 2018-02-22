@@ -23,19 +23,12 @@ import matplotlib.pyplot as plt
 #  % data1を移動させてdata2を作る
 #  data2=t+A*data1;
 
-#  % ICPアルゴリズム data2とdata1のMatching
-#  % R:回転行列　t:併進ベクトル
-#  % [R,T]=icp(data1,data2)
-#  [R,T] = ICPMatching(data2,data1);
-
 #  function [R, t]=ICPMatching(data1, data2)
 #  % ICPアルゴリズムによる、並進ベクトルと回転行列の計算を実施する関数
 #  % data1 = [x(t)1 x(t)2 x(t)3 ...]
 #  % data2 = [x(t+1)1 x(t+1)2 x(t+1)3 ...]
 #  % x=[x y z]'
 
-#  R=eye(2);%回転行列
-#  t=zeros(2,1);%並進ベクトル
 
 #  while ~(dError < EPS)
 #  count=count+1;
@@ -93,18 +86,48 @@ import matplotlib.pyplot as plt
 
 
 def ICP_matching(pdata, data):
-    R = 0.0  # rotation matrix
-    T = 0.0  # translation vector
+    R = np.eye(2)  # rotation matrix
+    T = np.zeros((2, 1))  # translation vector
 
     #  ICP
-    #  EPS = 0.0001
-    #  maxIter = 100
+    EPS = 0.0001
+    maxIter = 100
+
+    dError = 1000.0
+    count = 0
+
+    while dError >= EPS:
+        count += 1
+
+        Rt, Tt = SVD_motion_estimation(pdata, data)
+        #  print(count)
+
+        R = R * Rt
+        T = R * T + Tt
+
+        if maxIter <= count:
+            break
 
     #  preError = 0
-    #  loopcount = 0
-    #  dError = 1000.0
 
     return R, T
+
+
+def SVD_motion_estimation(pdata, data):
+
+    pm = np.mean(pdata, axis=1)
+    cm = np.mean(data, axis=1)
+
+    pshift = pdata - pm
+    cshift = data - cm
+
+    W = pshift * cshift.T
+    u, s, vh = np.linalg.svd(W)
+
+    R = (u * vh.T).T
+    t = pm - R * cm
+
+    return R, t
 
 
 def main():
@@ -125,6 +148,16 @@ def main():
           for (x, y) in zip(px, py)]
     cy = [math.sin(motion[2]) * x + math.cos(motion[2]) * y + motion[1]
           for (x, y) in zip(px, py)]
+
+    pdata = np.matrix(np.vstack((px, py)))
+    #  print(pdata)
+    data = np.matrix(np.vstack((cx, cy)))
+    #  print(data)
+
+    R, T = ICP_matching(pdata, data)
+    print(motion)
+    print(R)
+    print(T)
 
     plt.plot(px, py, ".b")
     plt.plot(cx, cy, ".r")
