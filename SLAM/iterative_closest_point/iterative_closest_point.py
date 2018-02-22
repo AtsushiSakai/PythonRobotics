@@ -102,8 +102,7 @@ def ICP_matching(pdata, data):
 
         error = nearest_neighbor_assosiation(pdata, data)
         Rt, Tt = SVD_motion_estimation(pdata, data)
-        #  print(count)
-        #  print(error)
+        print(error)
 
         data = (Rt * data) + Tt
         R = R * Rt
@@ -113,6 +112,8 @@ def ICP_matching(pdata, data):
         preError = error
 
         if dError <= EPS:
+            print("Converge", dError)
+            plt.plot(data[0, :], data[1, :], "*k")
             break
         elif maxIter <= count:
             break
@@ -140,7 +141,7 @@ def SVD_motion_estimation(pdata, data):
     pshift = np.matrix(pdata - pm)
     cshift = np.matrix(data - cm)
 
-    W = pshift * cshift.T
+    W = cshift * pshift.T
     u, s, vh = np.linalg.svd(W)
 
     R = (u * vh).T
@@ -174,12 +175,12 @@ def main():
     #  print(data)
 
     R, T = ICP_matching(pdata, data)
-    print(motion)
-    print(R)
-    print(T)
+
+    fdata = (R * data) + T
 
     plt.plot(px, py, ".b")
     plt.plot(cx, cy, ".r")
+    plt.plot(fdata[0, :], fdata[1, :], "xk")
     plt.plot(0.0, 0.0, "xr")
     plt.axis("equal")
     plt.show()
