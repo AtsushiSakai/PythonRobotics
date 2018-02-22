@@ -446,7 +446,6 @@ def main():
 
     if not flag:
         print("cannot find feasible path")
-        exit()
 
     #  flg, ax = plt.subplots(1)
     # Draw final path

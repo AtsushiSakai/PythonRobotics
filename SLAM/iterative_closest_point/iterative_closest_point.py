@@ -103,7 +103,7 @@ def ICP_matching(pdata, data):
         error = nearest_neighbor_assosiation(pdata, data)
         Rt, Tt = SVD_motion_estimation(pdata, data)
         #  print(count)
-        print(error)
+        #  print(error)
 
         data = (Rt * data) + Tt
         R = R * Rt
@@ -134,8 +134,8 @@ def nearest_neighbor_assosiation(pdata, data):
 
 def SVD_motion_estimation(pdata, data):
 
-    pm = np.mean(pdata, axis=1)
-    cm = np.mean(data, axis=1)
+    pm = np.matrix(np.mean(pdata, axis=1))
+    cm = np.matrix(np.mean(data, axis=1))
 
     pshift = np.matrix(pdata - pm)
     cshift = np.matrix(data - cm)
