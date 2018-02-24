@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from SLAM.iterative_closest_point import iterative_closest_point as m
+from PathPlanning.AStar import a_star as m
 
 print(__file__)
 
