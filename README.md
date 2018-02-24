@@ -145,7 +145,7 @@ Simultaneous Localization and Mapping(SLAM) examples
 
 This is a 2D ICP matching example with singular value decomposition.
 
-It can calculate rotation matrix and translation vector between points to points.
+It can calculate a rotation matrix and a translation vector between points to points.
 
 ![3](https://github.com/AtsushiSakai/PythonRobotics/blob/master/SLAM/iterative_closest_point/animation.gif)
 
