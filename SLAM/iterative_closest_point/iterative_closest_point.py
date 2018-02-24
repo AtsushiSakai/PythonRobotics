@@ -1,6 +1,6 @@
 """
 
-Iterative Closet Point (ICP) SLAM example
+Iterative Closest Point (ICP) SLAM example
 
 author: Atsushi Sakai (@Atsushi_twi)
 
@@ -17,7 +17,19 @@ MAXITER = 100
 show_animation = True
 
 
-def ICP_matching(pdata, data):
+def ICP_matching(ppoints, cpoints):
+    """
+    Iterative Closest Point matching
+
+    - input
+    ppoints: 2D points in the previous frame
+    cpoints: 2D points in the current frame
+
+    - output
+    R: Rotation matrix
+    T: Translation vector
+
+    """
     H = None  # homogeneraous transformation matrix
 
     dError = 1000.0
@@ -29,17 +41,17 @@ def ICP_matching(pdata, data):
 
         if show_animation:
             plt.cla()
-            plt.plot(pdata[0, :], pdata[1, :], ".r")
-            plt.plot(data[0, :], data[1, :], ".b")
+            plt.plot(ppoints[0, :], ppoints[1, :], ".r")
+            plt.plot(cpoints[0, :], cpoints[1, :], ".b")
             plt.plot(0.0, 0.0, "xr")
             plt.axis("equal")
             plt.pause(1.0)
 
-        inds, error = nearest_neighbor_assosiation(pdata, data)
-        Rt, Tt = SVD_motion_estimation(pdata[:, inds], data)
+        inds, error = nearest_neighbor_assosiation(ppoints, cpoints)
+        Rt, Tt = SVD_motion_estimation(ppoints[:, inds], cpoints)
 
         # update current points
-        data = (Rt * data) + Tt
+        cpoints = (Rt * cpoints) + Tt
 
         H = update_homogenerous_matrix(H, Rt, Tt)
 
@@ -79,20 +91,20 @@ def update_homogenerous_matrix(Hin, R, T):
         return Hin * H
 
 
-def nearest_neighbor_assosiation(pdata, data):
+def nearest_neighbor_assosiation(ppoints, cpoints):
 
     # calc the sum of residual errors
-    ddata = pdata - data
-    d = np.linalg.norm(ddata, axis=0)
+    dcpoints = ppoints - cpoints
+    d = np.linalg.norm(dcpoints, axis=0)
     error = sum(d)
 
     # calc index with nearest neighbor assosiation
     inds = []
-    for i in range(data.shape[1]):
+    for i in range(cpoints.shape[1]):
         minid = -1
         mind = float("inf")
-        for ii in range(pdata.shape[1]):
-            d = np.linalg.norm(pdata[:, ii] - data[:, i])
+        for ii in range(ppoints.shape[1]):
+            d = np.linalg.norm(ppoints[:, ii] - cpoints[:, i])
 
             if mind >= d:
                 mind = d
@@ -103,13 +115,13 @@ def nearest_neighbor_assosiation(pdata, data):
     return inds, error
 
 
-def SVD_motion_estimation(pdata, data):
+def SVD_motion_estimation(ppoints, cpoints):
 
-    pm = np.matrix(np.mean(pdata, axis=1))
-    cm = np.matrix(np.mean(data, axis=1))
+    pm = np.matrix(np.mean(ppoints, axis=1))
+    cm = np.matrix(np.mean(cpoints, axis=1))
 
-    pshift = np.matrix(pdata - pm)
-    cshift = np.matrix(data - cm)
+    pshift = np.matrix(ppoints - pm)
+    cshift = np.matrix(cpoints - cm)
 
     W = cshift * pshift.T
     u, s, vh = np.linalg.svd(W)
@@ -135,16 +147,16 @@ def main():
         # previous points
         px = (np.random.rand(nPoint) - 0.5) * fieldLength
         py = (np.random.rand(nPoint) - 0.5) * fieldLength
-        pdata = np.matrix(np.vstack((px, py)))
+        ppoints = np.matrix(np.vstack((px, py)))
 
         # current points
         cx = [math.cos(motion[2]) * x - math.sin(motion[2]) * y + motion[0]
               for (x, y) in zip(px, py)]
         cy = [math.sin(motion[2]) * x + math.cos(motion[2]) * y + motion[1]
               for (x, y) in zip(px, py)]
-        data = np.matrix(np.vstack((cx, cy)))
+        cpoints = np.matrix(np.vstack((cx, cy)))
 
-        R, T = ICP_matching(pdata, data)
+        R, T = ICP_matching(ppoints, cpoints)
 
 
 if __name__ == '__main__':
