@@ -5,7 +5,6 @@
 
 Python codes for robotics algorithm.
 
-
 # Table of Contents
    * [Requirements](#requirements)
    * [How to use](#how-to-use)
@@ -16,6 +15,8 @@ Python codes for robotics algorithm.
    * [Mapping](#mapping)
       * [Gaussian grid map](#gaussian-grid-map)
       * [Ray casting grid map](#ray-casting-grid-map)
+   * [SLAM](#slam)
+      * [Iterative Closest Point (ICP) Matching](#iterative-closest-point-icp-matching)
    * [Path Planning](#path-planning)
       * [Dynamic Window Approach](#dynamic-window-approach)
       * [Grid based search](#grid-based-search)
@@ -138,7 +139,13 @@ This is a 2D ray casting grid mapping example.
 
 # SLAM
 
+Simultaneous Localization and Mapping(SLAM) examples
+
 ## Iterative Closest Point (ICP) Matching
+
+This is a 2D ICP matching example.
+
+It can calculate rotation matrix and translation vector between points to points.
 
 ![3](https://github.com/AtsushiSakai/PythonRobotics/blob/master/SLAM/iterative_closest_point/animation.gif)
 
@@ -539,6 +546,7 @@ A small PR like bug fix is welcome.
 # Author
 
 Atsushi Sakai ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
+
 
 
 
