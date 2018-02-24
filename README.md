@@ -136,6 +136,12 @@ This is a 2D ray casting grid mapping example.
 ![2](https://github.com/AtsushiSakai/PythonRobotics/blob/master/Mapping/raycasting_grid_map/animation.gif)
 
 
+# SLAM
+
+## Iterative Closest Point (ICP) Matching
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/blob/master/SLAM/iterative_closest_point/animation.gif)
+
 
 # Path Planning
 
@@ -468,6 +474,7 @@ Ref:
 - [Automatic Steering Methods for Autonomous Automobile Path Tracking](https://www.ri.cmu.edu/pub_files/2009/2/Automatic_Steering_Methods_for_Autonomous_Automobile_Path_Tracking.pdf)
 
 
+
 ## Rear wheel feedback control
 
 Path tracking simulation with rear wheel feedback steering control and PID speed control.
@@ -517,6 +524,7 @@ Ref:
 
 - [MPC Course Material \- MPC Lab @ UC\-Berkeley](http://www.mpc.berkeley.edu/mpc-course-material)
 
+ 
 
 # License 
 
