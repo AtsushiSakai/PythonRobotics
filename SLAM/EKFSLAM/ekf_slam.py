@@ -10,6 +10,8 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
+Cx = np.diag([1.0, 1.0, math.radians(30.0)])**2
+
 #  Simulation parameter
 Qsim = np.diag([0.2])**2
 Rsim = np.diag([1.0, math.radians(30.0)])**2
@@ -17,6 +19,9 @@ Rsim = np.diag([1.0, math.radians(30.0)])**2
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
 MAX_RANGE = 20.0  # maximum observation range
+
+POSE_SIZE = 3  # [x,y,yaw]
+LM_SIZE = 2  # [x,y]
 
 # Particle filter parameter
 NP = 100  # Number of Particle
@@ -61,26 +66,43 @@ def observation(xTrue, xd, u, RFID):
 
 def motion_model(x, u):
 
-    F = np.matrix([[1.0, 0, 0, 0],
-                   [0, 1.0, 0, 0],
-                   [0, 0, 1.0, 0],
-                   [0, 0, 0, 0]])
+    F = np.matrix([[1.0, 0, 0],
+                   [0, 1.0, 0],
+                   [0, 0, 1.0]])
 
     B = np.matrix([[DT * math.cos(x[2, 0]), 0],
                    [DT * math.sin(x[2, 0]), 0],
-                   [0.0, DT],
-                   [1.0, 0.0]])
+                   [0.0, DT]])
 
     x = F * x + B * u
 
     return x
 
 
+def calc_n_LM(x):
+    n = int((len(x) - POSE_SIZE) / LM_SIZE)
+    return n
+
+
+def jacob_motion(x, u):
+
+    Fx = np.hstack((np.eye(POSE_SIZE), np.zeros(
+        (POSE_SIZE, LM_SIZE * calc_n_LM(x)))))
+
+    jF = np.matrix([[0.0, 0.0, -DT * u[0] * math.sin(x[2, 0])],
+                    [0.0, 0.0, DT * u[0] * math.cos(x[2, 0])],
+                    [0.0, 0.0, 0.0]])
+
+    G = np.eye(POSE_SIZE) + Fx.T * jF * Fx
+
+    return G, Fx,
+
+
 def ekf_slam(xEst, PEst, u, z):
     #  Predict
     xEst = motion_model(xEst, u)
-    #  [G,Fx]=jacobF(xEst, u);
-    #  PEst= G'*PEst*G + Fx'*R*Fx;
+    G, Fx = jacob_motion(xEst, u)
+    PEst = G.T * PEst * G + Fx.T * Cx * Fx
 
     return xEst, PEst
 
@@ -137,11 +159,11 @@ def main():
                      [-5.0, 20.0]])
 
     # State Vector [x y yaw v]'
-    xEst = np.matrix(np.zeros((4, 1)))
-    xTrue = np.matrix(np.zeros((4, 1)))
-    PEst = np.eye(4)
+    xEst = np.matrix(np.zeros((POSE_SIZE, 1)))
+    xTrue = np.matrix(np.zeros((POSE_SIZE, 1)))
+    PEst = np.eye(POSE_SIZE)
 
-    xDR = np.matrix(np.zeros((4, 1)))  # Dead reckoning
+    xDR = np.matrix(np.zeros((POSE_SIZE, 1)))  # Dead reckoning
 
     # history
     hxEst = xEst
