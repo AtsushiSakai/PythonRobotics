@@ -20,6 +20,8 @@ DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
 MAX_RANGE = 20.0  # maximum observation range
 
+M_DIST_TH = 1.0
+
 POSE_SIZE = 3  # [x,y,yaw]
 LM_SIZE = 2  # [x,y]
 
@@ -98,53 +100,90 @@ def jacob_motion(x, u):
     return G, Fx,
 
 
+def calc_LM_Pos(x, z):
+
+    zp = np.zeros((2, 1))
+
+    zp[0, 0] = x[0, 0] + z[0, 0] * math.cos(x[2, 0] + z[0, 1])
+    zp[1, 0] = x[1, 0] + z[0, 0] * math.sin(x[2, 0] + z[0, 1])
+
+    return zp
+
+
+def calc_mahalanobis_dist(xAug, PAug):
+
+    nLM = calc_n_LM(xAug)
+
+    mdist = []
+
+    for i in range(nLM):
+
+        if i == nLM - 1:
+            mdist.append(M_DIST_TH)
+        else:
+            lm = xAug[POSE_SIZE + LM_SIZE *
+                      i: POSE_SIZE + LM_SIZE * (i + 1), :]
+            #  y, S, H = calc_innovation(lm, xAug, PAug, z[iz, 0:2], il)
+            #  mdist=[mdist y'*inv(S)*y];%マハラノビス距離の計算
+
+    return mdist
+
+#  function [y,S,H]=CalcInnovation(lm,xEst,PEst,z,LMId)
+#  %対応付け結果からイノベーションを計算する関数
+#  global Q;
+#  delta=lm-xEst(1:2);
+#  q=delta'*delta;
+#  zangle=atan2(delta(2),delta(1))-xEst(3);
+#  zp=[sqrt(q) PI2PI(zangle)];%観測値の予測
+#  y=(z-zp)';
+#  H=jacobH(q,delta,xEst,LMId);
+#  S=H*PEst*H'+Q;
+
+
 def ekf_slam(xEst, PEst, u, z):
-    #  Predict
-    xEst = motion_model(xEst, u)
-    G, Fx = jacob_motion(xEst, u)
-    PEst = G.T * PEst * G + Fx.T * Cx * Fx
+    # Predict
+    xEst[0:POSE_SIZE] = motion_model(xEst[0:POSE_SIZE], u)
+    G, Fx = jacob_motion(xEst[0:POSE_SIZE], u)
+    PEst[0:POSE_SIZE, 0:POSE_SIZE] = G.T * \
+        PEst[0:POSE_SIZE, 0:POSE_SIZE] * G + Fx.T * Cx * Fx
+    initP = np.eye(2) * 1000.0
 
-    return xEst, PEst
+    # Update
+    for iz in range(len(z[:, 0])):  # for each observation
+        #  print(iz)
 
-    #  % Update
-    #  for iz=1:length(z(:,1))%それぞれの観測値に対して
-    #  %観測値をランドマークとして追加
-    #  zl=CalcLMPosiFromZ(xEst,z(iz,:));%観測値そのものからLMの位置を計算
-    #  %状態ベクトルと共分散行列の追加
-    #  xAug=[xEst;zl];
-    #  PAug=[PEst zeros(length(xEst),LMSize);
-    #  zeros(LMSize,length(xEst)) initP];
+        zp = calc_LM_Pos(xEst, z[iz, :])
 
-    #  mdist=[];%マハラノビス距離のリスト
-    #  for il=1:GetnLM(xAug) %それぞれのランドマークについて
-    #  if il==GetnLM(xAug)
-    #  mdist=[mdist alpha];%新しく追加した点の距離はパラメータ値を使う
-    #  else
-    #  lm=xAug(4+2*(il-1):5+2*(il-1));
-    #  [y,S,H]=CalcInnovation(lm,xAug,PAug,z(iz,1:2),il);
-    #  mdist=[mdist y'*inv(S)*y];%マハラノビス距離の計算
-    #  end
-    #  end
+        # Extend state and covariance matrix
+        xAug = np.vstack((xEst, zp))
+        PAug = np.vstack((np.hstack((PEst, np.zeros((len(xEst), LM_SIZE)))),
+                          np.hstack((np.zeros((LM_SIZE, len(xEst))), initP))))
 
-    #  %マハラノビス距離が最も近いものに対応付け
-    #  [C,I]=min(mdist);
+        mah_dists = calc_mahalanobis_dist(xAug, PAug)
+        minid = mah_dists.index(min(mah_dists))
+        #  print(minid)
 
-    #  %一番距離が小さいものが追加したものならば、その観測値をランドマークとして採用
-    #  if I==GetnLM(xAug)
-    #  %disp('New LM')
-    #  xEst=xAug;
-    #  PEst=PAug;
-    #  end
+        nLM = calc_n_LM(xAug)
+        if minid == (nLM - 1):
+            print("New LM")
+            xEst = xAug
+            PEst = PAug
+        else:
+            print("Old LM")
 
-    #  lm=xEst(4+2*(I-1):5+2*(I-1));%対応付けられたランドマークデータの取得
-    #  %イノベーションの計算
-    #  [y,S,H]=CalcInnovation(lm,xEst,PEst,z(iz,1:2),I);
-    #  K = PEst*H'*inv(S);
-    #  xEst = xEst + K*y;
-    #  PEst = (eye(size(xEst,1)) - K*H)*PEst;
-    #  end
+        #  print("DB LM")
+        #  lm=xEst(4+2*(I-1):5+2*(I-1));%対応付けられたランドマークデータの取得
+        #  %イノベーションの計算
+        #  [y,S,H]=CalcInnovation(lm,xEst,PEst,z(iz,1:2),I);
+        #  K = PEst*H'*inv(S);
+        #  xEst = xEst + K*y;
+        #  PEst = (eye(size(xEst,1)) - K*H)*PEst;
+        #  end
 
     #  xEst(3)=PI2PI(xEst(3));%角度補正
+
+    print(len(xEst))
+    return xEst, PEst
 
 
 def main():
@@ -178,8 +217,10 @@ def main():
 
         xEst, PEst = ekf_slam(xEst, PEst, ud, z)
 
+        x_state = xEst[0:POSE_SIZE]
+
         # store data history
-        hxEst = np.hstack((hxEst, xEst))
+        hxEst = np.hstack((hxEst, x_state))
         hxDR = np.hstack((hxDR, xDR))
         hxTrue = np.hstack((hxTrue, xTrue))
 
