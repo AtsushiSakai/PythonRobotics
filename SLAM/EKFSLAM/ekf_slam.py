@@ -11,6 +11,8 @@ import math
 import matplotlib.pyplot as plt
 
 Cx = np.diag([1.0, 1.0, math.radians(30.0)])**2
+Cz = np.diag([1.0, 1.0])**2
+
 
 #  Simulation parameter
 Qsim = np.diag([0.2])**2
@@ -110,7 +112,7 @@ def calc_LM_Pos(x, z):
     return zp
 
 
-def calc_mahalanobis_dist(xAug, PAug):
+def calc_mahalanobis_dist(xAug, PAug, z, iz):
 
     nLM = calc_n_LM(xAug)
 
@@ -123,21 +125,50 @@ def calc_mahalanobis_dist(xAug, PAug):
         else:
             lm = xAug[POSE_SIZE + LM_SIZE *
                       i: POSE_SIZE + LM_SIZE * (i + 1), :]
-            #  y, S, H = calc_innovation(lm, xAug, PAug, z[iz, 0:2], il)
-            #  mdist=[mdist y'*inv(S)*y];%マハラノビス距離の計算
+            y, S, H = calc_innovation(lm, xAug, PAug, z[iz, 0:2], i)
+            mdist.append(y.T * np.linalg.inv(S) * y)
 
     return mdist
 
-#  function [y,S,H]=CalcInnovation(lm,xEst,PEst,z,LMId)
-#  %対応付け結果からイノベーションを計算する関数
-#  global Q;
-#  delta=lm-xEst(1:2);
-#  q=delta'*delta;
-#  zangle=atan2(delta(2),delta(1))-xEst(3);
-#  zp=[sqrt(q) PI2PI(zangle)];%観測値の予測
-#  y=(z-zp)';
-#  H=jacobH(q,delta,xEst,LMId);
-#  S=H*PEst*H'+Q;
+
+def calc_innovation(lm, xEst, PEst, z, LMid):
+    delta = lm - xEst[0:2]
+    q = (delta.T * delta)[0, 0]
+    zangle = math.atan2(delta[1], delta[0]) - xEst[2]
+    zp = [math.sqrt(q), pi_2_pi(zangle)]
+    y = (z - zp).T
+    H = jacobH(q, delta, xEst, LMid + 1)
+    S = H * PEst * H.T + Cz
+
+    return y, S, H
+
+
+def jacobH(q, delta, x, i):
+    sq = math.sqrt(q)
+    G = np.matrix([[-sq * delta[0, 0], - sq * delta[1, 0], 0, sq * delta[0, 0], sq * delta[1, 0]],
+                   [delta[1, 0], - delta[0, 0], - 1.0, - delta[1, 0], delta[0, 0]]])
+
+    G = G / q
+    nLM = calc_n_LM(x)
+    F1 = np.hstack((np.eye(3), np.zeros((3, 2 * nLM))))
+    F2 = np.hstack((np.zeros((2, 3)), np.zeros((2, 2 * (i - 1))),
+                    np.eye(2), np.zeros((2, 2 * nLM - 2 * i))))
+
+    F = np.vstack((F1, F2))
+
+    H = G * F
+
+    return H
+
+
+def pi_2_pi(angle):
+    while(angle > math.pi):
+        angle = angle - 2.0 * math.pi
+
+    while(angle < -math.pi):
+        angle = angle + 2.0 * math.pi
+
+    return angle
 
 
 def ekf_slam(xEst, PEst, u, z):
@@ -159,7 +190,7 @@ def ekf_slam(xEst, PEst, u, z):
         PAug = np.vstack((np.hstack((PEst, np.zeros((len(xEst), LM_SIZE)))),
                           np.hstack((np.zeros((LM_SIZE, len(xEst))), initP))))
 
-        mah_dists = calc_mahalanobis_dist(xAug, PAug)
+        mah_dists = calc_mahalanobis_dist(xAug, PAug, z, iz)
         minid = mah_dists.index(min(mah_dists))
         #  print(minid)
 
@@ -171,18 +202,16 @@ def ekf_slam(xEst, PEst, u, z):
         else:
             print("Old LM")
 
-        #  print("DB LM")
-        #  lm=xEst(4+2*(I-1):5+2*(I-1));%対応付けられたランドマークデータの取得
-        #  %イノベーションの計算
-        #  [y,S,H]=CalcInnovation(lm,xEst,PEst,z(iz,1:2),I);
-        #  K = PEst*H'*inv(S);
-        #  xEst = xEst + K*y;
-        #  PEst = (eye(size(xEst,1)) - K*H)*PEst;
-        #  end
+        lm = xEst[POSE_SIZE + LM_SIZE *
+                  iz: POSE_SIZE + LM_SIZE * (iz + 1), :]
+        y, S, H = calc_innovation(lm, xEst, PEst, z[iz, 0:2], iz)
 
-    #  xEst(3)=PI2PI(xEst(3));%角度補正
+        K = PEst * H.T * np.linalg.inv(S)
+        xEst = xEst + K * y
+        PEst = (np.eye(len(xEst)) - K * H) * PEst
 
-    print(len(xEst))
+    xEst[2] = pi_2_pi(xEst[2])
+
     return xEst, PEst
 
 
