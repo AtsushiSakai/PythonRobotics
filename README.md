@@ -70,7 +70,7 @@ Python codes for robotics algorithm.
 
 - pandas
 
-- [cvxpy](https://cvxgrp.github.io/cvxpy/index.html) 
+- [cvxpy 0.4.x](https://cvxgrp.github.io/cvxpy/index.html) 
 
 # How to use
 
