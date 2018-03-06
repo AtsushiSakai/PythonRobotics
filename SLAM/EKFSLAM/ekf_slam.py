@@ -10,26 +10,21 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
-Cx = np.diag([1.0, 1.0, math.radians(30.0)])**2
-Cz = np.diag([1.0, 1.0])**2
-
+# EKF state covariance
+Cx = np.diag([0.5, 0.5, math.radians(30.0)])**2
 
 #  Simulation parameter
 Qsim = np.diag([0.2])**2
-Rsim = np.diag([1.0, math.radians(30.0)])**2
+Rsim = np.diag([1.0, math.radians(10.0)])**2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
 MAX_RANGE = 20.0  # maximum observation range
 
-M_DIST_TH = 1.0
+M_DIST_TH = 1.0  # Threshold of Mahalanobis distance for data association.
 
-POSE_SIZE = 3  # [x,y,yaw]
-LM_SIZE = 2  # [x,y]
-
-# Particle filter parameter
-NP = 100  # Number of Particle
-NTh = NP / 2.0  # Number of particle for re-sampling
+STATE_SIZE = 3  # State size [x,y,yaw]
+LM_SIZE = 2  # LM srate size [x,y]
 
 show_animation = True
 
@@ -50,12 +45,13 @@ def observation(xTrue, xd, u, RFID):
 
     for i in range(len(RFID[:, 0])):
 
-        dx = xTrue[0, 0] - RFID[i, 0]
-        dy = xTrue[1, 0] - RFID[i, 1]
+        dx = RFID[i, 0] - xTrue[0, 0]
+        dy = RFID[i, 1] - xTrue[1, 0]
         d = math.sqrt(dx**2 + dy**2)
+        angle = pi_2_pi(math.atan2(dy, dx))
         if d <= MAX_RANGE:
-            dn = d + np.random.randn() * Qsim[0, 0]  # add noise
-            zi = np.matrix([dn, RFID[i, 0], RFID[i, 1]])
+            #  dn = d + np.random.randn() * Qsim[0, 0]  # add noise
+            zi = np.matrix([d, angle, i])
             z = np.vstack((z, zi))
 
     # add noise to input
@@ -84,20 +80,20 @@ def motion_model(x, u):
 
 
 def calc_n_LM(x):
-    n = int((len(x) - POSE_SIZE) / LM_SIZE)
+    n = int((len(x) - STATE_SIZE) / LM_SIZE)
     return n
 
 
 def jacob_motion(x, u):
 
-    Fx = np.hstack((np.eye(POSE_SIZE), np.zeros(
-        (POSE_SIZE, LM_SIZE * calc_n_LM(x)))))
+    Fx = np.hstack((np.eye(STATE_SIZE), np.zeros(
+        (STATE_SIZE, LM_SIZE * calc_n_LM(x)))))
 
     jF = np.matrix([[0.0, 0.0, -DT * u[0] * math.sin(x[2, 0])],
                     [0.0, 0.0, DT * u[0] * math.cos(x[2, 0])],
                     [0.0, 0.0, 0.0]])
 
-    G = np.eye(POSE_SIZE) + Fx.T * jF * Fx
+    G = np.eye(STATE_SIZE) + Fx.T * jF * Fx
 
     return G, Fx,
 
@@ -123,8 +119,8 @@ def calc_mahalanobis_dist(xAug, PAug, z, iz):
         if i == nLM - 1:
             mdist.append(M_DIST_TH)
         else:
-            lm = xAug[POSE_SIZE + LM_SIZE *
-                      i: POSE_SIZE + LM_SIZE * (i + 1), :]
+            lm = xAug[STATE_SIZE + LM_SIZE *
+                      i: STATE_SIZE + LM_SIZE * (i + 1), :]
             y, S, H = calc_innovation(lm, xAug, PAug, z[iz, 0:2], i)
             mdist.append(y.T * np.linalg.inv(S) * y)
 
@@ -138,7 +134,7 @@ def calc_innovation(lm, xEst, PEst, z, LMid):
     zp = [math.sqrt(q), pi_2_pi(zangle)]
     y = (z - zp).T
     H = jacobH(q, delta, xEst, LMid + 1)
-    S = H * PEst * H.T + Cz
+    S = H * PEst * H.T + Cx[0:2, 0:2]
 
     return y, S, H
 
@@ -173,16 +169,14 @@ def pi_2_pi(angle):
 
 def ekf_slam(xEst, PEst, u, z):
     # Predict
-    xEst[0:POSE_SIZE] = motion_model(xEst[0:POSE_SIZE], u)
-    G, Fx = jacob_motion(xEst[0:POSE_SIZE], u)
-    PEst[0:POSE_SIZE, 0:POSE_SIZE] = G.T * \
-        PEst[0:POSE_SIZE, 0:POSE_SIZE] * G + Fx.T * Cx * Fx
-    initP = np.eye(2) * 1000.0
+    xEst[0:STATE_SIZE] = motion_model(xEst[0:STATE_SIZE], u)
+    G, Fx = jacob_motion(xEst[0:STATE_SIZE], u)
+    PEst[0:STATE_SIZE, 0:STATE_SIZE] = G.T * \
+        PEst[0:STATE_SIZE, 0:STATE_SIZE] * G + Fx.T * Cx * Fx
+    initP = np.eye(2)
 
     # Update
     for iz in range(len(z[:, 0])):  # for each observation
-        #  print(iz)
-
         zp = calc_LM_Pos(xEst, z[iz, :])
 
         # Extend state and covariance matrix
@@ -192,7 +186,6 @@ def ekf_slam(xEst, PEst, u, z):
 
         mah_dists = calc_mahalanobis_dist(xAug, PAug, z, iz)
         minid = mah_dists.index(min(mah_dists))
-        #  print(minid)
 
         nLM = calc_n_LM(xAug)
         if minid == (nLM - 1):
@@ -202,9 +195,9 @@ def ekf_slam(xEst, PEst, u, z):
         else:
             print("Old LM")
 
-        lm = xEst[POSE_SIZE + LM_SIZE *
-                  iz: POSE_SIZE + LM_SIZE * (iz + 1), :]
-        y, S, H = calc_innovation(lm, xEst, PEst, z[iz, 0:2], iz)
+        lm = xEst[STATE_SIZE + LM_SIZE *
+                  minid: STATE_SIZE + LM_SIZE * (minid + 1), :]
+        y, S, H = calc_innovation(lm, xEst, PEst, z[iz, 0:2], minid)
 
         K = PEst * H.T * np.linalg.inv(S)
         xEst = xEst + K * y
@@ -227,11 +220,11 @@ def main():
                      [-5.0, 20.0]])
 
     # State Vector [x y yaw v]'
-    xEst = np.matrix(np.zeros((POSE_SIZE, 1)))
-    xTrue = np.matrix(np.zeros((POSE_SIZE, 1)))
-    PEst = np.eye(POSE_SIZE)
+    xEst = np.matrix(np.zeros((STATE_SIZE, 1)))
+    xTrue = np.matrix(np.zeros((STATE_SIZE, 1)))
+    PEst = np.eye(STATE_SIZE)
 
-    xDR = np.matrix(np.zeros((POSE_SIZE, 1)))  # Dead reckoning
+    xDR = np.matrix(np.zeros((STATE_SIZE, 1)))  # Dead reckoning
 
     # history
     hxEst = xEst
@@ -246,20 +239,26 @@ def main():
 
         xEst, PEst = ekf_slam(xEst, PEst, ud, z)
 
-        x_state = xEst[0:POSE_SIZE]
+        x_state = xEst[0:STATE_SIZE]
 
         # store data history
         hxEst = np.hstack((hxEst, x_state))
         hxDR = np.hstack((hxDR, xDR))
         hxTrue = np.hstack((hxTrue, xTrue))
 
+        #  print(xEst)
+
         if show_animation:
             plt.cla()
 
-            for i in range(len(z[:, 0])):
-                plt.plot([xTrue[0, 0], z[i, 1]], [xTrue[1, 0], z[i, 2]], "-k")
             plt.plot(RFID[:, 0], RFID[:, 1], "*k")
             plt.plot(xEst[0], xEst[1], ".r")
+
+            # plot landmark
+            for i in range(calc_n_LM(xEst)):
+                plt.plot(xEst[STATE_SIZE + i * 2],
+                         xEst[STATE_SIZE + i * 2 + 1], "xg")
+
             plt.plot(np.array(hxTrue[0, :]).flatten(),
                      np.array(hxTrue[1, :]).flatten(), "-b")
             plt.plot(np.array(hxDR[0, :]).flatten(),
@@ -269,6 +268,7 @@ def main():
             plt.axis("equal")
             plt.grid(True)
             plt.pause(0.001)
+            #  input()
 
 
 if __name__ == '__main__':
