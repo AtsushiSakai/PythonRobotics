@@ -1,6 +1,6 @@
 """
 
-Extended Kalman Filter based SLAM example
+Extended Kalman Filter SLAM example
 
 author: Atsushi Sakai (@Atsushi_twi)
 
@@ -14,19 +14,52 @@ import matplotlib.pyplot as plt
 Cx = np.diag([0.5, 0.5, math.radians(30.0)])**2
 
 #  Simulation parameter
-Qsim = np.diag([0.2])**2
+Qsim = np.diag([0.2, math.radians(1.0)])**2
 Rsim = np.diag([1.0, math.radians(10.0)])**2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
 MAX_RANGE = 20.0  # maximum observation range
-
-M_DIST_TH = 1.0  # Threshold of Mahalanobis distance for data association.
-
+M_DIST_TH = 2.0  # Threshold of Mahalanobis distance for data association.
 STATE_SIZE = 3  # State size [x,y,yaw]
 LM_SIZE = 2  # LM srate size [x,y]
 
 show_animation = True
+
+
+def ekf_slam(xEst, PEst, u, z):
+
+    # Predict
+    S = STATE_SIZE
+    xEst[0:S] = motion_model(xEst[0:S], u)
+    G, Fx = jacob_motion(xEst[0:S], u)
+    PEst[0:S, 0:S] = G.T * PEst[0:S, 0:S] * G + Fx.T * Cx * Fx
+    initP = np.eye(2)
+
+    # Update
+    for iz in range(len(z[:, 0])):  # for each observation
+        minid = search_correspond_LM_ID(xEst, PEst, z[iz, 0:2])
+
+        nLM = calc_n_LM(xEst)
+        if minid == nLM:
+            print("New LM")
+            # Extend state and covariance matrix
+            xAug = np.vstack((xEst, calc_LM_Pos(xEst, z[iz, :])))
+            PAug = np.vstack((np.hstack((PEst, np.zeros((len(xEst), LM_SIZE)))),
+                              np.hstack((np.zeros((LM_SIZE, len(xEst))), initP))))
+            xEst = xAug
+            PEst = PAug
+
+        lm = get_LM_Pos_from_state(xEst, minid)
+        y, S, H = calc_innovation(lm, xEst, PEst, z[iz, 0:2], minid)
+
+        K = PEst * H.T * np.linalg.inv(S)
+        xEst = xEst + K * y
+        PEst = (np.eye(len(xEst)) - K * H) * PEst
+
+    xEst[2] = pi_2_pi(xEst[2])
+
+    return xEst, PEst
 
 
 def calc_input():
@@ -50,8 +83,9 @@ def observation(xTrue, xd, u, RFID):
         d = math.sqrt(dx**2 + dy**2)
         angle = pi_2_pi(math.atan2(dy, dx))
         if d <= MAX_RANGE:
-            #  dn = d + np.random.randn() * Qsim[0, 0]  # add noise
-            zi = np.matrix([d, angle, i])
+            dn = d + np.random.randn() * Qsim[0, 0]  # add noise
+            anglen = angle + np.random.randn() * Qsim[1, 1]  # add noise
+            zi = np.matrix([dn, anglen, i])
             z = np.vstack((z, zi))
 
     # add noise to input
@@ -108,23 +142,32 @@ def calc_LM_Pos(x, z):
     return zp
 
 
-def calc_mahalanobis_dist(xAug, PAug, z, iz):
+def get_LM_Pos_from_state(x, ind):
+
+    lm = x[STATE_SIZE + LM_SIZE * ind: STATE_SIZE + LM_SIZE * (ind + 1), :]
+
+    return lm
+
+
+def search_correspond_LM_ID(xAug, PAug, zi):
+    """
+    Landmark association with Mahalanobis distance
+    """
 
     nLM = calc_n_LM(xAug)
 
     mdist = []
 
     for i in range(nLM):
+        lm = get_LM_Pos_from_state(xAug, i)
+        y, S, H = calc_innovation(lm, xAug, PAug, zi, i)
+        mdist.append(y.T * np.linalg.inv(S) * y)
 
-        if i == nLM - 1:
-            mdist.append(M_DIST_TH)
-        else:
-            lm = xAug[STATE_SIZE + LM_SIZE *
-                      i: STATE_SIZE + LM_SIZE * (i + 1), :]
-            y, S, H = calc_innovation(lm, xAug, PAug, z[iz, 0:2], i)
-            mdist.append(y.T * np.linalg.inv(S) * y)
+    mdist.append(M_DIST_TH)  # new landmark
 
-    return mdist
+    minid = mdist.index(min(mdist))
+
+    return minid
 
 
 def calc_innovation(lm, xEst, PEst, z, LMid):
@@ -133,6 +176,7 @@ def calc_innovation(lm, xEst, PEst, z, LMid):
     zangle = math.atan2(delta[1], delta[0]) - xEst[2]
     zp = [math.sqrt(q), pi_2_pi(zangle)]
     y = (z - zp).T
+    y[1] = pi_2_pi(y[1])
     H = jacobH(q, delta, xEst, LMid + 1)
     S = H * PEst * H.T + Cx[0:2, 0:2]
 
@@ -167,56 +211,15 @@ def pi_2_pi(angle):
     return angle
 
 
-def ekf_slam(xEst, PEst, u, z):
-    # Predict
-    xEst[0:STATE_SIZE] = motion_model(xEst[0:STATE_SIZE], u)
-    G, Fx = jacob_motion(xEst[0:STATE_SIZE], u)
-    PEst[0:STATE_SIZE, 0:STATE_SIZE] = G.T * \
-        PEst[0:STATE_SIZE, 0:STATE_SIZE] * G + Fx.T * Cx * Fx
-    initP = np.eye(2)
-
-    # Update
-    for iz in range(len(z[:, 0])):  # for each observation
-        zp = calc_LM_Pos(xEst, z[iz, :])
-
-        # Extend state and covariance matrix
-        xAug = np.vstack((xEst, zp))
-        PAug = np.vstack((np.hstack((PEst, np.zeros((len(xEst), LM_SIZE)))),
-                          np.hstack((np.zeros((LM_SIZE, len(xEst))), initP))))
-
-        mah_dists = calc_mahalanobis_dist(xAug, PAug, z, iz)
-        minid = mah_dists.index(min(mah_dists))
-
-        nLM = calc_n_LM(xAug)
-        if minid == (nLM - 1):
-            print("New LM")
-            xEst = xAug
-            PEst = PAug
-        else:
-            print("Old LM")
-
-        lm = xEst[STATE_SIZE + LM_SIZE *
-                  minid: STATE_SIZE + LM_SIZE * (minid + 1), :]
-        y, S, H = calc_innovation(lm, xEst, PEst, z[iz, 0:2], minid)
-
-        K = PEst * H.T * np.linalg.inv(S)
-        xEst = xEst + K * y
-        PEst = (np.eye(len(xEst)) - K * H) * PEst
-
-    xEst[2] = pi_2_pi(xEst[2])
-
-    return xEst, PEst
-
-
 def main():
     print(__file__ + " start!!")
 
     time = 0.0
 
     # RFID positions [x, y]
-    RFID = np.array([[10.0, 0.0],
-                     [10.0, 10.0],
-                     [0.0, 15.0],
+    RFID = np.array([[10.0, -2.0],
+                     [15.0, 10.0],
+                     [3.0, 15.0],
                      [-5.0, 20.0]])
 
     # State Vector [x y yaw v]'
@@ -246,8 +249,6 @@ def main():
         hxDR = np.hstack((hxDR, xDR))
         hxTrue = np.hstack((hxTrue, xTrue))
 
-        #  print(xEst)
-
         if show_animation:
             plt.cla()
 
@@ -268,7 +269,6 @@ def main():
             plt.axis("equal")
             plt.grid(True)
             plt.pause(0.001)
-            #  input()
 
 
 if __name__ == '__main__':
