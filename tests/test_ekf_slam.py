@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from SLAM.iterative_closest_point import iterative_closest_point as m
+from SLAM.EKFSLAM import ekf_slam as m
 
 print(__file__)
 
