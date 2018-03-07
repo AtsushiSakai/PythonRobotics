@@ -17,6 +17,7 @@ Python codes for robotics algorithm.
       * [Ray casting grid map](#ray-casting-grid-map)
    * [SLAM](#slam)
       * [Iterative Closest Point (ICP) Matching](#iterative-closest-point-icp-matching)
+      * [EKF SLAM](#ekf-slam)
    * [Path Planning](#path-planning)
       * [Dynamic Window Approach](#dynamic-window-approach)
       * [Grid based search](#grid-based-search)
@@ -152,6 +153,20 @@ Ref:
 
 - [Introduction to Mobile Robotics: Iterative Closest Point Algorithm](https://cs.gmu.edu/~kosecka/cs685/cs685-icp.pdf)
 
+
+## EKF SLAM
+
+This is a Extended Kalman Filter based SLAM example.
+
+The blue line is ground truth, the black line is dead reckoning, the red line is estimated trajectory with EKF SLAM.
+
+The green cross are estimated landmarks.
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/blob/master/SLAM/EKFSLAM/animation.gif)
+
+Ref:
+
+- [PROBABILISTIC\-ROBOTICS\.ORG](http://www.probabilistic-robotics.org/)
 
 # Path Planning
 
@@ -529,6 +544,7 @@ A small PR like bug fix is welcome.
 # Author
 
 Atsushi Sakai ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
+
 
 
 
