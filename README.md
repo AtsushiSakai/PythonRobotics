@@ -158,7 +158,7 @@ Ref:
 
 This is a Extended Kalman Filter based SLAM example.
 
-The blue line is ground truth, the black line is dead reckoning, the red line is estimated trajectory with EKF SLAM.
+The blue line is ground truth, the black line is dead reckoning, the red line is the estimated trajectory with EKF SLAM.
 
 The green cross are estimated landmarks.
 
@@ -166,7 +166,7 @@ The green cross are estimated landmarks.
 
 Ref:
 
-- [PROBABILISTIC\-ROBOTICS\.ORG](http://www.probabilistic-robotics.org/)
+- [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
 
 # Path Planning
 
