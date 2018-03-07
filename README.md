@@ -86,7 +86,7 @@ Python codes for robotics algorithm.
 
 ## Extended Kalman Filter localization
 
-<img src="https://github.com/AtsushiSakai/PythonRobotics/blob/master/Localization/extended_kalman_filter/animation.gif" width="640">
+<img src="https://github.com/AtsushiSakai/PythonRobotics/raw/master/Localization/extended_kalman_filter/animation.gif" width="640">
 
 This is a sensor fusion localization with Extended Kalman Filter(EKF).
 
