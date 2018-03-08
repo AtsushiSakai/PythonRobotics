@@ -25,12 +25,65 @@ M_DIST_TH = 2.0  # Threshold of Mahalanobis distance for data association.
 STATE_SIZE = 3  # State size [x,y,yaw]
 LM_SIZE = 2  # LM srate size [x,y]
 
+N_PARTICLE = 100  # number of particle
+
 show_animation = True
 
 
-def fast_slam(xEst, PEst, u, z):
+class Particle:
 
-    xEst[2] = pi_2_pi(xEst[2])
+    def __init__(self):
+        self.w = 1.0 / N_PARTICLE
+        self.x = 0.0
+        self.y = 0.0
+        self.yaw = 0.0
+
+
+def calc_final_state(particles):
+
+    xEst = np.zeros((STATE_SIZE, 1))
+
+    for i in range(N_PARTICLE):
+        xEst[0, 0] += particles[i].w * particles[i].x
+        xEst[1, 0] += particles[i].w * particles[i].y
+        xEst[2, 0] += particles[i].w * particles[i].yaw
+
+    xEst[2, 0] = pi_2_pi(xEst[2, 0])
+
+    return xEst
+
+
+def predict_particles(particles, u):
+
+    for i in range(N_PARTICLE):
+        px = np.zeros((STATE_SIZE, 1))
+        px[0, 0] = particles[i].x
+        px[1, 0] = particles[i].y
+        px[2, 0] = particles[i].yaw
+        ud = u + np.matrix(np.random.randn(1, 2)) * Rsim  # add noise
+        px = motion_model(px, ud)
+        particles[i].x = px[0, 0]
+        particles[i].y = px[1, 0]
+        particles[i].yaw = px[2, 0]
+
+    return particles
+
+
+def update_with_observation(particle, z):
+
+    return particle
+
+
+def fast_slam(particles, PEst, u, z):
+
+    # Predict
+    particles = predict_particles(particles, u)
+
+    # Observation
+    for i in range(N_PARTICLE):
+        particles[i] = update_with_observation(particles[i], z)
+
+    xEst = calc_final_state(particles)
 
     return xEst, PEst
 
@@ -163,13 +216,15 @@ def main():
     hxTrue = xTrue
     hxDR = xTrue
 
+    particles = [Particle() for i in range(N_PARTICLE)]
+
     while SIM_TIME >= time:
         time += DT
         u = calc_input()
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u, RFID)
 
-        xEst, PEst = fast_slam(xEst, PEst, ud, z)
+        xEst, PEst = fast_slam(particles, PEst, ud, z)
 
         x_state = xEst[0:STATE_SIZE]
 
@@ -182,7 +237,10 @@ def main():
             plt.cla()
 
             plt.plot(RFID[:, 0], RFID[:, 1], "*k")
-            plt.plot(xEst[0], xEst[1], ".r")
+            plt.plot(xEst[0], xEst[1], "xr")
+
+            for i in range(N_PARTICLE):
+                plt.plot(particles[i].x, particles[i].y, ".r")
 
             # plot landmark
             for i in range(calc_n_LM(xEst)):
