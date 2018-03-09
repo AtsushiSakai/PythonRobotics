@@ -70,7 +70,7 @@ Python codes for robotics algorithm.
 
 - pandas
 
-- [cvxpy 0.4.x](https://cvxgrp.github.io/cvxpy/index.html) 
+- [cvxpy 0.4.x](http://www.cvxpy.org/en/latest/) 
 
 # How to use
 
@@ -521,7 +521,7 @@ Path tracking simulation with iterative linear model predictive speed and steeri
 
 This code uses cvxpy as an optimization modeling tool.
 
-- [Welcome to CVXPY 1\.0 — CVXPY 1\.0\.0 documentation](https://cvxgrp.github.io/cvxpy/index.html)
+- [Welcome to CVXPY](http://www.cvxpy.org/en/latest/)
 
 Ref:
 
