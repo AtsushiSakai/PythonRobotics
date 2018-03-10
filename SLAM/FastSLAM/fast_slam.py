@@ -32,14 +32,27 @@ show_animation = True
 
 class Particle:
 
-    def __init__(self):
+    def __init__(self, N_LM):
         self.w = 1.0 / N_PARTICLE
         self.x = 0.0
         self.y = 0.0
         self.yaw = 0.0
+        self.lm = np.zeros((N_LM, 2))
+
+
+def normalize_weight(particles):
+
+    sumw = sum([particles[ip].w for ip in range(N_PARTICLE)])
+
+    for i in range(N_PARTICLE):
+        particles[i].w = particles[i].w / sumw
+
+    return particles
 
 
 def calc_final_state(particles):
+
+    particles = normalize_weight(particles)
 
     xEst = np.zeros((STATE_SIZE, 1))
 
@@ -69,9 +82,58 @@ def predict_particles(particles, u):
     return particles
 
 
-def update_with_observation(particle, z):
+def add_new_lm(particle, z):
+
+    r = z[0, 0]
+    b = z[0, 1]
+    lm_id = int(z[0, 2])
+
+    s = math.sin(particle.yaw + b)
+    c = math.cos(particle.yaw + b)
+
+    particle.lm[lm_id, 0] = particle.x + r * c
+    particle.lm[lm_id, 1] = particle.y + r * s
 
     return particle
+
+
+def compute_weight(particle, z):
+
+    lm_id = int(z[0, 2])
+
+    lmxy = np.matrix(particle.lm[lm_id, :])
+    zxy = z[0, 0:2]
+    #  print(lmxy)
+    #  print(zxy)
+
+    dx = (lmxy - zxy).T
+    S = np.eye(2)
+
+    num = math.exp(-0.5 * dx.T * np.linalg.inv(S) * dx)
+    den = 2.0 * math.pi * math.sqrt(np.linalg.det(S))
+
+    w = num / den
+
+    return w
+
+
+def update_with_observation(particles, z):
+
+    for iz in range(len(z[:, 0])):
+
+        lmid = int(z[iz, 2])
+
+        for ip in range(N_PARTICLE):
+            # new landmark
+            if abs(particles[ip].lm[lmid, 0]) <= 0.1:
+                particles[ip] = add_new_lm(particles[ip], z[iz, :])
+            # known landmark
+            else:
+                w = compute_weight(particles[ip], z[iz, :])  # w = p(z_k | x_k)
+                particles[ip].w = particles[ip].w * w
+                #  particles(i)= feature_update(particles(i), zf, idf, R)
+
+    return particles
 
 
 def fast_slam(particles, PEst, u, z):
@@ -80,8 +142,7 @@ def fast_slam(particles, PEst, u, z):
     particles = predict_particles(particles, u)
 
     # Observation
-    for i in range(N_PARTICLE):
-        particles[i] = update_with_observation(particles[i], z)
+    particles = update_with_observation(particles, z)
 
     xEst = calc_final_state(particles)
 
@@ -163,7 +224,7 @@ def get_LM_Pos_from_state(x, ind):
 
 def search_correspond_LM_ID(xAug, PAug, zi):
     """
-    Landmark association with Mahalanobis distance
+    Landmark association with Nearest Neighbor
     """
 
     nLM = calc_n_LM(xAug)
@@ -203,6 +264,7 @@ def main():
                      [15.0, 10.0],
                      [3.0, 15.0],
                      [-5.0, 20.0]])
+    N_LM = RFID.shape[0]
 
     # State Vector [x y yaw v]'
     xEst = np.matrix(np.zeros((STATE_SIZE, 1)))
@@ -216,7 +278,7 @@ def main():
     hxTrue = xTrue
     hxDR = xTrue
 
-    particles = [Particle() for i in range(N_PARTICLE)]
+    particles = [Particle(N_LM) for i in range(N_PARTICLE)]
 
     while SIM_TIME >= time:
         time += DT
