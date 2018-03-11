@@ -27,6 +27,8 @@ LM_SIZE = 2  # LM srate size [x,y]
 
 N_PARTICLE = 100  # number of particle
 
+NTH = N_PARTICLE / 2.0  # Number of particle for re-sampling
+
 show_animation = True
 
 
@@ -51,8 +53,6 @@ def normalize_weight(particles):
 
 
 def calc_final_state(particles):
-
-    particles = normalize_weight(particles)
 
     xEst = np.zeros((STATE_SIZE, 1))
 
@@ -102,9 +102,19 @@ def compute_weight(particle, z):
     lm_id = int(z[0, 2])
 
     lmxy = np.matrix(particle.lm[lm_id, :])
-    zxy = z[0, 0:2]
-    #  print(lmxy)
-    #  print(zxy)
+
+    # calc landmark xy
+    r = z[0, 0]
+    b = z[0, 1]
+    lm_id = int(z[0, 2])
+
+    s = math.sin(particle.yaw + b)
+    c = math.cos(particle.yaw + b)
+
+    zxy = np.zeros((1, 2))
+
+    zxy[0, 0] = particle.x + r * c
+    zxy[0, 1] = particle.y + r * s
 
     dx = (lmxy - zxy).T
     S = np.eye(2)
@@ -136,6 +146,40 @@ def update_with_observation(particles, z):
     return particles
 
 
+def resampling(particles):
+    """
+    low variance re-sampling
+    """
+
+    pw = []
+    for i in range(N_PARTICLE):
+        pw.append(particles[i].w)
+
+    pw = np.matrix(pw)
+
+    Neff = 1.0 / (pw * pw.T)[0, 0]  # Effective particle number
+
+    if Neff < NTH:  # resampling
+        wcum = np.cumsum(pw)
+        base = np.cumsum(pw * 0.0 + 1 / N_PARTICLE) - 1 / N_PARTICLE
+        resampleid = base + np.random.rand(base.shape[1]) / N_PARTICLE
+
+        inds = []
+        ind = 0
+        for ip in range(N_PARTICLE):
+            while resampleid[0, ip] > wcum[0, ind]:
+                ind += 1
+                inds.append(ind)
+
+        tparticles = particles[:]
+        for i in range(len(inds)):
+            particles[i] = tparticles[inds[i]]
+
+        particles = normalize_weight(particles)
+
+    return particles
+
+
 def fast_slam(particles, PEst, u, z):
 
     # Predict
@@ -143,6 +187,10 @@ def fast_slam(particles, PEst, u, z):
 
     # Observation
     particles = update_with_observation(particles, z)
+
+    particles = normalize_weight(particles)
+
+    particles = resampling(particles)
 
     xEst = calc_final_state(particles)
 
@@ -222,28 +270,6 @@ def get_LM_Pos_from_state(x, ind):
     return lm
 
 
-def search_correspond_LM_ID(xAug, PAug, zi):
-    """
-    Landmark association with Nearest Neighbor
-    """
-
-    nLM = calc_n_LM(xAug)
-
-    mdist = []
-
-    for i in range(nLM):
-        #  lm = get_LM_Pos_from_state(xAug, i)
-        #  #  y, S, H = calc_innovation(lm, xAug, PAug, zi, i)
-        #  mdist.append(y.T * np.linalg.inv(S) * y)
-        pass
-
-    mdist.append(M_DIST_TH)  # new landmark
-
-    minid = mdist.index(min(mdist))
-
-    return minid
-
-
 def pi_2_pi(angle):
     while(angle > math.pi):
         angle = angle - 2.0 * math.pi
@@ -299,7 +325,6 @@ def main():
             plt.cla()
 
             plt.plot(RFID[:, 0], RFID[:, 1], "*k")
-            plt.plot(xEst[0], xEst[1], "xr")
 
             for i in range(N_PARTICLE):
                 plt.plot(particles[i].x, particles[i].y, ".r")
@@ -315,6 +340,8 @@ def main():
                      np.array(hxDR[1, :]).flatten(), "-k")
             plt.plot(np.array(hxEst[0, :]).flatten(),
                      np.array(hxEst[1, :]).flatten(), "-r")
+
+            plt.plot(xEst[0], xEst[1], "xk")
             plt.axis("equal")
             plt.grid(True)
             plt.pause(0.001)
