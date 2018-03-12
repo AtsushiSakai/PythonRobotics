@@ -16,7 +16,7 @@ Cx = np.diag([0.5, 0.5, math.radians(30.0)])**2
 
 
 #  Simulation parameter
-Qsim = np.diag([0.2, math.radians(1.0)])**2
+Qsim = np.diag([0.0, math.radians(0.0)])**2
 Rsim = np.diag([1.0, math.radians(10.0)])**2
 
 DT = 0.1  # time tick [s]
@@ -100,6 +100,8 @@ def add_new_lm(particle, z):
 
     particle.lm[lm_id, 0] = particle.x + r * c
     particle.lm[lm_id, 1] = particle.y + r * s
+    #  print(particle.lm)
+    #  print(lm_id)
 
     # covariance
     Gz = np.matrix([[c, -r * s],
@@ -110,11 +112,17 @@ def add_new_lm(particle, z):
     return particle
 
 
+def feature_update(particle, z, R):
+
+    return particle
+
+
 def compute_weight(particle, z):
 
     lm_id = int(z[0, 2])
 
     lmxy = np.matrix(particle.lm[lm_id, :])
+    print(lmxy)
 
     # calc landmark xy
     r = z[0, 0]
@@ -154,7 +162,8 @@ def update_with_observation(particles, z):
             else:
                 w = compute_weight(particles[ip], z[iz, :])  # w = p(z_k | x_k)
                 particles[ip].w = particles[ip].w + w
-                #  particles(i)= feature_update(particles(i), zf, idf, R)
+                particles[ip] = feature_update(
+                    particles[ip], z[iz, :], Cx[0:2, 0:2])
 
     return particles
 
