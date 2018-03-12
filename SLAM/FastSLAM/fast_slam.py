@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 # EKF state covariance
 Cx = np.diag([0.5, 0.5, math.radians(30.0)])**2
 
+
 #  Simulation parameter
 Qsim = np.diag([0.2, math.radians(1.0)])**2
 Rsim = np.diag([1.0, math.radians(10.0)])**2
@@ -40,11 +41,17 @@ class Particle:
         self.y = 0.0
         self.yaw = 0.0
         self.lm = np.zeros((N_LM, 2))
+        self.lmP = [np.zeros((2, 2))] * N_LM
 
 
 def normalize_weight(particles):
 
     sumw = sum([particles[ip].w for ip in range(N_PARTICLE)])
+
+    #  if sumw <= 0.0000001:
+    #  for i in range(N_PARTICLE):
+    #  particles[i].w = 1.0 / N_PARTICLE
+    #  return particles
 
     for i in range(N_PARTICLE):
         particles[i].w = particles[i].w / sumw
@@ -94,6 +101,12 @@ def add_new_lm(particle, z):
     particle.lm[lm_id, 0] = particle.x + r * c
     particle.lm[lm_id, 1] = particle.y + r * s
 
+    # covariance
+    Gz = np.matrix([[c, -r * s],
+                    [s, r * c]])
+
+    particle.lmP[lm_id] = Gz * Cx[0:2, 0:2] * Gz.T
+
     return particle
 
 
@@ -117,7 +130,7 @@ def compute_weight(particle, z):
     zxy[0, 1] = particle.y + r * s
 
     dx = (lmxy - zxy).T
-    S = np.eye(2)
+    S = particle.lmP[lm_id]
 
     num = math.exp(-0.5 * dx.T * np.linalg.inv(S) * dx)
     den = 2.0 * math.pi * math.sqrt(np.linalg.det(S))
@@ -140,7 +153,7 @@ def update_with_observation(particles, z):
             # known landmark
             else:
                 w = compute_weight(particles[ip], z[iz, :])  # w = p(z_k | x_k)
-                particles[ip].w = particles[ip].w * w
+                particles[ip].w = particles[ip].w + w
                 #  particles(i)= feature_update(particles(i), zf, idf, R)
 
     return particles
@@ -151,15 +164,20 @@ def resampling(particles):
     low variance re-sampling
     """
 
+    particles = normalize_weight(particles)
+
     pw = []
     for i in range(N_PARTICLE):
         pw.append(particles[i].w)
 
     pw = np.matrix(pw)
+    #  print(pw)
 
     Neff = 1.0 / (pw * pw.T)[0, 0]  # Effective particle number
+    #  print(Neff)
 
     if Neff < NTH:  # resampling
+        print("resamping")
         wcum = np.cumsum(pw)
         base = np.cumsum(pw * 0.0 + 1 / N_PARTICLE) - 1 / N_PARTICLE
         resampleid = base + np.random.rand(base.shape[1]) / N_PARTICLE
@@ -167,9 +185,9 @@ def resampling(particles):
         inds = []
         ind = 0
         for ip in range(N_PARTICLE):
-            while resampleid[0, ip] > wcum[0, ind]:
+            while ((ind < wcum.shape[1] - 1) and (resampleid[0, ip] > wcum[0, ind])):
                 ind += 1
-                inds.append(ind)
+            inds.append(ind)
 
         tparticles = particles[:]
         for i in range(len(inds)):
