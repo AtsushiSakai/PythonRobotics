@@ -12,7 +12,10 @@ import matplotlib.pyplot as plt
 
 
 # EKF state covariance
-Cx = np.diag([1.0, 1.0, math.radians(30.0)])**2
+Cx = np.matrix([[1.0, 0.01, 0.1],
+                [0.01, 1.0, 0.1],
+                [0.1, 0.0, math.radians(30.0)]])
+
 
 #  Simulation parameter
 Qsim = np.diag([0.0, math.radians(0.0)])**2
@@ -46,15 +49,17 @@ class Particle:
 def normalize_weight(particles):
 
     sumw = sum([p.w for p in particles])
-    #  print(sumw)
 
-    #  if sumw <= 0.0000001:
-    #  for i in range(N_PARTICLE):
-    #  particles[i].w = 1.0 / N_PARTICLE
-    #  return particles
+    if sumw <= 0.0000001:
+        for i in range(N_PARTICLE):
+            particles[i].w = 1.0 / N_PARTICLE
+
+        return particles
 
     for i in range(N_PARTICLE):
-        particles[i].w = particles[i].w / sumw
+        particles[i].w /= sumw
+
+    #  sumw = sum([p.w for p in particles])
 
     return particles
 
@@ -104,8 +109,6 @@ def add_new_lm(particle, z):
 
     particle.lm[lm_id, 0] = particle.x + r * c
     particle.lm[lm_id, 1] = particle.y + r * s
-    #  print(particle.lm)
-    #  print(lm_id)
 
     # covariance
     Gz = np.matrix([[c, -r * s],
@@ -140,6 +143,7 @@ def KF_cholesky_update(xf, Pf, v, R, Hf):
     S = Hf * PHt + R
 
     S = (S + S.T) * 0.5
+    #  print(S)
     SChol = np.linalg.cholesky(S).T
 
     SCholInv = np.linalg.inv(SChol)
@@ -157,24 +161,16 @@ def feature_update(particle, z, R):
     lm_id = int(z[0, 2])
     xf = particle.lm[lm_id, :]
     Pf = particle.lmP[lm_id]
-    #  print(xf)
-    #  print(particle.lm)
 
     zp, Hv, Hf, Sf = compute_jacobians(particle, xf, Pf, R)
 
     v = z[0, 0:2] - zp
     v[0, 1] = pi_2_pi(v[0, 1])
-    #  print(v)
 
     xf, Pf = KF_cholesky_update(xf, Pf, v, R, Hf)
 
     particle.lm[lm_id, :] = xf
     particle.lmP[lm_id] = Pf
-
-    #  print(xf)
-    #  print(particle.lm)
-    #  print(Pf)
-    #  input()
 
     return particle
 
@@ -196,7 +192,7 @@ def compute_weight(particle, z, R):
     den = 2.0 * math.pi * math.sqrt(np.linalg.det(S))
 
     w = num / den
-    print(w)
+    #  print(w)
 
     return w
 
@@ -216,8 +212,8 @@ def update_with_observation(particles, z):
                 # w = p(z_k | x_k)
                 w = compute_weight(particles[ip], z[iz, :], Cx[0:2, 0:2])
                 particles[ip].w = particles[ip].w * w
-                particles[ip] = feature_update(
-                    particles[ip], z[iz, :], Cx[0:2, 0:2])
+                #  particles[ip] = feature_update(
+                #  particles[ip], z[iz, :], Cx[0:2, 0:2])
 
     return particles
 
@@ -233,10 +229,11 @@ def resampling(particles):
     for i in range(N_PARTICLE):
         pw.append(particles[i].w)
 
+    #  print("sumpw", sum(pw))
+
     pw = np.matrix(pw)
 
     Neff = 1.0 / (pw * pw.T)[0, 0]  # Effective particle number
-    print(Neff)
 
     if Neff < NTH:  # resampling
         print("resamping")
@@ -251,16 +248,14 @@ def resampling(particles):
                 ind += 1
             inds.append(ind)
 
-        #  print(inds)
-        #  print(pw)
-
         tparticles = particles[:]
         for i in range(len(inds)):
-            particles[i] = tparticles[inds[i]]
+            particles[i].x = tparticles[inds[i]].x
+            particles[i].y = tparticles[inds[i]].y
+            particles[i].yaw = tparticles[inds[i]].yaw
+            particles[i].lm = tparticles[inds[i]].lm[:, :]
+            particles[i].lmP = tparticles[inds[i]].lmP[:]
             particles[i].w = 1.0 / N_PARTICLE
-
-        particles = normalize_weight(particles)
-        #  input()
 
     return particles
 
@@ -279,7 +274,7 @@ def fast_slam(particles, PEst, u, z):
 
     xEst = calc_final_state(particles)
 
-    return xEst, PEst
+    return xEst, PEst, particles
 
 
 def calc_input():
@@ -399,7 +394,7 @@ def main():
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u, RFID)
 
-        xEst, PEst = fast_slam(particles, PEst, ud, z)
+        xEst, PEst, particles = fast_slam(particles, PEst, ud, z)
 
         x_state = xEst[0:STATE_SIZE]
 
@@ -415,10 +410,7 @@ def main():
 
             for i in range(N_PARTICLE):
                 plt.plot(particles[i].x, particles[i].y, ".r")
-
-                #  for ii in range(N_LM):
-                #  plt.plot(particles[i].lm[ii, 0],
-                #  particles[i].lm[ii, 1], "xb")
+                plt.plot(particles[i].lm[:, 0], particles[i].lm[:, 1], "xb")
 
             # plot landmark
             for i in range(calc_n_LM(xEst)):
