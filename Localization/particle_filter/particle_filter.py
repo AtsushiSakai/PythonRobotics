@@ -169,8 +169,15 @@ def plot_covariance_ellipse(xEst, PEst):
         smallind = 0
 
     t = np.arange(0, 2 * math.pi + 0.1, 0.1)
-    a = math.sqrt(eigval[bigind])
-    b = math.sqrt(eigval[smallind])
+
+    #eigval[bigind] or eiqval[smallind] were occassionally negative numbers extremely
+    #close to 0 (~10^-20), catch these cases and set the respective variable to 0
+    try: a = math.sqrt(eigval[bigind])
+    except ValueError: a = 0
+
+    try: b = math.sqrt(eigval[smallind])
+    except ValueError: b = 0
+
     x = [a * math.cos(it) for it in t]
     y = [b * math.sin(it) for it in t]
     angle = math.atan2(eigvec[bigind, 1], eigvec[bigind, 0])
