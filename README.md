@@ -168,6 +168,27 @@ Ref:
 
 - [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
 
+## Fast SLAM 1.0
+
+This is a feature based SLAM example using FastSLAM 1.0.
+
+The blue line is ground truth, the black line is dead reckoning, the red line is the estimated trajectory with FastSLAM1.0.
+
+The red points are particles of FastSLAM.
+
+Black points are landmarks, Blue crosses are estimated landmark positions by FastSLAM.
+
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/FastSLAM1/animation.gif)
+
+
+Ref:
+
+- [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
+
+- [Matlab Utilities](http://www-personal.acfr.usyd.edu.au/tbailey/software/slam_simulations.htm)
+
+
 # Path Planning
 
 ## Dynamic Window Approach
