@@ -12,15 +12,12 @@ import matplotlib.pyplot as plt
 
 
 # EKF state covariance
-Cx = np.matrix([[0.1, 0.0, 0.1],
-                [0.0, math.radians(1.0), 0.1],
-                [0.1, 0.0, math.radians(30.0)]])
-
-R = np.diag([1.0, math.radians(10.0)])**2
+Q = np.diag([1.0, math.radians(4.0)])**2
+R = np.diag([0.5, math.radians(15.0)])**2
 
 #  Simulation parameter
-Qsim = np.diag([0.0, math.radians(0.0)])**2
-Rsim = np.diag([1.0, math.radians(10.0)])**2
+Qsim = np.diag([0.3, math.radians(2.0)])**2
+Rsim = np.diag([0.5, math.radians(10.0)])**2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
@@ -28,9 +25,7 @@ MAX_RANGE = 20.0  # maximum observation range
 M_DIST_TH = 2.0  # Threshold of Mahalanobis distance for data association.
 STATE_SIZE = 3  # State size [x,y,yaw]
 LM_SIZE = 2  # LM srate size [x,y]
-
 N_PARTICLE = 100  # number of particle
-
 NTH = N_PARTICLE / 2.0  # Number of particle for re-sampling
 
 show_animation = True
@@ -45,6 +40,19 @@ class Particle:
         self.yaw = 0.0
         self.lm = np.matrix(np.zeros((N_LM, 2)))
         self.lmP = np.matrix(np.zeros((N_LM * 2, 2)))
+
+
+def fast_slam(particles, PEst, u, z):
+
+    particles = predict_particles(particles, u)
+
+    particles = update_with_observation(particles, z)
+
+    particles = resampling(particles)
+
+    xEst = calc_final_state(particles)
+
+    return xEst, PEst, particles
 
 
 def normalize_weight(particles):
@@ -87,7 +95,7 @@ def predict_particles(particles, u):
         px[0, 0] = particles[i].x
         px[1, 0] = particles[i].y
         px[2, 0] = particles[i].yaw
-        ud = u + (np.matrix(np.random.randn(1, 2)) * Rsim).T  # add noise
+        ud = u + (np.matrix(np.random.randn(1, 2)) * R).T  # add noise
         px = motion_model(px, ud)
         particles[i].x = px[0, 0]
         particles[i].y = px[1, 0]
@@ -96,7 +104,7 @@ def predict_particles(particles, u):
     return particles
 
 
-def add_new_lm(particle, z):
+def add_new_lm(particle, z, Q):
 
     r = z[0, 0]
     b = z[0, 1]
@@ -112,12 +120,12 @@ def add_new_lm(particle, z):
     Gz = np.matrix([[c, -r * s],
                     [s, r * c]])
 
-    particle.lmP[2 * lm_id:2 * lm_id + 2] = Gz * Cx[0: 2, 0: 2] * Gz.T
+    particle.lmP[2 * lm_id:2 * lm_id + 2] = Gz * Q * Gz.T
 
     return particle
 
 
-def compute_jacobians(particle, xf, Pf, R):
+def compute_jacobians(particle, xf, Pf, Q):
     dx = xf[0, 0] - particle.x
     dy = xf[1, 0] - particle.y
     d2 = dx**2 + dy**2
@@ -131,14 +139,14 @@ def compute_jacobians(particle, xf, Pf, R):
     Hf = np.matrix([[dx / d, dy / d],
                     [-dy / d2, dx / d2]])
 
-    Sf = Hf * Pf * Hf.T + R
+    Sf = Hf * Pf * Hf.T + Q
 
     return zp, Hv, Hf, Sf
 
 
-def update_KF_with_cholesky(xf, Pf, v, R, Hf):
+def update_KF_with_cholesky(xf, Pf, v, Q, Hf):
     PHt = Pf * Hf.T
-    S = Hf * PHt + R
+    S = Hf * PHt + Q
 
     S = (S + S.T) * 0.5
     SChol = np.linalg.cholesky(S).T
@@ -152,18 +160,18 @@ def update_KF_with_cholesky(xf, Pf, v, R, Hf):
     return x, P
 
 
-def update_landmark(particle, z, R):
+def update_landmark(particle, z, Q):
 
     lm_id = int(z[0, 2])
     xf = np.matrix(particle.lm[lm_id, :]).T
     Pf = np.matrix(particle.lmP[2 * lm_id:2 * lm_id + 2, :])
 
-    zp, Hv, Hf, Sf = compute_jacobians(particle, xf, Pf, R)
+    zp, Hv, Hf, Sf = compute_jacobians(particle, xf, Pf, Q)
 
     dz = z[0, 0: 2].T - zp
     dz[1, 0] = pi_2_pi(dz[1, 0])
 
-    xf, Pf = update_KF_with_cholesky(xf, Pf, dz, R, Hf)
+    xf, Pf = update_KF_with_cholesky(xf, Pf, dz, Q, Hf)
 
     particle.lm[lm_id, :] = xf.T
     particle.lmP[2 * lm_id:2 * lm_id + 2, :] = Pf
@@ -171,12 +179,12 @@ def update_landmark(particle, z, R):
     return particle
 
 
-def compute_weight(particle, z, R):
+def compute_weight(particle, z, Q):
 
     lm_id = int(z[0, 2])
     xf = np.matrix(particle.lm[lm_id, :]).T
     Pf = np.matrix(particle.lmP[2 * lm_id:2 * lm_id + 2])
-    zp, Hv, Hf, Sf = compute_jacobians(particle, xf, Pf, R)
+    zp, Hv, Hf, Sf = compute_jacobians(particle, xf, Pf, Q)
 
     dx = z[0, 0: 2].T - zp
     dx[1, 0] = pi_2_pi(dx[1, 0])
@@ -204,13 +212,12 @@ def update_with_observation(particles, z):
         for ip in range(N_PARTICLE):
             # new landmark
             if abs(particles[ip].lm[lmid, 0]) <= 0.01:
-                particles[ip] = add_new_lm(particles[ip], z[iz, :])
+                particles[ip] = add_new_lm(particles[ip], z[iz, :], Q)
             # known landmark
             else:
-                # w = p(z_k | x_k)
-                w = compute_weight(particles[ip], z[iz, :], Cx[0: 2, 0: 2])
+                w = compute_weight(particles[ip], z[iz, :], Q)
                 particles[ip].w = particles[ip].w * w
-                particles[ip] = update_landmark(particles[ip], z[iz, :], R)
+                particles[ip] = update_landmark(particles[ip], z[iz, :], Q)
 
     return particles
 
@@ -229,9 +236,10 @@ def resampling(particles):
     pw = np.matrix(pw)
 
     Neff = 1.0 / (pw * pw.T)[0, 0]  # Effective particle number
+    #  print(Neff)
 
     if Neff < NTH:  # resampling
-        #  print("resamping")
+        #  print("resampling")
         wcum = np.cumsum(pw)
         base = np.cumsum(pw * 0.0 + 1 / N_PARTICLE) - 1 / N_PARTICLE
         resampleid = base + np.random.rand(base.shape[1]) / N_PARTICLE
@@ -253,23 +261,6 @@ def resampling(particles):
             particles[i].w = 1.0 / N_PARTICLE
 
     return particles
-
-
-def fast_slam(particles, PEst, u, z):
-
-    # Predict
-    particles = predict_particles(particles, u)
-
-    # Observation
-    particles = update_with_observation(particles, z)
-
-    particles = normalize_weight(particles)
-
-    particles = resampling(particles)
-
-    xEst = calc_final_state(particles)
-
-    return xEst, PEst, particles
 
 
 def calc_input():
@@ -300,7 +291,7 @@ def observation(xTrue, xd, u, RFID):
 
     # add noise to input
     ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
-    ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1]
+    ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1] + 0.01
     ud = np.matrix([ud1, ud2]).T
 
     xd = motion_model(xd, ud)
@@ -325,28 +316,6 @@ def motion_model(x, u):
     return x
 
 
-def calc_n_LM(x):
-    n = int((len(x) - STATE_SIZE) / LM_SIZE)
-    return n
-
-
-def calc_LM_Pos(x, z):
-
-    zp = np.zeros((2, 1))
-
-    zp[0, 0] = x[0, 0] + z[0, 0] * math.cos(x[2, 0] + z[0, 1])
-    zp[1, 0] = x[1, 0] + z[0, 0] * math.sin(x[2, 0] + z[0, 1])
-
-    return zp
-
-
-def get_LM_Pos_from_state(x, ind):
-
-    lm = x[STATE_SIZE + LM_SIZE * ind: STATE_SIZE + LM_SIZE * (ind + 1), :]
-
-    return lm
-
-
 def pi_2_pi(angle):
     while(angle > math.pi):
         angle = angle - 2.0 * math.pi
@@ -366,7 +335,9 @@ def main():
     RFID = np.array([[10.0, -2.0],
                      [15.0, 10.0],
                      [3.0, 15.0],
-                     [-5.0, 20.0]])
+                     [-5.0, 20.0],
+                     [-5.0, 5.0]
+                     ])
     N_LM = RFID.shape[0]
 
     # State Vector [x y yaw v]'
@@ -400,17 +371,11 @@ def main():
 
         if show_animation:
             plt.cla()
-
             plt.plot(RFID[:, 0], RFID[:, 1], "*k")
 
             for i in range(N_PARTICLE):
                 plt.plot(particles[i].x, particles[i].y, ".r")
                 plt.plot(particles[i].lm[:, 0], particles[i].lm[:, 1], "xb")
-
-            # plot landmark
-            for i in range(calc_n_LM(xEst)):
-                plt.plot(xEst[STATE_SIZE + i * 2],
-                         xEst[STATE_SIZE + i * 2 + 1], "xg")
 
             plt.plot(np.array(hxTrue[0, :]).flatten(),
                      np.array(hxTrue[1, :]).flatten(), "-b")
