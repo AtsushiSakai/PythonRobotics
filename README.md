@@ -173,7 +173,7 @@ Ref:
 
 This is a feature based SLAM example using FastSLAM 1.0.
 
-The blue line is ground truth, the black line is dead reckoning, the red line is the estimated trajectory with FastSLAM 1.0.
+The blue line is ground truth, the black line is dead reckoning, the red line is the estimated trajectory with FastSLAM.
 
 The red points are particles of FastSLAM.
 
@@ -187,7 +187,7 @@ Ref:
 
 - [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
 
-- [Matlab Utilities](http://www-personal.acfr.usyd.edu.au/tbailey/software/slam_simulations.htm)
+- [SLAM simulations by Tim Bailey](http://www-personal.acfr.usyd.edu.au/tbailey/software/slam_simulations.htm)
 
 
 # Path Planning
