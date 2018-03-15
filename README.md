@@ -18,6 +18,7 @@ Python codes for robotics algorithm.
    * [SLAM](#slam)
       * [Iterative Closest Point (ICP) Matching](#iterative-closest-point-icp-matching)
       * [EKF SLAM](#ekf-slam)
+      * [FastSLAM 1.0](#fastslam-10)
    * [Path Planning](#path-planning)
       * [Dynamic Window Approach](#dynamic-window-approach)
       * [Grid based search](#grid-based-search)
@@ -168,15 +169,15 @@ Ref:
 
 - [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
 
-## Fast SLAM 1.0
+## FastSLAM 1.0
 
 This is a feature based SLAM example using FastSLAM 1.0.
 
-The blue line is ground truth, the black line is dead reckoning, the red line is the estimated trajectory with FastSLAM1.0.
+The blue line is ground truth, the black line is dead reckoning, the red line is the estimated trajectory with FastSLAM 1.0.
 
 The red points are particles of FastSLAM.
 
-Black points are landmarks, Blue crosses are estimated landmark positions by FastSLAM.
+Black points are landmarks, blue crosses are estimated landmark positions by FastSLAM.
 
 
 ![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/FastSLAM1/animation.gif)
@@ -565,6 +566,7 @@ A small PR like bug fix is welcome.
 # Author
 
 Atsushi Sakai ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
+
 
 
 
