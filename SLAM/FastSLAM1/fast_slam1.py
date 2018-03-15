@@ -1,6 +1,6 @@
 """
 
-Fast SLAM example
+FastSLAM 1.0 example
 
 author: Atsushi Sakai (@Atsushi_twi)
 
@@ -11,13 +11,14 @@ import math
 import matplotlib.pyplot as plt
 
 
-# EKF state covariance
-Q = np.diag([1.0, math.radians(4.0)])**2
-R = np.diag([0.5, math.radians(15.0)])**2
+# Fast SLAM covariance
+Q = np.diag([3.0, math.radians(10.0)])**2
+R = np.diag([1.0, math.radians(20.0)])**2
 
 #  Simulation parameter
 Qsim = np.diag([0.3, math.radians(2.0)])**2
 Rsim = np.diag([0.5, math.radians(10.0)])**2
+OFFSET_YAWRATE_NOISE = 0.01
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
@@ -26,7 +27,7 @@ M_DIST_TH = 2.0  # Threshold of Mahalanobis distance for data association.
 STATE_SIZE = 3  # State size [x,y,yaw]
 LM_SIZE = 2  # LM srate size [x,y]
 N_PARTICLE = 100  # number of particle
-NTH = N_PARTICLE / 2.0  # Number of particle for re-sampling
+NTH = N_PARTICLE / 1.5  # Number of particle for re-sampling
 
 show_animation = True
 
@@ -38,11 +39,13 @@ class Particle:
         self.x = 0.0
         self.y = 0.0
         self.yaw = 0.0
-        self.lm = np.matrix(np.zeros((N_LM, 2)))
-        self.lmP = np.matrix(np.zeros((N_LM * 2, 2)))
+        # landmark x-y positions
+        self.lm = np.matrix(np.zeros((N_LM, LM_SIZE)))
+        # landmark position covariance
+        self.lmP = np.matrix(np.zeros((N_LM * LM_SIZE, LM_SIZE)))
 
 
-def fast_slam(particles, PEst, u, z):
+def fast_slam(particles, u, z):
 
     particles = predict_particles(particles, u)
 
@@ -50,9 +53,7 @@ def fast_slam(particles, PEst, u, z):
 
     particles = resampling(particles)
 
-    xEst = calc_final_state(particles)
-
-    return xEst, PEst, particles
+    return particles
 
 
 def normalize_weight(particles):
@@ -193,6 +194,7 @@ def compute_weight(particle, z, Q):
     try:
         invS = np.linalg.inv(S)
     except np.linalg.linalg.LinAlgError:
+        print("singuler")
         return 1.0
 
     num = math.exp(-0.5 * dx.T * invS * dx)
@@ -216,7 +218,7 @@ def update_with_observation(particles, z):
             # known landmark
             else:
                 w = compute_weight(particles[ip], z[iz, :], Q)
-                particles[ip].w = particles[ip].w * w
+                particles[ip].w *= w
                 particles[ip] = update_landmark(particles[ip], z[iz, :], Q)
 
     return particles
@@ -239,7 +241,6 @@ def resampling(particles):
     #  print(Neff)
 
     if Neff < NTH:  # resampling
-        #  print("resampling")
         wcum = np.cumsum(pw)
         base = np.cumsum(pw * 0.0 + 1 / N_PARTICLE) - 1 / N_PARTICLE
         resampleid = base + np.random.rand(base.shape[1]) / N_PARTICLE
@@ -263,10 +264,17 @@ def resampling(particles):
     return particles
 
 
-def calc_input():
-    v = 1.0  # [m/s]
-    yawrate = 0.1  # [rad/s]
+def calc_input(time):
+
+    if time <= 3.0:
+        v = 0.0
+        yawrate = 0.0
+    else:
+        v = 1.0  # [m/s]
+        yawrate = 0.1  # [rad/s]
+
     u = np.matrix([v, yawrate]).T
+
     return u
 
 
@@ -291,7 +299,7 @@ def observation(xTrue, xd, u, RFID):
 
     # add noise to input
     ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
-    ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1] + 0.01
+    ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1] + OFFSET_YAWRATE_NOISE
     ud = np.matrix([ud1, ud2]).T
 
     xd = motion_model(xd, ud)
@@ -334,16 +342,18 @@ def main():
     # RFID positions [x, y]
     RFID = np.array([[10.0, -2.0],
                      [15.0, 10.0],
+                     [15.0, 15.0],
+                     [10.0, 20.0],
                      [3.0, 15.0],
                      [-5.0, 20.0],
-                     [-5.0, 5.0]
+                     [-5.0, 5.0],
+                     [-10.0, 15.0]
                      ])
     N_LM = RFID.shape[0]
 
     # State Vector [x y yaw v]'
     xEst = np.matrix(np.zeros((STATE_SIZE, 1)))
     xTrue = np.matrix(np.zeros((STATE_SIZE, 1)))
-    PEst = np.eye(STATE_SIZE)
 
     xDR = np.matrix(np.zeros((STATE_SIZE, 1)))  # Dead reckoning
 
@@ -356,11 +366,13 @@ def main():
 
     while SIM_TIME >= time:
         time += DT
-        u = calc_input()
+        u = calc_input(time)
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u, RFID)
 
-        xEst, PEst, particles = fast_slam(particles, PEst, ud, z)
+        particles = fast_slam(particles, ud, z)
+
+        xEst = calc_final_state(particles)
 
         x_state = xEst[0: STATE_SIZE]
 
