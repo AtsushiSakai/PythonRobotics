@@ -66,7 +66,9 @@ def motion_model(x, u):
 def draw_heatmap(data, minx, maxx, miny, maxy, xyreso):
     x, y = np.mgrid[slice(minx - xyreso / 2.0, maxx + xyreso / 2.0, xyreso),
                     slice(miny - xyreso / 2.0, maxy + xyreso / 2.0, xyreso)]
-    plt.pcolor(x, y, data, vmax=1.0, cmap=plt.cm.Blues)
+
+    maxp = max([max(igmap) for igmap in data])
+    plt.pcolor(x, y, data, vmax=maxp, cmap=plt.cm.Blues)
     plt.axis("equal")
 
 
@@ -93,7 +95,7 @@ def observation(xTrue, u, RFID):
 def normalize_probability(gmap):
 
     sump = sum([sum(igmap) for igmap in gmap])
-    #  print(sump)
+    print(sump)
 
     for i in range(len(gmap)):
         for ii in range(len(gmap[i])):
@@ -117,6 +119,15 @@ def init_gmap(xyreso):
     return gmap, minx, maxx, miny, maxy,
 
 
+def motion_update(gmap, u, yaw, xyreso, minx, miny):
+
+    dx = DT * math.cos(yaw)
+    dy = DT * math.sin(yaw)
+    print(dx, dy)
+
+    return gmap
+
+
 def main():
     print(__file__ + " start!!")
 
@@ -135,11 +146,15 @@ def main():
 
     gmap, minx, maxx, miny, maxy = init_gmap(xyreso)
 
+    dx, dy = 0.0, 0.0
+
     while SIM_TIME >= time:
         time += DT
 
         u = calc_input()
         xTrue, z = observation(xTrue, u, RFID)
+
+        gmap = motion_update(gmap, u, xTrue[2, 0], xyreso, minx, miny)
 
         gmap = observation_update(gmap, z, STD, xyreso, minx, miny)
 
