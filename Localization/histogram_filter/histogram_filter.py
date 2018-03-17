@@ -9,6 +9,7 @@ author: Atsushi Sakai (@Atsushi_twi)
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+import copy
 from scipy.stats import norm
 
 EXTEND_AREA = 10.0  # [m] grid map extention length
@@ -95,7 +96,6 @@ def observation(xTrue, u, RFID):
 def normalize_probability(gmap):
 
     sump = sum([sum(igmap) for igmap in gmap])
-    print(sump)
 
     for i in range(len(gmap)):
         for ii in range(len(gmap[i])):
@@ -119,13 +119,38 @@ def init_gmap(xyreso):
     return gmap, minx, maxx, miny, maxy,
 
 
-def motion_update(gmap, u, yaw, xyreso, minx, miny):
+def map_shift(gmap, xshift, yshift):
 
-    dx = DT * math.cos(yaw)
-    dy = DT * math.sin(yaw)
-    print(dx, dy)
+    tgmap = copy.deepcopy(gmap)
+
+    lenx = len(gmap)
+    leny = len(gmap[0])
+
+    for ix in range(lenx):
+        for iy in range(leny):
+            nix = ix + xshift
+            niy = iy + yshift
+
+            if nix >= 0 and nix < lenx and niy >= 0 and niy < leny:
+                gmap[ix + xshift][iy + yshift] = tgmap[ix][iy]
 
     return gmap
+
+
+def motion_update(gmap, u, yaw, dx, dy, xyreso, minx, miny):
+
+    dx += DT * math.cos(yaw) * u[0]
+    dy += DT * math.sin(yaw) * u[0]
+
+    xshift = dx // xyreso
+    yshift = dy // xyreso
+
+    if abs(xshift) >= 1.0 or abs(yshift) >= 1.0:
+        gmap = map_shift(gmap, int(xshift), int(yshift))
+        dx -= xshift * xyreso
+        dy -= yshift * xyreso
+
+    return gmap, dx, dy
 
 
 def main():
@@ -154,7 +179,8 @@ def main():
         u = calc_input()
         xTrue, z = observation(xTrue, u, RFID)
 
-        gmap = motion_update(gmap, u, xTrue[2, 0], xyreso, minx, miny)
+        gmap, dx, dy = motion_update(
+            gmap, u, xTrue[2, 0], dx, dy, xyreso, minx, miny)
 
         gmap = observation_update(gmap, z, STD, xyreso, minx, miny)
 
