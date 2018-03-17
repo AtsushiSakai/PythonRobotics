@@ -155,7 +155,10 @@ def calc_frenet_paths(c_speed, c_d, c_d_d, c_d_dd, s0):
 
     frenet_paths = []
 
+    # generate path to each offset goal
     for di in np.arange(-MAX_ROAD_WIDTH, MAX_ROAD_WIDTH, D_ROAD_W):
+
+        # Lateral motion planning
         for Ti in np.arange(MINT, MAXT, DT):
             fp = Frenet_path()
 
@@ -166,6 +169,7 @@ def calc_frenet_paths(c_speed, c_d, c_d_d, c_d_dd, s0):
             fp.d_d = [lat_qp.calc_first_derivative(t) for t in fp.t]
             fp.d_dd = [lat_qp.calc_second_derivative(t) for t in fp.t]
 
+            # Loongitudinal motion planning (Velocity keeping)
             for tv in np.arange(TARGET_SPEED - D_T_S * N_S_SAMPLE, TARGET_SPEED + D_T_S * N_S_SAMPLE, D_T_S):
                 tfp = copy.deepcopy(fp)
                 lon_qp = quartic_polynomial(s0, c_speed, 0.0, tv, 0.0, Ti)
@@ -174,9 +178,14 @@ def calc_frenet_paths(c_speed, c_d, c_d_d, c_d_dd, s0):
                 tfp.s_d = [lon_qp.calc_first_derivative(t) for t in fp.t]
                 tfp.s_dd = [lon_qp.calc_second_derivative(t) for t in fp.t]
 
-                tfp.cd = KJ * sum(tfp.d_dd) + KT * Ti + KD * tfp.d[-1]**2
-                tfp.cv = KJ * sum(tfp.s_dd) + KT * Ti + KD * \
-                    (TARGET_SPEED - tfp.s_d[-1])**2
+                Jp = sum(np.diff(tfp.d_dd)**2)  # square of jerk
+                Js = sum(np.diff(tfp.s_dd)**2)  # square of jerk
+
+                # square of diff from target speed
+                ds = (TARGET_SPEED - tfp.s_d[-1])**2
+
+                tfp.cd = KJ * Jp + KT * Ti + KD * tfp.d[-1]**2
+                tfp.cv = KJ * Js + KT * Ti + KD * ds
                 tfp.cf = KLAT * tfp.cd + KLON * tfp.cv
 
                 frenet_paths.append(tfp)
