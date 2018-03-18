@@ -19,15 +19,25 @@ from scipy.stats import norm
 from scipy.ndimage import gaussian_filter
 
 # Parameters
-NOISE_RANGE = 2.0  # [m] 1σ range noise parameter
-NOISE_SPEED = 0.5  # [m/s] 1σ speed noise parameter
-
 EXTEND_AREA = 10.0  # [m] grid map extention length
 SIM_TIME = 50.0  # simulation time [s]
 DT = 0.1  # time tick [s]
 MAX_RANGE = 10.0  # maximum observation range
-MOTION_STD = 1.0
-RANGE_STD = 3.0  # standard diviation for gaussian distribution
+MOTION_STD = 1.0  # standard deviation for motion gaussian distribution
+RANGE_STD = 3.0  # standard deviation for observation gaussian distribution
+
+# grid map param
+XY_RESO = 0.5  # xy grid resolution
+MINX = -15.0
+MINY = -5.0
+MAXX = 15.0
+MAXY = 25.0
+
+
+# simulation paramters
+NOISE_RANGE = 2.0  # [m] 1σ range noise parameter
+NOISE_SPEED = 0.5  # [m/s] 1σ speed noise parameter
+
 
 show_animation = True
 
@@ -41,34 +51,41 @@ class grid_map():
         self.miny = None
         self.maxx = None
         self.maxx = None
+        self.xw = None
+        self.yw = None
+        self.dx = 0.0  # movement distance
+        self.dy = 0.0  # movement distance
 
 
-def histogram_filter_localization(gmap, u, z, yaw, dx, dy):
+def histogram_filter_localization(gmap, u, z, yaw):
 
-    gmap, dx, dy = motion_update(gmap, u, yaw, dx, dy)
+    gmap = motion_update(gmap, u, yaw)
 
     gmap = observation_update(gmap, z, RANGE_STD)
 
-    return gmap.data, dx, dy
+    return gmap
+
+
+def calc_gaussian_observation_pdf(gmap, z, iz, ix, iy, std):
+
+    # predicted range
+    x = ix * gmap.xyreso + gmap.minx
+    y = iy * gmap.xyreso + gmap.miny
+    d = math.sqrt((x - z[iz, 1])**2 + (y - z[iz, 2])**2)
+
+    # likelihood
+    pdf = (1.0 - norm.cdf(abs(d - z[iz, 0]), 0.0, std))
+
+    return pdf
 
 
 def observation_update(gmap, z, std):
 
     for iz in range(z.shape[0]):
-        for ix in range(len(gmap.data)):
-            for iy in range(len(gmap.data[ix])):
-
-                # observation range
-                zr = z[iz, 0]
-
-                # predicted range
-                x = ix * gmap.xyreso + gmap.minx
-                y = iy * gmap.xyreso + gmap.miny
-                d = math.sqrt((x - z[iz, 1])**2 + (y - z[iz, 2])**2)
-
-                # likelihood
-                pdf = (1.0 - norm.cdf(abs(d - zr), 0.0, std))
-                gmap.data[ix][iy] *= pdf
+        for ix in range(gmap.xw):
+            for iy in range(gmap.yw):
+                gmap.data[ix][iy] *= calc_gaussian_observation_pdf(
+                    gmap, z, iz, ix, iy, std)
 
     gmap = normalize_probability(gmap)
 
@@ -133,22 +150,22 @@ def normalize_probability(gmap):
 
     sump = sum([sum(igmap) for igmap in gmap.data])
 
-    for i in range(len(gmap.data)):
-        for ii in range(len(gmap.data[i])):
-            gmap.data[i][ii] /= sump
+    for ix in range(gmap.xw):
+        for iy in range(gmap.yw):
+            gmap.data[ix][iy] /= sump
 
     return gmap
 
 
-def init_gmap(xyreso):
+def init_gmap(xyreso, minx, miny, maxx, maxy):
 
     gmap = grid_map()
 
     gmap.xyreso = xyreso
-    gmap.minx = -15.0
-    gmap.miny = -5.0
-    gmap.maxx = 15.0
-    gmap.maxy = 25.0
+    gmap.minx = minx
+    gmap.miny = miny
+    gmap.maxx = maxx
+    gmap.maxy = maxy
     gmap.xw = int(round((gmap.maxx - gmap.minx) / gmap.xyreso))
     gmap.yw = int(round((gmap.maxy - gmap.miny) / gmap.xyreso))
 
@@ -162,42 +179,44 @@ def map_shift(gmap, xshift, yshift):
 
     tgmap = copy.deepcopy(gmap.data)
 
-    lenx = len(gmap.data)
-    leny = len(gmap.data[0])
-
-    for ix in range(lenx):
-        for iy in range(leny):
+    for ix in range(gmap.xw):
+        for iy in range(gmap.yw):
             nix = ix + xshift
             niy = iy + yshift
 
-            if nix >= 0 and nix < lenx and niy >= 0 and niy < leny:
+            if nix >= 0 and nix < gmap.xw and niy >= 0 and niy < gmap.yw:
                 gmap.data[ix + xshift][iy + yshift] = tgmap[ix][iy]
 
     return gmap
 
 
-def motion_update(gmap, u, yaw, dx, dy):
+def motion_update(gmap, u, yaw):
 
-    dx += DT * math.cos(yaw) * u[0]
-    dy += DT * math.sin(yaw) * u[0]
+    gmap.dx += DT * math.cos(yaw) * u[0]
+    gmap.dy += DT * math.sin(yaw) * u[0]
 
-    xshift = dx // gmap.xyreso
-    yshift = dy // gmap.xyreso
+    xshift = gmap.dx // gmap.xyreso
+    yshift = gmap.dy // gmap.xyreso
 
-    if abs(xshift) >= 1.0 or abs(yshift) >= 1.0:
+    if abs(xshift) >= 1.0 or abs(yshift) >= 1.0:  # map should be shifted
         gmap = map_shift(gmap, int(xshift), int(yshift))
-        dx -= xshift * gmap.xyreso
-        dy -= yshift * gmap.xyreso
+        gmap.dx -= xshift * gmap.xyreso
+        gmap.dy -= yshift * gmap.xyreso
 
     gmap.data = gaussian_filter(gmap.data, sigma=MOTION_STD)
 
-    return gmap, dx, dy
+    return gmap
+
+
+def calc_grid_index(gmap):
+    mx, my = np.mgrid[slice(gmap.minx - gmap.xyreso / 2.0, gmap.maxx + gmap.xyreso / 2.0, gmap.xyreso),
+                      slice(gmap.miny - gmap.xyreso / 2.0, gmap.maxy + gmap.xyreso / 2.0, gmap.xyreso)]
+
+    return mx, my
 
 
 def main():
     print(__file__ + " start!!")
-
-    xyreso = 0.5  # xy grid resolution
 
     # RFID positions [x, y]
     RFID = np.array([[10.0, 0.0],
@@ -208,25 +227,18 @@ def main():
     time = 0.0
 
     xTrue = np.matrix(np.zeros((4, 1)))
-
-    gmap = init_gmap(xyreso)
-
-    dx, dy = 0.0, 0.0
-
-    mx, my = np.mgrid[slice(gmap.minx - gmap.xyreso / 2.0, gmap.maxx + gmap.xyreso / 2.0, gmap.xyreso),
-                      slice(gmap.miny - gmap.xyreso / 2.0, gmap.maxy + gmap.xyreso / 2.0, gmap.xyreso)]
+    gmap = init_gmap(XY_RESO, MINX, MINY, MAXX, MAXY)
+    mx, my = calc_grid_index(gmap)  # for grid map visualization
 
     while SIM_TIME >= time:
         time += DT
 
         u = calc_input()
 
-        # Orientation is known in this simulation
-        yaw = xTrue[2, 0]
+        yaw = xTrue[2, 0]  # Orientation is known
         xTrue, z, ud = observation(xTrue, u, RFID)
 
-        gmap.data, dx, dy = histogram_filter_localization(
-            gmap, u, z, yaw, dx, dy)
+        gmap = histogram_filter_localization(gmap, u, z, yaw)
 
         if show_animation:
             plt.cla()
