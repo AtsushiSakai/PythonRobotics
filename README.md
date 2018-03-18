@@ -11,7 +11,8 @@ Python codes for robotics algorithm.
    * [Localization](#localization)
       * [Extended Kalman Filter localization](#extended-kalman-filter-localization)
       * [Unscented Kalman Filter localization](#unscented-kalman-filter-localization)
-      * [Particle Filter localization](#particle-filter-localization)
+      * [Particle filter localization](#particle-filter-localization)
+      * [Histogram filter localization](#histogram-filter-localization)
    * [Mapping](#mapping)
       * [Gaussian grid map](#gaussian-grid-map)
       * [Ray casting grid map](#ray-casting-grid-map)
@@ -97,6 +98,10 @@ the green point is positioning observation (ex. GPS), and the red line is estima
 
 The red ellipse is estimated covariance ellipse with EKF.
 
+Ref:
+
+- [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
+
 ## Unscented Kalman Filter localization
 
 ![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Localization/unscented_kalman_filter/animation.gif)
@@ -109,7 +114,8 @@ Ref:
 
 - [Discriminatively Trained Unscented Kalman Filter for Mobile Robot Localization](https://www.researchgate.net/publication/267963417_Discriminatively_Trained_Unscented_Kalman_Filter_for_Mobile_Robot_Localization)
 
-## Particle Filter localization
+
+## Particle filter localization
 
 ![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Localization/particle_filter/animation.gif)
 
@@ -122,6 +128,27 @@ and the red line is estimated trajectory with PF.
 It is assumed that the robot can measure a distance from landmarks (RFID).
 
 This measurements are used for PF localization.
+
+Ref:
+
+- [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
+
+
+## Histogram filter localization
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Localization/histogram_filter/animation.gif)
+
+This is a 2D localization example with Histogram filter.
+
+In this simulation, x,y are unknown, yaw is known.
+
+The filter integrates speed input and range observations from RFID for localization.
+
+Initial position is not needed.
+
+Ref:
+
+- [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
 
 # Mapping
 
@@ -566,6 +593,7 @@ A small PR like bug fix is welcome.
 # Author
 
 Atsushi Sakai ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
+
 
 
 

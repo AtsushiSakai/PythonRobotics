@@ -33,7 +33,6 @@ MINY = -5.0
 MAXX = 15.0
 MAXY = 25.0
 
-
 # simulation paramters
 NOISE_RANGE = 2.0  # [m] 1σ range noise parameter
 NOISE_SPEED = 0.5  # [m/s] 1σ speed noise parameter
