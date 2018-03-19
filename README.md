@@ -60,6 +60,18 @@ Python codes for robotics algorithm.
    * [Contribution](#contribution)
    * [Author](#author)
 
+# What is this?
+
+This is a Python code collection of robotics, especially autonomous navigation.
+
+Feature:
+
+1. Widely used and practical algorithms are selected.
+
+2. Minimum dependency.
+
+3. Easy to read for understanding the algorithm's basic idea.
+
 # Requirements
 
 - Python 3.6.x
