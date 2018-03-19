@@ -5,7 +5,9 @@
 
 Python codes for robotics algorithm.
 
+
 # Table of Contents
+   * [What is this?](#what-is-this)
    * [Requirements](#requirements)
    * [How to use](#how-to-use)
    * [Localization](#localization)
@@ -70,7 +72,7 @@ Feature:
 
 2. Minimum dependency.
 
-3. Easy to read for understanding the algorithm's basic idea.
+3. Easy to read for understanding each algorithm's basic idea.
 
 # Requirements
 
@@ -609,6 +611,7 @@ A small PR like bug fix is welcome.
 # Author
 
 Atsushi Sakai ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
+
 
 
 
