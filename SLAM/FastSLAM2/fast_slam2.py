@@ -1,6 +1,6 @@
 """
 
-FastSLAM 1.0 example
+FastSLAM 2.0 example
 
 author: Atsushi Sakai (@Atsushi_twi)
 
@@ -45,7 +45,7 @@ class Particle:
         self.lmP = np.matrix(np.zeros((N_LM * LM_SIZE, LM_SIZE)))
 
 
-def fast_slam1(particles, u, z):
+def fast_slam2(particles, u, z):
 
     particles = predict_particles(particles, u)
 
@@ -370,7 +370,7 @@ def main():
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u, RFID)
 
-        particles = fast_slam1(particles, ud, z)
+        particles = fast_slam2(particles, ud, z)
 
         xEst = calc_final_state(particles)
 
