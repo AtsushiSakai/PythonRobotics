@@ -25,8 +25,8 @@ def calc_potential_field(gx, gy, ox, oy, reso, rr):
     miny = min(oy) - AREA_WIDTH / 2.0
     maxx = max(ox) + AREA_WIDTH / 2.0
     maxy = max(oy) + AREA_WIDTH / 2.0
-    xw = round((maxx - minx) / reso)
-    yw = round((maxy - miny) / reso)
+    xw = int(round((maxx - minx) / reso))
+    yw = int(round((maxy - miny) / reso))
 
     # calc each potential
     pmap = [[0.0 for i in range(yw)] for i in range(xw)]
@@ -107,8 +107,8 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
         minp = float("inf")
         minix, miniy = -1, -1
         for i in range(len(motion)):
-            inx = ix + motion[i][0]
-            iny = iy + motion[i][1]
+            inx = int(ix + motion[i][0])
+            iny = int(iy + motion[i][1])
             if inx >= len(pmap) or iny >= len(pmap[0]):
                 p = float("inf")  # outside area
             else:
