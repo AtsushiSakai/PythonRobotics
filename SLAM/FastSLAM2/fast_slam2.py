@@ -27,7 +27,7 @@ M_DIST_TH = 2.0  # Threshold of Mahalanobis distance for data association.
 STATE_SIZE = 3  # State size [x,y,yaw]
 LM_SIZE = 2  # LM srate size [x,y]
 N_PARTICLE = 100  # number of particle
-NTH = N_PARTICLE / 1.5  # Number of particle for re-sampling
+NTH = N_PARTICLE / 1.0  # Number of particle for re-sampling
 
 show_animation = True
 
@@ -61,14 +61,14 @@ def normalize_weight(particles):
 
     sumw = sum([p.w for p in particles])
 
-    if sumw <= 0.0000001:
+    try:
+        for i in range(N_PARTICLE):
+            particles[i].w /= sumw
+    except ZeroDivisionError:
         for i in range(N_PARTICLE):
             particles[i].w = 1.0 / N_PARTICLE
 
         return particles
-
-    for i in range(N_PARTICLE):
-        particles[i].w /= sumw
 
     return particles
 
@@ -188,8 +188,8 @@ def compute_weight(particle, z, Q):
     Pf = np.matrix(particle.lmP[2 * lm_id:2 * lm_id + 2])
     zp, Hv, Hf, Sf = compute_jacobians(particle, xf, Pf, Q)
 
-    dx = z[0, 0: 2].T - zp
-    dx[1, 0] = pi_2_pi(dx[1, 0])
+    dz = z[0, 0: 2].T - zp
+    dz[1, 0] = pi_2_pi(dz[1, 0])
 
     S = particle.lmP[2 * lm_id:2 * lm_id + 2]
     try:
@@ -198,7 +198,7 @@ def compute_weight(particle, z, Q):
         print("singuler")
         return 1.0
 
-    num = math.exp(-0.5 * dx.T * invS * dx)
+    num = math.exp(-0.5 * dz.T * invS * dz)
     den = 2.0 * math.pi * math.sqrt(np.linalg.det(S))
 
     w = num / den
@@ -247,8 +247,8 @@ def update_with_observation(particles, z):
                 w = compute_weight(particles[ip], z[iz, :], Q)
                 particles[ip].w *= w
 
-                particles[ip] = proposal_sampling(particles[ip], z[iz, :], Q)
                 particles[ip] = update_landmark(particles[ip], z[iz, :], Q)
+                particles[ip] = proposal_sampling(particles[ip], z[iz, :], Q)
 
     return particles
 
@@ -267,7 +267,7 @@ def resampling(particles):
     pw = np.matrix(pw)
 
     Neff = 1.0 / (pw * pw.T)[0, 0]  # Effective particle number
-    #  print(Neff)
+    print(Neff)
 
     if Neff < NTH:  # resampling
         wcum = np.cumsum(pw)
@@ -319,7 +319,7 @@ def observation(xTrue, xd, u, RFID):
         dx = RFID[i, 0] - xTrue[0, 0]
         dy = RFID[i, 1] - xTrue[1, 0]
         d = math.sqrt(dx**2 + dy**2)
-        angle = pi_2_pi(math.atan2(dy, dx) - xTrue[2, 0])
+        angle = math.atan2(dy, dx) - xTrue[2, 0]
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Qsim[0, 0]  # add noise
             anglen = angle + np.random.randn() * Qsim[1, 1]  # add noise
@@ -413,6 +413,11 @@ def main():
         if show_animation:
             plt.cla()
             plt.plot(RFID[:, 0], RFID[:, 1], "*k")
+
+            for iz in range(len(z[:, 0])):
+                lmid = int(z[iz, 2])
+                plt.plot([xEst[0, 0], RFID[lmid, 0]], [
+                         xEst[1, 0], RFID[lmid, 1]], "-k")
 
             for i in range(N_PARTICLE):
                 plt.plot(particles[i].x, particles[i].y, ".r")
