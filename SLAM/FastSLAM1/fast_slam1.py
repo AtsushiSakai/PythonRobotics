@@ -60,14 +60,14 @@ def normalize_weight(particles):
 
     sumw = sum([p.w for p in particles])
 
-    if sumw <= 0.0000001:
+    try:
+        for i in range(N_PARTICLE):
+            particles[i].w /= sumw
+    except ZeroDivisionError:
         for i in range(N_PARTICLE):
             particles[i].w = 1.0 / N_PARTICLE
 
         return particles
-
-    for i in range(N_PARTICLE):
-        particles[i].w /= sumw
 
     return particles
 
