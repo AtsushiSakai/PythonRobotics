@@ -5,9 +5,62 @@
 
 Python codes for robotics algorithm.
 
-
-
 # Table of Contents
+   * [What is this?](#what-is-this)
+   * [Requirements](#requirements)
+   * [How to use](#how-to-use)
+   * [Localization](#localization)
+      * [Extended Kalman Filter localization](#extended-kalman-filter-localization)
+      * [Unscented Kalman Filter localization](#unscented-kalman-filter-localization)
+      * [Particle filter localization](#particle-filter-localization)
+      * [Histogram filter localization](#histogram-filter-localization)
+   * [Mapping](#mapping)
+      * [Gaussian grid map](#gaussian-grid-map)
+      * [Ray casting grid map](#ray-casting-grid-map)
+   * [SLAM](#slam)
+      * [Iterative Closest Point (ICP) Matching](#iterative-closest-point-icp-matching)
+      * [EKF SLAM](#ekf-slam)
+      * [FastSLAM 1.0](#fastslam-10)
+      * [FastSLAM 2.0](#fastslam-20)
+   * [Path Planning](#path-planning)
+      * [Dynamic Window Approach](#dynamic-window-approach)
+      * [Grid based search](#grid-based-search)
+         * [Dijkstra algorithm](#dijkstra-algorithm)
+         * [A* algorithm](#a-algorithm)
+         * [Potential Field algorithm](#potential-field-algorithm)
+      * [Model Predictive Trajectory Generator](#model-predictive-trajectory-generator)
+         * [Path optimization sample](#path-optimization-sample)
+         * [Lookup table generation sample](#lookup-table-generation-sample)
+      * [State Lattice Planning](#state-lattice-planning)
+         * [Uniform polar sampling](#uniform-polar-sampling)
+         * [Biased polar sampling](#biased-polar-sampling)
+         * [Lane sampling](#lane-sampling)
+      * [Probabilistic Road-Map (PRM) planning](#probabilistic-road-map-prm-planning)
+      * [Voronoi Road-Map planning](#voronoi-road-map-planning)
+      * [Rapidly-Exploring Random Trees (RRT)](#rapidly-exploring-random-trees-rrt)
+         * [Basic RRT](#basic-rrt)
+         * [RRT*](#rrt)
+         * [RRT with dubins path](#rrt-with-dubins-path)
+         * [RRT* with dubins path](#rrt-with-dubins-path-1)
+         * [RRT* with reeds-sheep path](#rrt-with-reeds-sheep-path)
+         * [Closed Loop RRT*](#closed-loop-rrt)
+      * [Cubic spline planning](#cubic-spline-planning)
+      * [B-Spline planning](#b-spline-planning)
+      * [Bezier path planning](#bezier-path-planning)
+      * [Quintic polynomials planning](#quintic-polynomials-planning)
+      * [Dubins path planning](#dubins-path-planning)
+      * [Reeds Shepp planning](#reeds-shepp-planning)
+      * [Optimal Trajectory in a Frenet Frame](#optimal-trajectory-in-a-frenet-frame)
+   * [Path tracking](#path-tracking)
+      * [Pure pursuit tracking](#pure-pursuit-tracking)
+      * [Stanley control](#stanley-control)
+      * [Rear wheel feedback control](#rear-wheel-feedback-control)
+      * [Linear–quadratic regulator (LQR) steering control](#linearquadratic-regulator-lqr-steering-control)
+      * [Linear–quadratic regulator (LQR) speed and steering control](#linearquadratic-regulator-lqr-speed-and-steering-control)
+      * [Model predictive speed and steering control](#model-predictive-speed-and-steering-control)
+   * [License](#license)
+   * [Contribution](#contribution)
+   * [Author](#author)
 
 # What is this?
 
@@ -573,6 +626,7 @@ A small PR like bug fix is welcome.
 # Author
 
 Atsushi Sakai ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
+
 
 
 
