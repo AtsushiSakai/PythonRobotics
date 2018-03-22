@@ -39,6 +39,7 @@ class Particle:
         self.x = 0.0
         self.y = 0.0
         self.yaw = 0.0
+        self.P = np.eye(3)
         # landmark x-y positions
         self.lm = np.matrix(np.zeros((N_LM, LM_SIZE)))
         # landmark position covariance
@@ -205,6 +206,32 @@ def compute_weight(particle, z, Q):
     return w
 
 
+def proposal_sampling(particle, z, Q):
+
+    lm_id = int(z[0, 2])
+    xf = np.matrix(particle.lm[lm_id, :]).T
+    Pf = np.matrix(particle.lmP[2 * lm_id:2 * lm_id + 2])
+    # State
+    x = np.matrix([[particle.x, particle.y, particle.yaw]]).T
+    P = particle.P
+    zp, Hv, Hf, Sf = compute_jacobians(particle, xf, Pf, Q)
+
+    Sfi = np.linalg.inv(Sf)
+    dz = z[0, 0: 2].T - zp
+    dz[1, 0] = pi_2_pi(dz[1, 0])
+
+    Pi = np.linalg.inv(P)
+
+    particle.P = np.linalg.inv(Hv.T * Sfi * Hv + Pi)  # proposal covariance
+    x += particle.P * Hv.T * Sfi * dz  # proposal mean
+
+    particle.x = x[0, 0]
+    particle.y = x[1, 0]
+    particle.yaw = x[2, 0]
+
+    return particle
+
+
 def update_with_observation(particles, z):
 
     for iz in range(len(z[:, 0])):
@@ -219,6 +246,8 @@ def update_with_observation(particles, z):
             else:
                 w = compute_weight(particles[ip], z[iz, :], Q)
                 particles[ip].w *= w
+
+                particles[ip] = proposal_sampling(particles[ip], z[iz, :], Q)
                 particles[ip] = update_landmark(particles[ip], z[iz, :], Q)
 
     return particles
