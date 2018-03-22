@@ -50,7 +50,7 @@ def atan_zero_to_twopi(y, x):
 
 def precasting(minx, miny, xw, yw, xyreso, yawreso):
 
-    precast = [[] for i in range(round((math.pi * 2.0) / yawreso) + 1)]
+    precast = [[] for i in range(int(round((math.pi * 2.0) / yawreso)) + 1)]
 
     for ix in range(xw):
         for iy in range(yw):
@@ -59,7 +59,7 @@ def precasting(minx, miny, xw, yw, xyreso, yawreso):
 
             d = math.sqrt(px**2 + py**2)
             angle = atan_zero_to_twopi(py, px)
-            angleid = math.floor(angle / yawreso)
+            angleid = int(math.floor(angle / yawreso))
 
             pc = precastDB()
 
@@ -87,7 +87,7 @@ def generate_ray_casting_grid_map(ox, oy, xyreso, yawreso):
 
         d = math.sqrt(x**2 + y**2)
         angle = atan_zero_to_twopi(y, x)
-        angleid = math.floor(angle / yawreso)
+        angleid = int(math.floor(angle / yawreso))
 
         gridlist = precast[angleid]
 
