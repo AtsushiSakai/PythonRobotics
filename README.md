@@ -625,16 +625,7 @@ A small PR like bug fix is welcome.
 
 # Author
 
-Atsushi Sakai ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
-
-
-
-
-
-
-
-
-
+- [Atsushi Sakai](https://github.com/AtsushiSakai/) ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
 
 
 
