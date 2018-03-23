@@ -239,7 +239,7 @@ Ref:
 
 This is a feature based SLAM example using FastSLAM 2.0.
 
-The animation has same meanings as one of FASTSLAM 1.0.
+The animation has same meanings as one of FastSLAM 1.0.
 
 ![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/FastSLAM2/animation.gif)
 
