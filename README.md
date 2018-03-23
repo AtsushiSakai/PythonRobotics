@@ -5,6 +5,7 @@
 
 Python codes for robotics algorithm.
 
+
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -60,7 +61,7 @@ Python codes for robotics algorithm.
       * [Model predictive speed and steering control](#model-predictive-speed-and-steering-control)
    * [License](#license)
    * [Contribution](#contribution)
-   * [Author](#author)
+   * [Authors](#authors)
 
 # What is this?
 
@@ -623,13 +624,14 @@ If you have any quesions or problems about this code, feel free to add an issue.
 
 A small PR like bug fix is welcome.
 
-If your PR is merged multiple time, I will add your account the Author list.
+If your PR is merged multiple times, I will add your account to the Author list.
 
 # Authors
 
 - [Atsushi Sakai](https://github.com/AtsushiSakai/) ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
 
 - [Daniel Ingram](https://github.com/daniel-s-ingram)
+
 
 
 
