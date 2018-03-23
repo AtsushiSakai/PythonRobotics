@@ -267,7 +267,7 @@ def resampling(particles):
     pw = np.matrix(pw)
 
     Neff = 1.0 / (pw * pw.T)[0, 0]  # Effective particle number
-    print(Neff)
+    #  print(Neff)
 
     if Neff < NTH:  # resampling
         wcum = np.cumsum(pw)
