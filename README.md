@@ -623,10 +623,13 @@ If you have any quesions or problems about this code, feel free to add an issue.
 
 A small PR like bug fix is welcome.
 
-# Author
+If your PR is merged multiple time, I will add your account the Author list.
+
+# Authors
 
 - [Atsushi Sakai](https://github.com/AtsushiSakai/) ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
 
+- [Daniel Ingram](https://github.com/daniel-s-ingram)
 
 
 
