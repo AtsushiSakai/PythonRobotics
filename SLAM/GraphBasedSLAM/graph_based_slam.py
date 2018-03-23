@@ -33,34 +33,14 @@ def graph_based_slam(xEst, PEst, u, z):
     # Predict
     S = STATE_SIZE
     xEst[0:S] = motion_model(xEst[0:S], u)
-    G, Fx = jacob_motion(xEst[0:S], u)
-    PEst[0:S, 0:S] = G.T * PEst[0:S, 0:S] * G + Fx.T * Cx * Fx
-    initP = np.eye(2)
 
     # Update
     for iz in range(len(z[:, 0])):  # for each observation
-        minid = search_correspond_LM_ID(xEst, PEst, z[iz, 0:2])
-
-        nLM = calc_n_LM(xEst)
-        if minid == nLM:
-            print("New LM")
-            # Extend state and covariance matrix
-            xAug = np.vstack((xEst, calc_LM_Pos(xEst, z[iz, :])))
-            PAug = np.vstack((np.hstack((PEst, np.zeros((len(xEst), LM_SIZE)))),
-                              np.hstack((np.zeros((LM_SIZE, len(xEst))), initP))))
-            xEst = xAug
-            PEst = PAug
-
-        lm = get_LM_Pos_from_state(xEst, minid)
-        y, S, H = calc_innovation(lm, xEst, PEst, z[iz, 0:2], minid)
-
-        K = PEst * H.T * np.linalg.inv(S)
-        xEst = xEst + K * y
-        PEst = (np.eye(len(xEst)) - K * H) * PEst
+        pass
 
     xEst[2] = pi_2_pi(xEst[2])
 
-    return xEst, PEst
+    return xEst, None
 
 
 def calc_input():
@@ -255,11 +235,6 @@ def main():
 
             plt.plot(RFID[:, 0], RFID[:, 1], "*k")
             plt.plot(xEst[0], xEst[1], ".r")
-
-            # plot landmark
-            for i in range(calc_n_LM(xEst)):
-                plt.plot(xEst[STATE_SIZE + i * 2],
-                         xEst[STATE_SIZE + i * 2 + 1], "xg")
 
             plt.plot(np.array(hxTrue[0, :]).flatten(),
                      np.array(hxTrue[1, :]).flatten(), "-b")
