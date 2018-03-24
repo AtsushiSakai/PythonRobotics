@@ -8,6 +8,7 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 import numpy as np
 import math
+import copy
 import matplotlib.pyplot as plt
 
 
@@ -25,22 +26,53 @@ M_DIST_TH = 2.0  # Threshold of Mahalanobis distance for data association.
 STATE_SIZE = 3  # State size [x,y,yaw]
 LM_SIZE = 2  # LM srate size [x,y]
 
+MAX_ITR = 20
+
 show_animation = True
 
 
-def graph_based_slam(xEst, PEst, u, z):
+def graph_based_slam(xEst, PEst, u, z, hxDR, hz):
 
-    # Predict
-    S = STATE_SIZE
-    xEst[0:S] = motion_model(xEst[0:S], u)
+    x_opt = copy.deepcopy(hxDR)
 
-    # Update
-    for iz in range(len(z[:, 0])):  # for each observation
-        pass
+    for itr in range(20):
+        #  pos_edges = []
 
-    xEst[2] = pi_2_pi(xEst[2])
+        #  # このfor文では、HalfEdgeからグラフの辺を作っていきます。
+        #  for i in range(len(actual_landmarks.positions)):                           # ランドマークごとにHalfEdgeからEdgeを作る
+        #  es = list(filter(lambda e: e.landmark_id == i, obs_edges))      # 同じランドマークIDを持つHalfEdgeの抽出
+        #  ps = list(itertools.combinations(es,2))                                       # esの要素のペアを全通り作る
+        #  for p in ps:
+            #  pos_edges.append(Edge(p[0],p[1]))                                    # エッジを登録
 
-    return xEst, None
+        n = len(hz) * 3
+        H = np.zeros((n, n))
+        b = np.zeros((n, 1))
+
+        #  for e in pos_edges:
+        #  e.addInfo(matH,vecb)
+
+        #  H[0:3, 0:3] += np.identity(3) * 10000  # to fix origin
+        H += np.identity(n) * 10000  # to fix origin
+
+        dx = - np.linalg.inv(H).dot(b)
+        #  print(dx)
+
+        for i in range(len(hz)):
+            x_opt[0, i] += dx[i * 3, 0]
+            x_opt[1, i] += dx[i * 3 + 1, 0]
+            x_opt[2, i] += dx[i * 3 + 2, 0]
+
+        #  # HalfEdgeに登録してある推定値も更新
+        #  for e in obs_edges:
+        #  e.update(robot.guess_poses)
+
+        diff = dx.T.dot(dx)
+        print("iteration: %d, diff: %f" % (itr + 1, diff))
+        if dx[0, 0] < 1.0e-5:
+            break
+
+    return x_opt, None
 
 
 def calc_input():
@@ -94,94 +126,6 @@ def motion_model(x, u):
     return x
 
 
-def calc_n_LM(x):
-    n = int((len(x) - STATE_SIZE) / LM_SIZE)
-    return n
-
-
-def jacob_motion(x, u):
-
-    Fx = np.hstack((np.eye(STATE_SIZE), np.zeros(
-        (STATE_SIZE, LM_SIZE * calc_n_LM(x)))))
-
-    jF = np.matrix([[0.0, 0.0, -DT * u[0] * math.sin(x[2, 0])],
-                    [0.0, 0.0, DT * u[0] * math.cos(x[2, 0])],
-                    [0.0, 0.0, 0.0]])
-
-    G = np.eye(STATE_SIZE) + Fx.T * jF * Fx
-
-    return G, Fx,
-
-
-def calc_LM_Pos(x, z):
-
-    zp = np.zeros((2, 1))
-
-    zp[0, 0] = x[0, 0] + z[0, 0] * math.cos(x[2, 0] + z[0, 1])
-    zp[1, 0] = x[1, 0] + z[0, 0] * math.sin(x[2, 0] + z[0, 1])
-
-    return zp
-
-
-def get_LM_Pos_from_state(x, ind):
-
-    lm = x[STATE_SIZE + LM_SIZE * ind: STATE_SIZE + LM_SIZE * (ind + 1), :]
-
-    return lm
-
-
-def search_correspond_LM_ID(xAug, PAug, zi):
-    """
-    Landmark association with Mahalanobis distance
-    """
-
-    nLM = calc_n_LM(xAug)
-
-    mdist = []
-
-    for i in range(nLM):
-        lm = get_LM_Pos_from_state(xAug, i)
-        y, S, H = calc_innovation(lm, xAug, PAug, zi, i)
-        mdist.append(y.T * np.linalg.inv(S) * y)
-
-    mdist.append(M_DIST_TH)  # new landmark
-
-    minid = mdist.index(min(mdist))
-
-    return minid
-
-
-def calc_innovation(lm, xEst, PEst, z, LMid):
-    delta = lm - xEst[0:2]
-    q = (delta.T * delta)[0, 0]
-    zangle = math.atan2(delta[1], delta[0]) - xEst[2]
-    zp = [math.sqrt(q), pi_2_pi(zangle)]
-    y = (z - zp).T
-    y[1] = pi_2_pi(y[1])
-    H = jacobH(q, delta, xEst, LMid + 1)
-    S = H * PEst * H.T + Cx[0:2, 0:2]
-
-    return y, S, H
-
-
-def jacobH(q, delta, x, i):
-    sq = math.sqrt(q)
-    G = np.matrix([[-sq * delta[0, 0], - sq * delta[1, 0], 0, sq * delta[0, 0], sq * delta[1, 0]],
-                   [delta[1, 0], - delta[0, 0], - 1.0, - delta[1, 0], delta[0, 0]]])
-
-    G = G / q
-    nLM = calc_n_LM(x)
-    F1 = np.hstack((np.eye(3), np.zeros((3, 2 * nLM))))
-    F2 = np.hstack((np.zeros((2, 3)), np.zeros((2, 2 * (i - 1))),
-                    np.eye(2), np.zeros((2, 2 * nLM - 2 * i))))
-
-    F = np.vstack((F1, F2))
-
-    H = G * F
-
-    return H
-
-
 def pi_2_pi(angle):
     while(angle > math.pi):
         angle = angle - 2.0 * math.pi
@@ -211,9 +155,9 @@ def main():
     xDR = np.matrix(np.zeros((STATE_SIZE, 1)))  # Dead reckoning
 
     # history
-    hxEst = xEst
     hxTrue = xTrue
     hxDR = xTrue
+    hz = []
 
     while SIM_TIME >= time:
         time += DT
@@ -221,13 +165,12 @@ def main():
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u, RFID)
 
-        xEst, PEst = graph_based_slam(xEst, PEst, ud, z)
+        hxDR = np.hstack((hxDR, xDR))
+        hz.append(z)
 
-        x_state = xEst[0:STATE_SIZE]
+        x_opt, PEst = graph_based_slam(xEst, PEst, ud, z, hxDR, hz)
 
         # store data history
-        hxEst = np.hstack((hxEst, x_state))
-        hxDR = np.hstack((hxDR, xDR))
         hxTrue = np.hstack((hxTrue, xTrue))
 
         if show_animation:
@@ -240,8 +183,8 @@ def main():
                      np.array(hxTrue[1, :]).flatten(), "-b")
             plt.plot(np.array(hxDR[0, :]).flatten(),
                      np.array(hxDR[1, :]).flatten(), "-k")
-            plt.plot(np.array(hxEst[0, :]).flatten(),
-                     np.array(hxEst[1, :]).flatten(), "-r")
+            plt.plot(np.array(x_opt[0, :]).flatten(),
+                     np.array(x_opt[1, :]).flatten(), "-r")
             plt.axis("equal")
             plt.grid(True)
             plt.pause(0.001)
