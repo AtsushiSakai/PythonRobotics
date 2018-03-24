@@ -9,11 +9,9 @@ author: Atsushi Sakai (@Atsushi_twi)
 import numpy as np
 import math
 import copy
+import itertools
 import matplotlib.pyplot as plt
 
-
-# EKF state covariance
-Cx = np.diag([0.5, 0.5, math.radians(30.0)])**2
 
 #  Simulation parameter
 Qsim = np.diag([0.2, math.radians(1.0)])**2
@@ -31,19 +29,57 @@ MAX_ITR = 20
 show_animation = True
 
 
+class Edge():
+
+    def __init__(self):
+        self.e = np.zeros((3, 1))
+
+
+def calc_edges(xlist, zlist):
+
+    edges = []
+    zids = list(itertools.combinations(range(len(zlist)), 2))
+    #  print(zids)
+
+    for (t, td) in zids:
+        xt = xlist[0, t]
+        yt = xlist[1, t]
+        yawt = xlist[2, t]
+        xtd = xlist[0, td]
+        ytd = xlist[1, td]
+        yawtd = xlist[2, td]
+
+        dt = zlist[t][0, 0]
+        anglet = zlist[t][1, 0]
+        phit = zlist[t][2, 0]
+
+        dtd = zlist[td][0, 0]
+        angletd = zlist[td][0, 0]
+        phitd = zlist[td][2, 0]
+
+        edge = Edge()
+
+        t1 = dt * math.cos(yawt + anglet)
+        t2 = dtd * math.cos(yawtd + angletd)
+        t3 = dt * math.sin(yawt + anglet)
+        t4 = dtd * math.sin(yawtd + angletd)
+
+        edge.e[0, 0] = xtd - xt - t1 + t2
+        edge.e[1, 0] = ytd - yt - t3 + t4
+        edge.e[2, 0] = yawtd - yawt - phit + phitd
+
+        edges.append(edge)
+
+    return edges
+
+
 def graph_based_slam(xEst, PEst, u, z, hxDR, hz):
 
     x_opt = copy.deepcopy(hxDR)
 
     for itr in range(20):
-        #  pos_edges = []
-
-        #  # このfor文では、HalfEdgeからグラフの辺を作っていきます。
-        #  for i in range(len(actual_landmarks.positions)):                           # ランドマークごとにHalfEdgeからEdgeを作る
-        #  es = list(filter(lambda e: e.landmark_id == i, obs_edges))      # 同じランドマークIDを持つHalfEdgeの抽出
-        #  ps = list(itertools.combinations(es,2))                                       # esの要素のペアを全通り作る
-        #  for p in ps:
-            #  pos_edges.append(Edge(p[0],p[1]))                                    # エッジを登録
+        edges = calc_edges(x_opt, hz)
+        print("nedges:", len(edges))
 
         n = len(hz) * 3
         H = np.zeros((n, n))
@@ -87,18 +123,19 @@ def observation(xTrue, xd, u, RFID):
     xTrue = motion_model(xTrue, u)
 
     # add noise to gps x-y
-    z = np.matrix(np.zeros((0, 3)))
+    z = np.matrix(np.zeros((0, 4)))
 
     for i in range(len(RFID[:, 0])):
 
         dx = RFID[i, 0] - xTrue[0, 0]
         dy = RFID[i, 1] - xTrue[1, 0]
         d = math.sqrt(dx**2 + dy**2)
-        angle = pi_2_pi(math.atan2(dy, dx))
+        angle = pi_2_pi(math.atan2(dy, dx)) - xTrue[2, 0]
+        phi = angle - xTrue[2, 0]
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Qsim[0, 0]  # add noise
             anglen = angle + np.random.randn() * Qsim[1, 1]  # add noise
-            zi = np.matrix([dn, anglen, i])
+            zi = np.matrix([dn, anglen, phi, i])
             z = np.vstack((z, zi))
 
     # add noise to input
@@ -141,11 +178,11 @@ def main():
 
     time = 0.0
 
-    # RFID positions [x, y]
-    RFID = np.array([[10.0, -2.0],
-                     [15.0, 10.0],
-                     [3.0, 15.0],
-                     [-5.0, 20.0]])
+    # RFID positions [x, y, yaw]
+    RFID = np.array([[10.0, -2.0, 0.0],
+                     [15.0, 10.0, 0.0],
+                     [3.0, 15.0, 0.0],
+                     [-5.0, 20.0, 0.0]])
 
     # State Vector [x y yaw v]'
     xEst = np.matrix(np.zeros((STATE_SIZE, 1)))
