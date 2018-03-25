@@ -24,6 +24,10 @@ M_DIST_TH = 2.0  # Threshold of Mahalanobis distance for data association.
 STATE_SIZE = 3  # State size [x,y,yaw]
 LM_SIZE = 2  # LM srate size [x,y]
 
+C_SIGMA1 = 1.0
+C_SIGMA2 = 0.1
+C_SIGMA3 = 0.1
+
 MAX_ITR = 20
 
 show_animation = True
@@ -33,29 +37,37 @@ class Edge():
 
     def __init__(self):
         self.e = np.zeros((3, 1))
+        self.omega = np.zeros((3, 3))  # information matrix
+        self.d_t = 0.0
+        self.d_td = 0.0
+        self.yaw_t = 0.0
+        self.yaw_td = 0.0
+        self.angle_t = 0.0
+        self.angle_td = 0.0
+
+
+def cal_ob_sigma(d):
+
+    sigma = np.zeros((3, 3))
+    sigma[0, 0] = (d * C_SIGMA1)**2
+    sigma[1, 1] = (d * C_SIGMA2)**2
+    sigma[2, 2] = C_SIGMA3**2
+
+    return sigma
 
 
 def calc_edges(xlist, zlist):
 
     edges = []
     zids = list(itertools.combinations(range(len(zlist)), 2))
-    #  print(zids)
 
     for (t, td) in zids:
-        xt = xlist[0, t]
-        yt = xlist[1, t]
-        yawt = xlist[2, t]
-        xtd = xlist[0, td]
-        ytd = xlist[1, td]
-        yawtd = xlist[2, td]
+        xt, yt, yawt = xlist[0, t], xlist[1, t], xlist[2, t]
+        xtd, ytd, yawtd = xlist[0, td], xlist[1, td], xlist[2, td]
 
-        dt = zlist[t][0, 0]
-        anglet = zlist[t][1, 0]
-        phit = zlist[t][2, 0]
+        dt, anglet, phit = zlist[t][0, 0], zlist[t][1, 0], zlist[t][2, 0]
 
-        dtd = zlist[td][0, 0]
-        angletd = zlist[td][0, 0]
-        phitd = zlist[td][2, 0]
+        dtd, angletd, phitd = zlist[td][0, 0], zlist[td][1, 0], zlist[td][2, 0]
 
         edge = Edge()
 
@@ -68,25 +80,58 @@ def calc_edges(xlist, zlist):
         edge.e[1, 0] = ytd - yt - t3 + t4
         edge.e[2, 0] = yawtd - yawt - phit + phitd
 
+        sig_t = cal_ob_sigma(dt)
+        sig_td = cal_ob_sigma(dtd)
+
+        Rt = np.matrix([[math.cos(yawt + anglet), math.sin(yawt + anglet), 0],
+                        [-math.sin(yawt + anglet), math.cos(yawt + anglet), 0],
+                        [0, 0, 1.0]])
+        Rtd = np.matrix([[math.cos(yawtd + angletd), math.sin(yawtd + angletd), 0],
+                         [-math.sin(yawtd + angletd),
+                          math.cos(yawtd + angletd), 0],
+                         [0, 0, 1.0]])
+
+        edge.omega = np.linalg.inv(Rt * sig_t * Rt.T + Rtd * sig_td * Rtd.T)
+        edge.d_t, edge.d_td = dt, dtd
+        edge.yaw_t, edge.yaw_td = yawt, yawtd
+        edge.angle_t, edge.angle_td = anglet, angletd
+
         edges.append(edge)
 
     return edges
 
 
+def calc_jacobian(edge):
+    t = edge.yaw_t + edge.angle_t
+    A = np.matrix([[-1.0, 0, edge.d_t * math.sin(t)],
+                   [0, -1.0, -edge.d_t * math.cos(t)],
+                   [0, 0, -1.0]])
+
+    td = edge.yaw_td + edge.angle_td
+    B = np.matrix([[1.0, 0, -edge.d_td * math.sin(td)],
+                   [0, 1.0, edge.d_td * math.cos(td)],
+                   [0, 0, 1.0]])
+
+    #  print(A)
+    #  print(B)
+
+    return A, B
+
+
 def graph_based_slam(xEst, PEst, u, z, hxDR, hz):
 
     x_opt = copy.deepcopy(hxDR)
+    edges = calc_edges(x_opt, hz)
+    n = len(hz) * 3
 
-    for itr in range(20):
-        edges = calc_edges(x_opt, hz)
+    for itr in range(MAX_ITR):
         print("nedges:", len(edges))
 
-        n = len(hz) * 3
         H = np.zeros((n, n))
         b = np.zeros((n, 1))
 
-        #  for e in pos_edges:
-        #  e.addInfo(matH,vecb)
+        for edge in edges:
+            A, B = calc_jacobian(edge)
 
         #  H[0:3, 0:3] += np.identity(3) * 10000  # to fix origin
         H += np.identity(n) * 10000  # to fix origin
