@@ -44,6 +44,8 @@ class Edge():
         self.yaw_td = 0.0
         self.angle_t = 0.0
         self.angle_td = 0.0
+        self.id1 = 0
+        self.id2 = 0
 
 
 def cal_ob_sigma(d):
@@ -95,6 +97,7 @@ def calc_edges(xlist, zlist):
         edge.d_t, edge.d_td = dt, dtd
         edge.yaw_t, edge.yaw_td = yawt, yawtd
         edge.angle_t, edge.angle_td = anglet, angletd
+        edge.id1, edge.id2 = t, td
 
         edges.append(edge)
 
@@ -122,10 +125,10 @@ def graph_based_slam(xEst, PEst, u, z, hxDR, hz):
 
     x_opt = copy.deepcopy(hxDR)
     edges = calc_edges(x_opt, hz)
+    print("nedges:", len(edges))
     n = len(hz) * 3
 
     for itr in range(MAX_ITR):
-        print("nedges:", len(edges))
 
         H = np.zeros((n, n))
         b = np.zeros((n, 1))
@@ -133,8 +136,16 @@ def graph_based_slam(xEst, PEst, u, z, hxDR, hz):
         for edge in edges:
             A, B = calc_jacobian(edge)
 
+            id1 = edge.id1 * 3
+
+            H[id1:id1 + 3, id1:id1 + 3] += A.T * edge.omega * A
+            #  h[self.id1*3:self.id1*3+3, self.id2*3:self.id2*3+3] += (self.matA).T.dot(self.info.dot(self.matB))
+            #  h[self.id2*3:self.id2*3+3, self.id1*3:self.id1*3+3] += (self.matB).T.dot(self.info.dot(self.matA))
+            #  h[self.id2*3:self.id2*3+3, self.id2*3:self.id2*3+3] += (self.matB).T.dot(self.info.dot(self.matB))
+
         #  H[0:3, 0:3] += np.identity(3) * 10000  # to fix origin
         H += np.identity(n) * 10000  # to fix origin
+        print(H)
 
         dx = - np.linalg.inv(H).dot(b)
         #  print(dx)
