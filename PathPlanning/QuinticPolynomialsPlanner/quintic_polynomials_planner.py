@@ -65,9 +65,13 @@ class quinic_polynomial:
         xt = 2 * self.a2 + 6 * self.a3 * t + 12 * self.a4 * t**2 + 20 * self.a5 * t**3
 
         return xt
+    
+    def calc_third_derivative(self, t):
+        xt = 6 * self.a3 + 24 * self.a4 * t + 60 * self.a5 * t**2
 
+        return xt
 
-def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_accel, dt):
+def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_accel, max_jerk, dt):
     """
     quinic polynomial planner
 
@@ -81,6 +85,7 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
         gyaw: goal yaw angle [rad]
         ga: goal accel [m/ss]
         max_accel: maximum accel [m/ss]
+        max_jerk: maximum jerk [m/sss]
         dt: time tick [s]
 
     return
@@ -107,7 +112,7 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
         xqp = quinic_polynomial(sx, vxs, axs, gx, vxg, axg, T)
         yqp = quinic_polynomial(sy, vys, ays, gy, vyg, ayg, T)
 
-        time, rx, ry, ryaw, rv, ra = [], [], [], [], [], []
+        time, rx, ry, ryaw, rv, ra, rj  = [], [], [], [], [], [], []
 
         for t in np.arange(0.0, T + dt, dt):
             time.append(t)
@@ -129,7 +134,14 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
                 pass
             ra.append(a)
 
-        if max([abs(i) for i in ra]) <= max_accel:
+            jx = xqp.calc_third_derivative(t)
+            jy = yqp.calc_third_derivative(t)
+            j = np.hypot(ax, ay)
+            if len(ra) >= 2 and ra[-1] - ra[-2] < 0.0:
+                j *= -1
+            rj.append(j)
+
+        if max([abs(i) for i in ra]) <= max_accel and max([abs(i) for i in rj]) <= max_jerk:
             print("find path!!")
             break
 
@@ -146,7 +158,7 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
                       " a[m/ss]:" + str(ra[i])[0:4])
             plt.pause(0.001)
 
-    return time, rx, ry, ryaw, rv, ra
+    return time, rx, ry, ryaw, rv, ra, rj
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
@@ -177,10 +189,11 @@ def main():
     gv = 1.0  # goal speed [m/s]
     ga = 0.1  # goal accel [m/ss]
     max_accel = 1.0  # max accel [m/ss]
+    max_jerk = 0.5  # max jerk [m/sss]
     dt = 0.1  # time tick [s]
 
-    time, x, y, yaw, v, a = quinic_polynomials_planner(
-        sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_accel, dt)
+    time, x, y, yaw, v, a, j = quinic_polynomials_planner(
+        sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_accel, max_jerk, dt)
 
     if show_animation:
         plt.plot(x, y, "-r")
@@ -201,6 +214,12 @@ def main():
         plt.plot(time, a, "-r")
         plt.xlabel("Time[s]")
         plt.ylabel("accel[m/ss]")
+        plt.grid(True)
+
+        plt.subplots()
+        plt.plot(time, j, "-r")
+        plt.xlabel("Time[s]")
+        plt.ylabel("jerk[m/sss]")
         plt.grid(True)
 
         plt.show()
