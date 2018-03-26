@@ -85,11 +85,11 @@ def calc_edges(xlist, zlist):
         sig_t = cal_ob_sigma(dt)
         sig_td = cal_ob_sigma(dtd)
 
-        Rt = np.matrix([[math.cos(yawt + anglet), math.sin(yawt + anglet), 0],
-                        [-math.sin(yawt + anglet), math.cos(yawt + anglet), 0],
+        Rt = np.matrix([[math.cos(yawt + anglet), -math.sin(yawt + anglet), 0],
+                        [math.sin(yawt + anglet), math.cos(yawt + anglet), 0],
                         [0, 0, 1.0]])
-        Rtd = np.matrix([[math.cos(yawtd + angletd), math.sin(yawtd + angletd), 0],
-                         [-math.sin(yawtd + angletd),
+        Rtd = np.matrix([[math.cos(yawtd + angletd), -math.sin(yawtd + angletd), 0],
+                         [math.sin(yawtd + angletd),
                           math.cos(yawtd + angletd), 0],
                          [0, 0, 1.0]])
 
@@ -124,28 +124,30 @@ def calc_jacobian(edge):
 def graph_based_slam(xEst, PEst, u, z, hxDR, hz):
 
     x_opt = copy.deepcopy(hxDR)
-    edges = calc_edges(x_opt, hz)
-    print("nedges:", len(edges))
     n = len(hz) * 3
 
     for itr in range(MAX_ITR):
+        edges = calc_edges(x_opt, hz)
+        print("nedges:", len(edges))
 
-        H = np.zeros((n, n))
-        b = np.zeros((n, 1))
+        H = np.matrix(np.zeros((n, n)))
+        b = np.matrix(np.zeros((n, 1)))
 
         for edge in edges:
             A, B = calc_jacobian(edge)
 
             id1 = edge.id1 * 3
+            id2 = edge.id2 * 3
 
             H[id1:id1 + 3, id1:id1 + 3] += A.T * edge.omega * A
-            #  h[self.id1*3:self.id1*3+3, self.id2*3:self.id2*3+3] += (self.matA).T.dot(self.info.dot(self.matB))
-            #  h[self.id2*3:self.id2*3+3, self.id1*3:self.id1*3+3] += (self.matB).T.dot(self.info.dot(self.matA))
-            #  h[self.id2*3:self.id2*3+3, self.id2*3:self.id2*3+3] += (self.matB).T.dot(self.info.dot(self.matB))
+            H[id1:id1 + 3, id2:id2 + 3] += A.T * edge.omega * B
+            H[id2:id2 + 3, id1:id1 + 3] += B.T * edge.omega * A
+            H[id2:id2 + 3, id2:id2 + 3] += B.T * edge.omega * B
 
-        #  H[0:3, 0:3] += np.identity(3) * 10000  # to fix origin
-        H += np.identity(n) * 10000  # to fix origin
-        print(H)
+            b[id1:id1 + 3, 0] += (A.T * edge.omega * edge.e)
+            b[id2:id2 + 3, 0] += (B.T * edge.omega * edge.e)
+
+        H[0:3, 0:3] += np.identity(3) * 10000  # to fix origin
 
         dx = - np.linalg.inv(H).dot(b)
         #  print(dx)
@@ -155,13 +157,9 @@ def graph_based_slam(xEst, PEst, u, z, hxDR, hz):
             x_opt[1, i] += dx[i * 3 + 1, 0]
             x_opt[2, i] += dx[i * 3 + 2, 0]
 
-        #  # HalfEdgeに登録してある推定値も更新
-        #  for e in obs_edges:
-        #  e.update(robot.guess_poses)
-
         diff = dx.T.dot(dx)
         print("iteration: %d, diff: %f" % (itr + 1, diff))
-        if dx[0, 0] < 1.0e-5:
+        if diff < 1.0e-5:
             break
 
     return x_opt, None
