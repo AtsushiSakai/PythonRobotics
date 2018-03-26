@@ -15,8 +15,8 @@ import matplotlib.pyplot as plt
 import math
 
 # parameter
-MAX_T = 100.0
-MIN_T = 5.0
+MAX_T = 100.0  # maximum time to the goal [s]
+MIN_T = 5.0  # minimum time to the goal[s]
 
 show_animation = True
 
