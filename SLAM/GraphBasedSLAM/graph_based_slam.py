@@ -48,7 +48,7 @@ class Edge():
         self.id2 = 0
 
 
-def cal_ob_sigma(d):
+def cal_observation_sigma(d):
 
     sigma = np.zeros((3, 3))
     sigma[0, 0] = (d * C_SIGMA1)**2
@@ -56,6 +56,14 @@ def cal_ob_sigma(d):
     sigma[2, 2] = C_SIGMA3**2
 
     return sigma
+
+
+def calc_rotational_matrix(angle):
+
+    Rt = np.matrix([[math.cos(angle), -math.sin(angle), 0],
+                    [math.sin(angle), math.cos(angle), 0],
+                    [0, 0, 1.0]])
+    return Rt
 
 
 def calc_edges(xlist, zlist):
@@ -66,32 +74,27 @@ def calc_edges(xlist, zlist):
     for (t, td) in zids:
         xt, yt, yawt = xlist[0, t], xlist[1, t], xlist[2, t]
         xtd, ytd, yawtd = xlist[0, td], xlist[1, td], xlist[2, td]
-
         dt, anglet, phit = zlist[t][0, 0], zlist[t][1, 0], zlist[t][2, 0]
-
         dtd, angletd, phitd = zlist[td][0, 0], zlist[td][1, 0], zlist[td][2, 0]
 
         edge = Edge()
 
-        t1 = dt * math.cos(yawt + anglet)
-        t2 = dtd * math.cos(yawtd + angletd)
-        t3 = dt * math.sin(yawt + anglet)
-        t4 = dtd * math.sin(yawtd + angletd)
+        tangle1 = yawt + anglet
+        tangle2 = yawt + anglet
+        t1 = dt * math.cos(tangle1)
+        t2 = dtd * math.cos(tangle2)
+        t3 = dt * math.sin(tangle1)
+        t4 = dtd * math.sin(tangle2)
 
         edge.e[0, 0] = xtd - xt - t1 + t2
         edge.e[1, 0] = ytd - yt - t3 + t4
         edge.e[2, 0] = yawtd - yawt - phit + phitd
 
-        sig_t = cal_ob_sigma(dt)
-        sig_td = cal_ob_sigma(dtd)
+        sig_t = cal_observation_sigma(dt)
+        sig_td = cal_observation_sigma(dtd)
 
-        Rt = np.matrix([[math.cos(yawt + anglet), -math.sin(yawt + anglet), 0],
-                        [math.sin(yawt + anglet), math.cos(yawt + anglet), 0],
-                        [0, 0, 1.0]])
-        Rtd = np.matrix([[math.cos(yawtd + angletd), -math.sin(yawtd + angletd), 0],
-                         [math.sin(yawtd + angletd),
-                          math.cos(yawtd + angletd), 0],
-                         [0, 0, 1.0]])
+        Rt = calc_rotational_matrix(tangle1)
+        Rtd = calc_rotational_matrix(tangle2)
 
         edge.omega = np.linalg.inv(Rt * sig_t * Rt.T + Rtd * sig_td * Rtd.T)
         edge.d_t, edge.d_td = dt, dtd
@@ -115,10 +118,25 @@ def calc_jacobian(edge):
                    [0, 1.0, edge.d_td * math.cos(td)],
                    [0, 0, 1.0]])
 
-    #  print(A)
-    #  print(B)
-
     return A, B
+
+
+def fill_H_and_b(H, b, edge):
+
+    A, B = calc_jacobian(edge)
+
+    id1 = edge.id1 * 3
+    id2 = edge.id2 * 3
+
+    H[id1:id1 + 3, id1:id1 + 3] += A.T * edge.omega * A
+    H[id1:id1 + 3, id2:id2 + 3] += A.T * edge.omega * B
+    H[id2:id2 + 3, id1:id1 + 3] += B.T * edge.omega * A
+    H[id2:id2 + 3, id2:id2 + 3] += B.T * edge.omega * B
+
+    b[id1:id1 + 3, 0] += (A.T * edge.omega * edge.e)
+    b[id2:id2 + 3, 0] += (B.T * edge.omega * edge.e)
+
+    return H, b
 
 
 def graph_based_slam(xEst, PEst, u, z, hxDR, hz):
@@ -128,34 +146,20 @@ def graph_based_slam(xEst, PEst, u, z, hxDR, hz):
 
     for itr in range(MAX_ITR):
         edges = calc_edges(x_opt, hz)
-        print("nedges:", len(edges))
+        #  print("n edges:", len(edges))
 
         H = np.matrix(np.zeros((n, n)))
         b = np.matrix(np.zeros((n, 1)))
 
         for edge in edges:
-            A, B = calc_jacobian(edge)
-
-            id1 = edge.id1 * 3
-            id2 = edge.id2 * 3
-
-            H[id1:id1 + 3, id1:id1 + 3] += A.T * edge.omega * A
-            H[id1:id1 + 3, id2:id2 + 3] += A.T * edge.omega * B
-            H[id2:id2 + 3, id1:id1 + 3] += B.T * edge.omega * A
-            H[id2:id2 + 3, id2:id2 + 3] += B.T * edge.omega * B
-
-            b[id1:id1 + 3, 0] += (A.T * edge.omega * edge.e)
-            b[id2:id2 + 3, 0] += (B.T * edge.omega * edge.e)
+            H, b = fill_H_and_b(H, b, edge)
 
         H[0:3, 0:3] += np.identity(3) * 10000  # to fix origin
 
         dx = - np.linalg.inv(H).dot(b)
-        #  print(dx)
 
         for i in range(len(hz)):
-            x_opt[0, i] += dx[i * 3, 0]
-            x_opt[1, i] += dx[i * 3 + 1, 0]
-            x_opt[2, i] += dx[i * 3 + 2, 0]
+            x_opt[0:3, i] += dx[i * 3:i * 3 + 3, 0]
 
         diff = dx.T.dot(dx)
         print("iteration: %d, diff: %f" % (itr + 1, diff))
@@ -185,7 +189,7 @@ def observation(xTrue, xd, u, RFID):
         dy = RFID[i, 1] - xTrue[1, 0]
         d = math.sqrt(dx**2 + dy**2)
         angle = pi_2_pi(math.atan2(dy, dx)) - xTrue[2, 0]
-        phi = angle - xTrue[2, 0]
+        phi = angle + xTrue[2, 0]
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Qsim[0, 0]  # add noise
             anglen = angle + np.random.randn() * Qsim[1, 1]  # add noise
