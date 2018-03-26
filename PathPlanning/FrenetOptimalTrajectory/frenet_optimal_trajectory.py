@@ -192,8 +192,8 @@ def calc_frenet_paths(c_speed, c_d, c_d_d, c_d_dd, s0):
                 tfp.s_dd = [lon_qp.calc_second_derivative(t) for t in fp.t]
                 tfp.s_ddd = [lon_qp.calc_third_derivative(t) for t in fp.t]
 
-                Jp = sum((tfp.d_ddd)**2)  # square of jerk
-                Js = sum((tfp.s_ddd)**2)  # square of jerk
+                Jp = sum(np.power(tfp.d_ddd, 2))  # square of jerk
+                Js = sum(np.power(tfp.s_ddd, 2))  # square of jerk
 
                 # square of diff from target speed
                 ds = (TARGET_SPEED - tfp.s_d[-1])**2
