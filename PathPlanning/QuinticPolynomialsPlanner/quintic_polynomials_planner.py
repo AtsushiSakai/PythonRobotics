@@ -65,11 +65,12 @@ class quinic_polynomial:
         xt = 2 * self.a2 + 6 * self.a3 * t + 12 * self.a4 * t**2 + 20 * self.a5 * t**3
 
         return xt
-    
+
     def calc_third_derivative(self, t):
         xt = 6 * self.a3 + 24 * self.a4 * t + 60 * self.a5 * t**2
 
         return xt
+
 
 def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_accel, max_jerk, dt):
     """
@@ -112,7 +113,7 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
         xqp = quinic_polynomial(sx, vxs, axs, gx, vxg, axg, T)
         yqp = quinic_polynomial(sy, vys, ays, gy, vyg, ayg, T)
 
-        time, rx, ry, ryaw, rv, ra, rj  = [], [], [], [], [], [], []
+        time, rx, ry, ryaw, rv, ra, rj = [], [], [], [], [], [], []
 
         for t in np.arange(0.0, T + dt, dt):
             time.append(t)
@@ -131,12 +132,11 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
             a = np.hypot(ax, ay)
             if len(rv) >= 2 and rv[-1] - rv[-2] < 0.0:
                 a *= -1
-                pass
             ra.append(a)
 
             jx = xqp.calc_third_derivative(t)
             jy = yqp.calc_third_derivative(t)
-            j = np.hypot(ax, ay)
+            j = np.hypot(jx, jy)
             if len(ra) >= 2 and ra[-1] - ra[-2] < 0.0:
                 j *= -1
             rj.append(j)
@@ -155,14 +155,16 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
             plot_arrow(rx[i], ry[i], ryaw[i])
             plt.title("Time[s]:" + str(time[i])[0:4] +
                       " v[m/s]:" + str(rv[i])[0:4] +
-                      " a[m/ss]:" + str(ra[i])[0:4])
+                      " a[m/ss]:" + str(ra[i])[0:4] +
+                      " jerk[m/sss]:" + str(rj[i])[0:4],
+                      )
             plt.pause(0.001)
 
     return time, rx, ry, ryaw, rv, ra, rj
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
-    u"""
+    """
     Plot arrow
     """
 
