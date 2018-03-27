@@ -632,6 +632,8 @@ If your PR is merged multiple times, I will add your account to the Author list.
 
 - [Daniel Ingram](https://github.com/daniel-s-ingram)
 
+- [Joe Dinius](https://github.com/jwdinius)
+
 
 
 
