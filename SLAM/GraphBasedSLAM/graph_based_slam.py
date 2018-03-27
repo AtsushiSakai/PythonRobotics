@@ -20,15 +20,14 @@ Rsim = np.diag([1.0, math.radians(10.0)])**2
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
 MAX_RANGE = 20.0  # maximum observation range
-M_DIST_TH = 2.0  # Threshold of Mahalanobis distance for data association.
 STATE_SIZE = 3  # State size [x,y,yaw]
-LM_SIZE = 2  # LM srate size [x,y]
 
+# Covariance parameter of Graph Based SLAM
 C_SIGMA1 = 1.0
 C_SIGMA2 = 0.1
 C_SIGMA3 = 0.1
 
-MAX_ITR = 20
+MAX_ITR = 20  # Maximuma iteration
 
 show_animation = True
 
@@ -66,41 +65,52 @@ def calc_rotational_matrix(angle):
     return Rt
 
 
+def calc_edge(xt, yt, yawt, xtd, ytd, yawtd, dt,
+              anglet, phit, dtd, angletd, phitd, t, td):
+    edge = Edge()
+
+    tangle1 = pi_2_pi(yawt + anglet)
+    tangle2 = pi_2_pi(yawt + anglet)
+    t1 = dt * math.cos(tangle1)
+    t2 = dtd * math.cos(tangle2)
+    t3 = dt * math.sin(tangle1)
+    t4 = dtd * math.sin(tangle2)
+
+    edge.e[0, 0] = xtd - xt - t1 + t2
+    edge.e[1, 0] = ytd - yt - t3 + t4
+    edge.e[2, 0] = pi_2_pi(yawtd - yawt - phit + phitd)
+
+    sig_t = cal_observation_sigma(dt)
+    sig_td = cal_observation_sigma(dtd)
+
+    Rt = calc_rotational_matrix(tangle1)
+    Rtd = calc_rotational_matrix(tangle2)
+
+    edge.omega = np.linalg.inv(Rt * sig_t * Rt.T + Rtd * sig_td * Rtd.T)
+    edge.d_t, edge.d_td = dt, dtd
+    edge.yaw_t, edge.yaw_td = yawt, yawtd
+    edge.angle_t, edge.angle_td = anglet, angletd
+    edge.id1, edge.id2 = t, td
+
+    return edge
+
+
 def calc_edges(xlist, zlist):
 
     edges = []
     zids = list(itertools.combinations(range(len(zlist)), 2))
 
     for (t, td) in zids:
+        #  print(xlist)
+        #  print(zlist)
         xt, yt, yawt = xlist[0, t], xlist[1, t], xlist[2, t]
         xtd, ytd, yawtd = xlist[0, td], xlist[1, td], xlist[2, td]
         dt, anglet, phit = zlist[t][0, 0], zlist[t][1, 0], zlist[t][2, 0]
         dtd, angletd, phitd = zlist[td][0, 0], zlist[td][1, 0], zlist[td][2, 0]
+        #  input()
 
-        edge = Edge()
-
-        tangle1 = yawt + anglet
-        tangle2 = yawt + anglet
-        t1 = dt * math.cos(tangle1)
-        t2 = dtd * math.cos(tangle2)
-        t3 = dt * math.sin(tangle1)
-        t4 = dtd * math.sin(tangle2)
-
-        edge.e[0, 0] = xtd - xt - t1 + t2
-        edge.e[1, 0] = ytd - yt - t3 + t4
-        edge.e[2, 0] = yawtd - yawt - phit + phitd
-
-        sig_t = cal_observation_sigma(dt)
-        sig_td = cal_observation_sigma(dtd)
-
-        Rt = calc_rotational_matrix(tangle1)
-        Rtd = calc_rotational_matrix(tangle2)
-
-        edge.omega = np.linalg.inv(Rt * sig_t * Rt.T + Rtd * sig_td * Rtd.T)
-        edge.d_t, edge.d_td = dt, dtd
-        edge.yaw_t, edge.yaw_td = yawt, yawtd
-        edge.angle_t, edge.angle_td = anglet, angletd
-        edge.id1, edge.id2 = t, td
+        edge = calc_edge(xt, yt, yawt, xtd, ytd, yawtd, dt,
+                         anglet, phit, dtd, angletd, phitd, t, td)
 
         edges.append(edge)
 
@@ -139,10 +149,12 @@ def fill_H_and_b(H, b, edge):
     return H, b
 
 
-def graph_based_slam(xEst, PEst, u, z, hxDR, hz):
+def graph_based_slam(u, z, hxDR, hz):
 
     x_opt = copy.deepcopy(hxDR)
     n = len(hz) * 3
+
+    #  return x_opt
 
     for itr in range(MAX_ITR):
         edges = calc_edges(x_opt, hz)
@@ -157,6 +169,7 @@ def graph_based_slam(xEst, PEst, u, z, hxDR, hz):
         H[0:3, 0:3] += np.identity(3) * 10000  # to fix origin
 
         dx = - np.linalg.inv(H).dot(b)
+        #  print(dx)
 
         for i in range(len(hz)):
             x_opt[0:3, i] += dx[i * 3:i * 3 + 3, 0]
@@ -166,7 +179,9 @@ def graph_based_slam(xEst, PEst, u, z, hxDR, hz):
         if diff < 1.0e-5:
             break
 
-    return x_opt, None
+    #  print(x_opt)
+
+    return x_opt
 
 
 def calc_input():
@@ -189,7 +204,7 @@ def observation(xTrue, xd, u, RFID):
         dy = RFID[i, 1] - xTrue[1, 0]
         d = math.sqrt(dx**2 + dy**2)
         angle = pi_2_pi(math.atan2(dy, dx)) - xTrue[2, 0]
-        phi = angle + xTrue[2, 0]
+        phi = pi_2_pi(math.atan2(dy, dx))
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Qsim[0, 0]  # add noise
             anglen = angle + np.random.randn() * Qsim[1, 1]  # add noise
@@ -243,9 +258,7 @@ def main():
                      [-5.0, 20.0, 0.0]])
 
     # State Vector [x y yaw v]'
-    xEst = np.matrix(np.zeros((STATE_SIZE, 1)))
     xTrue = np.matrix(np.zeros((STATE_SIZE, 1)))
-    PEst = np.eye(STATE_SIZE)
 
     xDR = np.matrix(np.zeros((STATE_SIZE, 1)))  # Dead reckoning
 
@@ -263,7 +276,7 @@ def main():
         hxDR = np.hstack((hxDR, xDR))
         hz.append(z)
 
-        x_opt, PEst = graph_based_slam(xEst, PEst, ud, z, hxDR, hz)
+        x_opt = graph_based_slam(ud, z, hxDR, hz)
 
         # store data history
         hxTrue = np.hstack((hxTrue, xTrue))
@@ -272,7 +285,6 @@ def main():
             plt.cla()
 
             plt.plot(RFID[:, 0], RFID[:, 1], "*k")
-            plt.plot(xEst[0], xEst[1], ".r")
 
             plt.plot(np.array(hxTrue[0, :]).flatten(),
                      np.array(hxTrue[1, :]).flatten(), "-b")
