@@ -1,6 +1,6 @@
 """
 
-Graph SLAM example
+Graph  based SLAM example
 
 author: Atsushi Sakai (@Atsushi_twi)
 
@@ -14,11 +14,11 @@ import matplotlib.pyplot as plt
 
 
 #  Simulation parameter
-Qsim = np.diag([0.2, math.radians(1.0)])**2
-Rsim = np.diag([1.0, math.radians(10.0)])**2
+Qsim = np.diag([0.0, math.radians(0.0)])**2
+Rsim = np.diag([0.0, math.radians(00.0)])**2
 
 DT = 1.0  # time tick [s]
-SIM_TIME = 50.0  # simulation time [s]
+SIM_TIME = 20.0  # simulation time [s]
 MAX_RANGE = 20.0  # maximum observation range
 STATE_SIZE = 3  # State size [x,y,yaw]
 
@@ -37,12 +37,12 @@ class Edge():
     def __init__(self):
         self.e = np.zeros((3, 1))
         self.omega = np.zeros((3, 3))  # information matrix
-        self.d_t = 0.0
-        self.d_td = 0.0
-        self.yaw_t = 0.0
-        self.yaw_td = 0.0
-        self.angle_t = 0.0
-        self.angle_td = 0.0
+        self.d1 = 0.0
+        self.d2 = 0.0
+        self.yaw1 = 0.0
+        self.yaw2 = 0.0
+        self.angle1 = 0.0
+        self.angle2 = 0.0
         self.id1 = 0
         self.id2 = 0
 
@@ -65,32 +65,32 @@ def calc_rotational_matrix(angle):
     return Rt
 
 
-def calc_edge(xt, yt, yawt, xtd, ytd, yawtd, dt,
-              anglet, phit, dtd, angletd, phitd, t, td):
+def calc_edge(x1, y1, yaw1, x2, y2, yaw2, d1,
+              angle1, phi1, d2, angle2, phi2, t1, t2):
     edge = Edge()
 
-    tangle1 = pi_2_pi(yawt + anglet)
-    tangle2 = pi_2_pi(yawt + anglet)
-    t1 = dt * math.cos(tangle1)
-    t2 = dtd * math.cos(tangle2)
-    t3 = dt * math.sin(tangle1)
-    t4 = dtd * math.sin(tangle2)
+    tangle1 = pi_2_pi(yaw1 + angle1)
+    tangle2 = pi_2_pi(yaw2 + angle2)
+    tmp1 = d1 * math.cos(tangle1)
+    tmp2 = d2 * math.cos(tangle2)
+    tmp3 = d1 * math.sin(tangle1)
+    tmp4 = d2 * math.sin(tangle2)
 
-    edge.e[0, 0] = xtd - xt - t1 + t2
-    edge.e[1, 0] = ytd - yt - t3 + t4
-    edge.e[2, 0] = pi_2_pi(yawtd - yawt - phit + phitd)
+    edge.e[0, 0] = x2 - x1 - tmp1 + tmp2
+    edge.e[1, 0] = y2 - y1 - tmp3 + tmp4
+    edge.e[2, 0] = pi_2_pi(yaw2 - yaw1 - phi1 + phi2)
 
-    sig_t = cal_observation_sigma(dt)
-    sig_td = cal_observation_sigma(dtd)
+    sig_t = cal_observation_sigma(d1)
+    sig_td = cal_observation_sigma(d2)
 
     Rt = calc_rotational_matrix(tangle1)
     Rtd = calc_rotational_matrix(tangle2)
 
     edge.omega = np.linalg.inv(Rt * sig_t * Rt.T + Rtd * sig_td * Rtd.T)
-    edge.d_t, edge.d_td = dt, dtd
-    edge.yaw_t, edge.yaw_td = yawt, yawtd
-    edge.angle_t, edge.angle_td = anglet, angletd
-    edge.id1, edge.id2 = t, td
+    edge.d1, edge.d2 = d1, d2
+    edge.yaw1, edge.yaw2 = yaw1, yaw2
+    edge.angle1, edge.angle2 = angle1, angle2
+    edge.id1, edge.id2 = t1, t2
 
     return edge
 
@@ -100,40 +100,35 @@ def calc_edges(xlist, zlist):
     edges = []
     zids = list(itertools.combinations(range(len(zlist)), 2))
 
-    for (t, td) in zids:
-        #  print(xlist)
-        #  print(zlist)
-        xt, yt, yawt = xlist[0, t], xlist[1, t], xlist[2, t]
-        xtd, ytd, yawtd = xlist[0, td], xlist[1, td], xlist[2, td]
-        #  print(zlist[t])
-        #  print(zlist[td])
+    for (t1, t2) in zids:
+        x1, y1, yaw1 = xlist[0, t1], xlist[1, t1], xlist[2, t1]
+        x2, y2, yaw2 = xlist[0, t2], xlist[1, t2], xlist[2, t2]
 
-        for iz1 in range(len(zlist[t][:, 0])):
-            for iz2 in range(len(zlist[td][:, 0])):
-                if zlist[t][iz1, 3] == zlist[td][iz2, 3]:
-                    dt, anglet, phit = zlist[t][iz1,
-                                                0], zlist[t][iz1, 1], zlist[t][iz1, 2]
-                    dtd, angletd, phitd = zlist[td][iz2,
-                                                    0], zlist[td][iz2, 1], zlist[td][iz2, 2]
+        for iz1 in range(len(zlist[t1][:, 0])):
+            for iz2 in range(len(zlist[t2][:, 0])):
+                if zlist[t1][iz1, 3] == zlist[t2][iz2, 3]:
+                    d1 = zlist[t1][iz1, 0]
+                    angle1, phi1 = zlist[t1][iz1, 1], zlist[t1][iz1, 2]
+                    d2 = zlist[t2][iz2, 0]
+                    angle2, phi2 = zlist[t2][iz2, 1], zlist[t2][iz2, 2]
 
-                    edge = calc_edge(xt, yt, yawt, xtd, ytd, yawtd, dt,
-                                     anglet, phit, dtd, angletd, phitd, t, td)
+                    edge = calc_edge(x1, y1, yaw1, x2, y2, yaw2, d1,
+                                     angle1, phi1, d2, angle2, phi2, t1, t2)
 
                     edges.append(edge)
-                    break
 
     return edges
 
 
 def calc_jacobian(edge):
-    t = edge.yaw_t + edge.angle_t
-    A = np.matrix([[-1.0, 0, edge.d_t * math.sin(t)],
-                   [0, -1.0, -edge.d_t * math.cos(t)],
+    t1 = edge.yaw1 + edge.angle1
+    A = np.matrix([[-1.0, 0, edge.d1 * math.sin(t1)],
+                   [0, -1.0, -edge.d1 * math.cos(t1)],
                    [0, 0, -1.0]])
 
-    td = edge.yaw_td + edge.angle_td
-    B = np.matrix([[1.0, 0, -edge.d_td * math.sin(td)],
-                   [0, 1.0, edge.d_td * math.cos(td)],
+    t2 = edge.yaw2 + edge.angle2
+    B = np.matrix([[1.0, 0, -edge.d2 * math.sin(t2)],
+                   [0, 1.0, edge.d2 * math.cos(t2)],
                    [0, 0, 1.0]])
 
     return A, B
@@ -143,27 +138,25 @@ def fill_H_and_b(H, b, edge):
 
     A, B = calc_jacobian(edge)
 
-    id1 = edge.id1 * 3
-    id2 = edge.id2 * 3
+    id1 = edge.id1 * STATE_SIZE
+    id2 = edge.id2 * STATE_SIZE
 
-    H[id1:id1 + 3, id1:id1 + 3] += A.T * edge.omega * A
-    H[id1:id1 + 3, id2:id2 + 3] += A.T * edge.omega * B
-    H[id2:id2 + 3, id1:id1 + 3] += B.T * edge.omega * A
-    H[id2:id2 + 3, id2:id2 + 3] += B.T * edge.omega * B
+    H[id1:id1 + STATE_SIZE, id1:id1 + STATE_SIZE] += A.T * edge.omega * A
+    H[id1:id1 + STATE_SIZE, id2:id2 + STATE_SIZE] += A.T * edge.omega * B
+    H[id2:id2 + STATE_SIZE, id1:id1 + STATE_SIZE] += B.T * edge.omega * A
+    H[id2:id2 + STATE_SIZE, id2:id2 + STATE_SIZE] += B.T * edge.omega * B
 
-    b[id1:id1 + 3, 0] += (A.T * edge.omega * edge.e)
-    b[id2:id2 + 3, 0] += (B.T * edge.omega * edge.e)
+    b[id1:id1 + STATE_SIZE, 0] += (A.T * edge.omega * edge.e)
+    b[id2:id2 + STATE_SIZE, 0] += (B.T * edge.omega * edge.e)
 
     return H, b
 
 
-def graph_based_slam(u, z, hxDR, hz):
+def graph_based_slam(x_init, hz):
     print("start graph based slam")
 
-    x_opt = copy.deepcopy(hxDR)
-    n = len(hz) * 3
-
-    #  return x_opt
+    x_opt = copy.deepcopy(x_init)
+    n = len(hz) * STATE_SIZE
 
     for itr in range(MAX_ITR):
         edges = calc_edges(x_opt, hz)
@@ -175,10 +168,10 @@ def graph_based_slam(u, z, hxDR, hz):
         for edge in edges:
             H, b = fill_H_and_b(H, b, edge)
 
-        H[0:3, 0:3] += np.identity(3) * 10000  # to fix origin
+        # to fix origin
+        H[0:STATE_SIZE, 0:STATE_SIZE] += np.identity(STATE_SIZE)
 
         dx = - np.linalg.inv(H).dot(b)
-        #  print(dx)
 
         for i in range(len(hz)):
             x_opt[0:3, i] += dx[i * 3:i * 3 + 3, 0]
@@ -268,13 +261,14 @@ def main():
 
     # State Vector [x y yaw v]'
     xTrue = np.matrix(np.zeros((STATE_SIZE, 1)))
-
     xDR = np.matrix(np.zeros((STATE_SIZE, 1)))  # Dead reckoning
 
     # history
     hxTrue = xTrue
     hxDR = xTrue
-    hz = []
+    hz = [np.matrix(np.zeros((1, 4)))]
+    hz[0][0, 3] = -1
+    #  hz = []
 
     while SIM_TIME >= time:
         time += DT
@@ -283,12 +277,10 @@ def main():
         xTrue, z, xDR, ud = observation(xTrue, xDR, u, RFID)
 
         hxDR = np.hstack((hxDR, xDR))
+        hxTrue = np.hstack((hxTrue, xTrue))
         hz.append(z)
 
-        # store data history
-        hxTrue = np.hstack((hxTrue, xTrue))
-
-    x_opt = graph_based_slam(ud, z, hxDR, hz)
+    x_opt = graph_based_slam(hxDR, hz)
 
     if show_animation:
         plt.cla()
