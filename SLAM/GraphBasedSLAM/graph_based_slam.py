@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 Qsim = np.diag([0.2, math.radians(1.0)])**2
 Rsim = np.diag([1.0, math.radians(10.0)])**2
 
-DT = 0.1  # time tick [s]
+DT = 1.0  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
 MAX_RANGE = 20.0  # maximum observation range
 STATE_SIZE = 3  # State size [x,y,yaw]
@@ -105,14 +105,22 @@ def calc_edges(xlist, zlist):
         #  print(zlist)
         xt, yt, yawt = xlist[0, t], xlist[1, t], xlist[2, t]
         xtd, ytd, yawtd = xlist[0, td], xlist[1, td], xlist[2, td]
-        dt, anglet, phit = zlist[t][0, 0], zlist[t][1, 0], zlist[t][2, 0]
-        dtd, angletd, phitd = zlist[td][0, 0], zlist[td][1, 0], zlist[td][2, 0]
-        #  input()
+        #  print(zlist[t])
+        #  print(zlist[td])
 
-        edge = calc_edge(xt, yt, yawt, xtd, ytd, yawtd, dt,
-                         anglet, phit, dtd, angletd, phitd, t, td)
+        for iz1 in range(len(zlist[t][:, 0])):
+            for iz2 in range(len(zlist[td][:, 0])):
+                if zlist[t][iz1, 3] == zlist[td][iz2, 3]:
+                    dt, anglet, phit = zlist[t][iz1,
+                                                0], zlist[t][iz1, 1], zlist[t][iz1, 2]
+                    dtd, angletd, phitd = zlist[td][iz2,
+                                                    0], zlist[td][iz2, 1], zlist[td][iz2, 2]
 
-        edges.append(edge)
+                    edge = calc_edge(xt, yt, yawt, xtd, ytd, yawtd, dt,
+                                     anglet, phit, dtd, angletd, phitd, t, td)
+
+                    edges.append(edge)
+                    break
 
     return edges
 
@@ -150,6 +158,7 @@ def fill_H_and_b(H, b, edge):
 
 
 def graph_based_slam(u, z, hxDR, hz):
+    print("start graph based slam")
 
     x_opt = copy.deepcopy(hxDR)
     n = len(hz) * 3
@@ -276,25 +285,25 @@ def main():
         hxDR = np.hstack((hxDR, xDR))
         hz.append(z)
 
-        x_opt = graph_based_slam(ud, z, hxDR, hz)
-
         # store data history
         hxTrue = np.hstack((hxTrue, xTrue))
 
-        if show_animation:
-            plt.cla()
+    x_opt = graph_based_slam(ud, z, hxDR, hz)
 
-            plt.plot(RFID[:, 0], RFID[:, 1], "*k")
+    if show_animation:
+        plt.cla()
 
-            plt.plot(np.array(hxTrue[0, :]).flatten(),
-                     np.array(hxTrue[1, :]).flatten(), "-b")
-            plt.plot(np.array(hxDR[0, :]).flatten(),
-                     np.array(hxDR[1, :]).flatten(), "-k")
-            plt.plot(np.array(x_opt[0, :]).flatten(),
-                     np.array(x_opt[1, :]).flatten(), "-r")
-            plt.axis("equal")
-            plt.grid(True)
-            plt.pause(0.001)
+        plt.plot(RFID[:, 0], RFID[:, 1], "*k")
+
+        plt.plot(np.array(hxTrue[0, :]).flatten(),
+                 np.array(hxTrue[1, :]).flatten(), "-b")
+        plt.plot(np.array(hxDR[0, :]).flatten(),
+                 np.array(hxDR[1, :]).flatten(), "-k")
+        plt.plot(np.array(x_opt[0, :]).flatten(),
+                 np.array(x_opt[1, :]).flatten(), "-r")
+        plt.axis("equal")
+        plt.grid(True)
+        plt.show()
 
 
 if __name__ == '__main__':
