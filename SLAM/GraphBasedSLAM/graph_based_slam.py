@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 Qsim = np.diag([0.0, math.radians(0.0)])**2
 Rsim = np.diag([0.0, math.radians(00.0)])**2
 
-DT = 1.0  # time tick [s]
+DT = 5.0  # time tick [s]
 SIM_TIME = 20.0  # simulation time [s]
 MAX_RANGE = 20.0  # maximum observation range
 STATE_SIZE = 3  # State size [x,y,yaw]
@@ -80,13 +80,13 @@ def calc_edge(x1, y1, yaw1, x2, y2, yaw2, d1,
     edge.e[1, 0] = y2 - y1 - tmp3 + tmp4
     edge.e[2, 0] = pi_2_pi(yaw2 - yaw1 - phi1 + phi2)
 
-    sig_t = cal_observation_sigma(d1)
-    sig_td = cal_observation_sigma(d2)
+    Rt1 = calc_rotational_matrix(tangle1)
+    Rt2 = calc_rotational_matrix(tangle2)
 
-    Rt = calc_rotational_matrix(tangle1)
-    Rtd = calc_rotational_matrix(tangle2)
+    sig1 = cal_observation_sigma(d1)
+    sig2 = cal_observation_sigma(d2)
 
-    edge.omega = np.linalg.inv(Rt * sig_t * Rt.T + Rtd * sig_td * Rtd.T)
+    edge.omega = np.linalg.inv(Rt1 * sig1 * Rt1.T + Rt2 * sig2 * Rt2.T)
     edge.d1, edge.d2 = d1, d2
     edge.yaw1, edge.yaw2 = yaw1, yaw2
     edge.angle1, edge.angle2 = angle1, angle2
@@ -98,6 +98,7 @@ def calc_edge(x1, y1, yaw1, x2, y2, yaw2, d1,
 def calc_edges(xlist, zlist):
 
     edges = []
+    cost = 0.0
     zids = list(itertools.combinations(range(len(zlist)), 2))
 
     for (t1, t2) in zids:
@@ -116,7 +117,9 @@ def calc_edges(xlist, zlist):
                                      angle1, phi1, d2, angle2, phi2, t1, t2)
 
                     edges.append(edge)
+                    cost += (edge.e.T * edge.omega * edge.e)[0, 0]
 
+    print("cost:", cost)
     return edges
 
 
@@ -169,7 +172,7 @@ def graph_based_slam(x_init, hz):
             H, b = fill_H_and_b(H, b, edge)
 
         # to fix origin
-        H[0:STATE_SIZE, 0:STATE_SIZE] += np.identity(STATE_SIZE)
+        H[0:STATE_SIZE, 0:STATE_SIZE] += np.identity(STATE_SIZE) * 1000.0
 
         dx = - np.linalg.inv(H).dot(b)
 
