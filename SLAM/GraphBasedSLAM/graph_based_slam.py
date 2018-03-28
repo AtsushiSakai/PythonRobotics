@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 #  Simulation parameter
 Qsim = np.diag([0.1, math.radians(1.0)])**2
-Rsim = np.diag([0.1, math.radians(5.0)])**2
+Rsim = np.diag([0.1, math.radians(10.0)])**2
 
 DT = 1.0  # time tick [s]
 SIM_TIME = 40.0  # simulation time [s]
@@ -23,9 +23,9 @@ MAX_RANGE = 20.0  # maximum observation range
 STATE_SIZE = 3  # State size [x,y,yaw]
 
 # Covariance parameter of Graph Based SLAM
-C_SIGMA1 = 1.0
-C_SIGMA2 = 1.0
-C_SIGMA3 = math.radians(35.0)
+C_SIGMA1 = 0.01
+C_SIGMA2 = 0.01
+C_SIGMA3 = math.radians(5.0)
 
 MAX_ITR = 20  # Maximuma iteration
 
@@ -59,8 +59,8 @@ def cal_observation_sigma(d):
 
 def calc_rotational_matrix(angle):
 
-    Rt = np.matrix([[math.cos(angle), -math.sin(angle), 0],
-                    [math.sin(angle), math.cos(angle), 0],
+    Rt = np.matrix([[math.cos(angle), math.sin(angle), 0],
+                    [-math.sin(angle), math.cos(angle), 0],
                     [0, 0, 1.0]])
     return Rt
 
@@ -78,7 +78,8 @@ def calc_edge(x1, y1, yaw1, x2, y2, yaw2, d1,
 
     edge.e[0, 0] = x2 - x1 - tmp1 + tmp2
     edge.e[1, 0] = y2 - y1 - tmp3 + tmp4
-    edge.e[2, 0] = pi_2_pi(yaw2 - yaw1 - phi1 + phi2)
+    hyaw = phi1 - phi2 + angle1 - angle2
+    edge.e[2, 0] = pi_2_pi(yaw2 - yaw1 - hyaw)
 
     Rt1 = calc_rotational_matrix(tangle1)
     Rt2 = calc_rotational_matrix(tangle2)
@@ -87,8 +88,6 @@ def calc_edge(x1, y1, yaw1, x2, y2, yaw2, d1,
     sig2 = cal_observation_sigma(d2)
 
     edge.omega = np.linalg.inv(Rt1 * sig1 * Rt1.T + Rt2 * sig2 * Rt2.T)
-    #  print(edge.omega)
-    #  edge.omega = np.eye(3)
 
     edge.d1, edge.d2 = d1, d2
     edge.yaw1, edge.yaw2 = yaw1, yaw2
@@ -273,7 +272,8 @@ def main():
     # history
     hxTrue = xTrue
     hxDR = xTrue
-    hz = [np.matrix(np.zeros((1, 4)))]
+    #  hz = [np.matrix(np.zeros((1, 4)))]
+    #  hz[0][0, 3] = -1
     hz = []
 
     while SIM_TIME >= time:
