@@ -14,18 +14,18 @@ import matplotlib.pyplot as plt
 
 
 #  Simulation parameter
-Qsim = np.diag([0.0, math.radians(0.0)])**2
-Rsim = np.diag([0.0, math.radians(00.0)])**2
+Qsim = np.diag([0.1, math.radians(1.0)])**2
+Rsim = np.diag([0.1, math.radians(5.0)])**2
 
-DT = 5.0  # time tick [s]
-SIM_TIME = 20.0  # simulation time [s]
+DT = 1.0  # time tick [s]
+SIM_TIME = 40.0  # simulation time [s]
 MAX_RANGE = 20.0  # maximum observation range
 STATE_SIZE = 3  # State size [x,y,yaw]
 
 # Covariance parameter of Graph Based SLAM
 C_SIGMA1 = 1.0
-C_SIGMA2 = 0.1
-C_SIGMA3 = 0.1
+C_SIGMA2 = 1.0
+C_SIGMA3 = math.radians(35.0)
 
 MAX_ITR = 20  # Maximuma iteration
 
@@ -50,8 +50,8 @@ class Edge():
 def cal_observation_sigma(d):
 
     sigma = np.zeros((3, 3))
-    sigma[0, 0] = (d * C_SIGMA1)**2
-    sigma[1, 1] = (d * C_SIGMA2)**2
+    sigma[0, 0] = C_SIGMA1**2
+    sigma[1, 1] = C_SIGMA2**2
     sigma[2, 2] = C_SIGMA3**2
 
     return sigma
@@ -87,6 +87,9 @@ def calc_edge(x1, y1, yaw1, x2, y2, yaw2, d1,
     sig2 = cal_observation_sigma(d2)
 
     edge.omega = np.linalg.inv(Rt1 * sig1 * Rt1.T + Rt2 * sig2 * Rt2.T)
+    #  print(edge.omega)
+    #  edge.omega = np.eye(3)
+
     edge.d1, edge.d2 = d1, d2
     edge.yaw1, edge.yaw2 = yaw1, yaw2
     edge.angle1, edge.angle2 = angle1, angle2
@@ -159,7 +162,8 @@ def graph_based_slam(x_init, hz):
     print("start graph based slam")
 
     x_opt = copy.deepcopy(x_init)
-    n = len(hz) * STATE_SIZE
+    #  n = len(hz) * STATE_SIZE
+    n = x_opt.shape[1] * STATE_SIZE
 
     for itr in range(MAX_ITR):
         edges = calc_edges(x_opt, hz)
@@ -176,7 +180,7 @@ def graph_based_slam(x_init, hz):
 
         dx = - np.linalg.inv(H).dot(b)
 
-        for i in range(len(hz)):
+        for i in range((x_opt.shape[1])):
             x_opt[0:3, i] += dx[i * 3:i * 3 + 3, 0]
 
         diff = dx.T.dot(dx)
@@ -270,8 +274,7 @@ def main():
     hxTrue = xTrue
     hxDR = xTrue
     hz = [np.matrix(np.zeros((1, 4)))]
-    hz[0][0, 3] = -1
-    #  hz = []
+    hz = []
 
     while SIM_TIME >= time:
         time += DT
@@ -283,6 +286,8 @@ def main():
         hxTrue = np.hstack((hxTrue, xTrue))
         hz.append(z)
 
+    hz.append(hz[-1])
+
     x_opt = graph_based_slam(hxDR, hz)
 
     if show_animation:
@@ -291,7 +296,7 @@ def main():
         plt.plot(RFID[:, 0], RFID[:, 1], "*k")
 
         plt.plot(np.array(hxTrue[0, :]).flatten(),
-                 np.array(hxTrue[1, :]).flatten(), "-b")
+                 np.array(hxTrue[1, :]).flatten(), "xb")
         plt.plot(np.array(hxDR[0, :]).flatten(),
                  np.array(hxDR[1, :]).flatten(), "-k")
         plt.plot(np.array(x_opt[0, :]).flatten(),
