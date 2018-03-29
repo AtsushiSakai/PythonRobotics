@@ -264,6 +264,8 @@ The black line is dead reckoning.
 
 The red line is the estimated trajectory with Graph based SLAM.
 
+The black stars are landmarks for graph edge generation.
+
 ![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/GraphBasedSLAM/animation.gif)
 
 Ref:

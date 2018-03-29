@@ -4,6 +4,10 @@ Graph based SLAM example
 
 author: Atsushi Sakai (@Atsushi_twi)
 
+Ref
+
+[A Tutorial on Graph-Based SLAM](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)
+
 """
 
 import numpy as np
