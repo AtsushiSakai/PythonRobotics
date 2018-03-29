@@ -6,6 +6,7 @@
 Python codes for robotics algorithm.
 
 
+
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -23,6 +24,7 @@ Python codes for robotics algorithm.
       * [EKF SLAM](#ekf-slam)
       * [FastSLAM 1.0](#fastslam-10)
       * [FastSLAM 2.0](#fastslam-20)
+      * [Graph based SLAM](#graph-based-slam)
    * [Path Planning](#path-planning)
       * [Dynamic Window Approach](#dynamic-window-approach)
       * [Grid based search](#grid-based-search)
@@ -241,6 +243,7 @@ This is a feature based SLAM example using FastSLAM 2.0.
 
 The animation has same meanings as one of FastSLAM 1.0.
 
+
 ![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/FastSLAM2/animation.gif)
 
 
@@ -249,6 +252,23 @@ Ref:
 - [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
 
 - [SLAM simulations by Tim Bailey](http://www-personal.acfr.usyd.edu.au/tbailey/software/slam_simulations.htm)
+
+
+## Graph based SLAM
+
+This is a graph based SLAM example.
+
+The blue line is ground truth.
+
+The black line is dead reckoning.
+
+The red line is the estimated trajectory with Graph based SLAM.
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/GraphBasedSLAM/animation.gif)
+
+Ref:
+
+- [A Tutorial on Graph-Based SLAM](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)
 
 
 # Path Planning
@@ -633,6 +653,7 @@ If your PR is merged multiple times, I will add your account to the Author list.
 - [Daniel Ingram](https://github.com/daniel-s-ingram)
 
 - [Joe Dinius](https://github.com/jwdinius)
+
 
 
 
