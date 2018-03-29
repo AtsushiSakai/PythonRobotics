@@ -12,6 +12,7 @@ import copy
 import itertools
 import matplotlib.pyplot as plt
 
+
 #  Simulation parameter
 Qsim = np.diag([0.2, math.radians(1.0)])**2
 Rsim = np.diag([0.1, math.radians(10.0)])**2
@@ -165,8 +166,6 @@ def graph_based_slam(x_init, hz):
 
     zlist = copy.deepcopy(hz)
     zlist.insert(1, zlist[0])
-    #  zlist.append(zlist[-1])
-    #  zlist.append(None)
 
     x_opt = copy.deepcopy(x_init)
     nt = x_opt.shape[1]
@@ -310,6 +309,7 @@ def main():
                          np.array(x_opt[1, :]).flatten(), "-r")
                 plt.axis("equal")
                 plt.grid(True)
+                plt.title("Time" + str(time)[0:5])
                 plt.pause(1.0)
 
 
