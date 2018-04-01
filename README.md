@@ -67,7 +67,7 @@ Python codes for robotics algorithm.
 
 # What is this?
 
-This is a Python code collection of robotics, especially autonomous navigation.
+This is a Python code collection of robotics algorithms, especially autonomous navigation.
 
 Feature:
 
@@ -646,7 +646,7 @@ If you have any quesions or problems about this code, feel free to add an issue.
 
 A small PR like bug fix is welcome.
 
-If your PR is merged multiple times, I will add your account to the Author list.
+If your PR is merged multiple times, I will add your account to the author list.
 
 # Authors
 
