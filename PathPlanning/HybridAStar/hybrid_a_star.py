@@ -20,6 +20,26 @@ EXTEND_AREA = 5.0  # [m]
 show_animation = True
 
 
+class Node:
+    """
+    Node
+    """
+
+    def __init__(self, xind, yind, yawind, direction, x, y, yaw, directions, steer, cost, pind):
+        # store kd-tree
+        self.xind = xind
+        self.yind = yind
+        self.yawind = yawind
+        self.direction = direction
+        self.xlist = x
+        self.ylist = y
+        self.yawlist = yaw
+        self.directionlist = directions
+        self.steer = steer
+        self.cost = cost
+        self.pind = pind
+
+
 class KDTree:
     """
     Nearest neighbor search class with KDTree
@@ -100,6 +120,11 @@ def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
     obkdtree = KDTree(np.vstack((tox, toy)).T)
 
     c = Config(tox, toy, xyreso, yawreso)
+
+    nstart = Node(int(start[0] / xyreso), int(start[1] / xyreso), int(start[2] / yawreso),
+                  True, [start[0]], [start[1]], [start[2]], [True], 0.0, 0.0, -1)
+    ngoal = Node(int(goal[0] / xyreso), int(goal[1] / xyreso), int(goal[2] / yawreso),
+                 True, [goal[0]], [goal[1]], [goal[2]], [True], 0.0, 0.0, -1)
 
     rx, ry, ryaw = [], [], []
 
