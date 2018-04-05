@@ -14,16 +14,15 @@ import numpy as np
 import scipy.spatial
 import matplotlib.pyplot as plt
 import reeds_shepp_path_planning as rs
+import heapq
 
 EXTEND_AREA = 5.0  # [m]
+H_COST = 1.0
 
 show_animation = True
 
 
 class Node:
-    """
-    Node
-    """
 
     def __init__(self, xind, yind, yawind, direction, x, y, yaw, directions, steer, cost, pind):
         # store kd-tree
@@ -117,7 +116,7 @@ def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
     start[2], goal[2] = rs.pi_2_pi(start[2]), rs.pi_2_pi(goal[2])
     tox, toy = ox[:], oy[:]
 
-    obkdtree = KDTree(np.vstack((tox, toy)).T)
+    #  obkdtree = KDTree(np.vstack((tox, toy)).T)
 
     c = Config(tox, toy, xyreso, yawreso)
 
@@ -126,9 +125,33 @@ def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
     ngoal = Node(int(goal[0] / xyreso), int(goal[1] / xyreso), int(goal[2] / yawreso),
                  True, [goal[0]], [goal[1]], [goal[2]], [True], 0.0, 0.0, -1)
 
+    openList, closedList = {}, {}
+    h = []
+    #  goalqueue = queue.PriorityQueue()
+    pq = []
+    openList[calc_index(nstart, c)] = nstart
+    heapq.heappush(pq, (calc_index(nstart, c), calc_cost(nstart, h, ngoal, c)))
+
     rx, ry, ryaw = [], [], []
 
     return rx, ry, ryaw
+
+
+def calc_cost(n, h, ngoal, c):
+
+    hcost = 1.0
+
+    return (n.cost + H_COST * hcost)
+
+
+def calc_index(node, c):
+    ind = (node.yawind - c.minyaw) * c.xw * c.yw + \
+        (node.yind - c.miny) * c.xw + (node.xind - c.minx)
+
+    if ind <= 0:
+        print("Error(calc_index):", ind)
+
+    return ind
 
 
 def main():
