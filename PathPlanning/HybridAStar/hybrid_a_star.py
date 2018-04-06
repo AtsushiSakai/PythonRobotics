@@ -10,7 +10,7 @@ import sys
 sys.path.append("../ReedsSheppPath/")
 
 import math
-import numpy as np
+#  import numpy as np
 import scipy.spatial
 import matplotlib.pyplot as plt
 import reeds_shepp_path_planning as rs
@@ -132,6 +132,15 @@ def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
     openList[calc_index(nstart, c)] = nstart
     heapq.heappush(pq, (calc_index(nstart, c), calc_cost(nstart, h, ngoal, c)))
 
+    while True:
+        if not openList:
+            print("Error: Cannot find path, No open set")
+            return [], [], []
+
+        c_id, cost = heapq.heappop(pq)
+        current = openList.pop(c_id)
+        #  print(current)
+
     rx, ry, ryaw = [], [], []
 
     return rx, ry, ryaw
@@ -155,8 +164,7 @@ def calc_index(node, c):
 
 
 def main():
-    print("Start rrt start planning")
-    # ====Search Path with RRT====
+    print("Start Hybrid A* planning")
 
     ox, oy = [], []
 
