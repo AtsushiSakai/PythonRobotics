@@ -10,7 +10,7 @@ import sys
 sys.path.append("../ReedsSheppPath/")
 
 import math
-#  import numpy as np
+import numpy as np
 import scipy.spatial
 import matplotlib.pyplot as plt
 import reeds_shepp_path_planning as rs
@@ -103,6 +103,11 @@ class Config:
         self.yaww = int(self.maxyaw - self.minyaw)
 
 
+def analytic_expantion(current, ngoal, c, ox, oy, kdtree):
+
+    return False, None  # no update
+
+
 def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
     """
     start
@@ -116,7 +121,7 @@ def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
     start[2], goal[2] = rs.pi_2_pi(start[2]), rs.pi_2_pi(goal[2])
     tox, toy = ox[:], oy[:]
 
-    #  obkdtree = KDTree(np.vstack((tox, toy)).T)
+    obkdtree = KDTree(np.vstack((tox, toy)).T)
 
     c = Config(tox, toy, xyreso, yawreso)
 
@@ -139,6 +144,11 @@ def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
 
         c_id, cost = heapq.heappop(pq)
         current = openList.pop(c_id)
+        closedList[c_id] = current
+
+        isupdated, fpath = analytic_expantion(
+            current, ngoal, c, ox, oy, obkdtree)
+
         #  print(current)
 
     rx, ry, ryaw = [], [], []
