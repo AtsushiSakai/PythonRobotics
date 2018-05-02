@@ -11,6 +11,29 @@ import matplotlib.pyplot as plt
 import random
 
 
+class Cluster:
+
+    def __init__(self):
+        self.x = []
+        self.y = []
+        self.cx = None
+        self.cy = None
+
+
+def kmean_clustering(rx, ry, nc):
+
+    minx, maxx = min(rx), max(rx)
+    miny, maxy = min(ry), max(ry)
+
+    clusters = [Cluster() for i in range(nc)]
+
+    for c in clusters:
+        c.cx = random.uniform(minx, maxx)
+        c.cy = random.uniform(miny, maxy)
+
+    return clusters
+
+
 def calc_raw_data():
 
     rx, ry = [], []
@@ -33,7 +56,14 @@ def main():
 
     rx, ry = calc_raw_data()
 
-    plt.plot(rx, ry, "x")
+    ncluster = 2
+    clusters = kmean_clustering(rx, ry, ncluster)
+
+    for c in clusters:
+        print(c.cx, c.cy)
+        plt.plot(c.cx, c.cy, "x")
+
+    plt.plot(rx, ry, ".")
     plt.show()
 
 
