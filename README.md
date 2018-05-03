@@ -186,6 +186,12 @@ This is a 2D ray casting grid mapping example.
 
 ![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/raycasting_grid_map/animation.gif)
 
+## k-means object clustering
+
+This is a 2D object clustering with k-means algorithm.
+
+![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/kmeans_clustering/animation.gif)
+
 
 # SLAM
 
