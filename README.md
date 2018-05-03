@@ -7,7 +7,6 @@
 Python codes for robotics algorithm.
 
 
-
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -20,6 +19,7 @@ Python codes for robotics algorithm.
    * [Mapping](#mapping)
       * [Gaussian grid map](#gaussian-grid-map)
       * [Ray casting grid map](#ray-casting-grid-map)
+      * [k-means object clustering](#k-means-object-clustering)
    * [SLAM](#slam)
       * [Iterative Closest Point (ICP) Matching](#iterative-closest-point-icp-matching)
       * [EKF SLAM](#ekf-slam)
@@ -662,6 +662,7 @@ If your PR is merged multiple times, I will add your account to the author list.
 - [Daniel Ingram](https://github.com/daniel-s-ingram)
 
 - [Joe Dinius](https://github.com/jwdinius)
+
 
 
 
