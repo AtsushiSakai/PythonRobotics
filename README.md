@@ -2,7 +2,6 @@
 
 # PythonRobotics
 [![Build Status](https://travis-ci.org/AtsushiSakai/PythonRobotics.svg?branch=master)](https://travis-ci.org/AtsushiSakai/PythonRobotics)
-[![Support via PayPal](https://cdn.rawgit.com/twolfson/paypal-github-button/1.0.0/dist/button.svg)](https://www.paypal.me/myenigmapay/)
 
 Python codes for robotics algorithm.
 
@@ -654,6 +653,10 @@ If you have any quesions or problems about this code, feel free to add an issue.
 A small PR like bug fix is welcome.
 
 If your PR is merged multiple times, I will add your account to the author list.
+
+You can support financially this project via PayPal.
+
+[![Support via PayPal](https://cdn.rawgit.com/twolfson/paypal-github-button/1.0.0/dist/button.svg)](https://www.paypal.me/myenigmapay/)
 
 # Authors
 
