@@ -42,7 +42,7 @@ def LQRplanning(sx, sy, gx, gy):
 
         d = math.sqrt((gx - rx[-1])**2 + (gy - ry[-1])**2)
         if d <= 0.1:
-            print("Goal!!")
+            #  print("Goal!!")
             found_path = True
             break
 
