@@ -119,8 +119,8 @@ def LQR_control(A, B, x):
 def main():
     print(__file__ + " start!!")
 
-    ntest = 10
-    area = 100.0
+    ntest = 10  # number of goal
+    area = 100.0  # sampling area
 
     for i in range(ntest):
         sx = 6.0
