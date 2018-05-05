@@ -1,6 +1,6 @@
 """
 
-LQR local path planning module
+LQR local path planning
 
 author: Atsushi Sakai (@Atsushi_twi)
 
@@ -13,21 +13,22 @@ import math
 
 show_animation = True
 
-MAX_TIME = 100.0
-DT = 0.1
+MAX_TIME = 100.0  # Maximum simulation time
+DT = 0.1  # Time tick
 
 
 def LQRplanning(sx, sy, gx, gy):
 
     rx, ry = [sx], [sy]
 
-    x = np.matrix([gx - sx, gy - sy]).T  # State vector
+    x = np.matrix([sx - gx, sy - gy]).T  # State vector
 
     # Linear system model
     A, B = get_system_model()
 
-    time = 0.0
+    found_path = False
 
+    time = 0.0
     while time <= MAX_TIME:
         time += DT
 
@@ -35,18 +36,27 @@ def LQRplanning(sx, sy, gx, gy):
 
         x = A * x + B * u
 
-        rx.append(x[0, 0])
-        ry.append(x[1, 0])
+        rx.append(x[0, 0] + gx)
+        ry.append(x[1, 0] + gy)
 
-        plt.plot(rx, ry)
-        plt.plot(rx[-1], ry[-1], "xr")
-        plt.pause(1.0)
-
-        d = math.sqrt((gx - x[0, 0])**2 + (gy - x[1, 0])**2)
-        print(d)
+        d = math.sqrt((gx - rx[-1])**2 + (gy - ry[-1])**2)
         if d <= 0.1:
             print("Goal!!")
+            found_path = True
             break
+
+        # animation
+        if show_animation:
+            plt.cla()
+            plt.plot(sx, sy, "or")
+            plt.plot(gx, gy, "ob")
+            plt.plot(rx, ry, "-r")
+            plt.axis("equal")
+            plt.pause(1.0)
+
+    if not found_path:
+        print("Cannot found path")
+        return [], []
 
     return rx, ry
 
@@ -89,8 +99,9 @@ def dlqr(A, B, Q, R):
 
 
 def get_system_model():
-    A = np.eye(2) * DT
-    A[0, 1] = 1.0
+
+    A = np.matrix([[DT, 1.0],
+                   [0.0, DT]])
     B = np.matrix([0.0, 1.0]).T
 
     return A, B
@@ -108,18 +119,19 @@ def LQR_control(A, B, x):
 def main():
     print(__file__ + " start!!")
 
-    sx = -10.0
-    sy = -5.0
-    gx = 0.0
-    gy = 0.0
+    sx = 6.0
+    sy = 6.0
+    gx = 10.0
+    gy = 10.0
 
     rx, ry = LQRplanning(sx, sy, gx, gy)
 
-    plt.plot(sx, sy, "xb")
-    plt.plot(gx, gy, "xb")
-    plt.plot(rx, ry)
-    plt.axis("equal")
-    plt.show()
+    if show_animation:
+        plt.plot(sx, sy, "or")
+        plt.plot(gx, gy, "ob")
+        plt.plot(rx, ry, "-r")
+        plt.axis("equal")
+        plt.show()
 
 
 if __name__ == '__main__':
