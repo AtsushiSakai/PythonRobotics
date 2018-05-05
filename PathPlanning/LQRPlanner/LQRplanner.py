@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.linalg as la
 import math
+import random
 
 show_animation = True
 
@@ -47,7 +48,6 @@ def LQRplanning(sx, sy, gx, gy):
 
         # animation
         if show_animation:
-            plt.cla()
             plt.plot(sx, sy, "or")
             plt.plot(gx, gy, "ob")
             plt.plot(rx, ry, "-r")
@@ -117,6 +117,28 @@ def LQR_control(A, B, x):
 
 
 def main():
+    print(__file__ + " start!!")
+
+    ntest = 10
+    area = 100.0
+
+    for i in range(ntest):
+        sx = 6.0
+        sy = 6.0
+        gx = random.uniform(-area, area)
+        gy = random.uniform(-area, area)
+
+        rx, ry = LQRplanning(sx, sy, gx, gy)
+
+        if show_animation:
+            plt.plot(sx, sy, "or")
+            plt.plot(gx, gy, "ob")
+            plt.plot(rx, ry, "-r")
+            plt.axis("equal")
+            plt.pause(1.0)
+
+
+def main1():
     print(__file__ + " start!!")
 
     sx = 6.0
