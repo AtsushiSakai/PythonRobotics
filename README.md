@@ -5,6 +5,7 @@
 
 Python codes for robotics algorithm.
 
+
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -46,6 +47,7 @@ Python codes for robotics algorithm.
          * [RRT* with dubins path](#rrt-with-dubins-path-1)
          * [RRT* with reeds-sheep path](#rrt-with-reeds-sheep-path)
          * [Closed Loop RRT*](#closed-loop-rrt)
+         * [LQR-RRT*](#lqr-rrt)
       * [Cubic spline planning](#cubic-spline-planning)
       * [B-Spline planning](#b-spline-planning)
       * [Bezier path planning](#bezier-path-planning)
@@ -462,6 +464,21 @@ Autonomous Urban Driving](http://acl.mit.edu/papers/KuwataTCST09.pdf)
 
 - [[1601.06326] Sampling-based Algorithms for Optimal Motion Planning Using Closed-loop Prediction](https://arxiv.org/abs/1601.06326)
 
+### LQR-RRT\*
+
+This is a path planning simulation with LQR-RRT\*.
+
+A double integrator motion model is used for LQR local planner.
+
+![LQRRRT](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/LQRRRTStar/animation.gif)
+
+Ref:
+
+- [LQR\-RRT\*: Optimal Sampling\-Based Motion Planning with Automatically Derived Extension Heuristics](http://lis.csail.mit.edu/pubs/perez-icra12.pdf)
+
+- [MahanFathi/LQR\-RRTstar: LQR\-RRT\* method is used for random motion planning of a simple pendulum in it's phase plot](https://github.com/MahanFathi/LQR-RRTstar)
+
+
 ## Cubic spline planning
 
 A sample code for cubic path planning.
@@ -672,6 +689,7 @@ You can support financially this project via PayPal.
 - [Daniel Ingram](https://github.com/daniel-s-ingram)
 
 - [Joe Dinius](https://github.com/jwdinius)
+
 
 
 
