@@ -20,7 +20,8 @@ show_animation = True
 
 LQRplanner.show_animation = False
 
-STEP_SIZE = 0.05
+STEP_SIZE = 0.05  # step size of local path
+XYTH = 0.5  # [m] acceptance xy distance in final paths
 
 
 class RRT():
@@ -47,7 +48,7 @@ class RRT():
         self.maxIter = maxIter
         self.obstacleList = obstacleList
 
-    def Planning(self, animation=True):
+    def planning(self, animation=True):
         """
         Pathplanning
 
@@ -57,13 +58,13 @@ class RRT():
         self.nodeList = [self.start]
         for i in range(self.maxIter):
             rnd = self.get_random_point()
-            nind = self.GetNearestListIndex(self.nodeList, rnd)
+            nind = self.get_nearest_index(self.nodeList, rnd)
 
             newNode = self.steer(rnd, nind)
             if newNode is None:
                 continue
 
-            if self.CollisionCheck(newNode, self.obstacleList):
+            if self.check_collision(newNode, self.obstacleList):
                 nearinds = self.find_near_nodes(newNode)
                 newNode = self.choose_parent(newNode, nearinds)
                 if newNode is None:
@@ -72,7 +73,7 @@ class RRT():
                 self.rewire(newNode, nearinds)
 
             if animation and i % 5 == 0:
-                self.DrawGraph(rnd=rnd)
+                self.draw_graph(rnd=rnd)
 
         # generate coruse
         lastIndex = self.get_best_last_index()
@@ -91,7 +92,7 @@ class RRT():
             if tNode is None:
                 continue
 
-            if self.CollisionCheck(tNode, self.obstacleList):
+            if self.check_collision(tNode, self.obstacleList):
                 dlist.append(tNode.cost)
             else:
                 dlist.append(float("inf"))
@@ -164,7 +165,6 @@ class RRT():
                    random.uniform(-math.pi, math.pi)
                    ]
         else:  # goal point sampling
-            #  print("goal sample")
             rnd = [self.end.x, self.end.y]
 
         node = Node(rnd[0], rnd[1])
@@ -173,8 +173,6 @@ class RRT():
 
     def get_best_last_index(self):
         #  print("get_best_last_index")
-
-        XYTH = 0.5
 
         goalinds = []
         for (i, node) in enumerate(self.nodeList):
@@ -197,7 +195,6 @@ class RRT():
             node = self.nodeList[goalind]
             for (ix, iy) in zip(reversed(node.path_x), reversed(node.path_y)):
                 path.append([ix, iy])
-            #  path.append([node.x, node.y])
             goalind = node.parent
         path.append([self.start.x, self.start.y])
         return path
@@ -224,20 +221,18 @@ class RRT():
             if tNode is None:
                 continue
 
-            obstacleOK = self.CollisionCheck(tNode, self.obstacleList)
+            obstacleOK = self.check_collision(tNode, self.obstacleList)
             imporveCost = nearNode.cost > tNode.cost
 
             if obstacleOK and imporveCost:
                 #  print("rewire")
                 self.nodeList[i] = tNode
 
-    def DrawGraph(self, rnd=None):
-        """
-        Draw Graph
-        """
+    def draw_graph(self, rnd=None):
         plt.clf()
         if rnd is not None:
             plt.plot(rnd.x, rnd.y, "^k")
+
         for node in self.nodeList:
             if node.parent is not None:
                 plt.plot(node.path_x, node.path_y, "-g")
@@ -252,7 +247,7 @@ class RRT():
         plt.grid(True)
         plt.pause(0.01)
 
-    def GetNearestListIndex(self, nodeList, rnd):
+    def get_nearest_index(self, nodeList, rnd):
         dlist = [(node.x - rnd.x) ** 2 +
                  (node.y - rnd.y) ** 2
                  for node in nodeList]
@@ -260,15 +255,18 @@ class RRT():
 
         return minind
 
-    def CollisionCheck(self, node, obstacleList):
+    def check_collision(self, node, obstacleList):
+
+        px = np.array(node.path_x)
+        py = np.array(node.path_y)
 
         for (ox, oy, size) in obstacleList:
-            for (ix, iy) in zip(node.path_x, node.path_y):
-                dx = ox - ix
-                dy = oy - iy
-                d = dx * dx + dy * dy
-                if d <= size ** 2:
-                    return False  # collision
+            dx = ox - px
+            dy = oy - py
+            d = dx ** 2 + dy ** 2
+            dmin = min(d)
+            if dmin <= size ** 2:
+                return False  # collision
 
         return True  # safe
 
@@ -305,15 +303,17 @@ def main():
     goal = [6.0, 7.0]
 
     rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
-    path = rrt.Planning(animation=show_animation)
+    path = rrt.planning(animation=show_animation)
 
     # Draw final path
     if show_animation:
-        rrt.DrawGraph()
+        rrt.draw_graph()
         plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
         plt.grid(True)
         plt.pause(0.001)
         plt.show()
+
+    print("Done")
 
 
 if __name__ == '__main__':
