@@ -565,7 +565,7 @@ Ref:
 
 ## LQR based path planning
 
-A sample code using LQR based path planning for double itegrator model.
+A sample code using LQR based path planning for double integrator model.
 
 ![RSPlanning](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/LQRPlanner/animation.gif?raw=true)
 
