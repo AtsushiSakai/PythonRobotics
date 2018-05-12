@@ -193,6 +193,17 @@ This is a 2D object clustering with k-means algorithm.
 
 ![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/kmeans_clustering/animation.gif)
 
+## object shape recognition using circle fitting
+
+This is a object shape recoginition using circle fitting.
+
+![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/circle_fitting/animation.gif)
+
+The blue circle is true object circle.
+
+The red crosses are observations from ranging sensor.
+
+The red circle is the estimated object shape using circle fitting.
 
 # SLAM
 
