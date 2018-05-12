@@ -6,7 +6,6 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-
 import matplotlib.pyplot as plt
 import math
 import random
@@ -53,12 +52,12 @@ def circle_fitting(x, y):
 def get_sample_points(cx, cy, cr, angle_reso):
     x, y, angle, r = [], [], [], []
 
+    # points sampling
     for theta in np.arange(0.0, 2.0 * math.pi, angle_reso):
-        rn = cr * random.uniform(0.9, 1.1)  # add noize
-        nx = cx + rn * math.cos(theta)
-        ny = cy + rn * math.sin(theta)
+        nx = cx + cr * math.cos(theta)
+        ny = cy + cr * math.sin(theta)
         nangle = math.atan2(ny, nx)
-        nr = math.hypot(nx, ny)
+        nr = math.hypot(nx, ny) * random.uniform(0.95, 1.05)
 
         x.append(nx)
         y.append(ny)
@@ -84,7 +83,7 @@ def ray_casting_filter(xl, yl, thetal, rangel, angle_reso):
 
     for i in range(len(rangedb)):
         t = i * angle_reso
-        if rangedb[i] <= 1000.0:
+        if rangedb[i] != float("inf"):
             rx.append(rangedb[i] * math.cos(t))
             ry.append(rangedb[i] * math.sin(t))
 
@@ -101,14 +100,15 @@ def plot_circle(x, y, size, color="-b"):
 
 def main():
 
-    simtime = 10.0
-    dt = 1.0
+    # simulation parameters
+    simtime = 15.0  # simulation time
+    dt = 1.0  # time tick
 
-    cx = -2.0
-    cy = -8.0
-    cr = 1.0
-    theta = math.radians(30.0)
-    angle_reso = math.radians(3.0)
+    cx = -2.0  # initial x position of obstacle
+    cy = -8.0  # initial y position of obstacle
+    cr = 1.0  # obstacle radious
+    theta = math.radians(30.0)  # obstacle moving direction
+    angle_reso = math.radians(3.0)  # sensor angle resolution
 
     time = 0.0
     while time <= simtime:
