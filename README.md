@@ -6,6 +6,7 @@
 Python codes for robotics algorithm.
 
 
+
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -19,6 +20,7 @@ Python codes for robotics algorithm.
       * [Gaussian grid map](#gaussian-grid-map)
       * [Ray casting grid map](#ray-casting-grid-map)
       * [k-means object clustering](#k-means-object-clustering)
+      * [Object shape recognition using circle fitting](#object-shape-recognition-using-circle-fitting)
    * [SLAM](#slam)
       * [Iterative Closest Point (ICP) Matching](#iterative-closest-point-icp-matching)
       * [EKF SLAM](#ekf-slam)
@@ -193,15 +195,15 @@ This is a 2D object clustering with k-means algorithm.
 
 ![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/kmeans_clustering/animation.gif)
 
-## object shape recognition using circle fitting
+## Object shape recognition using circle fitting
 
 This is a object shape recoginition using circle fitting.
 
 ![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/circle_fitting/animation.gif)
 
-The blue circle is true object circle.
+The blue circle is the true object shape.
 
-The red crosses are observations from ranging sensor.
+The red crosses are observations from a ranging sensor.
 
 The red circle is the estimated object shape using circle fitting.
 
@@ -700,6 +702,7 @@ You can support financially this project via PayPal.
 - [Daniel Ingram](https://github.com/daniel-s-ingram)
 
 - [Joe Dinius](https://github.com/jwdinius)
+
 
 
 
