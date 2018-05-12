@@ -21,6 +21,7 @@ install:
   - pip install cvxpy
   - conda install -y -c cvxgrp cvxpy
   - conda install -y -c anaconda cvxopt
+  - conda update numpy
 
 script:
   - python --version

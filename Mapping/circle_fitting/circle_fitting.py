@@ -37,21 +37,13 @@ def circle_fitting(x, y):
                   [-sum([ix ** 2 * iy + iy ** 3 for (ix, iy) in zip(x, y)])],
                   [-sum([ix ** 2 + iy ** 2 for (ix, iy) in zip(x, y)])]])
 
-    #  try:
     T = np.linalg.inv(F).dot(G)
-    #  except:
-    #  return (0, 0, float("inf"))
 
     cxe = float(T[0] / -2)
     cye = float(T[1] / -2)
-    #  print (cxe,cye,T)
-    #  try:
     re = math.sqrt(cxe**2 + cye**2 - T[2])
-    #  except:
-    #  return (cxe, cye, float("inf"))
 
     error = sum([np.hypot(cxe - ix, cye - iy) - re for (ix, iy) in zip(x, y)])
-    #  print(error)
 
     return (cxe, cye, re, error)
 
@@ -60,26 +52,37 @@ def get_sample_points(cx, cy, r, angle_reso):
     x, y, angle, ran = [], [], [], []
 
     for theta in np.arange(0.0, 2.0 * math.pi, angle_reso):
-        rn = r * random.uniform(1.0, 1.0)
-        nx = cx + rn * math.cos(theta)
-        ny = cy + rn * math.sin(theta)
-        nangle = math.atan2(ny, nx)
+        #  rn = r * random.uniform(1.0, 1.0)
+        nx = cx + r * math.cos(theta)
+        ny = cy + r * math.sin(theta)
+        nangle = math.atan(ny / nx)
         nr = math.hypot(nx, ny)
 
-        occluded = False
-        for i in range(len(angle)):
-            if abs(angle[i] - nangle) <= angle_reso:
-                if nr >= ran[i]:
-                    occluded = True
-                    break
+        x.append(nx)
+        y.append(ny)
+        angle.append(nangle)
+        ran.append(nr)
 
-        if not occluded:
-            x.append(nx)
-            y.append(ny)
-            angle.append(nangle)
-            ran.append(nr)
+    # ray casting filter
+    rx, ry = [], []
+    rangedb = [float("inf") for _ in range(
+        int(round((math.pi * 2.0) / angle_reso)) + 1)]
 
-    return x, y
+    for i in range(len(angle)):
+        angleid = math.floor(angle[i] / angle_reso)
+        #  print(angleid)
+
+        if rangedb[angleid] > ran[i]:
+            rangedb[angleid] = ran[i]
+
+    for i in range(len(rangedb)):
+        if rangedb[i] <= 1000.0:
+            theta = i * angle_reso
+            print(theta)
+            rx.append(rangedb[i] * math.cos(theta))
+            ry.append(rangedb[i] * math.sin(theta))
+
+    return rx, ry
 
 
 def plot_circle(x, y, size, color="-b"):
@@ -122,7 +125,7 @@ def main():
     theta = math.radians(30.0)
 
     cr = 1.0
-    angle_reso = math.radians(30.0)
+    angle_reso = math.radians(3.0)
 
     while time <= simtime:
         time += dt
@@ -140,7 +143,7 @@ def main():
         plt.plot(0.0, 0.0, "*r")
         plot_circle(cx, cy, cr)
         plt.plot(x, y, "xr")
-        plot_circle(ex, ey, er, "-r")
+        #  plot_circle(ex, ey, er, "-r")
         plt.pause(dt)
 
 
