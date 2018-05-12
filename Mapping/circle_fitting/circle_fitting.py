@@ -12,6 +12,8 @@ import math
 import random
 import numpy as np
 
+show_animation = True
+
 
 def circle_fitting(x, y):
     """
@@ -120,15 +122,17 @@ def main():
         ex, ey, er, error = circle_fitting(x, y)
         print("Error:", error)
 
-        plt.cla()
-        plt.axis("equal")
-        plt.plot(0.0, 0.0, "*r")
-        plot_circle(cx, cy, cr)
-        plt.plot(x, y, "xr")
-        plot_circle(ex, ey, er, "-r")
-        plt.pause(dt)
+        if show_animation:
+            plt.cla()
+            plt.axis("equal")
+            plt.plot(0.0, 0.0, "*r")
+            plot_circle(cx, cy, cr)
+            plt.plot(x, y, "xr")
+            plot_circle(ex, ey, er, "-r")
+            plt.pause(dt)
+
+    print("Done")
 
 
 if __name__ == '__main__':
-    #  main1()
     main()
