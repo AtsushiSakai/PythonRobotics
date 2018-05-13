@@ -6,7 +6,6 @@
 Python codes for robotics algorithm.
 
 
-
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -179,7 +178,7 @@ Ref:
 
 ## Gaussian grid map
 
-This is a 2D gaussian grid mapping example.
+This is a 2D Gaussian grid mapping example.
 
 ![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/gaussian_grid_map/animation.gif)
 
@@ -197,7 +196,7 @@ This is a 2D object clustering with k-means algorithm.
 
 ## Object shape recognition using circle fitting
 
-This is a object shape recoginition using circle fitting.
+This is a object shape recognition using circle fitting.
 
 ![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/circle_fitting/animation.gif)
 
