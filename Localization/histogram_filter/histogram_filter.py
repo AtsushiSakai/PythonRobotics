@@ -231,6 +231,7 @@ def main():
 
     while SIM_TIME >= time:
         time += DT
+        print("Time:", time)
 
         u = calc_input()
 
