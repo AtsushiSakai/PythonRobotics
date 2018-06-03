@@ -80,12 +80,25 @@ def observation_model(x):
 
 
 def jacobF(x, u):
-    # Jacobian of Motion Model
+    """
+    Jacobian of Motion Model
+
+    motion model
+    x_{t+1} = x_t+v*dt*cos(yaw)
+    y_{t+1} = y_t+v*dt*sin(yaw)
+    yaw_{t+1} = yaw_t+omega*dt
+    v_{t+1} = v{t}
+    so
+    dx/dyaw = -v*dt*sin(yaw)
+    dx/dv = dt*cos(yaw)
+    dy/dyaw = v*dt*cos(yaw)
+    dy/dv = dt*sin(yaw)
+    """
     yaw = x[2, 0]
-    u1 = u[0, 0]
+    v = u[0, 0]
     jF = np.matrix([
-        [1.0, 0.0, -DT * u1 * math.sin(yaw), DT * u1 * math.cos(yaw)],
-        [0.0, 1.0, DT * math.cos(yaw), DT * math.sin(yaw)],
+        [1.0, 0.0, -DT * v * math.sin(yaw), DT * math.cos(yaw)],
+        [0.0, 1.0, DT * v * math.cos(yaw), DT * math.sin(yaw)],
         [0.0, 0.0, 1.0, 0.0],
         [0.0, 0.0, 0.0, 1.0]])
 
