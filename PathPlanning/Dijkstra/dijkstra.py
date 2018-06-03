@@ -85,12 +85,12 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, reso, rr):
             else:
                 openset[n_id] = node
 
-    rx, ry = calc_fianl_path(ngoal, closedset, reso)
+    rx, ry = calc_final_path(ngoal, closedset, reso)
 
     return rx, ry
 
 
-def calc_fianl_path(ngoal, closedset, reso):
+def calc_final_path(ngoal, closedset, reso):
     # generate final course
     rx, ry = [ngoal.x * reso], [ngoal.y * reso]
     pind = ngoal.pind
