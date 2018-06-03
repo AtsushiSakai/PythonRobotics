@@ -100,7 +100,7 @@ def jacobF(x, u):
         [1.0, 0.0, -DT * v * math.sin(yaw), DT * math.cos(yaw)],
         [0.0, 1.0, DT * v * math.cos(yaw), DT * math.sin(yaw)],
         [0.0, 0.0, 1.0, 0.0],
-        [0.0, 0.0, 0.0, 1.0]])
+        [0.0, 0.0, 0.0, 0.0]])
 
     return jF
 
