@@ -85,7 +85,7 @@ def jacobF(x, u):
     u1 = u[0, 0]
     jF = np.matrix([
         [1.0, 0.0, -DT * u1 * math.sin(yaw), DT * u1 * math.cos(yaw)],
-        [0.0, 1.0, DT * math.cos(yaw), DT * math.sin(yaw)],
+        [0.0, 1.0, DT * u1 *  math.cos(yaw), DT * math.sin(yaw)],
         [0.0, 0.0, 1.0, 0.0],
         [0.0, 0.0, 0.0, 1.0]])
 
