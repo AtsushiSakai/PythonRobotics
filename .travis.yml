@@ -12,7 +12,6 @@ before_install:
     - conda update -q conda
     # Useful for debugging any issues with conda
     - conda info -a
-    - conda uninstall numpy, scipy
 
 install:
   - conda install numpy
