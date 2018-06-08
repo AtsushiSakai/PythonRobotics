@@ -15,7 +15,7 @@ before_install:
 
 install:
   - pip install scipy
-  - pip install numpy
+  - conda install numpy
   - pip install matplotlib
   - pip install pandas
   - pip install cvxpy
