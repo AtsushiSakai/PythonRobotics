@@ -1,6 +1,6 @@
 language: python
 python:
-  - 3.6.5
+  - 3.6
 
 before_install:
     - sudo apt-get update
@@ -15,6 +15,7 @@ before_install:
     - conda info -a
 
 install:
+  - conda uninstall numpy
   - conda install numpy
   - conda install scipy
   - conda install matplotlib
@@ -22,7 +23,6 @@ install:
   - pip install cvxpy
   - conda install -y -c cvxgrp cvxpy
   - conda install -y -c anaconda cvxopt
-  - conda install numpy
 
 script:
   - python --version
