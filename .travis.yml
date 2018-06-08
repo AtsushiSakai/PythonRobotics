@@ -15,7 +15,6 @@ before_install:
     - conda info -a
 
 install:
-  - conda uninstall numpy
   - conda install numpy
   - conda install scipy
   - conda install matplotlib
