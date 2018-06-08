@@ -12,13 +12,14 @@ before_install:
     - conda update -q conda
     # Useful for debugging any issues with conda
     - conda info -a
+    - conda uninstall numpy, scipy
 
 install:
-  - pip install scipy
   - conda install numpy
-  - pip install matplotlib
-  - pip install pandas
-  - pip install cvxpy
+  - conda install scipy
+  - conda install matplotlib
+  - conda install pandas
+  - conda install cvxpy
   - conda install -y -c cvxgrp cvxpy
   - conda install -y -c anaconda cvxopt
   - conda update numpy
