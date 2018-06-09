@@ -5,7 +5,6 @@
 
 Python codes for robotics algorithm.
 
-
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -47,6 +46,7 @@ Python codes for robotics algorithm.
          * [RRT with dubins path](#rrt-with-dubins-path)
          * [RRT* with dubins path](#rrt-with-dubins-path-1)
          * [RRT* with reeds-sheep path](#rrt-with-reeds-sheep-path)
+         * [Informed RRT*](#informed-rrt)
          * [Closed Loop RRT*](#closed-loop-rrt)
          * [LQR-RRT*](#lqr-rrt)
       * [Cubic spline planning](#cubic-spline-planning)
@@ -423,7 +423,7 @@ Ref:
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/RRT/animation.gif)
 
-This script is a simple path planning code with Rapidly-Exploring Random Trees (RRT)
+This is a simple path planning code with Rapidly-Exploring Random Trees (RRT)
 
 Black circles are obstacles, green line is a searched tree, red crosses are start and goal positions.
 
@@ -431,7 +431,7 @@ Black circles are obstacles, green line is a searched tree, red crosses are star
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/RRTstar/animation.gif)
 
-This script is a  path planning code with RRT\*
+This is a path planning code with RRT\*
 
 Black circles are obstacles, green line is a searched tree, red crosses are start and goal positions.
 
@@ -461,6 +461,19 @@ Path planning for a car robot with RRT\* and dubins path planner.
 ![Robotics/animation.gif at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/RRTStarReedsShepp/animation.gif))
 
 Path planning for a car robot with RRT\* and reeds sheep path planner.
+
+### Informed RRT\*
+
+![irrt](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/InformedRRTStar/animation.gif))
+
+This is a path planning code with Informed RRT\*.
+
+The cyan ellipse is the heuristic sampling domein of Informed RRT\*.
+
+Ref:
+
+- [Informed RRT\*: Optimal Sampling-based Path Planning Focused via Direct Sampling of an Admissible Ellipsoidal Heuristic](https://arxiv.org/pdf/1404.2334.pdf)
+
 
 ### Closed Loop RRT\*
 
@@ -708,11 +721,7 @@ You can support financially this project via PayPal.
 
 - [Joe Dinius](https://github.com/jwdinius)
 
-
-
-
-
-
+- [Karan Chawla](https://github.com/karanchawla)
 
 
 
