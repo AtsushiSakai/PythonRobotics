@@ -10,7 +10,7 @@ import random
 import numpy as np 
 import copy 
 import operator 
-from math import cos, sin, atan2, pi 
+import math
 import matplotlib.pyplot as plt 
 
 show_animation = True 
@@ -26,8 +26,8 @@ class Node():
 class BITStar():
 
 	def __init__(self, start, goal, 
-				 obstacleList, randArea, 
-				 expandDis=0.5, goalSampleRate=10, maxIter=200, eta):
+				 obstacleList, randArea, eta=2.0,
+				 expandDis=0.5, goalSampleRate=10, maxIter=200):
 		self.start = Node(start[0], start[1])
 		self.goal = Node(goal[0], goal[1])
 		self.minrand = randArea[0]
@@ -43,7 +43,7 @@ class BITStar():
 		self.f_scores = dict()
 		self.r = float('inf')
 		self.eta = eta # tunable parameter
-		self.unit_ball_measure = #TODO
+		self.unit_ball_measure = 1
 		self.old_vertices = []
 
 	def plan(self, animation=True):
@@ -52,10 +52,10 @@ class BITStar():
 		plan = None 
 		iterations = 0 
 		# max length we expect to find in our 'informed' sample space, starts as infinite
-        cBest = float('inf')
-        pathLen = float('inf')
-        solutionSet = set()
-        path = None
+		cBest = float('inf')
+		pathLen = float('inf')
+		solutionSet = set()
+		path = None
 
 		# Computing the sampling space
 		cMin = math.sqrt(pow(self.start.x - self.goal.x, 2) +
@@ -72,22 +72,22 @@ class BITStar():
 		C = np.dot(np.dot(U, np.diag(
 			[1.0, 1.0, np.linalg.det(U) * np.linalg.det(np.transpose(Vh))])), Vh)
 
-		# while (iterations < self.maxIter):
+		while (iterations < self.maxIter):
+			if len(self.vertex_queue) == 0 and len(self.edge_queue) == 0:
+				samples = self.informedSample(100, cBest, cMin, xCenter, C)
+				# prune the tree
 
-		if len(self.vertex_queue) == 0 and len(self.edge_queue) == 0:
-			print("Batch: ", iterations)
-			samples = self.informedSample(100, cBest, cMin, xCenter, C)
-			# prune the tree
+			if animation:
+				self.drawGraph(xCenter=xCenter, cBest=cBest,
+							   cMin=cMin, etheta=etheta, samples=samples)
 
-		if animation:
-			self.drawGraph(xCenter=xCenter, cBest=cBest,
-						   cMin=cMin, etheta=etheta, rnd=samples)
+			iterations += 1
 
+		return plan
 
+	# def expandVertex(self, vertex):
 
-	def expandVertex(self, vertex):
-
-	def prune(self, c):
+	# def prune(self, c):
 
 	def radius(self, q):
 		dim = len(start) #dimensions
@@ -98,26 +98,26 @@ class BITStar():
 		return min_radius * pow(numpy.log(q)/q, 1/dim)
 
 	# Return the closest sample 
-	def getNearestSample(self):
+	# def getNearestSample(self):
 
 	# Sample free space confined in the radius of ball R
 	def informedSample(self, m, cMax, cMin, xCenter, C):
-			if cMax < float('inf'):
-				samples = []
-				for i in range(m):
-					r = [cMax / 2.0,
-		                 math.sqrt(cMax**2 - cMin**2) / 2.0,
-		                 math.sqrt(cMax**2 - cMin**2) / 2.0]
-					L = np.diag(r)
-					xBall = self.sampleUnitBall()
-					rnd = np.dot(np.dot(C, L), xBall) + xCenter
-					rnd = [rnd[(0, 0)], rnd[(1, 0)]]
-					samples.append(rnd)
-			else: 
-				for i in range(m):
-					rnd = self.sampleFreeSpace()
-					samples.append(rnd)
-
+		samples = []
+		if cMax < float('inf'):
+			for i in range(m):
+				r = [cMax / 2.0,
+	                 math.sqrt(cMax**2 - cMin**2) / 2.0,
+	                 math.sqrt(cMax**2 - cMin**2) / 2.0]
+				L = np.diag(r)
+				xBall = self.sampleUnitBall()
+				rnd = np.dot(np.dot(C, L), xBall) + xCenter
+				rnd = [rnd[(0, 0)], rnd[(1, 0)]]
+				samples.append(rnd)
+		else: 
+			for i in range(m):
+				rnd = self.sampleFreeSpace()
+				samples.append(rnd)
+		return samples
 
 	# Sample point in a unit ball
 	def sampleUnitBall(self):
@@ -131,27 +131,27 @@ class BITStar():
 				  b * math.sin(2 * math.pi * a / b))
 		return np.array([[sample[0]], [sample[1]], [0]])
 
-    def sampleFreeSpace(self):
+	def sampleFreeSpace(self):
 		if random.randint(0, 100) > self.goalSampleRate:
 			rnd = [random.uniform(self.minrand, self.maxrand),
 				   random.uniform(self.minrand, self.maxrand)]
-        else:
+		else:
 			rnd = [self.goal.x, self.goal.y]
 
 		return rnd
 
-	def bestVertexQueueValue(self):
+	# def bestVertexQueueValue(self):
 
-	def bestEdgeQueueValue(self):
+	# def bestEdgeQueueValue(self):
 
-	def bestInEdgeQueue(self):
+	# def bestInEdgeQueue(self):
 
-	def bestInVertexQueue(self):
+	# def bestInVertexQueue(self):
 
-	def updateGraph(self):
+	# def updateGraph(self):
 
-	def drawGraph(self, xCenter=None, cBest=None, cMin=None, etheta=None, rnd=None):
-
+	def drawGraph(self, xCenter=None, cBest=None, cMin=None, etheta=None, samples=None):
+		print("Plotting Graph")
 		plt.clf()
 		for rnd in samples:
 			if rnd is not None:
@@ -172,7 +172,7 @@ class BITStar():
 		plt.plot(self.goal.x, self.goal.y, "xr")
 		plt.axis([-2, 15, -2, 15])
 		plt.grid(True)
-		plt.pause(0.01)
+		plt.pause(5)
 
 	def plot_ellipse(self, xCenter, cBest, cMin, etheta):
 
@@ -207,6 +207,7 @@ def main():
 	bitStar = BITStar(start=[0, 0], goal=[5, 10],
 				randArea=[-2, 15], obstacleList=obstacleList)
 	path = bitStar.plan(animation=show_animation)
+	print("Done")
 
-	if show_animation:
-		bitStar.drawGraph()
+if __name__ == '__main__':
+    main()
