@@ -13,14 +13,14 @@ import operator
 import math
 import matplotlib.pyplot as plt
 
-show_animation = True
+show_animation = False
 
 
 class RTree(object):
 
-    def __init__(self, start=[0,0], lowerLimit=[0,0], upperLimit=[10,10], resolution=1):
+    def __init__(self, start=[0, 0], lowerLimit=[0, 0], upperLimit=[10, 10], resolution=1):
+
         self.vertices = dict()
-        
         self.edges = []
         self.start = start
         self.lowerLimit = lowerLimit
@@ -61,7 +61,7 @@ class RTree(object):
         # the output is the same as real world coords if the resolution
         # is set to 1
         coord = [0] * self.dimension
-        for i in range(0, len(coord)):
+        for i in range(len(coord)):
             start = self.lowerLimit[i]  # start of the grid space
             coord[i] = np.around((real_coord[i] - start) / self.resolution)
         return coord
@@ -131,8 +131,8 @@ class BITStar(object):
         self.start = start
         self.goal = goal
 
-        self.minrand = randArea[0]
-        self.maxrand = randArea[1]
+        self.minrand = randArea[0] 
+        self.maxrand = randArea[1] 
         self.expandDis = expandDis
         self.goalSampleRate = goalSampleRate
         self.maxIter = maxIter
@@ -152,7 +152,8 @@ class BITStar(object):
         # initialize tree
         lowerLimit = [randArea[0], randArea[0]]
         upperLimit = [randArea[1], randArea[1]]
-        self.tree = RTree(start=start,lowerLimit=lowerLimit,upperLimit=upperLimit,resolution=0.1)
+        self.tree = RTree(start=start, lowerLimit=lowerLimit,
+                          upperLimit=upperLimit, resolution=0.1)
 
     def plan(self, animation=True):
 
@@ -175,14 +176,14 @@ class BITStar(object):
         cBest = self.g_scores[self.goalId]
         pathLen = float('inf')
         solutionSet = set()
-        path = None
+        plan = []
 
         # Computing the sampling space
         cMin = math.sqrt(pow(self.start[0] - self.goal[1], 2) +
                          pow(self.start[0] - self.goal[1], 2))
         xCenter = np.matrix([[(self.start[0] + self.goal[0]) / 2.0],
                              [(self.goal[1] - self.start[1]) / 2.0], [0]])
-        a1 = np.matrix([[(self.goal[0]- self.start[0]) / cMin],
+        a1 = np.matrix([[(self.goal[0] - self.start[0]) / cMin],
                         [(self.goal[1] - self.start[1]) / cMin], [0]])
         etheta = math.atan2(a1[1], a1[0])
         # first column of idenity matrix transposed
@@ -238,7 +239,7 @@ class BITStar(object):
                         secondCoord = self.tree.nodeIdToRealWorldCoord(
                             bestEdge[1])
                         path = self.connect(firstCoord, secondCoord)
-                        if path == None or len(path) == 0:
+                        if path is None or len(path) == 0:
                             continue
                         nextCoord = path[len(path) - 1, :]
                         nextCoordPathId = self.tree.realWorldToNodeId(
@@ -248,7 +249,7 @@ class BITStar(object):
                             del self.samples[bestEdge[1]]
                         except(KeyError):
                             pass
-                        eid = self.tree.addVertex(nextCoordPathId)
+                        eid = self.tree.addVertex(nextCoord)
                         self.vertex_queue.append(eid)
                         if eid == self.goalId or bestEdge[0] == self.goalId or bestEdge[1] == self.goalId:
                             print("Goal found")
@@ -259,15 +260,17 @@ class BITStar(object):
                         g_score = self.computeDistanceCost(
                             bestEdge[0], bestEdge[1])
                         self.g_scores[bestEdge[1]] = g_score + \
-                            self.g_scores[best_edge[0]]
+                            self.g_scores[bestEdge[0]]
                         self.f_scores[bestEdge[1]] = g_score + \
                             self.computeHeuristicCost(bestEdge[1], self.goalId)
                         self.updateGraph()
 
                         # visualize new edge
-                        # if animation:
-                        # 	self.drawGraph(xCenter=xCenter, cBest=cBest,
-                        # 	   cMin=cMin, etheta=etheta, samples=samples)
+
+                        if animation:
+                        	self.drawGraph(xCenter=xCenter, cBest=cBest,
+                        	   cMin=cMin, etheta=etheta, samples=self.samples.values(),
+                        	   start=firstCoord, end=secondCoord, plan=plan)
 
                         for edge in self.edge_queue:
                             if(edge[0] == bestEdge[1]):
@@ -288,14 +291,36 @@ class BITStar(object):
         plan.append(self.goal)
         currId = self.goalId
         while (currId != self.startId):
-            plan.append(seld.tree.nodeIdToRealWorldCoord(currId))
+            plan.append(self.tree.nodeIdToRealWorldCoord(currId))
             currId = self.nodes[currId]
 
         plan.append(self.startId)
         plan = plan[::-1]  # reverse the plan
         return np.array(plan)
 
-    # def expandVertex(self, vertex):
+    def connect(self, start, end):
+            # A function which attempts to extend from a start coordinates
+            # to goal coordinates
+        steps = self.computeDistanceCost(self.tree.realWorldToNodeId(
+            start), self.tree.realWorldToNodeId(end)) * 25
+        x = np.linspace(start[0], end[0], num=steps)
+        y = np.linspace(start[1], end[1], num=steps)
+        for i in range(len(x)):
+            if(self._collisionCheck(x[i], y[i])):
+                if(i == 0):
+                    return None
+                # if collision, send path until collision
+                return np.vstack((x[0:i], y[0:i])).transpose()
+            return np.vstack((x, y)).transpose()
+
+    def _collisionCheck(self, x, y):
+        for (ox, oy, size) in self.obstacleList:
+            dx = ox - x
+            dy = oy - y
+            d = dx * dx + dy * dy
+            if d <= 1.1 * size ** 2:
+                return True  # collision
+        return False
 
     # def prune(self, c):
 
@@ -485,7 +510,8 @@ class BITStar(object):
                     # store the parent and child
                     self.nodes[succesor] = currId
 
-    def drawGraph(self, xCenter=None, cBest=None, cMin=None, etheta=None, samples=None):
+    def drawGraph(self, xCenter=None, cBest=None, cMin=None, etheta=None, 
+    			  samples=None, start=None, end=None, plan=None):
         print("Plotting Graph")
         plt.clf()
         for rnd in samples:
@@ -493,6 +519,9 @@ class BITStar(object):
                 plt.plot(rnd[0], rnd[1], "^k")
                 if cBest != float('inf'):
                     self.plot_ellipse(xCenter, cBest, cMin, etheta)
+
+        if start is not None and end is not None:
+        	plt.plot([start[0], start[1]], [end[0], end[1]], "-g")
 
         # for node in self.nodeList:
         # 	if node.parent is not None:
@@ -503,11 +532,11 @@ class BITStar(object):
         for (ox, oy, size) in self.obstacleList:
             plt.plot(ox, oy, "ok", ms=30 * size)
 
-        plt.plot(self.start.x, self.start.y, "xr")
-        plt.plot(self.goal.x, self.goal.y, "xr")
+        plt.plot(self.start[0], self.start[1], "xr")
+        plt.plot(self.goal[0], self.goal[1], "xr")
         plt.axis([-2, 15, -2, 15])
         plt.grid(True)
-        plt.pause(5)
+        plt.pause(0.01)
 
     def plot_ellipse(self, xCenter, cBest, cMin, etheta):
 
@@ -532,16 +561,16 @@ class BITStar(object):
 def main():
     print("Starting Batch Informed Trees Star planning")
     obstacleList = [
-        (5, 5, 0.5),
-        (9, 6, 1),
-        (7, 5, 1),
-        (1, 5, 1),
-        (3, 6, 1),
-        (7, 9, 1)
+        # (5, 5, 0.5),
+        # (9, 6, 1),
+        # (7, 5, 1),
+        # (1, 5, 1),
+        # (3, 6, 1),
+        # (7, 9, 1)
     ]
 
-    bitStar = BITStar(start=[0, 0], goal=[5, 10], obstacleList=obstacleList,
-                      randArea=[0, 15])
+    bitStar = BITStar(start=[0, 0], goal=[2, 4], obstacleList=obstacleList,
+                      randArea=[-2, 15])
     path = bitStar.plan(animation=show_animation)
     print("Done")
 
