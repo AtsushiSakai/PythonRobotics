@@ -15,6 +15,43 @@ import matplotlib.pyplot as plt
 
 show_animation = True 
 
+class Tree(object):
+
+	def __init__(self, start, lowerLimit, upperLimit, resolution):
+		self.vertices = dict()
+		vertex_id = self.gridCoordinateToNodeId(start)
+		self.vertices[vid] = []
+		self.edges = []
+		self.start = start
+		self.lowerLimit = lowerLimit
+		self.upperLimit = upperLimit
+		for idx in range(len(lowerLimit)):
+			self.num_cells[idx] = np.ceil((upperLimit[idx] - lowerLimit[idx])/resolution)
+
+	def getRootId(self):
+		return 0
+
+	def addVertex(self, vertex):
+		vertex_id = self.gridCoordinateToNodeId(vertex)
+		self.vertices[vertex_id] = []
+		return vertex_id
+
+	def addEdge(self, v, x):
+		if (v, x) not in self.edges:
+			self.edges.append((v,x))
+		self.vertices[v].append(x)
+		self.vertices[x].append(v)
+
+	def gridCoordinateToNodeId(self, coord):
+		nodeId = 0
+		for i in range(len(coord) - 1, -1, -1):
+			product = 1
+			for j in range(0 , i):
+				product *= product * self.num_cells[j]
+			node_id = node_id + coord[i] * product
+		return node_id
+
+
 class Node():
 
     def __init__(self, x, y):
@@ -72,10 +109,15 @@ class BITStar():
 		C = np.dot(np.dot(U, np.diag(
 			[1.0, 1.0, np.linalg.det(U) * np.linalg.det(np.transpose(Vh))])), Vh)
 
+		foundGoal = False
+		# run until done
 		while (iterations < self.maxIter):
 			if len(self.vertex_queue) == 0 and len(self.edge_queue) == 0:
 				samples = self.informedSample(100, cBest, cMin, xCenter, C)
 				# prune the tree
+
+
+
 
 			if animation:
 				self.drawGraph(xCenter=xCenter, cBest=cBest,
