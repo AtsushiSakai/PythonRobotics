@@ -13,7 +13,7 @@ import operator
 import math
 import matplotlib.pyplot as plt
 
-show_animation = False
+show_animation = True
 
 
 class RTree(object):
@@ -131,8 +131,8 @@ class BITStar(object):
         self.start = start
         self.goal = goal
 
-        self.minrand = randArea[0] 
-        self.maxrand = randArea[1] 
+        self.minrand = randArea[0]
+        self.maxrand = randArea[1]
         self.expandDis = expandDis
         self.goalSampleRate = goalSampleRate
         self.maxIter = maxIter
@@ -158,7 +158,9 @@ class BITStar(object):
     def plan(self, animation=True):
 
         self.startId = self.tree.realWorldToNodeId(self.start)
+        print("startId: ", self.startId)
         self.goalId = self.tree.realWorldToNodeId(self.goal)
+        print("goalId: ", self.goalId)
 
         # add goal to the samples
         self.samples[self.goalId] = self.goal
@@ -193,13 +195,15 @@ class BITStar(object):
         C = np.dot(np.dot(U, np.diag(
             [1.0, 1.0, np.linalg.det(U) * np.linalg.det(np.transpose(Vh))])), Vh)
 
+        self.samples.update(self.informedSample(
+            200, cBest, cMin, xCenter, C))
         foundGoal = False
         # run until done
         while (iterations < self.maxIter):
             if len(self.vertex_queue) == 0 and len(self.edge_queue) == 0:
                 # Using informed rrt star way of computing the samples
                 self.samples.update(self.informedSample(
-                    200, cBest, cMin, xCenter, C))
+                    50, cBest, cMin, xCenter, C))
                 # prune the tree
                 self.r = 2.0
                 if iterations != 0:
@@ -266,11 +270,10 @@ class BITStar(object):
                         self.updateGraph()
 
                         # visualize new edge
-
                         if animation:
-                        	self.drawGraph(xCenter=xCenter, cBest=cBest,
-                        	   cMin=cMin, etheta=etheta, samples=self.samples.values(),
-                        	   start=firstCoord, end=secondCoord, plan=plan)
+                            self.drawGraph(xCenter=xCenter, cBest=cBest,
+                                           cMin=cMin, etheta=etheta, samples=self.samples.values(),
+                                           start=firstCoord, end=secondCoord, tree=self.nodes)
 
                         for edge in self.edge_queue:
                             if(edge[0] == bestEdge[1]):
@@ -280,7 +283,7 @@ class BITStar(object):
                                             (edge[0], bestEdge[1]))
                             if(edge[1] == bestEdge[1]):
                                 if self.g_scores[edge[1]] + self.computeDistanceCost(edge[1], bestEdge[1]) >= self.g_scores[self.goalId]:
-                                    if(edge[1], best_edge[1]) in self.edge_queue:
+                                    if(edge[1], bestEdge[1]) in self.edge_queue:
                                         self.edge_queue.remove(
                                             (edge[1], bestEdge[1]))
             else:
@@ -409,7 +412,7 @@ class BITStar(object):
         v_plus_vals = [(v, self.g_scores[v] + self.computeHeuristicCost(v, self.goalId))
                        for v in self.vertex_queue]
         v_plus_vals = sorted(v_plus_vals, key=lambda x: x[1])
-
+        # print(v_plus_vals)
         return v_plus_vals[0][0]
 
     def bestInEdgeQueue(self):
@@ -510,8 +513,8 @@ class BITStar(object):
                     # store the parent and child
                     self.nodes[succesor] = currId
 
-    def drawGraph(self, xCenter=None, cBest=None, cMin=None, etheta=None, 
-    			  samples=None, start=None, end=None, plan=None):
+    def drawGraph(self, xCenter=None, cBest=None, cMin=None, etheta=None,
+                  samples=None, start=None, end=None, tree=None):
         print("Plotting Graph")
         plt.clf()
         for rnd in samples:
@@ -521,13 +524,13 @@ class BITStar(object):
                     self.plot_ellipse(xCenter, cBest, cMin, etheta)
 
         if start is not None and end is not None:
-        	plt.plot([start[0], start[1]], [end[0], end[1]], "-g")
+            plt.plot([start[0], start[1]], [end[0], end[1]], "-g")
 
-        # for node in self.nodeList:
-        # 	if node.parent is not None:
-        # 		if node.x or node.y is not None:
-        # 			plt.plot([node.x, self.nodeList[node.parent].x], [
-        # 					node.y, self.nodeList[node.parent].y], "-g")
+        if tree is not None and len(tree) != 0:
+            for key, value in tree.items():
+            	keyCoord = self.tree.nodeIdToRealWorldCoord(key)
+            	valueCoord = self.tree.nodeIdToRealWorldCoord(value)
+            	plt.plot(keyCoord, valueCoord, "-r")
 
         for (ox, oy, size) in self.obstacleList:
             plt.plot(ox, oy, "ok", ms=30 * size)
@@ -570,7 +573,7 @@ def main():
     ]
 
     bitStar = BITStar(start=[0, 0], goal=[2, 4], obstacleList=obstacleList,
-                      randArea=[-2, 15])
+                      randArea=[0, 15])
     path = bitStar.plan(animation=show_animation)
     print("Done")
 
