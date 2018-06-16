@@ -9,6 +9,7 @@ Uses lazy connecting by combining sampling based methods and A*
 like incremental graph search algorithms.
 
 author: Karan Chawla(@karanchawla)
+        Atsushi Sakai(@Atsushi_twi)
 
 Reference: https://arxiv.org/abs/1405.5848
 """
@@ -20,11 +21,10 @@ import matplotlib.pyplot as plt
 
 show_animation = True
 
-# Class to represent the explicit tree created
-# while sampling through the state space
-
 
 class RTree(object):
+    # Class to represent the explicit tree created
+    # while sampling through the state space
 
     def __init__(self, start=[0, 0], lowerLimit=[0, 0], upperLimit=[10, 10], resolution=1):
 
@@ -581,7 +581,6 @@ def main():
     bitStar = BITStar(start=[-1, 0], goal=[3, 8], obstacleList=obstacleList,
                       randArea=[-2, 15])
     path = bitStar.plan(animation=show_animation)
-    #  print(path)
     print("Done")
 
     if show_animation:
