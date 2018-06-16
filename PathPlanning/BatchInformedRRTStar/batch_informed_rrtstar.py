@@ -329,8 +329,8 @@ class BITStar(object):
     def connect(self, start, end):
         # A function which attempts to extend from a start coordinates
         # to goal coordinates
-        steps = self.computeDistanceCost(self.tree.realWorldToNodeId(
-            start), self.tree.realWorldToNodeId(end)) * 10
+        steps = int(self.computeDistanceCost(self.tree.realWorldToNodeId(
+            start), self.tree.realWorldToNodeId(end)) * 10)
         x = np.linspace(start[0], end[0], num=steps)
         y = np.linspace(start[1], end[1], num=steps)
         for i in range(len(x)):

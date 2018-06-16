@@ -5,6 +5,7 @@
 
 Python codes for robotics algorithm.
 
+
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -47,6 +48,7 @@ Python codes for robotics algorithm.
          * [RRT* with dubins path](#rrt-with-dubins-path-1)
          * [RRT* with reeds-sheep path](#rrt-with-reeds-sheep-path)
          * [Informed RRT*](#informed-rrt)
+         * [Batch Informed RRT*](#batch-informed-rrt)
          * [Closed Loop RRT*](#closed-loop-rrt)
          * [LQR-RRT*](#lqr-rrt)
       * [Cubic spline planning](#cubic-spline-planning)
@@ -474,6 +476,15 @@ Ref:
 
 - [Informed RRT\*: Optimal Sampling-based Path Planning Focused via Direct Sampling of an Admissible Ellipsoidal Heuristic](https://arxiv.org/pdf/1404.2334.pdf)
 
+### Batch Informed RRT\*
+
+![irrt](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/BatchInformedRRTStar/animation.gif))
+
+This is a path planning code with Batch Informed RRT\*.
+
+Ref:
+
+- [Batch Informed Trees \(BIT\*\): Sampling\-based Optimal Planning via the Heuristically Guided Search of Implicit Random Geometric Graphs](https://arxiv.org/abs/1405.5848)
 
 ### Closed Loop RRT\*
 
@@ -722,6 +733,7 @@ You can support financially this project via PayPal.
 - [Joe Dinius](https://github.com/jwdinius)
 
 - [Karan Chawla](https://github.com/karanchawla)
+
 
 
 
