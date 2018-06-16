@@ -191,6 +191,26 @@ class BITStar(object):
 
         return etheta, cMin, xCenter, C, cBest
 
+    def setup_sample(self, iterations, foundGoal, cMin, xCenter, C, cBest):
+        print("Batch: ", iterations)
+        # Using informed rrt star way of computing the samples
+        self.r = 2.0
+        if iterations != 0:
+            if foundGoal:
+                # a better way to do this would be to make number of samples
+                # a function of cMin
+                m = 200
+                self.samples = dict()
+                self.samples[self.goalId] = self.goal
+            else:
+                m = 100
+            cBest = self.g_scores[self.goalId]
+            self.samples.update(self.informedSample(
+                m, cBest, cMin, xCenter, C))
+            return cBest
+
+        return cBest
+
     def plan(self, animation=True):
 
         etheta, cMin, xCenter, C, cBest = self.setup_planning()
@@ -201,22 +221,8 @@ class BITStar(object):
         # run until done
         while (iterations < self.maxIter):
             if len(self.vertex_queue) == 0 and len(self.edge_queue) == 0:
-                print("Batch: ", iterations)
-                # Using informed rrt star way of computing the samples
-                self.r = 2.0
-                if iterations != 0:
-                    if foundGoal:
-                        # a better way to do this would be to make number of samples
-                        # a function of cMin
-                        m = 200
-                        self.samples = dict()
-                        self.samples[self.goalId] = self.goal
-                    else:
-                        m = 100
-                    cBest = self.g_scores[self.goalId]
-                    self.samples.update(self.informedSample(
-                        m, cBest, cMin, xCenter, C))
-
+                cBest = self.setup_sample(iterations,
+                                          foundGoal, cMin, xCenter, C, cBest)
                 # make the old vertices the new vertices
                 self.old_vertices += self.tree.vertices.keys()
                 # add the vertices to the vertex queue
@@ -241,57 +247,54 @@ class BITStar(object):
             actualCostOfEdge = self.g_scores[bestEdge[0]] + \
                 self.computeDistanceCost(bestEdge[0], bestEdge[1])
 
-            if(estimatedCostOfVertex < self.g_scores[self.goalId]):
-                if(estimatedCostOfEdge < self.g_scores[self.goalId]):
-                    if(actualCostOfEdge < self.g_scores[self.goalId]):
-                        # connect this edge
-                        firstCoord = self.tree.nodeIdToRealWorldCoord(
-                            bestEdge[0])
-                        secondCoord = self.tree.nodeIdToRealWorldCoord(
-                            bestEdge[1])
-                        path = self.connect(firstCoord, secondCoord)
-                        lastEdge = self.tree.realWorldToNodeId(secondCoord)
-                        if path is None or len(path) == 0:
-                            continue
-                        nextCoord = path[len(path) - 1, :]
-                        nextCoordPathId = self.tree.realWorldToNodeId(
-                            nextCoord)
-                        bestEdge = (bestEdge[0], nextCoordPathId)
-                        if(bestEdge[1] in self.tree.vertices.keys()):
-                            continue
-                        else:
-                            try:
-                                del self.samples[bestEdge[1]]
-                            except(KeyError):
-                                pass
-                            eid = self.tree.addVertex(nextCoord)
-                            self.vertex_queue.append(eid)
-                        if eid == self.goalId or bestEdge[0] == self.goalId or bestEdge[1] == self.goalId:
-                            print("Goal found")
-                            foundGoal = True
+            f1 = estimatedCostOfVertex < self.g_scores[self.goalId]
+            f2 = estimatedCostOfEdge < self.g_scores[self.goalId]
+            f3 = actualCostOfEdge < self.g_scores[self.goalId]
 
-                        self.tree.addEdge(bestEdge[0], bestEdge[1])
+            if f1 and f2 and f3:
+                # connect this edge
+                firstCoord = self.tree.nodeIdToRealWorldCoord(
+                    bestEdge[0])
+                secondCoord = self.tree.nodeIdToRealWorldCoord(
+                    bestEdge[1])
+                path = self.connect(firstCoord, secondCoord)
+                lastEdge = self.tree.realWorldToNodeId(secondCoord)
+                if path is None or len(path) == 0:
+                    continue
+                nextCoord = path[len(path) - 1, :]
+                nextCoordPathId = self.tree.realWorldToNodeId(
+                    nextCoord)
+                bestEdge = (bestEdge[0], nextCoordPathId)
+                if(bestEdge[1] in self.tree.vertices.keys()):
+                    continue
+                else:
+                    try:
+                        del self.samples[bestEdge[1]]
+                    except(KeyError):
+                        pass
+                    eid = self.tree.addVertex(nextCoord)
+                    self.vertex_queue.append(eid)
+                if eid == self.goalId or bestEdge[0] == self.goalId or bestEdge[1] == self.goalId:
+                    print("Goal found")
+                    foundGoal = True
 
-                        g_score = self.computeDistanceCost(
-                            bestEdge[0], bestEdge[1])
-                        self.g_scores[bestEdge[1]] = g_score + \
-                            self.g_scores[bestEdge[0]]
-                        self.f_scores[bestEdge[1]] = g_score + \
-                            self.computeHeuristicCost(bestEdge[1], self.goalId)
-                        self.updateGraph()
+                self.tree.addEdge(bestEdge[0], bestEdge[1])
 
-                        # visualize new edge
-                        if animation:
-                            self.drawGraph(xCenter=xCenter, cBest=cBest,
-                                           cMin=cMin, etheta=etheta, samples=self.samples.values(),
-                                           start=firstCoord, end=secondCoord, tree=self.tree.edges)
+                g_score = self.computeDistanceCost(
+                    bestEdge[0], bestEdge[1])
+                self.g_scores[bestEdge[1]] = g_score + \
+                    self.g_scores[bestEdge[0]]
+                self.f_scores[bestEdge[1]] = g_score + \
+                    self.computeHeuristicCost(bestEdge[1], self.goalId)
+                self.updateGraph()
 
-                        for edge in self.edge_queue:
-                            if(edge[1] == bestEdge[1]):
-                                if self.g_scores[edge[1]] + self.computeDistanceCost(edge[1], bestEdge[1]) >= self.g_scores[self.goalId]:
-                                    if(lastEdge, bestEdge[1]) in self.edge_queue:
-                                        self.edge_queue.remove(
-                                            (lastEdge, bestEdge[1]))
+                # visualize new edge
+                if animation:
+                    self.drawGraph(xCenter=xCenter, cBest=cBest,
+                                   cMin=cMin, etheta=etheta, samples=self.samples.values(),
+                                   start=firstCoord, end=secondCoord, tree=self.tree.edges)
+
+                self.remove_queue(lastEdge, bestEdge)
 
             else:
                 print("Nothing good")
@@ -311,9 +314,17 @@ class BITStar(object):
         plan = plan[::-1]  # reverse the plan
         return plan
 
+    def remove_queue(self, lastEdge, bestEdge):
+        for edge in self.edge_queue:
+            if(edge[1] == bestEdge[1]):
+                if self.g_scores[edge[1]] + self.computeDistanceCost(edge[1], bestEdge[1]) >= self.g_scores[self.goalId]:
+                    if(lastEdge, bestEdge[1]) in self.edge_queue:
+                        self.edge_queue.remove(
+                            (lastEdge, bestEdge[1]))
+
     def connect(self, start, end):
-            # A function which attempts to extend from a start coordinates
-            # to goal coordinates
+        # A function which attempts to extend from a start coordinates
+        # to goal coordinates
         steps = self.computeDistanceCost(self.tree.realWorldToNodeId(
             start), self.tree.realWorldToNodeId(end)) * 10
         x = np.linspace(start[0], end[0], num=steps)
