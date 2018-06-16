@@ -311,7 +311,11 @@ class BITStar(object):
         currId = self.goalId
         while (currId != self.startId):
             plan.append(self.tree.nodeIdToRealWorldCoord(currId))
-            currId = self.nodes[currId]
+            try:
+                currId = self.nodes[currId]
+            except(KeyError):
+                print("Path key error")
+                return []
 
         plan.append(self.start)
         plan = plan[::-1]  # reverse the plan
