@@ -192,43 +192,42 @@ class BITStar(object):
         return etheta, cMin, xCenter, C, cBest
 
     def setup_sample(self, iterations, foundGoal, cMin, xCenter, C, cBest):
-        print("Batch: ", iterations)
-        # Using informed rrt star way of computing the samples
-        self.r = 2.0
-        if iterations != 0:
-            if foundGoal:
-                # a better way to do this would be to make number of samples
-                # a function of cMin
-                m = 200
-                self.samples = dict()
-                self.samples[self.goalId] = self.goal
-            else:
-                m = 100
-            cBest = self.g_scores[self.goalId]
-            self.samples.update(self.informedSample(
-                m, cBest, cMin, xCenter, C))
-            return cBest
 
+        if len(self.vertex_queue) == 0 and len(self.edge_queue) == 0:
+            print("Batch: ", iterations)
+            # Using informed rrt star way of computing the samples
+            self.r = 2.0
+            if iterations != 0:
+                if foundGoal:
+                    # a better way to do this would be to make number of samples
+                    # a function of cMin
+                    m = 200
+                    self.samples = dict()
+                    self.samples[self.goalId] = self.goal
+                else:
+                    m = 100
+                cBest = self.g_scores[self.goalId]
+                self.samples.update(self.informedSample(
+                    m, cBest, cMin, xCenter, C))
+
+            # make the old vertices the new vertices
+            self.old_vertices += self.tree.vertices.keys()
+            # add the vertices to the vertex queue
+            for nid in self.tree.vertices.keys():
+                if nid not in self.vertex_queue:
+                    self.vertex_queue.append(nid)
         return cBest
 
     def plan(self, animation=True):
 
         etheta, cMin, xCenter, C, cBest = self.setup_planning()
         iterations = 0
-        plan = []
 
         foundGoal = False
         # run until done
         while (iterations < self.maxIter):
-            if len(self.vertex_queue) == 0 and len(self.edge_queue) == 0:
-                cBest = self.setup_sample(iterations,
-                                          foundGoal, cMin, xCenter, C, cBest)
-                # make the old vertices the new vertices
-                self.old_vertices += self.tree.vertices.keys()
-                # add the vertices to the vertex queue
-                for nid in self.tree.vertices.keys():
-                    if nid not in self.vertex_queue:
-                        self.vertex_queue.append(nid)
+            cBest = self.setup_sample(iterations,
+                                      foundGoal, cMin, xCenter, C, cBest)
             # expand the best vertices until an edge is better than the vertex
             # this is done because the vertex cost represents the lower bound
             # on the edge cost
@@ -304,6 +303,10 @@ class BITStar(object):
             iterations += 1
 
         print("Finding the path")
+        return self.find_final_path()
+
+    def find_final_path(self):
+        plan = []
         plan.append(self.goal)
         currId = self.goalId
         while (currId != self.startId):
@@ -312,6 +315,7 @@ class BITStar(object):
 
         plan.append(self.start)
         plan = plan[::-1]  # reverse the plan
+
         return plan
 
     def remove_queue(self, lastEdge, bestEdge):
