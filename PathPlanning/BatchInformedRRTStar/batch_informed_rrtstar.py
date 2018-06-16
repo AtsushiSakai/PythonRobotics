@@ -1,12 +1,12 @@
 """
 Batch Informed Trees based path planning:
-Uses a heuristic to efficiently search increasingly dense 
-RGGs while reusing previous information. Provides faster 
+Uses a heuristic to efficiently search increasingly dense
+RGGs while reusing previous information. Provides faster
 convergence that RRT*, Informed RRT* and other sampling based
-methods. 
+methods.
 
-Uses lazy connecting by combining sampling based methods and A* 
-like incremental graph search algorithms. 
+Uses lazy connecting by combining sampling based methods and A*
+like incremental graph search algorithms.
 
 author: Karan Chawla(@karanchawla)
 
@@ -15,8 +15,6 @@ Reference: https://arxiv.org/abs/1405.5848
 
 import random
 import numpy as np
-import copy
-import operator
 import math
 import matplotlib.pyplot as plt
 
@@ -101,8 +99,7 @@ class RTree(object):
             start = self.lowerLimit[i]
             # step from the coordinate in the grid
             grid_step = self.resolution * coord[i]
-            half_step = self.resolution / 2  # To get to middle of the grid
-            config[i] = start + grid_step  # + half_step
+            config[i] = start + grid_step
         return config
 
     def nodeIdToGridCoord(self, node_id):
@@ -156,8 +153,7 @@ class BITStar(object):
         self.tree = RTree(start=start, lowerLimit=lowerLimit,
                           upperLimit=upperLimit, resolution=0.01)
 
-    def plan(self, animation=True):
-
+    def setup_planning(self):
         self.startId = self.tree.realWorldToNodeId(self.start)
         self.goalId = self.tree.realWorldToNodeId(self.goal)
 
@@ -172,12 +168,8 @@ class BITStar(object):
         self.f_scores[self.startId] = self.computeHeuristicCost(
             self.startId, self.goalId)
 
-        iterations = 0
         # max length we expect to find in our 'informed' sample space, starts as infinite
         cBest = self.g_scores[self.goalId]
-        pathLen = float('inf')
-        solutionSet = set()
-        plan = []
 
         # Computing the sampling space
         cMin = math.sqrt(pow(self.start[0] - self.goal[1], 2) +
@@ -196,6 +188,15 @@ class BITStar(object):
 
         self.samples.update(self.informedSample(
             200, cBest, cMin, xCenter, C))
+
+        return etheta, cMin, xCenter, C, cBest
+
+    def plan(self, animation=True):
+
+        etheta, cMin, xCenter, C, cBest = self.setup_planning()
+        iterations = 0
+        plan = []
+
         foundGoal = False
         # run until done
         while (iterations < self.maxIter):
@@ -286,20 +287,17 @@ class BITStar(object):
                                            start=firstCoord, end=secondCoord, tree=self.tree.edges)
 
                         for edge in self.edge_queue:
-                            if(edge[0] == bestEdge[1]):
-                                if self.g_scores[edge[0]] + self.computeDistanceCost(edge[0], bestEdge[1]) >= self.g_scores[self.goalId]:
-                                    if(edge[0], best_edge[1]) in self.edge_queue:
-                                        self.edge_queue.remove(
-                                            (edge[0], bestEdge[1]))
                             if(edge[1] == bestEdge[1]):
                                 if self.g_scores[edge[1]] + self.computeDistanceCost(edge[1], bestEdge[1]) >= self.g_scores[self.goalId]:
                                     if(lastEdge, bestEdge[1]) in self.edge_queue:
                                         self.edge_queue.remove(
                                             (lastEdge, bestEdge[1]))
+
             else:
                 print("Nothing good")
                 self.edge_queue = []
                 self.vertex_queue = []
+
             iterations += 1
 
         print("Finding the path")
@@ -449,6 +447,9 @@ class BITStar(object):
                 self.edge_queue.append((vid, sid))
 
         # add the vertex to the edge queue
+        self.add_vertex_to_edge_queue(vid, currCoord)
+
+    def add_vertex_to_edge_queue(self, vid, currCoord):
         if vid not in self.old_vertices:
             neigbors = []
             for v, edges in self.tree.vertices.items():
@@ -459,7 +460,6 @@ class BITStar(object):
 
             for neighbor in neigbors:
                 sid = neighbor[0]
-                scoord = neighbor[1]
                 estimated_f_score = self.computeDistanceCost(self.startId, vid) + \
                     self.computeDistanceCost(
                         vid, sid) + self.computeHeuristicCost(sid, self.goalId)
@@ -472,8 +472,6 @@ class BITStar(object):
         currId = self.startId
         openSet.append(currId)
 
-        foundGoal = False
-
         while len(openSet) != 0:
             # get the element with lowest f_score
             currId = min(openSet, key=lambda x: self.f_scores[x])
@@ -484,7 +482,6 @@ class BITStar(object):
             # Check if we're at the goal
             if(currId == self.goalId):
                 self.nodes[self.goalId]
-                foundGoal = True
                 break
 
             if(currId not in closedSet):
@@ -497,7 +494,6 @@ class BITStar(object):
                     continue
                 else:
                     # claculate tentative g score
-                    succesorCoord = self.tree.nodeIdToRealWorldCoord(succesor)
                     g_score = self.g_scores[currId] + \
                         self.computeDistanceCost(currId, succesor)
                     if succesor not in openSet:
@@ -570,7 +566,9 @@ def main():
     bitStar = BITStar(start=[-1, 0], goal=[3, 8], obstacleList=obstacleList,
                       randArea=[-2, 15])
     path = bitStar.plan(animation=show_animation)
-    print(path)
+    #  print(path)
+    print("Done")
+
     if show_animation:
         plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
         plt.grid(True)
