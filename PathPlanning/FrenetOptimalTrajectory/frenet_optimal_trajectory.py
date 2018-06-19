@@ -42,11 +42,11 @@ KLON = 1.0
 show_animation = True
 
 
-class quinic_polynomial:
+class quintic_polynomial:
 
     def __init__(self, xs, vxs, axs, xe, vxe, axe, T):
 
-        # calc coefficient of quinic polynomial
+        # calc coefficient of quintic polynomial
         self.xs = xs
         self.vxs = vxs
         self.axs = axs
@@ -86,17 +86,18 @@ class quinic_polynomial:
         xt = 2 * self.a2 + 6 * self.a3 * t + 12 * self.a4 * t**2 + 20 * self.a5 * t**3
 
         return xt
-    
+
     def calc_third_derivative(self, t):
         xt = 6 * self.a3 + 24 * self.a4 * t + 60 * self.a5 * t**2
 
         return xt
 
+
 class quartic_polynomial:
 
     def __init__(self, xs, vxs, axs, vxe, axe, T):
 
-        # calc coefficient of quinic polynomial
+        # calc coefficient of quintic polynomial
         self.xs = xs
         self.vxs = vxs
         self.axs = axs
@@ -132,7 +133,7 @@ class quartic_polynomial:
         xt = 2 * self.a2 + 6 * self.a3 * t + 12 * self.a4 * t**2
 
         return xt
-    
+
     def calc_third_derivative(self, t):
         xt = 6 * self.a3 + 24 * self.a4 * t
 
@@ -173,7 +174,7 @@ def calc_frenet_paths(c_speed, c_d, c_d_d, c_d_dd, s0):
         for Ti in np.arange(MINT, MAXT, DT):
             fp = Frenet_path()
 
-            lat_qp = quinic_polynomial(c_d, c_d_d, c_d_dd, di, 0.0, 0.0, Ti)
+            lat_qp = quintic_polynomial(c_d, c_d_d, c_d_dd, di, 0.0, 0.0, Ti)
 
             fp.t = [t for t in np.arange(0.0, Ti, DT)]
             fp.d = [lat_qp.calc_point(t) for t in fp.t]
