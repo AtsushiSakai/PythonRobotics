@@ -1,36 +1,47 @@
 """
 A* grid based planning
-
 author: Atsushi Sakai(@Atsushi_twi)
+Revised by Nikos Kanargias (nkana@tee.gr)
+See Wikipedia article (https://en.wikipedia.org/wiki/A*_search_algorithm)
+See also code of Christian Careaga (http://code.activestate.com/recipes/578919-python-a-pathfinding-with-binary-heap/)
 """
 
 import matplotlib.pyplot as plt
 import math
+from operator import attrgetter
 
 show_animation = True
 
 
 class Node:
 
-    def __init__(self, x, y, cost, pind):
+    def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.cost = cost
-        self.pind = pind
+        self.gscore = 0
+        self.fscore = 0
 
     def __str__(self):
-        return str(self.x) + "," + str(self.y) + "," + str(self.cost) + "," + str(self.pind)
+        return str(self.x) + "," + str(self.y) + "," + str(self.fscore)
+
+    def __eq__(self, other):
+        """
+        useful Cell equivalence
+        """
+        if isinstance(other, self.__class__):
+            return self.x == other.x and self.y == other.y
+        else:
+            return False
 
 
-def calc_fianl_path(ngoal, closedset, reso):
+def calc_final_path(nstart, ngoal, reso):
     # generate final course
     rx, ry = [ngoal.x * reso], [ngoal.y * reso]
-    pind = ngoal.pind
-    while pind != -1:
-        n = closedset[pind]
-        rx.append(n.x * reso)
-        ry.append(n.y * reso)
-        pind = n.pind
+    current = ngoal
+    while current != nstart:
+        rx.append(current.x * reso)
+        ry.append(current.y * reso)
+        current = current.cameFrom
 
     return rx, ry
 
@@ -45,8 +56,8 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
     rr: robot radius[m]
     """
 
-    nstart = Node(round(sx / reso), round(sy / reso), 0.0, -1)
-    ngoal = Node(round(gx / reso), round(gy / reso), 0.0, -1)
+    nstart = Node(round(sx / reso), round(sy / reso))
+    ngoal = Node(round(gx / reso), round(gy / reso))
     ox = [iox / reso for iox in ox]
     oy = [ioy / reso for ioy in oy]
 
@@ -54,59 +65,54 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
 
     motion = get_motion_model()
 
-    openset, closedset = dict(), dict()
-    openset[calc_index(nstart, xw, minx, miny)] = nstart
+    openset, closedset = [nstart], []
 
-    while 1:
-        c_id = min(
-            openset, key=lambda o: openset[o].cost + calc_h(ngoal, openset[o].x, openset[o].y))
-        current = openset[c_id]
-        #  print("current", current)
+    while openset:
+        openset.sort(key=attrgetter("fscore"))
+        # Remove the item with the smallest fscore value from the open set
+        current = openset.pop(0)
 
         # show graph
         if show_animation:
             plt.plot(current.x * reso, current.y * reso, "xc")
-            if len(closedset.keys()) % 10 == 0:
+            if len(closedset) % 10 == 0:
                 plt.pause(0.001)
 
-        if current.x == ngoal.x and current.y == ngoal.y:
+        if current == ngoal:
             print("Find goal")
-            ngoal.pind = current.pind
-            ngoal.cost = current.cost
+            ngoal.cameFrom = current.cameFrom
             break
 
-        # Remove the item from the open set
-        del openset[c_id]
         # Add it to the closed set
-        closedset[c_id] = current
+        closedset.insert(0, current)
 
         # expand search grid based on motion model
         for i in range(len(motion)):
-            node = Node(current.x + motion[i][0], current.y + motion[i][1],
-                        current.cost + motion[i][2], c_id)
-            n_id = calc_index(node, xw, minx, miny)
+            neighbor = Node(current.x + motion[i][0], current.y + motion[i][1])
 
-            if not verify_node(node, obmap, minx, miny, maxx, maxy):
+            # if tentative_g_score is eliminated we get the greedy algorithm instead
+            tentative_g_score = current.gscore + heuristic(current, neighbor)
+
+            if not verify_node(neighbor, obmap, minx, miny, maxx, maxy):
                 continue
 
-            if n_id in closedset:
+            if neighbor in closedset and tentative_g_score >= neighbor.gscore:
                 continue
-            # Otherwise if it is already in the open set
-            if n_id in openset:
-                if openset[n_id].cost > node.cost:
-                    openset[n_id].cost = node.cost
-                    openset[n_id].pind = c_id
-            else:
-                openset[n_id] = node
 
-    rx, ry = calc_fianl_path(ngoal, closedset, reso)
+            if tentative_g_score < neighbor.gscore or neighbor not in openset:
+                neighbor.cameFrom = current
+                neighbor.gscore = tentative_g_score
+                neighbor.fscore = tentative_g_score + heuristic(neighbor, ngoal)
+                openset.append(neighbor)
+
+    rx, ry = calc_final_path(nstart, ngoal, reso)
 
     return rx, ry
 
 
-def calc_h(ngoal, x, y):
+def heuristic(a, b):
     w = 10.0  # weight of heuristic
-    d = w * math.sqrt((ngoal.x - x)**2 + (ngoal.y - y)**2)
+    d = w * math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2)
     return d
 
 
@@ -157,10 +163,6 @@ def calc_obstacle_map(ox, oy, reso, vr):
                     break
 
     return obmap, minx, miny, maxx, maxy, xwidth, ywidth
-
-
-def calc_index(node, xwidth, xmin, ymin):
-    return (node.y - ymin) * xwidth + (node.x - xmin)
 
 
 def get_motion_model():
