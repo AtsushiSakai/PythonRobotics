@@ -714,13 +714,19 @@ MIT
 
 # Contribution
 
-If you have any quesions or problems about this code, feel free to add an issue.
-
 A small PR like bug fix is welcome.
 
 If your PR is merged multiple times, I will add your account to the author list.
 
-You can support financially this project via PayPal.
+# Support
+
+You can support this project financially via Patrion.
+
+You can get e-mail technical supports about the codes if you are being patron.
+
+![Atsushi Sakai is creating Open Source Software \| Patreon](https://www.patreon.com/myenigma)
+
+PayPal donation is also welcome.
 
 [![Support via PayPal](https://cdn.rawgit.com/twolfson/paypal-github-button/1.0.0/dist/button.svg)](https://www.paypal.me/myenigmapay/)
 
@@ -733,7 +739,5 @@ You can support financially this project via PayPal.
 - [Joe Dinius](https://github.com/jwdinius)
 
 - [Karan Chawla](https://github.com/karanchawla)
-
-
 
 
