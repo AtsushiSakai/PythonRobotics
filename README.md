@@ -5,8 +5,6 @@
 
 Python codes for robotics algorithm.
 
-
-
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -722,7 +720,7 @@ If your PR is merged multiple times, I will add your account to the author list.
 
 # Support
 
-You can support this project financially via Patrion.
+You can support this project financially via Patreon.
 
 You can get e-mail technical supports about the codes if you are being patron.
 
