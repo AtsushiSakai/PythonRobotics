@@ -6,6 +6,7 @@
 Python codes for robotics algorithm.
 
 
+
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -68,6 +69,7 @@ Python codes for robotics algorithm.
       * [Model predictive speed and steering control](#model-predictive-speed-and-steering-control)
    * [License](#license)
    * [Contribution](#contribution)
+   * [Support](#support)
    * [Authors](#authors)
 
 # What is this?
@@ -724,7 +726,7 @@ You can support this project financially via Patrion.
 
 You can get e-mail technical supports about the codes if you are being patron.
 
-![Atsushi Sakai is creating Open Source Software \| Patreon](https://www.patreon.com/myenigma)
+- [Atsushi Sakai is creating Open Source Software \| Patreon](https://www.patreon.com/myenigma)
 
 PayPal donation is also welcome.
 
@@ -739,5 +741,6 @@ PayPal donation is also welcome.
 - [Joe Dinius](https://github.com/jwdinius)
 
 - [Karan Chawla](https://github.com/karanchawla)
+
 
 
