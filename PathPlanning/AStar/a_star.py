@@ -6,7 +6,6 @@ author: Atsushi Sakai(@Atsushi_twi)
         Nikos Kanargias (nkana@tee.gr)
 
 See Wikipedia article (https://en.wikipedia.org/wiki/A*_search_algorithm)
-See also code of Christian Careaga (http://code.activestate.com/recipes/578919-python-a-pathfinding-with-binary-heap/)
 
 """
 
@@ -98,8 +97,13 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
             if not verify_node(node, obmap, minx, miny, maxx, maxy):
                 continue
 
-            if node.cost < node.cost or n_id not in openset:
-                openset[n_id] = node  # update or insert new node
+            if n_id not in openset:
+                openset[n_id] = node  # Discover a new node
+
+            if node.cost >= node.cost:
+                continue  # this is not a better path
+
+            openset[n_id] = node  # This path is the best unitl now. record it!
 
     rx, ry = calc_fianl_path(ngoal, closedset, reso)
 
