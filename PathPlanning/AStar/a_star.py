@@ -100,9 +100,12 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
             if n_id not in openset:
                 openset[n_id] = node  # Discover a new node
 
-            if node.cost >= node.cost:
+            tcost = current.cost + calc_heuristic(current, node)
+
+            if tcost >= node.cost:
                 continue  # this is not a better path
 
+            node.cost = tcost
             openset[n_id] = node  # This path is the best unitl now. record it!
 
     rx, ry = calc_fianl_path(ngoal, closedset, reso)
