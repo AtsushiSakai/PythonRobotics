@@ -92,23 +92,14 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
                         current.cost + motion[i][2], c_id)
             n_id = calc_index(node, xw, minx, miny)
 
-            if not verify_node(node, obmap, minx, miny, maxx, maxy):
-                continue
-
             if n_id in closedset:
                 continue
 
-            if n_id not in openset:
-                openset[n_id] = node
+            if not verify_node(node, obmap, minx, miny, maxx, maxy):
+                continue
 
-            # The distance from start to a neighbor.
-            # The "dist_between" function may vary as per the solution requirements.
-            if node.cost >= openset[n_id].cost:
-                continue  # This is not a better path.
-
-            # This path is the best until now. Record it!
-            openset[n_id].cost = node.cost
-            openset[n_id].pind = c_id
+            if node.cost < node.cost or n_id not in openset:
+                openset[n_id] = node  # update or insert new node
 
     rx, ry = calc_fianl_path(ngoal, closedset, reso)
 
