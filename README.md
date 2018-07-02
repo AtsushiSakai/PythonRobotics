@@ -740,5 +740,6 @@ PayPal donation is also welcome.
 
 - [Karan Chawla](https://github.com/karanchawla)
 
+- [Antonin RAFFIN](https://github.com/araffin)
 
 
