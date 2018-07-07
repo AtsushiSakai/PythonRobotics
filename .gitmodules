@@ -1,0 +1,3 @@
+[submodule "doc/PythonRoboticsPaper"]
+	path = doc/PythonRoboticsPaper
+	url = https://github.com/AtsushiSakai/PythonRoboticsPaper
