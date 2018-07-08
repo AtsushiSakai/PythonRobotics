@@ -1,3 +1,11 @@
 [submodule "doc/PythonRoboticsPaper"]
 	path = doc/PythonRoboticsPaper
 	url = https://github.com/AtsushiSakai/PythonRoboticsPaper
+
+[submodule "PathTracking/rear_wheel_feedback/pycubicspline"]
+	path = PathTracking/rear_wheel_feedback/pycubicspline
+	url = https://github.com/AtsushiSakai/pycubicspline
+
+[submodule "PathTracking/stanley_controller/pycubicspline"]
+	path = PathTracking/stanley_controller/pycubicspline
+	url = https://github.com/AtsushiSakai/pycubicspline
