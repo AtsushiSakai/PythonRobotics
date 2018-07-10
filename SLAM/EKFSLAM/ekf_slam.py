@@ -203,13 +203,7 @@ def jacobH(q, delta, x, i):
 
 
 def pi_2_pi(angle):
-    while(angle > math.pi):
-        angle = angle - 2.0 * math.pi
-
-    while(angle < -math.pi):
-        angle = angle + 2.0 * math.pi
-
-    return angle
+    return (angle + math.pi) % (2*math.pi) - math.pi
 
 
 def main():
