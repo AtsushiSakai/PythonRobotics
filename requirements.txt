@@ -1,0 +1,9 @@
+numpy==1.12.0
+pandas==0.20.3
+tqdm==4.11.2
+scipy==1.0.1
+ascii_graph==1.2.0
+tweepy==3.5.0
+matplotlib==2.1.2
+cvxpy==1.0.6
+ipdb==0.11
