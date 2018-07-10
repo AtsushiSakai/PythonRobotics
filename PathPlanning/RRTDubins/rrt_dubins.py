@@ -96,14 +96,10 @@ class RRT():
 
         return newNode
 
+
     def pi_2_pi(self, angle):
-        while(angle >= math.pi):
-            angle = angle - 2.0 * math.pi
+        return (angle + math.pi) % (2*math.pi) - math.pi
 
-        while(angle <= -math.pi):
-            angle = angle + 2.0 * math.pi
-
-        return angle
 
     def steer(self, rnd, nind):
         #  print(rnd)
