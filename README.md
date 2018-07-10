@@ -72,9 +72,9 @@ Python codes for robotics algorithm.
 
 # What is this?
 
-This is a Python code collection of robotics algorithms, especially autonomous navigation.
+This is a collection of Python implementation of robotics algorithms, especially for autonomous navigation.
 
-Feature:
+Features:
 
 1. Widely used and practical algorithms are selected.
 
