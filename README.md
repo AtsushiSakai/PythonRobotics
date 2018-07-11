@@ -198,7 +198,7 @@ This is a 2D object clustering with k-means algorithm.
 
 ## Object shape recognition using circle fitting
 
-This is a object shape recognition using circle fitting.
+This is an object shape recognition using circle fitting.
 
 ![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/circle_fitting/animation.gif)
 
@@ -227,11 +227,11 @@ Ref:
 
 ## EKF SLAM
 
-This is a Extended Kalman Filter based SLAM example.
+This is an Extended Kalman Filter based SLAM example.
 
 The blue line is ground truth, the black line is dead reckoning, the red line is the estimated trajectory with EKF SLAM.
 
-The green cross are estimated landmarks.
+The green crosses are estimated landmarks.
 
 ![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/EKFSLAM/animation.gif)
 
@@ -263,7 +263,7 @@ Ref:
 
 This is a feature based SLAM example using FastSLAM 2.0.
 
-The animation has same meanings as one of FastSLAM 1.0.
+The animation has the same meanings as one of FastSLAM 1.0.
 
 
 ![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/FastSLAM2/animation.gif)
@@ -324,7 +324,7 @@ This is a 2D grid based shortest path planning with A star algorithm.
 
 In the animation, cyan points are searched nodes.
 
-It's heuristic is 2D Euclid distance.
+Its heuristic is 2D Euclid distance.
 
 ### Potential Field algorithm
 
@@ -410,7 +410,7 @@ This Voronoi road-map planner uses Dijkstra method for graph search.
 
 In the animation, blue points are Voronoi points,
 
-Cyan crosses means searched points with Dijkstra method,
+Cyan crosses mean searched points with Dijkstra method,
 
 The red line is the final path of Vornoi Road-Map.
 
@@ -470,7 +470,7 @@ Path planning for a car robot with RRT\* and reeds sheep path planner.
 
 This is a path planning code with Informed RRT\*.
 
-The cyan ellipse is the heuristic sampling domein of Informed RRT\*.
+The cyan ellipse is the heuristic sampling domain of Informed RRT\*.
 
 Ref:
 
@@ -518,7 +518,7 @@ Ref:
 
 - [LQR\-RRT\*: Optimal Sampling\-Based Motion Planning with Automatically Derived Extension Heuristics](http://lis.csail.mit.edu/pubs/perez-icra12.pdf)
 
-- [MahanFathi/LQR\-RRTstar: LQR\-RRT\* method is used for random motion planning of a simple pendulum in it's phase plot](https://github.com/MahanFathi/LQR-RRTstar)
+- [MahanFathi/LQR\-RRTstar: LQR\-RRT\* method is used for random motion planning of a simple pendulum in its phase plot](https://github.com/MahanFathi/LQR-RRTstar)
 
 
 ## Cubic spline planning
@@ -722,7 +722,7 @@ If your PR is merged multiple times, I will add your account to the author list.
 
 You can support this project financially via Patreon.
 
-You can get e-mail technical supports about the codes if you are being patron.
+You can get e-mail technical supports about the codes if you are being a patron.
 
 - [Atsushi Sakai is creating Open Source Software \| Patreon](https://www.patreon.com/myenigma)
 
