@@ -188,20 +188,22 @@ def calc_nearest_index(state, cx, cy, cyaw, pind):
     dx = [state.x - icx for icx in cx[pind:(pind + N_IND_SEARCH)]]
     dy = [state.y - icy for icy in cy[pind:(pind + N_IND_SEARCH)]]
 
-    d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
+    d = [idx ** 2 + idy ** 2 for (idx, idy) in zip(dx, dy)]
 
-    min_d = min(d)
+    mind = min(d)
 
-    ind = d.index(min_d) + pind
+    ind = d.index(mind) + pind
+
+    mind = math.sqrt(mind)
 
     dxl = cx[ind] - state.x
     dyl = cy[ind] - state.y
 
     angle = pi_2_pi(cyaw[ind] - math.atan2(dyl, dxl))
     if angle < 0:
-        min_d *= -1
+        mind *= -1
 
-    return ind, min_d
+    return ind, mind
 
 
 def predict_motion(x0, oa, od, xref):
