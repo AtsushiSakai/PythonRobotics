@@ -742,4 +742,6 @@ PayPal donation is also welcome.
 
 - [Antonin RAFFIN](https://github.com/araffin)
 
+- [Alexis Paques](https://github.com/AlexisTM)
+
 
