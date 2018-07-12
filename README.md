@@ -31,9 +31,6 @@ Features:
 
 - Java / Processing
 
-
-- [cvxpy 0.4.x](http://www.cvxpy.org/en/latest/) 
-
 # How to use
 
 1. Install the required libraries.
@@ -75,13 +72,6 @@ A small PR like bug fix is welcome.
 
 If your PR is merged multiple times, I will add your account to the author list.
 
-# Support
-
-You can support this project financially via Patreon.
-
-You can get e-mail technical supports about the codes if you are being a patron.
-
-PayPal donation is also welcome.
 
 # Authors
 
