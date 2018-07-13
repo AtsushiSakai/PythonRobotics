@@ -1,0 +1,6 @@
+numpy
+pandas
+scipy
+matplotlib
+cvxpy
+ipdb
