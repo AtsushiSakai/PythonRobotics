@@ -3,4 +3,3 @@ pandas
 scipy
 matplotlib
 cvxpy
-ipdb
