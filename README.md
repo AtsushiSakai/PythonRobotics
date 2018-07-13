@@ -548,6 +548,16 @@ Ref:
 
 - [B\-spline \- Wikipedia](https://en.wikipedia.org/wiki/B-spline)
 
+## Eta^3 Spline path planning
+
+![eta3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/Eta3SplinePath/animation.gif?raw=True)
+
+Ref: 
+
+- [\eta^3-Splines for the Smooth Path Generation of Wheeled Mobile Robots](https://ieeexplore.ieee.org/document/4339545/)
+
+
+
 ## Bezier path planning
 
 A sample code of Bezier path planning.
