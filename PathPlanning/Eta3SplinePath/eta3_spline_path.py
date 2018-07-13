@@ -278,6 +278,7 @@ def test3():
     plt.xlabel('x')
     plt.ylabel('y')
     plt.title('Path')
+    plt.pause(1.0)
 
     plt.show()
 
