@@ -5,6 +5,7 @@
 
 Python codes for robotics algorithm.
 
+
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -52,6 +53,7 @@ Python codes for robotics algorithm.
          * [LQR-RRT*](#lqr-rrt)
       * [Cubic spline planning](#cubic-spline-planning)
       * [B-Spline planning](#b-spline-planning)
+      * [Eta^3 Spline path planning](#eta3-spline-path-planning)
       * [Bezier path planning](#bezier-path-planning)
       * [Quintic polynomials planning](#quintic-polynomials-planning)
       * [Dubins path planning](#dubins-path-planning)
@@ -552,6 +554,8 @@ Ref:
 
 ![eta3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/Eta3SplinePath/animation.gif?raw=True)
 
+This is a path planning with Eta^3 spline.
+
 Ref: 
 
 - [\eta^3-Splines for the Smooth Path Generation of Wheeled Mobile Robots](https://ieeexplore.ieee.org/document/4339545/)
@@ -753,5 +757,6 @@ PayPal donation is also welcome.
 - [Antonin RAFFIN](https://github.com/araffin)
 
 - [Alexis Paques](https://github.com/AlexisTM)
+
 
 
