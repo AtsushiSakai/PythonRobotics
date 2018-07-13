@@ -3,6 +3,7 @@
 \eta^3 polynomials planner
 
 author: Joe Dinius, Ph.D (https://jwdinius.github.io)
+        Atsushi Sakai (@Atsushi_twi)
 
 Ref:
 
@@ -162,10 +163,63 @@ class eta3_path_segment(object):
         return self.coeffs.dot(np.array([1, u, u**2, u**3, u**4, u**5, u**6, u**7]))
 
 
-def main():
-    """
-    recreate path from reference (see Table 1)
-    """
+def test1():
+
+    for i in range(10):
+        path_segments = []
+        # segment 1: lane-change curve
+        start_pose = [0, 0, 0]
+        end_pose = [4, 3.0, 0]
+        # NOTE: The ordering on kappa is [kappa_A, kappad_A, kappa_B, kappad_B], with kappad_* being the curvature derivative
+        kappa = [0, 0, 0, 0]
+        eta = [i, i, 0, 0, 0, 0]
+        path_segments.append(eta3_path_segment(
+            start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
+
+        path = eta3_path(path_segments)
+
+        # interpolate at several points along the path
+        ui = np.linspace(0, len(path_segments), 1001)
+        pos = np.empty((2, ui.size))
+        for i, u in enumerate(ui):
+            pos[:, i] = path.calc_path_point(u)
+
+        # plot the path
+        plt.plot(pos[0, :], pos[1, :])
+        plt.pause(1.0)
+
+    plt.close("all")
+
+
+def test2():
+
+    for i in range(10):
+        path_segments = []
+        # segment 1: lane-change curve
+        start_pose = [0, 0, 0]
+        end_pose = [4, 3.0, 0]
+        # NOTE: The ordering on kappa is [kappa_A, kappad_A, kappa_B, kappad_B], with kappad_* being the curvature derivative
+        kappa = [0, 0, 0, 0]
+        eta = [0, 0, (i - 5) * 20, (5 - i) * 20, 0, 0]
+        path_segments.append(eta3_path_segment(
+            start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
+
+        path = eta3_path(path_segments)
+
+        # interpolate at several points along the path
+        ui = np.linspace(0, len(path_segments), 1001)
+        pos = np.empty((2, ui.size))
+        for i, u in enumerate(ui):
+            pos[:, i] = path.calc_path_point(u)
+
+        # plot the path
+        plt.plot(pos[0, :], pos[1, :])
+        plt.pause(1.0)
+
+    plt.close("all")
+
+
+def test3():
     path_segments = []
 
     # segment 1: lane-change curve
@@ -224,7 +278,17 @@ def main():
     plt.xlabel('x')
     plt.ylabel('y')
     plt.title('Path')
+
     plt.show()
+
+
+def main():
+    """
+    recreate path from reference (see Table 1)
+    """
+    test1()
+    test2()
+    test3()
 
 
 if __name__ == '__main__':
