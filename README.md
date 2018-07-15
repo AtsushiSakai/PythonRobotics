@@ -96,7 +96,7 @@ Features:
 
 - pandas
 
-- [cvxpy 0.4.x](http://www.cvxpy.org/en/latest/) 
+- [cvxpy](http://www.cvxpy.org/en/latest/) 
 
 # How to use
 
