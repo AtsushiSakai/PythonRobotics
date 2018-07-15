@@ -19,9 +19,11 @@ install:
   - conda install scipy
   - conda install matplotlib
   - conda install pandas
-  - pip install cvxpy
-  - conda install -y -c cvxgrp cvxpy
-  - conda install -y -c anaconda cvxopt
+  - conda install -c conda-forge lapack
+  - conda install -c cvxgrp cvxpy
+  #- pip install cvxpy
+  #- conda install -y -c cvxgrp cvxpy
+  #- conda install -y -c anaconda cvxopt
 
 script:
   - python --version
