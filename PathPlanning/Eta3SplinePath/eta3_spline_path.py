@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 
 # NOTE: *_pose is a 3-array: 0 - x coord, 1 - y coord, 2 - orientation angle \theta
 
+show_animation = True
+
 
 class eta3_path(object):
     """
@@ -184,11 +186,13 @@ def test1():
         for i, u in enumerate(ui):
             pos[:, i] = path.calc_path_point(u)
 
-        # plot the path
-        plt.plot(pos[0, :], pos[1, :])
-        plt.pause(1.0)
+        if show_animation:
+            # plot the path
+            plt.plot(pos[0, :], pos[1, :])
+            plt.pause(1.0)
 
-    plt.close("all")
+    if show_animation:
+        plt.close("all")
 
 
 def test2():
@@ -212,11 +216,13 @@ def test2():
         for i, u in enumerate(ui):
             pos[:, i] = path.calc_path_point(u)
 
-        # plot the path
-        plt.plot(pos[0, :], pos[1, :])
-        plt.pause(1.0)
+        if show_animation:
+            # plot the path
+            plt.plot(pos[0, :], pos[1, :])
+            plt.pause(1.0)
 
-    plt.close("all")
+    if show_animation:
+        plt.close("all")
 
 
 def test3():
@@ -273,14 +279,16 @@ def test3():
         pos[:, i] = path.calc_path_point(u)
 
     # plot the path
-    plt.figure('Path from Reference')
-    plt.plot(pos[0, :], pos[1, :])
-    plt.xlabel('x')
-    plt.ylabel('y')
-    plt.title('Path')
-    plt.pause(1.0)
 
-    plt.show()
+    if show_animation:
+        plt.figure('Path from Reference')
+        plt.plot(pos[0, :], pos[1, :])
+        plt.xlabel('x')
+        plt.ylabel('y')
+        plt.title('Path')
+        plt.pause(1.0)
+
+        plt.show()
 
 
 def main():
