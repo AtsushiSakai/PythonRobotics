@@ -478,14 +478,25 @@ def smooth_yaw(yaw):
 
     for i in range(len(yaw) - 1):
         dyaw = yaw[i + 1] - yaw[i]
+
         while dyaw >= math.pi / 2.0:
             yaw[i + 1] -= math.pi * 2.0
             dyaw = yaw[i + 1] - yaw[i]
+
         while dyaw <= -math.pi / 2.0:
             yaw[i + 1] += math.pi * 2.0
             dyaw = yaw[i + 1] - yaw[i]
 
     return yaw
+
+
+def get_straight_course(dl):
+    ax = [0.0, 5.0, 10.0, 20.0, 30.0, 40.0, 50.0]
+    ay = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+        ax, ay, ds=dl)
+
+    return cx, cy, cyaw, ck
 
 
 def get_forward_course(dl):
@@ -519,7 +530,8 @@ def main():
     print(__file__ + " start!!")
 
     dl = 1.0  # course tick
-    #  cx, cy, cyaw, ck = get_forward_course(dl)
+    # cx, cy, cyaw, ck = get_straight_course(dl)
+    # cx, cy, cyaw, ck = get_forward_course(dl)
     cx, cy, cyaw, ck = get_switch_back_course(dl)
 
     sp = calc_speed_profile(cx, cy, cyaw, TARGET_SPEED)
