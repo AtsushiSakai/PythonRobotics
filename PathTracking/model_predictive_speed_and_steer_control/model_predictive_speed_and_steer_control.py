@@ -94,10 +94,15 @@ def get_linear_model_matrix(v, phi, delta):
     B[2, 0] = DT
     B[3, 1] = DT * v / (WB * math.cos(delta) ** 2)
 
-    C = np.matrix(np.zeros((NX, 1)))
-    C[0, 0] = DT * v * math.sin(phi) * phi
-    C[1, 0] = - DT * v * math.cos(phi) * phi
-    C[3, 0] = v * delta / (WB * math.cos(delta) ** 2)
+    # C = np.matrix(np.zeros((NX, 1)))
+    # C[0, 0] = DT * v * math.sin(phi) * phi
+    # C[1, 0] = - DT * v * math.cos(phi) * phi
+    # C[3, 0] = v * delta / (WB * math.cos(delta) ** 2)
+
+    C = np.zeros(NX)
+    C[0] = DT * v * math.sin(phi) * phi
+    C[1] = - DT * v * math.cos(phi) * phi
+    C[3] = v * delta / (WB * math.cos(delta) ** 2)
 
     return A, B, C
 
@@ -254,8 +259,8 @@ def linear_mpc_control(xref, xbar, x0, dref):
     dref: reference steer angle
     """
 
-    x = cvxpy.Variable(NX, T + 1)
-    u = cvxpy.Variable(NU, T)
+    x = cvxpy.Variable((NX, T + 1))
+    u = cvxpy.Variable((NU, T))
 
     cost = 0.0
     constraints = []
@@ -273,18 +278,18 @@ def linear_mpc_control(xref, xbar, x0, dref):
         if t < (T - 1):
             cost += cvxpy.quad_form(u[:, t + 1] - u[:, t], Rd)
             constraints += [cvxpy.abs(u[1, t + 1] - u[1, t])
-                            < MAX_DSTEER * DT]
+                            <= MAX_DSTEER * DT]
 
     cost += cvxpy.quad_form(xref[:, T] - x[:, T], Qf)
 
     constraints += [x[:, 0] == x0]
     constraints += [x[2, :] <= MAX_SPEED]
     constraints += [x[2, :] >= MIN_SPEED]
-    constraints += [cvxpy.abs(u[0, :]) < MAX_ACCEL]
-    constraints += [cvxpy.abs(u[1, :]) < MAX_STEER]
+    constraints += [cvxpy.abs(u[0, :]) <= MAX_ACCEL]
+    constraints += [cvxpy.abs(u[1, :]) <= MAX_STEER]
 
     prob = cvxpy.Problem(cvxpy.Minimize(cost), constraints)
-    prob.solve(verbose=False)
+    prob.solve(solver=cvxpy.ECOS, verbose=False)
 
     if prob.status == cvxpy.OPTIMAL or prob.status == cvxpy.OPTIMAL_INACCURATE:
         ox = get_nparray_from_matrix(x.value[0, :])
