@@ -510,6 +510,17 @@ def get_straight_course2(dl):
     return cx, cy, cyaw, ck
 
 
+def get_straight_course3(dl):
+    ax = [0.0, -10.0, -20.0, -40.0, -50.0, -60.0, -70.0]
+    ay = [0.0, -1.0, 1.0, 0.0, -1.0, 1.0, 0.0]
+    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+        ax, ay, ds=dl)
+
+    cyaw = [i - math.pi for i in cyaw]
+
+    return cx, cy, cyaw, ck
+
+
 def get_forward_course(dl):
     ax = [0.0, 60.0, 125.0, 50.0, 75.0, 30.0, -10.0]
     ay = [0.0, 0.0, 50.0, 65.0, 30.0, 50.0, -20.0]
@@ -543,8 +554,9 @@ def main():
     dl = 1.0  # course tick
     # cx, cy, cyaw, ck = get_straight_course(dl)
     # cx, cy, cyaw, ck = get_straight_course2(dl)
+    cx, cy, cyaw, ck = get_straight_course3(dl)
     # cx, cy, cyaw, ck = get_forward_course(dl)
-    cx, cy, cyaw, ck = get_switch_back_course(dl)
+    # CX, cy, cyaw, ck = get_switch_back_course(dl)
 
     sp = calc_speed_profile(cx, cy, cyaw, TARGET_SPEED)
 
@@ -577,11 +589,11 @@ def main2():
     print(__file__ + " start!!")
 
     dl = 1.0  # course tick
-    cx, cy, cyaw, ck = get_straight_course2(dl)
+    cx, cy, cyaw, ck = get_straight_course3(dl)
 
     sp = calc_speed_profile(cx, cy, cyaw, TARGET_SPEED)
 
-    initial_state = State(x=cx[0], y=cy[0], yaw=math.pi, v=0.0)
+    initial_state = State(x=cx[0], y=cy[0], yaw=0.0, v=0.0)
 
     t, x, y, yaw, v, d, a = do_simulation(
         cx, cy, cyaw, ck, sp, dl, initial_state)
@@ -607,5 +619,5 @@ def main2():
 
 
 if __name__ == '__main__':
-    main()
-    # main2()
+    # main()
+    main2()
