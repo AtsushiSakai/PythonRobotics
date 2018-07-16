@@ -365,7 +365,7 @@ def check_goal(state, goal, tind, nind):
     return False
 
 
-def do_simulation(cx, cy, cyaw, ck, sp, dl):
+def do_simulation(cx, cy, cyaw, ck, sp, dl, initial_state):
     """
     Simulation
 
@@ -379,7 +379,14 @@ def do_simulation(cx, cy, cyaw, ck, sp, dl):
     """
 
     goal = [cx[-1], cy[-1]]
-    state = State(x=cx[0], y=cy[0], yaw=cyaw[0], v=0.0)
+
+    state = initial_state
+
+    # initial yaw compensation
+    if state.yaw - cyaw[0] >= math.pi:
+        state.yaw -= math.pi * 2.0
+    elif state.yaw - cyaw[0] <= -math.pi:
+        state.yaw += math.pi * 2.0
 
     time = 0.0
     x = [state.x]
@@ -494,6 +501,15 @@ def get_straight_course(dl):
     return cx, cy, cyaw, ck
 
 
+def get_straight_course2(dl):
+    ax = [0.0, -10.0, -20.0, -40.0, -50.0, -60.0, -70.0]
+    ay = [0.0, -1.0, 1.0, 0.0, -1.0, 1.0, 0.0]
+    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+        ax, ay, ds=dl)
+
+    return cx, cy, cyaw, ck
+
+
 def get_forward_course(dl):
     ax = [0.0, 60.0, 125.0, 50.0, 75.0, 30.0, -10.0]
     ay = [0.0, 0.0, 50.0, 65.0, 30.0, 50.0, -20.0]
@@ -526,12 +542,49 @@ def main():
 
     dl = 1.0  # course tick
     # cx, cy, cyaw, ck = get_straight_course(dl)
+    # cx, cy, cyaw, ck = get_straight_course2(dl)
     # cx, cy, cyaw, ck = get_forward_course(dl)
     cx, cy, cyaw, ck = get_switch_back_course(dl)
 
     sp = calc_speed_profile(cx, cy, cyaw, TARGET_SPEED)
 
-    t, x, y, yaw, v, d, a = do_simulation(cx, cy, cyaw, ck, sp, dl)
+    initial_state = State(x=cx[0], y=cy[0], yaw=cyaw[0], v=0.0)
+
+    t, x, y, yaw, v, d, a = do_simulation(
+        cx, cy, cyaw, ck, sp, dl, initial_state)
+
+    if show_animation:
+        plt.close("all")
+        plt.subplots()
+        plt.plot(cx, cy, "-r", label="spline")
+        plt.plot(x, y, "-g", label="tracking")
+        plt.grid(True)
+        plt.axis("equal")
+        plt.xlabel("x[m]")
+        plt.ylabel("y[m]")
+        plt.legend()
+
+        plt.subplots()
+        plt.plot(t, v, "-r", label="speed")
+        plt.grid(True)
+        plt.xlabel("Time [s]")
+        plt.ylabel("Speed [kmh]")
+
+        plt.show()
+
+
+def main2():
+    print(__file__ + " start!!")
+
+    dl = 1.0  # course tick
+    cx, cy, cyaw, ck = get_straight_course2(dl)
+
+    sp = calc_speed_profile(cx, cy, cyaw, TARGET_SPEED)
+
+    initial_state = State(x=cx[0], y=cy[0], yaw=math.pi, v=0.0)
+
+    t, x, y, yaw, v, d, a = do_simulation(
+        cx, cy, cyaw, ck, sp, dl, initial_state)
 
     if show_animation:
         plt.close("all")
@@ -555,3 +608,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    # main2()
