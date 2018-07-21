@@ -710,15 +710,10 @@ Path tracking simulation with iterative linear model predictive speed and steeri
 
 <img src="https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif" width="640">
 
-This code uses cvxpy as an optimization modeling tool.
-
-- [Welcome to CVXPY](http://www.cvxpy.org/en/latest/)
-
 Ref:
 
-- [Vehicle Dynamics and Control \| Rajesh Rajamani \| Springer](http://www.springer.com/us/book/9781461414322)
+- [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/notebook.ipynb)
 
-- [MPC Course Material \- MPC Lab @ UC\-Berkeley](http://www.mpc.berkeley.edu/mpc-course-material)
 
  
 
