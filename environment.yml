@@ -1,0 +1,9 @@
+name: python_robotics
+dependencies:
+- python==3.6
+- matplotlib
+- scipy
+- numpy
+- pandas
+- pip:
+    - cvxpy
