@@ -100,7 +100,7 @@ Features:
 
 # How to use
 
-1. Install the required libraries.
+1. Install the required libraries. You can use environment.yml with conda command.
 
 2. Clone this repo.
 
