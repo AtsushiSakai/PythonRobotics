@@ -60,10 +60,10 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
         x_traj.append(x)
         y_traj.append(y)
 
-        plot_vehicle(x, y, theta, x_start, y_start, x_goal, y_goal, x_traj, y_traj)
+        plot_vehicle(x, y, theta, x_start, y_start, x_goal, y_goal, theta_goal, x_traj, y_traj)
 
 
-def plot_vehicle(x, y, theta, x_start, y_start, x_goal, y_goal, x_traj, y_traj):
+def plot_vehicle(x, y, theta, x_start, y_start, x_goal, y_goal, theta_goal, x_traj, y_traj):
     T = transformation_matrix(x, y, theta)
     p1 = np.matmul(T, p1_i)
     p2 = np.matmul(T, p2_i)
@@ -73,7 +73,7 @@ def plot_vehicle(x, y, theta, x_start, y_start, x_goal, y_goal, x_traj, y_traj):
     plt.plot([p2[0], p3[0]], [p2[1], p3[1]], 'k-')
     plt.plot([p3[0], p1[0]], [p3[1], p1[1]], 'k-')
     plt.plot(x_start, y_start, 'r*')
-    plt.plot(x_goal, y_goal, 'g*')
+    plt.arrow(x_goal, y_goal, cos(theta_goal), sin(theta_goal), color='g', width=0.1)
     plt.plot(x_traj, y_traj, 'b--')
     plt.xlim(0, 20)
     plt.ylim(0, 20)
