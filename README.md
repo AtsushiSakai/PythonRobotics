@@ -645,6 +645,13 @@ Ref:
 
 # Path tracking
 
+## move to a pose control
+
+This is a simulation of moving to a pose control
+
+![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/move_to_pose/animation.gif)
+
+
 ## Pure pursuit tracking
 
 Path tracking simulation with pure pursuit steering control and PID speed control.
