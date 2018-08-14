@@ -49,16 +49,22 @@ def two_joint_arm():
 def plot_arm(theta1, theta2, x, y):
     elbow = shoulder + np.array([l1*cos(theta1), l1*sin(theta1)])
     wrist = elbow + np.array([l2*cos(theta1+theta2), l2*sin(theta1+theta2)])
+
     plt.cla()
+
     plt.plot([shoulder[0], elbow[0]], [shoulder[1], elbow[1]], 'k-')
     plt.plot([elbow[0], wrist[0]], [elbow[1], wrist[1]], 'k-')
+
     plt.plot(shoulder[0], shoulder[1], 'ro')
     plt.plot(elbow[0], elbow[1], 'ro')
     plt.plot(wrist[0], wrist[1], 'ro')
+
     plt.plot([wrist[0], x], [wrist[1], y], 'g--')
     plt.plot(x, y, 'g*')
+
     plt.xlim(-2, 2)
     plt.ylim(-2, 2)
+    
     plt.show()
     plt.pause(dt)
 
