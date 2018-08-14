@@ -6,6 +6,7 @@
 Python codes for robotics algorithm.
 
 
+
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -61,6 +62,7 @@ Python codes for robotics algorithm.
       * [LQR based path planning](#lqr-based-path-planning)
       * [Optimal Trajectory in a Frenet Frame](#optimal-trajectory-in-a-frenet-frame)
    * [Path tracking](#path-tracking)
+      * [move to a pose control](#move-to-a-pose-control)
       * [Pure pursuit tracking](#pure-pursuit-tracking)
       * [Stanley control](#stanley-control)
       * [Rear wheel feedback control](#rear-wheel-feedback-control)
@@ -651,6 +653,10 @@ This is a simulation of moving to a pose control
 
 ![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/move_to_pose/animation.gif)
 
+Ref:
+
+- [Robotics, Vision and Control \- Fundamental Algorithms In MATLAB® Second, Completely Revised, Extended And Updated Edition \| Peter Corke \| Springer](https://www.springer.com/us/book/9783319544120)
+
 
 ## Pure pursuit tracking
 
@@ -759,6 +765,7 @@ PayPal donation is also welcome.
 - [Antonin RAFFIN](https://github.com/araffin)
 
 - [Alexis Paques](https://github.com/AlexisTM)
+
 
 
 
