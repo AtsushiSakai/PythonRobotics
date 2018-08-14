@@ -13,9 +13,9 @@ import numpy as np
 from math import cos, sin, sqrt, atan2, pi
 from random import random
 
-Kp_rho = 3
-Kp_alpha = 5
-Kp_beta = -2
+Kp_rho = 9
+Kp_alpha = 15
+Kp_beta = -3
 dt = 0.01
 
 #Corners of triangular vehicle when pointing to the right (0 radians)
@@ -40,45 +40,62 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
     x = x_start
     y = y_start
     theta = theta_start
-    while True:
+
+    x_diff = x_goal - x
+    y_diff = y_goal - y
+
+    rho = sqrt(x_diff**2 + y_diff**2)
+    while rho > 0.001:
+        x_traj.append(x)
+        y_traj.append(y)
+
         x_diff = x_goal - x
         y_diff = y_goal - y
 
+        """
+        Restrict alpha and beta (angle differences) to the range
+        [-pi, pi] to prevent unstable behavior e.g. difference going 
+        from 0 rad to 2*pi rad with slight turn
+        """ 
+
         rho = sqrt(x_diff**2 + y_diff**2)
-        alpha = atan2(y_diff, x_diff) - theta
-        beta = theta_goal - theta - alpha
+        alpha = (atan2(y_diff, x_diff) - theta + pi)%(2*pi) - pi
+        beta = (theta_goal - theta - alpha + pi)%(2*pi) - pi
 
         v = Kp_rho*rho
         w = Kp_alpha*alpha + Kp_beta*beta
 
-        if alpha > pi/2 or alpha < -pi/2:
+        if alpha > pi/2 or alpha < -pi/2: 
             v = -v
 
         theta = theta + w*dt
         x = x + v*cos(theta)*dt
         y = y + v*sin(theta)*dt
-        x_traj.append(x)
-        y_traj.append(y)
 
-        plot_vehicle(x, y, theta, x_start, y_start, x_goal, y_goal, theta_goal, x_traj, y_traj)
+        plot_vehicle(x, y, theta, x_traj, y_traj)
 
 
-def plot_vehicle(x, y, theta, x_start, y_start, x_goal, y_goal, theta_goal, x_traj, y_traj):
+def plot_vehicle(x, y, theta, x_traj, y_traj):
     T = transformation_matrix(x, y, theta)
     p1 = np.matmul(T, p1_i)
     p2 = np.matmul(T, p2_i)
     p3 = np.matmul(T, p3_i)
+
     plt.cla()
+
     plt.plot([p1[0], p2[0]], [p1[1], p2[1]], 'k-')
     plt.plot([p2[0], p3[0]], [p2[1], p3[1]], 'k-')
     plt.plot([p3[0], p1[0]], [p3[1], p1[1]], 'k-')
-    plt.plot(x_start, y_start, 'r*')
+
+    plt.arrow(x_start, y_start, cos(theta_start), sin(theta_start), color='r', width=0.1)
     plt.arrow(x_goal, y_goal, cos(theta_goal), sin(theta_goal), color='g', width=0.1)
     plt.plot(x_traj, y_traj, 'b--')
+
     plt.xlim(0, 20)
     plt.ylim(0, 20)
+
     plt.show()
-    plt.pause(dt/10)
+    plt.pause(dt)
 
 def transformation_matrix(x, y, theta):
     return np.array([
@@ -88,12 +105,12 @@ def transformation_matrix(x, y, theta):
         ])
 
 if __name__ == '__main__':
-    x_start = 4 #20*random()
-    y_start = 15 #20*random()
-    theta_start = pi/2 #2*pi*random() - pi
-    x_goal = 13 #20*random()
-    y_goal = 3 #20*random()
-    theta_goal = -pi/2 #2*pi*random() - pi
+    x_start = 20*random()
+    y_start = 20*random()
+    theta_start = 2*pi*random() - pi
+    x_goal = 20*random()
+    y_goal = 20*random()
+    theta_goal = 2*pi*random() - pi
     print("Initial x: %.2f m\nInitial y: %.2f m\nInitial theta: %.2f rad\n" % (x_start, y_start, theta_start))
     print("Goal x: %.2f m\nGoal y: %.2f m\nGoal theta: %.2f rad\n" % (x_goal, y_goal, theta_goal))
     move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal)
