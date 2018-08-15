@@ -728,7 +728,14 @@ Ref:
 - [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/notebook.ipynb)
 
 
- 
+# Arm Navigation
+
+## Two joint arm to point control
+
+Two josint arm control simulation to a point. 
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/ArmNavigation/two_joint_arm_to_point_control/animation.gif)
+
 
 # License 
 
