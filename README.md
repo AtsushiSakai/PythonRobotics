@@ -6,6 +6,7 @@
 
 Python codes for robotics algorithm.
 
+
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -70,6 +71,7 @@ Python codes for robotics algorithm.
       * [Model predictive speed and steering control](#model-predictive-speed-and-steering-control)
    * [Arm Navigation](#arm-navigation)
       * [Two joint arm to point control](#two-joint-arm-to-point-control)
+      * [N joint arm to point control](#n-joint-arm-to-point-control)
    * [License](#license)
    * [Contribution](#contribution)
    * [Support](#support)
@@ -657,7 +659,7 @@ This is a simulation of moving to a pose control
 
 Ref:
 
-- [Robotics, Vision and Control \- Fundamental Algorithms In MATLAB® Second, Completely Revised, Extended And Updated Edition \| Peter Corke \| Springer](https://www.springer.com/us/book/9783319544120)
+- [P. I. Corke, "Robotics, Vision and Control" \| SpringerLink p102](https://link.springer.com/book/10.1007/978-3-642-20144-8)
 
 
 ## Pure pursuit tracking
@@ -742,9 +744,16 @@ You can set the goal position of the end effector with left-click on the ploting
 
 ![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/ArmNavigation/two_joint_arm_to_point_control/animation.gif)
 
-Ref:
 
-- [P. I. Corke, "Robotics, Vision and Control" \| SpringerLink p102](https://link.springer.com/book/10.1007/978-3-642-20144-8)
+## N joint arm to point control
+
+N joint arm to a point control simulation. 
+
+This is a interactive simulation.
+
+You can set the goal position of the end effector with left-click on the ploting area. 
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/ArmNavigation/n_joint_arm_to_point_control/animation.gif)
 
 
 # License 
@@ -782,4 +791,5 @@ PayPal donation is also welcome.
 - [Antonin RAFFIN](https://github.com/araffin)
 
 - [Alexis Paques](https://github.com/AlexisTM)
+
 
