@@ -747,13 +747,15 @@ You can set the goal position of the end effector with left-click on the ploting
 
 ## N joint arm to point control
 
-N joint arm to a point control simulation. 
+N joint arm to a point control simulation.
 
 This is a interactive simulation.
 
 You can set the goal position of the end effector with left-click on the ploting area. 
 
 ![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/ArmNavigation/n_joint_arm_to_point_control/animation.gif)
+
+In this simulation N = 10, however, you can change it.
 
 
 # License 
