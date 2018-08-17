@@ -6,9 +6,6 @@
 
 Python codes for robotics algorithm.
 
-
-
-
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -84,11 +81,12 @@ This is a Python code collection of robotics algorithms, especially for autonomo
 
 Features:
 
-1. Widely used and practical algorithms are selected.
+1. Easy to read for understanding each algorithm's basic idea.
 
-2. Minimum dependency.
+2. Widely used and practical algorithms are selected.
 
-3. Easy to read for understanding each algorithm's basic idea.
+3. Minimum dependency.
+
 
 # Requirements
 
@@ -738,7 +736,15 @@ Ref:
 
 Two joint arm to a point control simulation. 
 
+This is a interactive simulation.
+
+You can set the goal position of the end effector with left-click on the ploting area. 
+
 ![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/ArmNavigation/two_joint_arm_to_point_control/animation.gif)
+
+Ref:
+
+- [P. I. Corke, "Robotics, Vision and Control" \| SpringerLink p102](https://link.springer.com/book/10.1007/978-3-642-20144-8)
 
 
 # License 
@@ -776,8 +782,4 @@ PayPal donation is also welcome.
 - [Antonin RAFFIN](https://github.com/araffin)
 
 - [Alexis Paques](https://github.com/AlexisTM)
-
-
-
-
 
