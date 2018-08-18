@@ -770,15 +770,15 @@ If your PR is merged multiple times, I will add your account to the author list.
 
 # Support
 
-You can support this project financially via Patreon.
+If you or your company like to support this project, please consider:
 
-You can get e-mail technical supports about the codes if you are being a patron.
+- [Become a backer or sponsor on Patreon](https://www.patreon.com/myenigma)
 
-- [Atsushi Sakai is creating Open Source Software \| Patreon](https://www.patreon.com/myenigma)
+- [One-time donation via PayPal](https://www.paypal.me/myenigmapay/)
 
-PayPal donation is also welcome.
+You can add your name or your company logo in README if you are a patron.
 
-[![Support via PayPal](https://cdn.rawgit.com/twolfson/paypal-github-button/1.0.0/dist/button.svg)](https://www.paypal.me/myenigmapay/)
+E-mail consultant is also available.
 
 # Authors
 
