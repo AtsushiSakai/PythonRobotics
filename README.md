@@ -770,7 +770,7 @@ If your PR is merged multiple times, I will add your account to the author list.
 
 # Support
 
-If you or your company like to support this project, please consider:
+If you or your company would like to support this project, please consider:
 
 - [Become a backer or sponsor on Patreon](https://www.patreon.com/myenigma)
 
@@ -779,6 +779,11 @@ If you or your company like to support this project, please consider:
 You can add your name or your company logo in README if you are a patron.
 
 E-mail consultant is also available.
+
+
+Your comment using [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/AtsushiSakai) is also welcome. 
+
+This is a list: [Users comments](https://github.com/AtsushiSakai/PythonRobotics/blob/master/users_comments.md)
 
 # Authors
 
