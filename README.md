@@ -780,6 +780,7 @@ You can add your name or your company logo in README if you are a patron.
 
 E-mail consultant is also available.
 
+ 　
 
 Your comment using [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/AtsushiSakai) is also welcome. 
 
