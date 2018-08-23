@@ -29,7 +29,7 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
     beta is the angle between the robot's position and the goal position plus the goal angle
 
     Kp_rho*rho and Kp_alpha*alpha drive the robot along a line towards the goal
-    Kp*beta*beta rotates the line so that it is parallel to the goal angle
+    Kp_beta*beta rotates the line so that it is parallel to the goal angle
     """
     x = x_start
     y = y_start
