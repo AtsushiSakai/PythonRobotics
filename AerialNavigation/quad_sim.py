@@ -9,7 +9,7 @@ import numpy as np
 from Quadrotor import Quadrotor
 from TrajectoryGenerator import TrajectoryGenerator
 
-#Simulation parameters
+# Simulation parameters
 g = 9.81
 m = 0.2
 Ixx = 1
@@ -17,7 +17,7 @@ Iyy = 1
 Izz = 1
 T = 5
 
-#Proportional coefficients
+# Proportional coefficients
 Kp_x = 1
 Kp_y = 1
 Kp_z = 1
@@ -25,10 +25,11 @@ Kp_roll = 25
 Kp_pitch = 25
 Kp_yaw = 25
 
-#Derivative coefficients
+# Derivative coefficients
 Kd_x = 10
 Kd_y = 10
 Kd_z = 1
+
 
 def quad_sim(x_c, y_c, z_c):
     """
@@ -57,9 +58,12 @@ def quad_sim(x_c, y_c, z_c):
     dt = 0.1
     t = 0
 
-    q = Quadrotor(x=x_pos, y=y_pos, z=z_pos, roll=roll, pitch=pitch, yaw=yaw, size=1)
+    q = Quadrotor(x=x_pos, y=y_pos, z=z_pos, roll=roll,
+                  pitch=pitch, yaw=yaw, size=1)
 
     i = 0
+    n_run = 8
+    irun = 0
 
     while True:
         while t <= T:
@@ -73,38 +77,48 @@ def quad_sim(x_c, y_c, z_c):
             des_y_acc = calculate_acceleration(y_c[i], t)
             des_z_acc = calculate_acceleration(z_c[i], t)
 
-            thrust = m*(g + des_z_acc + Kp_z*(des_z_pos - z_pos) + Kd_z*(des_z_vel - z_vel))
+            thrust = m * (g + des_z_acc + Kp_z * (des_z_pos -
+                                                  z_pos) + Kd_z * (des_z_vel - z_vel))
 
-            roll_torque = Kp_roll*(((des_x_acc*sin(des_yaw) - des_y_acc*cos(des_yaw))/g) - roll)
-            pitch_torque = Kp_pitch*(((des_x_acc*cos(des_yaw) - des_y_acc*sin(des_yaw))/g) - pitch)
-            yaw_torque = Kp_yaw*(des_yaw - yaw)
+            roll_torque = Kp_roll * \
+                (((des_x_acc * sin(des_yaw) - des_y_acc * cos(des_yaw)) / g) - roll)
+            pitch_torque = Kp_pitch * \
+                (((des_x_acc * cos(des_yaw) - des_y_acc * sin(des_yaw)) / g) - pitch)
+            yaw_torque = Kp_yaw * (des_yaw - yaw)
 
-            roll_vel += roll_torque*dt/Ixx
-            pitch_vel += pitch_torque*dt/Iyy
-            yaw_vel += yaw_torque*dt/Izz
+            roll_vel += roll_torque * dt / Ixx
+            pitch_vel += pitch_torque * dt / Iyy
+            yaw_vel += yaw_torque * dt / Izz
 
-            roll += roll_vel*dt
-            pitch += pitch_vel*dt
-            yaw += yaw_vel*dt
+            roll += roll_vel * dt
+            pitch += pitch_vel * dt
+            yaw += yaw_vel * dt
 
             R = rotation_matrix(roll, pitch, yaw)
-            acc = (np.matmul(R, np.array([0, 0, thrust]).T) - np.array([0, 0, m*g]).T)/m
+            acc = (np.matmul(R, np.array(
+                [0, 0, thrust]).T) - np.array([0, 0, m * g]).T) / m
             x_acc = acc[0]
             y_acc = acc[1]
             z_acc = acc[2]
-            x_vel += x_acc*dt
-            y_vel += y_acc*dt
-            z_vel += z_acc*dt
-            x_pos += x_vel*dt
-            y_pos += y_vel*dt
-            z_pos += z_vel*dt
+            x_vel += x_acc * dt
+            y_vel += y_acc * dt
+            z_vel += z_acc * dt
+            x_pos += x_vel * dt
+            y_pos += y_vel * dt
+            z_pos += z_vel * dt
 
             q.update_pose(x_pos, y_pos, z_pos, roll, pitch, yaw)
 
             t += dt
 
         t = 0
-        i = (i+1)%4
+        i = (i + 1) % 4
+        irun += 1
+        if irun >= n_run:
+            break
+
+    print("Done")
+
 
 def calculate_position(c, t):
     """
@@ -118,7 +132,8 @@ def calculate_position(c, t):
     Returns
         Position
     """
-    return c[0]*t**5 + c[1]*t**4 + c[2]*t**3 + c[3]*t**2 + c[4]*t + c[5]
+    return c[0] * t**5 + c[1] * t**4 + c[2] * t**3 + c[3] * t**2 + c[4] * t + c[5]
+
 
 def calculate_velocity(c, t):
     """
@@ -132,7 +147,8 @@ def calculate_velocity(c, t):
     Returns
         Velocity
     """
-    return 5*c[0]*t**4 + 4*c[1]*t**3 + 3*c[2]*t**2 + 2*c[3]*t + c[4]
+    return 5 * c[0] * t**4 + 4 * c[1] * t**3 + 3 * c[2] * t**2 + 2 * c[3] * t + c[4]
+
 
 def calculate_acceleration(c, t):
     """
@@ -146,7 +162,8 @@ def calculate_acceleration(c, t):
     Returns
         Acceleration
     """
-    return 20*c[0]*t**3 + 12*c[1]*t**2 + 6*c[2]*t + 2*c[3]
+    return 20 * c[0] * t**3 + 12 * c[1] * t**2 + 6 * c[2] * t + 2 * c[3]
+
 
 def rotation_matrix(roll, pitch, yaw):
     """
@@ -161,10 +178,12 @@ def rotation_matrix(roll, pitch, yaw):
         3x3 rotation matrix as NumPy array
     """
     return np.array(
-        [[cos(yaw)*cos(pitch), -sin(yaw)*cos(roll)+cos(yaw)*sin(pitch)*sin(roll), sin(yaw)*sin(roll)+cos(yaw)*sin(pitch)*cos(roll)],
-         [sin(yaw)*cos(pitch), cos(yaw)*cos(roll)+sin(yaw)*sin(pitch)*sin(roll), -cos(yaw)*sin(roll)+sin(yaw)*sin(pitch)*cos(roll)],
-         [-sin(pitch), cos(pitch)*sin(roll), cos(pitch)*cos(yaw)]
-        ])
+        [[cos(yaw) * cos(pitch), -sin(yaw) * cos(roll) + cos(yaw) * sin(pitch) * sin(roll), sin(yaw) * sin(roll) + cos(yaw) * sin(pitch) * cos(roll)],
+         [sin(yaw) * cos(pitch), cos(yaw) * cos(roll) + sin(yaw) * sin(pitch) *
+          sin(roll), -cos(yaw) * sin(roll) + sin(yaw) * sin(pitch) * cos(roll)],
+         [-sin(pitch), cos(pitch) * sin(roll), cos(pitch) * cos(yaw)]
+         ])
+
 
 def main():
     """
@@ -177,13 +196,14 @@ def main():
     waypoints = [[-5, -5, 5], [5, -5, 5], [5, 5, 5], [-5, 5, 5]]
 
     for i in range(4):
-        traj = TrajectoryGenerator(waypoints[i], waypoints[(i+1)%4], T)
+        traj = TrajectoryGenerator(waypoints[i], waypoints[(i + 1) % 4], T)
         traj.solve()
         x_coeffs[i] = traj.x_c
         y_coeffs[i] = traj.y_c
         z_coeffs[i] = traj.z_c
 
     quad_sim(x_coeffs, y_coeffs, z_coeffs)
+
 
 if __name__ == "__main__":
     main()
