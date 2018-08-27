@@ -9,6 +9,8 @@ import numpy as np
 from Quadrotor import Quadrotor
 from TrajectoryGenerator import TrajectoryGenerator
 
+show_animation = True
+
 # Simulation parameters
 g = 9.81
 m = 0.2
@@ -59,7 +61,7 @@ def quad_sim(x_c, y_c, z_c):
     t = 0
 
     q = Quadrotor(x=x_pos, y=y_pos, z=z_pos, roll=roll,
-                  pitch=pitch, yaw=yaw, size=1)
+                  pitch=pitch, yaw=yaw, size=1, show_animation=show_animation)
 
     i = 0
     n_run = 8
