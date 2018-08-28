@@ -7,6 +7,7 @@
 Python codes for robotics algorithm.
 
 
+
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -72,6 +73,8 @@ Python codes for robotics algorithm.
    * [Arm Navigation](#arm-navigation)
       * [Two joint arm to point control](#two-joint-arm-to-point-control)
       * [N joint arm to point control](#n-joint-arm-to-point-control)
+   * [Aerial Navigation](#aerial-navigation)
+      * [drone 3d trajectory following](#drone-3d-trajectory-following)
    * [License](#license)
    * [Contribution](#contribution)
    * [Support](#support)
@@ -757,6 +760,14 @@ You can set the goal position of the end effector with left-click on the ploting
 
 In this simulation N = 10, however, you can change it.
 
+# Aerial Navigation
+
+## drone 3d trajectory following 
+
+This is a 3d trajectory following simulation for a quadrotor.
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/AerialNavigation/drone_3d_trajectory_following/animation.gif)
+
 
 # License 
 
@@ -799,5 +810,6 @@ This is a list: [Users comments](https://github.com/AtsushiSakai/PythonRobotics/
 - [Antonin RAFFIN](https://github.com/araffin)
 
 - [Alexis Paques](https://github.com/AlexisTM)
+
 
 
