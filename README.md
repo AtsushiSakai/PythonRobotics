@@ -6,8 +6,6 @@
 
 Python codes for robotics algorithm.
 
-
-
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -91,6 +89,10 @@ Features:
 2. Widely used and practical algorithms are selected.
 
 3. Minimum dependency.
+
+See this paper for more details:
+
+- [\[1808\.10703\] PythonRobotics: a Python code collection of robotics algorithms](https://arxiv.org/abs/1808.10703)[BibTeX](https://github.com/AtsushiSakai/PythonRoboticsPaper/blob/master/python_robotics.bib)
 
 
 # Requirements
