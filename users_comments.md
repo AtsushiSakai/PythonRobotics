@@ -16,3 +16,9 @@ Dear AtsushiSakai, <br>WE found your project from google when first searching fo
 --Hanlin(Julia) Chen, MCity Apollo team
 
 ---
+
+Dear Atsushi Sakai, <br> <br>With your simplistic descriptions in text and as gifs, i was able to help my students understand easily and effectively, I would be honored to help, in anyway towards this, As a hobbyist have been developing lidar based slam navigation systems from 2011 and its only right to acknowledge and thank you for your contributions.
+
+--Shiva
+
+---
