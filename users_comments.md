@@ -22,3 +22,9 @@ Dear Atsushi Sakai, <br> <br>With your simplistic descriptions in text and as gi
 --Shiva
 
 ---
+
+Dear Atsushi Sakai <br>I first came across your Matlab repository on ICP and SLAM. The repository for both python and Matlab helped me in understanding the essential concepts of robotics.I am really grateful to you for helping me develop my understanding of the concepts of robotics.
+
+--Sparsh Garg
+
+---
