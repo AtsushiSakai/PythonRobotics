@@ -36,7 +36,10 @@ See this paper for more details:
    modules/localization
    modules/mapping
    modules/slam
-
+   modules/path_planning
+   modules/path_tracking
+   modules/arm_navigation
+   modules/aerial_navigation
 
 
 Indices and tables
