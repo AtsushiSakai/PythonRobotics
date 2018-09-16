@@ -6,6 +6,7 @@
 
 Python codes for robotics algorithm.
 
+
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -48,7 +49,6 @@ Python codes for robotics algorithm.
       * [Linear–quadratic regulator (LQR) speed and steering control](#linearquadratic-regulator-lqr-speed-and-steering-control)
       * [Model predictive speed and steering control](#model-predictive-speed-and-steering-control)
    * [Arm Navigation](#arm-navigation)
-      * [Two joint arm to point control](#two-joint-arm-to-point-control)
       * [N joint arm to point control](#n-joint-arm-to-point-control)
    * [Aerial Navigation](#aerial-navigation)
       * [drone 3d trajectory following](#drone-3d-trajectory-following)
@@ -471,17 +471,6 @@ Ref:
 
 # Arm Navigation
 
-## Two joint arm to point control
-
-Two joint arm to a point control simulation. 
-
-This is a interactive simulation.
-
-You can set the goal position of the end effector with left-click on the ploting area. 
-
-![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/ArmNavigation/two_joint_arm_to_point_control/animation.gif)
-
-
 ## N joint arm to point control
 
 N joint arm to a point control simulation.
@@ -544,6 +533,7 @@ This is a list: [Users comments](https://github.com/AtsushiSakai/PythonRobotics/
 - [Antonin RAFFIN](https://github.com/araffin)
 
 - [Alexis Paques](https://github.com/AlexisTM)
+
 
 
 
