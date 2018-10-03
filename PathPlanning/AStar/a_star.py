@@ -1,7 +1,12 @@
 """
+
 A* grid based planning
 
 author: Atsushi Sakai(@Atsushi_twi)
+        Nikos Kanargias (nkana@tee.gr)
+
+See Wikipedia article (https://en.wikipedia.org/wiki/A*_search_algorithm)
+
 """
 
 import matplotlib.pyplot as plt
@@ -59,9 +64,8 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
 
     while 1:
         c_id = min(
-            openset, key=lambda o: openset[o].cost + calc_h(ngoal, openset[o].x, openset[o].y))
+            openset, key=lambda o: openset[o].cost + calc_heuristic(ngoal, openset[o]))
         current = openset[c_id]
-        #  print("current", current)
 
         # show graph
         if show_animation:
@@ -82,31 +86,32 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
 
         # expand search grid based on motion model
         for i in range(len(motion)):
-            node = Node(current.x + motion[i][0], current.y + motion[i][1],
+            node = Node(current.x + motion[i][0],
+                        current.y + motion[i][1],
                         current.cost + motion[i][2], c_id)
             n_id = calc_index(node, xw, minx, miny)
+
+            if n_id in closedset:
+                continue
 
             if not verify_node(node, obmap, minx, miny, maxx, maxy):
                 continue
 
-            if n_id in closedset:
-                continue
-            # Otherwise if it is already in the open set
-            if n_id in openset:
-                if openset[n_id].cost > node.cost:
-                    openset[n_id].cost = node.cost
-                    openset[n_id].pind = c_id
+            if n_id not in openset:
+                openset[n_id] = node  # Discover a new node
             else:
-                openset[n_id] = node
+                if openset[n_id].cost >= node.cost:
+                    # This path is the best until now. record it!
+                    openset[n_id] = node
 
     rx, ry = calc_fianl_path(ngoal, closedset, reso)
 
     return rx, ry
 
 
-def calc_h(ngoal, x, y):
-    w = 10.0  # weight of heuristic
-    d = w * math.sqrt((ngoal.x - x)**2 + (ngoal.y - y)**2)
+def calc_heuristic(n1, n2):
+    w = 1.0  # weight of heuristic
+    d = w * math.sqrt((n1.x - n2.x)**2 + (n1.y - n2.y)**2)
     return d
 
 

@@ -12,10 +12,11 @@ import random
 import math
 import copy
 import numpy as np
-import reeds_shepp_path_planning
 import pure_pursuit
-import unicycle_model
 import matplotlib.pyplot as plt
+
+import reeds_shepp_path_planning
+import unicycle_model
 
 show_animation = True
 
@@ -220,14 +221,10 @@ class RRT():
 
         return newNode
 
+
     def pi_2_pi(self, angle):
-        while(angle > math.pi):
-            angle = angle - 2.0 * math.pi
+        return (angle + math.pi) % (2*math.pi) - math.pi
 
-        while(angle < -math.pi):
-            angle = angle + 2.0 * math.pi
-
-        return angle
 
     def steer(self, rnd, nind):
         #  print(rnd)
@@ -337,18 +334,14 @@ class RRT():
                 self.nodeList[i] = tNode
 
     def DrawGraph(self, rnd=None):
-        u"""
+        """
         Draw Graph
         """
-        #  plt.clf()
         if rnd is not None:
             plt.plot(rnd.x, rnd.y, "^k")
         for node in self.nodeList:
             if node.parent is not None:
                 plt.plot(node.path_x, node.path_y, "-g")
-                pass
-                #  plt.plot([node.x, self.nodeList[node.parent].x], [
-                #  node.y, self.nodeList[node.parent].y], "-g")
 
         for (ox, oy, size) in self.obstacleList:
             plt.plot(ox, oy, "ok", ms=30 * size)
@@ -361,9 +354,6 @@ class RRT():
         plt.axis([-2, 15, -2, 15])
         plt.grid(True)
         plt.pause(0.01)
-
-        #  plt.show()
-        #  input()
 
     def GetNearestListIndex(self, nodeList, rnd):
         dlist = [(node.x - rnd.x) ** 2 +
@@ -399,7 +389,7 @@ class RRT():
 
 
 class Node():
-    u"""
+    """
     RRT Node
     """
 
@@ -417,14 +407,6 @@ class Node():
 def main():
     print("Start rrt start planning")
     # ====Search Path with RRT====
-    obstacleList = [
-        (5, 5, 1),
-        (3, 6, 2),
-        (3, 8, 2),
-        (3, 10, 2),
-        (7, 5, 2),
-        (9, 5, 2)
-    ]  # [x,y,size(radius)]
     obstacleList = [
         (5, 5, 1),
         (4, 6, 1),

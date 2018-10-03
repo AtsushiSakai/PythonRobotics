@@ -51,13 +51,7 @@ def update(state, a, delta):
 
 
 def pi_2_pi(angle):
-    while (angle > math.pi):
-        angle = angle - 2.0 * math.pi
-
-    while (angle < -math.pi):
-        angle = angle + 2.0 * math.pi
-
-    return angle
+    return (angle + math.pi) % (2*math.pi) - math.pi
 
 
 def solve_DARE(A, B, Q, R):
@@ -148,11 +142,13 @@ def calc_nearest_index(state, cx, cy, cyaw):
     dx = [state.x - icx for icx in cx]
     dy = [state.y - icy for icy in cy]
 
-    d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
+    d = [idx ** 2 + idy ** 2 for (idx, idy) in zip(dx, dy)]
 
     mind = min(d)
 
     ind = d.index(mind)
+
+    mind = math.sqrt(mind)
 
     dxl = cx[ind] - state.x
     dyl = cy[ind] - state.y
