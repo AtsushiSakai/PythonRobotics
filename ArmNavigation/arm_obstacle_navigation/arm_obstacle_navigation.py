@@ -10,22 +10,25 @@ from matplotlib.colors import from_levels_and_colors
 
 plt.ion()
 
-#Simulation parameters
+# Simulation parameters
 M = 100
 obstacles = [[1.75, 0.75, 0.6], [0.55, 1.5, 0.5], [0, -1, 0.25]]
 
+
 def main():
     arm = NLinkArm([1, 1], [0, 0])
+    start = (10, 50)
+    goal = (58, 56)
     grid = get_occupancy_grid(arm, obstacles)
     plt.imshow(grid)
     plt.show()
-    #(50,50) (58,56)
-    route = astar_torus(grid, (10, 50), (58, 56))
+    route = astar_torus(grid, start, goal)
     for node in route:
-        theta1 = 2*pi*node[0]/M-pi
-        theta2 = 2*pi*node[1]/M-pi
+        theta1 = 2 * pi * node[0] / M - pi
+        theta2 = 2 * pi * node[1] / M - pi
         arm.update_joints([theta1, theta2])
         arm.plot(obstacles=obstacles)
+
 
 def detect_collision(line_seg, circle):
     """
@@ -48,17 +51,18 @@ def detect_collision(line_seg, circle):
     line_vec = b_vec - a_vec
     line_mag = np.linalg.norm(line_vec)
     circle_vec = c_vec - a_vec
-    proj = circle_vec.dot(line_vec/line_mag)
+    proj = circle_vec.dot(line_vec / line_mag)
     if proj <= 0:
         closest_point = a_vec
     elif proj >= line_mag:
         closest_point = b_vec
     else:
-        closest_point = a_vec + line_vec*proj/line_mag
-    if np.linalg.norm(closest_point-c_vec) > radius:
+        closest_point = a_vec + line_vec * proj / line_mag
+    if np.linalg.norm(closest_point - c_vec) > radius:
         return False
     else:
         return True
+
 
 def get_occupancy_grid(arm, obstacles):
     """
@@ -76,22 +80,23 @@ def get_occupancy_grid(arm, obstacles):
         Occupancy grid in joint space
     """
     grid = [[0 for _ in range(M)] for _ in range(M)]
-    theta_list = [2*i*pi/M for i in range(-M//2, M//2+1)]
+    theta_list = [2 * i * pi / M for i in range(-M // 2, M // 2 + 1)]
     for i in range(M):
         for j in range(M):
             arm.update_joints([theta_list[i], theta_list[j]])
             points = arm.points
             collision_detected = False
-            for k in range(len(points)-1):
+            for k in range(len(points) - 1):
                 for obstacle in obstacles:
-                    line_seg = [points[k], points[k+1]]
+                    line_seg = [points[k], points[k + 1]]
                     collision_detected = detect_collision(line_seg, obstacle)
                     if collision_detected:
                         break
                 if collision_detected:
-                        break
+                    break
             grid[i][j] = int(collision_detected)
     return np.array(grid)
+
 
 def astar_torus(grid, start_node, goal_node):
     """
@@ -119,12 +124,12 @@ def astar_torus(grid, start_node, goal_node):
     heuristic_map = np.abs(X - goal_node[1]) + np.abs(Y - goal_node[0])
     for i in range(heuristic_map.shape[0]):
         for j in range(heuristic_map.shape[1]):
-            heuristic_map[i,j] = min(heuristic_map[i,j],
-                                     i + 1 + heuristic_map[M-1,j],
-                                     M - i + heuristic_map[0,j],
-                                     j + 1 + heuristic_map[i,M-1],
-                                     M - j + heuristic_map[i,0]
-                                     )
+            heuristic_map[i, j] = min(heuristic_map[i, j],
+                                      i + 1 + heuristic_map[M - 1, j],
+                                      M - i + heuristic_map[0, j],
+                                      j + 1 + heuristic_map[i, M - 1],
+                                      M - j + heuristic_map[i, 0]
+                                      )
 
     explored_heuristic_map = np.full((M, M), np.inf)
     distance_map = np.full((M, M), np.inf)
@@ -134,7 +139,8 @@ def astar_torus(grid, start_node, goal_node):
         grid[start_node] = 4
         grid[goal_node] = 5
 
-        current_node = np.unravel_index(np.argmin(explored_heuristic_map, axis=None), explored_heuristic_map.shape)
+        current_node = np.unravel_index(
+            np.argmin(explored_heuristic_map, axis=None), explored_heuristic_map.shape)
         min_distance = np.min(explored_heuristic_map)
         if (current_node == goal_node) or np.isinf(min_distance):
             break
@@ -145,23 +151,23 @@ def astar_torus(grid, start_node, goal_node):
         i, j = current_node[0], current_node[1]
 
         neighbors = []
-        if i-1 >= 0: 
-            neighbors.append((i-1, j))
+        if i - 1 >= 0:
+            neighbors.append((i - 1, j))
         else:
-            neighbors.append((M-1, j))
+            neighbors.append((M - 1, j))
 
-        if i+1 < M:
-            neighbors.append((i+1, j))
+        if i + 1 < M:
+            neighbors.append((i + 1, j))
         else:
             neighbors.append((0, j))
 
-        if j-1 >= 0:
-            neighbors.append((i, j-1))
+        if j - 1 >= 0:
+            neighbors.append((i, j - 1))
         else:
-            neighbors.append((i, M-1))
+            neighbors.append((i, M - 1))
 
-        if j+1 < M:
-            neighbors.append((i, j+1))
+        if j + 1 < M:
+            neighbors.append((i, j + 1))
         else:
             neighbors.append((i, 0))
 
@@ -196,10 +202,12 @@ def astar_torus(grid, start_node, goal_node):
 
     return route
 
+
 class NLinkArm(object):
     """
     Class for controlling and plotting a planar arm with an arbitrary number of links.
     """
+
     def __init__(self, link_lengths, joint_angles):
         self.n_links = len(link_lengths)
         if self.n_links is not len(joint_angles):
@@ -207,7 +215,7 @@ class NLinkArm(object):
 
         self.link_lengths = np.array(link_lengths)
         self.joint_angles = np.array(joint_angles)
-        self.points = [[0, 0] for _ in range(self.n_links+1)]
+        self.points = [[0, 0] for _ in range(self.n_links + 1)]
 
         self.lim = sum(link_lengths)
         self.update_points()
@@ -217,9 +225,13 @@ class NLinkArm(object):
         self.update_points()
 
     def update_points(self):
-        for i in range(1, self.n_links+1):
-            self.points[i][0] = self.points[i-1][0] + self.link_lengths[i-1]*np.cos(np.sum(self.joint_angles[:i]))
-            self.points[i][1] = self.points[i-1][1] + self.link_lengths[i-1]*np.sin(np.sum(self.joint_angles[:i]))
+        for i in range(1, self.n_links + 1):
+            self.points[i][0] = self.points[i - 1][0] + \
+                self.link_lengths[i - 1] * \
+                np.cos(np.sum(self.joint_angles[:i]))
+            self.points[i][1] = self.points[i - 1][1] + \
+                self.link_lengths[i - 1] * \
+                np.sin(np.sum(self.joint_angles[:i]))
 
         self.end_effector = np.array(self.points[self.n_links]).T
 
@@ -227,18 +239,21 @@ class NLinkArm(object):
         plt.cla()
 
         for obstacle in obstacles:
-            circle = plt.Circle((obstacle[0], obstacle[1]), radius=0.5*obstacle[2], fc='k')
+            circle = plt.Circle(
+                (obstacle[0], obstacle[1]), radius=0.5 * obstacle[2], fc='k')
             plt.gca().add_patch(circle)
 
-        for i in range(self.n_links+1):
+        for i in range(self.n_links + 1):
             if i is not self.n_links:
-                plt.plot([self.points[i][0], self.points[i+1][0]], [self.points[i][1], self.points[i+1][1]], 'r-')
+                plt.plot([self.points[i][0], self.points[i + 1][0]],
+                         [self.points[i][1], self.points[i + 1][1]], 'r-')
             plt.plot(self.points[i][0], self.points[i][1], 'k.')
 
         plt.xlim([-self.lim, self.lim])
         plt.ylim([-self.lim, self.lim])
         plt.draw()
         plt.pause(1e-5)
+
 
 if __name__ == '__main__':
     main()
