@@ -88,16 +88,16 @@ def get_linear_model_matrix(v, phi, delta):
     A[0, 3] = - DT * v * math.sin(phi)
     A[1, 2] = DT * math.sin(phi)
     A[1, 3] = DT * v * math.cos(phi)
-    A[3, 2] = DT * math.tan(delta)
+    A[3, 2] = DT * math.tan(delta) / WB
 
     B = np.matrix(np.zeros((NX, NU)))
     B[2, 0] = DT
     B[3, 1] = DT * v / (WB * math.cos(delta) ** 2)
 
-    C = np.matrix(np.zeros((NX, 1)))
-    C[0, 0] = DT * v * math.sin(phi) * phi
-    C[1, 0] = - DT * v * math.cos(phi) * phi
-    C[3, 0] = v * delta / (WB * math.cos(delta) ** 2)
+    C = np.zeros(NX)
+    C[0] = DT * v * math.sin(phi) * phi
+    C[1] = - DT * v * math.cos(phi) * phi
+    C[3] = v * delta / (WB * math.cos(delta) ** 2)
 
     return A, B, C
 
@@ -188,20 +188,22 @@ def calc_nearest_index(state, cx, cy, cyaw, pind):
     dx = [state.x - icx for icx in cx[pind:(pind + N_IND_SEARCH)]]
     dy = [state.y - icy for icy in cy[pind:(pind + N_IND_SEARCH)]]
 
-    d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
+    d = [idx ** 2 + idy ** 2 for (idx, idy) in zip(dx, dy)]
 
-    min_d = min(d)
+    mind = min(d)
 
-    ind = d.index(min_d) + pind
+    ind = d.index(mind) + pind
+
+    mind = math.sqrt(mind)
 
     dxl = cx[ind] - state.x
     dyl = cy[ind] - state.y
 
     angle = pi_2_pi(cyaw[ind] - math.atan2(dyl, dxl))
     if angle < 0:
-        min_d *= -1
+        mind *= -1
 
-    return ind, min_d
+    return ind, mind
 
 
 def predict_motion(x0, oa, od, xref):
@@ -252,8 +254,8 @@ def linear_mpc_control(xref, xbar, x0, dref):
     dref: reference steer angle
     """
 
-    x = cvxpy.Variable(NX, T + 1)
-    u = cvxpy.Variable(NU, T)
+    x = cvxpy.Variable((NX, T + 1))
+    u = cvxpy.Variable((NU, T))
 
     cost = 0.0
     constraints = []
@@ -271,18 +273,18 @@ def linear_mpc_control(xref, xbar, x0, dref):
         if t < (T - 1):
             cost += cvxpy.quad_form(u[:, t + 1] - u[:, t], Rd)
             constraints += [cvxpy.abs(u[1, t + 1] - u[1, t])
-                            < MAX_DSTEER * DT]
+                            <= MAX_DSTEER * DT]
 
     cost += cvxpy.quad_form(xref[:, T] - x[:, T], Qf)
 
     constraints += [x[:, 0] == x0]
     constraints += [x[2, :] <= MAX_SPEED]
     constraints += [x[2, :] >= MIN_SPEED]
-    constraints += [cvxpy.abs(u[0, :]) < MAX_ACCEL]
-    constraints += [cvxpy.abs(u[1, :]) < MAX_STEER]
+    constraints += [cvxpy.abs(u[0, :]) <= MAX_ACCEL]
+    constraints += [cvxpy.abs(u[1, :]) <= MAX_STEER]
 
     prob = cvxpy.Problem(cvxpy.Minimize(cost), constraints)
-    prob.solve(verbose=False)
+    prob.solve(solver=cvxpy.ECOS, verbose=False)
 
     if prob.status == cvxpy.OPTIMAL or prob.status == cvxpy.OPTIMAL_INACCURATE:
         ox = get_nparray_from_matrix(x.value[0, :])
@@ -363,7 +365,7 @@ def check_goal(state, goal, tind, nind):
     return False
 
 
-def do_simulation(cx, cy, cyaw, ck, sp, dl):
+def do_simulation(cx, cy, cyaw, ck, sp, dl, initial_state):
     """
     Simulation
 
@@ -377,7 +379,14 @@ def do_simulation(cx, cy, cyaw, ck, sp, dl):
     """
 
     goal = [cx[-1], cy[-1]]
-    state = State(x=cx[0], y=cy[0], yaw=cyaw[0], v=0.0)
+
+    state = initial_state
+
+    # initial yaw compensation
+    if state.yaw - cyaw[0] >= math.pi:
+        state.yaw -= math.pi * 2.0
+    elif state.yaw - cyaw[0] <= -math.pi:
+        state.yaw += math.pi * 2.0
 
     time = 0.0
     x = [state.x]
@@ -471,14 +480,45 @@ def smooth_yaw(yaw):
 
     for i in range(len(yaw) - 1):
         dyaw = yaw[i + 1] - yaw[i]
+
         while dyaw >= math.pi / 2.0:
             yaw[i + 1] -= math.pi * 2.0
             dyaw = yaw[i + 1] - yaw[i]
+
         while dyaw <= -math.pi / 2.0:
             yaw[i + 1] += math.pi * 2.0
             dyaw = yaw[i + 1] - yaw[i]
 
     return yaw
+
+
+def get_straight_course(dl):
+    ax = [0.0, 5.0, 10.0, 20.0, 30.0, 40.0, 50.0]
+    ay = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+        ax, ay, ds=dl)
+
+    return cx, cy, cyaw, ck
+
+
+def get_straight_course2(dl):
+    ax = [0.0, -10.0, -20.0, -40.0, -50.0, -60.0, -70.0]
+    ay = [0.0, -1.0, 1.0, 0.0, -1.0, 1.0, 0.0]
+    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+        ax, ay, ds=dl)
+
+    return cx, cy, cyaw, ck
+
+
+def get_straight_course3(dl):
+    ax = [0.0, -10.0, -20.0, -40.0, -50.0, -60.0, -70.0]
+    ay = [0.0, -1.0, 1.0, 0.0, -1.0, 1.0, 0.0]
+    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+        ax, ay, ds=dl)
+
+    cyaw = [i - math.pi for i in cyaw]
+
+    return cx, cy, cyaw, ck
 
 
 def get_forward_course(dl):
@@ -512,12 +552,51 @@ def main():
     print(__file__ + " start!!")
 
     dl = 1.0  # course tick
-    #  cx, cy, cyaw, ck = get_forward_course(dl)
-    cx, cy, cyaw, ck = get_switch_back_course(dl)
+    # cx, cy, cyaw, ck = get_straight_course(dl)
+    # cx, cy, cyaw, ck = get_straight_course2(dl)
+    cx, cy, cyaw, ck = get_straight_course3(dl)
+    # cx, cy, cyaw, ck = get_forward_course(dl)
+    # CX, cy, cyaw, ck = get_switch_back_course(dl)
 
     sp = calc_speed_profile(cx, cy, cyaw, TARGET_SPEED)
 
-    t, x, y, yaw, v, d, a = do_simulation(cx, cy, cyaw, ck, sp, dl)
+    initial_state = State(x=cx[0], y=cy[0], yaw=cyaw[0], v=0.0)
+
+    t, x, y, yaw, v, d, a = do_simulation(
+        cx, cy, cyaw, ck, sp, dl, initial_state)
+
+    if show_animation:
+        plt.close("all")
+        plt.subplots()
+        plt.plot(cx, cy, "-r", label="spline")
+        plt.plot(x, y, "-g", label="tracking")
+        plt.grid(True)
+        plt.axis("equal")
+        plt.xlabel("x[m]")
+        plt.ylabel("y[m]")
+        plt.legend()
+
+        plt.subplots()
+        plt.plot(t, v, "-r", label="speed")
+        plt.grid(True)
+        plt.xlabel("Time [s]")
+        plt.ylabel("Speed [kmh]")
+
+        plt.show()
+
+
+def main2():
+    print(__file__ + " start!!")
+
+    dl = 1.0  # course tick
+    cx, cy, cyaw, ck = get_straight_course3(dl)
+
+    sp = calc_speed_profile(cx, cy, cyaw, TARGET_SPEED)
+
+    initial_state = State(x=cx[0], y=cy[0], yaw=0.0, v=0.0)
+
+    t, x, y, yaw, v, d, a = do_simulation(
+        cx, cy, cyaw, ck, sp, dl, initial_state)
 
     if show_animation:
         plt.close("all")
@@ -540,4 +619,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    main2()

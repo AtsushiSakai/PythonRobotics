@@ -13,3 +13,4 @@ class Test(TestCase):
     def test1(self):
         m.show_animation = False
         m.main()
+        m.main2()

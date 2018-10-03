@@ -1,15 +1,15 @@
-#! /usr/bin/python
-# -*- coding: utf-8 -*-
 """
 
+Unicycle model class
 
 author Atsushi Sakai
+
 """
 
 import math
 
 dt = 0.05  # [s]
-L = 2.9  # [m]
+L = 0.9  # [m]
 steer_max = math.radians(40.0)
 curvature_max = math.tan(steer_max) / L
 curvature_max = 1.0 / curvature_max + 1.0
@@ -38,13 +38,7 @@ def update(state, a, delta):
 
 
 def pi_2_pi(angle):
-    while(angle > math.pi):
-        angle = angle - 2.0 * math.pi
-
-    while(angle < -math.pi):
-        angle = angle + 2.0 * math.pi
-
-    return angle
+    return (angle + math.pi) % (2*math.pi) - math.pi
 
 
 if __name__ == '__main__':

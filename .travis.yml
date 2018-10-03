@@ -3,6 +3,7 @@ python:
   - 3.6
 
 before_install:
+    - sudo apt-get update
     - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
     - chmod +x miniconda.sh
     - bash miniconda.sh -b -p $HOME/miniconda
@@ -14,13 +15,15 @@ before_install:
     - conda info -a
 
 install:
-  - pip install scipy
-  - pip install numpy
-  - pip install matplotlib
-  - pip install pandas
-  - pip install cvxpy
-  - conda install -y -c cvxgrp cvxpy
-  - conda install -y -c anaconda cvxopt
+  - conda install numpy
+  - conda install scipy
+  - conda install matplotlib
+  - conda install pandas
+  - conda install -c conda-forge lapack
+  - conda install -c cvxgrp cvxpy
+  #- pip install cvxpy
+  #- conda install -y -c cvxgrp cvxpy
+  #- conda install -y -c anaconda cvxopt
 
 script:
   - python --version

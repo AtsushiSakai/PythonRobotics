@@ -39,7 +39,7 @@ class RRT():
         self.obstacleList = obstacleList
 
     def Planning(self, animation=True):
-        u"""
+        """
         Pathplanning
 
         animation: flag for animation on or off
@@ -71,6 +71,7 @@ class RRT():
                 continue
 
             self.nodeList.append(newNode)
+            print("nNodelist:", len(self.nodeList))
 
             # check goal
             dx = newNode.x - self.end.x
@@ -94,7 +95,7 @@ class RRT():
         return path
 
     def DrawGraph(self, rnd=None):
-        u"""
+        """
         Draw Graph
         """
         plt.clf()
@@ -133,7 +134,7 @@ class RRT():
 
 
 class Node():
-    u"""
+    """
     RRT Node
     """
 
@@ -144,7 +145,7 @@ class Node():
 
 
 def main():
-    print("start RRT path planning")
+    print("start simple RRT path planning")
 
     # ====Search Path with RRT====
     obstacleList = [
