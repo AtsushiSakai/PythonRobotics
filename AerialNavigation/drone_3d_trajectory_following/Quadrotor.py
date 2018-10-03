@@ -22,12 +22,12 @@ class Quadrotor():
         self.z_data = []
         self.show_animation = show_animation
 
-        self.update_pose(x, y, z, roll, pitch, yaw)
-
         if self.show_animation:
             plt.ion()
             fig = plt.figure()
             self.ax = fig.add_subplot(111, projection='3d')
+
+        self.update_pose(x, y, z, roll, pitch, yaw)
 
     def update_pose(self, x, y, z, roll, pitch, yaw):
         self.x = x
