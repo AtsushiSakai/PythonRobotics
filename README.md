@@ -8,6 +8,7 @@
 Python codes for robotics algorithm.
 
 
+
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -51,6 +52,7 @@ Python codes for robotics algorithm.
       * [Model predictive speed and steering control](#model-predictive-speed-and-steering-control)
    * [Arm Navigation](#arm-navigation)
       * [N joint arm to point control](#n-joint-arm-to-point-control)
+      * [Arm navigation with obstacle avoidance](#arm-navigation-with-obstacle-avoidance)
    * [Aerial Navigation](#aerial-navigation)
       * [drone 3d trajectory following](#drone-3d-trajectory-following)
    * [License](#license)
@@ -541,6 +543,7 @@ This is a list: [Users comments](https://github.com/AtsushiSakai/PythonRobotics/
 - [Antonin RAFFIN](https://github.com/araffin)
 
 - [Alexis Paques](https://github.com/AlexisTM)
+
 
 
 
