@@ -484,6 +484,13 @@ You can set the goal position of the end effector with left-click on the ploting
 
 In this simulation N = 10, however, you can change it.
 
+## Arm navigation with obstacle avoidance 
+
+Arm navigation with obstacle avoidance simulation.
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/ArmNavigation/arm_obstacle_navigation/animation.gif)
+
+
 # Aerial Navigation
 
 ## drone 3d trajectory following 
