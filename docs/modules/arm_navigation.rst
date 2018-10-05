@@ -13,6 +13,8 @@ This is a interactive simulation.
 You can set the goal position of the end effector with left-click on the
 ploting area.
 
+`Documentation <PythonRobotics/arm_obstacle_navigation.py at master · AtsushiSakai/PythonRobotics https://github.com/AtsushiSakai/PythonRobotics/blob/master/ArmNavigation/arm_obstacle_navigation/arm_obstacle_navigation.py>`_
+
 |3|
 
 N joint arm to point control
