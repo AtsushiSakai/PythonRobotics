@@ -13,7 +13,7 @@ This is a interactive simulation.
 You can set the goal position of the end effector with left-click on the
 ploting area.
 
-Check this doc for machematical background: `Jupyter notebook documentation <https://github.com/AtsushiSakai/PythonRobotics/blob/master/ArmNavigation/arm_obstacle_navigation/arm_obstacle_navigation.py>`_
+Check this doc for machematical background: `Jupyter notebook documentation <https://github.com/AtsushiSakai/PythonRobotics/blob/master/ArmNavigation/two_joint_arm_to_point_control/Planar_Two_Link_IK.ipynb>`_
 
 |3|
 
