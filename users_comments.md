@@ -34,3 +34,8 @@ Dear AtsushiSakai, <br>Thank you very much for all the example programs related 
 --Kalyan
 
 ---
+Dear AtsushiSakai, <br> <br>Thanks for Python Robotics
+
+--Rebecca Li
+
+---
