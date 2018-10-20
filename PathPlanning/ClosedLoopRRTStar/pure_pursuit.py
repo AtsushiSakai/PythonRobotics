@@ -1,21 +1,16 @@
-#! /usr/bin/python
-# -*- coding: utf-8 -*-
-u"""
-
+"""
 Path tracking simulation with pure pursuit steering control and PID speed control.
 
 author: Atsushi Sakai
-
 """
-import numpy as np
-import math
 import matplotlib.pyplot as plt
+import numpy as np
 import unicycle_model
 
 Kp = 2.0  # speed propotional gain
 Lf = 0.5  # look-ahead distance
 T = 100.0  # max simulation time
-goal_dis = 0.5
+goal_distance_square = 0.5 ** 2
 stop_speed = 0.5
 
 #  animation = True
@@ -41,20 +36,17 @@ def pure_pursuit_control(state, cx, cy, pind):
         ind = pind
 
     #  print(pind, ind)
-    if ind < len(cx):
-        tx = cx[ind]
-        ty = cy[ind]
-    else:
-        tx = cx[-1]
-        ty = cy[-1]
+    if ind >= len(cx):
         ind = len(cx) - 1
+    tx = cx[ind]
+    ty = cy[ind]
 
-    alpha = math.atan2(ty - state.y, tx - state.x) - state.yaw
+    alpha = np.arctan2(ty - state.y, tx - state.x) - state.yaw
 
     if state.v <= 0.0:  # back
-        alpha = math.pi - alpha
+        alpha = np.pi - alpha
 
-    delta = math.atan2(2.0 * unicycle_model.L * math.sin(alpha) / Lf, 1.0)
+    delta = np.arctan2(2.0 * unicycle_model.L * np.sin(alpha) / Lf, 1.0)
 
     if delta > unicycle_model.steer_max:
         delta = unicycle_model.steer_max
@@ -65,24 +57,23 @@ def pure_pursuit_control(state, cx, cy, pind):
 
 
 def calc_target_index(state, cx, cy):
-    dx = [state.x - icx for icx in cx]
-    dy = [state.y - icy for icy in cy]
-
-    d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
-    mindis = min(d)
-
-    ind = d.index(mindis)
+    min_d = np.inf
+    min_idx = 0
+    for (i, icx, icy) in zip(range(len(cx)), cx, cy):
+        d = np.hypot(state.x - icx, state.y - icy)
+        if d < min_d:
+            min_d = d
+            min_idx = i
 
     L = 0.0
 
-    while Lf > L and (ind + 1) < len(cx):
-        dx = cx[ind + 1] - cx[ind]
-        dy = cx[ind + 1] - cx[ind]
-        L += math.sqrt(dx ** 2 + dy ** 2)
-        ind += 1
+    while Lf > L and min_idx + 1 < len(cx):
+        dx = cx[min_idx + 1] - cx[min_idx]
+        dy = cx[min_idx + 1] - cx[min_idx]
+        L += np.hypot(dx, dy)
+        min_idx += 1
 
-    #  print(mindis)
-    return ind, mindis
+    return min_idx, min_d
 
 
 def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
@@ -116,12 +107,12 @@ def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
         if abs(state.v) <= stop_speed and target_ind <= len(cx) - 2:
             target_ind += 1
 
-        time = time + unicycle_model.dt
+        time += unicycle_model.dt
 
         # check goal
         dx = state.x - goal[0]
         dy = state.y - goal[1]
-        if math.sqrt(dx ** 2 + dy ** 2) <= goal_dis:
+        if dx ** 2 + dy ** 2 <= goal_distance_square:
             find_goal = True
             break
 
@@ -140,8 +131,7 @@ def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
             plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")
             plt.axis("equal")
             plt.grid(True)
-            plt.title("speed:" + str(round(state.v, 2)) +
-                      "tind:" + str(target_ind))
+            plt.title("speed:{:.2f}, tind:{}".format(state.v, target_ind))
             plt.pause(0.0001)
 
     else:
@@ -157,21 +147,21 @@ def set_stop_point(target_speed, cx, cy, cyaw):
     d = []
 
     # Set stop point
+    coeff = 1
     for i in range(len(cx) - 1):
         dx = cx[i + 1] - cx[i]
         dy = cy[i + 1] - cy[i]
-        d.append(math.sqrt(dx ** 2.0 + dy ** 2.0))
+        d.append(np.hypot(dx, dy))
         iyaw = cyaw[i]
-        move_direction = math.atan2(dy, dx)
-        is_back = abs(move_direction - iyaw) >= math.pi / 2.0
+        move_direction = np.arctan2(dy, dx)
+        is_back = abs(move_direction - iyaw) >= np.pi / 2.0
 
         if dx == 0.0 and dy == 0.0:
             continue
 
         if is_back:
-            speed_profile[i] = - target_speed
-        else:
-            speed_profile[i] = target_speed
+            coeff = -1
+        speed_profile[i] = target_speed * coeff
 
         if is_back and forward:
             speed_profile[i] = 0.0
@@ -184,10 +174,7 @@ def set_stop_point(target_speed, cx, cy, cyaw):
             #  plt.plot(cx[i], cy[i], "xb")
             #  print(iyaw, move_direction, dx, dy)
     speed_profile[0] = 0.0
-    if is_back:
-        speed_profile[-1] = -stop_speed
-    else:
-        speed_profile[-1] = stop_speed
+    speed_profile[-1] = stop_speed * coeff
 
     d.append(d[-1])
 
@@ -209,14 +196,14 @@ def extend_path(cx, cy, cyaw):
     dl = 0.1
     dl_list = [dl] * (int(Lf / dl) + 1)
 
-    move_direction = math.atan2(cy[-1] - cy[-3], cx[-1] - cx[-3])
-    is_back = abs(move_direction - cyaw[-1]) >= math.pi / 2.0
+    move_direction = np.arctan2(cy[-1] - cy[-3], cx[-1] - cx[-3])
+    is_back = abs(move_direction - cyaw[-1]) >= np.pi / 2.0
 
     for idl in dl_list:
         if is_back:
             idl *= -1
-        cx = np.append(cx, cx[-1] + idl * math.cos(cyaw[-1]))
-        cy = np.append(cy, cy[-1] + idl * math.sin(cyaw[-1]))
+        cx = np.append(cx, cx[-1] + idl * np.cos(cyaw[-1]))
+        cy = np.append(cy, cy[-1] + idl * np.sin(cyaw[-1]))
         cyaw = np.append(cyaw, cyaw[-1])
 
     return cx, cy, cyaw
@@ -226,7 +213,7 @@ def main():
     #  target course
     import numpy as np
     cx = np.arange(0, 50, 0.1)
-    cy = [math.sin(ix / 5.0) * ix / 2.0 for ix in cx]
+    cy = np.sin(cx/5) * cx / 2
 
     target_speed = 5.0 / 3.6
 
@@ -236,9 +223,9 @@ def main():
     #  state = unicycle_model.State(x=-1.0, y=-5.0, yaw=0.0, v=-30.0 / 3.6)
     #  state = unicycle_model.State(x=10.0, y=5.0, yaw=0.0, v=-30.0 / 3.6)
     #  state = unicycle_model.State(
-    #  x=3.0, y=5.0, yaw=math.radians(-40.0), v=-10.0 / 3.6)
+    #  x=3.0, y=5.0, yaw=np.deg2rad(-40.0), v=-10.0 / 3.6)
     #  state = unicycle_model.State(
-    #  x=3.0, y=5.0, yaw=math.radians(40.0), v=50.0 / 3.6)
+    #  x=3.0, y=5.0, yaw=np.deg2rad(40.0), v=50.0 / 3.6)
 
     lastIndex = len(cx) - 1
     time = 0.0
@@ -254,7 +241,7 @@ def main():
         di, target_ind = pure_pursuit_control(state, cx, cy, target_ind)
         state = unicycle_model.update(state, ai, di)
 
-        time = time + unicycle_model.dt
+        time += unicycle_model.dt
 
         x.append(state.x)
         y.append(state.y)
@@ -271,7 +258,7 @@ def main():
         #  plt.pause(0.1)
         #  input()
 
-    flg, ax = plt.subplots(1)
+    plt.subplots(1)
     plt.plot(cx, cy, ".r", label="course")
     plt.plot(x, y, "-b", label="trajectory")
     plt.legend()
@@ -280,8 +267,8 @@ def main():
     plt.axis("equal")
     plt.grid(True)
 
-    flg, ax = plt.subplots(1)
-    plt.plot(t, [iv * 3.6 for iv in v], "-r")
+    plt.subplots(1)
+    plt.plot(t, np.array(v) * 3.6, "-r")
     plt.xlabel("Time[s]")
     plt.ylabel("Speed[km/h]")
     plt.grid(True)
@@ -306,7 +293,7 @@ def main2():
     t, x, y, yaw, v, a, d, flag = closed_loop_prediction(
         cx, cy, cyaw, speed_profile, goal)
 
-    flg, ax = plt.subplots(1)
+    plt.subplots(1)
     plt.plot(cx, cy, ".r", label="course")
     plt.plot(x, y, "-b", label="trajectory")
     plt.plot(goal[0], goal[1], "xg", label="goal")
@@ -316,8 +303,8 @@ def main2():
     plt.axis("equal")
     plt.grid(True)
 
-    flg, ax = plt.subplots(1)
-    plt.plot(t, [iv * 3.6 for iv in v], "-r")
+    plt.subplots(1)
+    plt.plot(t, np.array(v) * 3.6, "-r")
     plt.xlabel("Time[s]")
     plt.ylabel("Speed[km/h]")
     plt.grid(True)

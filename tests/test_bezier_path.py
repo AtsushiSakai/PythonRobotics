@@ -1,9 +1,10 @@
+import sys
 from unittest import TestCase
 
-import sys
 sys.path.append("./PathPlanning/BezierPath/")
 
 from PathPlanning.BezierPath import bezier_path as m
+
 
 print(__file__)
 

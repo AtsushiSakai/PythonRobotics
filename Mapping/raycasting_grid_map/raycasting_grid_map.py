@@ -6,9 +6,8 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import math
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 EXTEND_AREA = 10.0
 
@@ -37,29 +36,29 @@ class precastDB:
         self.iy = 0
 
     def __str__(self):
-        return str(self.px) + "," + str(self.py) + "," + str(self.d) + "," + str(self.angle)
+        return '{},{},{},{}'.format(self.px, self.py, self.d, self.angle)
 
 
 def atan_zero_to_twopi(y, x):
-    angle = math.atan2(y, x)
+    angle = np.arctan2(y, x)
     if angle < 0.0:
-        angle += math.pi * 2.0
+        angle += np.pi * 2.0
 
     return angle
 
 
 def precasting(minx, miny, xw, yw, xyreso, yawreso):
 
-    precast = [[] for i in range(int(round((math.pi * 2.0) / yawreso)) + 1)]
+    precast = [[] for i in range(int(round((np.pi * 2.0) / yawreso)) + 1)]
 
     for ix in range(xw):
         for iy in range(yw):
             px = ix * xyreso + minx
             py = iy * xyreso + miny
 
-            d = math.sqrt(px**2 + py**2)
+            d = np.hypot(px, py)
             angle = atan_zero_to_twopi(py, px)
-            angleid = int(math.floor(angle / yawreso))
+            angleid = int(np.floor(angle / yawreso))
 
             pc = precastDB()
 
@@ -79,15 +78,15 @@ def generate_ray_casting_grid_map(ox, oy, xyreso, yawreso):
 
     minx, miny, maxx, maxy, xw, yw = calc_grid_map_config(ox, oy, xyreso)
 
-    pmap = [[0.0 for i in range(yw)] for i in range(xw)]
+    pmap = [[0.0 for j in range(yw)] for i in range(xw)]
 
     precast = precasting(minx, miny, xw, yw, xyreso, yawreso)
 
     for (x, y) in zip(ox, oy):
 
-        d = math.sqrt(x**2 + y**2)
+        d = np.hypot(x, y)
         angle = atan_zero_to_twopi(y, x)
-        angleid = int(math.floor(angle / yawreso))
+        angleid = int(np.floor(angle / yawreso))
 
         gridlist = precast[angleid]
 
@@ -111,12 +110,12 @@ def draw_heatmap(data, minx, maxx, miny, maxy, xyreso):
 
 
 def main():
-    print(__file__ + " start!!")
+    print("{} start!!".format(__file__))
 
     xyreso = 0.25  # x-y grid resolution [m]
-    yawreso = math.radians(10.0)  # yaw angle resolution [rad]
+    yawreso = np.deg2rad(10.0)  # yaw angle resolution [rad]
 
-    for i in range(5):
+    for _ in range(5):
         ox = (np.random.rand(4) - 0.5) * 10.0
         oy = (np.random.rand(4) - 0.5) * 10.0
         pmap, minx, maxx, miny, maxy, xyreso = generate_ray_casting_grid_map(

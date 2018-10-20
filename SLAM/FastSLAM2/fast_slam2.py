@@ -6,18 +6,16 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import numpy as np
-import math
 import matplotlib.pyplot as plt
-
+import numpy as np
 
 # Fast SLAM covariance
-Q = np.diag([3.0, math.radians(10.0)])**2
-R = np.diag([1.0, math.radians(20.0)])**2
+Q = np.diag([3.0, np.deg2rad(10.0)])**2
+R = np.diag([1.0, np.deg2rad(20.0)])**2
 
 #  Simulation parameter
-Qsim = np.diag([0.3, math.radians(2.0)])**2
-Rsim = np.diag([0.5, math.radians(10.0)])**2
+Qsim = np.diag([0.3, np.deg2rad(2.0)])**2
+Rsim = np.diag([0.5, np.deg2rad(10.0)])**2
 OFFSET_YAWRATE_NOISE = 0.01
 
 DT = 0.1  # time tick [s]
@@ -47,7 +45,6 @@ class Particle:
 
 
 def fast_slam2(particles, u, z):
-
     particles = predict_particles(particles, u)
 
     particles = update_with_observation(particles, z)
@@ -61,14 +58,12 @@ def normalize_weight(particles):
 
     sumw = sum([p.w for p in particles])
 
-    try:
+    if sumw > 0:
         for i in range(N_PARTICLE):
             particles[i].w /= sumw
-    except ZeroDivisionError:
+    else:
         for i in range(N_PARTICLE):
             particles[i].w = 1.0 / N_PARTICLE
-
-        return particles
 
     return particles
 
@@ -112,8 +107,8 @@ def add_new_lm(particle, z, Q):
     b = z[0, 1]
     lm_id = int(z[0, 2])
 
-    s = math.sin(pi_2_pi(particle.yaw + b))
-    c = math.cos(pi_2_pi(particle.yaw + b))
+    s = np.sin(particle.yaw + b)
+    c = np.cos(particle.yaw + b)
 
     particle.lm[lm_id, 0] = particle.x + r * c
     particle.lm[lm_id, 1] = particle.y + r * s
@@ -131,9 +126,9 @@ def compute_jacobians(particle, xf, Pf, Q):
     dx = xf[0, 0] - particle.x
     dy = xf[1, 0] - particle.y
     d2 = dx**2 + dy**2
-    d = math.sqrt(d2)
+    d = np.sqrt(d2)
 
-    zp = np.matrix([[d, pi_2_pi(math.atan2(dy, dx) - particle.yaw)]]).T
+    zp = np.matrix([[d, pi_2_pi(np.arctan2(dy, dx) - particle.yaw)]]).T
 
     Hv = np.matrix([[-dx / d, -dy / d, 0.0],
                     [dy / d2, -dx / d2, -1.0]])
@@ -168,7 +163,7 @@ def update_landmark(particle, z, Q):
     xf = np.matrix(particle.lm[lm_id, :]).T
     Pf = np.matrix(particle.lmP[2 * lm_id:2 * lm_id + 2, :])
 
-    zp, Hv, Hf, Sf = compute_jacobians(particle, xf, Pf, Q)
+    zp, _, Hf, _ = compute_jacobians(particle, xf, Pf, Q)
 
     dz = z[0, 0: 2].T - zp
     dz[1, 0] = pi_2_pi(dz[1, 0])
@@ -186,7 +181,7 @@ def compute_weight(particle, z, Q):
     lm_id = int(z[0, 2])
     xf = np.matrix(particle.lm[lm_id, :]).T
     Pf = np.matrix(particle.lmP[2 * lm_id:2 * lm_id + 2])
-    zp, Hv, Hf, Sf = compute_jacobians(particle, xf, Pf, Q)
+    zp, _, _, _ = compute_jacobians(particle, xf, Pf, Q)
 
     dz = z[0, 0: 2].T - zp
     dz[1, 0] = pi_2_pi(dz[1, 0])
@@ -198,10 +193,10 @@ def compute_weight(particle, z, Q):
         print("singuler")
         return 1.0
 
-    num = math.exp(-0.5 * dz.T * invS * dz)
-    den = 2.0 * math.pi * math.sqrt(np.linalg.det(S))
+    num = np.exp(-0.5 * dz.T * invS * dz)
+    den = 2.0 * np.pi * np.sqrt(np.linalg.det(S))
 
-    w = num / den
+    w = num[0, 0] / den
 
     return w
 
@@ -214,7 +209,7 @@ def proposal_sampling(particle, z, Q):
     # State
     x = np.matrix([[particle.x, particle.y, particle.yaw]]).T
     P = particle.P
-    zp, Hv, Hf, Sf = compute_jacobians(particle, xf, Pf, Q)
+    zp, Hv, _, Sf = compute_jacobians(particle, xf, Pf, Q)
 
     Sfi = np.linalg.inv(Sf)
     dz = z[0, 0: 2].T - zp
@@ -318,8 +313,8 @@ def observation(xTrue, xd, u, RFID):
 
         dx = RFID[i, 0] - xTrue[0, 0]
         dy = RFID[i, 1] - xTrue[1, 0]
-        d = math.sqrt(dx**2 + dy**2)
-        angle = math.atan2(dy, dx) - xTrue[2, 0]
+        d = np.hypot(dx, dy)
+        angle = np.arctan2(dy, dx) - xTrue[2, 0]
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Qsim[0, 0]  # add noise
             anglen = angle + np.random.randn() * Qsim[1, 1]  # add noise
@@ -342,8 +337,8 @@ def motion_model(x, u):
                    [0, 1.0, 0],
                    [0, 0, 1.0]])
 
-    B = np.matrix([[DT * math.cos(x[2, 0]), 0],
-                   [DT * math.sin(x[2, 0]), 0],
+    B = np.matrix([[DT * np.cos(x[2, 0]), 0],
+                   [DT * np.sin(x[2, 0]), 0],
                    [0.0, DT]])
 
     x = F * x + B * u
@@ -354,11 +349,11 @@ def motion_model(x, u):
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2*math.pi) - math.pi
+    return (angle + np.pi) % (2*np.pi) - np.pi
 
 
 def main():
-    print(__file__ + " start!!")
+    print("{} start!!".format(__file__))
 
     time = 0.0
 

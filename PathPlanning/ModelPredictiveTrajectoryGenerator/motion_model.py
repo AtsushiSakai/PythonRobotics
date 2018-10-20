@@ -1,4 +1,3 @@
-import math
 import numpy as np
 import scipy.interpolate
 
@@ -18,15 +17,15 @@ class State:
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2*math.pi) - math.pi
+    return (angle + np.pi) % (2*np.pi) - np.pi
 
 
 def update(state, v, delta, dt, L):
 
     state.v = v
-    state.x = state.x + state.v * math.cos(state.yaw) * dt
-    state.y = state.y + state.v * math.sin(state.yaw) * dt
-    state.yaw = state.yaw + state.v / L * math.tan(delta) * dt
+    state.x = state.x + state.v * np.cos(state.yaw) * dt
+    state.y = state.y + state.v * np.sin(state.yaw) * dt
+    state.yaw = state.yaw + state.v / L * np.tan(delta) * dt
     state.yaw = pi_2_pi(state.yaw)
 
     return state
@@ -41,7 +40,7 @@ def generate_trajectory(s, km, kf, k0):
     t = np.arange(0.0, time, time / n)
     fkp = scipy.interpolate.interp1d(tk, kk, kind="quadratic")
     kp = [fkp(ti) for ti in t]
-    dt = float(time / n)
+    dt = time / n
 
     #  plt.plot(t, kp)
     #  plt.show()

@@ -1,9 +1,11 @@
+import sys
 from unittest import TestCase
 
-import sys
 sys.path.append("./AerialNavigation/drone_3d_trajectory_following/")
 
-from AerialNavigation.drone_3d_trajectory_following import drone_3d_trajectory_following as m
+from AerialNavigation.drone_3d_trajectory_following import \
+    drone_3d_trajectory_following as m
+
 print(__file__)
 
 

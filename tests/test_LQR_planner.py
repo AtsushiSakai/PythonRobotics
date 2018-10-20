@@ -1,9 +1,10 @@
+import sys
 from unittest import TestCase
 
-import sys
 sys.path.append("./PathPlanning/LQRPlanner")
 
 from PathPlanning.LQRPlanner import LQRplanner as m
+
 
 print(__file__)
 

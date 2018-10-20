@@ -1,9 +1,10 @@
+import sys
 from unittest import TestCase
 
-import sys
 sys.path.append("./PathTracking/lqr_speed_steer_control/")
 
 from PathTracking.lqr_speed_steer_control import lqr_speed_steer_control as m
+
 
 print(__file__)
 

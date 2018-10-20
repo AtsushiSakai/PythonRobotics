@@ -1,20 +1,17 @@
 """
-
 Path tracking simulation with Stanley steering control and PID speed control.
 
 author: Atsushi Sakai (@Atsushi_twi)
-
 """
-from __future__ import division, print_function
-
 import sys
-
-sys.path.append("../../PathPlanning/CubicSpline/")
 
 import matplotlib.pyplot as plt
 import numpy as np
 
+sys.path.append("../../PathPlanning/CubicSpline/")
+
 import cubic_spline_planner
+
 
 k = 0.5  # control gain
 Kp = 1.0  # speed propotional gain
@@ -130,13 +127,14 @@ def calc_target_index(state, cx, cy):
     # Search nearest point index
     dx = [fx - icx for icx in cx]
     dy = [fy - icy for icy in cy]
-    d = [np.sqrt(idx ** 2 + idy ** 2) for (idx, idy) in zip(dx, dy)]
+    d = [np.hypot(idx, idy) for (idx, idy) in zip(dx, dy)]
     error_front_axle = min(d)
     target_idx = d.index(error_front_axle)
 
-    target_yaw = normalize_angle(np.arctan2(fy - cy[target_idx], fx - cx[target_idx]) - state.yaw)
+    target_yaw = normalize_angle(np.arctan2(
+        fy - cy[target_idx], fx - cx[target_idx]) - state.yaw)
     if target_yaw > 0.0:
-        error_front_axle = - error_front_axle
+        error_front_axle *= -1
 
     return target_idx, error_front_axle
 
@@ -147,7 +145,7 @@ def main():
     ax = [0.0, 100.0, 100.0, 50.0, 60.0]
     ay = [0.0, 0.0, -30.0, -20.0, 0.0]
 
-    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+    cx, cy, cyaw, _, _ = cubic_spline_planner.calc_spline_course(
         ax, ay, ds=0.1)
 
     target_speed = 30.0 / 3.6  # [m/s]
@@ -186,13 +184,15 @@ def main():
             plt.plot(cx[target_idx], cy[target_idx], "xg", label="target")
             plt.axis("equal")
             plt.grid(True)
-            plt.title("Speed[km/h]:" + str(state.v * 3.6)[:4])
+            plt.legend(loc='best')
+            plt.title("Speed[km/h]:{:.2f}".format(state.v * 3.6))
             plt.pause(0.001)
 
     # Test
     assert last_idx >= target_idx, "Cannot reach goal"
 
     if show_animation:
+        plt.cla()
         plt.plot(cx, cy, ".r", label="course")
         plt.plot(x, y, "-b", label="trajectory")
         plt.legend()
@@ -201,11 +201,12 @@ def main():
         plt.axis("equal")
         plt.grid(True)
 
-        flg, ax = plt.subplots(1)
-        plt.plot(t, [iv * 3.6 for iv in v], "-r")
+        plt.subplots(1)
+        plt.plot(t, np.array(v) * 3.6, "-r")
         plt.xlabel("Time[s]")
         plt.ylabel("Speed[km/h]")
         plt.grid(True)
+        plt.legend(loc='best')
         plt.show()
 
 

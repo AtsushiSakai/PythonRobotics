@@ -5,11 +5,9 @@ Path Planning with Bezier curve.
 author: Atsushi Sakai(@Atsushi_twi)
 
 """
-from __future__ import division, print_function
-
-import scipy.special
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import scipy.special
 
 show_animation = True
 
@@ -27,7 +25,7 @@ def calc_4points_bezier_path(sx, sy, syaw, ex, ey, eyaw, offset):
     :param offset: (float)
     :return: (numpy array, numpy array)
     """
-    dist = np.sqrt((sx - ex) ** 2 + (sy - ey) ** 2) / offset
+    dist = np.hypot(sx - ex, sy - ey) / offset
     control_points = np.array(
         [[sx, sy],
          [sx + dist * np.cos(syaw), sy + dist * np.sin(syaw)],
@@ -94,7 +92,8 @@ def bezier_derivatives_control_points(control_points, n_derivatives):
     w = {0: control_points}
     for i in range(n_derivatives):
         n = len(w[i])
-        w[i + 1] = np.array([(n - 1) * (w[i][j + 1] - w[i][j]) for j in range(n - 1)])
+        w[i + 1] = np.array([(n - 1) * (w[i][j + 1] - w[i][j])
+                             for j in range(n - 1)])
     return w
 
 
@@ -126,11 +125,11 @@ def main():
     """Plot an example bezier curve."""
     start_x = 10.0  # [m]
     start_y = 1.0  # [m]
-    start_yaw = np.radians(180.0)  # [rad]
+    start_yaw = np.deg2rad(180.0)  # [rad]
 
     end_x = -0.0  # [m]
     end_y = -3.0  # [m]
-    end_yaw = np.radians(-45.0)  # [rad]
+    end_yaw = np.deg2rad(-45.0)  # [rad]
     offset = 3.0
 
     path, control_points = calc_4points_bezier_path(
@@ -155,7 +154,8 @@ def main():
     tangent = np.array([point, point + dt])
     normal = np.array([point, point + [- dt[1], dt[0]]])
     curvature_center = point + np.array([- dt[1], dt[0]]) * radius
-    circle = plt.Circle(tuple(curvature_center), radius, color=(0, 0.8, 0.8), fill=False, linewidth=1)
+    circle = plt.Circle(tuple(curvature_center), radius,
+                        color=(0, 0.8, 0.8), fill=False, linewidth=1)
 
     assert path.T[0][0] == start_x, "path is invalid"
     assert path.T[1][0] == start_y, "path is invalid"
@@ -163,9 +163,10 @@ def main():
     assert path.T[1][-1] == end_y, "path is invalid"
 
     if show_animation:
-        fig, ax = plt.subplots()
+        _, ax = plt.subplots()
         ax.plot(path.T[0], path.T[1], label="Bezier Path")
-        ax.plot(control_points.T[0], control_points.T[1], '--o', label="Control Points")
+        ax.plot(control_points.T[0], control_points.T[1],
+                '--o', label="Control Points")
         ax.plot(x_target, y_target)
         ax.plot(tangent[:, 0], tangent[:, 1], label="Tangent")
         ax.plot(normal[:, 0], normal[:, 1], label="Normal")
@@ -182,14 +183,14 @@ def main2():
     """Show the effect of the offset."""
     start_x = 10.0  # [m]
     start_y = 1.0  # [m]
-    start_yaw = np.radians(180.0)  # [rad]
+    start_yaw = np.deg2rad(180.0)  # [rad]
 
     end_x = -0.0  # [m]
     end_y = -3.0  # [m]
-    end_yaw = np.radians(-45.0)  # [rad]
+    end_yaw = np.deg2rad(-45.0)  # [rad]
 
     for offset in np.arange(1.0, 5.0, 1.0):
-        path, control_points = calc_4points_bezier_path(
+        path, _ = calc_4points_bezier_path(
             start_x, start_y, start_yaw, end_x, end_y, end_yaw, offset)
         assert path.T[0][0] == start_x, "path is invalid"
         assert path.T[1][0] == start_y, "path is invalid"

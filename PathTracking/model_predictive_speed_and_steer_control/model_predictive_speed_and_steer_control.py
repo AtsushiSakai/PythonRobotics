@@ -1,18 +1,19 @@
 """
-
 Path tracking simulation with iterative linear model predictive control for speed and steer control
 
 author: Atsushi Sakai (@Atsushi_twi)
-
 """
-import sys
-sys.path.append("../../PathPlanning/CubicSpline/")
-
-import numpy as np
 import math
+import sys
+
 import cvxpy
 import matplotlib.pyplot as plt
+import numpy as np
+
+sys.path.append("../../PathPlanning/CubicSpline/")
+
 import cubic_spline_planner
+
 
 NX = 4  # x = x, y, v, yaw
 NU = 2  # a = [accel, steer]
@@ -45,8 +46,8 @@ WHEEL_WIDTH = 0.2  # [m]
 TREAD = 0.7  # [m]
 WB = 2.5  # [m]
 
-MAX_STEER = math.radians(45.0)  # maximum steering angle [rad]
-MAX_DSTEER = math.radians(30.0)  # maximum steering speed [rad/s]
+MAX_STEER = np.deg2rad(45.0)  # maximum steering angle [rad]
+MAX_DSTEER = np.deg2rad(30.0)  # maximum steering speed [rad/s]
 MAX_SPEED = 55.0 / 3.6  # maximum speed [m/s]
 MIN_SPEED = -20.0 / 3.6  # minimum speed [m/s]
 MAX_ACCEL = 1.0  # maximum accel [m/ss]
@@ -231,7 +232,7 @@ def iterative_linear_mpc_control(xref, x0, dref, oa, od):
         oa = [0.0] * T
         od = [0.0] * T
 
-    for i in range(MAX_ITER):
+    for _ in range(MAX_ITER):
         xbar = predict_motion(x0, oa, od, xref)
         poa, pod = oa[:], od[:]
         oa, od, ox, oy, oyaw, ov = linear_mpc_control(xref, xbar, x0, dref)
@@ -344,9 +345,9 @@ def check_goal(state, goal, tind, nind):
     # check goal
     dx = state.x - goal[0]
     dy = state.y - goal[1]
-    d = math.sqrt(dx ** 2 + dy ** 2)
+    d = np.hypot(dx, dy)
 
-    if (d <= GOAL_DIS):
+    if d <= GOAL_DIS:
         isgoal = True
     else:
         isgoal = False
@@ -354,7 +355,7 @@ def check_goal(state, goal, tind, nind):
     if abs(tind - nind) >= 5:
         isgoal = False
 
-    if (abs(state.v) <= STOP_SPEED):
+    if abs(state.v) <= STOP_SPEED:
         isstop = True
     else:
         isstop = False
@@ -408,7 +409,7 @@ def do_simulation(cx, cy, cyaw, ck, sp, dl, initial_state):
 
         x0 = [state.x, state.y, state.v, state.yaw]  # current state
 
-        oa, odelta, ox, oy, oyaw, ov = iterative_linear_mpc_control(
+        oa, odelta, ox, oy, _, _ = iterative_linear_mpc_control(
             xref, x0, dref, oa, odelta)
 
         if odelta is not None:
@@ -495,7 +496,7 @@ def smooth_yaw(yaw):
 def get_straight_course(dl):
     ax = [0.0, 5.0, 10.0, 20.0, 30.0, 40.0, 50.0]
     ay = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+    cx, cy, cyaw, ck, _ = cubic_spline_planner.calc_spline_course(
         ax, ay, ds=dl)
 
     return cx, cy, cyaw, ck
@@ -504,7 +505,7 @@ def get_straight_course(dl):
 def get_straight_course2(dl):
     ax = [0.0, -10.0, -20.0, -40.0, -50.0, -60.0, -70.0]
     ay = [0.0, -1.0, 1.0, 0.0, -1.0, 1.0, 0.0]
-    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+    cx, cy, cyaw, ck, _ = cubic_spline_planner.calc_spline_course(
         ax, ay, ds=dl)
 
     return cx, cy, cyaw, ck
@@ -513,7 +514,7 @@ def get_straight_course2(dl):
 def get_straight_course3(dl):
     ax = [0.0, -10.0, -20.0, -40.0, -50.0, -60.0, -70.0]
     ay = [0.0, -1.0, 1.0, 0.0, -1.0, 1.0, 0.0]
-    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+    cx, cy, cyaw, ck, _ = cubic_spline_planner.calc_spline_course(
         ax, ay, ds=dl)
 
     cyaw = [i - math.pi for i in cyaw]
@@ -524,7 +525,7 @@ def get_straight_course3(dl):
 def get_forward_course(dl):
     ax = [0.0, 60.0, 125.0, 50.0, 75.0, 30.0, -10.0]
     ay = [0.0, 0.0, 50.0, 65.0, 30.0, 50.0, -20.0]
-    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+    cx, cy, cyaw, ck, _ = cubic_spline_planner.calc_spline_course(
         ax, ay, ds=dl)
 
     return cx, cy, cyaw, ck
@@ -533,11 +534,11 @@ def get_forward_course(dl):
 def get_switch_back_course(dl):
     ax = [0.0, 30.0, 6.0, 20.0, 35.0]
     ay = [0.0, 0.0, 20.0, 35.0, 20.0]
-    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+    cx, cy, cyaw, ck, _ = cubic_spline_planner.calc_spline_course(
         ax, ay, ds=dl)
     ax = [35.0, 10.0, 0.0, 0.0]
     ay = [20.0, 30.0, 5.0, 0.0]
-    cx2, cy2, cyaw2, ck2, s2 = cubic_spline_planner.calc_spline_course(
+    cx2, cy2, cyaw2, ck2, _ = cubic_spline_planner.calc_spline_course(
         ax, ay, ds=dl)
     cyaw2 = [i - math.pi for i in cyaw2]
     cx.extend(cx2)
@@ -562,7 +563,7 @@ def main():
 
     initial_state = State(x=cx[0], y=cy[0], yaw=cyaw[0], v=0.0)
 
-    t, x, y, yaw, v, d, a = do_simulation(
+    t, x, y, _, v, _, _ = do_simulation(
         cx, cy, cyaw, ck, sp, dl, initial_state)
 
     if show_animation:
@@ -586,7 +587,7 @@ def main():
 
 
 def main2():
-    print(__file__ + " start!!")
+    print("{} start!!".format(__file__))
 
     dl = 1.0  # course tick
     cx, cy, cyaw, ck = get_straight_course3(dl)
@@ -595,7 +596,7 @@ def main2():
 
     initial_state = State(x=cx[0], y=cy[0], yaw=0.0, v=0.0)
 
-    t, x, y, yaw, v, d, a = do_simulation(
+    t, x, y, _, v, _, _ = do_simulation(
         cx, cy, cyaw, ck, sp, dl, initial_state)
 
     if show_animation:

@@ -3,16 +3,16 @@ Lookup Table generation for model predictive trajectory generator
 
 author: Atsushi Sakai
 """
-from matplotlib import pyplot as plt
 import numpy as np
-import math
+import pandas as pd
+from matplotlib import pyplot as plt
+
 import model_predictive_trajectory_generator as planner
 import motion_model
-import pandas as pd
 
 
 def calc_states_list():
-    maxyaw = math.radians(-30.0)
+    maxyaw = np.deg2rad(-30.0)
 
     x = np.arange(1.0, 30.0, 5.0)
     y = np.arange(0.0, 20.0, 2.0)
@@ -29,7 +29,7 @@ def calc_states_list():
 
 
 def search_nearest_one_from_lookuptable(tx, ty, tyaw, lookuptable):
-    mind = float("inf")
+    mind = np.inf
     minid = -1
 
     for (i, table) in enumerate(lookuptable):
@@ -37,7 +37,7 @@ def search_nearest_one_from_lookuptable(tx, ty, tyaw, lookuptable):
         dx = tx - table[0]
         dy = ty - table[1]
         dyaw = tyaw - table[2]
-        d = math.sqrt(dx ** 2 + dy ** 2 + dyaw ** 2)
+        d = np.sqrt(dx ** 2 + dy ** 2 + dyaw ** 2)
         if d <= mind:
             minid = i
             mind = d
@@ -60,7 +60,7 @@ def save_lookup_table(fname, table):
     df["kf"] = mt[:, 5]
     df.to_csv(fname, index=None)
 
-    print("lookup table file is saved as " + fname)
+    print("lookup table file is saved as {}".format(fname))
 
 
 def generate_lookup_table():
@@ -76,7 +76,7 @@ def generate_lookup_table():
 
         target = motion_model.State(x=state[0], y=state[1], yaw=state[2])
         init_p = np.matrix(
-            [math.sqrt(state[0] ** 2 + state[1] ** 2), bestp[4], bestp[5]]).T
+            [np.hypot(state[0], state[1]), bestp[4], bestp[5]]).T
 
         x, y, yaw, p = planner.optimize_trajectory(target, k0, init_p)
 
@@ -90,10 +90,10 @@ def generate_lookup_table():
     save_lookup_table("lookuptable.csv", lookuptable)
 
     for table in lookuptable:
-        xc, yc, yawc = motion_model.generate_trajectory(
+        xc, yc, _ = motion_model.generate_trajectory(
             table[3], table[4], table[5], k0)
         plt.plot(xc, yc, "-r")
-        xc, yc, yawc = motion_model.generate_trajectory(
+        xc, yc, _ = motion_model.generate_trajectory(
             table[3], -table[4], -table[5], k0)
         plt.plot(xc, yc, "-r")
 

@@ -6,15 +6,17 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
+import heapq
 import sys
-sys.path.append("../ReedsSheppPath/")
 
-import math
+import matplotlib.pyplot as plt
 import numpy as np
 import scipy.spatial
-import matplotlib.pyplot as plt
+
+sys.path.append("../ReedsSheppPath/")
+
 import reeds_shepp_path_planning as rs
-import heapq
+
 
 EXTEND_AREA = 5.0  # [m]
 H_COST = 1.0
@@ -53,7 +55,6 @@ class KDTree:
         Search NN
         inp: input data, single frame or multi frame
         """
-
         if len(inp.shape) >= 2:  # multi input
             index = []
             dist = []
@@ -72,7 +73,6 @@ class KDTree:
         """
         find points with in a distance r
         """
-
         index = self.tree.query_ball_point(inp, r)
         return index
 
@@ -98,8 +98,8 @@ class Config:
         self.xw = int(self.maxx - self.minx)
         self.yw = int(self.maxy - self.miny)
 
-        self.minyaw = int(- math.pi / yawreso) - 1
-        self.maxyaw = int(math.pi / yawreso)
+        self.minyaw = int(- np.pi / yawreso) - 1
+        self.maxyaw = int(np.pi / yawreso)
         self.yaww = int(self.maxyaw - self.minyaw)
 
 
@@ -142,12 +142,11 @@ def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
             print("Error: Cannot find path, No open set")
             return [], [], []
 
-        c_id, cost = heapq.heappop(pq)
+        c_id, _ = heapq.heappop(pq)
         current = openList.pop(c_id)
         closedList[c_id] = current
 
-        isupdated, fpath = analytic_expantion(
-            current, ngoal, c, ox, oy, obkdtree)
+        analytic_expantion(current, ngoal, c, ox, oy, obkdtree)
 
         #  print(current)
 
@@ -157,10 +156,9 @@ def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
 
 
 def calc_cost(n, h, ngoal, c):
-
     hcost = 1.0
 
-    return (n.cost + H_COST * hcost)
+    return n.cost + H_COST * hcost
 
 
 def calc_index(node, c):
@@ -168,7 +166,7 @@ def calc_index(node, c):
         (node.yind - c.miny) * c.xw + (node.xind - c.minx)
 
     if ind <= 0:
-        print("Error(calc_index):", ind)
+        print("Error(calc_index): {}".format(ind))
 
     return ind
 
@@ -198,14 +196,13 @@ def main():
         oy.append(60.0 - i)
 
     # Set Initial parameters
-    start = [10.0, 10.0, math.radians(90.0)]
-    goal = [50.0, 50.0, math.radians(-90.0)]
+    start = [10.0, 10.0, np.deg2rad(90.0)]
+    goal = [50.0, 50.0, np.deg2rad(-90.0)]
 
     xyreso = 2.0
-    yawreso = math.radians(15.0)
+    yawreso = np.deg2rad(15.0)
 
-    rx, ry, ryaw = hybrid_a_star_planning(
-        start, goal, ox, oy, xyreso, yawreso)
+    hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso)
 
     plt.plot(ox, oy, ".k")
     rs.plot_arrow(start[0], start[1], start[2])
@@ -215,7 +212,7 @@ def main():
     plt.axis("equal")
     plt.show()
 
-    print(__file__ + " start!!")
+    print("{} start!!".format(__file__))
 
 
 if __name__ == '__main__':

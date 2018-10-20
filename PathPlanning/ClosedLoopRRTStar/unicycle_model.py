@@ -1,17 +1,15 @@
 """
-
 Unicycle model class
 
 author Atsushi Sakai
-
 """
-
-import math
+import matplotlib.pyplot as plt
+import numpy as np
 
 dt = 0.05  # [s]
 L = 0.9  # [m]
-steer_max = math.radians(40.0)
-curvature_max = math.tan(steer_max) / L
+steer_max = np.deg2rad(40.0)
+curvature_max = np.tan(steer_max) / L
 curvature_max = 1.0 / curvature_max + 1.0
 
 accel_max = 5.0
@@ -28,9 +26,9 @@ class State:
 
 def update(state, a, delta):
 
-    state.x = state.x + state.v * math.cos(state.yaw) * dt
-    state.y = state.y + state.v * math.sin(state.yaw) * dt
-    state.yaw = state.yaw + state.v / L * math.tan(delta) * dt
+    state.x = state.x + state.v * np.cos(state.yaw) * dt
+    state.y = state.y + state.v * np.sin(state.yaw) * dt
+    state.yaw = state.yaw + state.v / L * np.tan(delta) * dt
     state.yaw = pi_2_pi(state.yaw)
     state.v = state.v + a * dt
 
@@ -38,16 +36,15 @@ def update(state, a, delta):
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2*math.pi) - math.pi
+    return (angle + np.pi) % (2*np.pi) - np.pi
 
 
 if __name__ == '__main__':
     print("start unicycle simulation")
-    import matplotlib.pyplot as plt
 
     T = 100
     a = [1.0] * T
-    delta = [math.radians(1.0)] * T
+    delta = [np.deg2rad(1.0)] * T
     #  print(delta)
     #  print(a, delta)
 

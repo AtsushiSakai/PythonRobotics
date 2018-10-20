@@ -1,15 +1,12 @@
 """
-
 Voronoi Road Map Planner
 
 author: Atsushi Sakai (@Atsushi_twi)
 
 """
-
-import math
+import matplotlib.pyplot as plt
 import numpy as np
 import scipy.spatial
-import matplotlib.pyplot as plt
 
 # parameter
 N_KNN = 10  # number of edge from one sampled point
@@ -30,7 +27,7 @@ class Node:
         self.pind = pind
 
     def __str__(self):
-        return str(self.x) + "," + str(self.y) + "," + str(self.cost) + "," + str(self.pind)
+        return '{},{},{},{}'.format(self.x, self.y, self.cost, self.pind)
 
 
 class KDTree:
@@ -43,11 +40,10 @@ class KDTree:
         self.tree = scipy.spatial.cKDTree(data)
 
     def search(self, inp, k=1):
-        u"""
+        """
         Search NN
 
         inp: input data, single frame or multi frame
-
         """
 
         if len(inp.shape) >= 2:  # multi input
@@ -65,7 +61,7 @@ class KDTree:
             return index, dist
 
     def search_in_distance(self, inp, r):
-        u"""
+        """
         find points with in a distance r
         """
 
@@ -94,24 +90,27 @@ def is_collision(sx, sy, gx, gy, rr, okdtree):
     y = sy
     dx = gx - sx
     dy = gy - sy
-    yaw = math.atan2(gy - sy, gx - sx)
-    d = math.sqrt(dx**2 + dy**2)
+    yaw = np.arctan2(gy - sy, gx - sx)
+    d = np.hypot(dx, dy)
 
     if d >= MAX_EDGE_LEN:
         return True
 
     D = rr
-    nstep = round(d / D)
+    nstep = int(round(d / D))
 
-    for i in range(nstep):
-        idxs, dist = okdtree.search(np.matrix([x, y]).T)
+    sin_yaw = np.sin(yaw)
+    cos_yaw = np.cos(yaw)
+
+    for _ in range(nstep):
+        _, dist = okdtree.search(np.matrix([x, y]).T)
         if dist[0] <= rr:
             return True  # collision
-        x += D * math.cos(yaw)
-        y += D * math.sin(yaw)
+        x += D * cos_yaw
+        y += D * sin_yaw
 
     # goal point check
-    idxs, dist = okdtree.search(np.matrix([gx, gy]).T)
+    _, dist = okdtree.search(np.matrix([gx, gy]).T)
     if dist[0] <= rr:
         return True  # collision
 
@@ -132,9 +131,9 @@ def generate_roadmap(sample_x, sample_y, rr, obkdtree):
     nsample = len(sample_x)
     skdtree = KDTree(np.vstack((sample_x, sample_y)).T)
 
-    for (i, ix, iy) in zip(range(nsample), sample_x, sample_y):
+    for (ix, iy) in zip(sample_x, sample_y):
 
-        index, dists = skdtree.search(
+        index, _ = skdtree.search(
             np.matrix([ix, iy]).T, k=nsample)
         inds = index[0][0]
         edge_id = []
@@ -186,7 +185,7 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
             plt.plot(current.x, current.y, "xg")
             plt.pause(0.001)
 
-        if c_id == (len(road_map) - 1):
+        if c_id == len(road_map) - 1:
             print("goal is found!")
             ngoal.pind = current.pind
             ngoal.cost = current.cost
@@ -202,7 +201,7 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
             n_id = road_map[c_id][i]
             dx = sample_x[n_id] - current.x
             dy = sample_y[n_id] - current.y
-            d = math.sqrt(dx**2 + dy**2)
+            d = np.hypot(dx, dy)
             node = Node(sample_x[n_id], sample_y[n_id],
                         current.cost + d, c_id)
 
@@ -255,7 +254,7 @@ def sample_points(sx, sy, gx, gy, rr, ox, oy, obkdtree):
 
 
 def main():
-    print(__file__ + " start!!")
+    print("{} start!!".format(__file__))
 
     # start and goal position
     sx = 10.0  # [m]

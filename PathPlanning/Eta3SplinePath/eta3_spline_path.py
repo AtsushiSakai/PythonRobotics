@@ -1,5 +1,4 @@
 """
-
 \eta^3 polynomials planner
 
 author: Joe Dinius, Ph.D (https://jwdinius.github.io)
@@ -11,11 +10,12 @@ Ref:
 
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy.integrate import quad
 
-# NOTE: *_pose is a 3-array: 0 - x coord, 1 - y coord, 2 - orientation angle \theta
+# NOTE: *_pose is a 3-array:
+# 0 - x coord, 1 - y coord, 2 - orientation angle \theta
 
 show_animation = True
 
@@ -152,8 +152,9 @@ class eta3_path_segment(object):
             + (10. * eta[1] - 2. * eta[3] + 1. / 6 * eta[5]) * sb \
             - (2. * eta[1]**2 * kappa[2] - 1. / 6 * eta[1]**3 *
                kappa[3] - 1. / 2 * eta[1] * eta[3] * kappa[2]) * cb
-        
-        s_dot = lambda u : np.linalg.norm(self.coeffs[:, 1:].dot(np.array([1, 2.*u, 3.*u**2, 4.*u**3, 5.*u**4, 6.*u**5, 7.*u**6])))
+
+        def s_dot(u): return np.linalg.norm(self.coeffs[:, 1:].dot(
+            np.array([1, 2.*u, 3.*u**2, 4.*u**3, 5.*u**4, 6.*u**5, 7.*u**6])))
         self.segment_length = quad(lambda u: s_dot(u), 0, 1)[0]
 
     """
@@ -164,6 +165,7 @@ class eta3_path_segment(object):
     returns
         (x,y) of point along the segment
     """
+
     def calc_point(self, u):
         assert(u >= 0 and u <= 1)
         return self.coeffs.dot(np.array([1, u, u**2, u**3, u**4, u**5, u**6, u**7]))

@@ -11,12 +11,12 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import math
-import numpy as np
-import matplotlib.pyplot as plt
 import copy
-from scipy.stats import norm
+
+import matplotlib.pyplot as plt
+import numpy as np
 from scipy.ndimage import gaussian_filter
+from scipy.stats import norm
 
 # Parameters
 EXTEND_AREA = 10.0  # [m] grid map extention length
@@ -36,7 +36,6 @@ MAXY = 25.0
 # simulation paramters
 NOISE_RANGE = 2.0  # [m] 1σ range noise parameter
 NOISE_SPEED = 0.5  # [m/s] 1σ speed noise parameter
-
 
 show_animation = True
 
@@ -70,10 +69,10 @@ def calc_gaussian_observation_pdf(gmap, z, iz, ix, iy, std):
     # predicted range
     x = ix * gmap.xyreso + gmap.minx
     y = iy * gmap.xyreso + gmap.miny
-    d = math.sqrt((x - z[iz, 1])**2 + (y - z[iz, 2])**2)
+    d = np.hypot(x - z[iz, 1], y - z[iz, 2])
 
     # likelihood
-    pdf = (1.0 - norm.cdf(abs(d - z[iz, 0]), 0.0, std))
+    pdf = 1.0 - norm.cdf(abs(d - z[iz, 0]), 0.0, std)
 
     return pdf
 
@@ -105,8 +104,8 @@ def motion_model(x, u):
                    [0, 0, 1.0, 0],
                    [0, 0, 0, 0]])
 
-    B = np.matrix([[DT * math.cos(x[2, 0]), 0],
-                   [DT * math.sin(x[2, 0]), 0],
+    B = np.matrix([[DT * np.cos(x[2, 0]), 0],
+                   [DT * np.sin(x[2, 0]), 0],
                    [0.0, DT],
                    [1.0, 0.0]])
 
@@ -131,7 +130,7 @@ def observation(xTrue, u, RFID):
 
         dx = xTrue[0, 0] - RFID[i, 0]
         dy = xTrue[1, 0] - RFID[i, 1]
-        d = math.sqrt(dx**2 + dy**2)
+        d = np.hypot(dx, dy)
         if d <= MAX_RANGE:
             # add noise to range observation
             dn = d + np.random.randn() * NOISE_RANGE
@@ -146,8 +145,7 @@ def observation(xTrue, u, RFID):
 
 
 def normalize_probability(gmap):
-
-    sump = sum([sum(igmap) for igmap in gmap.data])
+    sump = np.sum(gmap.data)
 
     for ix in range(gmap.xw):
         for iy in range(gmap.yw):
@@ -191,8 +189,8 @@ def map_shift(gmap, xshift, yshift):
 
 def motion_update(gmap, u, yaw):
 
-    gmap.dx += DT * math.cos(yaw) * u[0]
-    gmap.dy += DT * math.sin(yaw) * u[0]
+    gmap.dx += DT * np.cos(yaw) * u[0]
+    gmap.dy += DT * np.sin(yaw) * u[0]
 
     xshift = gmap.dx // gmap.xyreso
     yshift = gmap.dy // gmap.xyreso
@@ -215,7 +213,7 @@ def calc_grid_index(gmap):
 
 
 def main():
-    print(__file__ + " start!!")
+    print("{} start!!".format(__file__))
 
     # RFID positions [x, y]
     RFID = np.array([[10.0, 0.0],
@@ -231,12 +229,12 @@ def main():
 
     while SIM_TIME >= time:
         time += DT
-        print("Time:", time)
+        print("Time:{}".format(time))
 
         u = calc_input()
 
         yaw = xTrue[2, 0]  # Orientation is known
-        xTrue, z, ud = observation(xTrue, u, RFID)
+        xTrue, z, _ = observation(xTrue, u, RFID)
 
         gmap = histogram_filter_localization(gmap, u, z, yaw)
 
@@ -246,9 +244,9 @@ def main():
             plt.plot(xTrue[0, :], xTrue[1, :], "xr")
             plt.plot(RFID[:, 0], RFID[:, 1], ".k")
             for i in range(z.shape[0]):
-                plt.plot([xTrue[0, :], z[i, 1]], [
-                         xTrue[1, :], z[i, 2]], "-k")
-            plt.title("Time[s]:" + str(time)[0: 4])
+                plt.plot([xTrue[0, :], z[i, 1]],
+                         [xTrue[1, :], z[i, 2]], "-k")
+            plt.title("Time[s]:{:.2f}".format(time))
             plt.pause(0.1)
 
     print("Done")

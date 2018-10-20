@@ -1,5 +1,4 @@
 """
-
 Quinitc Polynomials Planner
 
 author: Atsushi Sakai (@Atsushi_twi)
@@ -9,10 +8,8 @@ Ref:
 - [Local Path Planning And Motion Control For Agv In Positioning](http://ieeexplore.ieee.org/document/637936/)
 
 """
-
-import numpy as np
 import matplotlib.pyplot as plt
-import math
+import numpy as np
 
 # parameter
 MAX_T = 100.0  # maximum time to the goal [s]
@@ -98,16 +95,20 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
         ra: accel result list
 
     """
+    sin_syaw = np.sin(syaw)
+    cos_syaw = np.cos(syaw)
+    sin_gyaw = np.sin(gyaw)
+    cos_gyaw = np.cos(gyaw)
 
-    vxs = sv * math.cos(syaw)
-    vys = sv * math.sin(syaw)
-    vxg = gv * math.cos(gyaw)
-    vyg = gv * math.sin(gyaw)
+    vxs = sv * cos_syaw
+    vys = sv * sin_syaw
+    vxg = gv * cos_gyaw
+    vyg = gv * sin_gyaw
 
-    axs = sa * math.cos(syaw)
-    ays = sa * math.sin(syaw)
-    axg = ga * math.cos(gyaw)
-    ayg = ga * math.sin(gyaw)
+    axs = sa * cos_syaw
+    ays = sa * sin_syaw
+    axg = ga * cos_gyaw
+    ayg = ga * sin_gyaw
 
     for T in np.arange(MIN_T, MAX_T, MIN_T):
         xqp = quinic_polynomial(sx, vxs, axs, gx, vxg, axg, T)
@@ -123,7 +124,7 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
             vx = xqp.calc_first_derivative(t)
             vy = yqp.calc_first_derivative(t)
             v = np.hypot(vx, vy)
-            yaw = math.atan2(vy, vx)
+            yaw = np.arctan2(vy, vx)
             rv.append(v)
             ryaw.append(yaw)
 
@@ -141,7 +142,8 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
                 j *= -1
             rj.append(j)
 
-        if max([abs(i) for i in ra]) <= max_accel and max([abs(i) for i in rj]) <= max_jerk:
+        if max([abs(i) for i in ra]) <= max_accel and \
+                max([abs(i) for i in rj]) <= max_jerk:
             print("find path!!")
             break
 
@@ -153,11 +155,8 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
             plot_arrow(sx, sy, syaw)
             plot_arrow(gx, gy, gyaw)
             plot_arrow(rx[i], ry[i], ryaw[i])
-            plt.title("Time[s]:" + str(time[i])[0:4] +
-                      " v[m/s]:" + str(rv[i])[0:4] +
-                      " a[m/ss]:" + str(ra[i])[0:4] +
-                      " jerk[m/sss]:" + str(rj[i])[0:4],
-                      )
+            plt.title("Time[s]:{:.2f}, v[m/s]:{:.2f}, a[m/ss]:{:.2f}, jerk[m/sss]:{:.2f}".format(
+                time[i], rv[i], ra[i], rj[i]))
             plt.pause(0.001)
 
     return time, rx, ry, ryaw, rv, ra, rj
@@ -172,22 +171,22 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
         for (ix, iy, iyaw) in zip(x, y, yaw):
             plot_arrow(ix, iy, iyaw)
     else:
-        plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),
+        plt.arrow(x, y, length * np.cos(yaw), length * np.sin(yaw),
                   fc=fc, ec=ec, head_width=width, head_length=width)
         plt.plot(x, y)
 
 
 def main():
-    print(__file__ + " start!!")
+    print("{} start!!".format(__file__))
 
     sx = 10.0  # start x position [m]
     sy = 10.0  # start y position [m]
-    syaw = math.radians(10.0)  # start yaw angle [rad]
+    syaw = np.deg2rad(10.0)  # start yaw angle [rad]
     sv = 1.0  # start speed [m/s]
     sa = 0.1  # start accel [m/ss]
     gx = 30.0  # goal x position [m]
     gy = -10.0  # goal y position [m]
-    gyaw = math.radians(20.0)  # goal yaw angle [rad]
+    gyaw = np.deg2rad(20.0)  # goal yaw angle [rad]
     gv = 1.0  # goal speed [m/s]
     ga = 0.1  # goal accel [m/ss]
     max_accel = 1.0  # max accel [m/ss]
@@ -201,7 +200,7 @@ def main():
         plt.plot(x, y, "-r")
 
         plt.subplots()
-        plt.plot(time, [math.degrees(i) for i in yaw], "-r")
+        plt.plot(time, np.rad2deg(yaw), "-r")
         plt.xlabel("Time[s]")
         plt.ylabel("Yaw[deg]")
         plt.grid(True)

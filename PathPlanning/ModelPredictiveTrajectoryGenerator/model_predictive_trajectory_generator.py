@@ -4,9 +4,9 @@ Model trajectory generator
 author: Atsushi Sakai(@Atsushi_twi)
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
-import math
+import numpy as np
+
 import motion_model
 
 # optimization parameter
@@ -18,10 +18,10 @@ show_animation = False
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
-    u"""
+    """
     Plot arrow
     """
-    plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),
+    plt.arrow(x, y, length * np.cos(yaw), length * np.sin(yaw),
               fc=fc, ec=ec, head_width=width, head_length=width)
     plt.plot(x, y)
     plt.plot(0, 0)
@@ -67,7 +67,7 @@ def calc_J(target, p, h, k0):
 
 def selection_learning_param(dp, p, k0, target):
 
-    mincost = float("inf")
+    mincost = np.inf
     mina = 1.0
     maxa = 2.0
     da = 0.5
@@ -100,14 +100,14 @@ def show_trajectory(target, xc, yc):
 
 
 def optimize_trajectory(target, k0, p):
-    for i in range(max_iter):
+    for _ in range(max_iter):
         xc, yc, yawc = motion_model.generate_trajectory(p[0], p[1], p[2], k0)
         dc = np.matrix(calc_diff(target, xc, yc, yawc)).T
         #  print(dc.T)
 
         cost = np.linalg.norm(dc)
         if cost <= cost_th:
-            print("path is ok cost is:" + str(cost))
+            print("path is ok cost is:{}".format(cost))
             break
 
         J = calc_J(target, p, h, k0)
@@ -133,13 +133,13 @@ def optimize_trajectory(target, k0, p):
 
 def test_optimize_trajectory():
 
-    #  target = motion_model.State(x=5.0, y=2.0, yaw=math.radians(00.0))
-    target = motion_model.State(x=5.0, y=2.0, yaw=math.radians(90.0))
+    #  target = motion_model.State(x=5.0, y=2.0, yaw=np.deg2rad(00.0))
+    target = motion_model.State(x=5.0, y=2.0, yaw=np.deg2rad(90.0))
     k0 = 0.0
 
     init_p = np.matrix([6.0, 0.0, 0.0]).T
 
-    x, y, yaw, p = optimize_trajectory(target, k0, init_p)
+    x, y, _, _ = optimize_trajectory(target, k0, init_p)
 
     show_trajectory(target, x, y)
     #  plt.plot(x, y, "-r")
@@ -152,14 +152,14 @@ def test_optimize_trajectory():
 def test_trajectory_generate():
     s = 5.0  # [m]
     k0 = 0.0
-    km = math.radians(30.0)
-    kf = math.radians(-30.0)
+    km = np.deg2rad(30.0)
+    kf = np.deg2rad(-30.0)
 
     #  plt.plot(xk, yk, "xr")
     #  plt.plot(t, kp)
     #  plt.show()
 
-    x, y = motion_model.generate_trajectory(s, km, kf, k0)
+    x, y, _ = motion_model.generate_trajectory(s, km, kf, k0)
 
     plt.plot(x, y, "-r")
     plt.axis("equal")
@@ -168,7 +168,7 @@ def test_trajectory_generate():
 
 
 def main():
-    print(__file__ + " start!!")
+    print("{} start!!".format(__file__))
     #  test_trajectory_generate()
     test_optimize_trajectory()
 

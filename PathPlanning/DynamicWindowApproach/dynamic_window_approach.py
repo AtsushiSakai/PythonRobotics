@@ -5,10 +5,8 @@ Mobile robot motion planning sample with Dynamic Window Approach
 author: Atsushi Sakai (@Atsushi_twi)
 
 """
-
-import math
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 show_animation = True
 
@@ -20,11 +18,11 @@ class Config():
         # robot parameter
         self.max_speed = 1.0  # [m/s]
         self.min_speed = -0.5  # [m/s]
-        self.max_yawrate = 40.0 * math.pi / 180.0  # [rad/s]
+        self.max_yawrate = 40.0 * np.pi / 180.0  # [rad/s]
         self.max_accel = 0.2  # [m/ss]
-        self.max_dyawrate = 40.0 * math.pi / 180.0  # [rad/ss]
+        self.max_dyawrate = 40.0 * np.pi / 180.0  # [rad/ss]
         self.v_reso = 0.01  # [m/s]
-        self.yawrate_reso = 0.1 * math.pi / 180.0  # [rad/s]
+        self.yawrate_reso = 0.1 * np.pi / 180.0  # [rad/s]
         self.dt = 0.1  # [s]
         self.predict_time = 3.0  # [s]
         self.to_goal_cost_gain = 1.0
@@ -35,8 +33,8 @@ class Config():
 def motion(x, u, dt):
     # motion model
 
-    x[0] += u[0] * math.cos(x[2]) * dt
-    x[1] += u[0] * math.sin(x[2]) * dt
+    x[0] += u[0] * np.cos(x[2]) * dt
+    x[1] += u[0] * np.sin(x[2]) * dt
     x[2] += u[1] * dt
     x[3] = u[0]
     x[4] = u[1]
@@ -117,7 +115,7 @@ def calc_obstacle_cost(traj, ob, config):
     # calc obstacle cost inf: collistion, 0:free
 
     skip_n = 2
-    minr = float("inf")
+    minr = np.inf
 
     for ii in range(0, len(traj[:, 1]), skip_n):
         for i in range(len(ob[:, 0])):
@@ -126,9 +124,9 @@ def calc_obstacle_cost(traj, ob, config):
             dx = traj[ii, 0] - ox
             dy = traj[ii, 1] - oy
 
-            r = math.sqrt(dx**2 + dy**2)
+            r = np.hypot(dx, dy)
             if r <= config.robot_radius:
-                return float("Inf")  # collisiton
+                return np.inf  # collisiton
 
             if minr >= r:
                 minr = r
@@ -141,7 +139,7 @@ def calc_to_goal_cost(traj, goal, config):
 
     dy = goal[0] - traj[-1, 0]
     dx = goal[1] - traj[-1, 1]
-    goal_dis = math.sqrt(dx**2 + dy**2)
+    goal_dis = np.hypot(dx, dy)
     cost = config.to_goal_cost_gain * goal_dis
 
     return cost
@@ -158,7 +156,7 @@ def dwa_control(x, u, config, goal, ob):
 
 
 def plot_arrow(x, y, yaw, length=0.5, width=0.1):
-    plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),
+    plt.arrow(x, y, length * np.cos(yaw), length * np.sin(yaw),
               head_length=width, head_width=width)
     plt.plot(x, y)
 
@@ -166,7 +164,7 @@ def plot_arrow(x, y, yaw, length=0.5, width=0.1):
 def main():
     print(__file__ + " start!!")
     # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
-    x = np.array([0.0, 0.0, math.pi / 8.0, 0.0, 0.0])
+    x = np.array([0.0, 0.0, np.pi / 8.0, 0.0, 0.0])
     # goal position [x(m), y(m)]
     goal = np.array([10, 10])
     # obstacles [x(m) y(m), ....]
@@ -186,7 +184,7 @@ def main():
     config = Config()
     traj = np.array(x)
 
-    for i in range(1000):
+    for _ in range(1000):
         u, ltraj = dwa_control(x, u, config, goal, ob)
 
         x = motion(x, u, config.dt)
@@ -204,7 +202,7 @@ def main():
             plt.pause(0.0001)
 
         # check goal
-        if math.sqrt((x[0] - goal[0])**2 + (x[1] - goal[1])**2) <= config.robot_radius:
+        if (x[0] - goal[0])**2 + (x[1] - goal[1])**2 <= config.robot_radius**2:
             print("Goal!!")
             break
 

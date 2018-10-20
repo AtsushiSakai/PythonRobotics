@@ -1,15 +1,15 @@
 """
-
 Path tracking simulation with rear wheel feedback steering control and PID speed control.
 
 author: Atsushi Sakai(@Atsushi_twi)
-
 """
 import sys
+
+import matplotlib.pyplot as plt
+import numpy as np
+
 sys.path.append("../../PathPlanning/CubicSpline/")
 
-import math
-import matplotlib.pyplot as plt
 import cubic_spline_planner
 
 
@@ -36,9 +36,9 @@ class State:
 
 def update(state, a, delta):
 
-    state.x = state.x + state.v * math.cos(state.yaw) * dt
-    state.y = state.y + state.v * math.sin(state.yaw) * dt
-    state.yaw = state.yaw + state.v / L * math.tan(delta) * dt
+    state.x = state.x + state.v * np.cos(state.yaw) * dt
+    state.y = state.y + state.v * np.sin(state.yaw) * dt
+    state.yaw = state.yaw + state.v / L * np.tan(delta) * dt
     state.v = state.v + a * dt
 
     return state
@@ -51,11 +51,11 @@ def PIDControl(target, current):
 
 
 def pi_2_pi(angle):
-    while(angle > math.pi):
-        angle = angle - 2.0 * math.pi
+    while(angle > np.pi):
+        angle = angle - 2.0 * np.pi
 
-    while(angle < -math.pi):
-        angle = angle + 2.0 * math.pi
+    while(angle < -np.pi):
+        angle = angle + 2.0 * np.pi
 
     return angle
 
@@ -67,13 +67,13 @@ def rear_wheel_feedback_control(state, cx, cy, cyaw, ck, preind):
     v = state.v
     th_e = pi_2_pi(state.yaw - cyaw[ind])
 
-    omega = v * k * math.cos(th_e) / (1.0 - k * e) - \
-        KTH * abs(v) * th_e - KE * v * math.sin(th_e) * e / th_e
+    omega = v * k * np.cos(th_e) / (1.0 - k * e) - \
+        KTH * abs(v) * th_e - KE * v * np.sin(th_e) * e / th_e
 
     if th_e == 0.0 or omega == 0.0:
         return 0.0, ind
 
-    delta = math.atan2(L * omega / v, 1.0)
+    delta = np.arctan2(L * omega / v, 1.0)
     #  print(k, v, e, th_e, omega, delta)
 
     return delta, ind
@@ -89,12 +89,12 @@ def calc_nearest_index(state, cx, cy, cyaw):
 
     ind = d.index(mind)
 
-    mind = math.sqrt(mind)
+    mind = np.sqrt(mind)
 
     dxl = cx[ind] - state.x
     dyl = cy[ind] - state.y
 
-    angle = pi_2_pi(cyaw[ind] - math.atan2(dyl, dxl))
+    angle = pi_2_pi(cyaw[ind] - np.arctan2(dyl, dxl))
     if angle < 0:
         mind *= -1
 
@@ -104,7 +104,7 @@ def calc_nearest_index(state, cx, cy, cyaw):
 def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
 
     T = 500.0  # max simulation time
-    goal_dis = 0.3
+    goal_distance_square = 0.3 ** 2
     stop_speed = 0.05
 
     state = State(x=-0.0, y=-0.0, yaw=0.0, v=0.0)
@@ -132,7 +132,7 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
         # check goal
         dx = state.x - goal[0]
         dy = state.y - goal[1]
-        if math.sqrt(dx ** 2 + dy ** 2) <= goal_dis:
+        if dx**2 + dy**2 <= goal_distance_square:
             print("Goal")
             goal_flag = True
             break
@@ -147,11 +147,12 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
             plt.cla()
             plt.plot(cx, cy, "-r", label="course")
             plt.plot(x, y, "ob", label="trajectory")
-            plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")
+            plt.title(
+                "speed[km/h]:{:.2f}, target index:{}".format(state.v * 3.6, target_ind))
             plt.axis("equal")
             plt.grid(True)
-            plt.title("speed[km/h]:" + str(round(state.v * 3.6, 2)) +
-                      ",target index:" + str(target_ind))
+            plt.title(
+                "speed[km/h]:{:.2f}, target index:{}".format(state.v * 3.6, target_ind))
             plt.pause(0.0001)
 
     return t, x, y, yaw, v, goal_flag
@@ -166,15 +167,12 @@ def calc_speed_profile(cx, cy, cyaw, target_speed):
     # Set stop point
     for i in range(len(cx) - 1):
         dyaw = cyaw[i + 1] - cyaw[i]
-        switch = math.pi / 4.0 <= dyaw < math.pi / 2.0
+        switch = np.pi / 4.0 <= dyaw < np.pi / 2.0
 
         if switch:
             direction *= -1
 
-        if direction != 1.0:
-            speed_profile[i] = - target_speed
-        else:
-            speed_profile[i] = target_speed
+        speed_profile[i] = target_speed * direction
 
         if switch:
             speed_profile[i] = 0.0
@@ -200,7 +198,7 @@ def main():
 
     sp = calc_speed_profile(cx, cy, cyaw, target_speed)
 
-    t, x, y, yaw, v, goal_flag = closed_loop_prediction(
+    _, x, y, _, _, goal_flag = closed_loop_prediction(
         cx, cy, cyaw, ck, sp, goal)
 
     # Test
@@ -208,7 +206,7 @@ def main():
 
     if show_animation:
         plt.close()
-        flg, _ = plt.subplots(1)
+        plt.subplots(1)
         plt.plot(ax, ay, "xb", label="input")
         plt.plot(cx, cy, "-r", label="spline")
         plt.plot(x, y, "-g", label="tracking")
@@ -218,14 +216,14 @@ def main():
         plt.ylabel("y[m]")
         plt.legend()
 
-        flg, ax = plt.subplots(1)
-        plt.plot(s, [math.degrees(iyaw) for iyaw in cyaw], "-r", label="yaw")
+        plt.subplots(1)
+        plt.plot(s, np.rad2deg(cyaw), "-r", label="yaw")
         plt.grid(True)
         plt.legend()
         plt.xlabel("line length[m]")
         plt.ylabel("yaw angle[deg]")
 
-        flg, ax = plt.subplots(1)
+        plt.subplots(1)
         plt.plot(s, ck, "-r", label="curvature")
         plt.grid(True)
         plt.legend()

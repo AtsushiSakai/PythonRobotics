@@ -1,6 +1,7 @@
 from unittest import TestCase
 
-from PathPlanning.QuinticPolynomialsPlanner import quintic_polynomials_planner as m
+from PathPlanning.QuinticPolynomialsPlanner import \
+    quintic_polynomials_planner as m
 
 print(__file__)
 

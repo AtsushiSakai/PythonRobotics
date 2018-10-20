@@ -5,12 +5,12 @@ author: AtsushiSakai(@Atsushi_twi)
 
 """
 
-import random
-import math
 import copy
-import numpy as np
-import dubins_path_planning
+
 import matplotlib.pyplot as plt
+import numpy as np
+
+import dubins_path_planning
 
 show_animation = True
 
@@ -83,12 +83,12 @@ class RRT():
             if self.CollisionCheck(tNode, self.obstacleList):
                 dlist.append(tNode.cost)
             else:
-                dlist.append(float("inf"))
+                dlist.append(np.inf)
 
         mincost = min(dlist)
         minind = nearinds[dlist.index(mincost)]
 
-        if mincost == float("inf"):
+        if mincost == np.inf:
             print("mincost is inf")
             return newNode
 
@@ -97,7 +97,7 @@ class RRT():
         return newNode
 
     def pi_2_pi(self, angle):
-        return (angle + math.pi) % (2*math.pi) - math.pi
+        return (angle + np.pi) % (2*np.pi) - np.pi
 
     def steer(self, rnd, nind):
         #  print(rnd)
@@ -105,7 +105,7 @@ class RRT():
 
         nearestNode = self.nodeList[nind]
 
-        px, py, pyaw, mode, clen = dubins_path_planning.dubins_path_planning(
+        px, py, pyaw, _, clen = dubins_path_planning.dubins_path_planning(
             nearestNode.x, nearestNode.y, nearestNode.yaw, rnd.x, rnd.y, rnd.yaw, curvature)
 
         newNode = copy.deepcopy(nearestNode)
@@ -123,10 +123,10 @@ class RRT():
 
     def get_random_point(self):
 
-        if random.randint(0, 100) > self.goalSampleRate:
-            rnd = [random.uniform(self.minrand, self.maxrand),
-                   random.uniform(self.minrand, self.maxrand),
-                   random.uniform(-math.pi, math.pi)
+        if np.random.randint(0, 100) > self.goalSampleRate:
+            rnd = [np.random.uniform(self.minrand, self.maxrand),
+                   np.random.uniform(self.minrand, self.maxrand),
+                   np.random.uniform(-np.pi, np.pi)
                    ]
         else:  # goal point sampling
             rnd = [self.end.x, self.end.y, self.end.yaw]
@@ -138,7 +138,7 @@ class RRT():
     def get_best_last_index(self):
         #  print("get_best_last_index")
 
-        YAWTH = math.radians(1.0)
+        YAWTH = np.deg2rad(1.0)
         XYTH = 0.5
 
         goalinds = []
@@ -178,7 +178,7 @@ class RRT():
 
     def find_near_nodes(self, newNode):
         nnode = len(self.nodeList)
-        r = 50.0 * math.sqrt((math.log(nnode) / nnode))
+        r = 50.0 * np.sqrt(np.log(nnode) / nnode)
         #  r = self.expandDis * 5.0
         dlist = [(node.x - newNode.x) ** 2 +
                  (node.y - newNode.y) ** 2 +
@@ -203,7 +203,7 @@ class RRT():
                 self.nodeList[i] = tNode
 
     def DrawGraph(self, rnd=None):
-        u"""
+        """
         Draw Graph
         """
         plt.clf()
@@ -281,8 +281,8 @@ def main():
     ]  # [x,y,size(radius)]
 
     # Set Initial parameters
-    start = [0.0, 0.0, math.radians(0.0)]
-    goal = [10.0, 10.0, math.radians(0.0)]
+    start = [0.0, 0.0, np.deg2rad(0.0)]
+    goal = [10.0, 10.0, np.deg2rad(0.0)]
 
     rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
     path = rrt.Planning(animation=show_animation)

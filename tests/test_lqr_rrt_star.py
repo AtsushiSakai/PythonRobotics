@@ -1,9 +1,10 @@
+import sys
 from unittest import TestCase
 
-import sys
 sys.path.append("./PathPlanning/LQRRRTStar/")
 
 from PathPlanning.LQRRRTStar import lqr_rrt_star as m
+
 
 print(__file__)
 

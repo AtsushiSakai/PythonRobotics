@@ -1,9 +1,10 @@
+import sys
 from unittest import TestCase
 
-import sys
 sys.path.append("./PathPlanning/FrenetOptimalTrajectory/")
 
 from PathPlanning.FrenetOptimalTrajectory import frenet_optimal_trajectory as m
+
 
 print(__file__)
 

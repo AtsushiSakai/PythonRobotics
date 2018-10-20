@@ -6,17 +6,15 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import numpy as np
-import math
 import matplotlib.pyplot as plt
-
+import numpy as np
 
 # EKF state covariance
-Cx = np.diag([0.5, 0.5, math.radians(30.0)])**2
+Cx = np.diag([0.5, 0.5, np.deg2rad(30.0)])**2
 
 #  Simulation parameter
-Qsim = np.diag([0.2, math.radians(1.0)])**2
-Rsim = np.diag([1.0, math.radians(10.0)])**2
+Qsim = np.diag([0.2, np.deg2rad(1.0)])**2
+Rsim = np.diag([1.0, np.deg2rad(10.0)])**2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
@@ -81,8 +79,8 @@ def observation(xTrue, xd, u, RFID):
 
         dx = RFID[i, 0] - xTrue[0, 0]
         dy = RFID[i, 1] - xTrue[1, 0]
-        d = math.sqrt(dx**2 + dy**2)
-        angle = pi_2_pi(math.atan2(dy, dx))
+        d = np.hypot(dx, dy)
+        angle = pi_2_pi(np.arctan2(dy, dx))
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Qsim[0, 0]  # add noise
             anglen = angle + np.random.randn() * Qsim[1, 1]  # add noise
@@ -105,8 +103,8 @@ def motion_model(x, u):
                    [0, 1.0, 0],
                    [0, 0, 1.0]])
 
-    B = np.matrix([[DT * math.cos(x[2, 0]), 0],
-                   [DT * math.sin(x[2, 0]), 0],
+    B = np.matrix([[DT * np.cos(x[2, 0]), 0],
+                   [DT * np.sin(x[2, 0]), 0],
                    [0.0, DT]])
 
     x = F * x + B * u
@@ -115,7 +113,7 @@ def motion_model(x, u):
 
 
 def calc_n_LM(x):
-    n = int((len(x) - STATE_SIZE) / LM_SIZE)
+    n = (len(x) - STATE_SIZE) // LM_SIZE
     return n
 
 
@@ -124,8 +122,8 @@ def jacob_motion(x, u):
     Fx = np.hstack((np.eye(STATE_SIZE), np.zeros(
         (STATE_SIZE, LM_SIZE * calc_n_LM(x)))))
 
-    jF = np.matrix([[0.0, 0.0, -DT * u[0] * math.sin(x[2, 0])],
-                    [0.0, 0.0, DT * u[0] * math.cos(x[2, 0])],
+    jF = np.matrix([[0.0, 0.0, -DT * u[0] * np.sin(x[2, 0])],
+                    [0.0, 0.0, DT * u[0] * np.cos(x[2, 0])],
                     [0.0, 0.0, 0.0]])
 
     G = np.eye(STATE_SIZE) + Fx.T * jF * Fx
@@ -137,8 +135,8 @@ def calc_LM_Pos(x, z):
 
     zp = np.zeros((2, 1))
 
-    zp[0, 0] = x[0, 0] + z[0, 0] * math.cos(x[2, 0] + z[0, 1])
-    zp[1, 0] = x[1, 0] + z[0, 0] * math.sin(x[2, 0] + z[0, 1])
+    zp[0, 0] = x[0, 0] + z[0, 0] * np.cos(x[2, 0] + z[0, 1])
+    zp[1, 0] = x[1, 0] + z[0, 0] * np.sin(x[2, 0] + z[0, 1])
 
     return zp
 
@@ -161,7 +159,7 @@ def search_correspond_LM_ID(xAug, PAug, zi):
 
     for i in range(nLM):
         lm = get_LM_Pos_from_state(xAug, i)
-        y, S, H = calc_innovation(lm, xAug, PAug, zi, i)
+        y, S, _ = calc_innovation(lm, xAug, PAug, zi, i)
         mdist.append(y.T * np.linalg.inv(S) * y)
 
     mdist.append(M_DIST_TH)  # new landmark
@@ -174,8 +172,8 @@ def search_correspond_LM_ID(xAug, PAug, zi):
 def calc_innovation(lm, xEst, PEst, z, LMid):
     delta = lm - xEst[0:2]
     q = (delta.T * delta)[0, 0]
-    zangle = math.atan2(delta[1], delta[0]) - xEst[2]
-    zp = [math.sqrt(q), pi_2_pi(zangle)]
+    zangle = np.arctan2(delta[1], delta[0]) - xEst[2]
+    zp = [np.sqrt(q), pi_2_pi(zangle)]
     y = (z - zp).T
     y[1] = pi_2_pi(y[1])
     H = jacobH(q, delta, xEst, LMid + 1)
@@ -185,9 +183,11 @@ def calc_innovation(lm, xEst, PEst, z, LMid):
 
 
 def jacobH(q, delta, x, i):
-    sq = math.sqrt(q)
-    G = np.matrix([[-sq * delta[0, 0], - sq * delta[1, 0], 0, sq * delta[0, 0], sq * delta[1, 0]],
-                   [delta[1, 0], - delta[0, 0], - 1.0, - delta[1, 0], delta[0, 0]]])
+    sq = np.sqrt(q)
+    G = np.matrix([[-sq * delta[0, 0], - sq * delta[1, 0], 0, sq * delta[0, 0],
+                    sq * delta[1, 0]],
+                   [delta[1, 0], - delta[0, 0], - 1.0, - delta[1, 0],
+                    delta[0, 0]]])
 
     G = G / q
     nLM = calc_n_LM(x)
@@ -203,7 +203,7 @@ def jacobH(q, delta, x, i):
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2*math.pi) - math.pi
+    return (angle + np.pi) % (2*np.pi) - np.pi
 
 
 def main():

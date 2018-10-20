@@ -7,14 +7,15 @@ author: Atsushi Sakai(Atsushi_twi)
 """
 import sys
 
+import numpy as np
+import pandas as pd
+from matplotlib import pyplot as plt
+
 sys.path.append("../ModelPredictiveTrajectoryGenerator")
 
-from matplotlib import pyplot as plt
-import numpy as np
-import math
-import pandas as pd
 import model_predictive_trajectory_generator as planner
 import motion_model
+
 
 table_path = "./lookuptable.csv"
 
@@ -22,7 +23,7 @@ show_animation = True
 
 
 def search_nearest_one_from_lookuptable(tx, ty, tyaw, lookup_table):
-    mind = float("inf")
+    mind = np.inf
     minid = -1
 
     for (i, table) in enumerate(lookup_table):
@@ -30,7 +31,7 @@ def search_nearest_one_from_lookuptable(tx, ty, tyaw, lookup_table):
         dx = tx - table[0]
         dy = ty - table[1]
         dyaw = tyaw - table[2]
-        d = math.sqrt(dx ** 2 + dy ** 2 + dyaw ** 2)
+        d = dx ** 2 + dy ** 2 + dyaw ** 2
         if d <= mind:
             minid = i
             mind = d
@@ -55,7 +56,7 @@ def generate_path(target_states, k0):
 
         target = motion_model.State(x=state[0], y=state[1], yaw=state[2])
         init_p = np.matrix(
-            [math.sqrt(state[0] ** 2 + state[1] ** 2), bestp[4], bestp[5]]).T
+            [np.hypot(state[0], state[1]), bestp[4], bestp[5]]).T
 
         x, y, yaw, p = planner.optimize_trajectory(target, k0, init_p)
 
@@ -106,7 +107,7 @@ def calc_biased_polar_states(goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_
     """
 
     asi = [a_min + (a_max - a_min) * i / (ns - 1) for i in range(ns - 1)]
-    cnav = [math.pi - abs(i - goal_angle) for i in asi]
+    cnav = [np.pi - abs(i - goal_angle) for i in asi]
 
     cnav_sum = sum(cnav)
     cnav_max = max(cnav)
@@ -143,15 +144,18 @@ def calc_lane_states(l_center, l_heading, l_width, v_width, d, nxy):
     :param nxy: sampling number
     :return: state list
     """
-    xc = math.cos(l_heading) * d + math.sin(l_heading) * l_center
-    yc = math.sin(l_heading) * d + math.cos(l_heading) * l_center
+    sin_l_heading = np.sin(l_heading)
+    cos_l_heading = np.cos(l_heading)
+
+    xc = cos_l_heading * d + sin_l_heading * l_center
+    yc = sin_l_heading * d + cos_l_heading * l_center
 
     states = []
     for i in range(nxy):
-        delta = -0.5 * (l_width - v_width) + \
-            (l_width - v_width) * i / (nxy - 1)
-        xf = xc - delta * math.sin(l_heading)
-        yf = yc + delta * math.cos(l_heading)
+        width_diff = l_width - v_width
+        delta = -0.5 * width_diff + width_diff * i / (nxy - 1)
+        xf = xc - delta * sin_l_heading
+        yf = yc + delta * cos_l_heading
         yawf = l_heading
         states.append([xf, yf, yawf])
 
@@ -162,10 +166,12 @@ def sample_states(angle_samples, a_min, a_max, d, p_max, p_min, nh):
     states = []
     for i in angle_samples:
         a = a_min + (a_max - a_min) * i
+        sin_a = np.sin(a)
+        cos_a = np.cos(a)
 
         for j in range(nh):
-            xf = d * math.cos(a)
-            yf = d * math.sin(a)
+            xf = d * cos_a
+            yf = d * sin_a
             if nh == 1:
                 yawf = (p_max - p_min) / 2 + a
             else:
@@ -180,10 +186,10 @@ def uniform_terminal_state_sampling_test1():
     nxy = 5
     nh = 3
     d = 20
-    a_min = - math.radians(45.0)
-    a_max = math.radians(45.0)
-    p_min = - math.radians(45.0)
-    p_max = math.radians(45.0)
+    a_min = - np.deg2rad(45.0)
+    a_max = np.deg2rad(45.0)
+    p_min = - np.deg2rad(45.0)
+    p_max = np.deg2rad(45.0)
     states = calc_uniform_polar_states(nxy, nh, d, a_min, a_max, p_min, p_max)
     result = generate_path(states, k0)
 
@@ -207,10 +213,10 @@ def uniform_terminal_state_sampling_test2():
     nxy = 6
     nh = 3
     d = 20
-    a_min = - math.radians(-10.0)
-    a_max = math.radians(45.0)
-    p_min = - math.radians(20.0)
-    p_max = math.radians(20.0)
+    a_min = - np.deg2rad(-10.0)
+    a_max = np.deg2rad(45.0)
+    p_min = - np.deg2rad(20.0)
+    p_max = np.deg2rad(20.0)
     states = calc_uniform_polar_states(nxy, nh, d, a_min, a_max, p_min, p_max)
     result = generate_path(states, k0)
 
@@ -234,12 +240,12 @@ def biased_terminal_state_sampling_test1():
     nxy = 30
     nh = 2
     d = 20
-    a_min = math.radians(-45.0)
-    a_max = math.radians(45.0)
-    p_min = - math.radians(20.0)
-    p_max = math.radians(20.0)
+    a_min = np.deg2rad(-45.0)
+    a_max = np.deg2rad(45.0)
+    p_min = - np.deg2rad(20.0)
+    p_max = np.deg2rad(20.0)
     ns = 100
-    goal_angle = math.radians(0.0)
+    goal_angle = np.deg2rad(0.0)
     states = calc_biased_polar_states(
         goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max)
     result = generate_path(states, k0)
@@ -261,12 +267,12 @@ def biased_terminal_state_sampling_test2():
     nxy = 30
     nh = 1
     d = 20
-    a_min = math.radians(0.0)
-    a_max = math.radians(45.0)
-    p_min = - math.radians(20.0)
-    p_max = math.radians(20.0)
+    a_min = np.deg2rad(0.0)
+    a_max = np.deg2rad(45.0)
+    p_min = - np.deg2rad(20.0)
+    p_max = np.deg2rad(20.0)
     ns = 100
-    goal_angle = math.radians(30.0)
+    goal_angle = np.deg2rad(30.0)
     states = calc_biased_polar_states(
         goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max)
     result = generate_path(states, k0)
@@ -288,7 +294,7 @@ def lane_state_sampling_test1():
     k0 = 0.0
 
     l_center = 10.0
-    l_heading = math.radians(90.0)
+    l_heading = np.deg2rad(90.0)
     l_width = 3.0
     v_width = 1.0
     d = 10

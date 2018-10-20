@@ -4,11 +4,10 @@ Path Planning Sample Code with Randamized Rapidly-Exploring Random Trees (RRT)
 @author: AtsushiSakai(@Atsushi_twi)
 
 """
+import copy
 
 import matplotlib.pyplot as plt
-import random
-import math
-import copy
+import numpy as np
 
 show_animation = True
 
@@ -47,8 +46,8 @@ class RRT():
         self.nodeList = [self.start]
         while True:
             # Random Sampling
-            if random.randint(0, 100) > self.goalSampleRate:
-                rnd = [random.uniform(self.minrand, self.maxrand), random.uniform(
+            if np.random.randint(0, 100) > self.goalSampleRate:
+                rnd = [np.random.uniform(self.minrand, self.maxrand), np.random.uniform(
                     self.minrand, self.maxrand)]
             else:
                 rnd = [self.end.x, self.end.y]
@@ -59,11 +58,11 @@ class RRT():
 
             # expand tree
             nearestNode = self.nodeList[nind]
-            theta = math.atan2(rnd[1] - nearestNode.y, rnd[0] - nearestNode.x)
+            theta = np.arctan2(rnd[1] - nearestNode.y, rnd[0] - nearestNode.x)
 
             newNode = copy.deepcopy(nearestNode)
-            newNode.x += self.expandDis * math.cos(theta)
-            newNode.y += self.expandDis * math.sin(theta)
+            newNode.x += self.expandDis * np.cos(theta)
+            newNode.y += self.expandDis * np.sin(theta)
             newNode.parent = nind
 
             if not self.__CollisionCheck(newNode, self.obstacleList):
@@ -74,7 +73,7 @@ class RRT():
             # check goal
             dx = newNode.x - self.end.x
             dy = newNode.y - self.end.y
-            d = math.sqrt(dx * dx + dy * dy)
+            d = np.hypot(dx, dy)
             if d <= self.expandDis:
                 print("Goal!!")
                 break
@@ -98,8 +97,8 @@ class RRT():
             plt.plot(rnd[0], rnd[1], "^k")
         for node in self.nodeList:
             if node.parent is not None:
-                plt.plot([node.x, self.nodeList[node.parent].x], [
-                         node.y, self.nodeList[node.parent].y], "-g")
+                plt.plot([node.x, self.nodeList[node.parent].x],
+                         [node.y, self.nodeList[node.parent].y], "-g")
         for (x, y, size) in self.obstacleList:
             self.PlotCircle(x, y, size)
 
@@ -112,8 +111,8 @@ class RRT():
     def PlotCircle(self, x, y, size):
         deg = list(range(0, 360, 5))
         deg.append(0)
-        xl = [x + size * math.cos(math.radians(d)) for d in deg]
-        yl = [y + size * math.sin(math.radians(d)) for d in deg]
+        xl = x + size * np.cos(np.deg2rad(deg))
+        yl = y + size * np.sin(np.deg2rad(deg))
         plt.plot(xl, yl, "-k")
 
     def GetNearestListIndex(self, nodeList, rnd):
@@ -127,7 +126,7 @@ class RRT():
         for (ox, oy, size) in obstacleList:
             dx = ox - node.x
             dy = oy - node.y
-            d = math.sqrt(dx * dx + dy * dy)
+            d = np.hypot(dx, dy)
             if d <= size:
                 return False  # collision
 
@@ -150,7 +149,7 @@ def GetPathLength(path):
     for i in range(len(path) - 1):
         dx = path[i + 1][0] - path[i][0]
         dy = path[i + 1][1] - path[i][1]
-        d = math.sqrt(dx * dx + dy * dy)
+        d = np.hypot(dx, dy)
         le += d
 
     return le
@@ -163,7 +162,7 @@ def GetTargetPoint(path, targetL):
     for i in range(len(path) - 1):
         dx = path[i + 1][0] - path[i][0]
         dy = path[i + 1][1] - path[i][1]
-        d = math.sqrt(dx * dx + dy * dy)
+        d = np.hypot(dx, dy)
         le += d
         if le >= targetL:
             ti = i - 1
@@ -189,16 +188,13 @@ def LineCollisionCheck(first, second, obstacleList):
     x2 = second[0]
     y2 = second[1]
 
-    try:
-        a = y2 - y1
-        b = -(x2 - x1)
-        c = y2 * (x2 - x1) - x2 * (y2 - y1)
-    except ZeroDivisionError:
-        return False
+    a = y2 - y1
+    b = -(x2 - x1)
+    c = y2 * (x2 - x1) - x2 * (y2 - y1)
 
     for (ox, oy, size) in obstacleList:
-        d = abs(a * ox + b * oy + c) / (math.sqrt(a * a + b * b))
-        if d <= (size):
+        d = abs(a * ox + b * oy + c) / np.hypot(a, b)
+        if d <= size:
             return False
 
     #  print("OK")
@@ -211,9 +207,9 @@ def PathSmoothing(path, maxIter, obstacleList):
 
     le = GetPathLength(path)
 
-    for i in range(maxIter):
+    for _ in range(maxIter):
         # Sample two points
-        pickPoints = [random.uniform(0, le), random.uniform(0, le)]
+        pickPoints = [np.random.uniform(0, le), np.random.uniform(0, le)]
         pickPoints.sort()
         #  print(pickPoints)
         first = GetTargetPoint(path, pickPoints[0])

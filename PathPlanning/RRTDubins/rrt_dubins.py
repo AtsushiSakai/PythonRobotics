@@ -2,15 +2,13 @@
 Path Planning Sample Code with RRT for car like robot.
 
 author: AtsushiSakai(@Atsushi_twi)
-
 """
-
-import random
-import math
 import copy
-import numpy as np
-import dubins_path_planning
+
 import matplotlib.pyplot as plt
+import numpy as np
+
+import dubins_path_planning
 
 show_animation = True
 
@@ -73,33 +71,30 @@ class RRT():
         if len(nearinds) == 0:
             return newNode
 
-        dlist = []
+        min_cost = np.inf
+        min_idx = 0
         for i in nearinds:
             dx = newNode.x - self.nodeList[i].x
             dy = newNode.y - self.nodeList[i].y
-            d = math.sqrt(dx ** 2 + dy ** 2)
-            theta = math.atan2(dy, dx)
+            d = np.hypot(dx, dy)
+            theta = np.arctan2(dy, dx)
             if self.check_collision_extend(self.nodeList[i], theta, d):
-                dlist.append(self.nodeList[i].cost + d)
-            else:
-                dlist.append(float("inf"))
+                cost = self.nodeList[i].cost + d
+                if cost < min_cost:
+                    min_cost = cost
+                    min_idx = i
 
-        mincost = min(dlist)
-        minind = nearinds[dlist.index(mincost)]
-
-        if mincost == float("inf"):
+        if min_cost == np.inf:
             print("mincost is inf")
             return newNode
 
-        newNode.cost = mincost
-        newNode.parent = minind
+        newNode.cost = min_cost
+        newNode.parent = min_idx
 
         return newNode
 
-
     def pi_2_pi(self, angle):
-        return (angle + math.pi) % (2*math.pi) - math.pi
-
+        return (angle + np.pi) % (2*np.pi) - np.pi
 
     def steer(self, rnd, nind):
         #  print(rnd)
@@ -107,7 +102,7 @@ class RRT():
 
         nearestNode = self.nodeList[nind]
 
-        px, py, pyaw, mode, clen = dubins_path_planning.dubins_path_planning(
+        px, py, pyaw, _, clen = dubins_path_planning.dubins_path_planning(
             nearestNode.x, nearestNode.y, nearestNode.yaw, rnd[0], rnd[1], rnd[2], curvature)
 
         newNode = copy.deepcopy(nearestNode)
@@ -125,10 +120,10 @@ class RRT():
 
     def get_random_point(self):
 
-        if random.randint(0, 100) > self.goalSampleRate:
-            rnd = [random.uniform(self.minrand, self.maxrand),
-                   random.uniform(self.minrand, self.maxrand),
-                   random.uniform(-math.pi, math.pi)
+        if np.random.randint(0, 100) > self.goalSampleRate:
+            rnd = [np.random.uniform(self.minrand, self.maxrand),
+                   np.random.uniform(self.minrand, self.maxrand),
+                   np.random.uniform(-np.pi, np.pi)
                    ]
         else:  # goal point sampling
             rnd = [self.end.x, self.end.y, self.end.yaw]
@@ -137,18 +132,16 @@ class RRT():
 
     def get_best_last_index(self):
         #  print("get_best_last_index")
+        min_cost = np.inf
+        min_idx = None
+        for i, node in enumerate(self.nodeList):
+            dist2goal = self.calc_dist_to_goal(node.x, node.y)
+            if dist2goal <= 0.1:
+                if node.cost < min_cost:
+                    min_cost = node.cost
+                    min_idx = i
 
-        disglist = [self.calc_dist_to_goal(
-            node.x, node.y) for node in self.nodeList]
-        goalinds = [disglist.index(i) for i in disglist if i <= 0.1]
-        #  print(goalinds)
-
-        mincost = min([self.nodeList[i].cost for i in goalinds])
-        for i in goalinds:
-            if self.nodeList[i].cost == mincost:
-                return i
-
-        return None
+        return min_idx
 
     def gen_final_course(self, goalind):
         path = [[self.end.x, self.end.y]]
@@ -185,12 +178,16 @@ class RRT():
         plt.pause(0.01)
 
     def GetNearestListIndex(self, nodeList, rnd):
-        dlist = [(node.x - rnd[0]) ** 2 +
-                 (node.y - rnd[1]) ** 2 +
-                 (node.yaw - rnd[2] ** 2) for node in nodeList]
-        minind = dlist.index(min(dlist))
+        min_d = np.inf
+        min_idx = 0
+        for i, node in enumerate(nodeList):
+            d = (node.x - rnd[0]) ** 2 + (node.y - rnd[1]) ** 2 + \
+                 (node.yaw - rnd[2]) ** 2
+            if d < min_d:
+                min_d = d
+                min_idx = i
 
-        return minind
+        return min_idx
 
     def __CollisionCheck(self, node, obstacleList):
 
@@ -234,8 +231,8 @@ def main():
     ]  # [x,y,size(radius)]
 
     # Set Initial parameters
-    start = [0.0, 0.0, math.radians(0.0)]
-    goal = [10.0, 10.0, math.radians(0.0)]
+    start = [0.0, 0.0, np.deg2rad(0.0)]
+    goal = [10.0, 10.0, np.deg2rad(0.0)]
 
     rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
     path = rrt.Planning(animation=show_animation)

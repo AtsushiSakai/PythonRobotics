@@ -37,7 +37,7 @@ def main():
         old_goal = goal_pos
         goal_pos = arm.goal
         end_effector = arm.end_effector
-        errors, distance = distance_to_goal(end_effector, goal_pos)
+        _, distance = distance_to_goal(end_effector, goal_pos)
 
         # State machine to allow changing of goal before current goal has been reached
         if state is WAIT_FOR_NEW_GOAL:
@@ -69,7 +69,7 @@ def inverse_kinematics(link_lengths, joint_angles, goal_pos):
         current_pos = forward_kinematics(link_lengths, joint_angles)
         errors, distance = distance_to_goal(current_pos, goal_pos)
         if distance < 0.1:
-            print("Solution found in %d iterations." % iteration)
+            print("Solution found in {} iterations.".format(iteration))
             return joint_angles, True
         J = jacobian_inverse(link_lengths, joint_angles)
         joint_angles = joint_angles + np.matmul(J, errors)
@@ -77,10 +77,9 @@ def inverse_kinematics(link_lengths, joint_angles, goal_pos):
 
 
 def get_random_goal():
-    from random import random
     SAREA = 15.0
-    return [SAREA * random() - SAREA / 2.0,
-            SAREA * random() - SAREA / 2.0]
+    return [SAREA * np.random.random() - SAREA / 2.0,
+            SAREA * np.random.random() - SAREA / 2.0]
 
 
 def animation():
@@ -96,7 +95,7 @@ def animation():
         old_goal = goal_pos
         goal_pos = arm.goal
         end_effector = arm.end_effector
-        errors, distance = distance_to_goal(end_effector, goal_pos)
+        _, distance = distance_to_goal(end_effector, goal_pos)
 
         # State machine to allow changing of goal before current goal has been reached
         if state is WAIT_FOR_NEW_GOAL:
@@ -149,7 +148,7 @@ def jacobian_inverse(link_lengths, joint_angles):
 def distance_to_goal(current_pos, goal_pos):
     x_diff = goal_pos[0] - current_pos[0]
     y_diff = goal_pos[1] - current_pos[1]
-    return np.array([x_diff, y_diff]).T, np.math.sqrt(x_diff**2 + y_diff**2)
+    return np.array([x_diff, y_diff]).T, np.hypot(x_diff, y_diff)
 
 
 def ang_diff(theta1, theta2):

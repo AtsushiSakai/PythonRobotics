@@ -2,14 +2,11 @@
 Path Planning Sample Code with RRT*
 
 author: AtsushiSakai(@Atsushi_twi)
-
 """
-
-import random
-import math
 import copy
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 show_animation = True
 
@@ -47,7 +44,7 @@ class RRT():
         """
 
         self.nodeList = [self.start]
-        for i in range(self.maxIter):
+        for _ in range(self.maxIter):
             rnd = self.get_random_point()
             nind = self.GetNearestListIndex(self.nodeList, rnd)
 
@@ -78,17 +75,17 @@ class RRT():
         for i in nearinds:
             dx = newNode.x - self.nodeList[i].x
             dy = newNode.y - self.nodeList[i].y
-            d = math.sqrt(dx ** 2 + dy ** 2)
-            theta = math.atan2(dy, dx)
+            d = np.hypot(dx, dy)
+            theta = np.arctan2(dy, dx)
             if self.check_collision_extend(self.nodeList[i], theta, d):
                 dlist.append(self.nodeList[i].cost + d)
             else:
-                dlist.append(float("inf"))
+                dlist.append(np.inf)
 
         mincost = min(dlist)
         minind = nearinds[dlist.index(mincost)]
 
-        if mincost == float("inf"):
+        if mincost == np.inf:
             print("mincost is inf")
             return newNode
 
@@ -101,10 +98,10 @@ class RRT():
 
         # expand tree
         nearestNode = self.nodeList[nind]
-        theta = math.atan2(rnd[1] - nearestNode.y, rnd[0] - nearestNode.x)
+        theta = np.arctan2(rnd[1] - nearestNode.y, rnd[0] - nearestNode.x)
         newNode = copy.deepcopy(nearestNode)
-        newNode.x += self.expandDis * math.cos(theta)
-        newNode.y += self.expandDis * math.sin(theta)
+        newNode.x += self.expandDis * np.cos(theta)
+        newNode.y += self.expandDis * np.sin(theta)
 
         newNode.cost += self.expandDis
         newNode.parent = nind
@@ -112,9 +109,9 @@ class RRT():
 
     def get_random_point(self):
 
-        if random.randint(0, 100) > self.goalSampleRate:
-            rnd = [random.uniform(self.minrand, self.maxrand),
-                   random.uniform(self.minrand, self.maxrand)]
+        if np.random.randint(0, 100) > self.goalSampleRate:
+            rnd = [np.random.uniform(self.minrand, self.maxrand),
+                   np.random.uniform(self.minrand, self.maxrand)]
         else:  # goal point sampling
             rnd = [self.end.x, self.end.y]
 
@@ -151,7 +148,7 @@ class RRT():
 
     def find_near_nodes(self, newNode):
         nnode = len(self.nodeList)
-        r = 50.0 * math.sqrt((math.log(nnode) / nnode))
+        r = 50.0 * np.sqrt(np.log(nnode) / nnode)
         #  r = self.expandDis * 5.0
         dlist = [(node.x - newNode.x) ** 2 +
                  (node.y - newNode.y) ** 2 for node in self.nodeList]
@@ -165,30 +162,31 @@ class RRT():
 
             dx = newNode.x - nearNode.x
             dy = newNode.y - nearNode.y
-            d = math.sqrt(dx ** 2 + dy ** 2)
+            d = np.hypot(dx, dy)
 
             scost = newNode.cost + d
 
             if nearNode.cost > scost:
-                theta = math.atan2(dy, dx)
+                theta = np.arctan2(dy, dx)
                 if self.check_collision_extend(nearNode, theta, d):
                     nearNode.parent = nnode - 1
                     nearNode.cost = scost
 
     def check_collision_extend(self, nearNode, theta, d):
-
         tmpNode = copy.deepcopy(nearNode)
+        sin_theta = np.sin(theta)
+        cos_theta = np.cos(theta)
 
-        for i in range(int(d / self.expandDis)):
-            tmpNode.x += self.expandDis * math.cos(theta)
-            tmpNode.y += self.expandDis * math.sin(theta)
+        for _ in range(int(d / self.expandDis)):
+            tmpNode.x += self.expandDis * cos_theta
+            tmpNode.y += self.expandDis * sin_theta
             if not self.__CollisionCheck(tmpNode, self.obstacleList):
                 return False
 
         return True
 
     def DrawGraph(self, rnd=None):
-        u"""
+        """
         Draw Graph
         """
         plt.clf()
@@ -196,8 +194,8 @@ class RRT():
             plt.plot(rnd[0], rnd[1], "^k")
         for node in self.nodeList:
             if node.parent is not None:
-                plt.plot([node.x, self.nodeList[node.parent].x], [
-                         node.y, self.nodeList[node.parent].y], "-g")
+                plt.plot([node.x, self.nodeList[node.parent].x],
+                         [node.y, self.nodeList[node.parent].y], "-g")
 
         for (ox, oy, size) in self.obstacleList:
             plt.plot(ox, oy, "ok", ms=30 * size)

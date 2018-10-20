@@ -1,20 +1,18 @@
 """
-
 Path Planning Sample Code with RRT for car like robot.
 
 author: AtsushiSakai(@Atsushi_twi)
-
 """
-
+import copy
 import sys
+
+import matplotlib.pyplot as plt
+import numpy as np
+
 sys.path.append("../ReedsSheppPath/")
 
-import random
-import math
-import copy
-import numpy as np
 import reeds_shepp_path_planning
-import matplotlib.pyplot as plt
+
 
 show_animation = True
 STEP_SIZE = 0.1
@@ -83,37 +81,36 @@ class RRT():
         if len(nearinds) == 0:
             return newNode
 
-        dlist = []
+        min_cost = np.inf
+        min_idx = 0
         for i in nearinds:
             tNode = self.steer(newNode, i)
             if tNode is None:
                 continue
 
             if self.CollisionCheck(tNode, self.obstacleList):
-                dlist.append(tNode.cost)
-            else:
-                dlist.append(float("inf"))
+                if tNode.cost < min_cost:
+                    min_cost = tNode.cost
+                    min_idx = i
 
-        mincost = min(dlist)
-        minind = nearinds[dlist.index(mincost)]
-
-        if mincost == float("inf"):
-            print("mincost is inf")
+        if min_cost == np.inf:
+            print("min_cost is inf")
             return newNode
 
-        newNode = self.steer(newNode, minind)
+        newNode = self.steer(newNode, min_idx)
 
         return newNode
 
     def pi_2_pi(self, angle):
-        return (angle + math.pi) % (2*math.pi) - math.pi
+        return (angle + np.pi) % (2*np.pi) - np.pi
 
     def steer(self, rnd, nind):
 
         nearestNode = self.nodeList[nind]
 
         px, py, pyaw, mode, clen = reeds_shepp_path_planning.reeds_shepp_path_planning(
-            nearestNode.x, nearestNode.y, nearestNode.yaw, rnd.x, rnd.y, rnd.yaw, curvature, STEP_SIZE)
+            nearestNode.x, nearestNode.y, nearestNode.yaw, rnd.x, rnd.y,
+            rnd.yaw, curvature, STEP_SIZE)
 
         if px is None:
             return None
@@ -133,10 +130,10 @@ class RRT():
 
     def get_random_point(self):
 
-        if random.randint(0, 100) > self.goalSampleRate:
-            rnd = [random.uniform(self.minrand, self.maxrand),
-                   random.uniform(self.minrand, self.maxrand),
-                   random.uniform(-math.pi, math.pi)
+        if np.random.randint(0, 100) > self.goalSampleRate:
+            rnd = [np.random.uniform(self.minrand, self.maxrand),
+                   np.random.uniform(self.minrand, self.maxrand),
+                   np.random.uniform(-np.pi, np.pi)
                    ]
         else:  # goal point sampling
             rnd = [self.end.x, self.end.y, self.end.yaw]
@@ -147,34 +144,18 @@ class RRT():
 
     def get_best_last_index(self):
         #  print("get_best_last_index")
-
-        YAWTH = math.radians(3.0)
+        YAWTH = np.deg2rad(3.0)
         XYTH = 0.5
 
-        goalinds = []
-        for (i, node) in enumerate(self.nodeList):
+        min_idx = None
+        min_cost = np.inf
+        for i, node in enumerate(self.nodeList):
             if self.calc_dist_to_goal(node.x, node.y) <= XYTH:
-                goalinds.append(i)
-        #  print("OK XY TH num is")
-        #  print(len(goalinds))
-
-        # angle check
-        fgoalinds = []
-        for i in goalinds:
-            if abs(self.nodeList[i].yaw - self.end.yaw) <= YAWTH:
-                fgoalinds.append(i)
-        #  print("OK YAW TH num is")
-        #  print(len(fgoalinds))
-
-        if len(fgoalinds) == 0:
-            return None
-
-        mincost = min([self.nodeList[i].cost for i in fgoalinds])
-        for i in fgoalinds:
-            if self.nodeList[i].cost == mincost:
-                return i
-
-        return None
+                if abs(node.yaw - self.end.yaw) <= YAWTH:
+                    if node.cost < min_cost:
+                        min_cost = node.cost
+                        min_idx = i
+        return min_idx
 
     def gen_final_course(self, goalind):
         path = [[self.end.x, self.end.y]]
@@ -192,17 +173,17 @@ class RRT():
 
     def find_near_nodes(self, newNode):
         nnode = len(self.nodeList)
-        r = 50.0 * math.sqrt((math.log(nnode) / nnode))
-        #  r = self.expandDis * 5.0
-        dlist = [(node.x - newNode.x) ** 2 +
-                 (node.y - newNode.y) ** 2 +
-                 (node.yaw - newNode.yaw) ** 2
-                 for node in self.nodeList]
-        nearinds = [dlist.index(i) for i in dlist if i <= r ** 2]
+        r = 50.0 * np.sqrt(np.log(nnode) / nnode)
+        r_square = r ** 2
+        nearinds = []
+        for i, node in enumerate(self.nodeList):
+            d = (node.x - newNode.x) ** 2 + (node.y - newNode.y) ** 2 + \
+                (node.yaw - newNode.yaw) ** 2
+            if d < r_square:
+                nearinds.append(i)
         return nearinds
 
     def rewire(self, newNode, nearinds):
-
         nnode = len(self.nodeList)
 
         for i in nearinds:
@@ -247,15 +228,18 @@ class RRT():
         #  input()
 
     def GetNearestListIndex(self, nodeList, rnd):
-        dlist = [(node.x - rnd.x) ** 2 +
-                 (node.y - rnd.y) ** 2 +
-                 (node.yaw - rnd.yaw) ** 2 for node in nodeList]
-        minind = dlist.index(min(dlist))
+        min_d = np.inf
+        min_idx = 0
+        for i, node in enumerate(nodeList):
+            d = (node.x - rnd.x) ** 2 + (node.y - rnd.y) ** 2 + \
+                (node.yaw - rnd.yaw) ** 2
+            if d < min_d:
+                min_d = d
+                min_idx = i
 
-        return minind
+        return min_idx
 
     def CollisionCheck(self, node, obstacleList):
-
         for (ox, oy, size) in obstacleList:
             for (ix, iy) in zip(node.path_x, node.path_y):
                 dx = ox - ix
@@ -308,8 +292,8 @@ def main():
     ]  # [x,y,size(radius)]
 
     # Set Initial parameters
-    start = [0.0, 0.0, math.radians(0.0)]
-    goal = [6.0, 7.0, math.radians(90.0)]
+    start = [0.0, 0.0, np.deg2rad(0.0)]
+    goal = [6.0, 7.0, np.deg2rad(90.0)]
 
     rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
     path = rrt.Planning(animation=show_animation)

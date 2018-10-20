@@ -1,20 +1,18 @@
 """
-
 Path planning code with LQR RRT*
 
 author: AtsushiSakai(@Atsushi_twi)
-
 """
-
+import copy
 import sys
+
+import matplotlib.pyplot as plt
+import numpy as np
+
 sys.path.append("../LQRPlanner/")
 
-import random
-import math
-import copy
-import numpy as np
-import matplotlib.pyplot as plt
 import LQRplanner
+
 
 show_animation = True
 
@@ -86,30 +84,28 @@ class RRT():
         if len(nearinds) == 0:
             return newNode
 
-        dlist = []
+        min_idx = 0
+        min_cost = np.inf
         for i in nearinds:
             tNode = self.steer(newNode, i)
             if tNode is None:
                 continue
 
             if self.check_collision(tNode, self.obstacleList):
-                dlist.append(tNode.cost)
-            else:
-                dlist.append(float("inf"))
+                if tNode.cost < min_cost:
+                    min_cost = tNode.cost
+                    min_idx = i
 
-        mincost = min(dlist)
-        minind = nearinds[dlist.index(mincost)]
-
-        if mincost == float("inf"):
-            print("mincost is inf")
+        if min_cost == np.inf:
+            print("min_cost is inf")
             return newNode
 
-        newNode = self.steer(newNode, minind)
+        newNode = self.steer(newNode, min_idx)
 
         return newNode
 
     def pi_2_pi(self, angle):
-        return (angle + math.pi) % (2*math.pi) - math.pi
+        return (angle + np.pi) % (2*np.pi) - np.pi
 
     def sample_path(self, wx, wy, step):
 
@@ -124,7 +120,7 @@ class RRT():
         dx = np.diff(px)
         dy = np.diff(py)
 
-        clen = [math.sqrt(idx**2 + idy**2) for (idx, idy) in zip(dx, dy)]
+        clen = [np.hypot(idx, idy) for (idx, idy) in zip(dx, dy)]
 
         return px, py, clen
 
@@ -153,10 +149,10 @@ class RRT():
 
     def get_random_point(self):
 
-        if random.randint(0, 100) > self.goalSampleRate:
-            rnd = [random.uniform(self.minrand, self.maxrand),
-                   random.uniform(self.minrand, self.maxrand),
-                   random.uniform(-math.pi, math.pi)
+        if np.random.randint(0, 100) > self.goalSampleRate:
+            rnd = [np.random.uniform(self.minrand, self.maxrand),
+                   np.random.uniform(self.minrand, self.maxrand),
+                   np.random.uniform(-np.pi, np.pi)
                    ]
         else:  # goal point sampling
             rnd = [self.end.x, self.end.y]
@@ -198,11 +194,14 @@ class RRT():
 
     def find_near_nodes(self, newNode):
         nnode = len(self.nodeList)
-        r = 50.0 * math.sqrt((math.log(nnode) / nnode))
-        dlist = [(node.x - newNode.x) ** 2 +
-                 (node.y - newNode.y) ** 2
-                 for node in self.nodeList]
-        nearinds = [dlist.index(i) for i in dlist if i <= r ** 2]
+        r = 50.0 * np.sqrt(np.log(nnode) / nnode)
+        r_square = r**2
+        nearinds = []
+        for i, node in enumerate(self.nodeList):
+            d = (node.x - newNode.x) ** 2 + (node.y - newNode.y) ** 2
+            if d<= r_square:
+                nearinds.append(i)
+
         return nearinds
 
     def rewire(self, newNode, nearinds):
@@ -242,12 +241,15 @@ class RRT():
         plt.pause(0.01)
 
     def get_nearest_index(self, nodeList, rnd):
-        dlist = [(node.x - rnd.x) ** 2 +
-                 (node.y - rnd.y) ** 2
-                 for node in nodeList]
-        minind = dlist.index(min(dlist))
+        min_d = np.inf
+        min_idx = -1
+        for i, node in enumerate(nodeList):
+            d = (node.x - rnd.x) ** 2 + (node.y - rnd.y) ** 2
+            if d < min_d:
+                min_d = d
+                min_idx = i
 
-        return minind
+        return min_idx
 
     def check_collision(self, node, obstacleList):
 
@@ -258,8 +260,7 @@ class RRT():
             dx = ox - px
             dy = oy - py
             d = dx ** 2 + dy ** 2
-            dmin = min(d)
-            if dmin <= size ** 2:
+            if any(d <= size ** 2):
                 return False  # collision
 
         return True  # safe

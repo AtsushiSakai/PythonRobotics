@@ -2,21 +2,20 @@
 Path Planning Sample Code with Closed loop RRT for car like robot.
 
 author: AtsushiSakai(@Atsushi_twi)
-
 """
 
+import copy
 import sys
+
+import matplotlib.pyplot as plt
+import numpy as np
+
 sys.path.append("../ReedsSheppPath/")
 
-import random
-import math
-import copy
-import numpy as np
 import pure_pursuit
-import matplotlib.pyplot as plt
-
 import reeds_shepp_path_planning
 import unicycle_model
+
 
 show_animation = True
 
@@ -106,7 +105,7 @@ class RRT():
 
         print("Start search feasible path")
 
-        best_time = float("inf")
+        best_time = np.inf
 
         fx = None
 
@@ -140,13 +139,13 @@ class RRT():
             lx = path[-1, 0]
             ly = path[-1, 1]
             lyaw = path[-1, 2]
-            move_yaw = math.atan2(path[-2, 1] - ly, path[-2, 0] - lx)
-            if abs(lyaw - move_yaw) >= math.pi / 2.0:
+            move_yaw = np.arctan2(path[-2, 1] - ly, path[-2, 0] - lx)
+            if abs(lyaw - move_yaw) >= np.pi / 2.0:
                 print("back")
                 ds *= -1
 
             lstate = np.matrix(
-                [lx + ds * math.cos(lyaw), ly + ds * math.sin(lyaw), lyaw])
+                [lx + ds * np.cos(lyaw), ly + ds * np.sin(lyaw), lyaw])
             #  print(lstate)
 
             path = np.vstack((path, lstate))
@@ -173,13 +172,13 @@ class RRT():
         if not find_goal:
             print("cannot reach goal")
 
-        if abs(yaw[-1] - goal[2]) >= math.pi / 4.0:
+        if abs(yaw[-1] - goal[2]) >= np.pi / 4.0:
             print("final angle is bad")
             find_goal = False
 
         travel = sum([abs(iv) * unicycle_model.dt for iv in v])
         #  print(travel)
-        origin_travel = sum([math.sqrt(dx ** 2 + dy ** 2)
+        origin_travel = sum([np.hypot(dx, dy)
                              for (dx, dy) in zip(np.diff(cx), np.diff(cy))])
         #  print(origin_travel)
 
@@ -188,7 +187,7 @@ class RRT():
             find_goal = False
 
         if not self.CollisionCheckWithXY(x, y, self.obstacleList):
-            print("This path is collision")
+            print("This path has collision")
             find_goal = False
 
         return find_goal, x, y, yaw, v, t, a, d
@@ -206,12 +205,12 @@ class RRT():
             if self.CollisionCheck(tNode, self.obstacleList):
                 dlist.append(tNode.cost)
             else:
-                dlist.append(float("inf"))
+                dlist.append(np.inf)
 
         mincost = min(dlist)
         minind = nearinds[dlist.index(mincost)]
 
-        if mincost == float("inf"):
+        if mincost == np.inf:
             print("mincost is inf")
             return newNode
 
@@ -223,7 +222,7 @@ class RRT():
 
 
     def pi_2_pi(self, angle):
-        return (angle + math.pi) % (2*math.pi) - math.pi
+        return (angle + np.pi) % (2*np.pi) - np.pi
 
 
     def steer(self, rnd, nind):
@@ -253,9 +252,9 @@ class RRT():
 
     def get_random_point(self):
 
-        rnd = [random.uniform(self.minrand, self.maxrand),
-               random.uniform(self.minrand, self.maxrand),
-               random.uniform(-math.pi, math.pi)
+        rnd = [np.random.uniform(self.minrand, self.maxrand),
+               np.random.uniform(self.minrand, self.maxrand),
+               np.random.uniform(-np.pi, np.pi)
                ]
 
         node = Node(rnd[0], rnd[1], rnd[2])
@@ -265,23 +264,21 @@ class RRT():
     def get_best_last_indexs(self):
         #  print("get_best_last_index")
 
-        YAWTH = math.radians(1.0)
+        YAWTH = np.deg2rad(1.0)
         XYTH = 0.5
 
         goalinds = []
-        for (i, node) in enumerate(self.nodeList):
+        for i, node in enumerate(self.nodeList):
             if self.calc_dist_to_goal(node.x, node.y) <= XYTH:
                 goalinds.append(i)
-        print("OK XY TH num is")
-        print(len(goalinds))
+        print("OK XY TH num is {}".format(len(goalinds)))
 
         # angle check
         fgoalinds = []
         for i in goalinds:
             if abs(self.nodeList[i].yaw - self.end.yaw) <= YAWTH:
                 fgoalinds.append(i)
-        print("OK YAW TH num is")
-        print(len(fgoalinds))
+        print("OK YAW TH num is {}".format(len(fgoalinds)))
 
         return fgoalinds
 
@@ -306,17 +303,18 @@ class RRT():
 
     def find_near_nodes(self, newNode):
         nnode = len(self.nodeList)
-        r = 50.0 * math.sqrt((math.log(nnode) / nnode))
-        #  r = self.expandDis * 5.0
-        dlist = [(node.x - newNode.x) ** 2 +
-                 (node.y - newNode.y) ** 2 +
-                 (node.yaw - newNode.yaw) ** 2
-                 for node in self.nodeList]
-        nearinds = [dlist.index(i) for i in dlist if i <= r ** 2]
+        r = 50.0 * np.sqrt(np.log(nnode) / nnode)
+        r_square = r ** 2
+        nearinds = []
+        for i, node in enumerate(self.nodeList):
+            d = (node.x - newNode.x) ** 2 + (node.y - newNode.y) ** 2 + \
+                (node.yaw - newNode.yaw) ** 2
+            if d <= r_square:
+                nearinds.append(i)
+
         return nearinds
 
     def rewire(self, newNode, nearinds):
-
         nnode = len(self.nodeList)
 
         for i in nearinds:
@@ -356,27 +354,18 @@ class RRT():
         plt.pause(0.01)
 
     def GetNearestListIndex(self, nodeList, rnd):
-        dlist = [(node.x - rnd.x) ** 2 +
-                 (node.y - rnd.y) ** 2 +
-                 (node.yaw - rnd.yaw) ** 2 for node in nodeList]
-        minind = dlist.index(min(dlist))
+        min_d = np.inf
+        min_idx = 0
+        for i, node in enumerate(nodeList):
+            d = (node.x - rnd.x) ** 2 + (node.y - rnd.y) ** 2 + \
+                (node.yaw - rnd.yaw) ** 2
+            if d < min_d:
+                min_d = d
+                min_idx = i
 
-        return minind
-
-    def CollisionCheck(self, node, obstacleList):
-
-        for (ox, oy, size) in obstacleList:
-            for (ix, iy) in zip(node.path_x, node.path_y):
-                dx = ox - ix
-                dy = oy - iy
-                d = dx * dx + dy * dy
-                if d <= size ** 2:
-                    return False  # collision
-
-        return True  # safe
+        return min_idx
 
     def CollisionCheckWithXY(self, x, y, obstacleList):
-
         for (ox, oy, size) in obstacleList:
             for (ix, iy) in zip(x, y):
                 dx = ox - ix
@@ -386,6 +375,9 @@ class RRT():
                     return False  # collision
 
         return True  # safe
+
+    def CollisionCheck(self, node, obstacleList):
+        return self.CollisionCheckWithXY(node.path_x, node.path_y, obstacleList)
 
 
 class Node():
@@ -420,8 +412,8 @@ def main():
     ]  # [x,y,size(radius)]
 
     # Set Initial parameters
-    start = [0.0, 0.0, math.radians(0.0)]
-    goal = [6.0, 7.0, math.radians(90.0)]
+    start = [0.0, 0.0, np.deg2rad(0.0)]
+    goal = [6.0, 7.0, np.deg2rad(90.0)]
 
     rrt = RRT(start, goal, randArea=[-2.0, 20.0], obstacleList=obstacleList)
     flag, x, y, yaw, v, t, a, d = rrt.Planning(animation=show_animation)
@@ -438,13 +430,13 @@ def main():
         plt.pause(0.001)
 
         flg, ax = plt.subplots(1)
-        plt.plot(t, [math.degrees(iyaw) for iyaw in yaw[:-1]], '-r')
+        plt.plot(t, np.rad2deg(yaw[:-1]), '-r')
         plt.xlabel("time[s]")
         plt.ylabel("Yaw[deg]")
         plt.grid(True)
 
         flg, ax = plt.subplots(1)
-        plt.plot(t, [iv * 3.6 for iv in v], '-r')
+        plt.plot(t, np.array(v) * 3.6, '-r')
 
         plt.xlabel("time[s]")
         plt.ylabel("velocity[km/h]")
@@ -457,7 +449,7 @@ def main():
         plt.grid(True)
 
         flg, ax = plt.subplots(1)
-        plt.plot(t, [math.degrees(td) for td in d], '-r')
+        plt.plot(t, np.rad2deg(d), '-r')
         plt.xlabel("time[s]")
         plt.ylabel("Steering angle[deg]")
         plt.grid(True)

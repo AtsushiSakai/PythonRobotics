@@ -1,5 +1,4 @@
 """
-
 A* grid based planning
 
 author: Atsushi Sakai(@Atsushi_twi)
@@ -8,9 +7,8 @@ author: Atsushi Sakai(@Atsushi_twi)
 See Wikipedia article (https://en.wikipedia.org/wiki/A*_search_algorithm)
 
 """
-
 import matplotlib.pyplot as plt
-import math
+import numpy as np
 
 show_animation = True
 
@@ -24,7 +22,7 @@ class Node:
         self.pind = pind
 
     def __str__(self):
-        return str(self.x) + "," + str(self.y) + "," + str(self.cost) + "," + str(self.pind)
+        return '{},{},{},{}'.format(self.x, self.y, self.cost, self.pind)
 
 
 def calc_fianl_path(ngoal, closedset, reso):
@@ -55,7 +53,7 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
     ox = [iox / reso for iox in ox]
     oy = [ioy / reso for ioy in oy]
 
-    obmap, minx, miny, maxx, maxy, xw, yw = calc_obstacle_map(ox, oy, reso, rr)
+    obmap, minx, miny, maxx, maxy, xw, _ = calc_obstacle_map(ox, oy, reso, rr)
 
     motion = get_motion_model()
 
@@ -111,7 +109,7 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
 
 def calc_heuristic(n1, n2):
     w = 1.0  # weight of heuristic
-    d = w * math.sqrt((n1.x - n2.x)**2 + (n1.y - n2.y)**2)
+    d = w * np.hypot(n1.x - n2.x, n1.y - n2.y)
     return d
 
 
@@ -156,7 +154,7 @@ def calc_obstacle_map(ox, oy, reso, vr):
             y = iy + miny
             #  print(x, y)
             for iox, ioy in zip(ox, oy):
-                d = math.sqrt((iox - x)**2 + (ioy - y)**2)
+                d = np.hypot(iox - x, ioy - y)
                 if d <= vr / reso:
                     obmap[ix][iy] = True
                     break
@@ -174,16 +172,16 @@ def get_motion_model():
               [0, 1, 1],
               [-1, 0, 1],
               [0, -1, 1],
-              [-1, -1, math.sqrt(2)],
-              [-1, 1, math.sqrt(2)],
-              [1, -1, math.sqrt(2)],
-              [1, 1, math.sqrt(2)]]
+              [-1, -1, np.sqrt(2)],
+              [-1, 1, np.sqrt(2)],
+              [1, -1, np.sqrt(2)],
+              [1, 1, np.sqrt(2)]]
 
     return motion
 
 
 def main():
-    print(__file__ + " start!!")
+    print("{} start!!".format(__file__))
 
     # start and goal position
     sx = 10.0  # [m]

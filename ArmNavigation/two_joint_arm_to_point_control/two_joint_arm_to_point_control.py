@@ -6,13 +6,12 @@ Author: Daniel Ingram (daniel-s-ingram)
         Atsushi Sakai (@Atsushi_twi)
 
 Ref: P. I. Corke, "Robotics, Vision & Control", Springer 2017, ISBN 978-3-319-54413-7 p102
-- [Robotics, Vision and Control \| SpringerLink](https://link.springer.com/book/10.1007/978-3-642-20144-8)
+- [Robotics, Vision and Control | SpringerLink](https://link.springer.com/book/10.1007/978-3-642-20144-8)
 
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
-
 
 # Similation parameters
 Kp = 15
@@ -39,23 +38,25 @@ def two_joint_arm(GOAL_TH=0.0, theta1=0.0, theta2=0.0):
         try:
             theta2_goal = np.arccos(
                 (x**2 + y**2 - l1**2 - l2**2) / (2 * l1 * l2))
-            theta1_goal = np.math.atan2(y, x) - np.math.atan2(l2 *
-                                                              np.sin(theta2_goal), (l1 + l2 * np.cos(theta2_goal)))
+            theta1_goal = np.arctan2(y, x) - \
+                np.arctan2(l2 * np.sin(theta2_goal),
+                           (l1 + l2 * np.cos(theta2_goal)))
 
             if theta1_goal < 0:
                 theta2_goal = -theta2_goal
-                theta1_goal = np.math.atan2(
-                    y, x) - np.math.atan2(l2 * np.sin(theta2_goal), (l1 + l2 * np.cos(theta2_goal)))
+                theta1_goal = np.arctan2(y, x) - \
+                    np.arctan2(l2 * np.sin(theta2_goal),
+                               (l1 + l2 * np.cos(theta2_goal)))
 
             theta1 = theta1 + Kp * ang_diff(theta1_goal, theta1) * dt
             theta2 = theta2 + Kp * ang_diff(theta2_goal, theta2) * dt
-        except ValueError as e:
+        except ValueError:
             print("Unreachable goal")
 
         wrist = plot_arm(theta1, theta2, x, y)
 
         # check goal
-        d2goal = np.math.sqrt((wrist[0] - x)**2 + (wrist[1] - y)**2)
+        d2goal = np.hypot(wrist[0] - x, wrist[1] - y)
 
         if abs(d2goal) < GOAL_TH and x is not None:
             return theta1, theta2
@@ -101,12 +102,11 @@ def click(event):
 
 
 def animation():
-    from random import random
     global x, y
     theta1 = theta2 = 0.0
-    for i in range(5):
-        x = 2.0 * random() - 1.0
-        y = 2.0 * random() - 1.0
+    for _ in range(5):
+        x = 2.0 * np.random.random() - 1.0
+        y = 2.0 * np.random.random() - 1.0
         theta1, theta2 = two_joint_arm(
             GOAL_TH=0.01, theta1=theta1, theta2=theta2)
 

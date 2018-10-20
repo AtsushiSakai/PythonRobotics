@@ -1,13 +1,10 @@
 """
-
 Path tracking simulation with pure pursuit steering control and PID speed control.
 
 author: Atsushi Sakai (@Atsushi_twi)
-
 """
-import numpy as np
-import math
 import matplotlib.pyplot as plt
+import numpy as np
 
 k = 0.1  # look forward gain
 Lfc = 1.0  # look-ahead distance
@@ -30,9 +27,9 @@ class State:
 
 def update(state, a, delta):
 
-    state.x = state.x + state.v * math.cos(state.yaw) * dt
-    state.y = state.y + state.v * math.sin(state.yaw) * dt
-    state.yaw = state.yaw + state.v / L * math.tan(delta) * dt
+    state.x = state.x + state.v * np.cos(state.yaw) * dt
+    state.y = state.y + state.v * np.sin(state.yaw) * dt
+    state.yaw = state.yaw + state.v / L * np.tan(delta) * dt
     state.v = state.v + a * dt
 
     return state
@@ -59,14 +56,14 @@ def pure_pursuit_control(state, cx, cy, pind):
         ty = cy[-1]
         ind = len(cx) - 1
 
-    alpha = math.atan2(ty - state.y, tx - state.x) - state.yaw
+    alpha = np.arctan2(ty - state.y, tx - state.x) - state.yaw
 
     if state.v < 0:  # back
-        alpha = math.pi - alpha
+        alpha = np.pi - alpha
 
     Lf = k * state.v + Lfc
 
-    delta = math.atan2(2.0 * L * math.sin(alpha) / Lf, 1.0)
+    delta = np.arctan2(2.0 * L * np.sin(alpha) / Lf, 1.0)
 
     return delta, ind
 
@@ -76,7 +73,7 @@ def calc_target_index(state, cx, cy):
     # search nearest point index
     dx = [state.x - icx for icx in cx]
     dy = [state.y - icy for icy in cy]
-    d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
+    d = [idx**2 + idy**2 for (idx, idy) in zip(dx, dy)]
     ind = d.index(min(d))
     L = 0.0
 
@@ -86,7 +83,7 @@ def calc_target_index(state, cx, cy):
     while Lf > L and (ind + 1) < len(cx):
         dx = cx[ind + 1] - cx[ind]
         dy = cx[ind + 1] - cx[ind]
-        L += math.sqrt(dx ** 2 + dy ** 2)
+        L += np.hypot(dx, dy)
         ind += 1
 
     return ind
@@ -95,7 +92,7 @@ def calc_target_index(state, cx, cy):
 def main():
     #  target course
     cx = np.arange(0, 50, 0.1)
-    cy = [math.sin(ix / 5.0) * ix / 2.0 for ix in cx]
+    cy = [np.sin(ix / 5.0) * ix / 2.0 for ix in cx]
 
     target_speed = 10.0 / 3.6  # [m/s]
 
@@ -133,7 +130,7 @@ def main():
             plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")
             plt.axis("equal")
             plt.grid(True)
-            plt.title("Speed[km/h]:" + str(state.v * 3.6)[:4])
+            plt.title("Speed[km/h]:{:.2f}".format(state.v * 3.6))
             plt.pause(0.001)
 
     # Test
@@ -148,8 +145,8 @@ def main():
         plt.axis("equal")
         plt.grid(True)
 
-        flg, ax = plt.subplots(1)
-        plt.plot(t, [iv * 3.6 for iv in v], "-r")
+        plt.subplots(1)
+        plt.plot(t, np.array(v) * 3.6, "-r")
         plt.xlabel("Time[s]")
         plt.ylabel("Speed[km/h]")
         plt.grid(True)

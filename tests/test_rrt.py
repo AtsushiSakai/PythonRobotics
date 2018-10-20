@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from PathPlanning.RRT import simple_rrt as m
 from PathPlanning.RRT import rrt_with_pathsmoothing as m1
+from PathPlanning.RRT import simple_rrt as m
 
 print(__file__)
 

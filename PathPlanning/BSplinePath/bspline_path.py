@@ -6,8 +6,8 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import scipy.interpolate as si
 
 # parameter
@@ -35,7 +35,7 @@ def bspline_planning(x, y, sn):
 
 
 def main():
-    print(__file__ + " start!!")
+    print("{} start!!".format(__file__))
     # way points
     x = np.array([-1.0, 3.0, 4.0, 2.0, 1.0])
     y = np.array([0.0, -3.0, 1.0, 1.0, 3.0])

@@ -1,5 +1,4 @@
 """
-
 Frenet optimal trajectory generator
 
 author: Atsushi Sakai (@Atsushi_twi)
@@ -12,10 +11,11 @@ Ref:
 
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
 import copy
-import math
+
+import matplotlib.pyplot as plt
+import numpy as np
+
 import cubic_spline_planner
 
 # Parameter
@@ -218,8 +218,8 @@ def calc_global_paths(fplist, csp):
                 break
             iyaw = csp.calc_yaw(fp.s[i])
             di = fp.d[i]
-            fx = ix + di * math.cos(iyaw + math.pi / 2.0)
-            fy = iy + di * math.sin(iyaw + math.pi / 2.0)
+            fx = ix + di * np.cos(iyaw + np.pi / 2.0)
+            fy = iy + di * np.sin(iyaw + np.pi / 2.0)
             fp.x.append(fx)
             fp.y.append(fy)
 
@@ -227,8 +227,8 @@ def calc_global_paths(fplist, csp):
         for i in range(len(fp.x) - 1):
             dx = fp.x[i + 1] - fp.x[i]
             dy = fp.y[i + 1] - fp.y[i]
-            fp.yaw.append(math.atan2(dy, dx))
-            fp.ds.append(math.sqrt(dx**2 + dy**2))
+            fp.yaw.append(np.arctan2(dy, dx))
+            fp.ds.append(np.hypot(dx, dy))
 
         fp.yaw.append(fp.yaw[-1])
         fp.ds.append(fp.ds[-1])
@@ -279,7 +279,7 @@ def frenet_optimal_planning(csp, s0, c_speed, c_d, c_d_d, c_d_dd, ob):
     fplist = check_paths(fplist, ob)
 
     # find minimum cost path
-    mincost = float("inf")
+    mincost = np.inf
     bestpath = None
     for fp in fplist:
         if mincost >= fp.cf:
@@ -318,7 +318,7 @@ def main():
                    [50.0, 3.0]
                    ])
 
-    tx, ty, tyaw, tc, csp = generate_target_course(wx, wy)
+    tx, ty, _, _, csp = generate_target_course(wx, wy)
 
     # initial state
     c_speed = 10.0 / 3.6  # current speed [m/s]
@@ -327,9 +327,9 @@ def main():
     c_d_dd = 0.0  # current latral acceleration [m/s]
     s0 = 0.0  # current course position
 
-    area = 20.0  # animation area length [m]
+    area = 30.0  # animation area length [m]
 
-    for i in range(500):
+    for _ in range(500):
         path = frenet_optimal_planning(
             csp, s0, c_speed, c_d, c_d_d, c_d_dd, ob)
 
@@ -339,7 +339,7 @@ def main():
         c_d_dd = path.d_dd[1]
         c_speed = path.s_d[1]
 
-        if np.hypot(path.x[1] - tx[-1], path.y[1] - ty[-1]) <= 1.0:
+        if (path.x[1] - tx[-1])**2 + (path.y[1] - ty[-1])**2 <= 1.0:
             print("Goal")
             break
 
@@ -351,7 +351,7 @@ def main():
             plt.plot(path.x[1], path.y[1], "vc")
             plt.xlim(path.x[1] - area, path.x[1] + area)
             plt.ylim(path.y[1] - area, path.y[1] + area)
-            plt.title("v[km/h]:" + str(c_speed * 3.6)[0:4])
+            plt.title("v[km/h]:{:.2f}".format(c_speed * 3.6))
             plt.grid(True)
             plt.pause(0.0001)
 

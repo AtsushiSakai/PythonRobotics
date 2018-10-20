@@ -6,9 +6,8 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import math
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 #  ICP parameters
 EPS = 0.0001
@@ -57,13 +56,13 @@ def ICP_matching(ppoints, cpoints):
 
         dError = abs(preError - error)
         preError = error
-        print("Residual:", error)
+        print("Residual:{}".format(error))
 
         if dError <= EPS:
-            print("Converge", error, dError, count)
+            print("Converge: {}, {}, {}".format(error, dError, count))
             break
         elif MAXITER <= count:
-            print("Not Converge...", error, dError, count)
+            print("Not Converge... {}, {}, {}".format(error, dError, count))
             break
 
     R = np.matrix(H[0:2, 0:2])
@@ -102,7 +101,7 @@ def nearest_neighbor_assosiation(ppoints, cpoints):
     inds = []
     for i in range(cpoints.shape[1]):
         minid = -1
-        mind = float("inf")
+        mind = np.inf
         for ii in range(ppoints.shape[1]):
             d = np.linalg.norm(ppoints[:, ii] - cpoints[:, i])
 
@@ -124,7 +123,7 @@ def SVD_motion_estimation(ppoints, cpoints):
     cshift = np.matrix(cpoints - cm)
 
     W = cshift * pshift.T
-    u, s, vh = np.linalg.svd(W)
+    u, _, vh = np.linalg.svd(W)
 
     R = (u * vh).T
     t = pm - R * cm
@@ -133,14 +132,17 @@ def SVD_motion_estimation(ppoints, cpoints):
 
 
 def main():
-    print(__file__ + " start!!")
+    print("{} start!!".format(__file__))
 
     # simulation parameters
     nPoint = 10
     fieldLength = 50.0
-    motion = [0.5, 2.0, math.radians(-10.0)]  # movement [x[m],y[m],yaw[deg]]
+    motion = [0.5, 2.0, np.deg2rad(-10.0)]  # movement [x[m],y[m],yaw[deg]]
 
     nsim = 3  # number of simulation
+
+    sin_yaw = np.sin(motion[2])
+    cos_yaw = np.cos(motion[2])
 
     for _ in range(nsim):
 
@@ -150,13 +152,14 @@ def main():
         ppoints = np.matrix(np.vstack((px, py)))
 
         # current points
-        cx = [math.cos(motion[2]) * x - math.sin(motion[2]) * y + motion[0]
-              for (x, y) in zip(px, py)]
-        cy = [math.sin(motion[2]) * x + math.cos(motion[2]) * y + motion[1]
-              for (x, y) in zip(px, py)]
+        cx = []
+        cy = []
+        for (x, y) in zip(px, py):
+            cx.append(cos_yaw * x - sin_yaw * y + motion[0])
+            cy.append(sin_yaw * x + cos_yaw * y + motion[1])
         cpoints = np.matrix(np.vstack((cx, cy)))
 
-        R, T = ICP_matching(ppoints, cpoints)
+        ICP_matching(ppoints, cpoints)
 
 
 if __name__ == '__main__':

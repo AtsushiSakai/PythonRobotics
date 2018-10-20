@@ -6,9 +6,8 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import math
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy.stats import norm
 
 EXTEND_AREA = 10.0  # [m] grid map extention length
@@ -20,7 +19,7 @@ def generate_gaussian_grid_map(ox, oy, xyreso, std):
 
     minx, miny, maxx, maxy, xw, yw = calc_grid_map_config(ox, oy, xyreso)
 
-    gmap = [[0.0 for i in range(yw)] for i in range(xw)]
+    gmap = [[0.0 for j in range(yw)] for i in range(xw)]
 
     for ix in range(xw):
         for iy in range(yw):
@@ -29,13 +28,13 @@ def generate_gaussian_grid_map(ox, oy, xyreso, std):
             y = iy * xyreso + miny
 
             # Search minimum distance
-            mindis = float("inf")
+            mindis = np.inf
             for (iox, ioy) in zip(ox, oy):
-                d = math.sqrt((iox - x)**2 + (ioy - y)**2)
+                d = (iox - x)**2 + (ioy - y)**2
                 if mindis >= d:
                     mindis = d
 
-            pdf = (1.0 - norm.cdf(mindis, 0.0, std))
+            pdf = 1.0 - norm.cdf(mindis, 0.0, std)
             gmap[ix][iy] = pdf
 
     return gmap, minx, maxx, miny, maxy
@@ -60,12 +59,12 @@ def draw_heatmap(data, minx, maxx, miny, maxy, xyreso):
 
 
 def main():
-    print(__file__ + " start!!")
+    print("{} start!!".format(__file__))
 
     xyreso = 0.5  # xy grid resolution
     STD = 5.0  # standard diviation for gaussian distribution
 
-    for i in range(5):
+    for _ in range(5):
         ox = (np.random.rand(4) - 0.5) * 10.0
         oy = (np.random.rand(4) - 0.5) * 10.0
         gmap, minx, maxx, miny, maxy = generate_gaussian_grid_map(

@@ -4,11 +4,10 @@ Path Planning Sample Code with Randamized Rapidly-Exploring Random Trees (RRT)
 author: AtsushiSakai(@Atsushi_twi)
 
 """
+import copy
 
 import matplotlib.pyplot as plt
-import random
-import math
-import copy
+import numpy as np
 
 show_animation = True
 
@@ -48,8 +47,8 @@ class RRT():
         self.nodeList = [self.start]
         while True:
             # Random Sampling
-            if random.randint(0, 100) > self.goalSampleRate:
-                rnd = [random.uniform(self.minrand, self.maxrand), random.uniform(
+            if np.random.randint(0, 100) > self.goalSampleRate:
+                rnd = [np.random.uniform(self.minrand, self.maxrand), np.random.uniform(
                     self.minrand, self.maxrand)]
             else:
                 rnd = [self.end.x, self.end.y]
@@ -60,23 +59,23 @@ class RRT():
 
             # expand tree
             nearestNode = self.nodeList[nind]
-            theta = math.atan2(rnd[1] - nearestNode.y, rnd[0] - nearestNode.x)
+            theta = np.arctan2(rnd[1] - nearestNode.y, rnd[0] - nearestNode.x)
 
             newNode = copy.deepcopy(nearestNode)
-            newNode.x += self.expandDis * math.cos(theta)
-            newNode.y += self.expandDis * math.sin(theta)
+            newNode.x += self.expandDis * np.cos(theta)
+            newNode.y += self.expandDis * np.sin(theta)
             newNode.parent = nind
 
             if not self.__CollisionCheck(newNode, self.obstacleList):
                 continue
 
             self.nodeList.append(newNode)
-            print("nNodelist:", len(self.nodeList))
+            print("nNodelist:{}".format(len(self.nodeList)))
 
             # check goal
             dx = newNode.x - self.end.x
             dy = newNode.y - self.end.y
-            d = math.sqrt(dx * dx + dy * dy)
+            d = np.hypot(dx, dy)
             if d <= self.expandDis:
                 print("Goal!!")
                 break
@@ -103,8 +102,8 @@ class RRT():
             plt.plot(rnd[0], rnd[1], "^k")
         for node in self.nodeList:
             if node.parent is not None:
-                plt.plot([node.x, self.nodeList[node.parent].x], [
-                         node.y, self.nodeList[node.parent].y], "-g")
+                plt.plot([node.x, self.nodeList[node.parent].x],
+                         [node.y, self.nodeList[node.parent].y], "-g")
 
         for (ox, oy, size) in self.obstacleList:
             plt.plot(ox, oy, "ok", ms=30 * size)
@@ -126,7 +125,7 @@ class RRT():
         for (ox, oy, size) in obstacleList:
             dx = ox - node.x
             dy = oy - node.y
-            d = math.sqrt(dx * dx + dy * dy)
+            d = np.hypot(dx, dy)
             if d <= size:
                 return False  # collision
 

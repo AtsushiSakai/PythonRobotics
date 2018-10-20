@@ -1,17 +1,14 @@
 """
-
 Move to specified pose
 
 Author: Daniel Ingram (daniel-s-ingram)
         Atsushi Sakai(@Atsushi_twi)
 
 P. I. Corke, "Robotics, Vision & Control", Springer 2017, ISBN 978-3-319-54413-7
-
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
-from random import random
 
 # simulation parameters
 Kp_rho = 9
@@ -20,6 +17,10 @@ Kp_beta = -3
 dt = 0.01
 
 show_animation = True
+
+
+def normalize_pi_2_pi(angle):
+    return (angle + np.pi) % (2 * np.pi) - np.pi
 
 
 def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
@@ -54,20 +55,19 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
         from 0 rad to 2*pi rad with slight turn
         """
 
-        rho = np.sqrt(x_diff**2 + y_diff**2)
-        alpha = (np.arctan2(y_diff, x_diff) -
-                 theta + np.pi) % (2 * np.pi) - np.pi
-        beta = (theta_goal - theta - alpha + np.pi) % (2 * np.pi) - np.pi
+        rho = np.hypot(x_diff, y_diff)
+        alpha = normalize_pi_2_pi(np.arctan2(y_diff, x_diff) - theta)
+        beta = normalize_pi_2_pi(theta_goal - theta - alpha)
 
         v = Kp_rho * rho
         w = Kp_alpha * alpha + Kp_beta * beta
 
         if alpha > np.pi / 2 or alpha < -np.pi / 2:
-            v = -v
+            v *= -1
 
-        theta = theta + w * dt
-        x = x + v * np.cos(theta) * dt
-        y = y + v * np.sin(theta) * dt
+        theta += w * dt
+        x += v * np.cos(theta) * dt
+        y += v * np.sin(theta) * dt
 
         if show_animation:
             plt.cla()
@@ -102,26 +102,28 @@ def plot_vehicle(x, y, theta, x_traj, y_traj):
 
 
 def transformation_matrix(x, y, theta):
+    sin_theta = np.sin(theta)
+    cos_theta = np.cos(theta)
     return np.array([
-        [np.cos(theta), -np.sin(theta), x],
-        [np.sin(theta), np.cos(theta), y],
+        [cos_theta, -sin_theta, x],
+        [sin_theta, cos_theta, y],
         [0, 0, 1]
     ])
 
 
 def main():
 
-    for i in range(5):
-        x_start = 20 * random()
-        y_start = 20 * random()
-        theta_start = 2 * np.pi * random() - np.pi
-        x_goal = 20 * random()
-        y_goal = 20 * random()
-        theta_goal = 2 * np.pi * random() - np.pi
-        print("Initial x: %.2f m\nInitial y: %.2f m\nInitial theta: %.2f rad\n" %
-              (x_start, y_start, theta_start))
-        print("Goal x: %.2f m\nGoal y: %.2f m\nGoal theta: %.2f rad\n" %
-              (x_goal, y_goal, theta_goal))
+    for _ in range(5):
+        x_start = 20 * np.random.random()
+        y_start = 20 * np.random.random()
+        theta_start = 2 * np.pi * np.random.random() - np.pi
+        x_goal = 20 * np.random.random()
+        y_goal = 20 * np.random.random()
+        theta_goal = 2 * np.pi * np.random.random() - np.pi
+        print("Initial x: {:.2f} m\nInitial y: {:.2f} m\nInitial theta: {:.2f} rad\n".format(
+            x_start, y_start, theta_start))
+        print("Goal x: {:.2f} m\nGoal y: {:.2f} m\nGoal theta: {:.2f} rad\n".format(
+            x_goal, y_goal, theta_goal))
         move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal)
 
 

@@ -10,16 +10,15 @@ Ref
 
 """
 
-import numpy as np
-import math
 import copy
 import itertools
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+import numpy as np
 
 #  Simulation parameter
-Qsim = np.diag([0.2, math.radians(1.0)])**2
-Rsim = np.diag([0.1, math.radians(10.0)])**2
+Qsim = np.diag([0.2, np.deg2rad(1.0)])**2
+Rsim = np.diag([0.1, np.deg2rad(10.0)])**2
 
 DT = 2.0  # time tick [s]
 SIM_TIME = 100.0  # simulation time [s]
@@ -29,7 +28,7 @@ STATE_SIZE = 3  # State size [x,y,yaw]
 # Covariance parameter of Graph Based SLAM
 C_SIGMA1 = 0.1
 C_SIGMA2 = 0.1
-C_SIGMA3 = math.radians(1.0)
+C_SIGMA3 = np.deg2rad(1.0)
 
 MAX_ITR = 20  # Maximum iteration
 
@@ -62,10 +61,10 @@ def cal_observation_sigma(d):
     return sigma
 
 
-def calc_rotational_matrix(angle):
+def calc_rotational_matrix(sin_angle, cos_angle):
 
-    Rt = np.matrix([[math.cos(angle), -math.sin(angle), 0],
-                    [math.sin(angle), math.cos(angle), 0],
+    Rt = np.matrix([[cos_angle, -sin_angle, 0],
+                    [sin_angle, cos_angle, 0],
                     [0, 0, 1.0]])
     return Rt
 
@@ -76,18 +75,19 @@ def calc_edge(x1, y1, yaw1, x2, y2, yaw2, d1,
 
     tangle1 = pi_2_pi(yaw1 + angle1)
     tangle2 = pi_2_pi(yaw2 + angle2)
-    tmp1 = d1 * math.cos(tangle1)
-    tmp2 = d2 * math.cos(tangle2)
-    tmp3 = d1 * math.sin(tangle1)
-    tmp4 = d2 * math.sin(tangle2)
 
-    edge.e[0, 0] = x2 - x1 - tmp1 + tmp2
-    edge.e[1, 0] = y2 - y1 - tmp3 + tmp4
+    sin_tangle1 = np.sin(tangle1)
+    sin_tangle2 = np.sin(tangle2)
+    cos_tangle1 = np.cos(tangle1)
+    cos_tangle2 = np.cos(tangle2)
+
+    edge.e[0, 0] = x2 - x1 - d1 * cos_tangle1 + d2 * cos_tangle2
+    edge.e[1, 0] = y2 - y1 - d1 * sin_tangle1 + d2 * sin_tangle2
     hyaw = phi1 - phi2 + angle1 - angle2
     edge.e[2, 0] = pi_2_pi(yaw2 - yaw1 - hyaw)
 
-    Rt1 = calc_rotational_matrix(tangle1)
-    Rt2 = calc_rotational_matrix(tangle2)
+    Rt1 = calc_rotational_matrix(sin_tangle1, cos_tangle1)
+    Rt2 = calc_rotational_matrix(sin_tangle2, cos_tangle2)
 
     sig1 = cal_observation_sigma(d1)
     sig2 = cal_observation_sigma(d2)
@@ -129,19 +129,19 @@ def calc_edges(xlist, zlist):
                     edges.append(edge)
                     cost += (edge.e.T * edge.omega * edge.e)[0, 0]
 
-    print("cost:", cost, ",nedge:", len(edges))
+    print("cost:{}, nedge:{}".format(cost, len(edges)))
     return edges
 
 
 def calc_jacobian(edge):
     t1 = edge.yaw1 + edge.angle1
-    A = np.matrix([[-1.0, 0, edge.d1 * math.sin(t1)],
-                   [0, -1.0, -edge.d1 * math.cos(t1)],
+    A = np.matrix([[-1.0, 0, edge.d1 * np.sin(t1)],
+                   [0, -1.0, -edge.d1 * np.cos(t1)],
                    [0, 0, -1.0]])
 
     t2 = edge.yaw2 + edge.angle2
-    B = np.matrix([[1.0, 0, -edge.d2 * math.sin(t2)],
-                   [0, 1.0, edge.d2 * math.cos(t2)],
+    B = np.matrix([[1.0, 0, -edge.d2 * np.sin(t2)],
+                   [0, 1.0, edge.d2 * np.cos(t2)],
                    [0, 0, 1.0]])
 
     return A, B
@@ -193,7 +193,7 @@ def graph_based_slam(x_init, hz):
             x_opt[0:3, i] += dx[i * 3:i * 3 + 3, 0]
 
         diff = dx.T.dot(dx)
-        print("iteration: %d, diff: %f" % (itr + 1, diff))
+        print("iteration: {}, diff: {}".format(itr + 1, diff[0, 0]))
         if diff < 1.0e-5:
             break
 
@@ -218,9 +218,9 @@ def observation(xTrue, xd, u, RFID):
 
         dx = RFID[i, 0] - xTrue[0, 0]
         dy = RFID[i, 1] - xTrue[1, 0]
-        d = math.sqrt(dx**2 + dy**2)
-        angle = pi_2_pi(math.atan2(dy, dx)) - xTrue[2, 0]
-        phi = pi_2_pi(math.atan2(dy, dx))
+        d = np.hypot(dx, dy)
+        phi = pi_2_pi(np.arctan2(dy, dx))
+        angle = phi - xTrue[2, 0]
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Qsim[0, 0]  # add noise
             anglen = angle + np.random.randn() * Qsim[1, 1]  # add noise
@@ -243,8 +243,8 @@ def motion_model(x, u):
                    [0, 1.0, 0],
                    [0, 0, 1.0]])
 
-    B = np.matrix([[DT * math.cos(x[2, 0]), 0],
-                   [DT * math.sin(x[2, 0]), 0],
+    B = np.matrix([[DT * np.cos(x[2, 0]), 0],
+                   [DT * np.sin(x[2, 0]), 0],
                    [0.0, DT]])
 
     x = F * x + B * u
@@ -253,11 +253,11 @@ def motion_model(x, u):
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2*math.pi) - math.pi
+    return (angle + np.pi) % (2*np.pi) - np.pi
 
 
 def main():
-    print(__file__ + " start!!")
+    print("{} start!!".format(__file__))
 
     time = 0.0
 
@@ -284,7 +284,7 @@ def main():
         dtime += DT
         u = calc_input()
 
-        xTrue, z, xDR, ud = observation(xTrue, xDR, u, RFID)
+        xTrue, z, xDR, _ = observation(xTrue, xDR, u, RFID)
 
         hxDR = np.hstack((hxDR, xDR))
         hxTrue = np.hstack((hxTrue, xTrue))
@@ -307,7 +307,7 @@ def main():
                          np.array(x_opt[1, :]).flatten(), "-r")
                 plt.axis("equal")
                 plt.grid(True)
-                plt.title("Time" + str(time)[0:5])
+                plt.title("Time:{:.2f}".format(time))
                 plt.pause(1.0)
 
 

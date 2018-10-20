@@ -6,17 +6,16 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import numpy as np
-import math
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Estimation parameter of PF
 Q = np.diag([0.1])**2  # range error
-R = np.diag([1.0, math.radians(40.0)])**2  # input error
+R = np.diag([1.0, np.deg2rad(40.0)])**2  # input error
 
 #  Simulation parameter
 Qsim = np.diag([0.2])**2
-Rsim = np.diag([1.0, math.radians(30.0)])**2
+Rsim = np.diag([1.0, np.deg2rad(30.0)])**2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
@@ -47,7 +46,7 @@ def observation(xTrue, xd, u, RFID):
 
         dx = xTrue[0, 0] - RFID[i, 0]
         dy = xTrue[1, 0] - RFID[i, 1]
-        d = math.sqrt(dx**2 + dy**2)
+        d = np.hypot(dx, dy)
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Qsim[0, 0]  # add noise
             zi = np.matrix([dn, RFID[i, 0], RFID[i, 1]])
@@ -70,8 +69,8 @@ def motion_model(x, u):
                    [0, 0, 1.0, 0],
                    [0, 0, 0, 0]])
 
-    B = np.matrix([[DT * math.cos(x[2, 0]), 0],
-                   [DT * math.sin(x[2, 0]), 0],
+    B = np.matrix([[DT * np.cos(x[2, 0]), 0],
+                   [DT * np.sin(x[2, 0]), 0],
                    [0.0, DT],
                    [1.0, 0.0]])
 
@@ -81,8 +80,8 @@ def motion_model(x, u):
 
 
 def gauss_likelihood(x, sigma):
-    p = 1.0 / math.sqrt(2.0 * math.pi * sigma ** 2) * \
-        math.exp(-x ** 2 / (2 * sigma ** 2))
+    p = 1.0 / np.sqrt(2.0 * np.pi * sigma ** 2) * \
+        np.exp(-x ** 2 / (2 * sigma ** 2))
 
     return p
 
@@ -116,9 +115,9 @@ def pf_localization(px, pw, xEst, PEst, z, u):
         for i in range(len(z[:, 0])):
             dx = x[0, 0] - z[i, 1]
             dy = x[1, 0] - z[i, 2]
-            prez = math.sqrt(dx**2 + dy**2)
+            prez = np.hypot(dx, dy)
             dz = prez - z[i, 0]
-            w = w * gauss_likelihood(dz, math.sqrt(Q[0, 0]))
+            w = w * gauss_likelihood(dz, np.sqrt(Q[0, 0]))
 
         px[:, ip] = x
         pw[0, ip] = w
@@ -168,21 +167,27 @@ def plot_covariance_ellipse(xEst, PEst):
         bigind = 1
         smallind = 0
 
-    t = np.arange(0, 2 * math.pi + 0.1, 0.1)
+    t = np.arange(0, 2 * np.pi + 0.1, 0.1)
 
-    #eigval[bigind] or eiqval[smallind] were occassionally negative numbers extremely
-    #close to 0 (~10^-20), catch these cases and set the respective variable to 0
-    try: a = math.sqrt(eigval[bigind])
-    except ValueError: a = 0
+    # eigval[bigind] or eiqval[smallind] were occassionally negative numbers extremely
+    # close to 0 (~10^-20), catch these cases and set the respective variable to 0
+    try:
+        a = np.sqrt(eigval[bigind])
+    except ValueError:
+        a = 0
 
-    try: b = math.sqrt(eigval[smallind])
-    except ValueError: b = 0
+    try:
+        b = np.sqrt(eigval[smallind])
+    except ValueError:
+        b = 0
 
-    x = [a * math.cos(it) for it in t]
-    y = [b * math.sin(it) for it in t]
-    angle = math.atan2(eigvec[bigind, 1], eigvec[bigind, 0])
-    R = np.matrix([[math.cos(angle), math.sin(angle)],
-                   [-math.sin(angle), math.cos(angle)]])
+    x = a * np.cos(t)
+    y = b * np.sin(t)
+    angle = np.arctan2(eigvec[bigind, 1], eigvec[bigind, 0])
+    sin_angle = np.sin(angle)
+    cos_angle = np.cos(angle)
+    R = np.matrix([[cos_angle, sin_angle],
+                   [-sin_angle, cos_angle]])
     fx = R * np.matrix([x, y])
     px = np.array(fx[0, :] + xEst[0, 0]).flatten()
     py = np.array(fx[1, :] + xEst[1, 0]).flatten()
@@ -190,7 +195,7 @@ def plot_covariance_ellipse(xEst, PEst):
 
 
 def main():
-    print(__file__ + " start!!")
+    print("{} start!!".format(__file__))
 
     time = 0.0
 

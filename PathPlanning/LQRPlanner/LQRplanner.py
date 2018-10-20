@@ -9,8 +9,6 @@ author: Atsushi Sakai (@Atsushi_twi)
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.linalg as la
-import math
-import random
 
 show_animation = True
 
@@ -40,7 +38,7 @@ def LQRplanning(sx, sy, gx, gy):
         rx.append(x[0, 0] + gx)
         ry.append(x[1, 0] + gy)
 
-        d = math.sqrt((gx - rx[-1])**2 + (gy - ry[-1])**2)
+        d = np.hypot(gx - rx[-1], gy - ry[-1])
         if d <= 0.1:
             #  print("Goal!!")
             found_path = True
@@ -69,7 +67,7 @@ def solve_DARE(A, B, Q, R):
     maxiter = 150
     eps = 0.01
 
-    for i in range(maxiter):
+    for _ in range(maxiter):
         Xn = A.T * X * A - A.T * X * B * \
             la.inv(R + B.T * X * B) * B.T * X * A + Q
         if (abs(Xn - X)).max() < eps:
@@ -93,7 +91,7 @@ def dlqr(A, B, Q, R):
     # compute the LQR gain
     K = np.matrix(la.inv(B.T * X * B + R) * (B.T * X * A))
 
-    eigVals, eigVecs = la.eig(A - B * K)
+    eigVals, _ = la.eig(A - B * K)
 
     return K, X, eigVals
 
@@ -109,24 +107,24 @@ def get_system_model():
 
 def LQR_control(A, B, x):
 
-    Kopt, X, ev = dlqr(A, B, np.eye(2), np.eye(1))
+    Kopt, _, _ = dlqr(A, B, np.eye(2), np.eye(1))
 
-    u = -Kopt * x
+    u = -1 * Kopt * x
 
     return u
 
 
 def main():
-    print(__file__ + " start!!")
+    print("{} start!!".format(__file__))
 
     ntest = 10  # number of goal
     area = 100.0  # sampling area
 
-    for i in range(ntest):
+    for _ in range(ntest):
         sx = 6.0
         sy = 6.0
-        gx = random.uniform(-area, area)
-        gy = random.uniform(-area, area)
+        gx = np.random.uniform(-area, area)
+        gy = np.random.uniform(-area, area)
 
         rx, ry = LQRplanning(sx, sy, gx, gy)
 
@@ -139,7 +137,7 @@ def main():
 
 
 def main1():
-    print(__file__ + " start!!")
+    print("{} start!!".format(__file__))
 
     sx = 6.0
     sy = 6.0

@@ -1,6 +1,6 @@
+import sys
 from unittest import TestCase
 
-import sys
 sys.path.append("./PathPlanning/RRTDubins/")
 
 from PathPlanning.RRTDubins import rrt_dubins as m

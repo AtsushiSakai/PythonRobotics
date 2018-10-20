@@ -1,5 +1,4 @@
 """
-
 Potential Field based path planner
 
 author: Atsushi Sakai (@Atsushi_twi)
@@ -9,8 +8,8 @@ https://www.cs.cmu.edu/~motionplanning/lecture/Chap4-Potential-Field_howie.pdf
 
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Parameters
 KP = 5.0  # attractive potential gain
@@ -51,9 +50,9 @@ def calc_attractive_potential(x, y, gx, gy):
 def calc_repulsive_potential(x, y, ox, oy, rr):
     # search nearest obstacle
     minid = -1
-    dmin = float("inf")
+    dmin = np.inf
     for i in range(len(ox)):
-        d = np.hypot(x - ox[i], y - oy[i])
+        d = (x - ox[i])**2 + (y - oy[i])**2
         if dmin >= d:
             dmin = d
             minid = i
@@ -104,13 +103,13 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
     rx, ry = [sx], [sy]
     motion = get_motion_model()
     while d >= reso:
-        minp = float("inf")
+        minp = np.inf
         minix, miniy = -1, -1
         for i in range(len(motion)):
             inx = int(ix + motion[i][0])
             iny = int(iy + motion[i][1])
             if inx >= len(pmap) or iny >= len(pmap[0]):
-                p = float("inf")  # outside area
+                p = np.inf  # outside area
             else:
                 p = pmap[inx][iny]
             if minp > p:
@@ -157,14 +156,13 @@ def main():
         plt.axis("equal")
 
     # path generation
-    rx, ry = potential_field_planning(
-        sx, sy, gx, gy, ox, oy, grid_size, robot_radius)
+    potential_field_planning(sx, sy, gx, gy, ox, oy, grid_size, robot_radius)
 
     if show_animation:
         plt.show()
 
 
 if __name__ == '__main__':
-    print(__file__ + " start!!")
+    print("{} start!!".format(__file__))
     main()
-    print(__file__ + " Done!!")
+    print("{} Done!!".format(__file__))

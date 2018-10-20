@@ -3,9 +3,8 @@ Obstacle navigation using A* on a toroidal grid
 
 Author: Daniel Ingram (daniel-s-ingram)
 """
-from math import pi
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.colors import from_levels_and_colors
 
 plt.ion()
@@ -24,8 +23,8 @@ def main():
     plt.show()
     route = astar_torus(grid, start, goal)
     for node in route:
-        theta1 = 2 * pi * node[0] / M - pi
-        theta2 = 2 * pi * node[1] / M - pi
+        theta1 = 2 * np.pi * node[0] / M - np.pi
+        theta2 = 2 * np.pi * node[1] / M - np.pi
         arm.update_joints([theta1, theta2])
         arm.plot(obstacles=obstacles)
 
@@ -74,13 +73,13 @@ def get_occupancy_grid(arm, obstacles):
     Args:
         arm: An instance of NLinkArm
         obstacles: A list of obstacles, with each obstacle defined as a list
-                   of xy coordinates and a radius. 
+                   of xy coordinates and a radius.
 
     Returns:
         Occupancy grid in joint space
     """
     grid = [[0 for _ in range(M)] for _ in range(M)]
-    theta_list = [2 * i * pi / M for i in range(-M // 2, M // 2 + 1)]
+    theta_list = [2 * i * np.pi / M for i in range(-M // 2, M // 2 + 1)]
     for i in range(M):
         for j in range(M):
             arm.update_joints([theta_list[i], theta_list[j]])

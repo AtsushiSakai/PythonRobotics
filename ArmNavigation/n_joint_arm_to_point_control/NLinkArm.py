@@ -4,8 +4,8 @@ Class for controlling and plotting an arm with an arbitrary number of links.
 Author: Daniel Ingram
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class NLinkArm(object):
