@@ -3,7 +3,7 @@ language: python
 matrix:
   include:
     - os: linux
-    - os: osx
+    #- os: osx
 
 python:
   - 3.6
