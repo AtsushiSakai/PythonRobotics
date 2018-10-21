@@ -1,31 +1,33 @@
 """
-
 Path tracking simulation with Stanley steering control and PID speed control.
 
+DOI: 10.1002/rob.20147
+
 author: Atsushi Sakai (@Atsushi_twi)
-
 """
-from __future__ import division, print_function
-
 import sys
-
-sys.path.append("../../PathPlanning/CubicSpline/")
 
 import matplotlib.pyplot as plt
 import numpy as np
 
+sys.path.append("../../PathPlanning/CubicSpline/")
+
 import cubic_spline_planner
+from utils_math import normalize_angle
+from utils_unit import kph2mps, mps2kph
+
 
 k = 0.5  # control gain
 Kp = 1.0  # speed propotional gain
 dt = 0.1  # [s] time difference
 L = 2.9  # [m] Wheel base of vehicle
-max_steer = np.radians(30.0)  # [rad] max steering angle
+max_steer = np.deg2rad(30.0)  # [rad] max steering angle
 
 show_animation = True
 
 
-class State(object):
+
+class State:
     """
     Class representing the state of a vehicle.
 
@@ -57,8 +59,9 @@ class State(object):
         self.x += self.v * np.cos(self.yaw) * dt
         self.y += self.v * np.sin(self.yaw) * dt
         self.yaw += self.v / L * np.tan(delta) * dt
-        self.yaw = normalize_angle(self.yaw)
         self.v += acceleration * dt
+
+        self.yaw = normalize_angle(self.yaw)
 
 
 def pid_control(target, current):
@@ -98,22 +101,6 @@ def stanley_control(state, cx, cy, cyaw, last_target_idx):
     return delta, current_target_idx
 
 
-def normalize_angle(angle):
-    """
-    Normalize an angle to [-pi, pi].
-
-    :param angle: (float)
-    :return: (float) Angle in radian in [-pi, pi]
-    """
-    while angle > np.pi:
-        angle -= 2.0 * np.pi
-
-    while angle < -np.pi:
-        angle += 2.0 * np.pi
-
-    return angle
-
-
 def calc_target_index(state, cx, cy):
     """
     Compute index in the trajectory list of the target.
@@ -128,17 +115,19 @@ def calc_target_index(state, cx, cy):
     fy = state.y + L * np.sin(state.yaw)
 
     # Search nearest point index
-    dx = [fx - icx for icx in cx]
-    dy = [fy - icy for icy in cy]
-    d = [np.sqrt(idx ** 2 + idy ** 2) for (idx, idy) in zip(dx, dy)]
-    error_front_axle = min(d)
-    target_idx = d.index(error_front_axle)
+    squared_errors = [(fx - icx)**2 + (fy - icy)**2
+        for (icx, icy) in zip(cx, cy)]
+    min_squared_errors = min(squared_errors)
+    target_idx = squared_errors.index(min_squared_errors)
+    error_of_front_axle = np.sqrt(min_squared_errors)
 
-    target_yaw = normalize_angle(np.arctan2(fy - cy[target_idx], fx - cx[target_idx]) - state.yaw)
+    target_yaw = normalize_angle(np.arctan2(
+        fy - cy[target_idx], fx - cx[target_idx]) - state.yaw)
+
     if target_yaw > 0.0:
-        error_front_axle = - error_front_axle
+        error_of_front_axle *= -1
 
-    return target_idx, error_front_axle
+    return target_idx, error_of_front_axle
 
 
 def main():
@@ -147,15 +136,14 @@ def main():
     ax = [0.0, 100.0, 100.0, 50.0, 60.0]
     ay = [0.0, 0.0, -30.0, -20.0, 0.0]
 
-    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
-        ax, ay, ds=0.1)
+    cx, cy, cyaw, _, _ = cubic_spline_planner.calc_spline_course(ax, ay, ds=0.1)
 
-    target_speed = 30.0 / 3.6  # [m/s]
+    target_speed = kph2mps(30.0)  # [m/s]
 
     max_simulation_time = 100.0
 
     # Initial state
-    state = State(x=-0.0, y=5.0, yaw=np.radians(20.0), v=0.0)
+    state = State(x=-0.0, y=5.0, yaw=np.deg2rad(20.0), v=0.0)
 
     last_idx = len(cx) - 1
     time = 0.0
@@ -186,23 +174,25 @@ def main():
             plt.plot(cx[target_idx], cy[target_idx], "xg", label="target")
             plt.axis("equal")
             plt.grid(True)
-            plt.title("Speed[km/h]:" + str(state.v * 3.6)[:4])
+            plt.legend(loc='best')
+            plt.title("Speed[km/h]:{:.2f}".format(mps2kph(state.v)))
             plt.pause(0.001)
 
     # Test
     assert last_idx >= target_idx, "Cannot reach goal"
 
     if show_animation:
+        plt.cla()
         plt.plot(cx, cy, ".r", label="course")
         plt.plot(x, y, "-b", label="trajectory")
-        plt.legend()
+        plt.legend(loc='best')
         plt.xlabel("x[m]")
         plt.ylabel("y[m]")
         plt.axis("equal")
         plt.grid(True)
 
-        flg, ax = plt.subplots(1)
-        plt.plot(t, [iv * 3.6 for iv in v], "-r")
+        plt.subplots(1)
+        plt.plot(t, mps2kph(np.array(v)), "-r")
         plt.xlabel("Time[s]")
         plt.ylabel("Speed[km/h]")
         plt.grid(True)
