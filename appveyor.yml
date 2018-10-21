@@ -1,12 +1,16 @@
 init:
-- ECHO %PYTHON%
+- "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
 
 environment:
   matrix:
   - PYTHON: C:/Python36-x64
 
 install:
-  - ps: (new-object net.webclient).DownloadFile('https://raw.github.com/pypa/pip/master/contrib/get-pip.py', 'C:/get-pip.py')
-  - "%PYTHON%/python.exe C:/get-pip.py"
-  - "%PYTHON%/Scripts/pip.exe install pillow==2.9.0"
+  - "%PYTHON%/Scripts/pip.exe install numpy"
+  - "%PYTHON%/Scripts/pip.exe install pandas"
+  - "%PYTHON%/Scripts/pip.exe install scipy"
+  - "%PYTHON%/Scripts/pip.exe install matplotlib"
+
+test_script:
+    - "%PYTHON%\python.exe -m unittest discover C:\projects\pythonrobotics\tests"
   
