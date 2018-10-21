@@ -7,6 +7,7 @@ init:
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
 
 install:
+  - "%PYTHON%\\python.exe -m pip install wheel"
   - "%PYTHON%/Scripts/pip.exe install numpy"
   - "%PYTHON%/Scripts/pip.exe install pandas"
   - "%PYTHON%/Scripts/pip.exe install scipy"
