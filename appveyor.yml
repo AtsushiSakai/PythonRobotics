@@ -1,15 +1,15 @@
-init:
-- "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
-
 environment:
   matrix:
   - PYTHON: C:/Python36-x64
+    CONDA_INSTALL_LOCN: "C:\\Miniconda36-x64"
+
+init:
+  - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
 
 install:
   - "%PYTHON%/Scripts/pip.exe install numpy"
   - "%PYTHON%/Scripts/pip.exe install pandas"
   - "%PYTHON%/Scripts/pip.exe install scipy"
-  - "%PYTHON%/Scripts/pip.exe install matplotlib"
 
 test_script:
   - "%PYTHON%/python.exe -m unittest discover C:/projects/pythonrobotics/tests"
