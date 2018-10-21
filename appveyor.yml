@@ -12,5 +12,5 @@ install:
   - "%PYTHON%/Scripts/pip.exe install matplotlib"
 
 test_script:
-    - "%PYTHON%\python.exe -m unittest discover C:/projects/pythonrobotics/tests"
+  - "%PYTHON%\python.exe -m unittest discover C:/projects/pythonrobotics/tests"
   
