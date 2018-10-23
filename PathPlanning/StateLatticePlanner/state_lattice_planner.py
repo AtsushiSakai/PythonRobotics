@@ -2,7 +2,7 @@
 
 State lattice planner with model predictive trajectory generator
 
-author: Atsushi Sakai(Atsushi_twi)
+author: Atsushi Sakai (@Atsushi_twi)
 
 """
 import sys
@@ -180,10 +180,10 @@ def uniform_terminal_state_sampling_test1():
     nxy = 5
     nh = 3
     d = 20
-    a_min = - math.radians(45.0)
-    a_max = math.radians(45.0)
-    p_min = - math.radians(45.0)
-    p_max = math.radians(45.0)
+    a_min = - np.deg2rad(45.0)
+    a_max = np.deg2rad(45.0)
+    p_min = - np.deg2rad(45.0)
+    p_max = np.deg2rad(45.0)
     states = calc_uniform_polar_states(nxy, nh, d, a_min, a_max, p_min, p_max)
     result = generate_path(states, k0)
 
@@ -207,10 +207,10 @@ def uniform_terminal_state_sampling_test2():
     nxy = 6
     nh = 3
     d = 20
-    a_min = - math.radians(-10.0)
-    a_max = math.radians(45.0)
-    p_min = - math.radians(20.0)
-    p_max = math.radians(20.0)
+    a_min = - np.deg2rad(-10.0)
+    a_max = np.deg2rad(45.0)
+    p_min = - np.deg2rad(20.0)
+    p_max = np.deg2rad(20.0)
     states = calc_uniform_polar_states(nxy, nh, d, a_min, a_max, p_min, p_max)
     result = generate_path(states, k0)
 
@@ -234,12 +234,12 @@ def biased_terminal_state_sampling_test1():
     nxy = 30
     nh = 2
     d = 20
-    a_min = math.radians(-45.0)
-    a_max = math.radians(45.0)
-    p_min = - math.radians(20.0)
-    p_max = math.radians(20.0)
+    a_min = np.deg2rad(-45.0)
+    a_max = np.deg2rad(45.0)
+    p_min = - np.deg2rad(20.0)
+    p_max = np.deg2rad(20.0)
     ns = 100
-    goal_angle = math.radians(0.0)
+    goal_angle = np.deg2rad(0.0)
     states = calc_biased_polar_states(
         goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max)
     result = generate_path(states, k0)
@@ -261,12 +261,12 @@ def biased_terminal_state_sampling_test2():
     nxy = 30
     nh = 1
     d = 20
-    a_min = math.radians(0.0)
-    a_max = math.radians(45.0)
-    p_min = - math.radians(20.0)
-    p_max = math.radians(20.0)
+    a_min = np.deg2rad(0.0)
+    a_max = np.deg2rad(45.0)
+    p_min = - np.deg2rad(20.0)
+    p_max = np.deg2rad(20.0)
     ns = 100
-    goal_angle = math.radians(30.0)
+    goal_angle = np.deg2rad(30.0)
     states = calc_biased_polar_states(
         goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max)
     result = generate_path(states, k0)
@@ -288,7 +288,7 @@ def lane_state_sampling_test1():
     k0 = 0.0
 
     l_center = 10.0
-    l_heading = math.radians(90.0)
+    l_heading = np.deg2rad(90.0)
     l_width = 3.0
     v_width = 1.0
     d = 10
