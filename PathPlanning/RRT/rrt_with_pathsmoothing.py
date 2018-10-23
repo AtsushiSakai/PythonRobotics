@@ -112,8 +112,8 @@ class RRT():
     def PlotCircle(self, x, y, size):
         deg = list(range(0, 360, 5))
         deg.append(0)
-        xl = [x + size * math.cos(math.radians(d)) for d in deg]
-        yl = [y + size * math.sin(math.radians(d)) for d in deg]
+        xl = [x + size * math.cos(np.deg2rad(d)) for d in deg]
+        yl = [y + size * math.sin(np.deg2rad(d)) for d in deg]
         plt.plot(xl, yl, "-k")
 
     def GetNearestListIndex(self, nodeList, rnd):

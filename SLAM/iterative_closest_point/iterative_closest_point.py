@@ -138,7 +138,7 @@ def main():
     # simulation parameters
     nPoint = 10
     fieldLength = 50.0
-    motion = [0.5, 2.0, math.radians(-10.0)]  # movement [x[m],y[m],yaw[deg]]
+    motion = [0.5, 2.0, np.deg2rad(-10.0)]  # movement [x[m],y[m],yaw[deg]]
 
     nsim = 3  # number of simulation
 

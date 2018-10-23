@@ -10,6 +10,7 @@ License MIT
 
 """
 import math
+import numpy as np
 
 
 def mod2pi(theta):
@@ -17,7 +18,7 @@ def mod2pi(theta):
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2*math.pi) - math.pi
+    return (angle + math.pi) % (2 * math.pi) - math.pi
 
 
 def LSL(alpha, beta, d):
@@ -230,7 +231,7 @@ def generate_course(length, mode, c):
         if m is "S":
             d = 1.0 / c
         else:  # turning couse
-            d = math.radians(3.0)
+            d = np.deg2rad(3.0)
 
         while pd < abs(l - d):
             #  print(pd, l)
@@ -281,11 +282,11 @@ if __name__ == '__main__':
 
     start_x = 1.0  # [m]
     start_y = 1.0  # [m]
-    start_yaw = math.radians(45.0)  # [rad]
+    start_yaw = np.deg2rad(45.0)  # [rad]
 
     end_x = -3.0  # [m]
     end_y = -3.0  # [m]
-    end_yaw = math.radians(-45.0)  # [rad]
+    end_yaw = np.deg2rad(-45.0)  # [rad]
 
     curvature = 1.0
 

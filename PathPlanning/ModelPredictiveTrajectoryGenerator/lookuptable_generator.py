@@ -12,7 +12,7 @@ import pandas as pd
 
 
 def calc_states_list():
-    maxyaw = math.radians(-30.0)
+    maxyaw = np.deg2rad(-30.0)
 
     x = np.arange(1.0, 30.0, 5.0)
     y = np.arange(0.0, 20.0, 2.0)

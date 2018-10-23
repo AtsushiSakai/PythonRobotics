@@ -93,8 +93,8 @@ def ray_casting_filter(xl, yl, thetal, rangel, angle_reso):
 def plot_circle(x, y, size, color="-b"):
     deg = list(range(0, 360, 5))
     deg.append(0)
-    xl = [x + size * math.cos(math.radians(d)) for d in deg]
-    yl = [y + size * math.sin(math.radians(d)) for d in deg]
+    xl = [x + size * math.cos(np.deg2rad(d)) for d in deg]
+    yl = [y + size * math.sin(np.deg2rad(d)) for d in deg]
     plt.plot(xl, yl, color)
 
 
@@ -107,8 +107,8 @@ def main():
     cx = -2.0  # initial x position of obstacle
     cy = -8.0  # initial y position of obstacle
     cr = 1.0  # obstacle radious
-    theta = math.radians(30.0)  # obstacle moving direction
-    angle_reso = math.radians(3.0)  # sensor angle resolution
+    theta = np.deg2rad(30.0)  # obstacle moving direction
+    angle_reso = np.deg2rad(3.0)  # sensor angle resolution
 
     time = 0.0
     while time <= simtime:

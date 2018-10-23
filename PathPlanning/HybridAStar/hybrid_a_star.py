@@ -198,11 +198,11 @@ def main():
         oy.append(60.0 - i)
 
     # Set Initial parameters
-    start = [10.0, 10.0, math.radians(90.0)]
-    goal = [50.0, 50.0, math.radians(-90.0)]
+    start = [10.0, 10.0, np.deg2rad(90.0)]
+    goal = [50.0, 50.0, np.deg2rad(-90.0)]
 
     xyreso = 2.0
-    yawreso = math.radians(15.0)
+    yawreso = np.deg2rad(15.0)
 
     rx, ry, ryaw = hybrid_a_star_planning(
         start, goal, ox, oy, xyreso, yawreso)

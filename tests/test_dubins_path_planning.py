@@ -1,6 +1,6 @@
 from unittest import TestCase
 from PathPlanning.DubinsPath import dubins_path_planning
-import math
+import numpy as np
 
 
 class Test(TestCase):
@@ -8,11 +8,11 @@ class Test(TestCase):
     def test1(self):
         start_x = 1.0  # [m]
         start_y = 1.0  # [m]
-        start_yaw = math.radians(45.0)  # [rad]
+        start_yaw = np.deg2rad(45.0)  # [rad]
 
         end_x = -3.0  # [m]
         end_y = -3.0  # [m]
-        end_yaw = math.radians(-45.0)  # [rad]
+        end_yaw = np.deg2rad(-45.0)  # [rad]
 
         curvature = 1.0
 

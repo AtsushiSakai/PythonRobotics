@@ -221,10 +221,8 @@ class RRT():
 
         return newNode
 
-
     def pi_2_pi(self, angle):
-        return (angle + math.pi) % (2*math.pi) - math.pi
-
+        return (angle + math.pi) % (2 * math.pi) - math.pi
 
     def steer(self, rnd, nind):
         #  print(rnd)
@@ -265,7 +263,7 @@ class RRT():
     def get_best_last_indexs(self):
         #  print("get_best_last_index")
 
-        YAWTH = math.radians(1.0)
+        YAWTH = np.deg2rad(1.0)
         XYTH = 0.5
 
         goalinds = []
@@ -420,8 +418,8 @@ def main():
     ]  # [x,y,size(radius)]
 
     # Set Initial parameters
-    start = [0.0, 0.0, math.radians(0.0)]
-    goal = [6.0, 7.0, math.radians(90.0)]
+    start = [0.0, 0.0, np.deg2rad(0.0)]
+    goal = [6.0, 7.0, np.deg2rad(90.0)]
 
     rrt = RRT(start, goal, randArea=[-2.0, 20.0], obstacleList=obstacleList)
     flag, x, y, yaw, v, t, a, d = rrt.Planning(animation=show_animation)
