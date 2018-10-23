@@ -236,9 +236,9 @@ def main():
     #  state = unicycle_model.State(x=-1.0, y=-5.0, yaw=0.0, v=-30.0 / 3.6)
     #  state = unicycle_model.State(x=10.0, y=5.0, yaw=0.0, v=-30.0 / 3.6)
     #  state = unicycle_model.State(
-    #  x=3.0, y=5.0, yaw=math.radians(-40.0), v=-10.0 / 3.6)
+    #  x=3.0, y=5.0, yaw=np.deg2rad(-40.0), v=-10.0 / 3.6)
     #  state = unicycle_model.State(
-    #  x=3.0, y=5.0, yaw=math.radians(40.0), v=50.0 / 3.6)
+    #  x=3.0, y=5.0, yaw=np.deg2rad(40.0), v=50.0 / 3.6)
 
     lastIndex = len(cx) - 1
     time = 0.0

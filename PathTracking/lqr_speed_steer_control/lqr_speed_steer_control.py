@@ -21,7 +21,7 @@ R = np.eye(2)
 # parameters
 dt = 0.1  # time tick[s]
 L = 0.5  # Wheel base of the vehicle [m]
-max_steer = math.radians(45.0)  # maximum steering angle[rad]
+max_steer = np.deg2rad(45.0)  # maximum steering angle[rad]
 
 show_animation = True
 
@@ -51,7 +51,7 @@ def update(state, a, delta):
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2*math.pi) - math.pi
+    return (angle + math.pi) % (2 * math.pi) - math.pi
 
 
 def solve_DARE(A, B, Q, R):

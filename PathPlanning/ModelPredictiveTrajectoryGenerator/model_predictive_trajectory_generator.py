@@ -133,8 +133,8 @@ def optimize_trajectory(target, k0, p):
 
 def test_optimize_trajectory():
 
-    #  target = motion_model.State(x=5.0, y=2.0, yaw=math.radians(00.0))
-    target = motion_model.State(x=5.0, y=2.0, yaw=math.radians(90.0))
+    #  target = motion_model.State(x=5.0, y=2.0, yaw=np.deg2rad(00.0))
+    target = motion_model.State(x=5.0, y=2.0, yaw=np.deg2rad(90.0))
     k0 = 0.0
 
     init_p = np.matrix([6.0, 0.0, 0.0]).T
@@ -152,8 +152,8 @@ def test_optimize_trajectory():
 def test_trajectory_generate():
     s = 5.0  # [m]
     k0 = 0.0
-    km = math.radians(30.0)
-    kf = math.radians(-30.0)
+    km = np.deg2rad(30.0)
+    kf = np.deg2rad(-30.0)
 
     #  plt.plot(xk, yk, "xr")
     #  plt.plot(t, kp)

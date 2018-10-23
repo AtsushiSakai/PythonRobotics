@@ -10,7 +10,7 @@ import math
 
 dt = 0.05  # [s]
 L = 0.9  # [m]
-steer_max = math.radians(40.0)
+steer_max = np.deg2rad(40.0)
 curvature_max = math.tan(steer_max) / L
 curvature_max = 1.0 / curvature_max + 1.0
 
@@ -38,7 +38,7 @@ def update(state, a, delta):
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2*math.pi) - math.pi
+    return (angle + math.pi) % (2 * math.pi) - math.pi
 
 
 if __name__ == '__main__':
@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     T = 100
     a = [1.0] * T
-    delta = [math.radians(1.0)] * T
+    delta = [np.deg2rad(1.0)] * T
     #  print(delta)
     #  print(a, delta)
 

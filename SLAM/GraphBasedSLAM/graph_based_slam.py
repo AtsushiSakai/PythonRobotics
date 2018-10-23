@@ -18,8 +18,8 @@ import matplotlib.pyplot as plt
 
 
 #  Simulation parameter
-Qsim = np.diag([0.2, math.radians(1.0)])**2
-Rsim = np.diag([0.1, math.radians(10.0)])**2
+Qsim = np.diag([0.2, np.deg2rad(1.0)])**2
+Rsim = np.diag([0.1, np.deg2rad(10.0)])**2
 
 DT = 2.0  # time tick [s]
 SIM_TIME = 100.0  # simulation time [s]
@@ -29,7 +29,7 @@ STATE_SIZE = 3  # State size [x,y,yaw]
 # Covariance parameter of Graph Based SLAM
 C_SIGMA1 = 0.1
 C_SIGMA2 = 0.1
-C_SIGMA3 = math.radians(1.0)
+C_SIGMA3 = np.deg2rad(1.0)
 
 MAX_ITR = 20  # Maximum iteration
 
@@ -253,7 +253,7 @@ def motion_model(x, u):
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2*math.pi) - math.pi
+    return (angle + math.pi) % (2 * math.pi) - math.pi
 
 
 def main():

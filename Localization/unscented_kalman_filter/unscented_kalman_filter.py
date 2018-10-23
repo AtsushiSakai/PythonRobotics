@@ -12,12 +12,12 @@ import math
 import matplotlib.pyplot as plt
 
 # Estimation parameter of UKF
-Q = np.diag([0.1, 0.1, math.radians(1.0), 1.0])**2
-R = np.diag([1.0, math.radians(40.0)])**2
+Q = np.diag([0.1, 0.1, np.deg2rad(1.0), 1.0])**2
+R = np.diag([1.0, np.deg2rad(40.0)])**2
 
 #  Simulation parameter
 Qsim = np.diag([0.5, 0.5])**2
-Rsim = np.diag([1.0, math.radians(30.0)])**2
+Rsim = np.diag([1.0, np.deg2rad(30.0)])**2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]

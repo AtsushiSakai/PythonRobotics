@@ -12,12 +12,12 @@ import matplotlib.pyplot as plt
 
 
 # Fast SLAM covariance
-Q = np.diag([3.0, math.radians(10.0)])**2
-R = np.diag([1.0, math.radians(20.0)])**2
+Q = np.diag([3.0, np.deg2rad(10.0)])**2
+R = np.diag([1.0, np.deg2rad(20.0)])**2
 
 #  Simulation parameter
-Qsim = np.diag([0.3, math.radians(2.0)])**2
-Rsim = np.diag([0.5, math.radians(10.0)])**2
+Qsim = np.diag([0.3, np.deg2rad(2.0)])**2
+Rsim = np.diag([0.5, np.deg2rad(10.0)])**2
 OFFSET_YAWRATE_NOISE = 0.01
 
 DT = 0.1  # time tick [s]
@@ -354,7 +354,7 @@ def motion_model(x, u):
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2*math.pi) - math.pi
+    return (angle + math.pi) % (2 * math.pi) - math.pi
 
 
 def main():

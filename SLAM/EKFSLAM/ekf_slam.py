@@ -12,11 +12,11 @@ import matplotlib.pyplot as plt
 
 
 # EKF state covariance
-Cx = np.diag([0.5, 0.5, math.radians(30.0)])**2
+Cx = np.diag([0.5, 0.5, np.deg2rad(30.0)])**2
 
 #  Simulation parameter
-Qsim = np.diag([0.2, math.radians(1.0)])**2
-Rsim = np.diag([1.0, math.radians(10.0)])**2
+Qsim = np.diag([0.2, np.deg2rad(1.0)])**2
+Rsim = np.diag([1.0, np.deg2rad(10.0)])**2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
@@ -203,7 +203,7 @@ def jacobH(q, delta, x, i):
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2*math.pi) - math.pi
+    return (angle + math.pi) % (2 * math.pi) - math.pi
 
 
 def main():
