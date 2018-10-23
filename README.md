@@ -99,9 +99,17 @@ Full documentation is available online: [https://pythonrobotics.readthedocs.io/]
 
 # How to use
 
-1. Install the required libraries. You can use environment.yml with conda command.
+1. Clone this repo.
 
-2. Clone this repo.
+> git clone https://github.com/dhiegomaga/PythonRobotics.git
+
+> cd PythonRobotics/
+
+
+2. Install the required libraries. You can use environment.yml with conda command.
+
+> conda env create -f environment.yml
+
 
 3. Execute python script in each directory.
 
