@@ -201,7 +201,7 @@ def main():
         plt.plot(x, y, "-r")
 
         plt.subplots()
-        plt.plot(time, [math.degrees(i) for i in yaw], "-r")
+        plt.plot(time, [np.rad2deg(i) for i in yaw], "-r")
         plt.xlabel("Time[s]")
         plt.ylabel("Yaw[deg]")
         plt.grid(True)

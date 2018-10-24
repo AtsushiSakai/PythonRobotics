@@ -38,7 +38,7 @@ def LSL(alpha, beta, d):
     t = mod2pi(-alpha + tmp1)
     p = math.sqrt(p_squared)
     q = mod2pi(beta - tmp1)
-    #  print(math.degrees(t), p, math.degrees(q))
+    #  print(np.rad2deg(t), p, np.rad2deg(q))
 
     return t, p, q, mode
 
