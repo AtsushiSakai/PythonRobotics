@@ -436,7 +436,7 @@ def main():
         plt.pause(0.001)
 
         flg, ax = plt.subplots(1)
-        plt.plot(t, [math.degrees(iyaw) for iyaw in yaw[:-1]], '-r')
+        plt.plot(t, [np.rad2deg(iyaw) for iyaw in yaw[:-1]], '-r')
         plt.xlabel("time[s]")
         plt.ylabel("Yaw[deg]")
         plt.grid(True)
@@ -455,7 +455,7 @@ def main():
         plt.grid(True)
 
         flg, ax = plt.subplots(1)
-        plt.plot(t, [math.degrees(td) for td in d], '-r')
+        plt.plot(t, [np.rad2deg(td) for td in d], '-r')
         plt.xlabel("time[s]")
         plt.ylabel("Steering angle[deg]")
         plt.grid(True)
