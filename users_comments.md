@@ -49,3 +49,11 @@ Thanks alot.
 Dear AtsushiSakai,<br> <br>thank you for you code!
 
 —- Anonymous
+
+--- 
+
+Thanks!
+
+--a friend
+
+
