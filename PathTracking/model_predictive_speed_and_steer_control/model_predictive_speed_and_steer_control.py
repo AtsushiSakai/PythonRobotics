@@ -79,7 +79,7 @@ def pi_2_pi(angle):
 
 def get_linear_model_matrix(v, phi, delta):
 
-    A = np.matrix(np.zeros((NX, NX)))
+    A = np.zeros((NX, NX))
     A[0, 0] = 1.0
     A[1, 1] = 1.0
     A[2, 2] = 1.0
@@ -90,7 +90,7 @@ def get_linear_model_matrix(v, phi, delta):
     A[1, 3] = DT * v * math.cos(phi)
     A[3, 2] = DT * math.tan(delta) / WB
 
-    B = np.matrix(np.zeros((NX, NU)))
+    B = np.zeros((NX, NU))
     B[2, 0] = DT
     B[3, 1] = DT * v / (WB * math.cos(delta) ** 2)
 
@@ -104,10 +104,10 @@ def get_linear_model_matrix(v, phi, delta):
 
 def plot_car(x, y, yaw, steer=0.0, cabcolor="-r", truckcolor="-k"):
 
-    outline = np.matrix([[-BACKTOWHEEL, (LENGTH - BACKTOWHEEL), (LENGTH - BACKTOWHEEL), -BACKTOWHEEL, -BACKTOWHEEL],
+    outline = np.array([[-BACKTOWHEEL, (LENGTH - BACKTOWHEEL), (LENGTH - BACKTOWHEEL), -BACKTOWHEEL, -BACKTOWHEEL],
                          [WIDTH / 2, WIDTH / 2, - WIDTH / 2, -WIDTH / 2, WIDTH / 2]])
 
-    fr_wheel = np.matrix([[WHEEL_LEN, -WHEEL_LEN, -WHEEL_LEN, WHEEL_LEN, WHEEL_LEN],
+    fr_wheel = np.array([[WHEEL_LEN, -WHEEL_LEN, -WHEEL_LEN, WHEEL_LEN, WHEEL_LEN],
                           [-WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD, WHEEL_WIDTH - TREAD, WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD]])
 
     rr_wheel = np.copy(fr_wheel)
@@ -117,22 +117,22 @@ def plot_car(x, y, yaw, steer=0.0, cabcolor="-r", truckcolor="-k"):
     rl_wheel = np.copy(rr_wheel)
     rl_wheel[1, :] *= -1
 
-    Rot1 = np.matrix([[math.cos(yaw), math.sin(yaw)],
+    Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
                       [-math.sin(yaw), math.cos(yaw)]])
-    Rot2 = np.matrix([[math.cos(steer), math.sin(steer)],
+    Rot2 = np.array([[math.cos(steer), math.sin(steer)],
                       [-math.sin(steer), math.cos(steer)]])
 
-    fr_wheel = (fr_wheel.T * Rot2).T
-    fl_wheel = (fl_wheel.T * Rot2).T
+    fr_wheel = (fr_wheel.T.dot(Rot2)).T
+    fl_wheel = (fl_wheel.T.dot(Rot2)).T
     fr_wheel[0, :] += WB
     fl_wheel[0, :] += WB
 
-    fr_wheel = (fr_wheel.T * Rot1).T
-    fl_wheel = (fl_wheel.T * Rot1).T
+    fr_wheel = (fr_wheel.T.dot(Rot1)).T
+    fl_wheel = (fl_wheel.T.dot(Rot1)).T
 
-    outline = (outline.T * Rot1).T
-    rr_wheel = (rr_wheel.T * Rot1).T
-    rl_wheel = (rl_wheel.T * Rot1).T
+    outline = (outline.T.dot(Rot1)).T
+    rr_wheel = (rr_wheel.T.dot(Rot1)).T
+    rl_wheel = (rl_wheel.T.dot(Rot1)).T
 
     outline[0, :] += x
     outline[1, :] += y
