@@ -3,13 +3,12 @@ environment:
     # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the
     # /E:ON and /V:ON options are not enabled in the batch script intepreter
     # See: http://stackoverflow.com/a/13751649/163740
-    PYTHON: "C:\\conda"
     CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
-    MINICONDA_FILENAME: "Miniconda2-latest-Windows-x86_64.exe"
 
   matrix:
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      PYTHON_VERSION: "3.5"
+  - PYTHON: "C:\\conda"
+    CONDA_INSTALL_LOCN: "C:\\Miniconda36-x64"
+    MINICONDA_FILENAME: "Miniconda2-latest-Windows-x86_64.exe"
 
 init:
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
@@ -27,11 +26,17 @@ install:
   - ECHO "Filesystem root:"
   - ps: "ls \"C:/\""
 
+  - ECHO "Installed SDKs:"
+  - ps: "ls \"C:/Program Files/Microsoft SDKs/Windows\""
+
+  # Install Python (from the official .msi of https://python.org) and pip when
+  # not already installed.
+  - ps: if (-not(Test-Path($env:PYTHON))) { & appveyor\install.ps1 }
 
   # Prepend newly installed Python to the PATH of this build (this cannot be
   # done from inside the powershell script as it would require to restart
   # the parent CMD process).
-  #- "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 
   # Check that we have the expected version and architecture for Python
   - "python --version"
@@ -45,12 +50,10 @@ install:
   # compiled extensions and are not provided as pre-built wheel packages,
   # pip will build them from source using the MSVC compiler matching the
   # target Python version and architecture
-  - "conda install numpy"
-  - "conda install pandas"
-  - "conda install scipy"
-  - "conda install matplotlib"
-  - "conda install -c conda-forge lapack"
-  - "conda install -c cvxgrp cvxpy"
+  - "%PYTHON%/Scripts/pip.exe install numpy"
+  - "%PYTHON%/Scripts/pip.exe install pandas"
+  - "%PYTHON%/Scripts/pip.exe install scipy"
+  - "%PYTHON%/Scripts/pip.exe install matplotlib"
 
 build: off
 
