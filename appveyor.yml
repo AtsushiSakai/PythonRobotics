@@ -51,9 +51,9 @@ install:
   # compiled extensions and are not provided as pre-built wheel packages,
   # pip will build them from source using the MSVC compiler matching the
   # target Python version and architecture
-  - "%PYTHON%/Scripts/pip.exe install numpy"
-  - "%PYTHON%/Scripts/pip.exe install pandas"
-  - "%PYTHON%/Scripts/pip.exe install scipy"
+  #- "%PYTHON%/Scripts/pip.exe install numpy"
+  #- "%PYTHON%/Scripts/pip.exe install pandas"
+  #- "%PYTHON%/Scripts/pip.exe install scipy"
 
 test_script:
   # Run the project tests and store results in .xml log
