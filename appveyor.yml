@@ -45,19 +45,19 @@ install:
 
   # Upgrade to the latest version of pip to avoid it displaying warnings
   # about it being out of date.
-  #- "python -m pip install --upgrade pip"
+  - "python -m pip install --upgrade pip"
 
   # Install the build dependencies of the project. If some dependencies contain
   # compiled extensions and are not provided as pre-built wheel packages,
   # pip will build them from source using the MSVC compiler matching the
   # target Python version and architecture
-  #- "%PYTHON%/Scripts/pip.exe install numpy"
-  #- "%PYTHON%/Scripts/pip.exe install pandas"
-  #- "%PYTHON%/Scripts/pip.exe install scipy"
+  - "%PYTHON%/Scripts/pip.exe install numpy"
+  - "%PYTHON%/Scripts/pip.exe install pandas"
+  - "%PYTHON%/Scripts/pip.exe install scipy"
 
 build: off
 
 test_script:
   # Run the project tests and store results in .xml log
-  #- ps: |
-      #&$env:PYTHON\python -m unittest discover tests
+  - ps: |
+      &$env:PYTHON\python -m unittest discover tests
