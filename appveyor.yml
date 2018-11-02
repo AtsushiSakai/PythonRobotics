@@ -54,6 +54,7 @@ install:
   - "%PYTHON%/Scripts/pip.exe install numpy"
   - "%PYTHON%/Scripts/pip.exe install pandas"
   - "%PYTHON%/Scripts/pip.exe install scipy"
+  - "%PYTHON%/Scripts/pip.exe install matplotlib"
 
 build: off
 
