@@ -61,4 +61,4 @@ build: off
 test_script:
   # Run the project tests and store results in .xml log
   - ps: |
-      &$env:PYTHON\python -m unittest discover tests
+      &$env:PYTHON\python -Wignore -m unittest discover tests
