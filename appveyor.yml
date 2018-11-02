@@ -55,7 +55,9 @@ install:
   #- "%PYTHON%/Scripts/pip.exe install pandas"
   #- "%PYTHON%/Scripts/pip.exe install scipy"
 
+build: off
+
 test_script:
   # Run the project tests and store results in .xml log
-  - ps: |
-      &$env:PYTHON\python -m unittest discover tests
+  #- ps: |
+      #&$env:PYTHON\python -m unittest discover tests
