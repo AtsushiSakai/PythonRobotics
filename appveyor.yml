@@ -55,6 +55,7 @@ install:
   - "%PYTHON%/Scripts/pip.exe install pandas"
   - "%PYTHON%/Scripts/pip.exe install scipy"
   - "%PYTHON%/Scripts/pip.exe install matplotlib"
+  - "%PYTHON%/Scripts/pip.exe install cvxpy"
 
 build: off
 
