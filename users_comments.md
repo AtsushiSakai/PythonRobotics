@@ -39,3 +39,27 @@ Dear AtsushiSakai, <br> <br>Thanks for Python Robotics
 --Rebecca Li
 
 ---
+
+Thanks alot.
+
+--Zain
+
+--- 
+
+Dear AtsushiSakai,<br> <br>thank you for you code!
+
+—- Anonymous
+
+--- 
+
+Thanks!
+
+--a friend
+
+--- 
+
+Thanks for the awesome collection of codes!
+
+--Qi
+
+=========
