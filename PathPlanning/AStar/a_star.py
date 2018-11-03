@@ -126,7 +126,7 @@ def verify_node(node, obmap, minx, miny, maxx, maxy):
     elif node.y >= maxy:
         return False
 
-    if obmap[node.x][node.y]:
+    if obmap[int(node.x)][int(node.y)]:
         return False
 
     return True
@@ -143,8 +143,8 @@ def calc_obstacle_map(ox, oy, reso, vr):
     #  print("maxx:", maxx)
     #  print("maxy:", maxy)
 
-    xwidth = round(maxx - minx)
-    ywidth = round(maxy - miny)
+    xwidth = int(round(maxx - minx))
+    ywidth = int(round(maxy - miny))
     #  print("xwidth:", xwidth)
     #  print("ywidth:", ywidth)
 
