@@ -27,7 +27,7 @@ show_animation = True
 def calc_input():
     v = 1.0  # [m/s]
     yawrate = 0.1  # [rad/s]
-    u = np.matrix([v, yawrate]).T
+    u = np.array([[v, yawrate]]).T
     return u
 
 
@@ -38,12 +38,12 @@ def observation(xTrue, xd, u):
     # add noise to gps x-y
     zx = xTrue[0, 0] + np.random.randn() * Qsim[0, 0]
     zy = xTrue[1, 0] + np.random.randn() * Qsim[1, 1]
-    z = np.matrix([zx, zy])
+    z = np.array([[zx, zy]])
 
     # add noise to input
     ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
     ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1]
-    ud = np.matrix([ud1, ud2]).T
+    ud = np.array([[ud1, ud2]]).T
 
     xd = motion_model(xd, ud)
 
@@ -52,29 +52,29 @@ def observation(xTrue, xd, u):
 
 def motion_model(x, u):
 
-    F = np.matrix([[1.0, 0, 0, 0],
+    F = np.array([[1.0, 0, 0, 0],
                    [0, 1.0, 0, 0],
                    [0, 0, 1.0, 0],
                    [0, 0, 0, 0]])
 
-    B = np.matrix([[DT * math.cos(x[2, 0]), 0],
+    B = np.array([[DT * math.cos(x[2, 0]), 0],
                    [DT * math.sin(x[2, 0]), 0],
                    [0.0, DT],
                    [1.0, 0.0]])
 
-    x = F * x + B * u
+    x = F.dot(x) + B.dot(u)
 
     return x
 
 
 def observation_model(x):
     #  Observation Model
-    H = np.matrix([
+    H = np.array([
         [1, 0, 0, 0],
         [0, 1, 0, 0]
     ])
 
-    z = H * x
+    z = H.dot(x)
 
     return z
 
@@ -96,7 +96,7 @@ def jacobF(x, u):
     """
     yaw = x[2, 0]
     v = u[0, 0]
-    jF = np.matrix([
+    jF = np.array([
         [1.0, 0.0, -DT * v * math.sin(yaw), DT * math.cos(yaw)],
         [0.0, 1.0, DT * v * math.cos(yaw), DT * math.sin(yaw)],
         [0.0, 0.0, 1.0, 0.0],
@@ -107,7 +107,7 @@ def jacobF(x, u):
 
 def jacobH(x):
     # Jacobian of Observation Model
-    jH = np.matrix([
+    jH = np.array([
         [1, 0, 0, 0],
         [0, 1, 0, 0]
     ])
@@ -126,10 +126,10 @@ def ekf_estimation(xEst, PEst, z, u):
     jH = jacobH(xPred)
     zPred = observation_model(xPred)
     y = z.T - zPred
-    S = jH * PPred * jH.T + R
-    K = PPred * jH.T * np.linalg.inv(S)
-    xEst = xPred + K * y
-    PEst = (np.eye(len(xEst)) - K * jH) * PPred
+    S = jH.dot(PPred).dot(jH.T) + R
+    K = PPred.dot(jH.T).dot(np.linalg.inv(S))
+    xEst = xPred + K.dot(y)
+    PEst = (np.eye(len(xEst)) - K.dot(jH)).dot(PPred)
 
     return xEst, PEst
 
@@ -151,9 +151,9 @@ def plot_covariance_ellipse(xEst, PEst):
     x = [a * math.cos(it) for it in t]
     y = [b * math.sin(it) for it in t]
     angle = math.atan2(eigvec[bigind, 1], eigvec[bigind, 0])
-    R = np.matrix([[math.cos(angle), math.sin(angle)],
+    R = np.array([[math.cos(angle), math.sin(angle)],
                    [-math.sin(angle), math.cos(angle)]])
-    fx = R * np.matrix([x, y])
+    fx = R.dot(np.array([[x, y]]))
     px = np.array(fx[0, :] + xEst[0, 0]).flatten()
     py = np.array(fx[1, :] + xEst[1, 0]).flatten()
     plt.plot(px, py, "--r")
@@ -165,11 +165,11 @@ def main():
     time = 0.0
 
     # State Vector [x y yaw v]'
-    xEst = np.matrix(np.zeros((4, 1)))
-    xTrue = np.matrix(np.zeros((4, 1)))
+    xEst = np.array(np.zeros((4, 1)))
+    xTrue = np.array(np.zeros((4, 1)))
     PEst = np.eye(4)
 
-    xDR = np.matrix(np.zeros((4, 1)))  # Dead reckoning
+    xDR = np.array(np.zeros((4, 1)))  # Dead reckoning
 
     # history
     hxEst = xEst
