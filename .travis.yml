@@ -4,6 +4,8 @@ matrix:
   include:
     - os: linux
     - os: osx
+        python: "3.6-dev"
+
 
 python:
   - 3.6
