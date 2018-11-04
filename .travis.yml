@@ -3,8 +3,8 @@ language: python
 matrix:
   include:
     - os: linux
-    - os: osx
-      python: "3.6-dev"
+    #- os: osx
+      #python: "3.6-dev"
 
 python:
   - 3.6
