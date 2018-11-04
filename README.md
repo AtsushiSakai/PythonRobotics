@@ -79,7 +79,7 @@ See this paper for more details:
 
 # Requirements
 
-- Python 3.6.x
+- Python 3.6.x (2.7 is not supported)
 
 - numpy
 
