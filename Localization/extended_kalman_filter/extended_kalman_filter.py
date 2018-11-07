@@ -183,7 +183,7 @@ def main():
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u)
 
-        xEst, PEst = ekf_estimation(xEst, PEst, z, u)
+        xEst, PEst = ekf_estimation(xEst, PEst, z, ud)
 
         # store data history
         hxEst = np.hstack((hxEst, xEst))
