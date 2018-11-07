@@ -11,7 +11,7 @@ import math
 import matplotlib.pyplot as plt
 
 # Estimation parameter of EKF
-Q = np.diag([1.0, np.deg2rad(40.0)])**2
+Q = np.diag([1.0, 1.0])**2
 R = np.diag([0.1, 0.1, np.deg2rad(1.0), 1.0])**2
 
 #  Simulation parameter
