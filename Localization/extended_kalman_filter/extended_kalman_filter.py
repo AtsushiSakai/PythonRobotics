@@ -11,8 +11,8 @@ import math
 import matplotlib.pyplot as plt
 
 # Estimation parameter of EKF
-Q = np.diag([0.1, 0.1, np.deg2rad(1.0), 1.0])**2
-R = np.diag([1.0, np.deg2rad(40.0)])**2
+Q = np.diag([1.0, np.deg2rad(40.0)])**2
+R = np.diag([0.1, 0.1, np.deg2rad(1.0), 1.0])**2
 
 #  Simulation parameter
 Qsim = np.diag([0.5, 0.5])**2
@@ -120,13 +120,13 @@ def ekf_estimation(xEst, PEst, z, u):
     #  Predict
     xPred = motion_model(xEst, u)
     jF = jacobF(xPred, u)
-    PPred = jF * PEst * jF.T + Q
+    PPred = jF.dot(PEst).dot(jF.T) + R
 
     #  Update
     jH = jacobH(xPred)
     zPred = observation_model(xPred)
     y = z.T - zPred
-    S = jH.dot(PPred).dot(jH.T) + R
+    S = jH.dot(PPred).dot(jH.T) + Q
     K = PPred.dot(jH.T).dot(np.linalg.inv(S))
     xEst = xPred + K.dot(y)
     PEst = (np.eye(len(xEst)) - K.dot(jH)).dot(PPred)
@@ -183,7 +183,7 @@ def main():
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u)
 
-        xEst, PEst = ekf_estimation(xEst, PEst, z, ud)
+        xEst, PEst = ekf_estimation(xEst, PEst, z, u)
 
         # store data history
         hxEst = np.hstack((hxEst, xEst))
