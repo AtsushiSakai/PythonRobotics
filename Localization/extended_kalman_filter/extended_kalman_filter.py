@@ -11,8 +11,8 @@ import math
 import matplotlib.pyplot as plt
 
 # Estimation parameter of EKF
-Q = np.diag([1.0, 1.0])**2
-R = np.diag([0.1, 0.1, np.deg2rad(1.0), 1.0])**2
+Q = np.diag([1.0, 1.0])**2  # Observation x,y position covariance
+R = np.diag([0.1, 0.1, np.deg2rad(1.0), 1.0])**2  # predict state covariance
 
 #  Simulation parameter
 Qsim = np.diag([0.5, 0.5])**2
@@ -152,7 +152,7 @@ def plot_covariance_ellipse(xEst, PEst):
     y = [b * math.sin(it) for it in t]
     angle = math.atan2(eigvec[bigind, 1], eigvec[bigind, 0])
     R = np.array([[math.cos(angle), math.sin(angle)],
-                   [-math.sin(angle), math.cos(angle)]])
+                  [-math.sin(angle), math.cos(angle)]])
     fx = R.dot(np.array([[x, y]]))
     px = np.array(fx[0, :] + xEst[0, 0]).flatten()
     py = np.array(fx[1, :] + xEst[1, 0]).flatten()
