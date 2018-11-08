@@ -28,7 +28,11 @@ install:
   - conda install pandas
   - conda install -c conda-forge lapack
   - conda install -c cvxgrp cvxpy
+  - conda install coveralls
 
 script:
   - python --version
   - ./runtests.sh
+
+after_success:
+  - coveralls
