@@ -53,14 +53,14 @@ def observation(xTrue, xd, u):
 def motion_model(x, u):
 
     F = np.array([[1.0, 0, 0, 0],
-                   [0, 1.0, 0, 0],
-                   [0, 0, 1.0, 0],
-                   [0, 0, 0, 0]])
+                  [0, 1.0, 0, 0],
+                  [0, 0, 1.0, 0],
+                  [0, 0, 0, 0]])
 
     B = np.array([[DT * math.cos(x[2, 0]), 0],
-                   [DT * math.sin(x[2, 0]), 0],
-                   [0.0, DT],
-                   [1.0, 0.0]])
+                  [DT * math.sin(x[2, 0]), 0],
+                  [0.0, DT],
+                  [1.0, 0.0]])
 
     x = F.dot(x) + B.dot(u)
 
@@ -165,11 +165,11 @@ def main():
     time = 0.0
 
     # State Vector [x y yaw v]'
-    xEst = np.array(np.zeros((4, 1)))
-    xTrue = np.array(np.zeros((4, 1)))
+    xEst = np.zeros((4, 1))
+    xTrue = np.zeros((4, 1))
     PEst = np.eye(4)
 
-    xDR = np.array(np.zeros((4, 1)))  # Dead reckoning
+    xDR = np.zeros((4, 1))  # Dead reckoning
 
     # history
     hxEst = xEst
@@ -194,12 +194,12 @@ def main():
         if show_animation:
             plt.cla()
             plt.plot(hz[:, 0], hz[:, 1], ".g")
-            plt.plot(np.array(hxTrue[0, :]).flatten(),
-                     np.array(hxTrue[1, :]).flatten(), "-b")
-            plt.plot(np.array(hxDR[0, :]).flatten(),
-                     np.array(hxDR[1, :]).flatten(), "-k")
-            plt.plot(np.array(hxEst[0, :]).flatten(),
-                     np.array(hxEst[1, :]).flatten(), "-r")
+            plt.plot(hxTrue[0, :].flatten(),
+                     hxTrue[1, :].flatten(), "-b")
+            plt.plot(hxDR[0, :].flatten(),
+                     hxDR[1, :].flatten(), "-k")
+            plt.plot(hxEst[0, :].flatten(),
+                     hxEst[1, :].flatten(), "-r")
             plot_covariance_ellipse(xEst, PEst)
             plt.axis("equal")
             plt.grid(True)
