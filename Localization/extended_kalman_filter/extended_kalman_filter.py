@@ -11,8 +11,8 @@ import math
 import matplotlib.pyplot as plt
 
 # Estimation parameter of EKF
-Q = np.diag([0.1, 0.1, np.deg2rad(1.0), 1.0])**2
-R = np.diag([1.0, np.deg2rad(40.0)])**2
+Q = np.diag([1.0, 1.0])**2
+R = np.diag([0.1, 0.1, np.deg2rad(1.0), 1.0])**2
 
 #  Simulation parameter
 Qsim = np.diag([0.5, 0.5])**2
@@ -53,14 +53,14 @@ def observation(xTrue, xd, u):
 def motion_model(x, u):
 
     F = np.array([[1.0, 0, 0, 0],
-                   [0, 1.0, 0, 0],
-                   [0, 0, 1.0, 0],
-                   [0, 0, 0, 0]])
+                  [0, 1.0, 0, 0],
+                  [0, 0, 1.0, 0],
+                  [0, 0, 0, 0]])
 
     B = np.array([[DT * math.cos(x[2, 0]), 0],
-                   [DT * math.sin(x[2, 0]), 0],
-                   [0.0, DT],
-                   [1.0, 0.0]])
+                  [DT * math.sin(x[2, 0]), 0],
+                  [0.0, DT],
+                  [1.0, 0.0]])
 
     x = F.dot(x) + B.dot(u)
 
@@ -120,13 +120,13 @@ def ekf_estimation(xEst, PEst, z, u):
     #  Predict
     xPred = motion_model(xEst, u)
     jF = jacobF(xPred, u)
-    PPred = jF * PEst * jF.T + Q
+    PPred = jF.dot(PEst).dot(jF.T) + R
 
     #  Update
     jH = jacobH(xPred)
     zPred = observation_model(xPred)
     y = z.T - zPred
-    S = jH.dot(PPred).dot(jH.T) + R
+    S = jH.dot(PPred).dot(jH.T) + Q
     K = PPred.dot(jH.T).dot(np.linalg.inv(S))
     xEst = xPred + K.dot(y)
     PEst = (np.eye(len(xEst)) - K.dot(jH)).dot(PPred)
@@ -165,11 +165,11 @@ def main():
     time = 0.0
 
     # State Vector [x y yaw v]'
-    xEst = np.array(np.zeros((4, 1)))
-    xTrue = np.array(np.zeros((4, 1)))
+    xEst = np.zeros((4, 1))
+    xTrue = np.zeros((4, 1))
     PEst = np.eye(4)
 
-    xDR = np.array(np.zeros((4, 1)))  # Dead reckoning
+    xDR = np.zeros((4, 1))  # Dead reckoning
 
     # history
     hxEst = xEst
@@ -194,12 +194,12 @@ def main():
         if show_animation:
             plt.cla()
             plt.plot(hz[:, 0], hz[:, 1], ".g")
-            plt.plot(np.array(hxTrue[0, :]).flatten(),
-                     np.array(hxTrue[1, :]).flatten(), "-b")
-            plt.plot(np.array(hxDR[0, :]).flatten(),
-                     np.array(hxDR[1, :]).flatten(), "-k")
-            plt.plot(np.array(hxEst[0, :]).flatten(),
-                     np.array(hxEst[1, :]).flatten(), "-r")
+            plt.plot(hxTrue[0, :].flatten(),
+                     hxTrue[1, :].flatten(), "-b")
+            plt.plot(hxDR[0, :].flatten(),
+                     hxDR[1, :].flatten(), "-k")
+            plt.plot(hxEst[0, :].flatten(),
+                     hxEst[1, :].flatten(), "-r")
             plot_covariance_ellipse(xEst, PEst)
             plt.axis("equal")
             plt.grid(True)
