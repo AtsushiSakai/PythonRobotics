@@ -68,4 +68,10 @@ Thank you!
 
 --huang pingzhong
 
-=========
+# Citations
+
+1. B. Blaga, M. Deac, R. W. Y. Al-doori, M. Negru and R. Dǎnescu, "Miniature Autonomous Vehicle Development on Raspberry Pi," 2018 IEEE 14th International Conference on Intelligent Computer Communication and Processing (ICCP), Cluj-Napoca, Romania, 2018, pp. 229-236.
+doi: 10.1109/ICCP.2018.8516589
+keywords: {Automobiles;Task analysis;Autonomous vehicles;Path planning;Global Positioning System;Cameras;miniature autonomous vehicle;path planning;navigation;parking assist;lane detection and tracking;traffic sign recognition},
+URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8516589&isnumber=8516425
+
