@@ -70,7 +70,7 @@ Thank you!
 
 ---
 
-Dear AtsushiSakai, <br>Thanks a lot for the wonderful collection of projects.It was really useful. I really appreciate your time in maintaing and building this repository.It will be really great if I get a chance to meet you in person sometime.I got really inspired looking at your work. <br>All the very best for all your future endeavors! <br> Thanks once again, <b>
+Dear AtsushiSakai, <br>Thanks a lot for the wonderful collection of projects.It was really useful. I really appreciate your time in maintaing and building this repository.It will be really great if I get a chance to meet you in person sometime.I got really inspired looking at your work. <br>All the very best for all your future endeavors! <br> Thanks once again, <br>
 
 ---Ezhil Bharathi 
 
