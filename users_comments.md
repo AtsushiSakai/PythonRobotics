@@ -68,6 +68,14 @@ Thank you!
 
 --huang pingzhong
 
+---
+
+Dear AtsushiSakai, <br>Thanks a lot for the wonderful collection of projects.It was really useful. I really appreciate your time in maintaing and building this repository.It will be really great if I get a chance to meet you in person sometime.I got really inspired looking at your work. <br>All the very best for all your future endeavors! <br> Thanks once again, <b>
+
+---Ezhil Bharathi 
+
+---
+
 # Citations
 
 1. B. Blaga, M. Deac, R. W. Y. Al-doori, M. Negru and R. Dǎnescu, "Miniature Autonomous Vehicle Development on Raspberry Pi," 2018 IEEE 14th International Conference on Intelligent Computer Communication and Processing (ICCP), Cluj-Napoca, Romania, 2018, pp. 229-236.
