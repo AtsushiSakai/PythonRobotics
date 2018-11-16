@@ -31,7 +31,7 @@ https://robotacademy.net.au/lesson/inverse-kinematics-for-a-2-joint-robot-arm-us
 
 First, let’s define a class to make plotting our arm easier.
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     %matplotlib inline
     from math import cos, sin
@@ -70,7 +70,7 @@ First, let’s define a class to make plotting our arm easier.
 Let’s also define a function to make it easier to draw an angle on our
 diagram.
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     from math import sqrt
     
@@ -103,7 +103,7 @@ called forward_kinematics - forward kinematics specifies the
 end-effector position given the joint angles and link lengths. Forward
 kinematics is easier than inverse kinematics.
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     arm = TwoLinkArm()
     
@@ -172,7 +172,7 @@ kinematics for :math:`\theta_0` and :math:`\theta_1`, but that would be
 the wrong move. An easier path involves going back to the geometry of
 the arm.
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     from math import pi
     
@@ -245,7 +245,7 @@ to the “arm-down” configuration of the arm, which is what’s shown in the
 diagram. Now we’ll derive an equation for :math:`\theta_0` that depends
 on this value of :math:`\theta_1`.
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     from math import atan2
     
@@ -294,7 +294,7 @@ We now have an expression for this angle :math:`\beta` in terms of one
 of our arm’s joint angles. Now, can we relate :math:`\beta` to
 :math:`\theta_0`? Yes!
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     arm.plot()
     label_diagram()
