@@ -82,8 +82,8 @@ This is for a multivariate distribution. For example, a robot in 2-D
 space can take values in both x and y. To describe them, a normal
 distribution with mean in both x and y is needed.
 
-For a multivariate distribution, mean $:raw-latex:`\mu `can be
-represented as a matrix,
+For a multivariate distribution, mean :math:`\mu` can be represented as
+a matrix,
 
 .. math::
 
