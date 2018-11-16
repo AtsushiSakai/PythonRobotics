@@ -40,6 +40,7 @@ See this paper for more details:
    modules/path_tracking
    modules/arm_navigation
    modules/aerial_navigation
+   modules/appendix
 
 
 Indices and tables
