@@ -1,9 +1,12 @@
 
-# *KF Basics - Part I*
-----------------------
+KF Basics - Part I
+------------------
+
+Introduction
+~~~~~~~~~~~~
 
 What is the need to describe belief in terms of PDF’s?
-''''''''''''''''''''''''''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This is because robot environments are stochastic. A robot environment
 may have cows with Tesla by side. That is a robot and it’s environment
@@ -14,7 +17,7 @@ Hence, we always have to model around some mean and variances
 associated.
 
 What is Expectation of a Random Variables?
-''''''''''''''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Expectation is nothing but an average of the probabilites
 
@@ -40,17 +43,17 @@ In the continous form,
 
 
 What is the advantage of representing the belief as a unimodal as opposed to multimodal?
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Obviously, it makes sense because we can’t multiple probabilities to a
 car moving for two locations. This would be too confusing and the
 information will not be useful.
 
-## Variance, Covariance and Correlation
----------------------------------------
+Variance, Covariance and Correlation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Variance
-~~~~~~~~
+^^^^^^^^
 
 Variance is the spread of the data. The mean does’nt tell much **about**
 the data. Therefore the variance tells us about the **story** about the
@@ -73,7 +76,7 @@ data meaning the spread of the data.
 
 
 Covariance
-~~~~~~~~~~
+^^^^^^^^^^
 
 This is for a multivariate distribution. For example, a robot in 2-D
 space can take values in both x and y. To describe them, a normal
@@ -170,8 +173,8 @@ Covariance taking the data as **population** with :math:`\frac{1}{N}`
 
 
 
-# Gaussians
------------
+Gaussians
+~~~~~~~~~
 
 Central Limit Theorem
 ^^^^^^^^^^^^^^^^^^^^^
@@ -204,11 +207,11 @@ increase the sample size.(Generally, for n>=30)
 
 
 
-.. image:: /Users/atsushisakai/Dropbox/Program/python/PythonRobotics/docs/modules/Localization/Kalmanfilter_basics_14_1.png
+.. image:: Kalmanfilter_basics_files/Kalmanfilter_basics_14_1.png
 
 
 Gaussian Distribution
-'''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^
 
 A Gaussian is a *continuous probability distribution* that is completely
 described with two parameters, the mean (:math:`\mu`) and the variance
@@ -241,11 +244,11 @@ charecteristic **bell curve**.
 
 
 
-.. image:: /Users/atsushisakai/Dropbox/Program/python/PythonRobotics/docs/modules/Localization/Kalmanfilter_basics_16_0.png
+.. image:: Kalmanfilter_basics_files/Kalmanfilter_basics_16_0.png
 
 
 Why do we need Gaussian distributions?
-''''''''''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Since it becomes really difficult in the real world to deal with
 multimodal distribution as we cannot put the belief in two seperate
@@ -254,8 +257,8 @@ impossible to comprehend. Gaussian probability distribution allows us to
 drive the robots using only one mode with peak at the mean with some
 variance.
 
-## Gaussian Properties
-----------------------
+Gaussian Properties
+~~~~~~~~~~~~~~~~~~~
 
 **Multiplication**
 
@@ -318,7 +321,7 @@ New mean is
 
 
 
-.. image:: /Users/atsushisakai/Dropbox/Program/python/PythonRobotics/docs/modules/Localization/Kalmanfilter_basics_19_1.png
+.. image:: Kalmanfilter_basics_files/Kalmanfilter_basics_19_1.png
 
 
 **Addition**
@@ -369,7 +372,7 @@ of the two.
 
 
 
-.. image:: /Users/atsushisakai/Dropbox/Program/python/PythonRobotics/docs/modules/Localization/Kalmanfilter_basics_21_1.png
+.. image:: Kalmanfilter_basics_files/Kalmanfilter_basics_21_1.png
 
 
 .. code:: ipython3
@@ -435,7 +438,7 @@ of the two.
 
 
 
-.. image:: /Users/atsushisakai/Dropbox/Program/python/PythonRobotics/docs/modules/Localization/Kalmanfilter_basics_22_0.png
+.. image:: Kalmanfilter_basics_files/Kalmanfilter_basics_22_0.png
 
 
 This is a 3D projection of the gaussians involved with the lower surface
@@ -443,8 +446,7 @@ showing the 2D projection of the 3D projection above. The innermost
 ellipse represents the highest peak, that is the maximum probability for
 a given (X,Y) value.
 
-numpy einsum examples
-'''''''''''''''''''''
+\*\* numpy einsum examples \*\*
 
 .. code:: ipython3
 
@@ -545,7 +547,7 @@ numpy einsum examples
 
 
 
-.. image:: /Users/atsushisakai/Dropbox/Program/python/PythonRobotics/docs/modules/Localization/Kalmanfilter_basics_28_1.png
+.. image:: Kalmanfilter_basics_files/Kalmanfilter_basics_28_1.png
 
 
 References:

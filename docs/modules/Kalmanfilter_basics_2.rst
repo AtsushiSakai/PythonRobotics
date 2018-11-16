@@ -1,16 +1,12 @@
 
-# *KF Basics - Part 2*
-----------------------
+KF Basics - Part 2
+------------------
 
-+-----------------------------------------------------------------------+
-| ### Probabilistic Generative Laws                                     |
-+=======================================================================+
-| \*1st Law**:                                                          |
-+-----------------------------------------------------------------------+
-| he belief representing the state :math:`x_{t}`, is conditioned on all |
-| past states, measurements and controls. This can be shown             |
-| mathematically by the conditional probability shown below:            |
-+-----------------------------------------------------------------------+
+### Probabilistic Generative Laws
+
+**1st Law**: The belief representing the state :math:`x_{t}`, is
+conditioned on all past states, measurements and controls. This can be
+shown mathematically by the conditional probability shown below:
 
 .. math:: p(x_{t} | x_{0:t-1},z_{1:t-1},u_{1:t})
 
@@ -53,8 +49,8 @@ Probability**
 :math:`\bullet` $p(z_{t} \| x_{t})
 :raw-latex:`\rightarrow `$\ **Measurement Probability**
 
-### Conditional dependence and independence example:
-----------------------------------------------------
+Conditional dependence and independence example:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :math:`\bullet`\ **Independent but conditionally dependent**
 
@@ -88,8 +84,8 @@ than Coin 1. This in turn increases the conditional probability that B
 occurs. This suggests that A and B are not independent. On the other
 hand, given C (Coin 1 is selected), A and B are independent.
 
-### Bayes Rule:
----------------
+Bayes Rule:
+~~~~~~~~~~~
 
 Posterior = $:raw-latex:`\frac{Likelihood*Prior}{Marginal}` $
 
@@ -132,8 +128,8 @@ had cancer (A). This is the chance of a true positive, 80% in our case.
 :math:`\bullet`\ Pr(X|not A) = Chance of a positive test (X) given that
 you didn’t have cancer (~A). This is a false positive, 9.6% in our case.
 
-### Bayes Filter Algorithm
---------------------------
+Bayes Filter Algorithm
+~~~~~~~~~~~~~~~~~~~~~~
 
 The basic filter algorithm is:
 
@@ -162,8 +158,21 @@ information here as the gaussians get multiplied here. (Multiplication
 of gaussian values allows the resultant to lie in between these numbers
 and the resultant covariance is smaller.
 
-### Bayes filter localization example:
---------------------------------------
+Bayes filter localization example:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: ipython3
+
+    from IPython.display import Image
+    Image(filename="bayes_filter.png",width=400)
+
+
+
+
+.. image:: Kalmanfilter_basics_2_files/Kalmanfilter_basics_2_5_0.png
+   :width: 400px
+
+
 
 Given - A robot with a sensor to detect doorways along a hallway. Also,
 the robot knows how the hallway looks like but doesn’t know where it is
@@ -199,8 +208,8 @@ in the map.
 Do note that the robot knows the map but doesn’t know where exactly it
 is on the map.
 
-### Bayes and Kalman filter structure
--------------------------------------
+Bayes and Kalman filter structure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The basic structure and the concept remains the same as bayes filter for
 Kalman. The only key difference is the mathematical representation of
@@ -229,8 +238,8 @@ or acceleration.
 
 :math:`\ast` denotes *convolution*.
 
-### Kalman Gain
----------------
+Kalman Gain
+~~~~~~~~~~~
 
 .. math::  x = (\mathcal L \bar x)
 
@@ -279,8 +288,8 @@ The variance in terms of the Kalman gain:
 is a scaling term that chooses a value partway between :math:`\mu_z` and
 :math:`\bar\mu`.**
 
-### Kalman Filter - Univariate and Multivariate
------------------------------------------------
+Kalman Filter - Univariate and Multivariate
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 \ **Prediction**\ 
 
@@ -318,8 +327,8 @@ are vectors and matrices, but the concepts are exactly the same:
 -  Use the process model to predict the next state (the prior)
 -  Form an estimate part way between the measurement and the prior
 
-### References:
----------------
+References:
+~~~~~~~~~~~
 
 1. Roger Labbe’s
    `repo <https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python>`__

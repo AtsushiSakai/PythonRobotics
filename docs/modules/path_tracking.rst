@@ -90,7 +90,7 @@ Ref:
    Conference
    Publication <http://ieeexplore.ieee.org/document/5940562/>`__
 
-.. include:: ./PathTracking/model_predictive_speed_and_steer_control/Model_predictive_speed_and_steering_control.rst
+.. include:: Model_predictive_speed_and_steering_control.rst
 
 Ref:
 

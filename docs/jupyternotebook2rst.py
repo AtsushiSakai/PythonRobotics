@@ -23,19 +23,35 @@ def generate_rst(npath):
     # print(npath)
 
     # generate dir
-    dirpath = "./modules/" + os.path.dirname(npath)[3:]
+    dirpath = os.path.dirname(npath)
     # print(dirpath)
 
-    if not os.path.exists(dirpath):
-        os.makedirs(dirpath)
-
     rstpath = os.path.abspath("./modules/" + npath[3:-5] + "rst")
-    print(rstpath)
+    # print(rstpath)
+
+    basename = os.path.basename(rstpath)
 
     cmd = "jupyter nbconvert --to rst "
     cmd += npath
-    cmd += " --output "
-    cmd += rstpath
+    print(cmd)
+    subprocess.call(cmd, shell=True)
+
+    cmd = "rm -rf "
+    cmd += "./modules/"
+    cmd += basename[:-4]
+    cmd += "*"
+    print(cmd)
+    subprocess.call(cmd, shell=True)
+
+    cmd = "mv "
+    cmd += dirpath
+    cmd += "/*.rst ./modules/"
+    print(cmd)
+    subprocess.call(cmd, shell=True)
+
+    cmd = "mv "
+    cmd += dirpath
+    cmd += "/*_files ./modules/"
     print(cmd)
     subprocess.call(cmd, shell=True)
 
