@@ -42,12 +42,9 @@ complete.
 
 The filter works in two parts:
 
-:math:`\bullet` $p(x_{t} \|
-x_{t-1},u_{t}):raw-latex:`\rightarrow `$\ **State Transition
-Probability**
+:math:`p(x_{t} | x_{t-1},u_{t})` -> **State Transition Probability**
 
-:math:`\bullet` $p(z_{t} \| x_{t})
-:raw-latex:`\rightarrow `$\ **Measurement Probability**
+:math:`p(z_{t} | x_{t})` -> **Measurement Probability**
 
 Conditional dependence and independence example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
