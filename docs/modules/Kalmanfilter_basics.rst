@@ -27,7 +27,7 @@ In the continous form,
 
 .. math:: \mathbb E[X] = \int_{-\infty}^\infty x\, f(x) \,dx
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     import numpy as np
     import random
@@ -61,7 +61,7 @@ data meaning the spread of the data.
 
 .. math:: \mathit{VAR}(X) = \frac{1}{n}\sum_{i=1}^n (x_i - \mu)^2
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     x=np.random.randn(10)
     np.var(x)
@@ -123,7 +123,7 @@ normal distribution:
    \begin{aligned}VAR(X) = \sigma_x^2 &=  \frac{1}{n}\sum_{i=1}^n(X - \mu)^2\\
    COV(X, Y) = \sigma_{xy} &= \frac{1}{n}\sum_{i=1}^n[(X-\mu_x)(Y-\mu_y)\big]\end{aligned}
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     x=np.random.random((3,3))
     np.cov(x)
@@ -141,7 +141,7 @@ normal distribution:
 
 Covariance taking the data as **sample** with :math:`\frac{1}{N-1}`
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     x_cor=np.random.rand(1,10)
     y_cor=np.random.rand(1,10)
@@ -159,7 +159,7 @@ Covariance taking the data as **sample** with :math:`\frac{1}{N-1}`
 
 Covariance taking the data as **population** with :math:`\frac{1}{N}`
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     np.cov(x_cor,y_cor,bias=1)
 
@@ -183,7 +183,7 @@ According to this theorem, the average of n samples of random and
 independant variables tends to follow a normal distribution as we
 increase the sample size.(Generally, for n>=30)
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     import matplotlib.pyplot as plt
     import random
@@ -222,13 +222,15 @@ described with two parameters, the mean (:math:`\mu`) and the variance
     
    f(x, \mu, \sigma) = \frac{1}{\sigma\sqrt{2\pi}} \exp\big [{-\frac{(x-\mu)^2}{2\sigma^2} }\big ]
 
- Range is [$-:raw-latex:`\inf`,:raw-latex:`\inf `$]
+ Range is
+
+.. math:: [-\inf,\inf] 
 
 This is just a function of mean(\ :math:`\mu`) and standard deviation
 (:math:`\sigma`) and what gives the normal distribution the
 charecteristic **bell curve**.
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     import matplotlib.mlab as mlab
     import math
@@ -284,7 +286,7 @@ New mean is
 
    \sigma_\mathtt{new} = \frac{\sigma_z^2\bar\sigma^2}{\bar\sigma^2+\sigma_z^2}
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     import matplotlib.mlab as mlab
     import math
@@ -336,7 +338,7 @@ of the two.
    \begin{gathered}\mu_x = \mu_p + \mu_z \\
    \sigma_x^2 = \sigma_z^2+\sigma_p^2\, \square\end{gathered}
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     import matplotlib.mlab as mlab
     import math
@@ -375,7 +377,7 @@ of the two.
 .. image:: Kalmanfilter_basics_files/Kalmanfilter_basics_21_1.png
 
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     #Example from:
     #https://scipython.com/blog/visualizing-the-bivariate-gaussian-distribution/
@@ -448,7 +450,7 @@ a given (X,Y) value.
 
 \*\* numpy einsum examples \*\*
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     a = np.arange(25).reshape(5,5)
     b = np.arange(5)
@@ -471,7 +473,7 @@ a given (X,Y) value.
      [3 4 5]]
 
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     #this is the diagonal sum, i repeated means the diagonal
     np.einsum('ij', a)
@@ -490,7 +492,7 @@ a given (X,Y) value.
 
 
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     A = np.arange(3).reshape(3,1)
     B = np.array([[ 0,  1,  2,  3],
@@ -508,7 +510,7 @@ a given (X,Y) value.
 
 
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     D = np.array([0,1,2])
     E = np.array([[ 0,  1,  2,  3],
@@ -526,7 +528,7 @@ a given (X,Y) value.
 
 
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     from scipy.stats import multivariate_normal
     x, y = np.mgrid[-5:5:.1, -5:5:.1]

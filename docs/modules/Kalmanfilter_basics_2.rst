@@ -4,9 +4,12 @@ KF Basics - Part 2
 
 ### Probabilistic Generative Laws
 
-**1st Law**: The belief representing the state :math:`x_{t}`, is
-conditioned on all past states, measurements and controls. This can be
-shown mathematically by the conditional probability shown below:
+1st Law:
+^^^^^^^^
+
+The belief representing the state :math:`x_{t}`, is conditioned on all
+past states, measurements and controls. This can be shown mathematically
+by the conditional probability shown below:
 
 .. math:: p(x_{t} | x_{0:t-1},z_{1:t-1},u_{1:t})
 
@@ -27,7 +30,8 @@ Therefore the law now holds as:
 
 .. math:: p(x_{t} | x_{0:t-1},z_{1:t-1},u_{1:t})=p(x_{t} | x_{t-1},u_{t})
 
-**2nd Law**:
+2nd Law:
+^^^^^^^^
 
 If :math:`x_{t}` is complete, then:
 
@@ -84,7 +88,9 @@ hand, given C (Coin 1 is selected), A and B are independent.
 Bayes Rule:
 ~~~~~~~~~~~
 
-Posterior = $:raw-latex:`\frac{Likelihood*Prior}{Marginal}` $
+Posterior =
+
+.. math:: \frac{Likelihood*Prior}{Marginal} 
 
 Here,
 
@@ -158,7 +164,7 @@ and the resultant covariance is smaller.
 Bayes filter localization example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: ipython3
+.. code-block:: ipython3
 
     from IPython.display import Image
     Image(filename="bayes_filter.png",width=400)
@@ -281,9 +287,9 @@ The variance in terms of the Kalman gain:
    &= (1-K)\bar\sigma^2 
    \end{aligned}
 
-**:math:`K` is the Kalman gain. It’s the crux of the Kalman filter. It
+:math:`K` is the *Kalman gain*. It’s the crux of the Kalman filter. It
 is a scaling term that chooses a value partway between :math:`\mu_z` and
-:math:`\bar\mu`.**
+:math:`\bar\mu`.
 
 Kalman Filter - Univariate and Multivariate
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
