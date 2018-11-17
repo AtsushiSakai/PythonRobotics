@@ -96,7 +96,9 @@ See this paper for more details:
 
 This README only shows some examples of this project. 
 
-Full documentation is available online: [https://pythonrobotics.readthedocs.io/](https://pythonrobotics.readthedocs.io/)
+If you are interested in other examples or mathematical backgrounds of each algorithm, 
+
+You can check the full documentation online: [https://pythonrobotics.readthedocs.io/](https://pythonrobotics.readthedocs.io/)
 
 # How to use
 
