@@ -163,16 +163,7 @@ So,
 
 where,
 
-:raw-latex:`\begin{equation*}
-A = (I + dtA')\\
-=
-\begin{bmatrix} 
-1 & 0 & cos(\bar{\phi})dt & -\bar{v}sin(\bar{\phi})dt\\
-0 & 1 & sin(\bar{\phi})dt & \bar{v}cos(\bar{\phi})dt \\
-0 & 0 & 1 & 0 \\
-0 & 0 &\frac{tan(\bar{\delta})}{L}dt & 1 \\
-\end{bmatrix}
-\end{equation*}`
+:math:`\begin{equation*} A = (I + dtA')\\ = \begin{bmatrix} 1 & 0 & cos(\bar{\phi})dt & -\bar{v}sin(\bar{\phi})dt\\ 0 & 1 & sin(\bar{\phi})dt & \bar{v}cos(\bar{\phi})dt \\ 0 & 0 & 1 & 0 \\ 0 & 0 &\frac{tan(\bar{\delta})}{L}dt & 1 \\ \end{bmatrix} \end{equation*}`
 
 :raw-latex:`\begin{equation*}
 B = dtB'\\
