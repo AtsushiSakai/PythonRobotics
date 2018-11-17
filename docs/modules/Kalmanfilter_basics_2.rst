@@ -2,7 +2,8 @@
 KF Basics - Part 2
 ------------------
 
-### Probabilistic Generative Laws
+Probabilistic Generative Laws
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1st Law:
 ^^^^^^^^
