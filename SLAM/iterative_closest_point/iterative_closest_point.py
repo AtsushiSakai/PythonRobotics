@@ -111,11 +111,11 @@ def nearest_neighbor_assosiation(ppoints, cpoints):
 
 def SVD_motion_estimation(ppoints, cpoints):
 
-    pm = np.asarray(np.mean(ppoints, axis=1))
-    cm = np.asarray(np.mean(cpoints, axis=1))
+    pm = np.mean(ppoints, axis=1)
+    cm = np.mean(cpoints, axis=1)
 
-    pshift = np.array(ppoints - pm[:,np.newaxis])
-    cshift = np.array(cpoints - cm[:,np.newaxis])
+    pshift = ppoints - pm[:,np.newaxis]
+    cshift = cpoints - cm[:,np.newaxis]
 
     W = cshift @ pshift.T
     u, s, vh = np.linalg.svd(W)
