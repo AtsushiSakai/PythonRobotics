@@ -123,11 +123,11 @@ Localization process using Extendted Kalman Filter:EKF is
 
 :math:`y = z - z_{Pred}`
 
-$ S = J_H P_{Pred}.J_H^T + R$
+:math:`S = J_H P_{Pred}.J_H^T + R`
 
-$ K = P_{Pred}.J_H^T S^{-1}$
+:math:`K = P_{Pred}.J_H^T S^{-1}`
 
-$ x_{t+1} = x_{Pred} + Ky$
+:math:`x_{t+1} = x_{Pred} + Ky`
 
 $P_{t+1} = ( I - K J_H) P_{Pred} $
 
