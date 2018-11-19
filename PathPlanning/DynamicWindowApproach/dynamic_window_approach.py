@@ -10,6 +10,11 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
+import sys
+sys.path.append("../../")
+from matplotrecorder import matplotrecorder
+
+
 show_animation = True
 
 
@@ -202,6 +207,7 @@ def main():
             plt.axis("equal")
             plt.grid(True)
             plt.pause(0.0001)
+            matplotrecorder.save_frame()
 
         # check goal
         if math.sqrt((x[0] - goal[0])**2 + (x[1] - goal[1])**2) <= config.robot_radius:
@@ -212,6 +218,10 @@ def main():
     if show_animation:
         plt.plot(traj[:, 0], traj[:, 1], "-r")
         plt.pause(0.0001)
+
+    for i in range(10):
+        matplotrecorder.save_frame()
+    matplotrecorder.save_movie("animation.gif", 0.1)
 
     plt.show()
 
