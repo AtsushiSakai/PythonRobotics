@@ -50,9 +50,9 @@ def ekf_slam(xEst, PEst, u, z):
         lm = get_LM_Pos_from_state(xEst, minid)
         y, S, H = calc_innovation(lm, xEst, PEst, z[iz, 0:2], minid)
 
-        K = PEst.dot(H.T).dot(np.linalg.inv(S))
-        xEst = xEst + K.dot(y)
-        PEst = (np.eye(len(xEst)) - K.dot(H)).dot(PEst)
+        K = (PEst @ H.T) @ np.linalg.inv(S)
+        xEst = xEst + (K @ y)
+        PEst = (np.eye(len(xEst)) - (K @ H)) @ PEst
 
     xEst[2] = pi_2_pi(xEst[2])
 
@@ -104,7 +104,7 @@ def motion_model(x, u):
                    [DT * math.sin(x[2, 0]), 0],
                    [0.0, DT]])
 
-    x = F.dot(x) + B .dot(u)
+    x = (F @ x) + (B @ u)
     return x
 
 
@@ -157,7 +157,7 @@ def search_correspond_LM_ID(xAug, PAug, zi):
     for i in range(nLM):
         lm = get_LM_Pos_from_state(xAug, i)
         y, S, H = calc_innovation(lm, xAug, PAug, zi, i)
-        mdist.append(y.T.dot(np.linalg.inv(S)).dot(y))
+        mdist.append(y.T @ np.linalg.inv(S) @ y)
 
     mdist.append(M_DIST_TH)  # new landmark
 
@@ -168,14 +168,14 @@ def search_correspond_LM_ID(xAug, PAug, zi):
 
 def calc_innovation(lm, xEst, PEst, z, LMid):
     delta = lm - xEst[0:2]
-    q = (delta.T.dot(delta))[0, 0]
+    q = (delta.T @ delta)[0, 0]
     #zangle = math.atan2(delta[1], delta[0]) - xEst[2]
     zangle = math.atan2(delta[1,0], delta[0,0]) - xEst[2]
     zp = np.array([[math.sqrt(q), pi_2_pi(zangle)]])
     y = (z - zp).T
     y[1] = pi_2_pi(y[1])
     H = jacobH(q, delta, xEst, LMid + 1)
-    S = H.dot(PEst).dot(H.T) + Cx[0:2, 0:2]
+    S = H @ PEst @ H.T + Cx[0:2, 0:2]
 
     return y, S, H
 
@@ -193,7 +193,7 @@ def jacobH(q, delta, x, i):
 
     F = np.vstack((F1, F2))
 
-    H = G.dot(F)
+    H = G @ F
 
     return H
 
