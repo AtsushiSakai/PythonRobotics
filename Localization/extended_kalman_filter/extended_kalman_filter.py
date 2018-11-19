@@ -11,12 +11,12 @@ import math
 import matplotlib.pyplot as plt
 
 # Estimation parameter of EKF
-Q = np.diag([1.0, 1.0])**2  # Observation x,y position covariance
-R = np.diag([0.1, 0.1, np.deg2rad(1.0), 1.0])**2  # predict state covariance
+Q = np.diag([0.1, 0.1, np.deg2rad(1.0), 1.0])**2  # predict state covariance
+R = np.diag([1.0, 1.0])**2  # Observation x,y position covariance
 
 #  Simulation parameter
-Qsim = np.diag([0.5, 0.5])**2
-Rsim = np.diag([1.0, np.deg2rad(30.0)])**2
+Qsim = np.diag([1.0, np.deg2rad(30.0)])**2
+Rsim = np.diag([0.5, 0.5])**2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
@@ -36,13 +36,13 @@ def observation(xTrue, xd, u):
     xTrue = motion_model(xTrue, u)
 
     # add noise to gps x-y
-    zx = xTrue[0, 0] + np.random.randn() * Qsim[0, 0]
-    zy = xTrue[1, 0] + np.random.randn() * Qsim[1, 1]
-    z = np.array([[zx, zy]])
+    zx = xTrue[0, 0] + np.random.randn() * Rsim[0, 0]
+    zy = xTrue[1, 0] + np.random.randn() * Rsim[1, 1]
+    z = np.array([[zx, zy]]).T
 
     # add noise to input
-    ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
-    ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1]
+    ud1 = u[0, 0] + np.random.randn() * Qsim[0, 0]
+    ud2 = u[1, 0] + np.random.randn() * Qsim[1, 1]
     ud = np.array([[ud1, ud2]]).T
 
     xd = motion_model(xd, ud)
@@ -62,7 +62,7 @@ def motion_model(x, u):
                   [0.0, DT],
                   [1.0, 0.0]])
 
-    x = F.dot(x) + B.dot(u)
+    x = F@x + B@u
 
     return x
 
@@ -74,7 +74,7 @@ def observation_model(x):
         [0, 1, 0, 0]
     ])
 
-    z = H.dot(x)
+    z = H@x
 
     return z
 
@@ -120,16 +120,16 @@ def ekf_estimation(xEst, PEst, z, u):
     #  Predict
     xPred = motion_model(xEst, u)
     jF = jacobF(xPred, u)
-    PPred = jF.dot(PEst).dot(jF.T) + R
+    PPred = jF@PEst@jF.T + Q
 
     #  Update
     jH = jacobH(xPred)
     zPred = observation_model(xPred)
-    y = z.T - zPred
-    S = jH.dot(PPred).dot(jH.T) + Q
-    K = PPred.dot(jH.T).dot(np.linalg.inv(S))
-    xEst = xPred + K.dot(y)
-    PEst = (np.eye(len(xEst)) - K.dot(jH)).dot(PPred)
+    y = z - zPred
+    S = jH@PPred@jH.T + R
+    K = PPred@jH.T@np.linalg.inv(S)
+    xEst = xPred + K@y
+    PEst = (np.eye(len(xEst)) - K@jH)@PPred
 
     return xEst, PEst
 
@@ -153,7 +153,7 @@ def plot_covariance_ellipse(xEst, PEst):
     angle = math.atan2(eigvec[bigind, 1], eigvec[bigind, 0])
     R = np.array([[math.cos(angle), math.sin(angle)],
                   [-math.sin(angle), math.cos(angle)]])
-    fx = R.dot(np.array([[x, y]]))
+    fx = R@(np.array([x, y]))
     px = np.array(fx[0, :] + xEst[0, 0]).flatten()
     py = np.array(fx[1, :] + xEst[1, 0]).flatten()
     plt.plot(px, py, "--r")
@@ -175,7 +175,7 @@ def main():
     hxEst = xEst
     hxTrue = xTrue
     hxDR = xTrue
-    hz = np.zeros((1, 2))
+    hz = np.zeros((2, 1))
 
     while SIM_TIME >= time:
         time += DT
@@ -189,7 +189,7 @@ def main():
         hxEst = np.hstack((hxEst, xEst))
         hxDR = np.hstack((hxDR, xDR))
         hxTrue = np.hstack((hxTrue, xTrue))
-        hz = np.vstack((hz, z))
+        hz = np.hstack((hz, z))
 
         if show_animation:
             plt.cla()

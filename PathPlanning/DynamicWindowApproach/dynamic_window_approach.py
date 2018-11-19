@@ -10,6 +10,11 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
+import sys
+sys.path.append("../../")
+from matplotrecorder import matplotrecorder
+
+
 show_animation = True
 
 
@@ -55,13 +60,10 @@ def calc_dynamic_window(x, config):
           x[3] + config.max_accel * config.dt,
           x[4] - config.max_dyawrate * config.dt,
           x[4] + config.max_dyawrate * config.dt]
-    #  print(Vs, Vd)
 
     #  [vmin,vmax, yawrate min, yawrate max]
     dw = [max(Vs[0], Vd[0]), min(Vs[1], Vd[1]),
           max(Vs[2], Vd[2]), min(Vs[3], Vd[3])]
-
-    #print(dw)
 
     return dw
 
@@ -76,7 +78,6 @@ def calc_trajectory(xinit, v, y, config):
         traj = np.vstack((traj, x))
         time += config.dt
 
-    #  print(len(traj))
     return traj
 
 
@@ -98,7 +99,7 @@ def calc_final_input(x, u, dw, config, goal, ob):
             speed_cost = config.speed_cost_gain * \
                 (config.max_speed - traj[-1, 3])
             ob_cost = calc_obstacle_cost(traj, ob, config)
-            #print(ob_cost)
+            # print(ob_cost)
 
             final_cost = to_goal_cost + speed_cost + ob_cost
 
@@ -109,9 +110,6 @@ def calc_final_input(x, u, dw, config, goal, ob):
                 min_cost = final_cost
                 min_u = [v, y]
                 best_traj = traj
-
-    #  print(min_u)
-    #  input()
 
     return min_u, best_traj
 
@@ -144,8 +142,8 @@ def calc_to_goal_cost(traj, goal, config):
 
     goal_magnitude = math.sqrt(goal[0]**2 + goal[1]**2)
     traj_magnitude = math.sqrt(traj[-1, 0]**2 + traj[-1, 1]**2)
-    dot_product = (goal[0]*traj[-1, 0]) + (goal[1]*traj[-1, 1])
-    error = dot_product / (goal_magnitude*traj_magnitude)
+    dot_product = (goal[0] * traj[-1, 0]) + (goal[1] * traj[-1, 1])
+    error = dot_product / (goal_magnitude * traj_magnitude)
     error_angle = math.acos(error)
     cost = config.to_goal_cost_gain * error_angle
 
@@ -197,7 +195,7 @@ def main():
         x = motion(x, u, config.dt)
         traj = np.vstack((traj, x))  # store state history
 
-        #print(traj)
+        # print(traj)
 
         if show_animation:
             plt.cla()
@@ -209,6 +207,7 @@ def main():
             plt.axis("equal")
             plt.grid(True)
             plt.pause(0.0001)
+            matplotrecorder.save_frame()
 
         # check goal
         if math.sqrt((x[0] - goal[0])**2 + (x[1] - goal[1])**2) <= config.robot_radius:
@@ -218,7 +217,13 @@ def main():
     print("Done")
     if show_animation:
         plt.plot(traj[:, 0], traj[:, 1], "-r")
-        plt.show()
+        plt.pause(0.0001)
+
+    for i in range(10):
+        matplotrecorder.save_frame()
+    matplotrecorder.save_movie("animation.gif", 0.1)
+
+    plt.show()
 
 
 if __name__ == '__main__':
