@@ -129,9 +129,9 @@ Localization process using Extendted Kalman Filter:EKF is
 
 :math:`x_{t+1} = x_{Pred} + Ky`
 
-$P_{t+1} = ( I - K J_H) P_{Pred} $
+:math:`P_{t+1} = ( I - K J_H) P_{Pred}`
 
-Ref
-~~~
+Ref:
+~~~~
 
 -  `PROBABILISTIC-ROBOTICS.ORG <http://www.probabilistic-robotics.org/>`__
