@@ -124,17 +124,7 @@ You can check the full documentation online: [https://pythonrobotics.readthedocs
 
 <img src="https://github.com/AtsushiSakai/PythonRobotics/raw/master/Localization/extended_kalman_filter/animation.gif" width="640">
 
-This is a sensor fusion localization with Extended Kalman Filter(EKF).
-
-The blue line is true trajectory, the black line is dead reckoning trajectory,
-
-the green point is positioning observation (ex. GPS), and the red line is estimated trajectory with EKF.
-
-The red ellipse is estimated covariance ellipse with EKF.
-
-Ref:
-
-- [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
+Documentation: [Notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/Localization/extended_kalman_filter/extended_kalman_filter_localization.ipynb)
 
 ## Particle filter localization
 
