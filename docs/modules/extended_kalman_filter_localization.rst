@@ -7,6 +7,19 @@ Extended Kalman Filter Localization
 
    EKF
 
+.. code-block:: ipython3
+
+    from IPython.display import Image
+    Image(filename="ekf.png",width=600)
+
+
+
+
+.. image:: extended_kalman_filter_localization_files/extended_kalman_filter_localization_1_0.png
+   :width: 600px
+
+
+
 This is a sensor fusion localization with Extended Kalman Filter(EKF).
 
 The blue line is true trajectory, the black line is dead reckoning
@@ -17,7 +30,7 @@ is estimated trajectory with EKF.
 
 The red ellipse is estimated covariance ellipse with EKF.
 
-Code; `PythonRobotics/extended_kalman_filter.py at master ·
+Code: `PythonRobotics/extended_kalman_filter.py at master ·
 AtsushiSakai/PythonRobotics <https://github.com/AtsushiSakai/PythonRobotics/blob/master/Localization/extended_kalman_filter/extended_kalman_filter.py>`__
 
 Filter design
@@ -85,12 +98,14 @@ where
 This is implemented at
 `code <https://github.com/AtsushiSakai/PythonRobotics/blob/916b4382de090de29f54538b356cef1c811aacce/Localization/extended_kalman_filter/extended_kalman_filter.py#L53-L67>`__
 
-Its Javaobian matrix is
+Its Jacobian matrix is
 
-:math:`\begin{equation*} J_F= \begin{bmatrix} \frac{dx}{dx}& \frac{dx}{dy} & \frac{dx}{d\phi} & \frac{dx}{dv}\\ \frac{dy}{dx}& \frac{dy}{dy} & \frac{dy}{d\phi} & \frac{dy}{dv}\\ \frac{d\phi}{dx}& \frac{d\phi}{dy} & \frac{d\phi}{d\phi} & \frac{d\phi}{dv}\\ \frac{dv}{dx}& \frac{dv}{dy} & \frac{dv}{d\phi} & \frac{dv}{dv}\\ \end{bmatrix} = \begin{bmatrix} 1& 0 & -v sin(\phi)dt & cos(\phi)dt\\ 0 & 1 & v cos(\phi)dt & sin(\phi) dt\\ 0 & 0 & 1 & 0\\ 0 & 0 & 0 & 1\\ \end{bmatrix} \end{equation*}`
+:math:`\begin{equation*} J_F= \begin{bmatrix} \frac{dx}{dx}& \frac{dx}{dy} & \frac{dx}{d\phi} & \frac{dx}{dv}\\ \frac{dy}{dx}& \frac{dy}{dy} & \frac{dy}{d\phi} & \frac{dy}{dv}\\ \frac{d\phi}{dx}& \frac{d\phi}{dy} & \frac{d\phi}{d\phi} & \frac{d\phi}{dv}\\ \frac{dv}{dx}& \frac{dv}{dy} & \frac{dv}{d\phi} & \frac{dv}{dv}\\ \end{bmatrix} \end{equation*}`
+
+:math:`\begin{equation*} 　= \begin{bmatrix} 1& 0 & -v sin(\phi)dt & cos(\phi)dt\\ 0 & 1 & v cos(\phi)dt & sin(\phi) dt\\ 0 & 0 & 1 & 0\\ 0 & 0 & 0 & 1\\ \end{bmatrix} \end{equation*}`
 
 Observation Model
-=================
+~~~~~~~~~~~~~~~~~
 
 The robot can get x-y position infomation from GPS.
 
@@ -104,10 +119,12 @@ where
 
 Its Jacobian matrix is
 
-:math:`\begin{equation*} J_H= \begin{bmatrix} \frac{dx}{dx}& \frac{dx}{dy} & \frac{dx}{d\phi} & \frac{dx}{dv}\\ \frac{dy}{dx}& \frac{dy}{dy} & \frac{dy}{d\phi} & \frac{dy}{dv}\\ \end{bmatrix} = \begin{bmatrix} 1& 0 & 0 & 0\\ 0 & 1 & 0 & 0\\ \end{bmatrix} \end{equation*}`
+:math:`\begin{equation*} J_H= \begin{bmatrix} \frac{dx}{dx}& \frac{dx}{dy} & \frac{dx}{d\phi} & \frac{dx}{dv}\\ \frac{dy}{dx}& \frac{dy}{dy} & \frac{dy}{d\phi} & \frac{dy}{dv}\\ \end{bmatrix} \end{equation*}`
+
+:math:`\begin{equation*} 　= \begin{bmatrix} 1& 0 & 0 & 0\\ 0 & 1 & 0 & 0\\ \end{bmatrix} \end{equation*}`
 
 Extented Kalman Filter
-======================
+~~~~~~~~~~~~~~~~~~~~~~
 
 Localization process using Extendted Kalman Filter:EKF is
 
