@@ -8,6 +8,7 @@ from math import cos, sin
 import numpy as np
 from Quadrotor import Quadrotor
 from TrajectoryGenerator import TrajectoryGenerator
+from mpl_toolkits.mplot3d import Axes3D
 
 show_animation = True
 
@@ -69,8 +70,8 @@ def quad_sim(x_c, y_c, z_c):
 
     while True:
         while t <= T:
-            des_x_pos = calculate_position(x_c[i], t)
-            des_y_pos = calculate_position(y_c[i], t)
+            # des_x_pos = calculate_position(x_c[i], t)
+            # des_y_pos = calculate_position(y_c[i], t)
             des_z_pos = calculate_position(z_c[i], t)
             des_x_vel = calculate_velocity(x_c[i], t)
             des_y_vel = calculate_velocity(y_c[i], t)

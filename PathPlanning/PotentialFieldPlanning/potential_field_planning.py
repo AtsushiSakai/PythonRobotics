@@ -160,6 +160,9 @@ def main():
     rx, ry = potential_field_planning(
         sx, sy, gx, gy, ox, oy, grid_size, robot_radius)
 
+    print(rx)
+    print(ry)
+
     if show_animation:
         plt.show()
 

@@ -269,7 +269,7 @@ def main():
         #  plt.pause(0.1)
         #  input()
 
-    flg, ax = plt.subplots(1)
+    plt.subplots(1)
     plt.plot(cx, cy, ".r", label="course")
     plt.plot(x, y, "-b", label="trajectory")
     plt.legend()
@@ -278,7 +278,7 @@ def main():
     plt.axis("equal")
     plt.grid(True)
 
-    flg, ax = plt.subplots(1)
+    subplots(1)
     plt.plot(t, [iv * 3.6 for iv in v], "-r")
     plt.xlabel("Time[s]")
     plt.ylabel("Speed[km/h]")
@@ -304,7 +304,7 @@ def main2():
     t, x, y, yaw, v, a, d, flag = closed_loop_prediction(
         cx, cy, cyaw, speed_profile, goal)
 
-    flg, ax = plt.subplots(1)
+    plt.subplots(1)
     plt.plot(cx, cy, ".r", label="course")
     plt.plot(x, y, "-b", label="trajectory")
     plt.plot(goal[0], goal[1], "xg", label="goal")
@@ -314,7 +314,7 @@ def main2():
     plt.axis("equal")
     plt.grid(True)
 
-    flg, ax = plt.subplots(1)
+    plt.subplots(1)
     plt.plot(t, [iv * 3.6 for iv in v], "-r")
     plt.xlabel("Time[s]")
     plt.ylabel("Speed[km/h]")
