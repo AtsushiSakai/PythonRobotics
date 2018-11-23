@@ -290,7 +290,6 @@ def generate_local_course(L, lengths, mode, maxc, step_size):
     else:
         d = -step_size
 
-    pd = d
     ll = 0.0
 
     for (m, l, i) in zip(mode, lengths, range(len(mode))):

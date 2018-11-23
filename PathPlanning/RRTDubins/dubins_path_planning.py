@@ -245,18 +245,18 @@ def generate_course(length, mode, c):
             elif m is "R":  # right turn
                 pyaw.append(pyaw[-1] - d)
             pd += d
-        else:
-            d = l - pd
-            px.append(px[-1] + d * c * math.cos(pyaw[-1]))
-            py.append(py[-1] + d * c * math.sin(pyaw[-1]))
 
-            if m is "L":  # left turn
-                pyaw.append(pyaw[-1] + d)
-            elif m is "S":  # Straight
-                pyaw.append(pyaw[-1])
-            elif m is "R":  # right turn
-                pyaw.append(pyaw[-1] - d)
-            pd += d
+        d = l - pd
+        px.append(px[-1] + d * c * math.cos(pyaw[-1]))
+        py.append(py[-1] + d * c * math.sin(pyaw[-1]))
+
+        if m is "L":  # left turn
+            pyaw.append(pyaw[-1] + d)
+        elif m is "S":  # Straight
+            pyaw.append(pyaw[-1])
+        elif m is "R":  # right turn
+            pyaw.append(pyaw[-1] - d)
+        pd += d
 
     return px, py, pyaw
 

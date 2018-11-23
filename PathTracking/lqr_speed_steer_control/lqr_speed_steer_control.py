@@ -173,7 +173,6 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
     yaw = [state.yaw]
     v = [state.v]
     t = [0.0]
-    target_ind = calc_nearest_index(state, cx, cy, cyaw)
 
     e, e_th = 0.0, 0.0
 
@@ -261,7 +260,7 @@ def main():
 
     if show_animation:
         plt.close()
-        flg, _ = plt.subplots(1)
+        plt.subplots(1)
         plt.plot(ax, ay, "xb", label="waypoints")
         plt.plot(cx, cy, "-r", label="target course")
         plt.plot(x, y, "-g", label="tracking")
@@ -271,14 +270,14 @@ def main():
         plt.ylabel("y[m]")
         plt.legend()
 
-        flg, ax = plt.subplots(1)
+        plt.subplots(1)
         plt.plot(s, [np.rad2deg(iyaw) for iyaw in cyaw], "-r", label="yaw")
         plt.grid(True)
         plt.legend()
         plt.xlabel("line length[m]")
         plt.ylabel("yaw angle[deg]")
 
-        flg, ax = plt.subplots(1)
+        plt.subplots(1)
         plt.plot(s, ck, "-r", label="curvature")
         plt.grid(True)
         plt.legend()

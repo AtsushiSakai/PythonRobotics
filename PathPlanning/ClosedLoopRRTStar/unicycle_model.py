@@ -7,6 +7,7 @@ author Atsushi Sakai
 """
 
 import math
+import numpy as np
 
 dt = 0.05  # [s]
 L = 0.9  # [m]
@@ -66,12 +67,12 @@ if __name__ == '__main__':
         yaw.append(state.yaw)
         v.append(state.v)
 
-    flg, ax = plt.subplots(1)
+    plt.subplots(1)
     plt.plot(x, y)
     plt.axis("equal")
     plt.grid(True)
 
-    flg, ax = plt.subplots(1)
+    plt.subplots(1)
     plt.plot(v)
     plt.grid(True)
 

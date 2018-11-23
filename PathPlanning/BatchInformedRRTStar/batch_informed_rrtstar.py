@@ -474,7 +474,7 @@ class BITStar(object):
             for v, edges in self.tree.vertices.items():
                 if v != vid and (v, vid) not in self.edge_queue and (vid, v) not in self.edge_queue:
                     vcoord = self.tree.nodeIdToRealWorldCoord(v)
-                    if(np.linalg.norm(vcoord - currCoord, 2) <= self.r and v != vid):
+                    if(np.linalg.norm(vcoord - currCoord, 2) <= self.r):
                         neigbors.append((vid, vcoord))
 
             for neighbor in neigbors:

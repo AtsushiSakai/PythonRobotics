@@ -1,6 +1,4 @@
-#! /usr/bin/python
-# -*- coding: utf-8 -*-
-u"""
+"""
 
 Path tracking simulation with pure pursuit steering control and PID speed control.
 
@@ -251,7 +249,7 @@ def main():
 
     while T >= time and lastIndex > target_ind:
         ai = PIDControl(target_speed, state.v)
-        di, target_ind = pure_pursuit_control(state, cx, cy, target_ind)
+        di, target_ind, _ = pure_pursuit_control(state, cx, cy, target_ind)
         state = unicycle_model.update(state, ai, di)
 
         time = time + unicycle_model.dt
