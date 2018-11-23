@@ -4,7 +4,6 @@ Inverse kinematics for an n-link arm using the Jacobian inverse method
 Author: Daniel Ingram (daniel-s-ingram)
         Atsushi Sakai (@Atsushi_twi)
 """
-import matplotlib.pyplot as plt
 import numpy as np
 
 from NLinkArm import NLinkArm
@@ -34,8 +33,8 @@ def main():
     state = WAIT_FOR_NEW_GOAL
     solution_found = False
     while True:
-        old_goal = np.ndarray(goal_pos)
-        goal_pos = arm.goal
+        old_goal = np.array(goal_pos)
+        goal_pos = np.array(arm.goal)
         end_effector = arm.end_effector
         errors, distance = distance_to_goal(end_effector, goal_pos)
 
@@ -160,5 +159,5 @@ def ang_diff(theta1, theta2):
 
 
 if __name__ == '__main__':
-    # main()
-    animation()
+    main()
+    # animation()

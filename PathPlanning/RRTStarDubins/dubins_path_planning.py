@@ -6,6 +6,7 @@ author Atsushi Sakai (@Atsushi_twi)
 
 """
 import math
+import matplotlib.pyplot as plt
 
 
 def mod2pi(theta):
@@ -260,7 +261,6 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
     u"""
     Plot arrow
     """
-    import matplotlib.pyplot as plt
 
     if not isinstance(x, float):
         for (ix, iy, iyaw) in zip(x, y, yaw):
@@ -273,7 +273,6 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
 
 if __name__ == '__main__':
     print("Dubins path planner sample start!!")
-    import matplotlib.pyplot as plt
 
     start_x = 1.0  # [m]
     start_y = 1.0  # [m]
