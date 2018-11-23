@@ -13,7 +13,7 @@ import math
 import numpy as np
 import scipy.spatial
 import matplotlib.pyplot as plt
-import reeds_shepp_path_planning as rs
+# import reeds_shepp_path_planning as rs
 import heapq
 
 EXTEND_AREA = 5.0  # [m]
@@ -118,40 +118,40 @@ def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
     yawreso: yaw angle resolution [rad]
     """
 
-    start[2], goal[2] = rs.pi_2_pi(start[2]), rs.pi_2_pi(goal[2])
-    tox, toy = ox[:], oy[:]
+    # start[2], goal[2] = rs.pi_2_pi(start[2]), rs.pi_2_pi(goal[2])
+    # tox, toy = ox[:], oy[:]
 
-    obkdtree = KDTree(np.vstack((tox, toy)).T)
+    # obkdtree = KDTree(np.vstack((tox, toy)).T)
 
-    c = Config(tox, toy, xyreso, yawreso)
+    # c = Config(tox, toy, xyreso, yawreso)
 
-    nstart = Node(int(start[0] / xyreso), int(start[1] / xyreso), int(start[2] / yawreso),
-                  True, [start[0]], [start[1]], [start[2]], [True], 0.0, 0.0, -1)
-    ngoal = Node(int(goal[0] / xyreso), int(goal[1] / xyreso), int(goal[2] / yawreso),
-                 True, [goal[0]], [goal[1]], [goal[2]], [True], 0.0, 0.0, -1)
+    # nstart = Node(int(start[0] / xyreso), int(start[1] / xyreso), int(start[2] / yawreso),
+    # True, [start[0]], [start[1]], [start[2]], [True], 0.0, 0.0, -1)
+    # ngoal = Node(int(goal[0] / xyreso), int(goal[1] / xyreso), int(goal[2] / yawreso),
+    # True, [goal[0]], [goal[1]], [goal[2]], [True], 0.0, 0.0, -1)
 
-    openList, closedList = {}, {}
-    h = []
-    #  goalqueue = queue.PriorityQueue()
-    pq = []
-    openList[calc_index(nstart, c)] = nstart
-    heapq.heappush(pq, (calc_index(nstart, c), calc_cost(nstart, h, ngoal, c)))
+    # openList, closedList = {}, {}
+    # h = []
+    # #  goalqueue = queue.PriorityQueue()
+    # pq = []
+    # openList[calc_index(nstart, c)] = nstart
+    # heapq.heappush(pq, (calc_index(nstart, c), calc_cost(nstart, h, ngoal, c)))
 
-    while True:
-        if not openList:
-            print("Error: Cannot find path, No open set")
-            return [], [], []
+    # while True:
+    # if not openList:
+    # print("Error: Cannot find path, No open set")
+    # return [], [], []
 
-        c_id, cost = heapq.heappop(pq)
-        current = openList.pop(c_id)
-        closedList[c_id] = current
+    # c_id, cost = heapq.heappop(pq)
+    # current = openList.pop(c_id)
+    # closedList[c_id] = current
 
-        isupdated, fpath = analytic_expantion(
-            current, ngoal, c, ox, oy, obkdtree)
+    # isupdated, fpath = analytic_expantion(
+    # current, ngoal, c, ox, oy, obkdtree)
 
-        #  print(current)
+    # #  print(current)
 
-    # rx, ry, ryaw = [], [], []
+    rx, ry, ryaw = [], [], []
 
     return rx, ry, ryaw
 
@@ -208,8 +208,8 @@ def main():
         start, goal, ox, oy, xyreso, yawreso)
 
     plt.plot(ox, oy, ".k")
-    rs.plot_arrow(start[0], start[1], start[2])
-    rs.plot_arrow(goal[0], goal[1], goal[2])
+    # rs.plot_arrow(start[0], start[1], start[2])
+    # rs.plot_arrow(goal[0], goal[1], goal[2])
 
     plt.grid(True)
     plt.axis("equal")

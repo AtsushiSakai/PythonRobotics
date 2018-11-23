@@ -459,7 +459,6 @@ class BITStar(object):
         # add an edge to the edge queue is the path might improve the solution
         for neighbor in neigbors:
             sid = neighbor[0]
-            scoord = neighbor[1]
             estimated_f_score = self.computeDistanceCost(
                 self.startId, vid) + self.computeHeuristicCost(sid, self.goalId) + self.computeDistanceCost(vid, sid)
             if estimated_f_score < self.g_scores[self.goalId]:
