@@ -34,7 +34,7 @@ def main():
     state = WAIT_FOR_NEW_GOAL
     solution_found = False
     while True:
-        old_goal = goal_pos
+        old_goal = np.ndarray(goal_pos)
         goal_pos = arm.goal
         end_effector = arm.end_effector
         errors, distance = distance_to_goal(end_effector, goal_pos)
@@ -51,7 +51,7 @@ def main():
                 elif solution_found:
                     state = MOVING_TO_GOAL
         elif state is MOVING_TO_GOAL:
-            if distance > 0.1 and (old_goal == goal_pos).all():
+            if distance > 0.1 and all(old_goal == goal_pos):
                 joint_angles = joint_angles + Kp * \
                     ang_diff(joint_goal_angles, joint_angles) * dt
             else:
@@ -93,8 +93,8 @@ def animation():
 
     i_goal = 0
     while True:
-        old_goal = goal_pos
-        goal_pos = arm.goal
+        old_goal = np.array(goal_pos)
+        goal_pos = np.array(arm.goal)
         end_effector = arm.end_effector
         errors, distance = distance_to_goal(end_effector, goal_pos)
 
@@ -111,7 +111,7 @@ def animation():
                 elif solution_found:
                     state = MOVING_TO_GOAL
         elif state is MOVING_TO_GOAL:
-            if distance > 0.1 and (old_goal == goal_pos).all():
+            if distance > 0.1 and all(old_goal == goal_pos):
                 joint_angles = joint_angles + Kp * \
                     ang_diff(joint_goal_angles, joint_angles) * dt
             else:
@@ -160,5 +160,5 @@ def ang_diff(theta1, theta2):
 
 
 if __name__ == '__main__':
-    main()
-    # animation()
+    # main()
+    animation()
