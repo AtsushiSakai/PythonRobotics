@@ -65,8 +65,8 @@ def cal_observation_sigma(d):
 def calc_rotational_matrix(angle):
 
     Rt = np.array([[math.cos(angle), -math.sin(angle), 0],
-                    [math.sin(angle), math.cos(angle), 0],
-                    [0, 0, 1.0]])
+                   [math.sin(angle), math.cos(angle), 0],
+                   [0, 0, 1.0]])
     return Rt
 
 
@@ -136,13 +136,13 @@ def calc_edges(xlist, zlist):
 def calc_jacobian(edge):
     t1 = edge.yaw1 + edge.angle1
     A = np.array([[-1.0, 0, edge.d1 * math.sin(t1)],
-                   [0, -1.0, -edge.d1 * math.cos(t1)],
-                   [0, 0, -1.0]])
+                  [0, -1.0, -edge.d1 * math.cos(t1)],
+                  [0, 0, -1.0]])
 
     t2 = edge.yaw2 + edge.angle2
     B = np.array([[1.0, 0, -edge.d2 * math.sin(t2)],
-                   [0, 1.0, edge.d2 * math.cos(t2)],
-                   [0, 0, 1.0]])
+                  [0, 1.0, edge.d2 * math.cos(t2)],
+                  [0, 0, 1.0]])
 
     return A, B
 
@@ -190,7 +190,7 @@ def graph_based_slam(x_init, hz):
         dx = - np.linalg.inv(H) @ b
 
         for i in range(nt):
-            x_opt[0:3, i] += dx[i * 3:i * 3 + 3,0]
+            x_opt[0:3, i] += dx[i * 3:i * 3 + 3, 0]
 
         diff = dx.T @ dx
         print("iteration: %d, diff: %f" % (itr + 1, diff))
@@ -223,8 +223,10 @@ def observation(xTrue, xd, u, RFID):
         phi = pi_2_pi(math.atan2(dy, dx))
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Qsim[0, 0]  # add noise
-            anglen = angle + np.random.randn() * Qsim[1, 1]  # add noise
-            zi = np.array([dn, anglen, phi, i])
+            angle_noise = np.random.randn() * Qsim[1, 1]
+            angle += angle_noise
+            phi += angle_noise
+            zi = np.array([dn, angle, phi, i])
             z = np.vstack((z, zi))
 
     # add noise to input
@@ -240,12 +242,12 @@ def observation(xTrue, xd, u, RFID):
 def motion_model(x, u):
 
     F = np.array([[1.0, 0, 0],
-                   [0, 1.0, 0],
-                   [0, 0, 1.0]])
+                  [0, 1.0, 0],
+                  [0, 0, 1.0]])
 
     B = np.array([[DT * math.cos(x[2, 0]), 0],
-                   [DT * math.sin(x[2, 0]), 0],
-                   [0.0, DT]])
+                  [DT * math.sin(x[2, 0]), 0],
+                  [0.0, DT]])
 
     x = F @ x + B @ u
 
@@ -271,7 +273,7 @@ def main():
 
     # State Vector [x y yaw v]'
     xTrue = np.zeros((STATE_SIZE, 1))
-    xDR = np.zeros((STATE_SIZE, 1)) # Dead reckoning
+    xDR = np.zeros((STATE_SIZE, 1))  # Dead reckoning
 
     # history
     hxTrue = xTrue
