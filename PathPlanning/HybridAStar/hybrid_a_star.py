@@ -14,7 +14,7 @@ import numpy as np
 import scipy.spatial
 import matplotlib.pyplot as plt
 # import reeds_shepp_path_planning as rs
-import heapq
+# import heapq
 
 EXTEND_AREA = 5.0  # [m]
 H_COST = 1.0
