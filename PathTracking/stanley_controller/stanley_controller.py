@@ -134,7 +134,8 @@ def calc_target_index(state, cx, cy):
     error_front_axle = min(d)
     target_idx = d.index(error_front_axle)
 
-    target_yaw = normalize_angle(np.arctan2(fy - cy[target_idx], fx - cx[target_idx]) - state.yaw)
+    target_yaw = normalize_angle(np.arctan2(
+        fy - cy[target_idx], fx - cx[target_idx]) - state.yaw)
     if target_yaw > 0.0:
         error_front_axle = - error_front_axle
 
@@ -201,7 +202,7 @@ def main():
         plt.axis("equal")
         plt.grid(True)
 
-        flg, ax = plt.subplots(1)
+        plt.subplots(1)
         plt.plot(t, [iv * 3.6 for iv in v], "-r")
         plt.xlabel("Time[s]")
         plt.ylabel("Speed[km/h]")
