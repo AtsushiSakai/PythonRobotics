@@ -427,7 +427,6 @@ def main():
     if not flag:
         print("cannot find feasible path")
 
-    #  flg, ax = plt.subplots(1)
     # Draw final path
     if show_animation:
         rrt.DrawGraph()
@@ -435,26 +434,26 @@ def main():
         plt.grid(True)
         plt.pause(0.001)
 
-        flg, ax = plt.subplots(1)
+        plt.subplots(1)
         plt.plot(t, [np.rad2deg(iyaw) for iyaw in yaw[:-1]], '-r')
         plt.xlabel("time[s]")
         plt.ylabel("Yaw[deg]")
         plt.grid(True)
 
-        flg, ax = plt.subplots(1)
+        plt.subplots(1)
         plt.plot(t, [iv * 3.6 for iv in v], '-r')
 
         plt.xlabel("time[s]")
         plt.ylabel("velocity[km/h]")
         plt.grid(True)
 
-        flg, ax = plt.subplots(1)
+        plt.subplots(1)
         plt.plot(t, a, '-r')
         plt.xlabel("time[s]")
         plt.ylabel("accel[m/ss]")
         plt.grid(True)
 
-        flg, ax = plt.subplots(1)
+        plt.subplots(1)
         plt.plot(t, [np.rad2deg(td) for td in d], '-r')
         plt.xlabel("time[s]")
         plt.ylabel("Steering angle[deg]")

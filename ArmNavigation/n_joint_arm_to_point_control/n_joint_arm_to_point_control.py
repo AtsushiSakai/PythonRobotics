@@ -51,7 +51,7 @@ def main():
                 elif solution_found:
                     state = MOVING_TO_GOAL
         elif state is MOVING_TO_GOAL:
-            if distance > 0.1 and (old_goal is goal_pos):
+            if distance > 0.1 and (old_goal == goal_pos).all():
                 joint_angles = joint_angles + Kp * \
                     ang_diff(joint_goal_angles, joint_angles) * dt
             else:
@@ -111,7 +111,7 @@ def animation():
                 elif solution_found:
                     state = MOVING_TO_GOAL
         elif state is MOVING_TO_GOAL:
-            if distance > 0.1 and (old_goal is goal_pos):
+            if distance > 0.1 and (old_goal == goal_pos).all():
                 joint_angles = joint_angles + Kp * \
                     ang_diff(joint_goal_angles, joint_angles) * dt
             else:

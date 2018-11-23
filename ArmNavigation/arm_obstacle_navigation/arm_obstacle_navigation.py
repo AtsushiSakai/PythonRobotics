@@ -210,7 +210,7 @@ class NLinkArm(object):
 
     def __init__(self, link_lengths, joint_angles):
         self.n_links = len(link_lengths)
-        if self.n_links is not len(joint_angles):
+        if self.n_links != len(joint_angles):
             raise ValueError()
 
         self.link_lengths = np.array(link_lengths)

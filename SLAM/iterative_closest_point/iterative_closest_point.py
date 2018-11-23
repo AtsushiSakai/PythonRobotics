@@ -45,7 +45,7 @@ def ICP_matching(ppoints, cpoints):
         Rt, Tt = SVD_motion_estimation(ppoints[:, inds], cpoints)
 
         # update current points
-        cpoints = (Rt @ cpoints) + Tt[:,np.newaxis]
+        cpoints = (Rt @ cpoints) + Tt[:, np.newaxis]
 
         H = update_homogenerous_matrix(H, Rt, Tt)
 
@@ -114,8 +114,8 @@ def SVD_motion_estimation(ppoints, cpoints):
     pm = np.mean(ppoints, axis=1)
     cm = np.mean(cpoints, axis=1)
 
-    pshift = ppoints - pm[:,np.newaxis]
-    cshift = cpoints - cm[:,np.newaxis]
+    pshift = ppoints - pm[:, np.newaxis]
+    cshift = cpoints - cm[:, np.newaxis]
 
     W = cshift @ pshift.T
     u, s, vh = np.linalg.svd(W)
@@ -151,6 +151,8 @@ def main():
         cpoints = np.vstack((cx, cy))
 
         R, T = ICP_matching(ppoints, cpoints)
+        print("R:", R)
+        print("T:", T)
 
 
 if __name__ == '__main__':

@@ -151,7 +151,7 @@ def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
 
         #  print(current)
 
-    rx, ry, ryaw = [], [], []
+    # rx, ry, ryaw = [], [], []
 
     return rx, ry, ryaw
 
