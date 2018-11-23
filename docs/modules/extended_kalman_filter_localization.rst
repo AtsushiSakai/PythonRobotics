@@ -2,11 +2,6 @@
 Extended Kalman Filter Localization
 -----------------------------------
 
-.. figure:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/Localization/extended_kalman_filter/animation.gif
-   :alt: EKF
-
-   EKF
-
 .. code-block:: ipython3
 
     from IPython.display import Image
@@ -19,6 +14,11 @@ Extended Kalman Filter Localization
    :width: 600px
 
 
+
+.. figure:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/Localization/extended_kalman_filter/animation.gif
+   :alt: EKF
+
+   EKF
 
 This is a sensor fusion localization with Extended Kalman Filter(EKF).
 
