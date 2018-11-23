@@ -66,7 +66,6 @@ def solve_DARE(A, B, Q, R):
         Xn = A.T * X * A - A.T * X * B * \
             la.inv(R + B.T * X * B) * B.T * X * A + Q
         if (abs(Xn - X)).max() < eps:
-            X = Xn
             break
         X = Xn
 
