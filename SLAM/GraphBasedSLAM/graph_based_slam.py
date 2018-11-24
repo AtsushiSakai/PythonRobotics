@@ -83,8 +83,7 @@ def calc_edge(x1, y1, yaw1, x2, y2, yaw2, d1,
 
     edge.e[0, 0] = x2 - x1 - tmp1 + tmp2
     edge.e[1, 0] = y2 - y1 - tmp3 + tmp4
-    hyaw = phi1 - phi2 + angle1 - angle2
-    edge.e[2, 0] = pi_2_pi(yaw2 - yaw1 - hyaw)
+    edge.e[2, 0] = 0
 
     Rt1 = calc_rotational_matrix(tangle1)
     Rt2 = calc_rotational_matrix(tangle2)
@@ -137,12 +136,12 @@ def calc_jacobian(edge):
     t1 = edge.yaw1 + edge.angle1
     A = np.array([[-1.0, 0, edge.d1 * math.sin(t1)],
                   [0, -1.0, -edge.d1 * math.cos(t1)],
-                  [0, 0, -1.0]])
+                  [0, 0, 0]])
 
     t2 = edge.yaw2 + edge.angle2
     B = np.array([[1.0, 0, -edge.d2 * math.sin(t2)],
                   [0, 1.0, edge.d2 * math.cos(t2)],
-                  [0, 0, 1.0]])
+                  [0, 0, 0]])
 
     return A, B
 
