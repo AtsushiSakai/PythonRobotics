@@ -169,7 +169,6 @@ def graph_based_slam(x_init, hz):
     print("start graph based slam")
 
     zlist = copy.deepcopy(hz)
-    zlist.insert(1, zlist[0])
 
     x_opt = copy.deepcopy(x_init)
     nt = x_opt.shape[1]
@@ -276,20 +275,28 @@ def main():
     xDR = np.zeros((STATE_SIZE, 1))  # Dead reckoning
 
     # history
-    hxTrue = xTrue
-    hxDR = xTrue
+    hxTrue = []
+    hxDR = []
     hz = []
     dtime = 0.0
-
+    init = False
     while SIM_TIME >= time:
+
+        if not init:
+            hxTrue = xTrue
+            hxDR = xTrue
+            init = True
+        else:
+            hxDR = np.hstack((hxDR, xDR))
+            hxTrue = np.hstack((hxTrue, xTrue))
+
         time += DT
         dtime += DT
         u = calc_input()
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u, RFID)
 
-        hxDR = np.hstack((hxDR, xDR))
-        hxTrue = np.hstack((hxTrue, xTrue))
+
         hz.append(z)
 
         if dtime >= show_graph_dtime:
