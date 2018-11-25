@@ -83,8 +83,7 @@ def calc_edge(x1, y1, yaw1, x2, y2, yaw2, d1,
 
     edge.e[0, 0] = x2 - x1 - tmp1 + tmp2
     edge.e[1, 0] = y2 - y1 - tmp3 + tmp4
-    hyaw = phi1 - phi2 + angle1 - angle2
-    edge.e[2, 0] = pi_2_pi(yaw2 - yaw1 - hyaw)
+    edge.e[2, 0] = 0
 
     Rt1 = calc_rotational_matrix(tangle1)
     Rt2 = calc_rotational_matrix(tangle2)
@@ -137,12 +136,12 @@ def calc_jacobian(edge):
     t1 = edge.yaw1 + edge.angle1
     A = np.array([[-1.0, 0, edge.d1 * math.sin(t1)],
                   [0, -1.0, -edge.d1 * math.cos(t1)],
-                  [0, 0, -1.0]])
+                  [0, 0, 0]])
 
     t2 = edge.yaw2 + edge.angle2
     B = np.array([[1.0, 0, -edge.d2 * math.sin(t2)],
                   [0, 1.0, edge.d2 * math.cos(t2)],
-                  [0, 0, 1.0]])
+                  [0, 0, 0]])
 
     return A, B
 
@@ -169,7 +168,6 @@ def graph_based_slam(x_init, hz):
     print("start graph based slam")
 
     zlist = copy.deepcopy(hz)
-    zlist.insert(1, zlist[0])
 
     x_opt = copy.deepcopy(x_init)
     nt = x_opt.shape[1]
@@ -276,20 +274,28 @@ def main():
     xDR = np.zeros((STATE_SIZE, 1))  # Dead reckoning
 
     # history
-    hxTrue = xTrue
-    hxDR = xTrue
+    hxTrue = []
+    hxDR = []
     hz = []
     dtime = 0.0
-
+    init = False
     while SIM_TIME >= time:
+
+        if not init:
+            hxTrue = xTrue
+            hxDR = xTrue
+            init = True
+        else:
+            hxDR = np.hstack((hxDR, xDR))
+            hxTrue = np.hstack((hxTrue, xTrue))
+
         time += DT
         dtime += DT
         u = calc_input()
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u, RFID)
 
-        hxDR = np.hstack((hxDR, xDR))
-        hxTrue = np.hstack((hxTrue, xTrue))
+
         hz.append(z)
 
         if dtime >= show_graph_dtime:
