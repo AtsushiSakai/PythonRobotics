@@ -33,7 +33,7 @@ show_animation = True
 def calc_input():
     v = 1.0  # [m/s]
     yawrate = 0.1  # [rad/s]
-    u = np.matrix([v, yawrate]).T
+    u = np.array([[v, yawrate]]).T
     return u
 
 
@@ -44,12 +44,12 @@ def observation(xTrue, xd, u):
     # add noise to gps x-y
     zx = xTrue[0, 0] + np.random.randn() * Qsim[0, 0]
     zy = xTrue[1, 0] + np.random.randn() * Qsim[1, 1]
-    z = np.matrix([zx, zy])
+    z = np.array([[zx, zy]]).T
 
     # add noise to input
-    ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
-    ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1]
-    ud = np.matrix([ud1, ud2]).T
+    ud1 = u[0] + np.random.randn() * Rsim[0, 0]
+    ud2 = u[1] + np.random.randn() * Rsim[1, 1]
+    ud = np.array([ud1, ud2])
 
     xd = motion_model(xd, ud)
 
@@ -58,44 +58,43 @@ def observation(xTrue, xd, u):
 
 def motion_model(x, u):
 
-    F = np.matrix([[1.0, 0, 0, 0],
-                   [0, 1.0, 0, 0],
-                   [0, 0, 1.0, 0],
-                   [0, 0, 0, 0]])
+    F = np.array([[1.0, 0, 0, 0],
+                  [0, 1.0, 0, 0],
+                  [0, 0, 1.0, 0],
+                  [0, 0, 0, 0]])
 
-    B = np.matrix([[DT * math.cos(x[2, 0]), 0],
-                   [DT * math.sin(x[2, 0]), 0],
-                   [0.0, DT],
-                   [1.0, 0.0]])
+    B = np.array([[DT * math.cos(x[2]), 0],
+                  [DT * math.sin(x[2]), 0],
+                  [0.0, DT],
+                  [1.0, 0.0]])
 
-    x = F * x + B * u
+    x = F @ x + B @ u
 
     return x
 
 
 def observation_model(x):
-    #  Observation Model
-    H = np.matrix([
+    H = np.array([
         [1, 0, 0, 0],
         [0, 1, 0, 0]
     ])
 
-    z = H * x
+    z = H @ x
 
     return z
 
 
 def generate_sigma_points(xEst, PEst, gamma):
     sigma = xEst
-    Psqrt = np.matrix(scipy.linalg.sqrtm(PEst))
+    Psqrt = scipy.linalg.sqrtm(PEst)
     n = len(xEst[:, 0])
     # Positive direction
     for i in range(n):
-        sigma = np.hstack((sigma, xEst + gamma * Psqrt[:, i]))
+        sigma = np.hstack((sigma, xEst + gamma * Psqrt[:, i:i + 1]))
 
     # Negative direction
     for i in range(n):
-        sigma = np.hstack((sigma, xEst - gamma * Psqrt[:, i]))
+        sigma = np.hstack((sigma, xEst - gamma * Psqrt[:, i:i + 1]))
 
     return sigma
 
@@ -103,7 +102,7 @@ def generate_sigma_points(xEst, PEst, gamma):
 def predict_sigma_motion(sigma, u):
     #  Sigma Points predition with motion model
     for i in range(sigma.shape[1]):
-        sigma[:, i] = motion_model(sigma[:, i], u)
+        sigma[:, i:i + 1] = motion_model(sigma[:, i:i + 1], u)
 
     return sigma
 
@@ -120,21 +119,21 @@ def predict_sigma_observation(sigma):
 
 def calc_sigma_covariance(x, sigma, wc, Pi):
     nSigma = sigma.shape[1]
-    d = sigma - x[0:sigma.shape[0], :]
+    d = sigma - x[0:sigma.shape[0]]
     P = Pi
     for i in range(nSigma):
-        P = P + wc[0, i] * d[:, i] * d[:, i].T
+        P = P + wc[0, i] * d[:, i:i + 1] @ d[:, i:i + 1].T
     return P
 
 
 def calc_pxz(sigma, x, z_sigma, zb, wc):
-    #  function P=CalcPxz(sigma,xPred,zSigma,zb,wc)
     nSigma = sigma.shape[1]
-    dx = np.matrix(sigma - x)
-    dz = np.matrix(z_sigma - zb[0:2, :])
-    P = np.matrix(np.zeros((dx.shape[0], dz.shape[0])))
+    dx = sigma - x
+    dz = z_sigma - zb[0:2]
+    P = np.zeros((dx.shape[0], dz.shape[0]))
+
     for i in range(nSigma):
-        P = P + wc[0, i] * dx[:, i] * dz[:, i].T
+        P = P + wc[0, i] * dx[:, i:i + 1] @ dz[:, i:i + 1].T
 
     return P
 
@@ -144,20 +143,20 @@ def ukf_estimation(xEst, PEst, z, u, wm, wc, gamma):
     #  Predict
     sigma = generate_sigma_points(xEst, PEst, gamma)
     sigma = predict_sigma_motion(sigma, u)
-    xPred = (wm * sigma.T).T
+    xPred = (wm @ sigma.T).T
     PPred = calc_sigma_covariance(xPred, sigma, wc, Q)
 
     #  Update
     zPred = observation_model(xPred)
-    y = z.T - zPred
+    y = z - zPred
     sigma = generate_sigma_points(xPred, PPred, gamma)
-    zb = (wm * sigma.T).T
+    zb = (wm @ sigma.T).T
     z_sigma = predict_sigma_observation(sigma)
     st = calc_sigma_covariance(zb, z_sigma, wc, R)
     Pxz = calc_pxz(sigma, xPred, z_sigma, zb, wc)
-    K = Pxz * np.linalg.inv(st)
-    xEst = xPred + K * y
-    PEst = PPred - K * st * K.T
+    K = Pxz @ np.linalg.inv(st)
+    xEst = xPred + K @ y
+    PEst = PPred - K @ st @ K.T
 
     return xEst, PEst
 
@@ -179,9 +178,9 @@ def plot_covariance_ellipse(xEst, PEst):
     x = [a * math.cos(it) for it in t]
     y = [b * math.sin(it) for it in t]
     angle = math.atan2(eigvec[bigind, 1], eigvec[bigind, 0])
-    R = np.matrix([[math.cos(angle), math.sin(angle)],
-                   [-math.sin(angle), math.cos(angle)]])
-    fx = R * np.matrix([x, y])
+    R = np.array([[math.cos(angle), math.sin(angle)],
+                  [-math.sin(angle), math.cos(angle)]])
+    fx = R @ np.array([x, y])
     px = np.array(fx[0, :] + xEst[0, 0]).flatten()
     py = np.array(fx[1, :] + xEst[1, 0]).flatten()
     plt.plot(px, py, "--r")
@@ -197,8 +196,8 @@ def setup_ukf(nx):
         wc.append(1.0 / (2 * (nx + lamda)))
     gamma = math.sqrt(nx + lamda)
 
-    wm = np.matrix(wm)
-    wc = np.matrix(wc)
+    wm = np.array([wm])
+    wc = np.array([wc])
 
     return wm, wc, gamma
 
@@ -207,10 +206,10 @@ def main():
     print(__file__ + " start!!")
 
     nx = 4  # State Vector [x y yaw v]'
-    xEst = np.matrix(np.zeros((nx, 1)))
-    xTrue = np.matrix(np.zeros((nx, 1)))
+    xEst = np.zeros((nx, 1))
+    xTrue = np.zeros((nx, 1))
     PEst = np.eye(nx)
-    xDR = np.matrix(np.zeros((nx, 1)))  # Dead reckoning
+    xDR = np.zeros((nx, 1))  # Dead reckoning
 
     wm, wc, gamma = setup_ukf(nx)
 
@@ -218,7 +217,7 @@ def main():
     hxEst = xEst
     hxTrue = xTrue
     hxDR = xTrue
-    hz = np.zeros((1, 2))
+    hz = np.zeros((2, 1))
 
     time = 0.0
 
@@ -234,11 +233,11 @@ def main():
         hxEst = np.hstack((hxEst, xEst))
         hxDR = np.hstack((hxDR, xDR))
         hxTrue = np.hstack((hxTrue, xTrue))
-        hz = np.vstack((hz, z))
+        hz = np.hstack((hz, z))
 
         if show_animation:
             plt.cla()
-            plt.plot(hz[:, 0], hz[:, 1], ".g")
+            plt.plot(hz[0, :], hz[1, :], ".g")
             plt.plot(np.array(hxTrue[0, :]).flatten(),
                      np.array(hxTrue[1, :]).flatten(), "-b")
             plt.plot(np.array(hxDR[0, :]).flatten(),
