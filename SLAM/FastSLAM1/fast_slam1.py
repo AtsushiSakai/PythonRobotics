@@ -190,15 +190,14 @@ def compute_weight(particle, z, Q):
     dx = z[0, 0: 2].T - zp
     dx[1, 0] = pi_2_pi(dx[1, 0])
 
-    S = particle.lmP[2 * lm_id:2 * lm_id + 2]
     try:
-        invS = np.linalg.inv(S)
+        invS = np.linalg.inv(Sf)
     except np.linalg.linalg.LinAlgError:
         print("singuler")
         return 1.0
 
     num = math.exp(-0.5 * dx.T * invS * dx)
-    den = 2.0 * math.pi * math.sqrt(np.linalg.det(S))
+    den = 2.0 * math.pi * math.sqrt(np.linalg.det(Sf))
 
     w = num / den
 
