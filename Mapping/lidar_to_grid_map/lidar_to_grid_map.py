@@ -11,7 +11,6 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 from math import cos, sin, radians, pi
-from scipy.ndimage.morphology import binary_closing, binary_fill_holes
 
 EXTEND_AREA = 1.0
 
