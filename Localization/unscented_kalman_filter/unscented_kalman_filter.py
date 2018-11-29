@@ -1,6 +1,6 @@
 """
 
-Uncented kalman filter (UKF) localization sample
+Unscented kalman filter (UKF) localization sample
 
 author: Atsushi Sakai (@Atsushi_twi)
 
@@ -32,8 +32,8 @@ show_animation = True
 
 def calc_input():
     v = 1.0  # [m/s]
-    yawrate = 0.1  # [rad/s]
-    u = np.array([[v, yawrate]]).T
+    yawRate = 0.1  # [rad/s]
+    u = np.array([[v, yawRate]]).T
     return u
 
 
@@ -100,7 +100,7 @@ def generate_sigma_points(xEst, PEst, gamma):
 
 
 def predict_sigma_motion(sigma, u):
-    #  Sigma Points predition with motion model
+    #  Sigma Points prediction with motion model
     for i in range(sigma.shape[1]):
         sigma[:, i:i + 1] = motion_model(sigma[:, i:i + 1], u)
 
@@ -108,7 +108,7 @@ def predict_sigma_motion(sigma, u):
 
 
 def predict_sigma_observation(sigma):
-    # Sigma Points predition with observation model
+    # Sigma Points prediction with observation model
     for i in range(sigma.shape[1]):
         sigma[0:2, i] = observation_model(sigma[:, i])
 
@@ -187,14 +187,14 @@ def plot_covariance_ellipse(xEst, PEst):
 
 
 def setup_ukf(nx):
-    lamda = ALPHA ** 2 * (nx + KAPPA) - nx
+    lamb = ALPHA ** 2 * (nx + KAPPA) - nx
     # calculate weights
-    wm = [lamda / (lamda + nx)]
-    wc = [(lamda / (lamda + nx)) + (1 - ALPHA ** 2 + BETA)]
+    wm = [lamb / (lamb + nx)]
+    wc = [(lamb / (lamb + nx)) + (1 - ALPHA ** 2 + BETA)]
     for i in range(2 * nx):
-        wm.append(1.0 / (2 * (nx + lamda)))
-        wc.append(1.0 / (2 * (nx + lamda)))
-    gamma = math.sqrt(nx + lamda)
+        wm.append(1.0 / (2 * (nx + lamb)))
+        wc.append(1.0 / (2 * (nx + lamb)))
+    gamma = math.sqrt(nx + lamb)
 
     wm = np.array([wm])
     wc = np.array([wc])
