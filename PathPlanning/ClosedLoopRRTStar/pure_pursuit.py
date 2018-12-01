@@ -1,6 +1,4 @@
-#! /usr/bin/python
-# -*- coding: utf-8 -*-
-u"""
+"""
 
 Path tracking simulation with pure pursuit steering control and PID speed control.
 
@@ -236,9 +234,9 @@ def main():
     #  state = unicycle_model.State(x=-1.0, y=-5.0, yaw=0.0, v=-30.0 / 3.6)
     #  state = unicycle_model.State(x=10.0, y=5.0, yaw=0.0, v=-30.0 / 3.6)
     #  state = unicycle_model.State(
-    #  x=3.0, y=5.0, yaw=math.radians(-40.0), v=-10.0 / 3.6)
+    #  x=3.0, y=5.0, yaw=np.deg2rad(-40.0), v=-10.0 / 3.6)
     #  state = unicycle_model.State(
-    #  x=3.0, y=5.0, yaw=math.radians(40.0), v=50.0 / 3.6)
+    #  x=3.0, y=5.0, yaw=np.deg2rad(40.0), v=50.0 / 3.6)
 
     lastIndex = len(cx) - 1
     time = 0.0
@@ -251,7 +249,7 @@ def main():
 
     while T >= time and lastIndex > target_ind:
         ai = PIDControl(target_speed, state.v)
-        di, target_ind = pure_pursuit_control(state, cx, cy, target_ind)
+        di, target_ind, _ = pure_pursuit_control(state, cx, cy, target_ind)
         state = unicycle_model.update(state, ai, di)
 
         time = time + unicycle_model.dt
@@ -271,7 +269,7 @@ def main():
         #  plt.pause(0.1)
         #  input()
 
-    flg, ax = plt.subplots(1)
+    plt.subplots(1)
     plt.plot(cx, cy, ".r", label="course")
     plt.plot(x, y, "-b", label="trajectory")
     plt.legend()
@@ -280,7 +278,7 @@ def main():
     plt.axis("equal")
     plt.grid(True)
 
-    flg, ax = plt.subplots(1)
+    subplots(1)
     plt.plot(t, [iv * 3.6 for iv in v], "-r")
     plt.xlabel("Time[s]")
     plt.ylabel("Speed[km/h]")
@@ -306,7 +304,7 @@ def main2():
     t, x, y, yaw, v, a, d, flag = closed_loop_prediction(
         cx, cy, cyaw, speed_profile, goal)
 
-    flg, ax = plt.subplots(1)
+    plt.subplots(1)
     plt.plot(cx, cy, ".r", label="course")
     plt.plot(x, y, "-b", label="trajectory")
     plt.plot(goal[0], goal[1], "xg", label="goal")
@@ -316,7 +314,7 @@ def main2():
     plt.axis("equal")
     plt.grid(True)
 
-    flg, ax = plt.subplots(1)
+    plt.subplots(1)
     plt.plot(t, [iv * 3.6 for iv in v], "-r")
     plt.xlabel("Time[s]")
     plt.ylabel("Speed[km/h]")

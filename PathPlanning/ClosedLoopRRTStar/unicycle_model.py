@@ -7,10 +7,11 @@ author Atsushi Sakai
 """
 
 import math
+import numpy as np
 
 dt = 0.05  # [s]
 L = 0.9  # [m]
-steer_max = math.radians(40.0)
+steer_max = np.deg2rad(40.0)
 curvature_max = math.tan(steer_max) / L
 curvature_max = 1.0 / curvature_max + 1.0
 
@@ -38,7 +39,7 @@ def update(state, a, delta):
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2*math.pi) - math.pi
+    return (angle + math.pi) % (2 * math.pi) - math.pi
 
 
 if __name__ == '__main__':
@@ -47,7 +48,7 @@ if __name__ == '__main__':
 
     T = 100
     a = [1.0] * T
-    delta = [math.radians(1.0)] * T
+    delta = [np.deg2rad(1.0)] * T
     #  print(delta)
     #  print(a, delta)
 
@@ -66,12 +67,12 @@ if __name__ == '__main__':
         yaw.append(state.yaw)
         v.append(state.v)
 
-    flg, ax = plt.subplots(1)
+    plt.subplots(1)
     plt.plot(x, y)
     plt.axis("equal")
     plt.grid(True)
 
-    flg, ax = plt.subplots(1)
+    plt.subplots(1)
     plt.plot(v)
     plt.grid(True)
 

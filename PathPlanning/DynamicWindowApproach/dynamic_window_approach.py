@@ -10,6 +10,10 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
+import sys
+sys.path.append("../../")
+
+
 show_animation = True
 
 
@@ -35,9 +39,9 @@ class Config():
 def motion(x, u, dt):
     # motion model
 
+    x[2] += u[1] * dt
     x[0] += u[0] * math.cos(x[2]) * dt
     x[1] += u[0] * math.sin(x[2]) * dt
-    x[2] += u[1] * dt
     x[3] = u[0]
     x[4] = u[1]
 
@@ -55,12 +59,10 @@ def calc_dynamic_window(x, config):
           x[3] + config.max_accel * config.dt,
           x[4] - config.max_dyawrate * config.dt,
           x[4] + config.max_dyawrate * config.dt]
-    #  print(Vs, Vd)
 
     #  [vmin,vmax, yawrate min, yawrate max]
     dw = [max(Vs[0], Vd[0]), min(Vs[1], Vd[1]),
           max(Vs[2], Vd[2]), min(Vs[3], Vd[3])]
-    #  print(dw)
 
     return dw
 
@@ -75,7 +77,6 @@ def calc_trajectory(xinit, v, y, config):
         traj = np.vstack((traj, x))
         time += config.dt
 
-    #  print(len(traj))
     return traj
 
 
@@ -97,18 +98,17 @@ def calc_final_input(x, u, dw, config, goal, ob):
             speed_cost = config.speed_cost_gain * \
                 (config.max_speed - traj[-1, 3])
             ob_cost = calc_obstacle_cost(traj, ob, config)
-            #  print(ob_cost)
+            # print(ob_cost)
 
             final_cost = to_goal_cost + speed_cost + ob_cost
+
+            #print (final_cost)
 
             # search minimum trajectory
             if min_cost >= final_cost:
                 min_cost = final_cost
                 min_u = [v, y]
                 best_traj = traj
-
-    #  print(min_u)
-    #  input()
 
     return min_u, best_traj
 
@@ -128,7 +128,7 @@ def calc_obstacle_cost(traj, ob, config):
 
             r = math.sqrt(dx**2 + dy**2)
             if r <= config.robot_radius:
-                return float("Inf")  # collisiton
+                return float("Inf")  # collision
 
             if minr >= r:
                 minr = r
@@ -139,10 +139,12 @@ def calc_obstacle_cost(traj, ob, config):
 def calc_to_goal_cost(traj, goal, config):
     # calc to goal cost. It is 2D norm.
 
-    dy = goal[0] - traj[-1, 0]
-    dx = goal[1] - traj[-1, 1]
-    goal_dis = math.sqrt(dx**2 + dy**2)
-    cost = config.to_goal_cost_gain * goal_dis
+    goal_magnitude = math.sqrt(goal[0]**2 + goal[1]**2)
+    traj_magnitude = math.sqrt(traj[-1, 0]**2 + traj[-1, 1]**2)
+    dot_product = (goal[0] * traj[-1, 0]) + (goal[1] * traj[-1, 1])
+    error = dot_product / (goal_magnitude * traj_magnitude)
+    error_angle = math.acos(error)
+    cost = config.to_goal_cost_gain * error_angle
 
     return cost
 
@@ -192,6 +194,8 @@ def main():
         x = motion(x, u, config.dt)
         traj = np.vstack((traj, x))  # store state history
 
+        # print(traj)
+
         if show_animation:
             plt.cla()
             plt.plot(ltraj[:, 0], ltraj[:, 1], "-g")
@@ -211,7 +215,9 @@ def main():
     print("Done")
     if show_animation:
         plt.plot(traj[:, 0], traj[:, 1], "-r")
-        plt.show()
+        plt.pause(0.0001)
+
+    plt.show()
 
 
 if __name__ == '__main__':

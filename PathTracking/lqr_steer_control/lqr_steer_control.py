@@ -24,7 +24,7 @@ R = np.eye(1)
 # parameters
 dt = 0.1  # time tick[s]
 L = 0.5  # Wheel base of the vehicle [m]
-max_steer = math.radians(45.0)  # maximum steering angle[rad]
+max_steer = np.deg2rad(45.0)  # maximum steering angle[rad]
 
 show_animation = True
 #  show_animation = False
@@ -61,7 +61,7 @@ def PIDControl(target, current):
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2*math.pi) - math.pi
+    return (angle + math.pi) % (2 * math.pi) - math.pi
 
 
 def solve_DARE(A, B, Q, R):
@@ -171,7 +171,6 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
     yaw = [state.yaw]
     v = [state.v]
     t = [0.0]
-    target_ind = calc_nearest_index(state, cx, cy, cyaw)
 
     e, e_th = 0.0, 0.0
 
@@ -237,10 +236,6 @@ def calc_speed_profile(cx, cy, cyaw, target_speed):
 
     speed_profile[-1] = 0.0
 
-    #  flg, ax = plt.subplots(1)
-    #  plt.plot(speed_profile, "-r")
-    #  plt.show()
-
     return speed_profile
 
 
@@ -260,7 +255,7 @@ def main():
 
     if show_animation:
         plt.close()
-        flg, _ = plt.subplots(1)
+        plt.subplots(1)
         plt.plot(ax, ay, "xb", label="input")
         plt.plot(cx, cy, "-r", label="spline")
         plt.plot(x, y, "-g", label="tracking")
@@ -270,14 +265,14 @@ def main():
         plt.ylabel("y[m]")
         plt.legend()
 
-        flg, ax = plt.subplots(1)
-        plt.plot(s, [math.degrees(iyaw) for iyaw in cyaw], "-r", label="yaw")
+        plt.subplots(1)
+        plt.plot(s, [np.rad2deg(iyaw) for iyaw in cyaw], "-r", label="yaw")
         plt.grid(True)
         plt.legend()
         plt.xlabel("line length[m]")
         plt.ylabel("yaw angle[deg]")
 
-        flg, ax = plt.subplots(1)
+        plt.subplots(1)
         plt.plot(s, ck, "-r", label="curvature")
         plt.grid(True)
         plt.legend()

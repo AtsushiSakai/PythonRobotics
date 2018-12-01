@@ -12,11 +12,11 @@ import matplotlib.pyplot as plt
 
 # Estimation parameter of PF
 Q = np.diag([0.1])**2  # range error
-R = np.diag([1.0, math.radians(40.0)])**2  # input error
+R = np.diag([1.0, np.deg2rad(40.0)])**2  # input error
 
 #  Simulation parameter
 Qsim = np.diag([0.2])**2
-Rsim = np.diag([1.0, math.radians(30.0)])**2
+Rsim = np.diag([1.0, np.deg2rad(30.0)])**2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
@@ -169,13 +169,17 @@ def plot_covariance_ellipse(xEst, PEst):
 
     t = np.arange(0, 2 * math.pi + 0.1, 0.1)
 
-    #eigval[bigind] or eiqval[smallind] were occassionally negative numbers extremely
-    #close to 0 (~10^-20), catch these cases and set the respective variable to 0
-    try: a = math.sqrt(eigval[bigind])
-    except ValueError: a = 0
+    # eigval[bigind] or eiqval[smallind] were occassionally negative numbers extremely
+    # close to 0 (~10^-20), catch these cases and set the respective variable to 0
+    try:
+        a = math.sqrt(eigval[bigind])
+    except ValueError:
+        a = 0
 
-    try: b = math.sqrt(eigval[smallind])
-    except ValueError: b = 0
+    try:
+        b = math.sqrt(eigval[smallind])
+    except ValueError:
+        b = 0
 
     x = [a * math.cos(it) for it in t]
     y = [b * math.sin(it) for it in t]

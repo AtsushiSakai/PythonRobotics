@@ -285,12 +285,6 @@ def generate_local_course(L, lengths, mode, maxc, step_size):
     else:
         directions[0] = -1
 
-    if lengths[0] > 0.0:
-        d = step_size
-    else:
-        d = -step_size
-
-    pd = d
     ll = 0.0
 
     for (m, l, i) in zip(mode, lengths, range(len(mode))):
@@ -331,7 +325,7 @@ def generate_local_course(L, lengths, mode, maxc, step_size):
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2*math.pi) - math.pi
+    return (angle + math.pi) % (2 * math.pi) - math.pi
 
 
 def calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size):
@@ -387,11 +381,11 @@ def test():
     for i in range(NTEST):
         start_x = (np.random.rand() - 0.5) * 10.0  # [m]
         start_y = (np.random.rand() - 0.5) * 10.0  # [m]
-        start_yaw = math.radians((np.random.rand() - 0.5) * 180.0)  # [rad]
+        start_yaw = np.deg2rad((np.random.rand() - 0.5) * 180.0)  # [rad]
 
         end_x = (np.random.rand() - 0.5) * 10.0  # [m]
         end_y = (np.random.rand() - 0.5) * 10.0  # [m]
-        end_yaw = math.radians((np.random.rand() - 0.5) * 180.0)  # [rad]
+        end_yaw = np.deg2rad((np.random.rand() - 0.5) * 180.0)  # [rad]
 
         curvature = 1.0 / (np.random.rand() * 20.0)
         step_size = 0.1
@@ -424,11 +418,11 @@ def main():
 
     start_x = -1.0  # [m]
     start_y = -4.0  # [m]
-    start_yaw = math.radians(-20.0)  # [rad]
+    start_yaw = np.deg2rad(-20.0)  # [rad]
 
     end_x = 5.0  # [m]
     end_y = 5.0  # [m]
-    end_yaw = math.radians(25.0)  # [rad]
+    end_yaw = np.deg2rad(25.0)  # [rad]
 
     curvature = 1.0
     step_size = 0.1

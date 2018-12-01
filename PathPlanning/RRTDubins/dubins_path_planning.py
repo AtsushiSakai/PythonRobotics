@@ -10,6 +10,7 @@ License MIT
 
 """
 import math
+import numpy as np
 
 
 def mod2pi(theta):
@@ -17,7 +18,7 @@ def mod2pi(theta):
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2*math.pi) - math.pi
+    return (angle + math.pi) % (2 * math.pi) - math.pi
 
 
 def LSL(alpha, beta, d):
@@ -37,7 +38,7 @@ def LSL(alpha, beta, d):
     t = mod2pi(-alpha + tmp1)
     p = math.sqrt(p_squared)
     q = mod2pi(beta - tmp1)
-    #  print(math.degrees(t), p, math.degrees(q))
+    #  print(np.rad2deg(t), p, np.rad2deg(q))
 
     return t, p, q, mode
 
@@ -230,7 +231,7 @@ def generate_course(length, mode, c):
         if m is "S":
             d = 1.0 / c
         else:  # turning couse
-            d = math.radians(3.0)
+            d = np.deg2rad(3.0)
 
         while pd < abs(l - d):
             #  print(pd, l)
@@ -244,18 +245,18 @@ def generate_course(length, mode, c):
             elif m is "R":  # right turn
                 pyaw.append(pyaw[-1] - d)
             pd += d
-        else:
-            d = l - pd
-            px.append(px[-1] + d * c * math.cos(pyaw[-1]))
-            py.append(py[-1] + d * c * math.sin(pyaw[-1]))
 
-            if m is "L":  # left turn
-                pyaw.append(pyaw[-1] + d)
-            elif m is "S":  # Straight
-                pyaw.append(pyaw[-1])
-            elif m is "R":  # right turn
-                pyaw.append(pyaw[-1] - d)
-            pd += d
+        d = l - pd
+        px.append(px[-1] + d * c * math.cos(pyaw[-1]))
+        py.append(py[-1] + d * c * math.sin(pyaw[-1]))
+
+        if m is "L":  # left turn
+            pyaw.append(pyaw[-1] + d)
+        elif m is "S":  # Straight
+            pyaw.append(pyaw[-1])
+        elif m is "R":  # right turn
+            pyaw.append(pyaw[-1] - d)
+        pd += d
 
     return px, py, pyaw
 
@@ -281,11 +282,11 @@ if __name__ == '__main__':
 
     start_x = 1.0  # [m]
     start_y = 1.0  # [m]
-    start_yaw = math.radians(45.0)  # [rad]
+    start_yaw = np.deg2rad(45.0)  # [rad]
 
     end_x = -3.0  # [m]
     end_y = -3.0  # [m]
-    end_yaw = math.radians(-45.0)  # [rad]
+    end_yaw = np.deg2rad(-45.0)  # [rad]
 
     curvature = 1.0
 

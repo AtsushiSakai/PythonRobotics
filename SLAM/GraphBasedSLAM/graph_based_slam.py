@@ -18,8 +18,8 @@ import matplotlib.pyplot as plt
 
 
 #  Simulation parameter
-Qsim = np.diag([0.2, math.radians(1.0)])**2
-Rsim = np.diag([0.1, math.radians(10.0)])**2
+Qsim = np.diag([0.2, np.deg2rad(1.0)])**2
+Rsim = np.diag([0.1, np.deg2rad(10.0)])**2
 
 DT = 2.0  # time tick [s]
 SIM_TIME = 100.0  # simulation time [s]
@@ -29,7 +29,7 @@ STATE_SIZE = 3  # State size [x,y,yaw]
 # Covariance parameter of Graph Based SLAM
 C_SIGMA1 = 0.1
 C_SIGMA2 = 0.1
-C_SIGMA3 = math.radians(1.0)
+C_SIGMA3 = np.deg2rad(1.0)
 
 MAX_ITR = 20  # Maximum iteration
 
@@ -64,9 +64,9 @@ def cal_observation_sigma(d):
 
 def calc_rotational_matrix(angle):
 
-    Rt = np.matrix([[math.cos(angle), -math.sin(angle), 0],
-                    [math.sin(angle), math.cos(angle), 0],
-                    [0, 0, 1.0]])
+    Rt = np.array([[math.cos(angle), -math.sin(angle), 0],
+                   [math.sin(angle), math.cos(angle), 0],
+                   [0, 0, 1.0]])
     return Rt
 
 
@@ -83,8 +83,7 @@ def calc_edge(x1, y1, yaw1, x2, y2, yaw2, d1,
 
     edge.e[0, 0] = x2 - x1 - tmp1 + tmp2
     edge.e[1, 0] = y2 - y1 - tmp3 + tmp4
-    hyaw = phi1 - phi2 + angle1 - angle2
-    edge.e[2, 0] = pi_2_pi(yaw2 - yaw1 - hyaw)
+    edge.e[2, 0] = 0
 
     Rt1 = calc_rotational_matrix(tangle1)
     Rt2 = calc_rotational_matrix(tangle2)
@@ -92,7 +91,7 @@ def calc_edge(x1, y1, yaw1, x2, y2, yaw2, d1,
     sig1 = cal_observation_sigma(d1)
     sig2 = cal_observation_sigma(d2)
 
-    edge.omega = np.linalg.inv(Rt1 * sig1 * Rt1.T + Rt2 * sig2 * Rt2.T)
+    edge.omega = np.linalg.inv(Rt1 @ sig1 @ Rt1.T + Rt2 @ sig2 @ Rt2.T)
 
     edge.d1, edge.d2 = d1, d2
     edge.yaw1, edge.yaw2 = yaw1, yaw2
@@ -127,7 +126,7 @@ def calc_edges(xlist, zlist):
                                      angle1, phi1, d2, angle2, phi2, t1, t2)
 
                     edges.append(edge)
-                    cost += (edge.e.T * edge.omega * edge.e)[0, 0]
+                    cost += (edge.e.T @ (edge.omega) @ edge.e)[0, 0]
 
     print("cost:", cost, ",nedge:", len(edges))
     return edges
@@ -135,14 +134,14 @@ def calc_edges(xlist, zlist):
 
 def calc_jacobian(edge):
     t1 = edge.yaw1 + edge.angle1
-    A = np.matrix([[-1.0, 0, edge.d1 * math.sin(t1)],
-                   [0, -1.0, -edge.d1 * math.cos(t1)],
-                   [0, 0, -1.0]])
+    A = np.array([[-1.0, 0, edge.d1 * math.sin(t1)],
+                  [0, -1.0, -edge.d1 * math.cos(t1)],
+                  [0, 0, 0]])
 
     t2 = edge.yaw2 + edge.angle2
-    B = np.matrix([[1.0, 0, -edge.d2 * math.sin(t2)],
-                   [0, 1.0, edge.d2 * math.cos(t2)],
-                   [0, 0, 1.0]])
+    B = np.array([[1.0, 0, -edge.d2 * math.sin(t2)],
+                  [0, 1.0, edge.d2 * math.cos(t2)],
+                  [0, 0, 0]])
 
     return A, B
 
@@ -154,13 +153,13 @@ def fill_H_and_b(H, b, edge):
     id1 = edge.id1 * STATE_SIZE
     id2 = edge.id2 * STATE_SIZE
 
-    H[id1:id1 + STATE_SIZE, id1:id1 + STATE_SIZE] += A.T * edge.omega * A
-    H[id1:id1 + STATE_SIZE, id2:id2 + STATE_SIZE] += A.T * edge.omega * B
-    H[id2:id2 + STATE_SIZE, id1:id1 + STATE_SIZE] += B.T * edge.omega * A
-    H[id2:id2 + STATE_SIZE, id2:id2 + STATE_SIZE] += B.T * edge.omega * B
+    H[id1:id1 + STATE_SIZE, id1:id1 + STATE_SIZE] += A.T @ edge.omega @ A
+    H[id1:id1 + STATE_SIZE, id2:id2 + STATE_SIZE] += A.T @ edge.omega @ B
+    H[id2:id2 + STATE_SIZE, id1:id1 + STATE_SIZE] += B.T @ edge.omega @ A
+    H[id2:id2 + STATE_SIZE, id2:id2 + STATE_SIZE] += B.T @ edge.omega @ B
 
-    b[id1:id1 + STATE_SIZE, 0] += (A.T * edge.omega * edge.e)
-    b[id2:id2 + STATE_SIZE, 0] += (B.T * edge.omega * edge.e)
+    b[id1:id1 + STATE_SIZE] += (A.T @ edge.omega @ edge.e)
+    b[id2:id2 + STATE_SIZE] += (B.T @ edge.omega @ edge.e)
 
     return H, b
 
@@ -169,7 +168,6 @@ def graph_based_slam(x_init, hz):
     print("start graph based slam")
 
     zlist = copy.deepcopy(hz)
-    zlist.insert(1, zlist[0])
 
     x_opt = copy.deepcopy(x_init)
     nt = x_opt.shape[1]
@@ -178,8 +176,8 @@ def graph_based_slam(x_init, hz):
     for itr in range(MAX_ITR):
         edges = calc_edges(x_opt, zlist)
 
-        H = np.matrix(np.zeros((n, n)))
-        b = np.matrix(np.zeros((n, 1)))
+        H = np.zeros((n, n))
+        b = np.zeros((n, 1))
 
         for edge in edges:
             H, b = fill_H_and_b(H, b, edge)
@@ -187,12 +185,12 @@ def graph_based_slam(x_init, hz):
         # to fix origin
         H[0:STATE_SIZE, 0:STATE_SIZE] += np.identity(STATE_SIZE)
 
-        dx = - np.linalg.inv(H).dot(b)
+        dx = - np.linalg.inv(H) @ b
 
         for i in range(nt):
             x_opt[0:3, i] += dx[i * 3:i * 3 + 3, 0]
 
-        diff = dx.T.dot(dx)
+        diff = dx.T @ dx
         print("iteration: %d, diff: %f" % (itr + 1, diff))
         if diff < 1.0e-5:
             break
@@ -203,7 +201,7 @@ def graph_based_slam(x_init, hz):
 def calc_input():
     v = 1.0  # [m/s]
     yawrate = 0.1  # [rad/s]
-    u = np.matrix([v, yawrate]).T
+    u = np.array([[v, yawrate]]).T
     return u
 
 
@@ -212,7 +210,7 @@ def observation(xTrue, xd, u, RFID):
     xTrue = motion_model(xTrue, u)
 
     # add noise to gps x-y
-    z = np.matrix(np.zeros((0, 4)))
+    z = np.zeros((0, 4))
 
     for i in range(len(RFID[:, 0])):
 
@@ -223,14 +221,16 @@ def observation(xTrue, xd, u, RFID):
         phi = pi_2_pi(math.atan2(dy, dx))
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Qsim[0, 0]  # add noise
-            anglen = angle + np.random.randn() * Qsim[1, 1]  # add noise
-            zi = np.matrix([dn, anglen, phi, i])
+            angle_noise = np.random.randn() * Qsim[1, 1]
+            angle += angle_noise
+            phi += angle_noise
+            zi = np.array([dn, angle, phi, i])
             z = np.vstack((z, zi))
 
     # add noise to input
     ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
     ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1]
-    ud = np.matrix([ud1, ud2]).T
+    ud = np.array([[ud1, ud2]]).T
 
     xd = motion_model(xd, ud)
 
@@ -239,21 +239,21 @@ def observation(xTrue, xd, u, RFID):
 
 def motion_model(x, u):
 
-    F = np.matrix([[1.0, 0, 0],
-                   [0, 1.0, 0],
-                   [0, 0, 1.0]])
+    F = np.array([[1.0, 0, 0],
+                  [0, 1.0, 0],
+                  [0, 0, 1.0]])
 
-    B = np.matrix([[DT * math.cos(x[2, 0]), 0],
-                   [DT * math.sin(x[2, 0]), 0],
-                   [0.0, DT]])
+    B = np.array([[DT * math.cos(x[2, 0]), 0],
+                  [DT * math.sin(x[2, 0]), 0],
+                  [0.0, DT]])
 
-    x = F * x + B * u
+    x = F @ x + B @ u
 
     return x
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2*math.pi) - math.pi
+    return (angle + math.pi) % (2 * math.pi) - math.pi
 
 
 def main():
@@ -270,24 +270,32 @@ def main():
                      ])
 
     # State Vector [x y yaw v]'
-    xTrue = np.matrix(np.zeros((STATE_SIZE, 1)))
-    xDR = np.matrix(np.zeros((STATE_SIZE, 1)))  # Dead reckoning
+    xTrue = np.zeros((STATE_SIZE, 1))
+    xDR = np.zeros((STATE_SIZE, 1))  # Dead reckoning
 
     # history
-    hxTrue = xTrue
-    hxDR = xTrue
+    hxTrue = []
+    hxDR = []
     hz = []
     dtime = 0.0
-
+    init = False
     while SIM_TIME >= time:
+
+        if not init:
+            hxTrue = xTrue
+            hxDR = xTrue
+            init = True
+        else:
+            hxDR = np.hstack((hxDR, xDR))
+            hxTrue = np.hstack((hxTrue, xTrue))
+
         time += DT
         dtime += DT
         u = calc_input()
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u, RFID)
 
-        hxDR = np.hstack((hxDR, xDR))
-        hxTrue = np.hstack((hxTrue, xTrue))
+
         hz.append(z)
 
         if dtime >= show_graph_dtime:
@@ -299,12 +307,12 @@ def main():
 
                 plt.plot(RFID[:, 0], RFID[:, 1], "*k")
 
-                plt.plot(np.array(hxTrue[0, :]).flatten(),
-                         np.array(hxTrue[1, :]).flatten(), "-b")
-                plt.plot(np.array(hxDR[0, :]).flatten(),
-                         np.array(hxDR[1, :]).flatten(), "-k")
-                plt.plot(np.array(x_opt[0, :]).flatten(),
-                         np.array(x_opt[1, :]).flatten(), "-r")
+                plt.plot(hxTrue[0, :].flatten(),
+                         hxTrue[1, :].flatten(), "-b")
+                plt.plot(hxDR[0, :].flatten(),
+                         hxDR[1, :].flatten(), "-k")
+                plt.plot(x_opt[0, :].flatten(),
+                         x_opt[1, :].flatten(), "-r")
                 plt.axis("equal")
                 plt.grid(True)
                 plt.title("Time" + str(time)[0:5])

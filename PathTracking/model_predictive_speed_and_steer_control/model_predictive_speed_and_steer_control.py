@@ -45,8 +45,8 @@ WHEEL_WIDTH = 0.2  # [m]
 TREAD = 0.7  # [m]
 WB = 2.5  # [m]
 
-MAX_STEER = math.radians(45.0)  # maximum steering angle [rad]
-MAX_DSTEER = math.radians(30.0)  # maximum steering speed [rad/s]
+MAX_STEER = np.deg2rad(45.0)  # maximum steering angle [rad]
+MAX_DSTEER = np.deg2rad(30.0)  # maximum steering speed [rad/s]
 MAX_SPEED = 55.0 / 3.6  # maximum speed [m/s]
 MIN_SPEED = -20.0 / 3.6  # minimum speed [m/s]
 MAX_ACCEL = 1.0  # maximum accel [m/ss]
@@ -97,7 +97,7 @@ def get_linear_model_matrix(v, phi, delta):
     C = np.zeros(NX)
     C[0] = DT * v * math.sin(phi) * phi
     C[1] = - DT * v * math.cos(phi) * phi
-    C[3] = v * delta / (WB * math.cos(delta) ** 2)
+    C[3] = - v * delta / (WB * math.cos(delta) ** 2)
 
     return A, B, C
 

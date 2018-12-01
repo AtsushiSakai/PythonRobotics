@@ -4,7 +4,6 @@ Inverse kinematics for an n-link arm using the Jacobian inverse method
 Author: Daniel Ingram (daniel-s-ingram)
         Atsushi Sakai (@Atsushi_twi)
 """
-import matplotlib.pyplot as plt
 import numpy as np
 
 from NLinkArm import NLinkArm
@@ -34,8 +33,8 @@ def main():
     state = WAIT_FOR_NEW_GOAL
     solution_found = False
     while True:
-        old_goal = goal_pos
-        goal_pos = arm.goal
+        old_goal = np.array(goal_pos)
+        goal_pos = np.array(arm.goal)
         end_effector = arm.end_effector
         errors, distance = distance_to_goal(end_effector, goal_pos)
 
@@ -51,7 +50,7 @@ def main():
                 elif solution_found:
                     state = MOVING_TO_GOAL
         elif state is MOVING_TO_GOAL:
-            if distance > 0.1 and (old_goal is goal_pos):
+            if distance > 0.1 and all(old_goal == goal_pos):
                 joint_angles = joint_angles + Kp * \
                     ang_diff(joint_goal_angles, joint_angles) * dt
             else:
@@ -93,8 +92,8 @@ def animation():
 
     i_goal = 0
     while True:
-        old_goal = goal_pos
-        goal_pos = arm.goal
+        old_goal = np.array(goal_pos)
+        goal_pos = np.array(arm.goal)
         end_effector = arm.end_effector
         errors, distance = distance_to_goal(end_effector, goal_pos)
 
@@ -111,7 +110,7 @@ def animation():
                 elif solution_found:
                     state = MOVING_TO_GOAL
         elif state is MOVING_TO_GOAL:
-            if distance > 0.1 and (old_goal is goal_pos):
+            if distance > 0.1 and all(old_goal == goal_pos):
                 joint_angles = joint_angles + Kp * \
                     ang_diff(joint_goal_angles, joint_angles) * dt
             else:

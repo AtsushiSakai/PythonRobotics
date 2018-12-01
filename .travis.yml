@@ -1,4 +1,11 @@
 language: python
+
+matrix:
+  include:
+    - os: linux
+    #- os: osx
+      #python: "3.6-dev"
+
 python:
   - 3.6
 
@@ -21,10 +28,11 @@ install:
   - conda install pandas
   - conda install -c conda-forge lapack
   - conda install -c cvxgrp cvxpy
-  #- pip install cvxpy
-  #- conda install -y -c cvxgrp cvxpy
-  #- conda install -y -c anaconda cvxopt
+  - conda install coveralls
 
 script:
   - python --version
   - ./runtests.sh
+
+after_success:
+  - coveralls

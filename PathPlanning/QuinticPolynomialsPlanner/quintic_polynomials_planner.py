@@ -182,12 +182,12 @@ def main():
 
     sx = 10.0  # start x position [m]
     sy = 10.0  # start y position [m]
-    syaw = math.radians(10.0)  # start yaw angle [rad]
+    syaw = np.deg2rad(10.0)  # start yaw angle [rad]
     sv = 1.0  # start speed [m/s]
     sa = 0.1  # start accel [m/ss]
     gx = 30.0  # goal x position [m]
     gy = -10.0  # goal y position [m]
-    gyaw = math.radians(20.0)  # goal yaw angle [rad]
+    gyaw = np.deg2rad(20.0)  # goal yaw angle [rad]
     gv = 1.0  # goal speed [m/s]
     ga = 0.1  # goal accel [m/ss]
     max_accel = 1.0  # max accel [m/ss]
@@ -201,7 +201,7 @@ def main():
         plt.plot(x, y, "-r")
 
         plt.subplots()
-        plt.plot(time, [math.degrees(i) for i in yaw], "-r")
+        plt.plot(time, [np.rad2deg(i) for i in yaw], "-r")
         plt.xlabel("Time[s]")
         plt.ylabel("Yaw[deg]")
         plt.grid(True)
