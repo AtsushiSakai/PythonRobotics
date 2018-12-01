@@ -40,9 +40,9 @@ class Particle:
         self.y = 0.0
         self.yaw = 0.0
         # landmark x-y positions
-        self.lm = np.matrix(np.zeros((N_LM, LM_SIZE)))
+        self.lm = np.zeros((N_LM, LM_SIZE))
         # landmark position covariance
-        self.lmP = np.matrix(np.zeros((N_LM * LM_SIZE, LM_SIZE)))
+        self.lmP = np.zeros((N_LM * LM_SIZE, LM_SIZE))
 
 
 def fast_slam1(particles, u, z):
@@ -96,7 +96,7 @@ def predict_particles(particles, u):
         px[0, 0] = particles[i].x
         px[1, 0] = particles[i].y
         px[2, 0] = particles[i].yaw
-        ud = u + (np.matrix(np.random.randn(1, 2)) * R).T  # add noise
+        ud = u + (np.random.randn(1, 2) @ R).T  # add noise
         px = motion_model(px, ud)
         particles[i].x = px[0, 0]
         particles[i].y = px[1, 0]
@@ -107,9 +107,9 @@ def predict_particles(particles, u):
 
 def add_new_lm(particle, z, Q):
 
-    r = z[0, 0]
-    b = z[0, 1]
-    lm_id = int(z[0, 2])
+    r = z[0]
+    b = z[1]
+    lm_id = int(z[2])
 
     s = math.sin(pi_2_pi(particle.yaw + b))
     c = math.cos(pi_2_pi(particle.yaw + b))
@@ -118,10 +118,10 @@ def add_new_lm(particle, z, Q):
     particle.lm[lm_id, 1] = particle.y + r * s
 
     # covariance
-    Gz = np.matrix([[c, -r * s],
-                    [s, r * c]])
+    Gz = np.array([[c, -r * s],
+                   [s, r * c]])
 
-    particle.lmP[2 * lm_id:2 * lm_id + 2] = Gz * Q * Gz.T
+    particle.lmP[2 * lm_id:2 * lm_id + 2] = Gz @ Q @ Gz.T
 
     return particle
 
@@ -132,44 +132,44 @@ def compute_jacobians(particle, xf, Pf, Q):
     d2 = dx**2 + dy**2
     d = math.sqrt(d2)
 
-    zp = np.matrix([[d, pi_2_pi(math.atan2(dy, dx) - particle.yaw)]]).T
+    zp = np.array([[d, pi_2_pi(math.atan2(dy, dx) - particle.yaw)]]).T
 
-    Hv = np.matrix([[-dx / d, -dy / d, 0.0],
-                    [dy / d2, -dx / d2, -1.0]])
+    Hv = np.array([[-dx / d, -dy / d, 0.0],
+                   [dy / d2, -dx / d2, -1.0]])
 
-    Hf = np.matrix([[dx / d, dy / d],
-                    [-dy / d2, dx / d2]])
+    Hf = np.array([[dx / d, dy / d],
+                   [-dy / d2, dx / d2]])
 
-    Sf = Hf * Pf * Hf.T + Q
+    Sf = Hf @ Pf @ Hf.T + Q
 
     return zp, Hv, Hf, Sf
 
 
 def update_KF_with_cholesky(xf, Pf, v, Q, Hf):
-    PHt = Pf * Hf.T
-    S = Hf * PHt + Q
+    PHt = Pf @ Hf.T
+    S = Hf @ PHt + Q
 
     S = (S + S.T) * 0.5
     SChol = np.linalg.cholesky(S).T
     SCholInv = np.linalg.inv(SChol)
-    W1 = PHt * SCholInv
-    W = W1 * SCholInv.T
+    W1 = PHt @ SCholInv
+    W = W1 @ SCholInv.T
 
-    x = xf + W * v
-    P = Pf - W1 * W1.T
+    x = xf + W @ v
+    P = Pf - W1 @ W1.T
 
     return x, P
 
 
 def update_landmark(particle, z, Q):
 
-    lm_id = int(z[0, 2])
-    xf = np.matrix(particle.lm[lm_id, :]).T
-    Pf = np.matrix(particle.lmP[2 * lm_id:2 * lm_id + 2, :])
+    lm_id = int(z[2])
+    xf = np.array(particle.lm[lm_id, :]).reshape(2, 1)
+    Pf = np.array(particle.lmP[2 * lm_id:2 * lm_id + 2, :])
 
     zp, Hv, Hf, Sf = compute_jacobians(particle, xf, Pf, Q)
 
-    dz = z[0, 0: 2].T - zp
+    dz = z[0:2].reshape(2, 1) - zp
     dz[1, 0] = pi_2_pi(dz[1, 0])
 
     xf, Pf = update_KF_with_cholesky(xf, Pf, dz, Q, Hf)
@@ -181,13 +181,12 @@ def update_landmark(particle, z, Q):
 
 
 def compute_weight(particle, z, Q):
-
-    lm_id = int(z[0, 2])
-    xf = np.matrix(particle.lm[lm_id, :]).T
-    Pf = np.matrix(particle.lmP[2 * lm_id:2 * lm_id + 2])
+    lm_id = int(z[2])
+    xf = np.array(particle.lm[lm_id, :]).reshape(2, 1)
+    Pf = np.array(particle.lmP[2 * lm_id:2 * lm_id + 2])
     zp, Hv, Hf, Sf = compute_jacobians(particle, xf, Pf, Q)
 
-    dx = z[0, 0: 2].T - zp
+    dx = z[0:2].reshape(2, 1) - zp
     dx[1, 0] = pi_2_pi(dx[1, 0])
 
     try:
@@ -196,7 +195,7 @@ def compute_weight(particle, z, Q):
         print("singuler")
         return 1.0
 
-    num = math.exp(-0.5 * dx.T * invS * dx)
+    num = math.exp(-0.5 * dx.T @ invS @ dx)
     den = 2.0 * math.pi * math.sqrt(np.linalg.det(Sf))
 
     w = num / den
@@ -206,19 +205,19 @@ def compute_weight(particle, z, Q):
 
 def update_with_observation(particles, z):
 
-    for iz in range(len(z[:, 0])):
+    for iz in range(len(z[0, :])):
 
-        lmid = int(z[iz, 2])
+        lmid = int(z[2, iz])
 
         for ip in range(N_PARTICLE):
             # new landmark
             if abs(particles[ip].lm[lmid, 0]) <= 0.01:
-                particles[ip] = add_new_lm(particles[ip], z[iz, :], Q)
+                particles[ip] = add_new_lm(particles[ip], z[:, iz], Q)
             # known landmark
             else:
-                w = compute_weight(particles[ip], z[iz, :], Q)
+                w = compute_weight(particles[ip], z[:, iz], Q)
                 particles[ip].w *= w
-                particles[ip] = update_landmark(particles[ip], z[iz, :], Q)
+                particles[ip] = update_landmark(particles[ip], z[:, iz], Q)
 
     return particles
 
@@ -234,20 +233,20 @@ def resampling(particles):
     for i in range(N_PARTICLE):
         pw.append(particles[i].w)
 
-    pw = np.matrix(pw)
+    pw = np.array(pw)
 
-    Neff = 1.0 / (pw * pw.T)[0, 0]  # Effective particle number
-    #  print(Neff)
+    Neff = 1.0 / (pw @ pw.T)  # Effective particle number
+    # print(Neff)
 
     if Neff < NTH:  # resampling
         wcum = np.cumsum(pw)
         base = np.cumsum(pw * 0.0 + 1 / N_PARTICLE) - 1 / N_PARTICLE
-        resampleid = base + np.random.rand(base.shape[1]) / N_PARTICLE
+        resampleid = base + np.random.rand(base.shape[0]) / N_PARTICLE
 
         inds = []
         ind = 0
         for ip in range(N_PARTICLE):
-            while ((ind < wcum.shape[1] - 1) and (resampleid[0, ip] > wcum[0, ind])):
+            while ((ind < wcum.shape[0] - 1) and (resampleid[ip] > wcum[ind])):
                 ind += 1
             inds.append(ind)
 
@@ -265,25 +264,25 @@ def resampling(particles):
 
 def calc_input(time):
 
-    if time <= 3.0:
+    if time <= 3.0:  # wait at first
         v = 0.0
         yawrate = 0.0
     else:
         v = 1.0  # [m/s]
         yawrate = 0.1  # [rad/s]
 
-    u = np.matrix([v, yawrate]).T
+    u = np.array([v, yawrate]).reshape(2, 1)
 
     return u
 
 
 def observation(xTrue, xd, u, RFID):
 
+    # calc true state
     xTrue = motion_model(xTrue, u)
 
-    # add noise to gps x-y
-    z = np.matrix(np.zeros((0, 3)))
-
+    # add noise to range observation
+    z = np.zeros((3, 0))
     for i in range(len(RFID[:, 0])):
 
         dx = RFID[i, 0] - xTrue[0, 0]
@@ -293,13 +292,13 @@ def observation(xTrue, xd, u, RFID):
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Qsim[0, 0]  # add noise
             anglen = angle + np.random.randn() * Qsim[1, 1]  # add noise
-            zi = np.matrix([dn, pi_2_pi(anglen), i])
-            z = np.vstack((z, zi))
+            zi = np.array([dn, pi_2_pi(anglen), i]).reshape(3, 1)
+            z = np.hstack((z, zi))
 
     # add noise to input
     ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
     ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1] + OFFSET_YAWRATE_NOISE
-    ud = np.matrix([ud1, ud2]).T
+    ud = np.array([ud1, ud2]).reshape(2, 1)
 
     xd = motion_model(xd, ud)
 
@@ -308,15 +307,15 @@ def observation(xTrue, xd, u, RFID):
 
 def motion_model(x, u):
 
-    F = np.matrix([[1.0, 0, 0],
-                   [0, 1.0, 0],
-                   [0, 0, 1.0]])
+    F = np.array([[1.0, 0, 0],
+                  [0, 1.0, 0],
+                  [0, 0, 1.0]])
 
-    B = np.matrix([[DT * math.cos(x[2, 0]), 0],
-                   [DT * math.sin(x[2, 0]), 0],
-                   [0.0, DT]])
+    B = np.array([[DT * math.cos(x[2, 0]), 0],
+                  [DT * math.sin(x[2, 0]), 0],
+                  [0.0, DT]])
 
-    x = F * x + B * u
+    x = F @ x + B @ u
 
     x[2, 0] = pi_2_pi(x[2, 0])
 
@@ -345,10 +344,9 @@ def main():
     N_LM = RFID.shape[0]
 
     # State Vector [x y yaw v]'
-    xEst = np.matrix(np.zeros((STATE_SIZE, 1)))
-    xTrue = np.matrix(np.zeros((STATE_SIZE, 1)))
-
-    xDR = np.matrix(np.zeros((STATE_SIZE, 1)))  # Dead reckoning
+    xEst = np.zeros((STATE_SIZE, 1))  # SLAM estimation
+    xTrue = np.zeros((STATE_SIZE, 1))  # True state
+    xDR = np.zeros((STATE_SIZE, 1))  # Dead reckoning
 
     # history
     hxEst = xEst
@@ -382,13 +380,9 @@ def main():
                 plt.plot(particles[i].x, particles[i].y, ".r")
                 plt.plot(particles[i].lm[:, 0], particles[i].lm[:, 1], "xb")
 
-            plt.plot(np.array(hxTrue[0, :]).flatten(),
-                     np.array(hxTrue[1, :]).flatten(), "-b")
-            plt.plot(np.array(hxDR[0, :]).flatten(),
-                     np.array(hxDR[1, :]).flatten(), "-k")
-            plt.plot(np.array(hxEst[0, :]).flatten(),
-                     np.array(hxEst[1, :]).flatten(), "-r")
-
+            plt.plot(hxTrue[0, :], hxTrue[1, :], "-b")
+            plt.plot(hxDR[0, :], hxDR[1, :], "-k")
+            plt.plot(hxEst[0, :], hxEst[1, :], "-r")
             plt.plot(xEst[0], xEst[1], "xk")
             plt.axis("equal")
             plt.grid(True)
