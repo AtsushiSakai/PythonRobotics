@@ -132,7 +132,8 @@ def compute_jacobians(particle, xf, Pf, Q):
     d2 = dx**2 + dy**2
     d = math.sqrt(d2)
 
-    zp = np.array([[d, pi_2_pi(math.atan2(dy, dx) - particle.yaw)]]).T
+    zp = np.array(
+        [d, pi_2_pi(math.atan2(dy, dx) - particle.yaw)]).reshape(2, 1)
 
     Hv = np.array([[-dx / d, -dy / d, 0.0],
                    [dy / d2, -dx / d2, -1.0]])
