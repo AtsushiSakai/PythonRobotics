@@ -94,23 +94,23 @@ def observation_update(gmap, z, std):
 def calc_input():
     v = 1.0  # [m/s]
     yawrate = 0.1  # [rad/s]
-    u = np.matrix([v, yawrate]).T
+    u = np.array([v, yawrate]).reshape(2, 1)
     return u
 
 
 def motion_model(x, u):
 
-    F = np.matrix([[1.0, 0, 0, 0],
-                   [0, 1.0, 0, 0],
-                   [0, 0, 1.0, 0],
-                   [0, 0, 0, 0]])
+    F = np.array([[1.0, 0, 0, 0],
+                  [0, 1.0, 0, 0],
+                  [0, 0, 1.0, 0],
+                  [0, 0, 0, 0]])
 
-    B = np.matrix([[DT * math.cos(x[2, 0]), 0],
-                   [DT * math.sin(x[2, 0]), 0],
-                   [0.0, DT],
-                   [1.0, 0.0]])
+    B = np.array([[DT * math.cos(x[2, 0]), 0],
+                  [DT * math.sin(x[2, 0]), 0],
+                  [0.0, DT],
+                  [1.0, 0.0]])
 
-    x = F * x + B * u
+    x = F @ x + B @ u
 
     return x
 
@@ -125,7 +125,7 @@ def observation(xTrue, u, RFID):
 
     xTrue = motion_model(xTrue, u)
 
-    z = np.matrix(np.zeros((0, 3)))
+    z = np.zeros((0, 3))
 
     for i in range(len(RFID[:, 0])):
 
@@ -135,7 +135,7 @@ def observation(xTrue, u, RFID):
         if d <= MAX_RANGE:
             # add noise to range observation
             dn = d + np.random.randn() * NOISE_RANGE
-            zi = np.matrix([dn, RFID[i, 0], RFID[i, 1]])
+            zi = np.array([dn, RFID[i, 0], RFID[i, 1]])
             z = np.vstack((z, zi))
 
     # add noise to speed
@@ -225,7 +225,7 @@ def main():
 
     time = 0.0
 
-    xTrue = np.matrix(np.zeros((4, 1)))
+    xTrue = np.zeros((4, 1))
     gmap = init_gmap(XY_RESO, MINX, MINY, MAXX, MAXY)
     mx, my = calc_grid_index(gmap)  # for grid map visualization
 
