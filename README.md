@@ -46,7 +46,7 @@ Python codes for robotics algorithm.
       * [Reeds Shepp planning](#reeds-shepp-planning)
       * [LQR based path planning](#lqr-based-path-planning)
       * [Optimal Trajectory in a Frenet Frame](#optimal-trajectory-in-a-frenet-frame)
-   * [Path tracking](#path-tracking)
+   * [Path Tracking](#path-tracking)
       * [move to a pose control](#move-to-a-pose-control)
       * [Stanley control](#stanley-control)
       * [Rear wheel feedback control](#rear-wheel-feedback-control)
@@ -414,7 +414,7 @@ Ref:
 - [Optimal trajectory generation for dynamic street scenarios in a Frenet Frame](https://www.youtube.com/watch?v=Cj6tAQe7UCY)
 
 
-# Path tracking
+# Path Tracking
 
 ## move to a pose control
 
