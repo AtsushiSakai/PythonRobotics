@@ -1,7 +1,9 @@
 """
+
 Model trajectory generator
 
 author: Atsushi Sakai(@Atsushi_twi)
+
 """
 
 import numpy as np
@@ -11,7 +13,7 @@ import motion_model
 
 # optimization parameter
 max_iter = 100
-h = np.matrix([0.5, 0.02, 0.02]).T  # parameter sampling distanse
+h = np.array([0.5, 0.02, 0.02]).T  # parameter sampling distance
 cost_th = 0.1
 
 show_animation = False
@@ -37,28 +39,28 @@ def calc_diff(target, x, y, yaw):
 
 def calc_J(target, p, h, k0):
     xp, yp, yawp = motion_model.generate_last_state(
-        p[0, 0] + h[0, 0], p[1, 0], p[2, 0], k0)
+        p[0, 0] + h[0], p[1, 0], p[2, 0], k0)
     dp = calc_diff(target, [xp], [yp], [yawp])
     xn, yn, yawn = motion_model.generate_last_state(
-        p[0, 0] - h[0, 0], p[1, 0], p[2, 0], k0)
+        p[0, 0] - h[0], p[1, 0], p[2, 0], k0)
     dn = calc_diff(target, [xn], [yn], [yawn])
-    d1 = np.matrix((dp - dn) / (2.0 * h[0, 0])).T
+    d1 = np.array((dp - dn) / (2.0 * h[0])).reshape(3, 1)
 
     xp, yp, yawp = motion_model.generate_last_state(
-        p[0, 0], p[1, 0] + h[1, 0], p[2, 0], k0)
+        p[0, 0], p[1, 0] + h[1], p[2, 0], k0)
     dp = calc_diff(target, [xp], [yp], [yawp])
     xn, yn, yawn = motion_model.generate_last_state(
-        p[0, 0], p[1, 0] - h[1, 0], p[2, 0], k0)
+        p[0, 0], p[1, 0] - h[1], p[2, 0], k0)
     dn = calc_diff(target, [xn], [yn], [yawn])
-    d2 = np.matrix((dp - dn) / (2.0 * h[1, 0])).T
+    d2 = np.array((dp - dn) / (2.0 * h[1])).reshape(3, 1)
 
     xp, yp, yawp = motion_model.generate_last_state(
-        p[0, 0], p[1, 0], p[2, 0] + h[2, 0], k0)
+        p[0, 0], p[1, 0], p[2, 0] + h[2], k0)
     dp = calc_diff(target, [xp], [yp], [yawp])
     xn, yn, yawn = motion_model.generate_last_state(
-        p[0, 0], p[1, 0], p[2, 0] - h[2, 0], k0)
+        p[0, 0], p[1, 0], p[2, 0] - h[2], k0)
     dn = calc_diff(target, [xn], [yn], [yawn])
-    d3 = np.matrix((dp - dn) / (2.0 * h[2, 0])).T
+    d3 = np.array((dp - dn) / (2.0 * h[2])).reshape(3, 1)
 
     J = np.hstack((d1, d2, d3))
 
@@ -73,10 +75,10 @@ def selection_learning_param(dp, p, k0, target):
     da = 0.5
 
     for a in np.arange(mina, maxa, da):
-        tp = p[:, :] + a * dp
+        tp = p + a * dp
         xc, yc, yawc = motion_model.generate_last_state(
             tp[0], tp[1], tp[2], k0)
-        dc = np.matrix(calc_diff(target, [xc], [yc], [yawc])).T
+        dc = calc_diff(target, [xc], [yc], [yawc])
         cost = np.linalg.norm(dc)
 
         if cost <= mincost and a != 0.0:
@@ -102,8 +104,7 @@ def show_trajectory(target, xc, yc):
 def optimize_trajectory(target, k0, p):
     for i in range(max_iter):
         xc, yc, yawc = motion_model.generate_trajectory(p[0], p[1], p[2], k0)
-        dc = np.matrix(calc_diff(target, xc, yc, yawc)).T
-        #  print(dc.T)
+        dc = np.array(calc_diff(target, xc, yc, yawc)).reshape(3, 1)
 
         cost = np.linalg.norm(dc)
         if cost <= cost_th:
@@ -112,7 +113,7 @@ def optimize_trajectory(target, k0, p):
 
         J = calc_J(target, p, h, k0)
         try:
-            dp = - np.linalg.inv(J) * dc
+            dp = - np.linalg.inv(J) @ dc
         except np.linalg.linalg.LinAlgError:
             print("cannot calc path LinAlgError")
             xc, yc, yawc, p = None, None, None, None
@@ -137,7 +138,7 @@ def test_optimize_trajectory():
     target = motion_model.State(x=5.0, y=2.0, yaw=np.deg2rad(90.0))
     k0 = 0.0
 
-    init_p = np.matrix([6.0, 0.0, 0.0]).T
+    init_p = np.array([6.0, 0.0, 0.0]).reshape(3, 1)
 
     x, y, yaw, p = optimize_trajectory(target, k0, init_p)
 
