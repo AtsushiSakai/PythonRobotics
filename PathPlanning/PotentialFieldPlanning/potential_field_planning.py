@@ -148,7 +148,7 @@ def main():
     gy = 30.0  # goal y position [m]
     grid_size = 0.5  # potential grid size [m]
     robot_radius = 5.0  # robot radius [m]
-
+    radius = [3.,3.,3.,3.,3.]
     ox = [15.0, 5.0, 20.0, 25.0]  # obstacle x position list [m]
     oy = [25.0, 15.0, 26.0, 25.0]  # obstacle y position list [m]
 
@@ -158,7 +158,7 @@ def main():
 
     # path generation
     rx, ry = potential_field_planning(
-        sx, sy, gx, gy, ox, oy, grid_size, robot_radius)
+        sx, sy, gx, gy, ox, oy, grid_size, robot_radius,radius)
 
     print(rx)
     print(ry)
