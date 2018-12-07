@@ -20,7 +20,7 @@ AREA_WIDTH = 30.0  # potential area width [m]
 show_animation = True
 
 
-def calc_potential_field(gx, gy, ox, oy, reso, rr):
+def calc_potential_field(gx, gy, ox, oy, reso, rr,radius):
     minx = min(ox) - AREA_WIDTH / 2.0
     miny = min(oy) - AREA_WIDTH / 2.0
     maxx = max(ox) + AREA_WIDTH / 2.0
@@ -37,7 +37,7 @@ def calc_potential_field(gx, gy, ox, oy, reso, rr):
         for iy in range(yw):
             y = iy * reso + miny
             ug = calc_attractive_potential(x, y, gx, gy)
-            uo = calc_repulsive_potential(x, y, ox, oy, rr)
+            uo = calc_repulsive_potential(x, y, ox, oy, rr,radius)
             uf = ug + uo
             pmap[ix][iy] = uf
 
@@ -48,7 +48,7 @@ def calc_attractive_potential(x, y, gx, gy):
     return 0.5 * KP * np.hypot(x - gx, y - gy)
 
 
-def calc_repulsive_potential(x, y, ox, oy, rr):
+def calc_repulsive_potential(x, y, ox, oy, rr,radius):
     # search nearest obstacle
     minid = -1
     dmin = float("inf")
@@ -61,11 +61,11 @@ def calc_repulsive_potential(x, y, ox, oy, rr):
     # calc repulsive potential
     dq = np.hypot(x - ox[minid], y - oy[minid])
 
-    if dq <= rr:
+    if dq <= (rr+radius[minid]):
         if dq <= 0.1:
             dq = 0.1
 
-        return 0.5 * ETA * (1.0 / dq - 1.0 / rr) ** 2
+        return 0.5 * ETA * (1.0 / dq - 1.0 / (rr+radius[minid])) ** 2
     else:
         return 0.0
 
@@ -84,10 +84,10 @@ def get_motion_model():
     return motion
 
 
-def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
+def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr,radius):
 
     # calc potential field
-    pmap, minx, miny = calc_potential_field(gx, gy, ox, oy, reso, rr)
+    pmap, minx, miny = calc_potential_field(gx, gy, ox, oy, reso, rr,radius)
 
     # search path
     d = np.hypot(sx - gx, sy - gy)
