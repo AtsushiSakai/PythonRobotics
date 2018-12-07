@@ -74,6 +74,10 @@ Dear AtsushiSakai, <br>Thanks a lot for the wonderful collection of projects.It 
 
 ---Ezhil Bharathi 
 
+Dear Atsushi Sakai, <br>Thank you so much for gathering all the useful stuff and good examples of robotics things ! :) <br>I am very new in this area and want to know more about robotics and SLAM things.  <br>and again, thank you so much :) <br>
+
+--Tutorgaming
+
 ---
 
 # Citations
