@@ -111,7 +111,7 @@ def pf_localization(px, pw, xEst, PEst, z, u):
         ud = np.array([[ud1, ud2]]).T
         x = motion_model(x, ud)
 
-        #  Calc Inportance Weight
+        #  Calc Importance Weight
         for i in range(len(z[:, 0])):
             dx = x[0, 0] - z[i, 1]
             dy = x[1, 0] - z[i, 2]
@@ -185,7 +185,7 @@ def plot_covariance_ellipse(xEst, PEst):
     y = [b * math.sin(it) for it in t]
     angle = math.atan2(eigvec[bigind, 1], eigvec[bigind, 0])
     R = np.array([[math.cos(angle), math.sin(angle)],
-                   [-math.sin(angle), math.cos(angle)]])
+                  [-math.sin(angle), math.cos(angle)]])
     fx = R.dot(np.array([[x, y]]))
     px = np.array(fx[0, :] + xEst[0, 0]).flatten()
     py = np.array(fx[1, :] + xEst[1, 0]).flatten()
