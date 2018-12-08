@@ -471,8 +471,7 @@ Path tracking simulation with iterative linear model predictive speed and steeri
 
 Ref:
 
-- [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/notebook.ipynb)
-
+- [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/Model_predictive_speed_and_steering_control.ipynb)
 
 # Arm Navigation
 
