@@ -73,8 +73,8 @@ def solve_DARE(A, B, Q, R):
     eps = 0.01
 
     for i in range(maxiter):
-        Xn = A.T * X * A - A.T * X * B * \
-            la.inv(R + B.T * X * B) * B.T * X * A + Q
+        Xn = A.T @ X @ A - A.T @ X @ B @ \
+            la.inv(R + B.T @ X @ B) @ B.T @ X @ A + Q
         if (abs(Xn - X)).max() < eps:
             X = Xn
             break
@@ -94,9 +94,9 @@ def dlqr(A, B, Q, R):
     X = solve_DARE(A, B, Q, R)
 
     # compute the LQR gain
-    K = np.matrix(la.inv(B.T * X * B + R) * (B.T * X * A))
+    K = la.inv(B.T @ X @ B + R) @ (B.T @ X @ A)
 
-    eigVals, eigVecs = la.eig(A - B * K)
+    eigVals, eigVecs = la.eig(A - B @ K)
 
     return K, X, eigVals
 
@@ -108,7 +108,7 @@ def lqr_steering_control(state, cx, cy, cyaw, ck, pe, pth_e):
     v = state.v
     th_e = pi_2_pi(state.yaw - cyaw[ind])
 
-    A = np.matrix(np.zeros((4, 4)))
+    A = np.zeros((4, 4))
     A[0, 0] = 1.0
     A[0, 1] = dt
     A[1, 2] = v
@@ -116,12 +116,12 @@ def lqr_steering_control(state, cx, cy, cyaw, ck, pe, pth_e):
     A[2, 3] = dt
     # print(A)
 
-    B = np.matrix(np.zeros((4, 1)))
+    B = np.zeros((4, 1))
     B[3, 0] = v / L
 
     K, _, _ = dlqr(A, B, Q, R)
 
-    x = np.matrix(np.zeros((4, 1)))
+    x = np.zeros((4, 1))
 
     x[0, 0] = e
     x[1, 0] = (e - pe) / dt
@@ -129,7 +129,7 @@ def lqr_steering_control(state, cx, cy, cyaw, ck, pe, pth_e):
     x[3, 0] = (th_e - pth_e) / dt
 
     ff = math.atan2(L * k, 1)
-    fb = pi_2_pi((-K * x)[0, 0])
+    fb = pi_2_pi((-K @ x)[0, 0])
 
     delta = ff + fb
 
