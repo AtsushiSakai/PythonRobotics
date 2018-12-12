@@ -91,7 +91,7 @@ where
 
 :math:`\begin{equation*} F= \begin{bmatrix} 1 & 0 & 0 & 0\\ 0 & 1 & 0 & 0\\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 0 \\ \end{bmatrix} \end{equation*}`
 
-:math:`\begin{equation*} B= \begin{bmatrix} sin(\phi)dt & 0\\ cos(\phi)dt & 0\\ 0 & dt\\ 1 & 0\\ \end{bmatrix} \end{equation*}`
+:math:`\begin{equation*} B= \begin{bmatrix} cos(\phi)dt & 0\\ sin(\phi)dt & 0\\ 0 & dt\\ 1 & 0\\ \end{bmatrix} \end{equation*}`
 
 :math:`dt` is a time interval.
 
@@ -102,7 +102,7 @@ Its Jacobian matrix is
 
 :math:`\begin{equation*} J_F= \begin{bmatrix} \frac{dx}{dx}& \frac{dx}{dy} & \frac{dx}{d\phi} & \frac{dx}{dv}\\ \frac{dy}{dx}& \frac{dy}{dy} & \frac{dy}{d\phi} & \frac{dy}{dv}\\ \frac{d\phi}{dx}& \frac{d\phi}{dy} & \frac{d\phi}{d\phi} & \frac{d\phi}{dv}\\ \frac{dv}{dx}& \frac{dv}{dy} & \frac{dv}{d\phi} & \frac{dv}{dv}\\ \end{bmatrix} \end{equation*}`
 
-:math:`\begin{equation*} 　= \begin{bmatrix} 1& 0 & -v sin(\phi)dt & cos(\phi)dt\\ 0 & 1 & v cos(\phi)dt & sin(\phi) dt\\ 0 & 0 & 1 & 0\\ 0 & 0 & 0 & 1\\ \end{bmatrix} \end{equation*}`
+:math:`\begin{equation*} 　= \begin{bmatrix} 1& 0 & -v cos(\phi)dt & sin(\phi)dt\\ 0 & 1 & v cos(\phi)dt & sin(\phi) dt\\ 0 & 0 & 1 & 0\\ 0 & 0 & 0 & 1\\ \end{bmatrix} \end{equation*}`
 
 Observation Model
 ~~~~~~~~~~~~~~~~~
