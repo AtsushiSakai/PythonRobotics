@@ -22,7 +22,7 @@ def LQRplanning(sx, sy, gx, gy):
 
     rx, ry = [sx], [sy]
 
-    x = np.matrix([sx - gx, sy - gy]).T  # State vector
+    x = np.array([sx - gx, sy - gy]).reshape(2, 1)  # State vector
 
     # Linear system model
     A, B = get_system_model()
@@ -35,7 +35,7 @@ def LQRplanning(sx, sy, gx, gy):
 
         u = LQR_control(A, B, x)
 
-        x = A * x + B * u
+        x = A @ x + B @ u
 
         rx.append(x[0, 0] + gx)
         ry.append(x[1, 0] + gy)
@@ -91,18 +91,18 @@ def dlqr(A, B, Q, R):
     X = solve_DARE(A, B, Q, R)
 
     # compute the LQR gain
-    K = np.matrix(la.inv(B.T * X * B + R) * (B.T * X * A))
+    K = la.inv(B.T @ X @ B + R) @ (B.T @ X @ A)
 
-    eigVals, eigVecs = la.eig(A - B * K)
+    eigVals, eigVecs = la.eig(A - B @ K)
 
     return K, X, eigVals
 
 
 def get_system_model():
 
-    A = np.matrix([[DT, 1.0],
-                   [0.0, DT]])
-    B = np.matrix([0.0, 1.0]).T
+    A = np.array([[DT, 1.0],
+                  [0.0, DT]])
+    B = np.array([0.0, 1.0]).reshape(2, 1)
 
     return A, B
 
@@ -111,7 +111,7 @@ def LQR_control(A, B, x):
 
     Kopt, X, ev = dlqr(A, B, np.eye(2), np.eye(1))
 
-    u = -Kopt * x
+    u = -Kopt @ x
 
     return u
 
