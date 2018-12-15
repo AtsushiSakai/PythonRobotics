@@ -46,14 +46,15 @@ class InformedRRTStar():
         # Computing the sampling space
         cMin = math.sqrt(pow(self.start.x - self.goal.x, 2) +
                          pow(self.start.y - self.goal.y, 2))
-        xCenter = np.matrix([[(self.start.x + self.goal.x) / 2.0],
-                             [(self.start.y + self.goal.y) / 2.0], [0]])
-        a1 = np.matrix([[(self.goal.x - self.start.x) / cMin],
-                        [(self.goal.y - self.start.y) / cMin], [0]])
+        xCenter = np.array([[(self.start.x + self.goal.x) / 2.0],
+                            [(self.start.y + self.goal.y) / 2.0], [0]])
+        a1 = np.array([[(self.goal.x - self.start.x) / cMin],
+                       [(self.goal.y - self.start.y) / cMin], [0]])
+
         etheta = math.atan2(a1[1], a1[0])
         # first column of idenity matrix transposed
-        id1_t = np.matrix([1.0, 0.0, 0.0])
-        M = np.dot(a1, id1_t)
+        id1_t = np.array([1.0, 0.0, 0.0]).reshape(1, 3)
+        M = a1 @ id1_t
         U, S, Vh = np.linalg.svd(M, 1, 1)
         C = np.dot(np.dot(U, np.diag(
             [1.0, 1.0, np.linalg.det(U) * np.linalg.det(np.transpose(Vh))])), Vh)
@@ -285,9 +286,9 @@ class InformedRRTStar():
         t = np.arange(0, 2 * math.pi + 0.1, 0.1)
         x = [a * math.cos(it) for it in t]
         y = [b * math.sin(it) for it in t]
-        R = np.matrix([[math.cos(angle), math.sin(angle)],
-                       [-math.sin(angle), math.cos(angle)]])
-        fx = R * np.matrix([x, y])
+        R = np.array([[math.cos(angle), math.sin(angle)],
+                      [-math.sin(angle), math.cos(angle)]])
+        fx = R @ np.array([x, y])
         px = np.array(fx[0, :] + cx).flatten()
         py = np.array(fx[1, :] + cy).flatten()
         plt.plot(cx, cy, "xc")
