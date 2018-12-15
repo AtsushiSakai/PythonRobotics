@@ -134,7 +134,7 @@ class RRT():
             return False, None, None, None, None, None, None, None
 
     def calc_tracking_path(self, path):
-        path = np.matrix(path[::-1])
+        path = np.array(path[::-1])
         ds = 0.2
         for i in range(10):
             lx = path[-1, 0]
@@ -145,7 +145,7 @@ class RRT():
                 print("back")
                 ds *= -1
 
-            lstate = np.matrix(
+            lstate = np.array(
                 [lx + ds * math.cos(lyaw), ly + ds * math.sin(lyaw), lyaw])
             #  print(lstate)
 
@@ -296,7 +296,7 @@ class RRT():
             goalind = node.parent
         path.append([self.start.x, self.start.y, self.start.yaw])
 
-        path = np.matrix(path[::-1])
+        path = np.array(path[::-1])
         return path
 
     def calc_dist_to_goal(self, x, y):
