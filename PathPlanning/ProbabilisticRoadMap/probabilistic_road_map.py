@@ -106,14 +106,14 @@ def is_collision(sx, sy, gx, gy, rr, okdtree):
     nstep = round(d / D)
 
     for i in range(nstep):
-        idxs, dist = okdtree.search(np.matrix([x, y]).T)
+        idxs, dist = okdtree.search(np.array([x, y]).reshape(2, 1))
         if dist[0] <= rr:
             return True  # collision
         x += D * math.cos(yaw)
         y += D * math.sin(yaw)
 
     # goal point check
-    idxs, dist = okdtree.search(np.matrix([gx, gy]).T)
+    idxs, dist = okdtree.search(np.array([gx, gy]).reshape(2, 1))
     if dist[0] <= rr:
         return True  # collision
 
@@ -137,8 +137,8 @@ def generate_roadmap(sample_x, sample_y, rr, obkdtree):
     for (i, ix, iy) in zip(range(nsample), sample_x, sample_y):
 
         index, dists = skdtree.search(
-            np.matrix([ix, iy]).T, k=nsample)
-        inds = index[0][0]
+            np.array([ix, iy]).reshape(2, 1), k=nsample)
+        inds = index[0]
         edge_id = []
         #  print(index)
 
@@ -252,7 +252,7 @@ def sample_points(sx, sy, gx, gy, rr, ox, oy, obkdtree):
         tx = (random.random() - minx) * (maxx - minx)
         ty = (random.random() - miny) * (maxy - miny)
 
-        index, dist = obkdtree.search(np.matrix([tx, ty]).T)
+        index, dist = obkdtree.search(np.array([tx, ty]).reshape(2, 1))
 
         if dist[0] >= rr:
             sample_x.append(tx)
