@@ -102,12 +102,16 @@ class RRT():
         # expand tree
         nearestNode = self.nodeList[nind]
         theta = math.atan2(rnd[1] - nearestNode.y, rnd[0] - nearestNode.x)
-        newNode = copy.deepcopy(nearestNode)
-        newNode.x += self.expandDis * math.cos(theta)
-        newNode.y += self.expandDis * math.sin(theta)
-
-        newNode.cost += self.expandDis
-        newNode.parent = nind
+        newNode = Node(rnd[0], rnd[1])
+        currentDistance = math.sqrt( (rnd[1] - nearestNode.y) ** 2 +  (rnd[0] - nearestNode.x) ** 2)
+        # Find a point within expandDis of nind, and closest to rnd
+        if currentDistance <= self.expandDis:
+            pass
+        else:
+            newNode.x = nearestNode.x + self.expandDis * math.cos(theta)
+            newNode.y = nearestNode.y + self.expandDis * math.sin(theta)
+        newNode.cost = float("inf") 
+        newNode.parent = None
         return newNode
 
     def get_random_point(self):
