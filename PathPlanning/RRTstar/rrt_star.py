@@ -20,7 +20,7 @@ class RRT():
     """
 
     def __init__(self, start, goal, obstacleList, randArea,
-                 expandDis=0.5, goalSampleRate=20, maxIter=1000):
+                 expandDis=0.5, goalSampleRate=20, maxIter=500):
         """
         Setting Parameter
 
@@ -60,7 +60,7 @@ class RRT():
                 self.nodeList.append(newNode)
                 self.rewire(newNode, nearinds)
 
-            if animation:
+            if animation and i % 5 == 0:
                 self.DrawGraph(rnd)
 
         # generate coruse
@@ -103,14 +103,15 @@ class RRT():
         nearestNode = self.nodeList[nind]
         theta = math.atan2(rnd[1] - nearestNode.y, rnd[0] - nearestNode.x)
         newNode = Node(rnd[0], rnd[1])
-        currentDistance = math.sqrt( (rnd[1] - nearestNode.y) ** 2 +  (rnd[0] - nearestNode.x) ** 2)
+        currentDistance = math.sqrt(
+            (rnd[1] - nearestNode.y) ** 2 + (rnd[0] - nearestNode.x) ** 2)
         # Find a point within expandDis of nind, and closest to rnd
         if currentDistance <= self.expandDis:
             pass
         else:
             newNode.x = nearestNode.x + self.expandDis * math.cos(theta)
             newNode.y = nearestNode.y + self.expandDis * math.sin(theta)
-        newNode.cost = float("inf") 
+        newNode.cost = float("inf")
         newNode.parent = None
         return newNode
 
@@ -192,7 +193,7 @@ class RRT():
         return True
 
     def DrawGraph(self, rnd=None):
-        u"""
+        """
         Draw Graph
         """
         plt.clf()
@@ -256,17 +257,22 @@ def main():
     ]  # [x,y,size(radius)]
 
     # Set Initial parameters
-    rrt = RRT(start=[0, 0], goal=[5, 10],
+    rrt = RRT(start=[0, 0], goal=[10, 10],
               randArea=[-2, 15], obstacleList=obstacleList)
     path = rrt.Planning(animation=show_animation)
 
-    # Draw final path
-    if show_animation:
-        rrt.DrawGraph()
-        plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
-        plt.grid(True)
-        plt.pause(0.01)  # Need for Mac
-        plt.show()
+    if path is None:
+        print("Cannot find path")
+    else:
+        print("found path!!")
+
+        # Draw final path
+        if show_animation:
+            rrt.DrawGraph()
+            plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
+            plt.grid(True)
+            plt.pause(0.01)  # Need for Mac
+            plt.show()
 
 
 if __name__ == '__main__':
