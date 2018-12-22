@@ -14,22 +14,33 @@ import matplotlib.pyplot as plt
 import math
 
 
+def differential_model(yaw, u_1, u_2):
+
+    dx = math.cos(yaw) * u_1
+    dy = math.sin(yaw) * u_1
+    dyaw = u_2
+
+    return dx, dy, dyaw
+
+
 class TwoWheeledSystem():
 
-    def __init__(self, init_x_1=0., init_x_2=0., init_x_3=0.):
+    def __init__(self, init_x, init_y, init_yaw):
 
-        self.x_1 = init_x_1
-        self.x_2 = init_x_2
-        self.x_3 = init_x_3
-        self.history_x_1 = [init_x_1]
-        self.history_x_2 = [init_x_2]
-        self.history_x_3 = [init_x_3]
+        self.x_1 = init_x
+        self.x_2 = init_y
+        self.x_3 = init_yaw
+        self.history_x_1 = [init_x]
+        self.history_x_2 = [init_y]
+        self.history_x_3 = [init_yaw]
 
     def update_state(self, u_1, u_2, dt=0.01):
 
-        self.x_1 += dt * math.cos(self.x_3) * u_1
-        self.x_2 += dt * math.sin(self.x_3) * u_1
-        self.x_3 += dt * u_2
+        dx, dy, dyaw = differential_model(self.x_3, u_1, u_2)
+
+        self.x_1 += dt * dx
+        self.x_2 += dt * dy
+        self.x_3 += dt * dyaw
 
         # save
         self.history_x_1.append(self.x_1)
@@ -40,75 +51,14 @@ class TwoWheeledSystem():
 class NMPCSimulatorSystem():
 
     def calc_predict_and_adjoint_state(self, x_1, x_2, x_3, u_1s, u_2s, N, dt):
-        """main
-        Parameters
-        ------------
-        x_1 : float
-            current state
-        x_2 : float
-            current state
-        x_3 : float
-            current state
-        u_1s : list of float
-            estimated optimal input Us for N steps
-        u_2s : list of float
-            estimated optimal input Us for N steps
-        N : int
-            predict step
-        dt : float
-            sampling time
-
-        Returns
-        --------
-        x_1s : list of float
-            predicted x_1s for N steps
-        x_2s : list of float
-            predicted x_2s for N steps
-        x_3s : list of float
-            predicted x_3s for N steps
-        lam_1s : list of float
-            adjoint state of x_1s, lam_1s for N steps
-        lam_2s : list of float
-            adjoint state of x_2s, lam_2s for N steps
-        lam_3s : list of float
-            adjoint state of x_3s, lam_3s for N steps
-        """
         x_1s, x_2s, x_3s = self._calc_predict_states(
-            x_1, x_2, x_3, u_1s, u_2s, N, dt)  # by usin state equation
+            x_1, x_2, x_3, u_1s, u_2s, N, dt)  # by using state equation
         lam_1s, lam_2s, lam_3s = self._calc_adjoint_states(
             x_1s, x_2s, x_3s, u_1s, u_2s, N, dt)  # by using adjoint equation
 
         return x_1s, x_2s, x_3s, lam_1s, lam_2s, lam_3s
 
     def _calc_predict_states(self, x_1, x_2, x_3, u_1s, u_2s, N, dt):
-        """ 
-        Parameters
-        ------------
-        x_1 : float
-            current state
-        x_2 : float
-            current state
-        x_3 : float
-            current state
-        u_1s : list of float
-            estimated optimal input Us for N steps
-        u_2s : list of float
-            estimated optimal input Us for N steps
-        N : int
-            predict step
-        dt : float
-            sampling time
-
-        Returns
-        --------
-        x_1s : list of float
-            predicted x_1s for N steps
-        x_2s : list of float
-            predicted x_2s for N steps
-        x_3s : list of float
-            predicted x_3s for N steps
-        """
-        # initial state
         x_1s = [x_1]
         x_2s = [x_2]
         x_3s = [x_3]
@@ -123,39 +73,11 @@ class NMPCSimulatorSystem():
         return x_1s, x_2s, x_3s
 
     def _calc_adjoint_states(self, x_1s, x_2s, x_3s, u_1s, u_2s, N, dt):
-        """
-        Parameters
-        ------------
-        x_1s : list of float
-            predicted x_1s for N steps
-        x_2s : list of float
-            predicted x_2s for N steps
-        x_3s : list of float
-            predicted x_3s for N steps
-        u_1s : list of float
-            estimated optimal input Us for N steps
-        u_2s : list of float
-            estimated optimal input Us for N steps
-        N : int
-            predict step
-        dt : float
-            sampling time
-
-        Returns
-        --------
-        lam_1s : list of float
-            adjoint state of x_1s, lam_1s for N steps
-        lam_2s : list of float
-            adjoint state of x_2s, lam_2s for N steps
-        lam_3s : list of float
-            adjoint state of x_2s, lam_2s for N steps
-        """
-        # final state
-        # final_state_func
         lam_1s = [x_1s[-1]]
         lam_2s = [x_2s[-1]]
         lam_3s = [x_3s[-1]]
 
+        # backward adjoint state calc
         for i in range(N - 1, 0, -1):
             temp_lam_1, temp_lam_2, temp_lam_3 = self._adjoint_state_with_oylar(
                 x_1s[i], x_2s[i], x_3s[i], lam_1s[0], lam_2s[0], lam_3s[0], u_1s[i], u_2s[i], dt)
@@ -171,215 +93,25 @@ class NMPCSimulatorSystem():
         pass
 
     def _predict_state_with_oylar(self, x_1, x_2, x_3, u_1, u_2, dt):
-        """in this case this function is the same as simulator
-        Parameters
-        ------------
-        x_1 : float
-            system state
-        x_2 : float
-            system state
-        x_3 : float
-            system state
-        u_1 : float
-            system input
-        u_2 : float
-            system input
-        dt : float in seconds
-            sampling time
-        Returns
-        --------
-        next_x_1 : float
-            next state, x_1 calculated by using state equation
-        next_x_2 : float
-            next state, x_2 calculated by using state equation
-        next_x_3 : float
-            next state, x_3 calculated by using state equation
-        """
-        k0 = [0. for _ in range(3)]
 
-        functions = [self.func_x_1, self.func_x_2, self.func_x_3]
+        dx, dy, dyaw = differential_model(
+            x_3, u_1, u_2)
 
-        for i, func in enumerate(functions):
-            k0[i] = dt * func(x_1, x_2, x_3, u_1, u_2)
-
-        next_x_1 = x_1 + k0[0]
-        next_x_2 = x_2 + k0[1]
-        next_x_3 = x_3 + k0[2]
+        next_x_1 = x_1 + dt * dx
+        next_x_2 = x_2 + dt * dy
+        next_x_3 = x_3 + dt * dyaw
 
         return next_x_1, next_x_2, next_x_3
 
-    def func_x_1(self, y_1, y_2, y_3, u_1, u_2):
-        """
-        Parameters
-        ------------
-        y_1 : float
-        y_2 : float
-        y_3 : float
-        u_1 : float
-            system input
-        u_2 : float
-            system input
-        """
-        y_dot = math.cos(y_3) * u_1
-        return y_dot
-
-    def func_x_2(self, y_1, y_2, y_3, u_1, u_2):
-        """
-        Parameters
-        ------------
-        y_1 : float
-        y_2 : float
-        y_3 : float
-        u_1 : float
-            system input
-        u_2 : float
-            system input
-        """
-        y_dot = math.sin(y_3) * u_1
-        return y_dot
-
-    def func_x_3(self, y_1, y_2, y_3, u_1, u_2):
-        """
-        Parameters
-        ------------
-        y_1 : float
-        y_2 : float
-        y_3 : float
-        u_1 : float
-            system input
-        u_2 : float
-            system input
-        """
-        y_dot = u_2
-        return y_dot
-
     def _adjoint_state_with_oylar(self, x_1, x_2, x_3, lam_1, lam_2, lam_3, u_1, u_2, dt):
-        """
-        Parameters
-        ------------
-        x_1 : float
-            system state
-        x_2 : float
-            system state
-        x_3 : float
-            system state
-        lam_1 : float
-            adjoint state
-        lam_2 : float
-            adjoint state
-        lam_3 : float
-            adjoint state
-        u_1 : float
-            system input
-        u_2 : float
-            system input
-        dt : float in seconds
-            sampling time
-        Returns
-        --------
-        pre_lam_1 : float
-            pre, 1 step before lam_1 calculated by using adjoint equation
-        pre_lam_2 : float
-            pre, 1 step before lam_2 calculated by using adjoint equation
-        pre_lam_3 : float
-            pre, 1 step before lam_3 calculated by using adjoint equation
-        """
-        k0 = [0. for _ in range(3)]
 
-        functions = [self._func_lam_1, self._func_lam_2, self._func_lam_3]
-
-        for i, func in enumerate(functions):
-            k0[i] = dt * func(x_1, x_2, x_3, lam_1, lam_2, lam_3, u_1, u_2)
-
-        pre_lam_1 = lam_1 + k0[0]
-        pre_lam_2 = lam_2 + k0[1]
-        pre_lam_3 = lam_3 + k0[2]
+        # ∂H/∂x
+        pre_lam_1 = lam_1 + dt * 0.0
+        pre_lam_2 = lam_2 + dt * 0.0
+        pre_lam_3 = lam_3 + dt * \
+            (- lam_1 * math.sin(x_3) * u_1 + lam_2 * math.cos(x_3) * u_1)
 
         return pre_lam_1, pre_lam_2, pre_lam_3
-
-    def _func_lam_1(self, y_1, y_2, y_3, y_4, y_5, y_6, u_1, u_2):
-        """calculating -\dot{lam_1}
-        Parameters
-        ------------
-        y_1 : float
-            means x_1
-        y_2 : float
-            means x_2
-        y_3 : float
-            means x_3
-        y_4 : float
-            means lam_1
-        y_5 : float
-            means lam_2
-        y_6 : float
-            means lam_3
-        u_1 : float
-            means system input
-        u_2 : float
-            means system input
-        Returns
-        ---------
-        y_dot : float
-            means -\dot{lam_1}
-        """
-        y_dot = 0.
-        return y_dot
-
-    def _func_lam_2(self, y_1, y_2, y_3, y_4, y_5, y_6, u_1, u_2):
-        """calculating -\dot{lam_2}
-        Parameters
-        ------------
-        y_1 : float
-            means x_1
-        y_2 : float
-            means x_2
-        y_3 : float
-            means x_3
-        y_4 : float
-            means lam_1
-        y_5 : float
-            means lam_2
-        y_6 : float
-            means lam_3
-        u_1 : float
-            means system input
-        u_2 : float
-            means system input
-        Returns
-        ---------
-        y_dot : float
-            means -\dot{lam_2}
-        """
-        y_dot = 0.
-        return y_dot
-
-    def _func_lam_3(self, y_1, y_2, y_3, y_4, y_5, y_6, u_1, u_2):
-        """calculating -\dot{lam_3}
-        Parameters
-        ------------
-        y_1 : float
-            means x_1
-        y_2 : float
-            means x_2
-        y_3 : float
-            means x_3
-        y_4 : float
-            means lam_1
-        y_5 : float
-            means lam_2
-        y_6 : float
-            means lam_3
-        u_1 : float
-            means system input
-        u_2 : float
-            means system input
-        Returns
-        ---------
-        y_dot : float
-            means -\dot{lam_3}
-        """
-        y_dot = - y_4 * math.sin(y_3) * u_1 + y_5 * math.cos(y_3) * u_1
-        return y_dot
 
 
 class NMPCController_with_CGMRES():
@@ -432,34 +164,27 @@ class NMPCController_with_CGMRES():
     """
 
     def __init__(self):
-        """
-        Parameters
-        -----------
-        None
-        """
         # parameters
-        self.zeta = 100.  # 安定化ゲイン
-        self.ht = 0.01  # 差分近似の幅
-        self.tf = 1.  # 最終時間
-        self.alpha = 0.5  # 時間の上昇ゲイン
-        self.N = 10  # 分割数
-        self.threshold = 0.001  # break値
-
-        self.input_num = 6  # dummy, 制約条件に対するuにも合わせた入力の数
+        self.zeta = 100.  # stability gain
+        self.ht = 0.01  # difference approximation tick
+        self.tf = 1.  # final time
+        self.alpha = 0.5  # time gain
+        self.N = 10  # division number
+        self.threshold = 0.001
+        self.input_num = 6  # input number of dummy, constraints
         self.max_iteration = self.input_num * self.N
 
         # simulator
         self.simulator = NMPCSimulatorSystem()
 
-        # initial
-        self.u_1s = np.ones(self.N) * 1.
-        self.u_2s = np.ones(self.N) * 0.1
-        self.dummy_u_1s = np.ones(self.N) * 0.1
-        self.dummy_u_2s = np.ones(self.N) * 2.5
-        self.raw_1s = np.ones(self.N) * 0.8
-        self.raw_2s = np.ones(self.N) * 0.8
+        # initial input, initialize as 1.0
+        self.u_1s = np.ones(self.N)
+        self.u_2s = np.ones(self.N)
+        self.dummy_u_1s = np.ones(self.N)
+        self.dummy_u_2s = np.ones(self.N)
+        self.raw_1s = np.zeros(self.N)
+        self.raw_2s = np.zeros(self.N)
 
-        # for fig
         self.history_u_1 = []
         self.history_u_2 = []
         self.history_dummy_u_1 = []
@@ -469,34 +194,13 @@ class NMPCController_with_CGMRES():
         self.history_f = []
 
     def calc_input(self, x_1, x_2, x_3, time):
-        """
-        Parameters
-        ------------
-        x_1 : float
-            current state
-        x_2 : float
-            current state
-        x_3 : float
-            current state
-        time : float in seconds
-            now time
-        Returns
-        --------
-        u_1s : list of float
-            estimated optimal system input
-        u_2s : list of float
-            estimated optimal system input
-        """
+
         # calculating sampling time
         dt = self.tf * (1. - np.exp(-self.alpha * time)) / float(self.N)
 
         # x_dot
-        x_1_dot = self.simulator.func_x_1(
-            x_1, x_2, x_3, self.u_1s[0], self.u_2s[0])
-        x_2_dot = self.simulator.func_x_2(
-            x_1, x_2, x_3, self.u_1s[0], self.u_2s[0])
-        x_3_dot = self.simulator.func_x_3(
-            x_1, x_2, x_3, self.u_1s[0], self.u_2s[0])
+        x_1_dot, x_2_dot, x_3_dot = differential_model(
+            x_3, self.u_1s[0], self.u_2s[0])
 
         dx_1 = x_1_dot * self.ht
         dx_2 = x_2_dot * self.ht
@@ -505,15 +209,17 @@ class NMPCController_with_CGMRES():
         x_1s, x_2s, x_3s, lam_1s, lam_2s, lam_3s = self.simulator.calc_predict_and_adjoint_state(
             x_1 + dx_1, x_2 + dx_2, x_3 + dx_3, self.u_1s, self.u_2s, self.N, dt)
 
-        # Fxt
-        Fxt = self._calc_f(x_1s, x_2s, x_3s, lam_1s, lam_2s, lam_3s, self.u_1s, self.u_2s, self.dummy_u_1s, self.dummy_u_2s,
+        # Fxt:F(U,x+hx˙,t+h)
+        Fxt = self._calc_f(x_1s, x_2s, x_3s, lam_1s, lam_2s, lam_3s,
+                           self.u_1s, self.u_2s, self.dummy_u_1s, self.dummy_u_2s,
                            self.raw_1s, self.raw_2s, self.N, dt)
 
-        # F
+        # F:F(U,x,t)
         x_1s, x_2s, x_3s, lam_1s, lam_2s, lam_3s = self.simulator.calc_predict_and_adjoint_state(
             x_1, x_2, x_3, self.u_1s, self.u_2s, self.N, dt)
 
-        F = self._calc_f(x_1s, x_2s, x_3s, lam_1s, lam_2s, lam_3s, self.u_1s, self.u_2s, self.dummy_u_1s, self.dummy_u_2s,
+        F = self._calc_f(x_1s, x_2s, x_3s, lam_1s, lam_2s, lam_3s,
+                         self.u_1s, self.u_2s, self.dummy_u_1s, self.dummy_u_2s,
                          self.raw_1s, self.raw_2s, self.N, dt)
 
         right = -self.zeta * F - ((Fxt - F) / self.ht)
@@ -528,7 +234,10 @@ class NMPCController_with_CGMRES():
         x_1s, x_2s, x_3s, lam_1s, lam_2s, lam_3s = self.simulator.calc_predict_and_adjoint_state(
             x_1 + dx_1, x_2 + dx_2, x_3 + dx_3, self.u_1s + du_1, self.u_2s + du_2, self.N, dt)
 
-        Fuxt = self._calc_f(x_1s, x_2s, x_3s, lam_1s, lam_2s, lam_3s, self.u_1s + du_1, self.u_2s + du_2, self.dummy_u_1s + ddummy_u_1, self.dummy_u_2s + ddummy_u_2,
+        # Fuxt:F(U+hdU(0),x+hx˙,t+h)
+        Fuxt = self._calc_f(x_1s, x_2s, x_3s, lam_1s, lam_2s, lam_3s,
+                            self.u_1s + du_1, self.u_2s + du_2,
+                            self.dummy_u_1s + ddummy_u_1, self.dummy_u_2s + ddummy_u_2,
                             self.raw_1s + draw_1, self.raw_2s + draw_2, self.N, dt)
 
         left = ((Fuxt - Fxt) / self.ht)
@@ -537,16 +246,14 @@ class NMPCController_with_CGMRES():
         r0 = right - left
         r0_norm = np.linalg.norm(r0)
 
-        # 数×iterarion回数
         vs = np.zeros((self.max_iteration, self.max_iteration + 1))
-
-        vs[:, 0] = r0 / r0_norm  # 最初の基底を算出
+        vs[:, 0] = r0 / r0_norm
 
         hs = np.zeros((self.max_iteration + 1, self.max_iteration + 1))
 
         # in this case the state is 3(u and dummy_u)
         e = np.zeros((self.max_iteration + 1, 1))
-        e[0] = 1.
+        e[0] = 1.0
 
         for i in range(self.max_iteration):
             du_1 = vs[::self.input_num, i] * self.ht
@@ -559,14 +266,17 @@ class NMPCController_with_CGMRES():
             x_1s, x_2s, x_3s, lam_1s, lam_2s, lam_3s = self.simulator.calc_predict_and_adjoint_state(
                 x_1 + dx_1, x_2 + dx_2, x_3 + dx_3, self.u_1s + du_1, self.u_2s + du_2, self.N, dt)
 
-            Fuxt = self._calc_f(x_1s, x_2s, x_3s, lam_1s, lam_2s, lam_3s, self.u_1s + du_1, self.u_2s + du_2, self.dummy_u_1s + ddummy_u_1, self.dummy_u_2s + ddummy_u_2,
+            Fuxt = self._calc_f(x_1s, x_2s, x_3s, lam_1s, lam_2s, lam_3s,
+                                self.u_1s + du_1, self.u_2s + du_2,
+                                self.dummy_u_1s + ddummy_u_1, self.dummy_u_2s + ddummy_u_2,
                                 self.raw_1s + draw_1, self.raw_2s + draw_2, self.N, dt)
 
             Av = ((Fuxt - Fxt) / self.ht)
 
             sum_Av = np.zeros(self.max_iteration)
 
-            for j in range(i + 1):  # グラムシュミットの直交化法です、和を取って差分を取って算出します
+            # Gram–Schmidt orthonormalization
+            for j in range(i + 1):
                 hs[j, i] = np.dot(Av, vs[:, j])
                 sum_Av = sum_Av + hs[j, i] * vs[:, j]
 
@@ -576,7 +286,7 @@ class NMPCController_with_CGMRES():
 
             vs[:, i + 1] = v_est / hs[i + 1, i]
 
-            inv_hs = np.linalg.pinv(hs[:i + 1, :i])  # この辺は教科書（実時間の方）にのっています
+            inv_hs = np.linalg.pinv(hs[:i + 1, :i])
             ys = np.dot(inv_hs, r0_norm * e[:i + 1])
 
             judge_value = r0_norm * e[:i + 1] - np.dot(hs[:i + 1, :i], ys[:i])
@@ -593,7 +303,7 @@ class NMPCController_with_CGMRES():
 
             ys_pre = ys
 
-        # update
+        # update input
         self.u_1s += du_1_new * self.ht
         self.u_2s += du_2_new * self.ht
         self.dummy_u_1s += ddummy_u_1_new * self.ht
@@ -604,7 +314,8 @@ class NMPCController_with_CGMRES():
         x_1s, x_2s, x_3s, lam_1s, lam_2s, lam_3s = self.simulator.calc_predict_and_adjoint_state(
             x_1, x_2, x_3, self.u_1s, self.u_2s, self.N, dt)
 
-        F = self._calc_f(x_1s, x_2s, x_3s, lam_1s, lam_2s, lam_3s, self.u_1s, self.u_2s, self.dummy_u_1s, self.dummy_u_2s,
+        F = self._calc_f(x_1s, x_2s, x_3s, lam_1s, lam_2s, lam_3s,
+                         self.u_1s, self.u_2s, self.dummy_u_1s, self.dummy_u_2s,
                          self.raw_1s, self.raw_2s, self.N, dt)
 
         print("check F = {0}".format(np.linalg.norm(F)))
@@ -620,47 +331,19 @@ class NMPCController_with_CGMRES():
 
         return self.u_1s, self.u_2s
 
-    def _calc_f(self, x_1s, x_2s, x_3s, lam_1s, lam_2s, lam_3s, u_1s, u_2s, dummy_u_1s, dummy_u_2s, raw_1s, raw_2s, N, dt):
-        """
-        Parameters
-        ------------
-        x_1s : list of float
-            predicted x_1s for N steps
-        x_2s : list of float
-            predicted x_2s for N steps
-        x_3s : list of float
-            predicted x_3s for N steps
-        lam_1s : list of float
-            adjoint state of x_1s, lam_1s for N steps
-        lam_2s : list of float
-            adjoint state of x_2s, lam_2s for N steps
-        lam_3s : list of float
-            adjoint state of x_2s, lam_3s for N steps
-        u_1s : list of float
-            estimated optimal system input
-        u_2s : list of float
-            estimated optimal system input
-        dummy_u_1s : list of float
-            estimated dummy input
-        dummy_u_2s : list of float
-            estimated dummy input
-        raw_1s : list of float
-            estimated constraint variable
-        raw_2s : list of float
-            estimated constraint variable
-        N : int
-            predict time step
-        dt : float
-            sampling time of system
-        """
-        F = []
+    def _calc_f(self, x_1s, x_2s, x_3s, lam_1s, lam_2s, lam_3s,
+                u_1s, u_2s, dummy_u_1s, dummy_u_2s, raw_1s, raw_2s, N, dt):
 
+        F = []
         for i in range(N):
+            # ∂H/∂u(xi, ui, λi)
             F.append(u_1s[i] + lam_1s[i] * math.cos(x_3s[i]) +
                      lam_2s[i] * math.sin(x_3s[i]) + 2 * raw_1s[i] * u_1s[i])
             F.append(u_2s[i] + lam_3s[i] + 2 * raw_2s[i] * u_2s[i])
             F.append(-0.01 + 2. * raw_1s[i] * dummy_u_1s[i])
             F.append(-0.01 + 2. * raw_2s[i] * dummy_u_2s[i])
+
+            # C(xi, ui, λi)
             F.append(u_1s[i]**2 + dummy_u_1s[i]**2 - 1.**2)
             F.append(u_2s[i]**2 + dummy_u_2s[i]**2 - 1.5**2)
 
@@ -747,9 +430,13 @@ def main():
     dt = 0.01
     iteration_time = 15.0  # [s]
 
+    init_x = -4.5
+    init_y = -2.5
+    init_yaw = math.radians(45.0)
+
     # plant
     plant_system = TwoWheeledSystem(
-        init_x_1=-4.5, init_x_2=-2.5, init_x_3=0.25)
+        init_x, init_y, init_yaw)
 
     # controller
     controller = NMPCController_with_CGMRES()
@@ -757,11 +444,9 @@ def main():
     iteration_num = int(iteration_time / dt)
     for i in range(1, iteration_num):
         time = float(i) * dt
-        x_1 = plant_system.x_1
-        x_2 = plant_system.x_2
-        x_3 = plant_system.x_3
         # make input
-        u_1s, u_2s = controller.calc_input(x_1, x_2, x_3, time)
+        u_1s, u_2s = controller.calc_input(
+            plant_system.x_1, plant_system.x_2, plant_system.x_3, time)
         # update state
         plant_system.update_state(u_1s[0], u_2s[0])
 
