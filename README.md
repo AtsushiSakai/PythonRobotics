@@ -52,6 +52,7 @@ Python codes for robotics algorithm.
       * [Rear wheel feedback control](#rear-wheel-feedback-control)
       * [Linear–quadratic regulator (LQR) speed and steering control](#linearquadratic-regulator-lqr-speed-and-steering-control)
       * [Model predictive speed and steering control](#model-predictive-speed-and-steering-control)
+      * [Nonlinear Model predictive control with C-GMRES](#nonlinear-model-predictive-control-with-c-gmres)
    * [Arm Navigation](#arm-navigation)
       * [N joint arm to point control](#n-joint-arm-to-point-control)
       * [Arm navigation with obstacle avoidance](#arm-navigation-with-obstacle-avoidance)
@@ -555,6 +556,7 @@ This is a list: [Users comments](https://github.com/AtsushiSakai/PythonRobotics/
 - [Antonin RAFFIN](https://github.com/araffin)
 
 - [Alexis Paques](https://github.com/AlexisTM)
+
 
 
 
