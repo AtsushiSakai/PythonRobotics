@@ -473,6 +473,17 @@ Ref:
 
 - [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/Model_predictive_speed_and_steering_control.ipynb)
 
+## Nonlinear Model predictive control with C-GMRES
+
+A motion planning and path tracking simulation with NMPC of C-GMRES 
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/cgmres_nmpc/animation.gif)
+
+Ref:
+
+- [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/cgmres_nmpc/cgmres_nmpc.ipynb)
+
+
 # Arm Navigation
 
 ## N joint arm to point control
