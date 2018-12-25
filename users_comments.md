@@ -94,7 +94,13 @@ Dear Atsushi Saka Arigato 🤗🤗
 
 Dear AtsushiSakai, <br>Thanks for teaching how to implement path planning algorithms in robotics. <br>
 
+---
 
+Your Github page is very useful. I will apply it with cooperative robot.
+
+--Soloist
+
+---
 
 # Citations
 
