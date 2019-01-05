@@ -1,7 +1,7 @@
 
 # Educational users
 
-TBD
+- [CSCI/ARTI 4530/6530: Introduction to Robotics (Fall 2018),  University of Georgia ](http://cobweb.cs.uga.edu/~ramviyas/csci_x530.html)
 
 # Individual users comments
 
