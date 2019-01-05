@@ -127,3 +127,5 @@ doi: 10.1109/ICCP.2018.8516589
 keywords: {Automobiles;Task analysis;Autonomous vehicles;Path planning;Global Positioning System;Cameras;miniature autonomous vehicle;path planning;navigation;parking assist;lane detection and tracking;traffic sign recognition},
 URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8516589&isnumber=8516425
 
+2. Peggy (Yuchun) Wang and Caitlin Hogan, "Path Planning with Dynamic Obstacle Avoidance for a Jumping-Enabled Robot", AA228/CS238 class report, Department of Computer Science, Stanford University, URL: https://web.stanford.edu/class/aa228/reports/2018/final113.pdf
+
