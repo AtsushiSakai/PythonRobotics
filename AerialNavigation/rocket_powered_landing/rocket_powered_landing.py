@@ -343,11 +343,7 @@ class Model_6DoF:
 
     def initialize_trajectory(self, X, U):
         """
-        Initialize the trajectory.
-
-        :param X: Numpy array of states to be initialized
-        :param U: Numpy array of inputs to be initialized
-        :return: The initialized X and U
+        Initialize the trajectory with linear approximation.
         """
         K = X.shape[1]
 
@@ -565,6 +561,46 @@ def axis3d_equal(X, Y, Z, ax):
         ax.plot([xb], [yb], [zb], 'w')
 
 
+def plot_animation(X, U):
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+
+    for k in range(K):
+        plt.cla()
+        ax.plot(X[2, :], X[3, :], X[1, :])  # trajectory
+        ax.scatter3D([0.0], [0.0], [0.0], c="r",
+                     marker="x")  # target landing point
+        axis3d_equal(X[2, :], X[3, :], X[1, :], ax)
+
+        rx, ry, rz = X[1:4, k]
+        vx, vy, vz = X[4:7, k]
+        qw, qx, qy, qz = X[7:11, k]
+
+        CBI = np.array([
+            [1 - 2 * (qy ** 2 + qz ** 2), 2 * (qx * qy + qw * qz),
+             2 * (qx * qz - qw * qy)],
+            [2 * (qx * qy - qw * qz), 1 - 2 *
+             (qx ** 2 + qz ** 2), 2 * (qy * qz + qw * qx)],
+            [2 * (qx * qz + qw * qy), 2 * (qy * qz - qw * qx),
+             1 - 2 * (qx ** 2 + qy ** 2)]
+        ])
+
+        Fx, Fy, Fz = np.dot(np.transpose(CBI), U[:, k])
+        dx, dy, dz = np.dot(np.transpose(CBI), np.array([1., 0., 0.]))
+
+        # attitude vector
+        ax.quiver(ry, rz, rx, dy, dz, dx, length=0.5, linewidth=3.0,
+                  arrow_length_ratio=0.0, color='black')
+
+        # thrust vector
+        ax.quiver(ry, rz, rx, -Fy, -Fz, -Fx, length=0.1,
+                  arrow_length_ratio=0.0, color='red')
+
+        ax.set_title("Rocket powered landing")
+        plt.pause(0.5)
+
+
 def main():
     print("start!!")
     m = Model_6DoF()
@@ -623,46 +659,6 @@ def main():
     plot_animation(X, U)
 
     print("done!!")
-
-
-def plot_animation(X, U):
-
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-
-    for k in range(K):
-        plt.cla()
-        ax.plot(X[2, :], X[3, :], X[1, :])  # trajectory
-        ax.scatter3D([0.0], [0.0], [0.0], c="r",
-                     marker="x")  # target landing point
-        axis3d_equal(X[2, :], X[3, :], X[1, :], ax)
-
-        rx, ry, rz = X[1:4, k]
-        vx, vy, vz = X[4:7, k]
-        qw, qx, qy, qz = X[7:11, k]
-
-        CBI = np.array([
-            [1 - 2 * (qy ** 2 + qz ** 2), 2 * (qx * qy + qw * qz),
-             2 * (qx * qz - qw * qy)],
-            [2 * (qx * qy - qw * qz), 1 - 2 *
-             (qx ** 2 + qz ** 2), 2 * (qy * qz + qw * qx)],
-            [2 * (qx * qz + qw * qy), 2 * (qy * qz - qw * qx),
-             1 - 2 * (qx ** 2 + qy ** 2)]
-        ])
-
-        Fx, Fy, Fz = np.dot(np.transpose(CBI), U[:, k])
-        dx, dy, dz = np.dot(np.transpose(CBI), np.array([1., 0., 0.]))
-
-        # attitude vector
-        ax.quiver(ry, rz, rx, dy, dz, dx, length=0.5, linewidth=3.0,
-                  arrow_length_ratio=0.0, color='black')
-
-        # thrust vector
-        ax.quiver(ry, rz, rx, -Fy, -Fz, -Fx, length=0.1,
-                  arrow_length_ratio=0.0, color='red')
-
-        ax.set_title("Rocket powered landing")
-        plt.pause(0.5)
 
 
 if __name__ == '__main__':
