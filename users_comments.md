@@ -1,6 +1,10 @@
 
 # Educational users
 
+This is a list of users who are using PythonRobotics for education.
+
+If you found other users, please make an issue and let me know.
+
 - [CSCI/ARTI 4530/6530: Introduction to Robotics (Fall 2018),  University of Georgia ](http://cobweb.cs.uga.edu/~ramviyas/csci_x530.html)
 
 # Individual users comments
