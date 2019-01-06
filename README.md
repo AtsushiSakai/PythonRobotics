@@ -10,8 +10,6 @@
 
 Python codes for robotics algorithm.
 
-
-
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -59,6 +57,7 @@ Python codes for robotics algorithm.
       * [Arm navigation with obstacle avoidance](#arm-navigation-with-obstacle-avoidance)
    * [Aerial Navigation](#aerial-navigation)
       * [drone 3d trajectory following](#drone-3d-trajectory-following)
+      * [rocket powered landing](#rocket-powered-landing)
    * [License](#license)
    * [Use-case](#use-case)
    * [Contribution](#contribution)
@@ -516,6 +515,15 @@ This is a 3d trajectory following simulation for a quadrotor.
 
 ![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/AerialNavigation/drone_3d_trajectory_following/animation.gif)
 
+## rocket powered landing
+
+This is a 3d trajectory generation simulation for a rocket powered landing.
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/AerialNavigation/rocket_powered_landing/animation.gif)
+
+Ref:
+
+- [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/AerialNavigation/rocket_powered_landing/rocket_powered_landing.ipynb)
 
 # License 
 
@@ -562,6 +570,7 @@ This is a list: [Users comments](https://github.com/AtsushiSakai/PythonRobotics/
 - [Antonin RAFFIN](https://github.com/araffin)
 
 - [Alexis Paques](https://github.com/AlexisTM)
+
 
 
 
