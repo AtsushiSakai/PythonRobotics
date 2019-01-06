@@ -519,6 +519,10 @@ This is a 3d trajectory following simulation for a quadrotor.
 
 MIT
 
+# Use-case
+
+See: [users\_comments](https://github.com/AtsushiSakai/PythonRobotics/blob/master/users_comments.md)
+
 # Contribution
 
 A small PR like bug fix is welcome.
