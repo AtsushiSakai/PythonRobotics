@@ -9,7 +9,7 @@ Ref:
 - Python implementation of 'Successive Convexification for 6-DoF Mars Rocket Powered Landing with Free-Final-Time' paper
 by Michael Szmuk and Behçet Açıkmeşe.
 
-- inspired by EmbersArc/SuccessiveConvexificationFreeFinalTime: Implementation of "Successive Convexification for 6-DoF Mars Rocket Powered Landing with Free-Final-Time" https://github.com/EmbersArc/SuccessiveConvexificationFreeFinalTime
+- EmbersArc/SuccessiveConvexificationFreeFinalTime: Implementation of "Successive Convexification for 6-DoF Mars Rocket Powered Landing with Free-Final-Time" https://github.com/EmbersArc/SuccessiveConvexificationFreeFinalTime
 
 """
 
@@ -34,6 +34,8 @@ W_NU = 1e5  # virtual control
 
 solver = 'ECOS'
 verbose_solver = False
+
+show_animation = True
 
 
 class Integrator:
@@ -656,7 +658,8 @@ def main():
             print(f'Converged after {it + 1} iterations.')
             break
 
-    plot_animation(X, U)
+    if show_animation:
+        plot_animation(X, U)
 
     print("done!!")
 
