@@ -585,8 +585,7 @@ def main():
 
     if show_animation:
         animation(plant_system, controller, dt)
-
-    plot_figures(plant_system, controller, iteration_num, dt)
+        plot_figures(plant_system, controller, iteration_num, dt)
 
 
 if __name__ == "__main__":
