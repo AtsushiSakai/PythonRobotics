@@ -7,11 +7,11 @@ environment:
 
 
   matrix:
-  - PYTHON: C:/Python36-x64
-    CONDA_INSTALL_LOCN: "C:\\Miniconda36-x64"
+  - PYTHON_VERSION: 3.6
+    MINICONDA: "C:\\Miniconda36-x64"
 
 init:
-  - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
+  - "ECHO %MINICONDA% %PYTHON_VERSION% %PYTHON_ARCH%"
 
   
 install:
@@ -30,31 +30,19 @@ install:
   - ECHO "Installed SDKs:"
   - ps: "ls \"C:/Program Files/Microsoft SDKs/Windows\""
 
-  # Install Python (from the official .msi of https://python.org) and pip when
-  # not already installed.
-  - ps: if (-not(Test-Path($env:PYTHON))) { & appveyor\install.ps1 }
-
   # Prepend newly installed Python to the PATH of this build (this cannot be
   # done from inside the powershell script as it would require to restart
   # the parent CMD process).
-  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
-
+  - "SET PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda info -a
+  - conda env create -f C:\\projects\pythonrobotics\environment.yml
+  - activate python_robotics
+  
   # Check that we have the expected version and architecture for Python
   - "python --version"
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
-
-  # Upgrade to the latest version of pip to avoid it displaying warnings
-  # about it being out of date.
-  - "python -m pip install --upgrade pip"
-
-  # Install the build dependencies of the project. If some dependencies contain
-  # compiled extensions and are not provided as pre-built wheel packages,
-  # pip will build them from source using the MSVC compiler matching the
-  # target Python version and architecture
-  - "%PYTHON%/Scripts/pip.exe install numpy"
-  - "%PYTHON%/Scripts/pip.exe install pandas"
-  - "%PYTHON%/Scripts/pip.exe install scipy"
-  - "%PYTHON%/Scripts/pip.exe install matplotlib"
 
 build: off
 
