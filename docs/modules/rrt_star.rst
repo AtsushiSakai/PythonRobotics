@@ -1,6 +1,6 @@
 
-Title
------
+Simulation
+~~~~~~~~~~
 
 .. code-block:: ipython3
 
@@ -15,21 +15,13 @@ Title
 
 
 
-.. figure:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/Localization/extended_kalman_filter/animation.gif
+.. figure:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/RRTstar/animation.gif
    :alt: gif
 
    gif
 
-Section1
-~~~~~~~~
-
-Section2
-~~~~~~~~
-
-:math:`\begin{equation*} F= \begin{bmatrix} 1 & 0 & 0 & 0\\ 0 & 1 & 0 & 0\\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 0 \\ \end{bmatrix} \end{equation*}`
-
 Ref
-~~~
+^^^
 
 -  `Sampling-based Algorithms for Optimal Motion
    Planning <https://arxiv.org/pdf/1105.1186.pdf>`__
