@@ -39,9 +39,9 @@ Filter design
 In this simulation, the robot has a state vector includes 4 states at
 time :math:`t`.
 
-.. math:: \textbf{x}_t=[x_t, y_t, \theta_t, v_t]
+.. math:: \textbf{x}_t=[x_t, y_t, \phi_t, v_t]
 
-x, y are a 2D x-y position, :math:`\theta` is orientation, and v is
+x, y are a 2D x-y position, :math:`\phi` is orientation, and v is
 velocity.
 
 In the code, “xEst” means the state vector.

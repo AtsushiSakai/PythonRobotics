@@ -61,28 +61,32 @@ Mathematical Formulation
 
 Motion model is
 
-:math:`\dot{x}=vcos\theta`
+.. math:: \dot{x}=vcos\theta
 
-:math:`\dot{y}=vsin\theta`
+.. math:: \dot{y}=vsin\theta
 
-:math:`\dot{\theta}=\frac{v}{WB}sin(u_{\delta})` (tan is not good for
-optimization)
+.. math:: \dot{\theta}=\frac{v}{WB}sin(u_{\delta})
 
-:math:`\dot{v}=u_a`
+\ (tan is not good for optimization)
+
+.. math:: \dot{v}=u_a
 
 Cost function is
 
-:math:`J=\frac{1}{2}(u_a^2+u_{\delta}^2)-\phi_a d_a-\phi_\delta d_\delta`
+.. math:: J=\frac{1}{2}(u_a^2+u_{\delta}^2)-\phi_a d_a-\phi_\delta d_\delta
 
 Input constraints are
 
-:math:`|u_a| \leq u_{a,max}`
+.. math:: |u_a| \leq u_{a,max}
 
-:math:`|u_\delta| \leq u_{\delta,max}`
+.. math:: |u_\delta| \leq u_{\delta,max}
 
 So, Hamiltonian　is
 
-:math:`J=\frac{1}{2}(u_a^2+u_{\delta}^2)-\phi_a d_a-\phi_\delta d_\delta\\ +\lambda_1vcos\theta+\lambda_2vsin\theta+\lambda_3\frac{v}{WB}sin(u_{\delta})+\lambda_4u_a\\ +\rho_1(u_a^2+d_a^2+u_{a,max}^2)+\rho_2(u_\delta^2+d_\delta^2+u_{\delta,max}^2)`
+.. math::
+
+   J=\frac{1}{2}(u_a^2+u_{\delta}^2)-\phi_a d_a-\phi_\delta d_\delta\\ +\lambda_1vcos\theta+\lambda_2vsin\theta+\lambda_3\frac{v}{WB}sin(u_{\delta})+\lambda_4u_a\\ 
+   +\rho_1(u_a^2+d_a^2+u_{a,max}^2)+\rho_2(u_\delta^2+d_\delta^2+u_{\delta,max}^2)
 
 Partial differential equations of the Hamiltonian are:
 
