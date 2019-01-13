@@ -23,6 +23,7 @@ def press(event):
         print('Quitting upon request.')
         sys.exit(0)
 
+
 def main():
     # Arm geometry in the working space
     link_length = [0.5, 1.5]
@@ -53,9 +54,11 @@ def animate(grid, arm, route):
         arm.update_joints([theta1, theta2])
         plt.subplot(1, 2, 2)
         arm.plot(plt, obstacles=obstacles)
+        plt.xlim(-2.0, 2.0)
+        plt.ylim(-3.0, 3.0)
         plt.show()
         # Uncomment here to save the sequence of frames
-        #plt.savefig('frame{:04d}.png'.format(i))
+        # plt.savefig('frame{:04d}.png'.format(i))
         plt.pause(0.1)
 
 
@@ -264,13 +267,13 @@ class NLinkArm(object):
         for i in range(self.n_links + 1):
             if i is not self.n_links:
                 myplt.plot([self.points[i][0], self.points[i + 1][0]],
-                         [self.points[i][1], self.points[i + 1][1]], 'r-')
+                           [self.points[i][1], self.points[i + 1][1]], 'r-')
             myplt.plot(self.points[i][0], self.points[i][1], 'k.')
 
         myplt.xlim([-self.lim, self.lim])
         myplt.ylim([-self.lim, self.lim])
         myplt.draw()
-        #myplt.pause(1e-5)
+        # myplt.pause(1e-5)
 
 
 if __name__ == '__main__':
