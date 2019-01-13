@@ -96,6 +96,9 @@ Ref:
 
 -  `notebook <https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/model_predictive_speed_and_steer_control.ipynb>`__
 
+
+.. include:: cgmres_nmpc.rst
+
 .. |2| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/move_to_pose/animation.gif
 .. |3| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/pure_pursuit/animation.gif
 .. |4| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/stanley_controller/animation.gif
