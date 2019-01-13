@@ -1,6 +1,6 @@
 
 Simulation
-~~~~~~~~~~
+^^^^^^^^^^
 
 .. code-block:: ipython3
 
