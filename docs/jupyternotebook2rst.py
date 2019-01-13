@@ -82,7 +82,8 @@ def main():
     # print(notebook_path_list)
 
     for npath in notebook_path_list:
-        generate_rst(npath)
+        if "template" not in npath:
+            generate_rst(npath)
 
     print("done!!")
 
