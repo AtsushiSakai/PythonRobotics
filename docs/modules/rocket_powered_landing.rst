@@ -1,6 +1,6 @@
 
 Simulation
-----------
+~~~~~~~~~~
 
 .. code-block:: ipython3
 
@@ -21,7 +21,7 @@ Simulation
    gif
 
 Equation generation
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: ipython3
 
