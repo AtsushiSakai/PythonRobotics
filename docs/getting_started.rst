@@ -27,3 +27,4 @@ How to use
 3. Execute python script in each directory.
 
 4. Add star to this repo if you like it 😃.
+
