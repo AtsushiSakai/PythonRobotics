@@ -85,7 +85,7 @@ def calc_target_index(state, cx, cy):
     # search look ahead target point index
     while Lf > L and (ind + 1) < len(cx):
         dx = cx[ind + 1] - cx[ind]
-        dy = cx[ind + 1] - cx[ind]
+        dy = cy[ind + 1] - cy[ind]
         L += math.sqrt(dx ** 2 + dy ** 2)
         ind += 1
 
