@@ -107,7 +107,7 @@ You can check the full documentation online: [https://pythonrobotics.readthedocs
 
 1. Clone this repo.
 
-> git clone https://github.com/dhiegomaga/PythonRobotics.git
+> git clone https://github.com/AtsushiSakai/PythonRobotics.git
 
 > cd PythonRobotics/
 
