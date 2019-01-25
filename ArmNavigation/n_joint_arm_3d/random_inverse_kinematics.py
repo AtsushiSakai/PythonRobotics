@@ -1,17 +1,27 @@
 import math
 from NLinkArm import NLinkArm
 import random
-import time
 
 
-n_link_arm = NLinkArm([[0., -math.pi/2, .1, 0.],
-                       [math.pi/2, math.pi/2, 0., 0.],
-                       [0., -math.pi/2, 0., .4],
-                       [0., math.pi/2, 0., 0.],
-                       [0., -math.pi/2, 0., .321],
-                       [0., math.pi/2, 0., 0.],
-                       [0., 0., 0., 0.]])
+def random_val(min_val, max_val):
+    return min_val + random.random() * (max_val - min_val)
 
-#n_link_arm.inverse_kinematics([-0.621, 0., 0., 0., 0., math.pi / 2])
-n_link_arm.inverse_kinematics([-0.5, 0., 0.1, 0., 0., math.pi / 2])
-n_link_arm.plot()
+if __name__ == "__main__":
+    print("Start solving Inverse Kinematics 10 times")
+
+    # init NLinkArm with Denavit-Hartenberg parameters of PR2        
+    n_link_arm = NLinkArm([[0., -math.pi/2, .1, 0.],
+                           [math.pi/2, math.pi/2, 0., 0.],
+                           [0., -math.pi/2, 0., .4],
+                           [0., math.pi/2, 0., 0.],
+                           [0., -math.pi/2, 0., .321],
+                           [0., math.pi/2, 0., 0.],
+                           [0., 0., 0., 0.]])
+
+    for i in range(10):
+        n_link_arm.inverse_kinematics([random_val(-0.5, 0.5),
+                                       random_val(-0.5, 0.5),
+                                       random_val(-0.5, 0.5),
+                                       random_val(-0.5, 0.5),
+                                       random_val(-0.5, 0.5),
+                                       random_val(-0.5, 0.5)], plot=True)
