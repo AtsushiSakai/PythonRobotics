@@ -24,11 +24,11 @@ class Link:
 
         return trans
 
-    def basic_jacobian(self, trans_prev, ee_pose):
+    def basic_jacobian(self, trans_prev, ee_pos):
         pos_prev = np.array([trans_prev[0, 3], trans_prev[1, 3], trans_prev[2, 3]])
         z_axis_prev = np.array([trans_prev[0, 2], trans_prev[1, 2], trans_prev[2, 2]])
 
-        basic_jacobian = np.hstack((np.cross(z_axis_prev, ee_pose - pos_prev), z_axis_prev))
+        basic_jacobian = np.hstack((np.cross(z_axis_prev, ee_pos - pos_prev), z_axis_prev))
         return basic_jacobian
         
 
@@ -50,7 +50,7 @@ class NLinkArm:
         x = trans[0, 3]
         y = trans[1, 3]
         z = trans[2, 3]
-        alpha, beta, gamma = self.calc_euler_angle()
+        alpha, beta, gamma = self.euler_angle()
 
         if plot:
             self.fig = plt.figure()
@@ -82,12 +82,13 @@ class NLinkArm:
 
         return [x, y, z, alpha, beta, gamma]
 
-    def basic_jacobian(self, ee_pose):
+    def basic_jacobian(self):
+        ee_pos = self.forward_kinematics()[0:3]
         basic_jacobian_mat = []
         
         trans = np.identity(4)        
         for i in range(len(self.link_list)):
-            basic_jacobian_mat.append(self.link_list[i].basic_jacobian(trans, ee_pose[0:3]))
+            basic_jacobian_mat.append(self.link_list[i].basic_jacobian(trans, ee_pos))
             trans = np.dot(trans, self.link_list[i].transformation_matrix())
             
         return np.array(basic_jacobian_mat).T
@@ -97,8 +98,8 @@ class NLinkArm:
             ee_pose = self.forward_kinematics()
             diff_pose = np.array(ref_ee_pose) - ee_pose
         
-            basic_jacobian_mat = self.basic_jacobian(ee_pose)
-            alpha, beta, gamma = self.calc_euler_angle()
+            basic_jacobian_mat = self.basic_jacobian()
+            alpha, beta, gamma = self.euler_angle()
             
             K_zyz = np.array([[0, -math.sin(alpha), math.cos(alpha) * math.sin(beta)],
                               [0, math.cos(alpha), math.sin(alpha) * math.sin(beta)],
@@ -138,13 +139,13 @@ class NLinkArm:
             self.ax.plot([ref_ee_pose[0]], [ref_ee_pose[1]], [ref_ee_pose[2]], "o")
             plt.show()
                 
-    def calc_euler_angle(self):
+    def euler_angle(self):
         trans = self.transformation_matrix()
         
         alpha = math.atan2(trans[1][2], trans[0][2])
-        if -math.pi / 2 <= alpha and alpha <= math.pi / 2:
+        if not (-math.pi / 2 <= alpha and alpha <= math.pi / 2):
             alpha = math.atan2(trans[1][2], trans[0][2]) + math.pi
-        if -math.pi / 2 <= alpha and alpha <= math.pi / 2:
+        if not (-math.pi / 2 <= alpha and alpha <= math.pi / 2):
             alpha = math.atan2(trans[1][2], trans[0][2]) - math.pi
         beta = math.atan2(trans[0][2] * math.cos(alpha) + trans[1][2] * math.sin(alpha), trans[2][2])
         gamma = math.atan2(-trans[0][0] * math.sin(alpha) + trans[1][0] * math.cos(alpha), -trans[0][1] * math.sin(alpha) + trans[1][1] * math.cos(alpha))

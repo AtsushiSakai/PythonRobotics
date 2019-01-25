@@ -22,5 +22,4 @@ if __name__ == "__main__":
         n_link_arm.set_joint_angles([random_val(-1, 1) for j in range(len(n_link_arm.link_list))])
         
         ee_pose = n_link_arm.forward_kinematics(plot=True)
-        print(ee_pose)
 
