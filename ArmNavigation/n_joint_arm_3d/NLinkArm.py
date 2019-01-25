@@ -13,13 +13,6 @@ class Link:
         a = self.dh_params_[2]
         d = self.dh_params_[3]
 
-        '''
-        trans = np.array(
-            [[math.cos(theta), -math.sin(theta), 0, a],
-             [math.cos(alpha) * math.sin(theta), math.cos(alpha) * math.cos(theta), -math.sin(alpha), -d * math.sin(alpha)],
-             [math.sin(alpha) * math.sin(theta), math.sin(alpha) * math.cos(theta), math.cos(alpha), d * math.cos(alpha)],
-             [0, 0, 0, 1]])
-        '''
         st = math.sin(theta)
         ct = math.cos(theta)
         sa = math.sin(alpha)
@@ -196,16 +189,3 @@ class NLinkArm:
         self.ax.set_ylim(-1, 1)
         self.ax.set_zlim(-1, 1)        
         plt.show()
-        
-if __name__ == "__main__":
-    n_link_arm = NLinkArm([[0., -math.pi/2, .1, 0.],
-                           [math.pi/2, math.pi/2, 0., 0.],
-                           [0., -math.pi/2, 0., .4],
-                           [0., math.pi/2, 0., 0.],
-                           [0., -math.pi/2, 0., .321],
-                           [0., math.pi/2, 0., 0.],
-                           [0., 0., 0., 0.]])
-
-    print(n_link_arm.forward_kinematics())
-    n_link_arm.set_joint_angles([1, 1, 1, 1, 1, 1, 1])
-    n_link_arm.plot()
