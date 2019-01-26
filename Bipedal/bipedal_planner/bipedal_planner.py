@@ -2,6 +2,8 @@ import numpy as np
 import math
 from matplotlib import pyplot as plt
 import matplotlib.patches as pat
+from mpl_toolkits.mplot3d import Axes3D
+import mpl_toolkits.mplot3d.art3d as art3d
 
 class BipedalPlanner(object):
     def __init__(self):
@@ -25,7 +27,8 @@ class BipedalPlanner(object):
             y += y_dot * delta_time
             y_dot += y_dot2 * delta_time
 
-            self.com_trajectory.append([x, y])
+            if i % 10 == 0:
+                self.com_trajectory.append([x, y])
 
         return x, x_dot, y, y_dot
         
@@ -34,31 +37,36 @@ class BipedalPlanner(object):
             print("No footsteps")
             return
 
+        # set up plotter
+        if plot:
+            fig = plt.figure()
+            ax = Axes3D(fig)
+            com_trajectory_for_plot = []
+            
         self.com_trajectory = []
-        self.ref_p = []
-        self.act_p = []        
+        self.ref_p = []   # reference footstep positions
+        self.act_p = []   # actual footstep positions
         
-        px, py = 0., 0.
-        px_star, py_star = px, py
+        px, py = 0., 0.   # reference footstep position
+        px_star, py_star = px, py   # modified footstep position
         xi, xi_dot, yi, yi_dot = 0., 0., 0.01, 0. # TODO yi should be set as +epsilon, set xi, yi as COM
         time = 0.
         n = 0
         self.ref_p.append([px, py, 0])
         self.act_p.append([px, py, 0])
         for i in range(len(self.ref_footsteps)):
-            # simulate x, y o finverted pendulum
+            # simulate x, y and those of dot of inverted pendulum
             xi, xi_dot, yi, yi_dot = self.inverted_pendulum(xi, xi_dot, px_star, yi, yi_dot, py_star, z_c, T_sup)
             
             # update time
             time += T_sup
             n += 1
-
             
             # calculate px, py, x_, y_, vx_, vy_
             f_x, f_y, f_theta = self.ref_footsteps[n - 1]
             rotate_mat = np.array([[math.cos(f_theta), -math.sin(f_theta)],
                                    [math.sin(f_theta), math.cos(f_theta)]])
-            
+
             if n == len(self.ref_footsteps):
                 f_x_next, f_y_next, f_theta_next = 0., 0., 0.
             else:
@@ -75,7 +83,6 @@ class BipedalPlanner(object):
             vx_, vy_ = list(np.dot(rotate_mat_next, np.array([(1 + C) / (T_c * S) * x_, (C - 1) / (T_c * S) * y_])))
             self.ref_p.append([px, py, f_theta])
 
-            
             # calculate reference COM
             xd, xd_dot = px + x_, vx_
             yd, yd_dot = py + y_, vy_
@@ -86,33 +93,54 @@ class BipedalPlanner(object):
             py_star = -a * (C - 1) / D * (yd - C * yi - T_c * S * yi_dot) - b * S / (T_c * D) * (yd_dot - S / T_c * yi - C * yi_dot)
             self.act_p.append([px_star, py_star, f_theta])
 
+            # plot
+            if plot:
+                # for plot trajectory, plot in for loop
+                for c in range(len(self.com_trajectory)):
+                    if c > len(com_trajectory_for_plot):
+                        # set up plotter
+                        plt.cla()
+                        ax.set_zlim(0, z_c * 2)                
+                        ax.set_aspect('equal', 'datalim')
+
+                        # update com_trajectory_for_plot
+                        com_trajectory_for_plot.append(self.com_trajectory[c])
+
+                        # plot com
+                        ax.plot([p[0] for p in com_trajectory_for_plot], [p[1] for p in com_trajectory_for_plot], [0 for p in com_trajectory_for_plot], color="red")
+
+                        # plot inverted pendulum
+                        ax.plot([px_star, com_trajectory_for_plot[-1][0]],
+                                [py_star , com_trajectory_for_plot[-1][1]],
+                                [0, z_c], color="green", linewidth=3)
+                        ax.scatter([com_trajectory_for_plot[-1][0]],
+                                   [com_trajectory_for_plot[-1][1]],
+                                    [z_c], color="green", s=300)
+                                   
+                        # foot rectangle for self.ref_p
+                        foot_width = 0.06
+                        foot_height = 0.04
+                        for i in range(len(self.ref_p)):
+                            angle = self.ref_p[i][2] + math.atan2(foot_height, foot_width) - math.pi
+                            r = math.sqrt(math.pow(foot_width / 3., 2) + math.pow(foot_height / 2., 2))
+                            rec = pat.Rectangle(xy = (self.ref_p[i][0] + r * math.cos(angle), self.ref_p[i][1] + r * math.sin(angle)),
+                                        width=foot_width, height=foot_height, angle=self.ref_p[i][2] * 180 / math.pi, color="blue", fill=False, ls=":")
+                            ax.add_patch(rec)
+                            art3d.pathpatch_2d_to_3d(rec, z=0, zdir="z")
+
+                        # foot rectangle for self.act_p                            
+                        for i in range(len(self.act_p)):
+                            angle = self.act_p[i][2] + math.atan2(foot_height, foot_width) - math.pi
+                            r = math.sqrt(math.pow(foot_width / 3., 2) + math.pow(foot_height / 2., 2))
+                            rec = pat.Rectangle(xy = (self.act_p[i][0] + r * math.cos(angle), self.act_p[i][1] + r * math.sin(angle)),
+                                                width=foot_width, height=foot_height, angle=self.act_p[i][2] * 180 / math.pi, color="blue", fill=False)
+                            ax.add_patch(rec)
+                            art3d.pathpatch_2d_to_3d(rec, z=0, zdir="z")                            
+
+                        plt.draw()
+                        plt.pause(0.001)
         if plot:
-            fig = plt.figure()
-            ax = fig.subplots()
-            ax.set_xlim(0, 1)
-            ax.set_ylim(-0.1, 0.2 + 0.1)
-            ax.set_aspect('equal', 'datalim')
-            
-            ax.plot([i[0] for i in self.com_trajectory], [i[1] for i in self.com_trajectory])
-
-            foot_width = 0.06
-            foot_height = 0.04
-            for i in range(len(self.ref_p)):
-                angle = self.ref_p[i][2] + math.atan2(foot_height, foot_width) - math.pi
-                r = math.sqrt(math.pow(foot_width / 3., 2) + math.pow(foot_height / 2., 2))
-                rec = pat.Rectangle(xy = (self.ref_p[i][0] + r * math.cos(angle), self.ref_p[i][1] + r * math.sin(angle)),
-                                    width=foot_width, height=foot_height, angle=self.ref_p[i][2] * 180 / math.pi, color="green", fill=False, ls=":")
-                ax.add_patch(rec)
-            for i in range(len(self.act_p)):
-                angle = self.act_p[i][2] + math.atan2(foot_height, foot_width) - math.pi
-                r = math.sqrt(math.pow(foot_width / 3., 2) + math.pow(foot_height / 2., 2))
-                rec = pat.Rectangle(xy = (self.act_p[i][0] + r * math.cos(angle), self.act_p[i][1] + r * math.sin(angle)),
-                                    width=foot_width, height=foot_height, angle=self.act_p[i][2] * 180 / math.pi, color="blue", fill=False)
-                ax.add_patch(rec)
-                
             plt.show()
-
-            
 
 if __name__ == "__main__":
     bipedal_planner = BipedalPlanner()
