@@ -37,6 +37,7 @@ class BipedalPlanner(object):
         self.com_trajectory = []
         self.footsteps = []
         self.ref_p = []
+        self.act_p = []        
         
         px, py = 0., 0.
         px_star, py_star = px, py
@@ -83,6 +84,7 @@ class BipedalPlanner(object):
             D = a * math.pow(C - 1, 2) + b * math.pow(S / T_c, 2)
             px_star = -a * (C - 1) / D * (xd - C * xi - T_c * S * xi_dot) - b * S / (T_c * D) * (xd_dot - S / T_c * xi - C * xi_dot)
             py_star = -a * (C - 1) / D * (yd - C * yi - T_c * S * yi_dot) - b * S / (T_c * D) * (yd_dot - S / T_c * yi - C * yi_dot)
+            self.act_p.append([px_star, py_star, f_theta])
 
             self.footsteps.append([px_star, py_star])
 
@@ -90,15 +92,20 @@ class BipedalPlanner(object):
             fig = plt.figure()
             ax = fig.subplots()
             ax.set_xlim(0, 1)
-            ax.set_ylim(-0.1, 0.2 + 0.1)            
+            ax.set_ylim(-0.1, 0.2 + 0.1)
+            ax.set_aspect('equal', 'datalim')
             
             ax.plot([i[0] for i in self.footsteps], [i[1] for i in self.footsteps])
             ax.plot([i[0] for i in self.com_trajectory], [i[1] for i in self.com_trajectory])
             
             for i in range(len(self.ref_p)):
-                rec = pat.Rectangle(xy = (self.ref_p[i][0], self.ref_p[i][1]), width = 0.06, height = 0.02, angle = self.ref_p[i][2] * 180 / math.pi, color = "blue", alpha = 0.5)
+                rec = pat.Rectangle(xy = (self.ref_p[i][0], self.ref_p[i][1]), width=0.06, height=0.04, angle=self.ref_p[i][2] * 180 / math.pi, color="green", fill=False, ls=":")
                 ax.add_patch(rec)
-            
+
+            for i in range(len(self.act_p)):
+                rec = pat.Rectangle(xy = (self.act_p[i][0], self.act_p[i][1]), width=0.06, height=0.04, angle=self.act_p[i][2] * 180 / math.pi, color="blue", fill=False)
+                ax.add_patch(rec)
+                
             plt.show()
 
             
