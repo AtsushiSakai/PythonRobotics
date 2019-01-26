@@ -1,3 +1,7 @@
+"""
+Forward Kinematics for an n-link arm in 3D
+Author: Takayuki Murooka (takayuki5168)
+"""
 import math
 from NLinkArm import NLinkArm
 import random
@@ -17,7 +21,8 @@ if __name__ == "__main__":
                            [0., -math.pi/2, 0., .321],
                            [0., math.pi/2, 0., 0.],
                            [0., 0., 0., 0.]])
-    
+
+    # execute FK 10 times
     for i in range(10):
         n_link_arm.set_joint_angles([random_val(-1, 1) for j in range(len(n_link_arm.link_list))])
         

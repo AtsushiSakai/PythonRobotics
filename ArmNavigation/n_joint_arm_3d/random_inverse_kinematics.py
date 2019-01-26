@@ -1,3 +1,7 @@
+"""
+Inverse Kinematics for an n-link arm in 3D
+Author: Takayuki Murooka (takayuki5168)
+"""
 import math
 from NLinkArm import NLinkArm
 import random
@@ -18,6 +22,7 @@ if __name__ == "__main__":
                            [0., math.pi/2, 0., 0.],
                            [0., 0., 0., 0.]])
 
+    # execute IK 10 times
     for i in range(10):
         n_link_arm.inverse_kinematics([random_val(-0.5, 0.5),
                                        random_val(-0.5, 0.5),
