@@ -1,3 +1,7 @@
+"""
+Class for bipedal walking planner
+Author: Takayuki Murooka (takayuki5168)
+"""
 import numpy as np
 import math
 from matplotlib import pyplot as plt
