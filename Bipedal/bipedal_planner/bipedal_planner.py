@@ -5,11 +5,11 @@ import matplotlib.patches as pat
 
 class BipedalPlanner(object):
     def __init__(self):
-        self.footsteps = None
+        self.ref_footsteps = None
         self.g = 9.8
 
-    def set_ref_footsteps(self, footsteps):
-        self.ref_footsteps = footsteps
+    def set_ref_footsteps(self, ref_footsteps):
+        self.ref_footsteps = ref_footsteps
 
     def inverted_pendulum(self, x, x_dot, px_star, y, y_dot, py_star, z_c, time_width):
         time_split = 100
@@ -35,13 +35,12 @@ class BipedalPlanner(object):
             return
 
         self.com_trajectory = []
-        self.footsteps = []
         self.ref_p = []
         self.act_p = []        
         
         px, py = 0., 0.
         px_star, py_star = px, py
-        xi, xi_dot, yi, yi_dot = 0., 0., 0.01, 0. # TODO yi should be set as +epsilon
+        xi, xi_dot, yi, yi_dot = 0., 0., 0.01, 0. # TODO yi should be set as +epsilon, set xi, yi as COM
         time = 0.
         n = 0
         self.ref_p.append([px, py, 0])
@@ -87,8 +86,6 @@ class BipedalPlanner(object):
             py_star = -a * (C - 1) / D * (yd - C * yi - T_c * S * yi_dot) - b * S / (T_c * D) * (yd_dot - S / T_c * yi - C * yi_dot)
             self.act_p.append([px_star, py_star, f_theta])
 
-            self.footsteps.append([px_star, py_star])
-
         if plot:
             fig = plt.figure()
             ax = fig.subplots()
@@ -96,17 +93,22 @@ class BipedalPlanner(object):
             ax.set_ylim(-0.1, 0.2 + 0.1)
             ax.set_aspect('equal', 'datalim')
             
-            ax.plot([i[0] for i in self.footsteps], [i[1] for i in self.footsteps])
             ax.plot([i[0] for i in self.com_trajectory], [i[1] for i in self.com_trajectory])
-            
-            for i in range(len(self.ref_p)):
-                rec = pat.Rectangle(xy = (self.ref_p[i][0], self.ref_p[i][1]), width=0.06, height=0.04, angle=self.ref_p[i][2] * 180 / math.pi, color="green", fill=False, ls=":")
-                ax.add_patch(rec)
 
-            for i in range(len(self.act_p)):
-                rec = pat.Rectangle(xy = (self.act_p[i][0], self.act_p[i][1]), width=0.06, height=0.04, angle=self.act_p[i][2] * 180 / math.pi, color="blue", fill=False)
+            foot_width = 0.06
+            foot_height = 0.04
+            for i in range(len(self.ref_p)):
+                angle = self.ref_p[i][2] + math.atan2(foot_height, foot_width) - math.pi
+                r = math.sqrt(math.pow(foot_width / 3., 2) + math.pow(foot_height / 2., 2))
+                rec = pat.Rectangle(xy = (self.ref_p[i][0] + r * math.cos(angle), self.ref_p[i][1] + r * math.sin(angle)),
+                                    width=foot_width, height=foot_height, angle=self.ref_p[i][2] * 180 / math.pi, color="green", fill=False, ls=":")
                 ax.add_patch(rec)
-            print(len(self.ref_p), len(self.act_p))
+            for i in range(len(self.act_p)):
+                angle = self.act_p[i][2] + math.atan2(foot_height, foot_width) - math.pi
+                r = math.sqrt(math.pow(foot_width / 3., 2) + math.pow(foot_height / 2., 2))
+                rec = pat.Rectangle(xy = (self.act_p[i][0] + r * math.cos(angle), self.act_p[i][1] + r * math.sin(angle)),
+                                    width=foot_width, height=foot_height, angle=self.act_p[i][2] * 180 / math.pi, color="blue", fill=False)
+                ax.add_patch(rec)
                 
             plt.show()
 
