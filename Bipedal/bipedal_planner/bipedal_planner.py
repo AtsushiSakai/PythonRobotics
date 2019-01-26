@@ -41,10 +41,11 @@ class BipedalPlanner(object):
         
         px, py = 0., 0.
         px_star, py_star = px, py
-        xi, xi_dot, yi, yi_dot = 0., 0., 0., 0.
+        xi, xi_dot, yi, yi_dot = 0., 0., 0.01, 0. # TODO yi should be set as +epsilon
         time = 0.
         n = 0
         self.ref_p.append([px, py, 0])
+        self.act_p.append([px, py, 0])
         for i in range(len(self.ref_footsteps)):
             # simulate x, y o finverted pendulum
             xi, xi_dot, yi, yi_dot = self.inverted_pendulum(xi, xi_dot, px_star, yi, yi_dot, py_star, z_c, T_sup)
@@ -105,6 +106,7 @@ class BipedalPlanner(object):
             for i in range(len(self.act_p)):
                 rec = pat.Rectangle(xy = (self.act_p[i][0], self.act_p[i][1]), width=0.06, height=0.04, angle=self.act_p[i][2] * 180 / math.pi, color="blue", fill=False)
                 ax.add_patch(rec)
+            print(len(self.ref_p), len(self.act_p))
                 
             plt.show()
 
@@ -114,9 +116,9 @@ if __name__ == "__main__":
     bipedal_planner = BipedalPlanner()
     
     footsteps = [[0.0, 0.2, 0.0],
-                [0.3, 0.2, 0.0],
-                [0.3, 0.2, 0.2],
-                [0.3, 0.2, 0.2],
-                [0.0, 0.2, 0.2]]
+                 [0.3, 0.2, 0.0],
+                 [0.3, 0.2, 0.2],
+                 [0.3, 0.2, 0.2],
+                 [0.0, 0.2, 0.2]]
     bipedal_planner.set_ref_footsteps(footsteps)
     bipedal_planner.walk(plot=True)
