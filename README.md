@@ -58,6 +58,8 @@ Python codes for robotics algorithm.
    * [Aerial Navigation](#aerial-navigation)
       * [drone 3d trajectory following](#drone-3d-trajectory-following)
       * [rocket powered landing](#rocket-powered-landing)
+   * [Bipedal](#bipedal)
+      * [bipedal planner with inverted pendulum](#bipedal-planner-with-inverted-pendulum)
    * [License](#license)
    * [Use-case](#use-case)
    * [Contribution](#contribution)
@@ -524,6 +526,16 @@ This is a 3d trajectory generation simulation for a rocket powered landing.
 Ref:
 
 - [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/AerialNavigation/rocket_powered_landing/rocket_powered_landing.ipynb)
+
+# Bipedal
+
+## bipedal planner with inverted pendulum
+
+This is an bipedal planner of modifying footsteps with inverted pendulum.
+
+You can set the footsteps and automatically planner will modify those.
+
+![3](https://github.com/AtsushiSakai/PythonRobotics/blob/master/Bipedal/bipedal_planner/animation.gif)
 
 # License 
 
