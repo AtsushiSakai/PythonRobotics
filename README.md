@@ -531,9 +531,9 @@ Ref:
 
 ## bipedal planner with inverted pendulum
 
-This is an bipedal planner of modifying footsteps with inverted pendulum.
+This is a bipedal planner for modifying footsteps with inverted pendulum.
 
-You can set the footsteps and automatically planner will modify those.
+You can set the footsteps and the planner will modify those automatically.
 
 ![3](https://github.com/AtsushiSakai/PythonRobotics/blob/master/Bipedal/bipedal_planner/animation.gif)
 
