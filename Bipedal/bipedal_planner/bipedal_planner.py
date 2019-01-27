@@ -37,7 +37,7 @@ class BipedalPlanner(object):
         return x, x_dot, y, y_dot
         
     def walk(self, T_sup=0.8, z_c=0.8, a=10, b=1, plot=False):
-        if self.ref_footsteps == None:
+        if self.ref_footsteps is None:
             print("No footsteps")
             return
 
@@ -124,20 +124,20 @@ class BipedalPlanner(object):
                         # foot rectangle for self.ref_p
                         foot_width = 0.06
                         foot_height = 0.04
-                        for i in range(len(self.ref_p)):
-                            angle = self.ref_p[i][2] + math.atan2(foot_height, foot_width) - math.pi
+                        for j in range(len(self.ref_p)):
+                            angle = self.ref_p[j][2] + math.atan2(foot_height, foot_width) - math.pi
                             r = math.sqrt(math.pow(foot_width / 3., 2) + math.pow(foot_height / 2., 2))
-                            rec = pat.Rectangle(xy = (self.ref_p[i][0] + r * math.cos(angle), self.ref_p[i][1] + r * math.sin(angle)),
-                                        width=foot_width, height=foot_height, angle=self.ref_p[i][2] * 180 / math.pi, color="blue", fill=False, ls=":")
+                            rec = pat.Rectangle(xy = (self.ref_p[j][0] + r * math.cos(angle), self.ref_p[j][1] + r * math.sin(angle)),
+                                        width=foot_width, height=foot_height, angle=self.ref_p[j][2] * 180 / math.pi, color="blue", fill=False, ls=":")
                             ax.add_patch(rec)
                             art3d.pathpatch_2d_to_3d(rec, z=0, zdir="z")
 
                         # foot rectangle for self.act_p                            
-                        for i in range(len(self.act_p)):
-                            angle = self.act_p[i][2] + math.atan2(foot_height, foot_width) - math.pi
+                        for j in range(len(self.act_p)):
+                            angle = self.act_p[j][2] + math.atan2(foot_height, foot_width) - math.pi
                             r = math.sqrt(math.pow(foot_width / 3., 2) + math.pow(foot_height / 2., 2))
-                            rec = pat.Rectangle(xy = (self.act_p[i][0] + r * math.cos(angle), self.act_p[i][1] + r * math.sin(angle)),
-                                                width=foot_width, height=foot_height, angle=self.act_p[i][2] * 180 / math.pi, color="blue", fill=False)
+                            rec = pat.Rectangle(xy = (self.act_p[j][0] + r * math.cos(angle), self.act_p[j][1] + r * math.sin(angle)),
+                                                width=foot_width, height=foot_height, angle=self.act_p[j][2] * 180 / math.pi, color="blue", fill=False)
                             ax.add_patch(rec)
                             art3d.pathpatch_2d_to_3d(rec, z=0, zdir="z")                            
 
