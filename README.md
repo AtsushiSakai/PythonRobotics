@@ -334,7 +334,7 @@ Ref:
 
 ### RRT\*
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/RRTstar/animation.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTstar/animation.gif)
 
 This is a path planning code with RRT\*
 
@@ -348,7 +348,7 @@ Ref:
 
 ### RRT\* with reeds-sheep path
 
-![Robotics/animation.gif at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/RRTStarReedsShepp/animation.gif))
+![Robotics/animation.gif at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTStarReedsShepp/animation.gif))
 
 Path planning for a car robot with RRT\* and reeds sheep path planner.
 
@@ -358,7 +358,7 @@ This is a path planning simulation with LQR-RRT\*.
 
 A double integrator motion model is used for LQR local planner.
 
-![LQRRRT](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/LQRRRTStar/animation.gif)
+![LQRRRT](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/LQRRRTStar/animation.gif)
 
 Ref:
 
@@ -371,7 +371,7 @@ Ref:
 
 Motion planning with quintic polynomials.
 
-![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/QuinticPolynomialsPlanner/animation.gif)
+![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/QuinticPolynomialsPlanner/animation.gif)
 
 It can calculate 2D path, velocity, and acceleration profile based on quintic polynomials.
 
@@ -383,7 +383,7 @@ Ref:
 
 A sample code with Reeds Shepp path planning.
 
-![RSPlanning](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/ReedsSheppPath/animation.gif?raw=true)
+![RSPlanning](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ReedsSheppPath/animation.gif?raw=true)
 
 Ref:
 
@@ -398,12 +398,12 @@ Ref:
 
 A sample code using LQR based path planning for double integrator model.
 
-![RSPlanning](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/LQRPlanner/animation.gif?raw=true)
+![RSPlanning](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/LQRPlanner/animation.gif?raw=true)
 
 
 ## Optimal Trajectory in a Frenet Frame 
 
-![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/FrenetOptimalTrajectory/animation.gif)
+![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/FrenetOptimalTrajectory/animation.gif)
 
 This is optimal trajectory generation in a Frenet Frame.
 
@@ -424,7 +424,7 @@ Ref:
 
 This is a simulation of moving to a pose control
 
-![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/move_to_pose/animation.gif)
+![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/move_to_pose/animation.gif)
 
 Ref:
 
@@ -435,7 +435,7 @@ Ref:
 
 Path tracking simulation with Stanley steering control and PID speed control.
 
-![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/stanley_controller/animation.gif)
+![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/stanley_controller/animation.gif)
 
 Ref:
 
@@ -449,7 +449,7 @@ Ref:
 
 Path tracking simulation with rear wheel feedback steering control and PID speed control.
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/rear_wheel_feedback/animation.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/rear_wheel_feedback/animation.gif)
 
 Ref:
 
@@ -460,7 +460,7 @@ Ref:
 
 Path tracking simulation with LQR speed and steering control.
 
-![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/lqr_speed_steer_control/animation.gif)
+![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/lqr_speed_steer_control/animation.gif)
 
 Ref:
 
@@ -471,7 +471,7 @@ Ref:
 
 Path tracking simulation with iterative linear model predictive speed and steering control.
 
-<img src="https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif" width="640">
+<img src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif" width="640">
 
 Ref:
 
@@ -481,7 +481,7 @@ Ref:
 
 A motion planning and path tracking simulation with NMPC of C-GMRES 
 
-![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/cgmres_nmpc/animation.gif)
+![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/cgmres_nmpc/animation.gif)
 
 Ref:
 
@@ -498,7 +498,7 @@ This is a interactive simulation.
 
 You can set the goal position of the end effector with left-click on the ploting area. 
 
-![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/ArmNavigation/n_joint_arm_to_point_control/animation.gif)
+![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/ArmNavigation/n_joint_arm_to_point_control/animation.gif)
 
 In this simulation N = 10, however, you can change it.
 
@@ -506,7 +506,7 @@ In this simulation N = 10, however, you can change it.
 
 Arm navigation with obstacle avoidance simulation.
 
-![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/ArmNavigation/arm_obstacle_navigation/animation.gif)
+![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/ArmNavigation/arm_obstacle_navigation/animation.gif)
 
 
 # Aerial Navigation
@@ -515,13 +515,13 @@ Arm navigation with obstacle avoidance simulation.
 
 This is a 3d trajectory following simulation for a quadrotor.
 
-![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/AerialNavigation/drone_3d_trajectory_following/animation.gif)
+![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/AerialNavigation/drone_3d_trajectory_following/animation.gif)
 
 ## rocket powered landing
 
 This is a 3d trajectory generation simulation for a rocket powered landing.
 
-![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/AerialNavigation/rocket_powered_landing/animation.gif)
+![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/AerialNavigation/rocket_powered_landing/animation.gif)
 
 Ref:
 
@@ -535,7 +535,7 @@ This is a bipedal planner for modifying footsteps with inverted pendulum.
 
 You can set the footsteps and the planner will modify those automatically.
 
-![3](https://github.com/AtsushiSakai/PythonRobotics/blob/master/Bipedal/bipedal_planner/animation.gif)
+![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Bipedal/bipedal_planner/animation.gif)
 
 # License 
 
