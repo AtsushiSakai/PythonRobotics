@@ -127,13 +127,13 @@ You can check the full documentation online: [https://pythonrobotics.readthedocs
 
 ## Extended Kalman Filter localization
 
-<img src="https://github.com/AtsushiSakai/PythonRobotics/raw/master/Localization/extended_kalman_filter/animation.gif" width="640">
+<img src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/extended_kalman_filter/animation.gif" width="640">
 
 Documentation: [Notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/Localization/extended_kalman_filter/extended_kalman_filter_localization.ipynb)
 
 ## Particle filter localization
 
-![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Localization/particle_filter/animation.gif)
+![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/particle_filter/animation.gif)
 
 This is a sensor fusion localization with Particle Filter(PF).
 
@@ -152,7 +152,7 @@ Ref:
 
 ## Histogram filter localization
 
-![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Localization/histogram_filter/animation.gif)
+![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/histogram_filter/animation.gif)
 
 This is a 2D localization example with Histogram filter.
 
@@ -176,19 +176,19 @@ Ref:
 
 This is a 2D Gaussian grid mapping example.
 
-![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/gaussian_grid_map/animation.gif)
+![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/gaussian_grid_map/animation.gif)
 
 ## Ray casting grid map
 
 This is a 2D ray casting grid mapping example.
 
-![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/raycasting_grid_map/animation.gif)
+![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/raycasting_grid_map/animation.gif)
 
 ## k-means object clustering
 
 This is a 2D object clustering with k-means algorithm.
 
-![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/kmeans_clustering/animation.gif)
+![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/kmeans_clustering/animation.gif)
 
 # SLAM
 
@@ -200,7 +200,7 @@ This is a 2D ICP matching example with singular value decomposition.
 
 It can calculate a rotation matrix and a translation vector between points to points.
 
-![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/iterative_closest_point/animation.gif)
+![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/iterative_closest_point/animation.gif)
 
 Ref:
 
@@ -218,7 +218,7 @@ The red points are particles of FastSLAM.
 Black points are landmarks, blue crosses are estimated landmark positions by FastSLAM.
 
 
-![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/FastSLAM1/animation.gif)
+![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/FastSLAM1/animation.gif)
 
 
 Ref:
@@ -240,7 +240,7 @@ The red line is the estimated trajectory with Graph based SLAM.
 
 The black stars are landmarks for graph edge generation.
 
-![3](https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/GraphBasedSLAM/animation.gif)
+![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/GraphBasedSLAM/animation.gif)
 
 Ref:
 
@@ -255,7 +255,7 @@ This is a 2D navigation sample code with Dynamic Window Approach.
 
 - [The Dynamic Window Approach to Collision Avoidance](https://www.ri.cmu.edu/pub_files/pub1/fox_dieter_1997_1/fox_dieter_1997_1.pdf)
 
-![2](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/DynamicWindowApproach/animation.gif)
+![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DynamicWindowApproach/animation.gif)
 
 
 ## Grid based search
@@ -264,7 +264,7 @@ This is a 2D navigation sample code with Dynamic Window Approach.
 
 This is a 2D grid based shortest path planning with Dijkstra's algorithm.
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/Dijkstra/animation.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/Dijkstra/animation.gif)
 
 In the animation, cyan points are searched nodes.
 
@@ -272,7 +272,7 @@ In the animation, cyan points are searched nodes.
 
 This is a 2D grid based shortest path planning with A star algorithm.
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/AStar/animation.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/AStar/animation.gif)
 
 In the animation, cyan points are searched nodes.
 
@@ -282,7 +282,7 @@ Its heuristic is 2D Euclid distance.
 
 This is a 2D grid based path planning with Potential Field algorithm.
 
-![PotentialField](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/PotentialFieldPlanning/animation.gif)
+![PotentialField](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/PotentialFieldPlanning/animation.gif)
 
 In the animation, the blue heat map shows potential value on each grid.
 
@@ -305,16 +305,16 @@ Ref:
 
 ### Biased polar sampling
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/StateLatticePlanner/BiasedPolarSampling.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/StateLatticePlanner/BiasedPolarSampling.gif)
 
 
 ### Lane sampling
 
-![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/StateLatticePlanner/LaneSampling.gif)
+![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/StateLatticePlanner/LaneSampling.gif)
 
 ## Probabilistic Road-Map (PRM) planning 
 
-![PRM](https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/ProbabilisticRoadMap/animation.gif)
+![PRM](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ProbabilisticRoadMap/animation.gif)
 
 This PRM planner uses Dijkstra method for graph search.
 
