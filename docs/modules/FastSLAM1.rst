@@ -28,7 +28,7 @@ The red points are particles of FastSLAM.
 Black points are landmarks, blue crosses are estimated landmark
 positions by FastSLAM.
 
-.. figure:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/FastSLAM1/animation.gif
+.. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/FastSLAM1/animation.gif
    :alt: gif
 
    gif
