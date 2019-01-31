@@ -20,17 +20,18 @@ before_install:
     - conda update -q conda
     # Useful for debugging any issues with conda
     - conda info -a
-    - conda env create -f ./environment.yml
-    - activate python_robotics
+    - conda install python==3.6.8
+    #- conda env create -f ./environment.yml
+    #- activate python_robotics
 
 
 install:
-  #- conda install numpy
-  #- conda install scipy
-  #- conda install matplotlib
-  #- conda install pandas
-  #- conda install -c conda-forge lapack
-  #- conda install -c cvxgrp cvxpy
+  - conda install numpy
+  - conda install scipy
+  - conda install matplotlib
+  - conda install pandas
+  - conda install -c conda-forge lapack
+  - conda install -c cvxgrp cvxpy
   - conda install coveralls
 
 script:
