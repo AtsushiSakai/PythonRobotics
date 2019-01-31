@@ -105,6 +105,8 @@ If you are interested in other examples or mathematical backgrounds of each algo
 
 You can check the full documentation online: [https://pythonrobotics.readthedocs.io/](https://pythonrobotics.readthedocs.io/)
 
+All animation gifs are stored here: [AtsushiSakai/PythonRoboticsGifs: Animation gifs of PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs)
+
 # How to use
 
 1. Clone this repo.
