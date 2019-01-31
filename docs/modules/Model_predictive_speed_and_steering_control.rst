@@ -2,7 +2,7 @@
 Model predictive speed and steering control
 -------------------------------------------
 
-.. figure:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif?raw=true
+.. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif?raw=true
    :alt: Model predictive speed and steering control
 
    Model predictive speed and steering control

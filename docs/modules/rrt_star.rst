@@ -15,7 +15,7 @@ Simulation
 
 
 
-.. figure:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/RRTstar/animation.gif
+.. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTstar/animation.gif
    :alt: gif
 
    gif

@@ -6,16 +6,30 @@ Simulation
 
     from IPython.display import Image
     Image(filename="figure.png",width=600)
+    from IPython.display import display, HTML
+    
+    display(HTML(data="""
+    <style>
+        div#notebook-container    { width: 95%; }
+        div#menubar-container     { width: 65%; }
+        div#maintoolbar-container { width: 99%; }
+    </style>
+    """))
 
 
 
+.. raw:: html
 
-.. image:: rocket_powered_landing_files/rocket_powered_landing_1_0.png
-   :width: 600px
+    
+    <style>
+        div#notebook-container    { width: 95%; }
+        div#menubar-container     { width: 65%; }
+        div#maintoolbar-container { width: 99%; }
+    </style>
 
 
 
-.. figure:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/AerialNavigation/rocket_powered_landing/animation.gif
+.. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/AerialNavigation/rocket_powered_landing/animation.gif
    :alt: gif
 
    gif
@@ -109,15 +123,13 @@ Equation generation
 
 .. code-block:: ipython3
 
-    sp.simplify(f.jacobian(x)) # A 
-
+    display(sp.simplify(f.jacobian(x)))# A 
 
 
 
 .. math::
 
     \left[\begin{array}{cccccccccccccc}0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\\frac{ux \left(2 q_{2}^{2} + 2 q_{3}^{2} - 1\right) + 2 uy \left(q_{0} q_{3} - q_{1} q_{2}\right) - 2 uz \left(q_{0} q_{2} + q_{1} q_{3}\right)}{m^{2}} & 0 & 0 & 0 & 0 & 0 & 0 & \frac{2 \left(q_{2} uz - q_{3} uy\right)}{m} & \frac{2 \left(q_{2} uy + q_{3} uz\right)}{m} & \frac{2 \left(q_{0} uz + q_{1} uy - 2 q_{2} ux\right)}{m} & \frac{2 \left(- q_{0} uy + q_{1} uz - 2 q_{3} ux\right)}{m} & 0 & 0 & 0\\\frac{- 2 ux \left(q_{0} q_{3} + q_{1} q_{2}\right) + uy \left(2 q_{1}^{2} + 2 q_{3}^{2} - 1\right) + 2 uz \left(q_{0} q_{1} - q_{2} q_{3}\right)}{m^{2}} & 0 & 0 & 0 & 0 & 0 & 0 & \frac{2 \left(- q_{1} uz + q_{3} ux\right)}{m} & \frac{2 \left(- q_{0} uz - 2 q_{1} uy + q_{2} ux\right)}{m} & \frac{2 \left(q_{1} ux + q_{3} uz\right)}{m} & \frac{2 \left(q_{0} ux + q_{2} uz - 2 q_{3} uy\right)}{m} & 0 & 0 & 0\\\frac{2 ux \left(q_{0} q_{2} - q_{1} q_{3}\right) - 2 uy \left(q_{0} q_{1} + q_{2} q_{3}\right) + uz \left(2 q_{1}^{2} + 2 q_{2}^{2} - 1\right)}{m^{2}} & 0 & 0 & 0 & 0 & 0 & 0 & \frac{2 \left(q_{1} uy - q_{2} ux\right)}{m} & \frac{2 \left(q_{0} uy - 2 q_{1} uz + q_{3} ux\right)}{m} & \frac{2 \left(- q_{0} ux - 2 q_{2} uz + q_{3} uy\right)}{m} & \frac{2 \left(q_{1} ux + q_{2} uy\right)}{m} & 0 & 0 & 0\\0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & - 0.5 wx & - 0.5 wy & - 0.5 wz & - 0.5 q_{1} & - 0.5 q_{2} & - 0.5 q_{3}\\0 & 0 & 0 & 0 & 0 & 0 & 0 & 0.5 wx & 0 & 0.5 wz & - 0.5 wy & 0.5 q_{0} & - 0.5 q_{3} & 0.5 q_{2}\\0 & 0 & 0 & 0 & 0 & 0 & 0 & 0.5 wy & - 0.5 wz & 0 & 0.5 wx & 0.5 q_{3} & 0.5 q_{0} & - 0.5 q_{1}\\0 & 0 & 0 & 0 & 0 & 0 & 0 & 0.5 wz & 0.5 wy & - 0.5 wx & 0 & - 0.5 q_{2} & 0.5 q_{1} & 0.5 q_{0}\\0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\end{array}\right]
-
 
 
 .. code-block:: ipython3
