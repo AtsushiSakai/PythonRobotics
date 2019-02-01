@@ -1,3 +1,7 @@
+import subprocess
+import os.path
+import os
+import glob
 """
 
 Jupyter notebook converter to rst file
@@ -7,11 +11,6 @@ author: Atsushi Sakai
 """
 
 NOTEBOOK_DIR = "../"
-
-import glob
-import os
-import os.path
-import subprocess
 
 
 def get_notebook_path_list(ndir):
@@ -29,8 +28,8 @@ def convert_rst(rstpath):
         after = ".. code-block:: ipython3"
         filedata = filedata.replace(before, after)
 
-    with open(rstpath, "w") as file:
-        file.write(filedata)
+    with open(rstpath, "w") as ffile:
+        ffile.write(filedata)
 
 
 def generate_rst(npath):
