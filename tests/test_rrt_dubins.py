@@ -1,9 +1,14 @@
 from unittest import TestCase
-
 import sys
 sys.path.append("./PathPlanning/RRTDubins/")
+sys.path.append("./PathPlanning/DubinsPath/")
 
-from PathPlanning.RRTDubins import rrt_dubins as m
+try:
+    from PathPlanning.RRTDubins import rrt_dubins as m
+    # from RRTDubins import rrt_dubins as m
+except:
+    raise
+
 
 print(__file__)
 
