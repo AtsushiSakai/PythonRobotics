@@ -7,6 +7,7 @@ author Atsushi Sakai (@Atsushi_twi)
 """
 import math
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def mod2pi(theta):
@@ -224,7 +225,7 @@ def generate_course(length, mode, c):
 
     for m, l in zip(mode, length):
         pd = 0.0
-        if m is "S":
+        if m == "S":
             d = 1.0 / c
         else:  # turning couse
             d = np.deg2rad(3.0)
@@ -234,11 +235,11 @@ def generate_course(length, mode, c):
             px.append(px[-1] + d * c * math.cos(pyaw[-1]))
             py.append(py[-1] + d * c * math.sin(pyaw[-1]))
 
-            if m is "L":  # left turn
+            if m == "L":  # left turn
                 pyaw.append(pyaw[-1] + d)
-            elif m is "S":  # Straight
+            elif m == "S":  # Straight
                 pyaw.append(pyaw[-1])
-            elif m is "R":  # right turn
+            elif m == "R":  # right turn
                 pyaw.append(pyaw[-1] - d)
             pd += d
 
@@ -246,11 +247,11 @@ def generate_course(length, mode, c):
         px.append(px[-1] + d * c * math.cos(pyaw[-1]))
         py.append(py[-1] + d * c * math.sin(pyaw[-1]))
 
-        if m is "L":  # left turn
+        if m == "L":  # left turn
             pyaw.append(pyaw[-1] + d)
-        elif m is "S":  # Straight
+        elif m == "S":  # Straight
             pyaw.append(pyaw[-1])
-        elif m is "R":  # right turn
+        elif m == "R":  # right turn
             pyaw.append(pyaw[-1] - d)
         pd += d
 
