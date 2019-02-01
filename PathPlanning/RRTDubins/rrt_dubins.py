@@ -4,13 +4,18 @@ Path Planning Sample Code with RRT for car like robot.
 author: AtsushiSakai(@Atsushi_twi)
 
 """
-
-import random
-import math
-import copy
-import numpy as np
-import dubins_path_planning
 import matplotlib.pyplot as plt
+import numpy as np
+import copy
+import math
+import random
+import sys
+sys.path.append("../DubinsPath/")
+try:
+    import dubins_path_planning
+except:
+    raise
+
 
 show_animation = True
 
@@ -183,9 +188,9 @@ class RRT():
         plt.pause(0.01)
 
     def GetNearestListIndex(self, nodeList, rnd):
-        dlist = [(node.x - rnd[0]) ** 2 +
-                 (node.y - rnd[1]) ** 2 +
-                 (node.yaw - rnd[2] ** 2) for node in nodeList]
+        dlist = [(node.x - rnd[0]) ** 2
+                 + (node.y - rnd[1]) ** 2
+                 + (node.yaw - rnd[2] ** 2) for node in nodeList]
         minind = dlist.index(min(dlist))
 
         return minind
