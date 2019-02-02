@@ -146,17 +146,17 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
             break
 
     if show_animation:
-        for i in range(len(rx)):
+        for i, _ in enumerate(rx):
             plt.cla()
             plt.grid(True)
             plt.axis("equal")
             plot_arrow(sx, sy, syaw)
             plot_arrow(gx, gy, gyaw)
             plot_arrow(rx[i], ry[i], ryaw[i])
-            plt.title("Time[s]:" + str(time[i])[0:4] +
-                      " v[m/s]:" + str(rv[i])[0:4] +
-                      " a[m/ss]:" + str(ra[i])[0:4] +
-                      " jerk[m/sss]:" + str(rj[i])[0:4],
+            plt.title("Time[s]:" + str(time[i])[0:4]
+                      + " v[m/s]:" + str(rv[i])[0:4]
+                      + " a[m/ss]:" + str(ra[i])[0:4]
+                      + " jerk[m/sss]:" + str(rj[i])[0:4],
                       )
             plt.pause(0.001)
 

@@ -127,8 +127,8 @@ class NMPCSimulatorSystem():
         pre_lam_3 = lam_3 + dt * \
             (- lam_1 * math.sin(yaw) * v + lam_2 * math.cos(yaw) * v)
         pre_lam_4 = lam_4 + dt * \
-            (lam_1 * math.cos(yaw) + lam_2 *
-             math.sin(yaw) + lam_3 * math.sin(u_2) / WB)
+            (lam_1 * math.cos(yaw) + lam_2
+             * math.sin(yaw) + lam_3 * math.sin(u_2) / WB)
 
         return pre_lam_1, pre_lam_2, pre_lam_3, pre_lam_4
 
@@ -275,6 +275,8 @@ class NMPCController_with_CGMRES():
         e = np.zeros((self.max_iteration + 1, 1))
         e[0] = 1.0
 
+        ys_pre = None
+
         for i in range(self.max_iteration):
             du_1 = vs[::self.input_num, i] * self.ht
             du_2 = vs[1::self.input_num, i] * self.ht
@@ -358,8 +360,8 @@ class NMPCController_with_CGMRES():
         for i in range(N):
             # ∂H/∂u(xi, ui, λi)
             F.append(u_1s[i] + lam_4s[i] + 2.0 * raw_1s[i] * u_1s[i])
-            F.append(u_2s[i] + lam_3s[i] * v_s[i] /
-                     WB * math.cos(u_2s[i])**2 + 2.0 * raw_2s[i] * u_2s[i])
+            F.append(u_2s[i] + lam_3s[i] * v_s[i]
+                     / WB * math.cos(u_2s[i])**2 + 2.0 * raw_2s[i] * u_2s[i])
             F.append(-PHI_V + 2.0 * raw_1s[i] * dummy_u_1s[i])
             F.append(-PHI_OMEGA + 2.0 * raw_2s[i] * dummy_u_2s[i])
 
@@ -420,13 +422,13 @@ def plot_figures(plant_system, controller, iteration_num, dt):
     u_2_fig.set_xlabel("time [s]")
     u_2_fig.set_ylabel("u_omega")
 
-    dummy_1_fig.plot(np.arange(iteration_num - 1) *
-                     dt, controller.history_dummy_u_1)
+    dummy_1_fig.plot(np.arange(iteration_num - 1)
+                     * dt, controller.history_dummy_u_1)
     dummy_1_fig.set_xlabel("time [s]")
     dummy_1_fig.set_ylabel("dummy u_1")
 
-    dummy_2_fig.plot(np.arange(iteration_num - 1) *
-                     dt, controller.history_dummy_u_2)
+    dummy_2_fig.plot(np.arange(iteration_num - 1)
+                     * dt, controller.history_dummy_u_2)
     dummy_2_fig.set_xlabel("time [s]")
     dummy_2_fig.set_ylabel("dummy u_2")
 
@@ -476,8 +478,8 @@ def plot_car(x, y, yaw, steer=0.0, cabcolor="-r", truckcolor="-k"):
                         [WIDTH / 2, WIDTH / 2, - WIDTH / 2, -WIDTH / 2, WIDTH / 2]])
 
     fr_wheel = np.array([[WHEEL_LEN, -WHEEL_LEN, -WHEEL_LEN, WHEEL_LEN, WHEEL_LEN],
-                         [-WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD, WHEEL_WIDTH
-                          - TREAD, WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD]])
+                         [-WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD, WHEEL_WIDTH -
+                          TREAD, WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD]])
 
     rr_wheel = np.copy(fr_wheel)
 
@@ -549,9 +551,9 @@ def animation(plant, controller, dt):
         plot_car(x, y, yaw, steer=steer)
         plt.axis("equal")
         plt.grid(True)
-        plt.title("Time[s]:" + str(round(time, 2)) +
-                  ", accel[m/s]:" + str(round(accel, 2)) +
-                  ", speed[km/h]:" + str(round(v * 3.6, 2)))
+        plt.title("Time[s]:" + str(round(time, 2))
+                  + ", accel[m/s]:" + str(round(accel, 2))
+                  + ", speed[km/h]:" + str(round(v * 3.6, 2)))
         plt.pause(0.0001)
 
     plt.close("all")

@@ -124,7 +124,7 @@ def calc_association(cx, cy, clusters):
 
     inds = []
 
-    for ic in range(len(cx)):
+    for ic, _ in enumerate(cx):
         tcx = cx[ic]
         tcy = cy[ic]
 

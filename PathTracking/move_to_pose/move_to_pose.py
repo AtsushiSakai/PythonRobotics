@@ -48,11 +48,9 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
         x_diff = x_goal - x
         y_diff = y_goal - y
 
-        """
-        Restrict alpha and beta (angle differences) to the range
-        [-pi, pi] to prevent unstable behavior e.g. difference going
-        from 0 rad to 2*pi rad with slight turn
-        """
+        # Restrict alpha and beta (angle differences) to the range
+        # [-pi, pi] to prevent unstable behavior e.g. difference going
+        # from 0 rad to 2*pi rad with slight turn
 
         rho = np.sqrt(x_diff**2 + y_diff**2)
         alpha = (np.arctan2(y_diff, x_diff) -
