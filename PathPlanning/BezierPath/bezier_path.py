@@ -94,7 +94,8 @@ def bezier_derivatives_control_points(control_points, n_derivatives):
     w = {0: control_points}
     for i in range(n_derivatives):
         n = len(w[i])
-        w[i + 1] = np.array([(n - 1) * (w[i][j + 1] - w[i][j]) for j in range(n - 1)])
+        w[i + 1] = np.array([(n - 1) * (w[i][j + 1] - w[i][j])
+                             for j in range(n - 1)])
     return w
 
 
@@ -111,7 +112,7 @@ def curvature(dx, dy, ddx, ddy):
     return (dx * ddy - dy * ddx) / (dx ** 2 + dy ** 2) ** (3 / 2)
 
 
-def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
+def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no cover
     """Plot arrow."""
     if not isinstance(x, float):
         for (ix, iy, iyaw) in zip(x, y, yaw):
@@ -155,7 +156,8 @@ def main():
     tangent = np.array([point, point + dt])
     normal = np.array([point, point + [- dt[1], dt[0]]])
     curvature_center = point + np.array([- dt[1], dt[0]]) * radius
-    circle = plt.Circle(tuple(curvature_center), radius, color=(0, 0.8, 0.8), fill=False, linewidth=1)
+    circle = plt.Circle(tuple(curvature_center), radius,
+                        color=(0, 0.8, 0.8), fill=False, linewidth=1)
 
     assert path.T[0][0] == start_x, "path is invalid"
     assert path.T[1][0] == start_y, "path is invalid"
@@ -165,7 +167,8 @@ def main():
     if show_animation:
         fig, ax = plt.subplots()
         ax.plot(path.T[0], path.T[1], label="Bezier Path")
-        ax.plot(control_points.T[0], control_points.T[1], '--o', label="Control Points")
+        ax.plot(control_points.T[0], control_points.T[1],
+                '--o', label="Control Points")
         ax.plot(x_target, y_target)
         ax.plot(tangent[:, 0], tangent[:, 1], label="Tangent")
         ax.plot(normal[:, 0], normal[:, 1], label="Normal")

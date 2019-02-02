@@ -229,7 +229,7 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
     return rx, ry
 
 
-def plot_road_map(road_map, sample_x, sample_y):
+def plot_road_map(road_map, sample_x, sample_y):  # pragma: no cover
 
     for i, _ in enumerate(road_map):
         for ii in range(len(road_map[i])):

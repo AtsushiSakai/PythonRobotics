@@ -172,8 +172,8 @@ class BITStar(object):
         cBest = self.g_scores[self.goalId]
 
         # Computing the sampling space
-        cMin = math.sqrt(pow(self.start[0] - self.goal[1], 2) +
-                         pow(self.start[0] - self.goal[1], 2)) / 1.5
+        cMin = math.sqrt(pow(self.start[0] - self.goal[1], 2)
+                         + pow(self.start[0] - self.goal[1], 2)) / 1.5
         xCenter = np.array([[(self.start[0] + self.goal[0]) / 2.0],
                             [(self.goal[1] - self.start[1]) / 2.0], [0]])
         a1 = np.array([[(self.goal[0] - self.start[0]) / cMin],
@@ -413,8 +413,8 @@ class BITStar(object):
     def bestVertexQueueValue(self):
         if(len(self.vertex_queue) == 0):
             return float('inf')
-        values = [self.g_scores[v] +
-                  self.computeHeuristicCost(v, self.goalId) for v in self.vertex_queue]
+        values = [self.g_scores[v]
+                  + self.computeHeuristicCost(v, self.goalId) for v in self.vertex_queue]
         values.sort()
         return values[0]
 
@@ -422,8 +422,8 @@ class BITStar(object):
         if(len(self.edge_queue) == 0):
             return float('inf')
         # return the best value in the queue by score g_tau[v] + c(v,x) + h(x)
-        values = [self.g_scores[e[0]] + self.computeDistanceCost(e[0], e[1]) +
-                  self.computeHeuristicCost(e[1], self.goalId) for e in self.edge_queue]
+        values = [self.g_scores[e[0]] + self.computeDistanceCost(e[0], e[1])
+                  + self.computeHeuristicCost(e[1], self.goalId) for e in self.edge_queue]
         values.sort(reverse=True)
         return values[0]
 
@@ -549,7 +549,7 @@ class BITStar(object):
         plt.grid(True)
         plt.pause(0.01)
 
-    def plot_ellipse(self, xCenter, cBest, cMin, etheta):
+    def plot_ellipse(self, xCenter, cBest, cMin, etheta):  # pragma: no cover
 
         a = math.sqrt(cBest**2 - cMin**2) / 2.0
         b = cBest / 2.0

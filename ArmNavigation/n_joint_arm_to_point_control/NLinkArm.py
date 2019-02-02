@@ -49,7 +49,7 @@ class NLinkArm(object):
         if self.show_animation:
             self.plot()
 
-    def plot(self):
+    def plot(self):  # pragma: no cover
         plt.cla()
 
         for i in range(self.n_links + 1):

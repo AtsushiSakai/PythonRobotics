@@ -51,12 +51,12 @@ class Quadrotor():
         yaw = self.yaw
         return np.array(
             [[cos(yaw) * cos(pitch), -sin(yaw) * cos(roll) + cos(yaw) * sin(pitch) * sin(roll), sin(yaw) * sin(roll) + cos(yaw) * sin(pitch) * cos(roll), x],
-             [sin(yaw) * cos(pitch), cos(yaw) * cos(roll) + sin(yaw) * sin(pitch) *
-              sin(roll), -cos(yaw) * sin(roll) + sin(yaw) * sin(pitch) * cos(roll), y],
+             [sin(yaw) * cos(pitch), cos(yaw) * cos(roll) + sin(yaw) * sin(pitch)
+              * sin(roll), -cos(yaw) * sin(roll) + sin(yaw) * sin(pitch) * cos(roll), y],
              [-sin(pitch), cos(pitch) * sin(roll), cos(pitch) * cos(yaw), z]
              ])
 
-    def plot(self):
+    def plot(self):  # pragma: no cover
         T = self.transformation_matrix()
 
         p1_t = np.matmul(T, self.p1)

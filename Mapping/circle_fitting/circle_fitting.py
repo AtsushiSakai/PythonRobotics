@@ -90,7 +90,7 @@ def ray_casting_filter(xl, yl, thetal, rangel, angle_reso):
     return rx, ry
 
 
-def plot_circle(x, y, size, color="-b"):
+def plot_circle(x, y, size, color="-b"):  # pragma: no cover
     deg = list(range(0, 360, 5))
     deg.append(0)
     xl = [x + size * math.cos(np.deg2rad(d)) for d in deg]

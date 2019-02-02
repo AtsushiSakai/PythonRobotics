@@ -161,7 +161,7 @@ def ukf_estimation(xEst, PEst, z, u, wm, wc, gamma):
     return xEst, PEst
 
 
-def plot_covariance_ellipse(xEst, PEst):
+def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
     Pxy = PEst[0:2, 0:2]
     eigval, eigvec = np.linalg.eig(Pxy)
 
