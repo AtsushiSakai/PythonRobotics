@@ -7,7 +7,7 @@ author: Sven Niederberger
 
 Ref:
 - Python implementation of 'Successive Convexification for 6-DoF Mars Rocket Powered Landing with Free-Final-Time' paper
-by Michael Szmuk and Behçet Açıkmeşe.
+by Michael Szmuk and Behcet Acıkmese.
 
 - EmbersArc/SuccessiveConvexificationFreeFinalTime: Implementation of "Successive Convexification for 6-DoF Mars Rocket Powered Landing with Free-Final-Time" https://github.com/EmbersArc/SuccessiveConvexificationFreeFinalTime
 
@@ -160,14 +160,14 @@ class Rocket_Model_6DoF:
                                                                                                                                               q3 * ux) / m, 2 * (-q0 * uz - 2 * q1 * uy + q2 * ux) / m, 2 * (q1 * ux + q3 * uz) / m, 2 * (q0 * ux + q2 * uz - 2 * q3 * uy) / m, 0, 0, 0],
             [(2 * ux * (q0 * q2 - q1 * q3) - 2 * uy * (q0 * q1 + q2 * q3) + uz * (2 * q1**2 + 2 * q2**2 - 1)) / m**2, 0, 0, 0, 0, 0, 0, 2 * (q1 * uy -
                                                                                                                                              q2 * ux) / m, 2 * (q0 * uy - 2 * q1 * uz + q3 * ux) / m, 2 * (-q0 * ux - 2 * q2 * uz + q3 * uy) / m, 2 * (q1 * ux + q2 * uy) / m, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, -0.5 * wx, -0.5 * wy, -
-             0.5 * wz, -0.5 * q1, -0.5 * q2, -0.5 * q3],
-            [0, 0, 0, 0, 0, 0, 0, 0.5 * wx, 0, 0.5 * wz, -
-             0.5 * wy, 0.5 * q0, -0.5 * q3, 0.5 * q2],
+            [0, 0, 0, 0, 0, 0, 0, 0, -0.5 * wx, -0.5 * wy,
+             - 0.5 * wz, -0.5 * q1, -0.5 * q2, -0.5 * q3],
+            [0, 0, 0, 0, 0, 0, 0, 0.5 * wx, 0, 0.5 * wz,
+             - 0.5 * wy, 0.5 * q0, -0.5 * q3, 0.5 * q2],
             [0, 0, 0, 0, 0, 0, 0, 0.5 * wy, -0.5 * wz, 0,
              0.5 * wx, 0.5 * q3, 0.5 * q0, -0.5 * q1],
-            [0, 0, 0, 0, 0, 0, 0, 0.5 * wz, 0.5 * wy, -
-             0.5 * wx, 0, -0.5 * q2, 0.5 * q1, 0.5 * q0],
+            [0, 0, 0, 0, 0, 0, 0, 0.5 * wz, 0.5 * wy,
+             - 0.5 * wx, 0, -0.5 * q2, 0.5 * q1, 0.5 * q0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
@@ -459,8 +459,8 @@ class SCProblem:
         # Dynamics:
         # x_t+1 = A_*x_t+B_*U_t+C_*U_T+1*S_*sigma+zbar+nu
         constraints += [
-            self.var['X'][:, k + 1] ==
-            cvxpy.reshape(self.par['A_bar'][:, k], (m.n_x, m.n_x))
+            self.var['X'][:, k + 1]
+            == cvxpy.reshape(self.par['A_bar'][:, k], (m.n_x, m.n_x))
             * self.var['X'][:, k]
             + cvxpy.reshape(self.par['B_bar'][:, k], (m.n_x, m.n_u))
             * self.var['U'][:, k]
@@ -552,12 +552,12 @@ def axis3d_equal(X, Y, Z, ax):
 
     max_range = np.array([X.max() - X.min(), Y.max() -
                           Y.min(), Z.max() - Z.min()]).max()
-    Xb = 0.5 * max_range * np.mgrid[-1:2:2, -1:2:2, -
-                                    1:2:2][0].flatten() + 0.5 * (X.max() + X.min())
-    Yb = 0.5 * max_range * np.mgrid[-1:2:2, -1:2:2, -
-                                    1:2:2][1].flatten() + 0.5 * (Y.max() + Y.min())
-    Zb = 0.5 * max_range * np.mgrid[-1:2:2, -1:2:2, -
-                                    1:2:2][2].flatten() + 0.5 * (Z.max() + Z.min())
+    Xb = 0.5 * max_range * np.mgrid[-1:2:2, -1:2:2,
+                                    - 1:2:2][0].flatten() + 0.5 * (X.max() + X.min())
+    Yb = 0.5 * max_range * np.mgrid[-1:2:2, -1:2:2,
+                                    - 1:2:2][1].flatten() + 0.5 * (Y.max() + Y.min())
+    Zb = 0.5 * max_range * np.mgrid[-1:2:2, -1:2:2,
+                                    - 1:2:2][2].flatten() + 0.5 * (Z.max() + Z.min())
     # Comment or uncomment following both lines to test the fake bounding box:
     for xb, yb, zb in zip(Xb, Yb, Zb):
         ax.plot([xb], [yb], [zb], 'w')
