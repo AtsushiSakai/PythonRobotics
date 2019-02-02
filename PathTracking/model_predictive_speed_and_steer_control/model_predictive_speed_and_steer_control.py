@@ -105,9 +105,6 @@ def get_linear_model_matrix(v, phi, delta):
 
     return A, B, C
 
-
-def plot_car(x, y, yaw, steer=0.0, cabcolor="-r", truckcolor="-k"):
-
     outline = np.array([[-BACKTOWHEEL, (LENGTH - BACKTOWHEEL), (LENGTH - BACKTOWHEEL), -BACKTOWHEEL, -BACKTOWHEEL],
                         [WIDTH / 2, WIDTH / 2, - WIDTH / 2, -WIDTH / 2, WIDTH / 2]])
 
@@ -276,8 +273,8 @@ def linear_mpc_control(xref, xbar, x0, dref):
 
         if t < (T - 1):
             cost += cvxpy.quad_form(u[:, t + 1] - u[:, t], Rd)
-            constraints += [cvxpy.abs(u[1, t + 1] - u[1, t])
-                            <= MAX_DSTEER * DT]
+            constraints += [cvxpy.abs(u[1, t + 1] - u[1, t]) <=
+                            MAX_DSTEER * DT]
 
     cost += cvxpy.quad_form(xref[:, T] - x[:, T], Qf)
 
@@ -438,8 +435,8 @@ def do_simulation(cx, cy, cyaw, ck, sp, dl, initial_state):
             plot_car(state.x, state.y, state.yaw, steer=di)
             plt.axis("equal")
             plt.grid(True)
-            plt.title("Time[s]:" + str(round(time, 2)) +
-                      ", speed[km/h]:" + str(round(state.v * 3.6, 2)))
+            plt.title("Time[s]:" + str(round(time, 2))
+                      + ", speed[km/h]:" + str(round(state.v * 3.6, 2)))
             plt.pause(0.0001)
 
     return t, x, y, yaw, v, d, a

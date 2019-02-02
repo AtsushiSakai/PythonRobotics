@@ -159,5 +159,5 @@ def ang_diff(theta1, theta2):
 
 
 if __name__ == '__main__':
-    main()
-    # animation()
+    # main()
+    animation()

@@ -19,7 +19,7 @@ cost_th = 0.1
 show_animation = False
 
 
-def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
+def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no cover
     """
     Plot arrow
     """

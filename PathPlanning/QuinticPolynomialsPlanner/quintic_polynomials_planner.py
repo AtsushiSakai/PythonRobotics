@@ -153,17 +153,17 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
             plot_arrow(sx, sy, syaw)
             plot_arrow(gx, gy, gyaw)
             plot_arrow(rx[i], ry[i], ryaw[i])
-            plt.title("Time[s]:" + str(time[i])[0:4]
-                      + " v[m/s]:" + str(rv[i])[0:4]
-                      + " a[m/ss]:" + str(ra[i])[0:4]
-                      + " jerk[m/sss]:" + str(rj[i])[0:4],
+            plt.title("Time[s]:" + str(time[i])[0:4] +
+                      " v[m/s]:" + str(rv[i])[0:4] +
+                      " a[m/ss]:" + str(ra[i])[0:4] +
+                      " jerk[m/sss]:" + str(rj[i])[0:4],
                       )
             plt.pause(0.001)
 
     return time, rx, ry, ryaw, rv, ra, rj
 
 
-def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
+def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no cover
     """
     Plot arrow
     """

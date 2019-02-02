@@ -200,10 +200,10 @@ def dubins_path_planning(sx, sy, syaw, ex, ey, eyaw, c):
     lpx, lpy, lpyaw, mode, clen = dubins_path_planning_from_origin(
         lex, ley, leyaw, c)
 
-    px = [math.cos(-syaw) * x + math.sin(-syaw) *
-          y + sx for x, y in zip(lpx, lpy)]
-    py = [- math.sin(-syaw) * x + math.cos(-syaw) *
-          y + sy for x, y in zip(lpx, lpy)]
+    px = [math.cos(-syaw) * x + math.sin(-syaw)
+          * y + sx for x, y in zip(lpx, lpy)]
+    py = [- math.sin(-syaw) * x + math.cos(-syaw)
+          * y + sy for x, y in zip(lpx, lpy)]
     pyaw = [pi_2_pi(iyaw + syaw) for iyaw in lpyaw]
     #  print(syaw)
     #  pyaw = lpyaw
@@ -258,7 +258,7 @@ def generate_course(length, mode, c):
     return px, py, pyaw
 
 
-def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
+def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no cover
     """
     Plot arrow
     """

@@ -129,12 +129,12 @@ class Rocket_Model_6DoF:
             [vx],
             [vy],
             [vz],
-            [(-1.0 * m - ux * (2 * q2**2 + 2 * q3**2 - 1) - 2 * uy *
-              (q0 * q3 - q1 * q2) + 2 * uz * (q0 * q2 + q1 * q3)) / m],
-            [(2 * ux * (q0 * q3 + q1 * q2) - uy * (2 * q1**2 +
-                                                   2 * q3**2 - 1) - 2 * uz * (q0 * q1 - q2 * q3)) / m],
-            [(-2 * ux * (q0 * q2 - q1 * q3) + 2 * uy *
-              (q0 * q1 + q2 * q3) - uz * (2 * q1**2 + 2 * q2**2 - 1)) / m],
+            [(-1.0 * m - ux * (2 * q2**2 + 2 * q3**2 - 1) - 2 * uy
+              * (q0 * q3 - q1 * q2) + 2 * uz * (q0 * q2 + q1 * q3)) / m],
+            [(2 * ux * (q0 * q3 + q1 * q2) - uy * (2 * q1**2
+                                                   + 2 * q3**2 - 1) - 2 * uz * (q0 * q1 - q2 * q3)) / m],
+            [(-2 * ux * (q0 * q2 - q1 * q3) + 2 * uy
+              * (q0 * q1 + q2 * q3) - uz * (2 * q1**2 + 2 * q2**2 - 1)) / m],
             [-0.5 * q1 * wx - 0.5 * q2 * wy - 0.5 * q3 * wz],
             [0.5 * q0 * wx + 0.5 * q2 * wz - 0.5 * q3 * wy],
             [0.5 * q0 * wy - 0.5 * q1 * wz + 0.5 * q3 * wx],
@@ -154,12 +154,12 @@ class Rocket_Model_6DoF:
             [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-            [(ux * (2 * q2**2 + 2 * q3**2 - 1) + 2 * uy * (q0 * q3 - q1 * q2) - 2 * uz * (q0 * q2 + q1 * q3)) / m**2, 0, 0, 0, 0, 0, 0, 2 * (q2 * uz -
-                                                                                                                                             q3 * uy) / m, 2 * (q2 * uy + q3 * uz) / m, 2 * (q0 * uz + q1 * uy - 2 * q2 * ux) / m, 2 * (-q0 * uy + q1 * uz - 2 * q3 * ux) / m, 0, 0, 0],
-            [(-2 * ux * (q0 * q3 + q1 * q2) + uy * (2 * q1**2 + 2 * q3**2 - 1) + 2 * uz * (q0 * q1 - q2 * q3)) / m**2, 0, 0, 0, 0, 0, 0, 2 * (-q1 * uz +
-                                                                                                                                              q3 * ux) / m, 2 * (-q0 * uz - 2 * q1 * uy + q2 * ux) / m, 2 * (q1 * ux + q3 * uz) / m, 2 * (q0 * ux + q2 * uz - 2 * q3 * uy) / m, 0, 0, 0],
-            [(2 * ux * (q0 * q2 - q1 * q3) - 2 * uy * (q0 * q1 + q2 * q3) + uz * (2 * q1**2 + 2 * q2**2 - 1)) / m**2, 0, 0, 0, 0, 0, 0, 2 * (q1 * uy -
-                                                                                                                                             q2 * ux) / m, 2 * (q0 * uy - 2 * q1 * uz + q3 * ux) / m, 2 * (-q0 * ux - 2 * q2 * uz + q3 * uy) / m, 2 * (q1 * ux + q2 * uy) / m, 0, 0, 0],
+            [(ux * (2 * q2**2 + 2 * q3**2 - 1) + 2 * uy * (q0 * q3 - q1 * q2) - 2 * uz * (q0 * q2 + q1 * q3)) / m**2, 0, 0, 0, 0, 0, 0, 2 * (q2 * uz
+                                                                                                                                             - q3 * uy) / m, 2 * (q2 * uy + q3 * uz) / m, 2 * (q0 * uz + q1 * uy - 2 * q2 * ux) / m, 2 * (-q0 * uy + q1 * uz - 2 * q3 * ux) / m, 0, 0, 0],
+            [(-2 * ux * (q0 * q3 + q1 * q2) + uy * (2 * q1**2 + 2 * q3**2 - 1) + 2 * uz * (q0 * q1 - q2 * q3)) / m**2, 0, 0, 0, 0, 0, 0, 2 * (-q1 * uz
+                                                                                                                                              + q3 * ux) / m, 2 * (-q0 * uz - 2 * q1 * uy + q2 * ux) / m, 2 * (q1 * ux + q3 * uz) / m, 2 * (q0 * ux + q2 * uz - 2 * q3 * uy) / m, 0, 0, 0],
+            [(2 * ux * (q0 * q2 - q1 * q3) - 2 * uy * (q0 * q1 + q2 * q3) + uz * (2 * q1**2 + 2 * q2**2 - 1)) / m**2, 0, 0, 0, 0, 0, 0, 2 * (q1 * uy
+                                                                                                                                             - q2 * ux) / m, 2 * (q0 * uy - 2 * q1 * uz + q3 * ux) / m, 2 * (-q0 * ux - 2 * q2 * uz + q3 * uy) / m, 2 * (q1 * ux + q2 * uy) / m, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, -0.5 * wx, -0.5 * wy,
              - 0.5 * wz, -0.5 * q1, -0.5 * q2, -0.5 * q3],
             [0, 0, 0, 0, 0, 0, 0, 0.5 * wx, 0, 0.5 * wz,
@@ -184,12 +184,12 @@ class Rocket_Model_6DoF:
             [0, 0, 0],
             [0, 0, 0],
             [0, 0, 0],
-            [(-2 * q2**2 - 2 * q3**2 + 1) / m, 2 *
-             (-q0 * q3 + q1 * q2) / m, 2 * (q0 * q2 + q1 * q3) / m],
-            [2 * (q0 * q3 + q1 * q2) / m, (-2 * q1**2 - 2 *
-                                           q3**2 + 1) / m, 2 * (-q0 * q1 + q2 * q3) / m],
-            [2 * (-q0 * q2 + q1 * q3) / m, 2 * (q0 * q1 + q2 * q3) /
-             m, (-2 * q1**2 - 2 * q2**2 + 1) / m],
+            [(-2 * q2**2 - 2 * q3**2 + 1) / m, 2
+             * (-q0 * q3 + q1 * q2) / m, 2 * (q0 * q2 + q1 * q3) / m],
+            [2 * (q0 * q3 + q1 * q2) / m, (-2 * q1**2 - 2
+                                           * q3**2 + 1) / m, 2 * (-q0 * q1 + q2 * q3) / m],
+            [2 * (-q0 * q2 + q1 * q3) / m, 2 * (q0 * q1 + q2 * q3)
+             / m, (-2 * q1**2 - 2 * q2**2 + 1) / m],
             [0, 0, 0],
             [0, 0, 0],
             [0, 0, 0],
@@ -227,12 +227,12 @@ class Rocket_Model_6DoF:
 
     def dir_cosine(self, q):
         return np.matrix([
-            [1 - 2 * (q[2] ** 2 + q[3] ** 2), 2 * (q[1] * q[2] +
-                                                   q[0] * q[3]), 2 * (q[1] * q[3] - q[0] * q[2])],
-            [2 * (q[1] * q[2] - q[0] * q[3]), 1 - 2 *
-             (q[1] ** 2 + q[3] ** 2), 2 * (q[2] * q[3] + q[0] * q[1])],
-            [2 * (q[1] * q[3] + q[0] * q[2]), 2 * (q[2] * q[3] -
-                                                   q[0] * q[1]), 1 - 2 * (q[1] ** 2 + q[2] ** 2)]
+            [1 - 2 * (q[2] ** 2 + q[3] ** 2), 2 * (q[1] * q[2]
+                                                   + q[0] * q[3]), 2 * (q[1] * q[3] - q[0] * q[2])],
+            [2 * (q[1] * q[2] - q[0] * q[3]), 1 - 2
+             * (q[1] ** 2 + q[3] ** 2), 2 * (q[2] * q[3] + q[0] * q[1])],
+            [2 * (q[1] * q[3] + q[0] * q[2]), 2 * (q[2] * q[3]
+                                                   - q[0] * q[1]), 1 - 2 * (q[1] ** 2 + q[2] ** 2)]
         ])
 
     def omega(self, w):
@@ -459,16 +459,16 @@ class SCProblem:
         # Dynamics:
         # x_t+1 = A_*x_t+B_*U_t+C_*U_T+1*S_*sigma+zbar+nu
         constraints += [
-            self.var['X'][:, k + 1]
-            == cvxpy.reshape(self.par['A_bar'][:, k], (m.n_x, m.n_x))
-            * self.var['X'][:, k]
-            + cvxpy.reshape(self.par['B_bar'][:, k], (m.n_x, m.n_u))
-            * self.var['U'][:, k]
-            + cvxpy.reshape(self.par['C_bar'][:, k], (m.n_x, m.n_u))
-            * self.var['U'][:, k + 1]
-            + self.par['S_bar'][:, k] * self.var['sigma']
-            + self.par['z_bar'][:, k]
-            + self.var['nu'][:, k]
+            self.var['X'][:, k + 1] ==
+            cvxpy.reshape(self.par['A_bar'][:, k], (m.n_x, m.n_x)) *
+            self.var['X'][:, k] +
+            cvxpy.reshape(self.par['B_bar'][:, k], (m.n_x, m.n_u)) *
+            self.var['U'][:, k] +
+            cvxpy.reshape(self.par['C_bar'][:, k], (m.n_x, m.n_u)) *
+            self.var['U'][:, k + 1] +
+            self.par['S_bar'][:, k] * self.var['sigma'] +
+            self.par['z_bar'][:, k] +
+            self.var['nu'][:, k]
             for k in range(K - 1)
         ]
 
@@ -486,10 +486,10 @@ class SCProblem:
 
         # Objective:
         sc_objective = cvxpy.Minimize(
-            self.par['weight_sigma'] * self.var['sigma']
-            + self.par['weight_nu'] * cvxpy.norm(self.var['nu'], 'inf')
-            + self.par['weight_delta'] * self.var['delta_norm']
-            + self.par['weight_delta_sigma'] * self.var['sigma_norm']
+            self.par['weight_sigma'] * self.var['sigma'] +
+            self.par['weight_nu'] * cvxpy.norm(self.var['nu'], 'inf') +
+            self.par['weight_delta'] * self.var['delta_norm'] +
+            self.par['weight_delta_sigma'] * self.var['sigma_norm']
         )
 
         objective = sc_objective
@@ -550,8 +550,8 @@ class SCProblem:
 
 def axis3d_equal(X, Y, Z, ax):
 
-    max_range = np.array([X.max() - X.min(), Y.max() -
-                          Y.min(), Z.max() - Z.min()]).max()
+    max_range = np.array([X.max() - X.min(), Y.max()
+                          - Y.min(), Z.max() - Z.min()]).max()
     Xb = 0.5 * max_range * np.mgrid[-1:2:2, -1:2:2,
                                     - 1:2:2][0].flatten() + 0.5 * (X.max() + X.min())
     Yb = 0.5 * max_range * np.mgrid[-1:2:2, -1:2:2,
@@ -563,7 +563,7 @@ def axis3d_equal(X, Y, Z, ax):
         ax.plot([xb], [yb], [zb], 'w')
 
 
-def plot_animation(X, U):
+def plot_animation(X, U):  # pragma: no cover
 
     fig = plt.figure()
     ax = fig.gca(projection='3d')
@@ -582,8 +582,8 @@ def plot_animation(X, U):
         CBI = np.array([
             [1 - 2 * (qy ** 2 + qz ** 2), 2 * (qx * qy + qw * qz),
              2 * (qx * qz - qw * qy)],
-            [2 * (qx * qy - qw * qz), 1 - 2 *
-             (qx ** 2 + qz ** 2), 2 * (qy * qz + qw * qx)],
+            [2 * (qx * qy - qw * qz), 1 - 2
+             * (qx ** 2 + qz ** 2), 2 * (qy * qz + qw * qx)],
             [2 * (qx * qz + qw * qy), 2 * (qy * qz - qw * qx),
              1 - 2 * (qx ** 2 + qy ** 2)]
         ])
