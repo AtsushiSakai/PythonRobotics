@@ -74,7 +74,7 @@ class RRT():
         return path
 
     def choose_parent(self, newNode, nearinds):
-        if len(nearinds) == 0:
+        if not nearinds:
             return newNode
 
         dlist = []
@@ -152,7 +152,7 @@ class RRT():
             if abs(self.nodeList[i].yaw - self.end.yaw) <= YAWTH:
                 fgoalinds.append(i)
 
-        if len(fgoalinds) == 0:
+        if not fgoalinds:
             return None
 
         mincost = min([self.nodeList[i].cost for i in fgoalinds])

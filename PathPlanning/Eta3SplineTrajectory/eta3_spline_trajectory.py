@@ -190,9 +190,11 @@ class eta3_trajectory(eta3_path):
         self.total_time = self.times.sum()
 
     def get_interp_param(self, seg_id, s, ui, tol=0.001):
-        def f(u): return self.segments[seg_id].f_length(u)[0] - s
+        def f(u):
+            return self.segments[seg_id].f_length(u)[0] - s
 
-        def fprime(u): return self.segments[seg_id].s_dot(u)
+        def fprime(u):
+            return self.segments[seg_id].s_dot(u)
         while (ui >= 0 and ui <= 1) and abs(f(ui)) > tol:
             ui -= f(ui) / fprime(ui)
         ui = max(0, min(ui, 1))
