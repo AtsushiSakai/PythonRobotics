@@ -75,13 +75,13 @@ def ray_casting_filter(xl, yl, thetal, rangel, angle_reso):
     rangedb = [float("inf") for _ in range(
         int(math.floor((math.pi * 2.0) / angle_reso)) + 1)]
 
-    for i in range(len(thetal)):
+    for i, _ in enumerate(thetal):
         angleid = math.floor(thetal[i] / angle_reso)
 
         if rangedb[angleid] > rangel[i]:
             rangedb[angleid] = rangel[i]
 
-    for i in range(len(rangedb)):
+    for i, _ in enumerate(rangedb):
         t = i * angle_reso
         if rangedb[i] != float("inf"):
             rx.append(rangedb[i] * math.cos(t))

@@ -6,15 +6,19 @@ author: AtsushiSakai(@Atsushi_twi)
 
 """
 
+import matplotlib.pyplot as plt
+import numpy as np
+import copy
+import math
+import random
 import sys
 sys.path.append("../LQRPlanner/")
 
-import random
-import math
-import copy
-import numpy as np
-import matplotlib.pyplot as plt
-import LQRplanner
+try:
+    import LQRplanner
+except:
+    raise
+
 
 show_animation = True
 
@@ -83,7 +87,7 @@ class RRT():
         return path
 
     def choose_parent(self, newNode, nearinds):
-        if len(nearinds) == 0:
+        if not nearinds:
             return newNode
 
         dlist = []
@@ -109,7 +113,7 @@ class RRT():
         return newNode
 
     def pi_2_pi(self, angle):
-        return (angle + math.pi) % (2*math.pi) - math.pi
+        return (angle + math.pi) % (2 * math.pi) - math.pi
 
     def sample_path(self, wx, wy, step):
 
@@ -173,7 +177,7 @@ class RRT():
             if self.calc_dist_to_goal(node.x, node.y) <= XYTH:
                 goalinds.append(i)
 
-        if len(goalinds) == 0:
+        if not goalinds:
             return None
 
         mincost = min([self.nodeList[i].cost for i in goalinds])
