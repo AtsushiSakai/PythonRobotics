@@ -13,7 +13,7 @@ environment:
 init:
   - "ECHO %MINICONDA% %PYTHON_VERSION% %PYTHON_ARCH%"
 
- 
+
 install:
   # If there is a newer build queued for the same PR, cancel this one.
   # The AppVeyor 'rollout builds' option is supposed to serve the same

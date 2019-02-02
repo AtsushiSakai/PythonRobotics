@@ -75,7 +75,7 @@ class RRT():
         return path
 
     def choose_parent(self, newNode, nearinds):
-        if len(nearinds) == 0:
+        if not nearinds:
             return newNode
 
         dlist = []
