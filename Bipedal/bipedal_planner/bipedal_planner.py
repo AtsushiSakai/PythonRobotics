@@ -52,10 +52,10 @@ class BipedalPlanner(object):
         self.ref_p = []   # reference footstep positions
         self.act_p = []   # actual footstep positions
 
-        px, py = 0., 0.   # reference footstep position
+        px, py = 0.0, 0.0   # reference footstep position
         px_star, py_star = px, py   # modified footstep position
-        xi, xi_dot, yi, yi_dot = 0., 0., 0.01, 0.  # TODO yi should be set as +epsilon, set xi, yi as COM
-        time = 0.
+        xi, xi_dot, yi, yi_dot = 0.0, 0.0, 0.01, 0.0
+        time = 0.0
         n = 0
         self.ref_p.append([px, py, 0])
         self.act_p.append([px, py, 0])

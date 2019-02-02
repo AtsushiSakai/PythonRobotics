@@ -5,9 +5,6 @@ author: AtsushiSakai(@Atsushi_twi)
 
 """
 
-import sys
-sys.path.append("../ReedsSheppPath/")
-
 import random
 import math
 import copy
@@ -15,8 +12,14 @@ import numpy as np
 import pure_pursuit
 import matplotlib.pyplot as plt
 
-import reeds_shepp_path_planning
-import unicycle_model
+import sys
+sys.path.append("../ReedsSheppPath/")
+
+try:
+    import reeds_shepp_path_planning
+    import unicycle_model
+except:
+    raise
 
 show_animation = True
 
@@ -130,8 +133,8 @@ class RRT():
             fy.append(self.end.y)
             fyaw.append(self.end.yaw)
             return True, fx, fy, fyaw, fv, ft, fa, fd
-        else:
-            return False, None, None, None, None, None, None, None
+
+        return False, None, None, None, None, None, None, None
 
     def calc_tracking_path(self, path):
         path = np.array(path[::-1])
@@ -194,7 +197,7 @@ class RRT():
         return find_goal, x, y, yaw, v, t, a, d
 
     def choose_parent(self, newNode, nearinds):
-        if len(nearinds) == 0:
+        if not nearinds:
             return newNode
 
         dlist = []

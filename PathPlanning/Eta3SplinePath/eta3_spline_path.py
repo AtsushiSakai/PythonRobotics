@@ -185,8 +185,8 @@ class eta3_path_segment(object):
         assert(order > 0 and order <= 2)
         if order == 1:
             return self.coeffs[:, 1:].dot(np.array([1, 2. * u, 3. * u**2, 4. * u**3, 5. * u**4, 6. * u**5, 7. * u**6]))
-        else:
-            return self.coeffs[:, 2:].dot(np.array([2, 6. * u, 12. * u**2, 20. * u**3, 30. * u**4, 42. * u**5]))
+
+        return self.coeffs[:, 2:].dot(np.array([2, 6. * u, 12. * u**2, 20. * u**3, 30. * u**4, 42. * u**5]))
 
 
 def test1():

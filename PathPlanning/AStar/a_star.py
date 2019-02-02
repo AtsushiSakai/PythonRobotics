@@ -85,7 +85,7 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
         closedset[c_id] = current
 
         # expand search grid based on motion model
-        for i in range(len(motion)):
+        for i, _ in enumerate(motion):
             node = Node(current.x + motion[i][0],
                         current.y + motion[i][1],
                         current.cost + motion[i][2], c_id)

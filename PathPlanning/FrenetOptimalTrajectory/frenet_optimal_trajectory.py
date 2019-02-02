@@ -257,7 +257,7 @@ def check_collision(fp, ob):
 def check_paths(fplist, ob):
 
     okind = []
-    for i in range(len(fplist)):
+    for i, _ in enumerate(fplist):
         if any([v > MAX_SPEED for v in fplist[i].s_d]):  # Max speed check
             continue
         elif any([abs(a) > MAX_ACCEL for a in fplist[i].s_dd]):  # Max accel check
