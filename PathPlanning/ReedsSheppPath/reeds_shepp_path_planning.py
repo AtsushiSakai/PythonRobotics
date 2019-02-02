@@ -357,14 +357,14 @@ def reeds_shepp_path_planning(sx, sy, syaw,
 
     paths = calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size)
 
-    if len(paths) == 0:
+    if not paths:
         #  print("No path")
         #  print(sx, sy, syaw, gx, gy, gyaw)
         return None, None, None, None, None
 
     minL = float("Inf")
     best_path_index = -1
-    for i in range(len(paths)):
+    for i, _ in enumerate(paths):
         if paths[i].L <= minL:
             minL = paths[i].L
             best_path_index = i

@@ -203,7 +203,7 @@ class RRT():
                 self.nodeList[i] = tNode
 
     def DrawGraph(self, rnd=None):
-        u"""
+        """
         Draw Graph
         """
         plt.clf()

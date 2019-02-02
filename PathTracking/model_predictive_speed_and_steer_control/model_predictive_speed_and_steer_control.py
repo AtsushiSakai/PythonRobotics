@@ -5,14 +5,18 @@ Path tracking simulation with iterative linear model predictive control for spee
 author: Atsushi Sakai (@Atsushi_twi)
 
 """
+import matplotlib.pyplot as plt
+import cvxpy
+import math
+import numpy as np
 import sys
 sys.path.append("../../PathPlanning/CubicSpline/")
 
-import numpy as np
-import math
-import cvxpy
-import matplotlib.pyplot as plt
-import cubic_spline_planner
+try:
+    import cubic_spline_planner
+except:
+    raise
+
 
 NX = 4  # x = x, y, v, yaw
 NU = 2  # a = [accel, steer]
@@ -105,10 +109,10 @@ def get_linear_model_matrix(v, phi, delta):
 def plot_car(x, y, yaw, steer=0.0, cabcolor="-r", truckcolor="-k"):
 
     outline = np.array([[-BACKTOWHEEL, (LENGTH - BACKTOWHEEL), (LENGTH - BACKTOWHEEL), -BACKTOWHEEL, -BACKTOWHEEL],
-                         [WIDTH / 2, WIDTH / 2, - WIDTH / 2, -WIDTH / 2, WIDTH / 2]])
+                        [WIDTH / 2, WIDTH / 2, - WIDTH / 2, -WIDTH / 2, WIDTH / 2]])
 
     fr_wheel = np.array([[WHEEL_LEN, -WHEEL_LEN, -WHEEL_LEN, WHEEL_LEN, WHEEL_LEN],
-                          [-WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD, WHEEL_WIDTH - TREAD, WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD]])
+                         [-WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD, WHEEL_WIDTH - TREAD, WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD]])
 
     rr_wheel = np.copy(fr_wheel)
 
@@ -118,9 +122,9 @@ def plot_car(x, y, yaw, steer=0.0, cabcolor="-r", truckcolor="-k"):
     rl_wheel[1, :] *= -1
 
     Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
-                      [-math.sin(yaw), math.cos(yaw)]])
+                     [-math.sin(yaw), math.cos(yaw)]])
     Rot2 = np.array([[math.cos(steer), math.sin(steer)],
-                      [-math.sin(steer), math.cos(steer)]])
+                     [-math.sin(steer), math.cos(steer)]])
 
     fr_wheel = (fr_wheel.T.dot(Rot2)).T
     fl_wheel = (fl_wheel.T.dot(Rot2)).T
@@ -208,7 +212,7 @@ def calc_nearest_index(state, cx, cy, cyaw, pind):
 
 def predict_motion(x0, oa, od, xref):
     xbar = xref * 0.0
-    for i in range(len(x0)):
+    for i, _ in enumerate(x0):
         xbar[i, 0] = x0[i]
 
     state = State(x=x0[0], y=x0[1], yaw=x0[3], v=x0[2])
@@ -346,18 +350,12 @@ def check_goal(state, goal, tind, nind):
     dy = state.y - goal[1]
     d = math.sqrt(dx ** 2 + dy ** 2)
 
-    if (d <= GOAL_DIS):
-        isgoal = True
-    else:
-        isgoal = False
+    isgoal = (d <= GOAL_DIS)
 
     if abs(tind - nind) >= 5:
         isgoal = False
 
-    if (abs(state.v) <= STOP_SPEED):
-        isstop = True
-    else:
-        isstop = False
+    isstop = (abs(state.v) <= STOP_SPEED)
 
     if isgoal and isstop:
         return True

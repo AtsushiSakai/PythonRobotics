@@ -71,7 +71,7 @@ class RRT():
         return path
 
     def choose_parent(self, newNode, nearinds):
-        if len(nearinds) == 0:
+        if not nearinds:
             return newNode
 
         dlist = []
@@ -130,9 +130,8 @@ class RRT():
         disglist = [self.calc_dist_to_goal(
             node.x, node.y) for node in self.nodeList]
         goalinds = [disglist.index(i) for i in disglist if i <= self.expandDis]
-        #  print(goalinds)
 
-        if len(goalinds) == 0:
+        if not goalinds:
             return None
 
         mincost = min([self.nodeList[i].cost for i in goalinds])

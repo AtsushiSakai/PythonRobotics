@@ -20,7 +20,7 @@ show_animation = False
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
-    u"""
+    """
     Plot arrow
     """
     plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),
