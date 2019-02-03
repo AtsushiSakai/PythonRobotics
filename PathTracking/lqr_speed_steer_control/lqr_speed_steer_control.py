@@ -1,3 +1,8 @@
+import cubic_spline_planner
+import scipy.linalg as la
+import matplotlib.pyplot as plt
+import math
+import numpy as np
 """
 
 Path tracking simulation with LQR speed and steering control
@@ -8,11 +13,6 @@ author Atsushi Sakai (@Atsushi_twi)
 import sys
 sys.path.append("../../PathPlanning/CubicSpline/")
 
-import numpy as np
-import math
-import matplotlib.pyplot as plt
-import scipy.linalg as la
-import cubic_spline_planner
 
 # LQR parameter
 Q = np.eye(5)
@@ -206,8 +206,8 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
             plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")
             plt.axis("equal")
             plt.grid(True)
-            plt.title("speed[km/h]:" + str(round(state.v * 3.6, 2)) +
-                      ",target index:" + str(target_ind))
+            plt.title("speed[km/h]:" + str(round(state.v * 3.6, 2))
+                      + ",target index:" + str(target_ind))
             plt.pause(0.0001)
 
     return t, x, y, yaw, v
@@ -257,7 +257,7 @@ def main():
 
     t, x, y, yaw, v = closed_loop_prediction(cx, cy, cyaw, ck, sp, goal)
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.close()
         plt.subplots(1)
         plt.plot(ax, ay, "xb", label="waypoints")

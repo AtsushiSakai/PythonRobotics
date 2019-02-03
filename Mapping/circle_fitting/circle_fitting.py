@@ -122,7 +122,7 @@ def main():
         ex, ey, er, error = circle_fitting(x, y)
         print("Error:", error)
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             plt.axis("equal")
             plt.plot(0.0, 0.0, "*r")

@@ -71,7 +71,7 @@ def main():
         gmap, minx, maxx, miny, maxy = generate_gaussian_grid_map(
             ox, oy, xyreso, STD)
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             draw_heatmap(gmap, minx, maxx, miny, maxy, xyreso)
             plt.plot(ox, oy, "xr")

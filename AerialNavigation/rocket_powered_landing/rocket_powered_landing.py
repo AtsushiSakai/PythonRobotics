@@ -656,7 +656,7 @@ def main():
             print(f'Converged after {it + 1} iterations.')
             break
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plot_animation(X, U)
 
     print("done!!")

@@ -67,7 +67,7 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
         x = x + v * np.cos(theta) * dt
         y = y + v * np.sin(theta) * dt
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             plt.arrow(x_start, y_start, np.cos(theta_start),
                       np.sin(theta_start), color='r', width=0.1)

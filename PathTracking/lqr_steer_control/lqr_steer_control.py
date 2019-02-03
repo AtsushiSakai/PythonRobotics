@@ -255,7 +255,7 @@ def main():
 
     t, x, y, yaw, v = closed_loop_prediction(cx, cy, cyaw, ck, sp, goal)
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.close()
         plt.subplots(1)
         plt.plot(ax, ay, "xb", label="input")

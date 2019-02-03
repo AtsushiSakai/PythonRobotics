@@ -295,14 +295,13 @@ def main():
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u, RFID)
 
-
         hz.append(z)
 
         if dtime >= show_graph_dtime:
             x_opt = graph_based_slam(hxDR, hz)
             dtime = 0.0
 
-            if show_animation:
+            if show_animation:  # pragma: no cover
                 plt.cla()
 
                 plt.plot(RFID[:, 0], RFID[:, 1], "*k")

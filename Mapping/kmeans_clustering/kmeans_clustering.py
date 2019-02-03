@@ -161,7 +161,7 @@ def main():
         clusters = kmeans_clustering(rx, ry, ncluster)
 
         # for animation
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             inds = calc_association(cx, cy, clusters)
             for ic in inds:

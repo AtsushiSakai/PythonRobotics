@@ -126,7 +126,7 @@ def main():
         v.append(state.v)
         t.append(time)
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             plt.plot(cx, cy, ".r", label="course")
             plt.plot(x, y, "-b", label="trajectory")
@@ -139,7 +139,7 @@ def main():
     # Test
     assert lastIndex >= target_ind, "Cannot goal"
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.cla()
         plt.plot(cx, cy, ".r", label="course")
         plt.plot(x, y, "-b", label="trajectory")

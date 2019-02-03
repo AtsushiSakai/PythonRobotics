@@ -97,12 +97,12 @@ def observation(xTrue, xd, u, RFID):
 def motion_model(x, u):
 
     F = np.array([[1.0, 0, 0],
-                   [0, 1.0, 0],
-                   [0, 0, 1.0]])
+                  [0, 1.0, 0],
+                  [0, 0, 1.0]])
 
     B = np.array([[DT * math.cos(x[2, 0]), 0],
-                   [DT * math.sin(x[2, 0]), 0],
-                   [0.0, DT]])
+                  [DT * math.sin(x[2, 0]), 0],
+                  [0.0, DT]])
 
     x = (F @ x) + (B @ u)
     return x
@@ -119,8 +119,8 @@ def jacob_motion(x, u):
         (STATE_SIZE, LM_SIZE * calc_n_LM(x)))))
 
     jF = np.array([[0.0, 0.0, -DT * u[0] * math.sin(x[2, 0])],
-                    [0.0, 0.0, DT * u[0] * math.cos(x[2, 0])],
-                    [0.0, 0.0, 0.0]])
+                   [0.0, 0.0, DT * u[0] * math.cos(x[2, 0])],
+                   [0.0, 0.0, 0.0]])
 
     G = np.eye(STATE_SIZE) + Fx.T * jF * Fx
 
@@ -170,7 +170,7 @@ def calc_innovation(lm, xEst, PEst, z, LMid):
     delta = lm - xEst[0:2]
     q = (delta.T @ delta)[0, 0]
     #zangle = math.atan2(delta[1], delta[0]) - xEst[2]
-    zangle = math.atan2(delta[1,0], delta[0,0]) - xEst[2]
+    zangle = math.atan2(delta[1, 0], delta[0, 0]) - xEst[2]
     zp = np.array([[math.sqrt(q), pi_2_pi(zangle)]])
     y = (z - zp).T
     y[1] = pi_2_pi(y[1])
@@ -183,7 +183,7 @@ def calc_innovation(lm, xEst, PEst, z, LMid):
 def jacobH(q, delta, x, i):
     sq = math.sqrt(q)
     G = np.array([[-sq * delta[0, 0], - sq * delta[1, 0], 0, sq * delta[0, 0], sq * delta[1, 0]],
-                   [delta[1, 0], - delta[0, 0], - 1.0, - delta[1, 0], delta[0, 0]]])
+                  [delta[1, 0], - delta[0, 0], - 1.0, - delta[1, 0], delta[0, 0]]])
 
     G = G / q
     nLM = calc_n_LM(x)
@@ -235,13 +235,12 @@ def main():
 
         x_state = xEst[0:STATE_SIZE]
 
-
         # store data history
         hxEst = np.hstack((hxEst, x_state))
         hxDR = np.hstack((hxDR, xDR))
         hxTrue = np.hstack((hxTrue, xTrue))
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
 
             plt.plot(RFID[:, 0], RFID[:, 1], "*k")
@@ -261,7 +260,6 @@ def main():
             plt.axis("equal")
             plt.grid(True)
             plt.pause(0.001)
-
 
 
 if __name__ == '__main__':

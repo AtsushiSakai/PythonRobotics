@@ -393,7 +393,7 @@ def test():
         px, py, pyaw, mode, clen = reeds_shepp_path_planning(
             start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature, step_size)
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             plt.plot(px, py, label="final course " + str(mode))
 
@@ -430,7 +430,7 @@ def main():
     px, py, pyaw, mode, clen = reeds_shepp_path_planning(
         start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature, step_size)
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.cla()
         plt.plot(px, py, label="final course " + str(mode))
 

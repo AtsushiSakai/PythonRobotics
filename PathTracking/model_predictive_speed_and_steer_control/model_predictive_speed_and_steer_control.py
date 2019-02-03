@@ -427,7 +427,7 @@ def do_simulation(cx, cy, cyaw, ck, sp, dl, initial_state):
             print("Goal")
             break
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             if ox is not None:
                 plt.plot(ox, oy, "xr", label="MPC")
@@ -563,7 +563,7 @@ def main():
     t, x, y, yaw, v, d, a = do_simulation(
         cx, cy, cyaw, ck, sp, dl, initial_state)
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.close("all")
         plt.subplots()
         plt.plot(cx, cy, "-r", label="spline")
@@ -596,7 +596,7 @@ def main2():
     t, x, y, yaw, v, d, a = do_simulation(
         cx, cy, cyaw, ck, sp, dl, initial_state)
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.close("all")
         plt.subplots()
         plt.plot(cx, cy, "-r", label="spline")
