@@ -4,17 +4,21 @@ Path tracking simulation with Stanley steering control and PID speed control.
 
 author: Atsushi Sakai (@Atsushi_twi)
 
+Ref:
+    - [Stanley: The robot that won the DARPA grand challenge](http://isl.ecst.csuchico.edu/DOCS/darpa2005/DARPA%202005%20Stanley.pdf)
+    - [Autonomous Automobile Path Tracking](https://www.ri.cmu.edu/pub_files/2009/2/Automatic_Steering_Methods_for_Autonomous_Automobile_Path_Tracking.pdf)
+
 """
-from __future__ import division, print_function
-
+import numpy as np
+import matplotlib.pyplot as plt
 import sys
-
 sys.path.append("../../PathPlanning/CubicSpline/")
 
-import matplotlib.pyplot as plt
-import numpy as np
+try:
+    import cubic_spline_planner
+except:
+    raise
 
-import cubic_spline_planner
 
 k = 0.5  # control gain
 Kp = 1.0  # speed propotional gain
@@ -131,12 +135,13 @@ def calc_target_index(state, cx, cy):
     dx = [fx - icx for icx in cx]
     dy = [fy - icy for icy in cy]
     d = [np.sqrt(idx ** 2 + idy ** 2) for (idx, idy) in zip(dx, dy)]
-    front_axle_vec = [-np.cos(state.yaw + np.pi/2), -np.sin(state.yaw + np.pi/2)]
     closest_error = min(d)
     target_idx = d.index(closest_error)
-    
-    #Project RMS error onto front axle vector
-    error_front_axle = np.dot( [ dx[target_idx], dy[target_idx] ], front_axle_vec)
+
+    # Project RMS error onto front axle vector
+    front_axle_vec = [-np.cos(state.yaw + np.pi / 2),
+                      - np.sin(state.yaw + np.pi / 2)]
+    error_front_axle = np.dot([dx[target_idx], dy[target_idx]], front_axle_vec)
 
     return target_idx, error_front_axle
 
