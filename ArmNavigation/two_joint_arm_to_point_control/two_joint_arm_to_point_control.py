@@ -39,8 +39,8 @@ def two_joint_arm(GOAL_TH=0.0, theta1=0.0, theta2=0.0):
         try:
             theta2_goal = np.arccos(
                 (x**2 + y**2 - l1**2 - l2**2) / (2 * l1 * l2))
-            theta1_goal = np.math.atan2(y, x) - np.math.atan2(l2
-                                                              * np.sin(theta2_goal), (l1 + l2 * np.cos(theta2_goal)))
+            theta1_goal = np.math.atan2(y, x) - np.math.atan2(l2 *
+                                                              np.sin(theta2_goal), (l1 + l2 * np.cos(theta2_goal)))
 
             if theta1_goal < 0:
                 theta2_goal = -theta2_goal
@@ -94,7 +94,7 @@ def ang_diff(theta1, theta2):
     return (theta1 - theta2 + np.pi) % (2 * np.pi) - np.pi
 
 
-def click(event):
+def click(event):  # pragma: no cover
     global x, y
     x = event.xdata
     y = event.ydata
@@ -111,7 +111,7 @@ def animation():
             GOAL_TH=0.01, theta1=theta1, theta2=theta2)
 
 
-def main():
+def main():  # pragma: no cover
     fig = plt.figure()
     fig.canvas.mpl_connect("button_press_event", click)
     two_joint_arm()
