@@ -167,7 +167,7 @@ class RRT():
     def calc_dist_to_goal(self, x, y):
         return np.linalg.norm([x - self.end.x, y - self.end.y])
 
-    def DrawGraph(self, rnd=None):
+    def DrawGraph(self, rnd=None):  # pragma: no cover
         plt.clf()
         if rnd is not None:
             plt.plot(rnd[0], rnd[1], "^k")
@@ -244,7 +244,7 @@ def main():
     path = rrt.Planning(animation=show_animation)
 
     # Draw final path
-    if show_animation:
+    if show_animation:  # pragma: no cover
         rrt.DrawGraph()
         plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
         plt.grid(True)

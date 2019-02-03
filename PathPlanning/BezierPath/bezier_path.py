@@ -163,7 +163,7 @@ def main():
     assert path.T[0][-1] == end_x, "path is invalid"
     assert path.T[1][-1] == end_y, "path is invalid"
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         fig, ax = plt.subplots()
         ax.plot(path.T[0], path.T[1], label="Bezier Path")
         ax.plot(control_points.T[0], control_points.T[1],
@@ -198,10 +198,10 @@ def main2():
         assert path.T[0][-1] == end_x, "path is invalid"
         assert path.T[1][-1] == end_y, "path is invalid"
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.plot(path.T[0], path.T[1], label="Offset=" + str(offset))
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plot_arrow(start_x, start_y, start_yaw)
         plot_arrow(end_x, end_y, end_yaw)
         plt.legend()

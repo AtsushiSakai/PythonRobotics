@@ -47,7 +47,7 @@ def LQRplanning(sx, sy, gx, gy):
             break
 
         # animation
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.plot(sx, sy, "or")
             plt.plot(gx, gy, "ob")
             plt.plot(rx, ry, "-r")
@@ -129,30 +129,12 @@ def main():
 
         rx, ry = LQRplanning(sx, sy, gx, gy)
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.plot(sx, sy, "or")
             plt.plot(gx, gy, "ob")
             plt.plot(rx, ry, "-r")
             plt.axis("equal")
             plt.pause(1.0)
-
-
-def main1():
-    print(__file__ + " start!!")
-
-    sx = 6.0
-    sy = 6.0
-    gx = 10.0
-    gy = 10.0
-
-    rx, ry = LQRplanning(sx, sy, gx, gy)
-
-    if show_animation:
-        plt.plot(sx, sy, "or")
-        plt.plot(gx, gy, "ob")
-        plt.plot(rx, ry, "-r")
-        plt.axis("equal")
-        plt.show()
 
 
 if __name__ == '__main__':
