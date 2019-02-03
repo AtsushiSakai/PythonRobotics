@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import math
 import random
 import numpy as np
+import itertools
 
 show_animation = True
 
@@ -39,7 +40,7 @@ class VehicleSimulator():
 
         # convert global coordinate
         gx, gy = self.calc_global_contour()
-        plt.plot(gx, gy, "-xr")
+        plt.plot(gx, gy, "-r")
 
     def calc_global_contour(self):
         gx = [(ix * math.cos(self.yaw) + iy * math.sin(self.yaw))
@@ -133,34 +134,29 @@ def ray_casting_filter(xl, yl, thetal, rangel, angle_reso):
 
 def adoptive_range_segmentation(ox, oy):
 
+    alpha = 0.2
+
+    # Setup initial cluster
     S = []
-
-    checked = [False] * len(ox)
-    R = 5.0
-
     for i, _ in enumerate(ox):
-        if checked[i]:
-            continue
-        C = []
-        r = R
+        C = set()
+        R = alpha * np.linalg.norm([ox[i], oy[i]])
         for j, _ in enumerate(ox):
             d = math.sqrt((ox[i] - ox[j])**2 + (oy[i] - oy[j])**2)
-            if d <= r:
-                C.append(j)
-                checked[j] = True
+            if d <= R:
+                C.add(j)
         S.append(C)
 
-    # Merge claster
-    fS = []
-    for k, _ in enumerate(S):
-        for l, _ in enumerate(S):
-            if k == l:
-                continue
-
-            for k, _ in enumerate(S[k]):
-
-    print(S)
-    input()
+    # Merge cluster
+    while 1:
+        no_change = True
+        for (c1, c2) in list(itertools.permutations(range(len(S)), 2)):
+            if S[c1] & S[c2]:
+                S[c1] = (S[c1] | S.pop(c2))
+                no_change = False
+                break
+        if no_change:
+            break
 
     return S
 
@@ -188,7 +184,7 @@ def main():
         ox, oy = get_observation_points([v1, v2], angle_reso)
 
         # step1: Adaptive Range Segmentation
-        ids = adoptive_range_segmentation(ox, oy)
+        idsets = adoptive_range_segmentation(ox, oy)
 
         if show_animation:  # pragma: no cover
             plt.cla()
@@ -197,7 +193,11 @@ def main():
             v1.plot()
             v2.plot()
 
-            plt.plot(ox, oy, "ob")
+            # plt.plot(ox, oy, "ob")
+            for ids in idsets:
+                plt.plot([ox[i] for i in range(len(ox)) if i in ids],
+                         [oy[i] for i in range(len(ox)) if i in ids],
+                         "o")
             # plt.plot(x, y, "xr")
             # plot_circle(ex, ey, er, "-r")
             plt.pause(0.1)
