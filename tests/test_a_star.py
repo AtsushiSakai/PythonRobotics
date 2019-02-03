@@ -2,8 +2,6 @@ from unittest import TestCase
 
 from PathPlanning.AStar import a_star as m
 
-print(__file__)
-
 
 class Test(TestCase):
 

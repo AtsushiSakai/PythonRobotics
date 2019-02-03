@@ -22,3 +22,11 @@ class Test(TestCase):
         assert(abs(px[-1] - end_x) <= 0.1)
         assert(abs(py[-1] - end_y) <= 0.1)
         assert(abs(pyaw[-1] - end_yaw) <= 0.1)
+
+    def test2(self):
+        dubins_path_planning.show_animation = False
+        dubins_path_planning.main()
+
+    def test3(self):
+        dubins_path_planning.show_animation = False
+        dubins_path_planning.test()

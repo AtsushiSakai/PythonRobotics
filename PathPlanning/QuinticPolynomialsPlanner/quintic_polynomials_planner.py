@@ -145,7 +145,7 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
             print("find path!!")
             break
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         for i, _ in enumerate(rx):
             plt.cla()
             plt.grid(True)
@@ -197,7 +197,7 @@ def main():
     time, x, y, yaw, v, a, j = quinic_polynomials_planner(
         sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_accel, max_jerk, dt)
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.plot(x, y, "-r")
 
         plt.subplots()
