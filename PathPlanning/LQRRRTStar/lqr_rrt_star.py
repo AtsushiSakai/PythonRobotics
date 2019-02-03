@@ -304,7 +304,7 @@ def main():
     path = rrt.planning(animation=show_animation)
 
     # Draw final path
-    if show_animation:
+    if show_animation:  # pragma: no cover
         rrt.draw_graph()
         plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
         plt.grid(True)

@@ -78,7 +78,7 @@ def VRM_planning(sx, sy, gx, gy, ox, oy, rr):
     obkdtree = KDTree(np.vstack((ox, oy)).T)
 
     sample_x, sample_y = sample_points(sx, sy, gx, gy, rr, ox, oy, obkdtree)
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.plot(sample_x, sample_y, ".b")
 
     road_map = generate_roadmap(sample_x, sample_y, rr, obkdtree)
@@ -183,7 +183,7 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
         current = openset[c_id]
 
         # show graph
-        if show_animation and len(closedset.keys()) % 2 == 0:
+        if show_animation and len(closedset.keys()) % 2 == 0:  # pragma: no cover
             plt.plot(current.x, current.y, "xg")
             plt.pause(0.001)
 
@@ -287,7 +287,7 @@ def main():
         ox.append(40.0)
         oy.append(60.0 - i)
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.plot(ox, oy, ".k")
         plt.plot(sx, sy, "^r")
         plt.plot(gx, gy, "^c")
@@ -298,7 +298,7 @@ def main():
 
     assert rx, 'Cannot found path'
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.plot(rx, ry, "-r")
         plt.show()
 

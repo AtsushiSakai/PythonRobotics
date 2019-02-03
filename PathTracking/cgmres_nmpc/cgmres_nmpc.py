@@ -584,7 +584,7 @@ def main():
         # update state
         plant_system.update_state(u_1s[0], u_2s[0])
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         animation(plant_system, controller, dt)
         plot_figures(plant_system, controller, iteration_num, dt)
 

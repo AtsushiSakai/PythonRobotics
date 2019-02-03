@@ -313,7 +313,7 @@ def test1(max_vel=0.5):
         for j, t in enumerate(times):
             state[:, j] = traj.calc_traj_point(t)
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             # plot the path
             plt.plot(state[0, :], state[1, :])
             plt.pause(1.0)

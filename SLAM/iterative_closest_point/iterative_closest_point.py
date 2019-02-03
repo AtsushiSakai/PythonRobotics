@@ -33,7 +33,7 @@ def ICP_matching(ppoints, cpoints):
     while dError >= EPS:
         count += 1
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             plt.plot(ppoints[0, :], ppoints[1, :], ".r")
             plt.plot(cpoints[0, :], cpoints[1, :], ".b")

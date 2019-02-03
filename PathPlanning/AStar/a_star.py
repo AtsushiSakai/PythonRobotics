@@ -68,7 +68,7 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
         current = openset[c_id]
 
         # show graph
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.plot(current.x * reso, current.y * reso, "xc")
             if len(closedset.keys()) % 10 == 0:
                 plt.pause(0.001)
@@ -214,7 +214,7 @@ def main():
         ox.append(40.0)
         oy.append(60.0 - i)
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.plot(ox, oy, ".k")
         plt.plot(sx, sy, "xr")
         plt.plot(gx, gy, "xb")
@@ -223,7 +223,7 @@ def main():
 
     rx, ry = a_star_planning(sx, sy, gx, gy, ox, oy, grid_size, robot_size)
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.plot(rx, ry, "-r")
         plt.show()
 

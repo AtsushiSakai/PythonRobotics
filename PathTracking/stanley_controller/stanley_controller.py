@@ -184,7 +184,7 @@ def main():
         v.append(state.v)
         t.append(time)
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             plt.plot(cx, cy, ".r", label="course")
             plt.plot(x, y, "-b", label="trajectory")
@@ -197,7 +197,7 @@ def main():
     # Test
     assert last_idx >= target_idx, "Cannot reach goal"
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.plot(cx, cy, ".r", label="course")
         plt.plot(x, y, "-b", label="trajectory")
         plt.legend()

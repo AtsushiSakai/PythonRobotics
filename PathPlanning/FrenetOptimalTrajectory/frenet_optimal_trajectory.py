@@ -343,7 +343,7 @@ def main():
             print("Goal")
             break
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             plt.plot(tx, ty)
             plt.plot(ob[:, 0], ob[:, 1], "xk")
@@ -356,7 +356,7 @@ def main():
             plt.pause(0.0001)
 
     print("Finish")
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.grid(True)
         plt.pause(0.0001)
         plt.show()

@@ -121,7 +121,8 @@ def main():
         oy = (np.random.rand(4) - 0.5) * 10.0
         pmap, minx, maxx, miny, maxy, xyreso = generate_ray_casting_grid_map(
             ox, oy, xyreso, yawreso)
-        if show_animation:
+
+        if show_animation:  # pragma: no cover
             plt.cla()
             draw_heatmap(pmap, minx, maxx, miny, maxy, xyreso)
             plt.plot(ox, oy, "xr")

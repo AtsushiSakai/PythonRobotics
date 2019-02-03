@@ -123,7 +123,7 @@ def optimize_trajectory(target, k0, p):
         p += alpha * np.array(dp)
         #  print(p.T)
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             show_trajectory(target, xc, yc)
     else:
         xc, yc, yawc, p = None, None, None, None
