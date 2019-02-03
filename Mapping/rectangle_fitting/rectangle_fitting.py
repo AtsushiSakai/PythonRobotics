@@ -42,10 +42,10 @@ class VehicleSimulator():
         plt.plot(gx, gy, "-xr")
 
     def calc_global_contour(self):
-        gx = [(ix * math.cos(self.yaw) + iy * math.sin(self.yaw)) +
-              self.x for (ix, iy) in zip(self.vc_x, self.vc_y)]
-        gy = [(ix * math.sin(self.yaw) - iy * math.cos(self.yaw)) +
-              self.y for (ix, iy) in zip(self.vc_x, self.vc_y)]
+        gx = [(ix * math.cos(self.yaw) + iy * math.sin(self.yaw))
+              + self.x for (ix, iy) in zip(self.vc_x, self.vc_y)]
+        gy = [(ix * math.sin(self.yaw) - iy * math.cos(self.yaw))
+              + self.y for (ix, iy) in zip(self.vc_x, self.vc_y)]
 
         return gx, gy
 
@@ -131,6 +131,40 @@ def ray_casting_filter(xl, yl, thetal, rangel, angle_reso):
     return rx, ry
 
 
+def adoptive_range_segmentation(ox, oy):
+
+    S = []
+
+    checked = [False] * len(ox)
+    R = 5.0
+
+    for i, _ in enumerate(ox):
+        if checked[i]:
+            continue
+        C = []
+        r = R
+        for j, _ in enumerate(ox):
+            d = math.sqrt((ox[i] - ox[j])**2 + (oy[i] - oy[j])**2)
+            if d <= r:
+                C.append(j)
+                checked[j] = True
+        S.append(C)
+
+    # Merge claster
+    fS = []
+    for k, _ in enumerate(S):
+        for l, _ in enumerate(S):
+            if k == l:
+                continue
+
+            for k, _ in enumerate(S[k]):
+
+    print(S)
+    input()
+
+    return S
+
+
 def main():
 
     # simulation parameters
@@ -152,6 +186,9 @@ def main():
         v2.update(dt, 0.1, -0.05)
 
         ox, oy = get_observation_points([v1, v2], angle_reso)
+
+        # step1: Adaptive Range Segmentation
+        ids = adoptive_range_segmentation(ox, oy)
 
         if show_animation:  # pragma: no cover
             plt.cla()
