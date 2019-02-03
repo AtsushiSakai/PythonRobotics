@@ -157,7 +157,7 @@ def main():
         plt.axis("equal")
 
     # path generation
-    rx, ry = potential_field_planning(
+    _, _ = potential_field_planning(
         sx, sy, gx, gy, ox, oy, grid_size, robot_radius)
 
     if show_animation:

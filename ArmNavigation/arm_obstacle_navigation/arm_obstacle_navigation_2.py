@@ -53,7 +53,7 @@ def animate(grid, arm, route):
         theta2 = 2 * pi * node[1] / M - pi
         arm.update_joints([theta1, theta2])
         plt.subplot(1, 2, 2)
-        arm.plot(plt, obstacles=obstacles)
+        arm.plot_arm(plt, obstacles=obstacles)
         plt.xlim(-2.0, 2.0)
         plt.ylim(-3.0, 3.0)
         plt.show()
@@ -272,7 +272,7 @@ class NLinkArm(object):
 
         self.end_effector = np.array(self.points[self.n_links]).T
 
-    def plot(self, myplt, obstacles=[]):  # pragma: no cover
+    def plot_arm(self, myplt, obstacles=[]):  # pragma: no cover
         myplt.cla()
 
         for obstacle in obstacles:
