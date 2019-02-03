@@ -5,7 +5,6 @@ Path Planning with Bezier curve.
 author: Atsushi Sakai(@Atsushi_twi)
 
 """
-from __future__ import division, print_function
 
 import scipy.special
 import numpy as np
