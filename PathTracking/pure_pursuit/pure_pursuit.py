@@ -140,6 +140,7 @@ def main():
     assert lastIndex >= target_ind, "Cannot goal"
 
     if show_animation:
+        plt.cla()
         plt.plot(cx, cy, ".r", label="course")
         plt.plot(x, y, "-b", label="trajectory")
         plt.legend()
@@ -148,7 +149,7 @@ def main():
         plt.axis("equal")
         plt.grid(True)
 
-        flg, ax = plt.subplots(1)
+        plt.subplots(1)
         plt.plot(t, [iv * 3.6 for iv in v], "-r")
         plt.xlabel("Time[s]")
         plt.ylabel("Speed[km/h]")

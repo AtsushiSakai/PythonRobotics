@@ -576,7 +576,7 @@ def plot_animation(X, U):  # pragma: no cover
         axis3d_equal(X[2, :], X[3, :], X[1, :], ax)
 
         rx, ry, rz = X[1:4, k]
-        vx, vy, vz = X[4:7, k]
+        # vx, vy, vz = X[4:7, k]
         qw, qx, qy, qz = X[7:11, k]
 
         CBI = np.array([
@@ -618,8 +618,6 @@ def main():
     integrator = Integrator(m, K)
     problem = SCProblem(m, K)
 
-    last_linear_cost = None
-
     converged = False
     w_delta = W_DELTA
     for it in range(iterations):
@@ -633,7 +631,7 @@ def main():
                                X_last=X, U_last=U, sigma_last=sigma,
                                weight_sigma=W_SIGMA, weight_nu=W_NU,
                                weight_delta=w_delta, weight_delta_sigma=W_DELTA_SIGMA)
-        info = problem.solve()
+        problem.solve()
 
         X = problem.get_variable('X')
         U = problem.get_variable('U')

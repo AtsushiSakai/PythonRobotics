@@ -222,7 +222,6 @@ def extend_path(cx, cy, cyaw):
 
 def main():
     #  target course
-    import numpy as np
     cx = np.arange(0, 50, 0.1)
     cy = [math.sin(ix / 5.0) * ix / 2.0 for ix in cx]
 
