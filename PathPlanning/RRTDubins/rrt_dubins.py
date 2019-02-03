@@ -74,33 +74,6 @@ class RRT():
         path = self.gen_final_course(lastIndex)
         return path
 
-    def choose_parent(self, newNode, nearinds):
-        if not nearinds:
-            return newNode
-
-        dlist = []
-        for i in nearinds:
-            dx = newNode.x - self.nodeList[i].x
-            dy = newNode.y - self.nodeList[i].y
-            d = math.sqrt(dx ** 2 + dy ** 2)
-            theta = math.atan2(dy, dx)
-            if self.check_collision_extend(self.nodeList[i], theta, d):
-                dlist.append(self.nodeList[i].cost + d)
-            else:
-                dlist.append(float("inf"))
-
-        mincost = min(dlist)
-        minind = nearinds[dlist.index(mincost)]
-
-        if mincost == float("inf"):
-            print("mincost is inf")
-            return newNode
-
-        newNode.cost = mincost
-        newNode.parent = minind
-
-        return newNode
-
     def pi_2_pi(self, angle):
         return (angle + math.pi) % (2 * math.pi) - math.pi
 

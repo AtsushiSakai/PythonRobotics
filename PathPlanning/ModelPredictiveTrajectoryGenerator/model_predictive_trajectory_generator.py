@@ -16,7 +16,7 @@ max_iter = 100
 h = np.array([0.5, 0.02, 0.02]).T  # parameter sampling distance
 cost_th = 0.1
 
-show_animation = False
+show_animation = True
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no cover
@@ -91,8 +91,7 @@ def selection_learning_param(dp, p, k0, target):
     return mina
 
 
-def show_trajectory(target, xc, yc):
-
+def show_trajectory(target, xc, yc):  # pragma: no cover
     plt.clf()
     plot_arrow(target.x, target.y, target.yaw)
     plt.plot(xc, yc, "-r")
@@ -142,35 +141,16 @@ def test_optimize_trajectory():
 
     x, y, yaw, p = optimize_trajectory(target, k0, init_p)
 
-    show_trajectory(target, x, y)
-    #  plt.plot(x, y, "-r")
-    plot_arrow(target.x, target.y, target.yaw)
-    plt.axis("equal")
-    plt.grid(True)
-    plt.show()
-
-
-def test_trajectory_generate():
-    s = 5.0  # [m]
-    k0 = 0.0
-    km = np.deg2rad(30.0)
-    kf = np.deg2rad(-30.0)
-
-    #  plt.plot(xk, yk, "xr")
-    #  plt.plot(t, kp)
-    #  plt.show()
-
-    x, y = motion_model.generate_trajectory(s, km, kf, k0)
-
-    plt.plot(x, y, "-r")
-    plt.axis("equal")
-    plt.grid(True)
-    plt.show()
+    if show_animation:
+        show_trajectory(target, x, y)
+        plot_arrow(target.x, target.y, target.yaw)
+        plt.axis("equal")
+        plt.grid(True)
+        plt.show()
 
 
 def main():
     print(__file__ + " start!!")
-    #  test_trajectory_generate()
     test_optimize_trajectory()
 
 
