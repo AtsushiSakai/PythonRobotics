@@ -123,7 +123,7 @@ def calc_target_index(state, cx, cy):
     :param cy: [float]
     :return: (int, float)
     """
-    # Calc front axle position
+   # Calc front axle position
     fx = state.x + L * np.cos(state.yaw)
     fy = state.y + L * np.sin(state.yaw)
 
@@ -131,13 +131,12 @@ def calc_target_index(state, cx, cy):
     dx = [fx - icx for icx in cx]
     dy = [fy - icy for icy in cy]
     d = [np.sqrt(idx ** 2 + idy ** 2) for (idx, idy) in zip(dx, dy)]
-    error_front_axle = min(d)
-    target_idx = d.index(error_front_axle)
-
-    target_yaw = normalize_angle(np.arctan2(
-        fy - cy[target_idx], fx - cx[target_idx]) - state.yaw)
-    if target_yaw > 0.0:
-        error_front_axle = - error_front_axle
+    front_axle_vec = [-np.cos(state.yaw + np.pi/2), -np.sin(state.yaw + np.pi/2)]
+    closest_error = min(d)
+    target_idx = d.index(closest_error)
+    
+    #Project RMS error onto front axle vector
+    error_front_axle = np.dot( [ dx[target_idx], dy[target_idx] ], front_axle_vec)
 
     return target_idx, error_front_axle
 
