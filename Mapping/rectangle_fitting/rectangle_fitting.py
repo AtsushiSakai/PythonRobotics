@@ -4,6 +4,9 @@ Object shape recognition with L-shape fitting
 
 author: Atsushi Sakai (@Atsushi_twi)
 
+Ref:
+- [Efficient L\-Shape Fitting for Vehicle Detection Using Laser Scanners \- The Robotics Institute Carnegie Mellon University](https://www.ri.cmu.edu/publications/efficient-l-shape-fitting-for-vehicle-detection-using-laser-scanners/)
+
 """
 
 import matplotlib.pyplot as plt
