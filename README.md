@@ -12,6 +12,7 @@
 
 Python codes for robotics algorithm.
 
+
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -25,6 +26,7 @@ Python codes for robotics algorithm.
       * [Gaussian grid map](#gaussian-grid-map)
       * [Ray casting grid map](#ray-casting-grid-map)
       * [k-means object clustering](#k-means-object-clustering)
+      * [L-Shape fitting](#l-shape-fitting)
    * [SLAM](#slam)
       * [Iterative Closest Point (ICP) Matching](#iterative-closest-point-icp-matching)
       * [FastSLAM 1.0](#fastslam-10)
@@ -193,6 +195,13 @@ This is a 2D ray casting grid mapping example.
 This is a 2D object clustering with k-means algorithm.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/kmeans_clustering/animation.gif)
+
+## L-Shape fitting
+
+This is a 2D L shape fitting for vehicle detection.
+
+![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/rectangle_fitting/animation.gif)
+
 
 # SLAM
 
@@ -586,6 +595,7 @@ This is a list: [Users comments](https://github.com/AtsushiSakai/PythonRobotics/
 - [Antonin RAFFIN](https://github.com/araffin)
 
 - [Alexis Paques](https://github.com/AlexisTM)
+
 
 
 
