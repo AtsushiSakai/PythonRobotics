@@ -27,7 +27,7 @@ class Node:
         return str(self.x) + "," + str(self.y) + "," + str(self.cost) + "," + str(self.pind)
 
 
-def calc_fianl_path(ngoal, closedset, reso):
+def calc_final_path(ngoal, closedset, reso):
     # generate final course
     rx, ry = [ngoal.x * reso], [ngoal.y * reso]
     pind = ngoal.pind
@@ -104,7 +104,7 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
                     # This path is the best until now. record it!
                     openset[n_id] = node
 
-    rx, ry = calc_fianl_path(ngoal, closedset, reso)
+    rx, ry = calc_final_path(ngoal, closedset, reso)
 
     return rx, ry
 
