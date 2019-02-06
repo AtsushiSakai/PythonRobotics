@@ -18,6 +18,8 @@ import copy
 import math
 import cubic_spline_planner
 
+SIM_LOOP = 500
+
 # Parameter
 MAX_SPEED = 50.0 / 3.6  # maximum speed [m/s]
 MAX_ACCEL = 2.0  # maximum acceleration [m/ss]
@@ -329,7 +331,7 @@ def main():
 
     area = 20.0  # animation area length [m]
 
-    for i in range(500):
+    for i in range(SIM_LOOP):
         path = frenet_optimal_planning(
             csp, s0, c_speed, c_d, c_d_d, c_d_dd, ob)
 
