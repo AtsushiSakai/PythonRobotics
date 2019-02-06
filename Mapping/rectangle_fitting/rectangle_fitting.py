@@ -54,7 +54,7 @@ class LShapeFitting():
         c1_min = min(c1)
         c2_min = min(c2)
 
-        alpha = - (c1_max - c1_min) * (c2_max - c2_min)
+        alpha = -(c1_max - c1_min) * (c2_max - c2_min)
 
         return alpha
 

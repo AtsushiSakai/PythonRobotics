@@ -314,7 +314,7 @@ class BITStar(object):
             try:
                 currId = self.nodes[currId]
             except(KeyError):
-                print("Path key error")
+                print("cannot find Path")
                 return []
 
         plan.append(self.start)
@@ -569,7 +569,7 @@ class BITStar(object):
         plt.plot(px, py, "--c")
 
 
-def main():
+def main(maxIter=80):
     print("Starting Batch Informed Trees Star planning")
     obstacleList = [
         (5, 5, 0.5),
@@ -581,7 +581,7 @@ def main():
     ]
 
     bitStar = BITStar(start=[-1, 0], goal=[3, 8], obstacleList=obstacleList,
-                      randArea=[-2, 15])
+                      randArea=[-2, 15], maxIter=maxIter)
     path = bitStar.plan(animation=show_animation)
     print("Done")
 

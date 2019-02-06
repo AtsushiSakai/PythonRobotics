@@ -144,7 +144,7 @@ class Node():
         self.parent = None
 
 
-def main():
+def main(gx=5.0, gy=10.0):
     print("start simple RRT path planning")
 
     # ====Search Path with RRT====
@@ -157,7 +157,7 @@ def main():
         (9, 5, 2)
     ]  # [x,y,size]
     # Set Initial parameters
-    rrt = RRT(start=[0, 0], goal=[5, 10],
+    rrt = RRT(start=[0, 0], goal=[gx, gy],
               randArea=[-2, 15], obstacleList=obstacleList)
     path = rrt.Planning(animation=show_animation)
 
