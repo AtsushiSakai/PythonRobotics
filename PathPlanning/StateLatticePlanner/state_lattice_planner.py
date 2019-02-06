@@ -6,17 +6,24 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 import sys
-
-sys.path.append("../ModelPredictiveTrajectoryGenerator")
-
+import os
 from matplotlib import pyplot as plt
 import numpy as np
 import math
 import pandas as pd
-import model_predictive_trajectory_generator as planner
-import motion_model
 
-table_path = "./lookuptable.csv"
+sys.path.append(os.path.dirname(os.path.abspath(__file__))
+                + "/../ModelPredictiveTrajectoryGenerator/")
+
+
+try:
+    import model_predictive_trajectory_generator as planner
+    import motion_model
+except:
+    raise
+
+
+table_path = os.path.dirname(os.path.abspath(__file__)) + "/lookuptable.csv"
 
 show_animation = True
 

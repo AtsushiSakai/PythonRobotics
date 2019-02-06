@@ -145,7 +145,7 @@ class Node():
 
 
 def main(gx=5.0, gy=10.0):
-    print("start simple RRT path planning")
+    print("start " + __file__)
 
     # ====Search Path with RRT====
     obstacleList = [

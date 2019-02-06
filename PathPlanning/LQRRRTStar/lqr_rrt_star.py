@@ -12,7 +12,8 @@ import copy
 import math
 import random
 import sys
-sys.path.append("../LQRPlanner/")
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../LQRPlanner/")
 
 try:
     import LQRplanner
@@ -203,8 +204,8 @@ class RRT():
     def find_near_nodes(self, newNode):
         nnode = len(self.nodeList)
         r = 50.0 * math.sqrt((math.log(nnode) / nnode))
-        dlist = [(node.x - newNode.x) ** 2 +
-                 (node.y - newNode.y) ** 2
+        dlist = [(node.x - newNode.x) ** 2
+                 + (node.y - newNode.y) ** 2
                  for node in self.nodeList]
         nearinds = [dlist.index(i) for i in dlist if i <= r ** 2]
         return nearinds
@@ -246,8 +247,8 @@ class RRT():
         plt.pause(0.01)
 
     def get_nearest_index(self, nodeList, rnd):
-        dlist = [(node.x - rnd.x) ** 2 +
-                 (node.y - rnd.y) ** 2
+        dlist = [(node.x - rnd.x) ** 2
+                 + (node.y - rnd.y) ** 2
                  for node in nodeList]
         minind = dlist.index(min(dlist))
 
@@ -283,8 +284,8 @@ class Node():
         self.parent = None
 
 
-def main():
-    print("Start rrt start planning")
+def main(maxIter=200):
+    print("Start " + __file__)
 
     # ====Search Path with RRT====
     obstacleList = [
@@ -300,7 +301,9 @@ def main():
     start = [0.0, 0.0]
     goal = [6.0, 7.0]
 
-    rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
+    rrt = RRT(start, goal, randArea=[-2.0, 15.0],
+              obstacleList=obstacleList,
+              maxIter=maxIter)
     path = rrt.planning(animation=show_animation)
 
     # Draw final path

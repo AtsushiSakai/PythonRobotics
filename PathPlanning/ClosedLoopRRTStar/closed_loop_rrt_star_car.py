@@ -13,7 +13,9 @@ import pure_pursuit
 import matplotlib.pyplot as plt
 
 import sys
-sys.path.append("../ReedsSheppPath/")
+import os
+sys.path.append(os.path.dirname(
+    os.path.abspath(__file__)) + "/../ReedsSheppPath/")
 
 try:
     import reeds_shepp_path_planning
@@ -405,8 +407,8 @@ class Node():
         self.parent = None
 
 
-def main():
-    print("Start rrt start planning")
+def main(gx=6.0, gy=7.0, gyaw=np.deg2rad(90.0), maxIter=500):
+    print("Start" + __file__)
     # ====Search Path with RRT====
     obstacleList = [
         (5, 5, 1),
@@ -422,9 +424,10 @@ def main():
 
     # Set Initial parameters
     start = [0.0, 0.0, np.deg2rad(0.0)]
-    goal = [6.0, 7.0, np.deg2rad(90.0)]
+    goal = [gx, gy, gyaw]
 
-    rrt = RRT(start, goal, randArea=[-2.0, 20.0], obstacleList=obstacleList)
+    rrt = RRT(start, goal, randArea=[-2.0, 20.0],
+              obstacleList=obstacleList, maxIter=maxIter)
     flag, x, y, yaw, v, t, a, d = rrt.Planning(animation=show_animation)
 
     if not flag:

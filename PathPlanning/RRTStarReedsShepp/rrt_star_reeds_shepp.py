@@ -11,7 +11,9 @@ import copy
 import math
 import random
 import sys
-sys.path.append("../ReedsSheppPath/")
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/../PathPlanning/ReedsSheppPath/")
 
 try:
     import reeds_shepp_path_planning
@@ -196,9 +198,9 @@ class RRT():
         nnode = len(self.nodeList)
         r = 50.0 * math.sqrt((math.log(nnode) / nnode))
         #  r = self.expandDis * 5.0
-        dlist = [(node.x - newNode.x) ** 2
-                 + (node.y - newNode.y) ** 2
-                 + (node.yaw - newNode.yaw) ** 2
+        dlist = [(node.x - newNode.x) ** 2 +
+                 (node.y - newNode.y) ** 2 +
+                 (node.yaw - newNode.yaw) ** 2
                  for node in self.nodeList]
         nearinds = [dlist.index(i) for i in dlist if i <= r ** 2]
         return nearinds
@@ -249,9 +251,9 @@ class RRT():
         #  input()
 
     def GetNearestListIndex(self, nodeList, rnd):
-        dlist = [(node.x - rnd.x) ** 2
-                 + (node.y - rnd.y) ** 2
-                 + (node.yaw - rnd.yaw) ** 2 for node in nodeList]
+        dlist = [(node.x - rnd.x) ** 2 +
+                 (node.y - rnd.y) ** 2 +
+                 (node.yaw - rnd.yaw) ** 2 for node in nodeList]
         minind = dlist.index(min(dlist))
 
         return minind
@@ -285,18 +287,10 @@ class Node():
         self.parent = None
 
 
-def main():
-    print("Start rrt start planning")
+def main(maxIter=200):
+    print("Start " + __file__)
 
     # ====Search Path with RRT====
-    #  obstacleList = [
-    #  (5, 5, 1),
-    #  (3, 6, 2),
-    #  (3, 8, 2),
-    #  (3, 10, 2),
-    #  (7, 5, 2),
-    #  (9, 5, 2)
-    #  ]  # [x,y,size(radius)]
     obstacleList = [
         (5, 5, 1),
         (4, 6, 1),
@@ -313,7 +307,9 @@ def main():
     start = [0.0, 0.0, np.deg2rad(0.0)]
     goal = [6.0, 7.0, np.deg2rad(90.0)]
 
-    rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
+    rrt = RRT(start, goal, randArea=[-2.0, 15.0],
+              obstacleList=obstacleList,
+              maxIter=maxIter)
     path = rrt.Planning(animation=show_animation)
 
     # Draw final path
