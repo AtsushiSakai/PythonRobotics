@@ -1,11 +1,13 @@
 from unittest import TestCase
 import sys
-sys.path.append("./PathPlanning/RRTDubins/")
-sys.path.append("./PathPlanning/DubinsPath/")
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/../PathPlanning/RRTDubins/")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/../PathPlanning/DubinsPath/")
 
 try:
-    from PathPlanning.RRTDubins import rrt_dubins as m
-    # from RRTDubins import rrt_dubins as m
+    import rrt_dubins as m
 except:
     raise
 
@@ -18,3 +20,8 @@ class Test(TestCase):
     def test1(self):
         m.show_animation = False
         m.main()
+
+
+if __name__ == '__main__':
+    test = Test()
+    test.test1()

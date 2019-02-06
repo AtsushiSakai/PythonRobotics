@@ -10,7 +10,10 @@ import copy
 import math
 import random
 import sys
-sys.path.append("../DubinsPath/")
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/../DubinsPath/")
+
 try:
     import dubins_path_planning
 except:
@@ -198,7 +201,7 @@ class Node():
 
 
 def main():
-    print("Start rrt planning")
+    print("Start " + __file__)
     # ====Search Path with RRT====
     obstacleList = [
         (5, 5, 1),

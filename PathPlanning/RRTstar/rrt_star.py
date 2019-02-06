@@ -243,7 +243,7 @@ class Node():
 
 
 def main():
-    print("Start rrt planning")
+    print("Start " + __file__)
 
     # ====Search Path with RRT====
     obstacleList = [
