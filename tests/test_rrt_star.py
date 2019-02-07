@@ -5,7 +5,6 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
                 "/../PathPlanning/RRTstar/")
 
 try:
-    print(sys.path)
     import rrt_star as m
 except:
     raise
@@ -24,3 +23,4 @@ class Test(TestCase):
 if __name__ == '__main__':
     test = Test()
     test.test1()
+    print(aa)

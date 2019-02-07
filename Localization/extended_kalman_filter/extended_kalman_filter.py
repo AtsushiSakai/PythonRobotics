@@ -193,7 +193,7 @@ def main():
 
         if show_animation:
             plt.cla()
-            plt.plot(hz[:, 0], hz[:, 1], ".g")
+            plt.plot(hz[0, :], hz[1, :], ".g")
             plt.plot(hxTrue[0, :].flatten(),
                      hxTrue[1, :].flatten(), "-b")
             plt.plot(hxDR[0, :].flatten(),
