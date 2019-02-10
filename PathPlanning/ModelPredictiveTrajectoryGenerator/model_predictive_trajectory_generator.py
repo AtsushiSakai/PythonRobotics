@@ -131,7 +131,7 @@ def optimize_trajectory(target, k0, p):
     return xc, yc, yawc, p
 
 
-def test_optimize_trajectory():
+def test_optimize_trajectory():  # pragma: no cover
 
     #  target = motion_model.State(x=5.0, y=2.0, yaw=np.deg2rad(00.0))
     target = motion_model.State(x=5.0, y=2.0, yaw=np.deg2rad(90.0))
@@ -149,7 +149,7 @@ def test_optimize_trajectory():
         plt.show()
 
 
-def main():
+def main():  # pragma: no cover
     print(__file__ + " start!!")
     test_optimize_trajectory()
 
