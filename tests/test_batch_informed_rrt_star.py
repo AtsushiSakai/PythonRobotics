@@ -17,6 +17,6 @@ class Test(TestCase):
         m.main(maxIter=10)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     test = Test()
     test.test1()

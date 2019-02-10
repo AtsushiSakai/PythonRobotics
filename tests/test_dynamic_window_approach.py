@@ -18,6 +18,6 @@ class Test(TestCase):
         m.main(gx=1.0, gy=1.0)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     test = Test()
     test.test1()

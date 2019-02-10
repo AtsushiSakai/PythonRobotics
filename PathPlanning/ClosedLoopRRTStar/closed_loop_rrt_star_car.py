@@ -138,26 +138,6 @@ class RRT():
 
         return False, None, None, None, None, None, None, None
 
-    def calc_tracking_path(self, path):
-        path = np.array(path[::-1])
-        ds = 0.2
-        for i in range(10):
-            lx = path[-1, 0]
-            ly = path[-1, 1]
-            lyaw = path[-1, 2]
-            move_yaw = math.atan2(path[-2, 1] - ly, path[-2, 0] - lx)
-            if abs(lyaw - move_yaw) >= math.pi / 2.0:
-                print("back")
-                ds *= -1
-
-            lstate = np.array(
-                [lx + ds * math.cos(lyaw), ly + ds * math.sin(lyaw), lyaw])
-            #  print(lstate)
-
-            path = np.vstack((path, lstate))
-
-        return path
-
     def check_tracking_path_is_feasible(self, path):
         #  print("check_tracking_path_is_feasible")
         cx = np.array(path[:, 0])
@@ -311,9 +291,9 @@ class RRT():
         nnode = len(self.nodeList)
         r = 50.0 * math.sqrt((math.log(nnode) / nnode))
         #  r = self.expandDis * 5.0
-        dlist = [(node.x - newNode.x) ** 2 +
-                 (node.y - newNode.y) ** 2 +
-                 (node.yaw - newNode.yaw) ** 2
+        dlist = [(node.x - newNode.x) ** 2
+                 + (node.y - newNode.y) ** 2
+                 + (node.yaw - newNode.yaw) ** 2
                  for node in self.nodeList]
         nearinds = [dlist.index(i) for i in dlist if i <= r ** 2]
         return nearinds
@@ -336,7 +316,7 @@ class RRT():
                 #  print("rewire")
                 self.nodeList[i] = tNode
 
-    def DrawGraph(self, rnd=None):
+    def DrawGraph(self, rnd=None):  # pragma: no cover
         """
         Draw Graph
         """
@@ -359,9 +339,9 @@ class RRT():
         plt.pause(0.01)
 
     def GetNearestListIndex(self, nodeList, rnd):
-        dlist = [(node.x - rnd.x) ** 2 +
-                 (node.y - rnd.y) ** 2 +
-                 (node.yaw - rnd.yaw) ** 2 for node in nodeList]
+        dlist = [(node.x - rnd.x) ** 2
+                 + (node.y - rnd.y) ** 2
+                 + (node.yaw - rnd.yaw) ** 2 for node in nodeList]
         minind = dlist.index(min(dlist))
 
         return minind
