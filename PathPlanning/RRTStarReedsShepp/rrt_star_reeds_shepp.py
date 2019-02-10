@@ -186,7 +186,6 @@ class RRT():
             node = self.nodeList[goalind]
             for (ix, iy) in zip(reversed(node.path_x), reversed(node.path_y)):
                 path.append([ix, iy])
-            #  path.append([node.x, node.y])
             goalind = node.parent
         path.append([self.start.x, self.start.y])
         return path
@@ -222,10 +221,7 @@ class RRT():
                 #  print("rewire")
                 self.nodeList[i] = tNode
 
-    def DrawGraph(self, rnd=None):
-        """
-        Draw Graph
-        """
+    def DrawGraph(self, rnd=None):  # pragma: no cover
         plt.clf()
         if rnd is not None:
             plt.plot(rnd.x, rnd.y, "^k")
@@ -313,7 +309,7 @@ def main(maxIter=200):
     path = rrt.Planning(animation=show_animation)
 
     # Draw final path
-    if show_animation:
+    if show_animation:  # pragma: no cover
         rrt.DrawGraph()
         plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
         plt.grid(True)
