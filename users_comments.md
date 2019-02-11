@@ -128,6 +128,12 @@ thankyou AtsushiSakai!
 
 --ou minghua
 
+---
+
+Dear AtsushiSakai <br>Thank You
+
+--Dogukan Altay
+
 =========
 
 # Citations
