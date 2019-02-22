@@ -140,6 +140,13 @@ so kind of you can you make videos of it.
 
 ---
 
+Dear AtshshiSakai, <br>You are very wise and smart that you created this library for students wanting to learn Probabilistic Robotics and actually perform robot control. <br>Hats off to you and your work. <br>I am also reading your book titled : Python Robotics
+
+--Himanshu
+
+---
+
+
 =========
 
 # Citations
