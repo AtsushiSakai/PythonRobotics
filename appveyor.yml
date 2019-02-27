@@ -37,8 +37,8 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - "python -m pip3 install --upgrade pip"
-  - "python -m pip3 install numpy"
+  - "python -m pip install --upgrade pip"
+  - "python -m pip install numpy"
   - conda env create -f C:\\projects\pythonrobotics\environment.yml
   - activate python_robotics
 
