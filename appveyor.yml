@@ -37,6 +37,7 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
+  - "python -m pip install --upgrade pip"
   - conda env create -f C:\\projects\pythonrobotics\environment.yml
   - activate python_robotics
 
