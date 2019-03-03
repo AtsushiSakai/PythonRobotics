@@ -6,4 +6,5 @@ dependencies:
 - numpy
 - pandas
 - pip:
+    - numpy
     - cvxpy
