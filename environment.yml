@@ -6,4 +6,5 @@ dependencies:
 - numpy==1.15
 - pandas
 - pip:
+    - numpy
     - cvxpy
