@@ -26,7 +26,7 @@ before_install:
 
 
 install:
-  - conda install numpy
+  - conda install numpy==1.15
   - conda install scipy
   - conda install matplotlib
   - conda install pandas

@@ -3,7 +3,7 @@ dependencies:
 - python==3.6
 - matplotlib
 - scipy
-- numpy
+- numpy==1.15
 - pandas
 - pip:
     - cvxpy
