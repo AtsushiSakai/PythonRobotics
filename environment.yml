@@ -5,5 +5,4 @@ dependencies:
 - scipy
 - numpy==1.15
 - pandas
-- pip:
-    - cvxpy
+- cvxpy
