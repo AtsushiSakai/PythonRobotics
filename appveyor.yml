@@ -42,6 +42,7 @@ install:
   - conda install scipy
   - conda install matplotlib
   - conda install pandas
+  - conda config --add channels conda-forge
   - conda install -c conda-forge lapack
   - conda install -c cvxgrp cvxpy
   - conda install coveralls
