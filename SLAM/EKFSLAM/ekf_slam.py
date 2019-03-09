@@ -20,7 +20,7 @@ SIM_TIME = 50.0  # simulation time [s]
 MAX_RANGE = 20.0  # maximum observation range
 M_DIST_TH = 2.0  # Threshold of Mahalanobis distance for data association.
 STATE_SIZE = 3  # State size [x,y,yaw]
-LM_SIZE = 2  # LM srate size [x,y]
+LM_SIZE = 2  # LM state size [x,y]
 
 show_animation = True
 
@@ -170,7 +170,7 @@ def calc_innovation(lm, xEst, PEst, z, LMid):
     delta = lm - xEst[0:2]
     q = (delta.T @ delta)[0, 0]
     #zangle = math.atan2(delta[1], delta[0]) - xEst[2]
-    zangle = math.atan2(delta[1, 0], delta[0, 0]) - xEst[2]
+    zangle = math.atan2(delta[1, 0], delta[0, 0]) - xEst[2, 0]
     zp = np.array([[math.sqrt(q), pi_2_pi(zangle)]])
     y = (z - zp).T
     y[1] = pi_2_pi(y[1])
