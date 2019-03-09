@@ -170,7 +170,7 @@ def calc_innovation(lm, xEst, PEst, z, LMid):
     delta = lm - xEst[0:2]
     q = (delta.T @ delta)[0, 0]
     #zangle = math.atan2(delta[1], delta[0]) - xEst[2]
-    zangle = math.atan2(delta[1, 0], delta[0, 0]) - xEst[2]
+    zangle = math.atan2(delta[1, 0], delta[0, 0]) - xEst[2, 0]
     zp = np.array([[math.sqrt(q), pi_2_pi(zangle)]])
     y = (z - zp).T
     y[1] = pi_2_pi(y[1])
