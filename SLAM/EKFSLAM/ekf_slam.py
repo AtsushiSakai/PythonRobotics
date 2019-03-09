@@ -3,8 +3,8 @@ Extended Kalman Filter SLAM example
 author: Atsushi Sakai (@Atsushi_twi)
 """
 
-import numpy as np
 import math
+import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -169,7 +169,6 @@ def search_correspond_LM_ID(xAug, PAug, zi):
 def calc_innovation(lm, xEst, PEst, z, LMid):
     delta = lm - xEst[0:2]
     q = (delta.T @ delta)[0, 0]
-    #zangle = math.atan2(delta[1], delta[0]) - xEst[2]
     zangle = math.atan2(delta[1, 0], delta[0, 0]) - xEst[2, 0]
     zp = np.array([[math.sqrt(q), pi_2_pi(zangle)]])
     y = (z - zp).T
