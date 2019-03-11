@@ -101,7 +101,7 @@ def get_linear_model_matrix(v, phi, delta):
     C = np.zeros(NX)
     C[0] = DT * v * math.sin(phi) * phi
     C[1] = - DT * v * math.cos(phi) * phi
-    C[3] = - v * delta / (WB * math.cos(delta) ** 2)
+    C[3] = - DT * v * delta / (WB * math.cos(delta) ** 2)
 
     return A, B, C
 
