@@ -146,6 +146,12 @@ Dear AtshshiSakai, <br>You are very wise and smart that you created this library
 
 ---
 
+Dear AtsushiSakai, <br>Hello! YOUR CODE IS SUPER SUPER HELPFUL AND GIVES ME CLEAR INSTRUCTIONs as well as STRONG SUPPORT!! <br>Thank you so much !
+
+--Lee
+
+---
+
 
 =========
 
