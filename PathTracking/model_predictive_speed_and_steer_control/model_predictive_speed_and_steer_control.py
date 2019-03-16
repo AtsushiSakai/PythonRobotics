@@ -552,9 +552,9 @@ def main():
     dl = 1.0  # course tick
     # cx, cy, cyaw, ck = get_straight_course(dl)
     # cx, cy, cyaw, ck = get_straight_course2(dl)
-    cx, cy, cyaw, ck = get_straight_course3(dl)
+    # cx, cy, cyaw, ck = get_straight_course3(dl)
     # cx, cy, cyaw, ck = get_forward_course(dl)
-    # CX, cy, cyaw, ck = get_switch_back_course(dl)
+    cx, cy, cyaw, ck = get_switch_back_course(dl)
 
     sp = calc_speed_profile(cx, cy, cyaw, TARGET_SPEED)
 
@@ -617,5 +617,5 @@ def main2():
 
 
 if __name__ == '__main__':
-    # main()
-    main2()
+    main()
+    # main2()
