@@ -152,6 +152,8 @@ Dear AtsushiSakai, <br>Hello! YOUR CODE IS SUPER SUPER HELPFUL AND GIVES ME CLEA
 
 ---
 
+Hi AtsushiSakai, <br> <br>Thanks for creating the pythonrobotics repo! It's an awesome repo that has been of great help to me. I've referenced your extended kalman filter algorithm while creating my own for localization using a 2D lidar, camera, and IMU. Our robot is destined to compete soon, so fingers crossed that all works out! Thanks again.
+
 
 =========
 
