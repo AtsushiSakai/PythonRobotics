@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import reeds_shepp_path_planning as rs
 import heapq
 from car import move, check_car_collision, MAX_STEER, WB, plot_car
-from a_star import dp_planning, calc_obstacle_map
+from a_star import dp_planning #, calc_obstacle_map
 
 XY_GRID_RESOLUTION = 2.0 #[m]
 YAW_GRID_RESOLUTION = np.deg2rad(15.0) #[rad]
@@ -38,9 +38,9 @@ H_COST = 5.0 # Heuristic cost
 
 show_animation = True
 
-_round = round
-def round(x):
-    return int(_round(x))
+# _round = round
+# def round(x):
+#     return int(_round(x))
 
 class Node:
 
@@ -92,9 +92,9 @@ class KDTree:
                 dist.append(idist)
 
             return index, dist
-        else:
-            dist, index = self.tree.query(inp, k=k)
-            return index, dist
+        
+        dist, index = self.tree.query(inp, k=k)
+        return index, dist
 
     def search_in_distance(self, inp, r):
         """
@@ -211,7 +211,7 @@ def analytic_expantion(current, goal, c, ox, oy, kdtree):
     paths = rs.calc_paths(sx,sy,syaw,gx, gy, gyaw,
                             max_curvature, step_size=MOTION_RESOLUTION)
 
-    if not len(paths):
+    if not paths:
         return None
 
     best_path, best = None, None
@@ -223,7 +223,7 @@ def analytic_expantion(current, goal, c, ox, oy, kdtree):
                 best = cost
                 best_path = path
   
-    return best_path  # no update
+    return best_path
 
 
 def update_node_with_analystic_expantion(current, goal, 
@@ -309,7 +309,6 @@ def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
                  True, [goal[0]], [goal[1]], [goal[2]], [True])
 
     openList, closedList = {}, {}
-    h = []
 
     _, _, h_dp = dp_planning(nstart.xlist[-1], nstart.ylist[-1],
             ngoal.xlist[-1], ngoal.ylist[-1], ox, oy, xyreso, VR)
@@ -324,9 +323,12 @@ def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
             return [], [], []
 
         cost, c_id = heapq.heappop(pq)
-        if openList.has_key(c_id):
+        # if openList.has_key(c_id): # python 2.7
+        if c_id in openList:
             current = openList.pop(c_id)
             closedList[c_id] = current
+        else:
+            continue
 
         if show_animation:  # pragma: no cover
             plt.plot(current.xlist[-1], current.ylist[-1], "xc")
@@ -341,23 +343,21 @@ def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
         
         for neighbor in get_neighbors(current, config, ox, oy, obkdtree):
             neighbor_index = calc_index(neighbor, config)
-            if closedList.has_key(neighbor_index):
+            # if closedList.has_key(neighbor_index):
+            if neighbor_index in closedList:
                 continue
-            if not openList.has_key(neighbor_index) \
-                or openList[neighbor_index].cost > neighbor.cost: # TODO huristic
+            if not neighbor in openList \
+                or openList[neighbor_index].cost > neighbor.cost:
                 heapq.heappush(pq, (calc_cost(neighbor, h_dp, ngoal, config), neighbor_index))
                 openList[neighbor_index] = neighbor
         
-        #  print(current)
-
-    rx, ry, ryaw = [], [], []
 
     path = get_final_path(closedList, fpath, nstart, config)
     return path
 
 def calc_cost(n, h_dp, goal, c):
     ind = (n.yind - c.miny) * c.xw + (n.xind - c.minx)
-    if not h_dp.has_key(ind):
+    if not ind in h_dp:
         return (n.cost + 999999999) # collision cost
     return (n.cost + H_COST*h_dp[ind].cost)
 
@@ -451,7 +451,7 @@ def main():
     x = path.xlist
     y = path.ylist
     yaw = path.yawlist
-    direction = path.directionlist
+    # direction = path.directionlist
 
     for ix, iy, iyaw in zip(x, y, yaw):
         plt.cla()

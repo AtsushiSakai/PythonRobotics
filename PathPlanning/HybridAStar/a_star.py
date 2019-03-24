@@ -13,9 +13,9 @@ import matplotlib.pyplot as plt
 import math
 import heapq
 
-_round = round
-def round(x):
-    return int(_round(x))
+# _round = round
+# def round(x):
+#     return int(_round(x))
 
 show_animation = False
 
@@ -73,7 +73,7 @@ def dp_planning(sx, sy, gx, gy, ox, oy, reso, rr):
         if not pq:
             break
         cost, c_id = heapq.heappop(pq)
-        if openset.has_key(c_id):
+        if c_id in openset:
             current = openset[c_id]
             closedset[c_id] = current
             openset.pop(c_id)
