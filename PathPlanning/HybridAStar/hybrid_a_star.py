@@ -3,6 +3,7 @@
 Hybrid A* path planning
 
 author: Atsushi Sakai (@Atsushi_twi)
+        Zheng Zh (@Zhengzh)
 
 """
 
@@ -143,7 +144,7 @@ def calc_motion_inputs():
 
 
 def get_neighbors(current, config, ox, oy, kdtree):
-    # import ipdb; ipdb.set_trace()
+
     for steer, d in calc_motion_inputs():
         node = calc_next_node(current, steer, d, config, ox, oy, kdtree)
         if node and verify_index(node, config):
@@ -163,7 +164,6 @@ def calc_next_node(current, steer, direction, config, ox, oy, kdtree):
     
     # plt.plot(xlist, ylist)
     if not check_car_collision(xlist, ylist, yawlist, ox, oy, kdtree):
-        # import ipdb; ipdb.set_trace()
         return None
 
     d = direction==1
