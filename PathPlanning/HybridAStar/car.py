@@ -23,7 +23,7 @@ def check_car_collision(xlist, ylist, yawlist, ox, oy, kdtree):
 
         ids = kdtree.search_in_distance([cx, cy], WBUBBLE_R)
 
-        if len(ids) == 0:
+        if not ids:
             continue
         
         if not rectangle_check(x, y, yaw,
