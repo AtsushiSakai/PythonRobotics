@@ -2,22 +2,18 @@
 
 A* grid based planning
 
-author: Atsushi Sakai(@Atsushi_twi)
-        Nikos Kanargias (nkana@tee.gr)
+author: Nikos Kanargias (nkana@tee.gr)
 
 See Wikipedia article (https://en.wikipedia.org/wiki/A*_search_algorithm)
 
 """
 
-import matplotlib.pyplot as plt
 import math
 import heapq
-
-# _round = round
-# def round(x):
-#     return int(_round(x))
+import matplotlib.pyplot as plt
 
 show_animation = False
+
 
 class Node:
 
@@ -67,7 +63,6 @@ def dp_planning(sx, sy, gx, gy, ox, oy, reso, rr):
     openset[calc_index(ngoal, xw, minx, miny)] = ngoal
     pq = []
     pq.append((0, calc_index(ngoal, xw, minx, miny)))
-    
 
     while 1:
         if not pq:
@@ -87,7 +82,6 @@ def dp_planning(sx, sy, gx, gy, ox, oy, reso, rr):
                 plt.pause(0.001)
 
         # Remove the item from the open set
-        
 
         # expand search grid based on motion model
         for i, _ in enumerate(motion):
@@ -104,15 +98,17 @@ def dp_planning(sx, sy, gx, gy, ox, oy, reso, rr):
 
             if n_id not in openset:
                 openset[n_id] = node  # Discover a new node
-                heapq.heappush(pq, (node.cost, calc_index(node, xw, minx, miny)))
+                heapq.heappush(
+                    pq, (node.cost, calc_index(node, xw, minx, miny)))
             else:
                 if openset[n_id].cost >= node.cost:
                     # This path is the best until now. record it!
                     openset[n_id] = node
-                    heapq.heappush(pq, (node.cost, calc_index(node, xw, minx, miny)))
+                    heapq.heappush(
+                        pq, (node.cost, calc_index(node, xw, minx, miny)))
 
-
-    rx, ry = calc_final_path(closedset[calc_index(nstart, xw, minx, miny)], closedset, reso)
+    rx, ry = calc_final_path(closedset[calc_index(
+        nstart, xw, minx, miny)], closedset, reso)
 
     return rx, ry, closedset
 
