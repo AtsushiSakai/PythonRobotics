@@ -142,15 +142,9 @@ def calc_obstacle_map(ox, oy, reso, vr):
     miny = round(min(oy))
     maxx = round(max(ox))
     maxy = round(max(oy))
-    #  print("minx:", minx)
-    #  print("miny:", miny)
-    #  print("maxx:", maxx)
-    #  print("maxy:", maxy)
 
     xwidth = round(maxx - minx)
     ywidth = round(maxy - miny)
-    #  print("xwidth:", xwidth)
-    #  print("ywidth:", ywidth)
 
     # obstacle map generation
     obmap = [[False for i in range(xwidth)] for i in range(ywidth)]
