@@ -7,11 +7,10 @@ author: Zheng Zh (@Zhengzh)
 """
 
 import heapq
-import matplotlib.pyplot as plt
 import scipy.spatial
 import numpy as np
 import math
-
+import matplotlib.pyplot as plt
 import sys
 sys.path.append("../ReedsSheppPath/")
 try:
@@ -24,32 +23,25 @@ except:
 
 XY_GRID_RESOLUTION = 2.0  # [m]
 YAW_GRID_RESOLUTION = np.deg2rad(15.0)  # [rad]
-GOAL_TYAW_TH = np.deg2rad(5.0)  # [rad]
 MOTION_RESOLUTION = 0.1  # [m] path interporate resolution
 N_STEER = 20.0  # number of steer command
-EXTEND_AREA = 0.0  # [m]
 H_COST = 1.0
-MOTION_RESOLUTION = 0.1
-SKIP_COLLISION_CHECK = 4
 VR = 1.0  # robot radius
 
 SB_COST = 100.0  # switch back penalty cost
 BACK_COST = 5.0  # backward penalty cost
 STEER_CHANGE_COST = 5.0  # steer angle change penalty cost
 STEER_COST = 1.0  # steer angle change penalty cost
-# JACKKNIF_COST= 200.0 # Jackknif cost
 H_COST = 5.0  # Heuristic cost
 
 show_animation = True
 
-# _round = round
-# def round(x):
-#     return int(_round(x))
-
 
 class Node:
 
-    def __init__(self, xind, yind, yawind, direction, xlist, ylist, yawlist, directions, steer=0.0, pind=None, cost=None):
+    def __init__(self, xind, yind, yawind, direction,
+                 xlist, ylist, yawlist, directions,
+                 steer=0.0, pind=None, cost=None):
         self.xind = xind
         self.yind = yind
         self.yawind = yawind
@@ -114,10 +106,10 @@ class KDTree:
 class Config:
 
     def __init__(self, ox, oy, xyreso, yawreso):
-        min_x_m = min(ox)  # - EXTEND_AREA
-        min_y_m = min(oy)  # - EXTEND_AREA
-        max_x_m = max(ox)  # + EXTEND_AREA
-        max_y_m = max(oy)  # + EXTEND_AREA
+        min_x_m = min(ox)
+        min_y_m = min(oy)
+        max_x_m = max(ox)
+        max_y_m = max(oy)
 
         ox.append(min_x_m)
         oy.append(min_y_m)
@@ -135,10 +127,6 @@ class Config:
         self.minyaw = round(- math.pi / yawreso) - 1
         self.maxyaw = round(math.pi / yawreso)
         self.yaww = round(self.maxyaw - self.minyaw)
-
-
-def show_expansion_tree():
-    pass
 
 
 def calc_motion_inputs():
@@ -168,7 +156,6 @@ def calc_next_node(current, steer, direction, config, ox, oy, kdtree):
         ylist.append(y)
         yawlist.append(yaw)
 
-    # plt.plot(xlist, ylist)
     if not check_car_collision(xlist, ylist, yawlist, ox, oy, kdtree):
         return None
 
@@ -252,7 +239,8 @@ def update_node_with_analystic_expantion(current, goal,
 
         fsteer = 0.0
         fpath = Node(current.xind, current.yind, current.yawind,
-                     current.direction, fx, fy, fyaw, fd, cost=fcost, pind=fpind, steer=fsteer)
+                     current.direction, fx, fy, fyaw, fd,
+                     cost=fcost, pind=fpind, steer=fsteer)
         return True, fpath
 
     return False, None
@@ -331,7 +319,6 @@ def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
             return [], [], []
 
         cost, c_id = heapq.heappop(pq)
-        # if openList.has_key(c_id): # python 2.7
         if c_id in openList:
             current = openList.pop(c_id)
             closedList[c_id] = current
@@ -351,13 +338,13 @@ def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
 
         for neighbor in get_neighbors(current, config, ox, oy, obkdtree):
             neighbor_index = calc_index(neighbor, config)
-            # if closedList.has_key(neighbor_index):
             if neighbor_index in closedList:
                 continue
-            if not neighbor in openList \
+            if neighbor not in openList \
                     or openList[neighbor_index].cost > neighbor.cost:
                 heapq.heappush(
-                    pq, (calc_cost(neighbor, h_dp, ngoal, config), neighbor_index))
+                    pq, (calc_cost(neighbor, h_dp, ngoal, config),
+                         neighbor_index))
                 openList[neighbor_index] = neighbor
 
     path = get_final_path(closedList, fpath, nstart, config)
@@ -366,9 +353,9 @@ def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
 
 def calc_cost(n, h_dp, goal, c):
     ind = (n.yind - c.miny) * c.xw + (n.xind - c.minx)
-    if not ind in h_dp:
-        return (n.cost + 999999999)  # collision cost
-    return (n.cost + H_COST * h_dp[ind].cost)
+    if ind not in h_dp:
+        return n.cost + 999999999  # collision cost
+    return n.cost + H_COST * h_dp[ind].cost
 
 
 def get_final_path(closed, ngoal, nstart, config):
@@ -392,7 +379,7 @@ def get_final_path(closed, ngoal, nstart, config):
     ryaw = list(reversed(ryaw))
     direction = list(reversed(direction))
 
-    # adjuct first direction
+    # adjust first direction
     direction[0] = direction[1]
 
     path = Path(rx, ry, ryaw, direction, finalcost)
@@ -457,12 +444,9 @@ def main():
     path = hybrid_a_star_planning(
         start, goal, ox, oy, XY_GRID_RESOLUTION, YAW_GRID_RESOLUTION)
 
-    # plot_car(*start)
-    # plot_car(*goal)
     x = path.xlist
     y = path.ylist
     yaw = path.yawlist
-    # direction = path.directionlist
 
     for ix, iy, iyaw in zip(x, y, yaw):
         plt.cla()
@@ -473,8 +457,7 @@ def main():
         plot_car(ix, iy, iyaw)
         plt.pause(0.0001)
 
-    plt.show()
-    print(__file__ + " start!!")
+    print(__file__ + " done!!")
 
 
 if __name__ == '__main__':

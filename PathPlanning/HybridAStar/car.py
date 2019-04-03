@@ -51,7 +51,6 @@ def rectangle_check(x, y, yaw, ox, oy):
         ry = s * tx + c * ty
 
         if not (rx > LF or rx < -LB or ry > W / 2.0 or ry < -W / 2.0):
-            # print (x, y, yaw, iox, ioy, c, s, rx, ry)
             return False  # no collision
 
     return True  # collision
