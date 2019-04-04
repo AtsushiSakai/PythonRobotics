@@ -137,7 +137,7 @@ def calc_obstacle_map(ox, oy, reso, vr):
     #  print("ywidth:", ywidth)
 
     # obstacle map generation
-    obmap = [[False for i in range(xwidth)] for i in range(ywidth)]
+    obmap = [[False for i in range(ywidth)] for i in range(xwidth)]
     for ix in range(xwidth):
         x = ix + minx
         for iy in range(ywidth):
