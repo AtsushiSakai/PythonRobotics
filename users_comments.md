@@ -160,6 +160,12 @@ You rock!
 
 --Matt
 
+---
+
+Dear AtsushiSakai, <br>You are the best. This is by far the best tutorial for learning and implementing robotics. <br>Thanks a lot for your time and efforts to do this!
+
+--Adi B
+
 =========
 
 # Citations
