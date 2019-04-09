@@ -166,6 +166,18 @@ Dear AtsushiSakai, <br>You are the best. This is by far the best tutorial for le
 
 --Adi B
 
+---
+
+Dear Atushi, thank you for this amazing repository. It is a pleasure to have access to python algorithms without the burden of ROS. While I'm no longer working on such robotics projects, it's wonderful to know its available when I need it and it was amazing to see all the beautiful animations for each algorithm.
+
+--Shreeyak Sajjan
+
+---
+
+Dear AtsushiSakai <br>Thank you for your contributions!
+
+--Luo
+
 =========
 
 # Citations
