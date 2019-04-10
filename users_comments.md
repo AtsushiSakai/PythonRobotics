@@ -178,6 +178,12 @@ Dear AtsushiSakai <br>Thank you for your contributions!
 
 --Luo
 
+---
+
+Dear AtsushiSakai, Your visualizations are awesome, and I am going to have this link bookmarked for future references. Thank you!
+
+--Srinivasa Varadhan Agaram Chakravarthy
+
 =========
 
 # Citations
