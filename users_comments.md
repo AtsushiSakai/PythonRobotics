@@ -195,7 +195,6 @@ URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8516589&isnumber=85
 
 2. Peggy (Yuchun) Wang and Caitlin Hogan, "Path Planning with Dynamic Obstacle Avoidance for a Jumping-Enabled Robot", AA228/CS238 class report, Department of Computer Science, Stanford University, URL: https://web.stanford.edu/class/aa228/reports/2018/final113.pdf
 
-3. Hogan, Caitlin M. “Path Planning with Dynamic Obstacle Avoidance for a Jumping-Enabled Robot.” (2018)., URL: https://www.semanticscholar.org/paper/Path-Planning-with-Dynamic-Obstacle-Avoidance-for-a-Hogan/62d03bfc802d5a70686025b31a991bea423e5ae1
 
 # Others
 
