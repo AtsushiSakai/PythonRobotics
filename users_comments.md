@@ -160,6 +160,30 @@ You rock!
 
 --Matt
 
+---
+
+Dear AtsushiSakai, <br>You are the best. This is by far the best tutorial for learning and implementing robotics. <br>Thanks a lot for your time and efforts to do this!
+
+--Adi B
+
+---
+
+Dear Atushi, thank you for this amazing repository. It is a pleasure to have access to python algorithms without the burden of ROS. While I'm no longer working on such robotics projects, it's wonderful to know its available when I need it and it was amazing to see all the beautiful animations for each algorithm.
+
+--Shreeyak Sajjan
+
+---
+
+Dear AtsushiSakai <br>Thank you for your contributions!
+
+--Luo
+
+---
+
+Dear AtsushiSakai, Your visualizations are awesome, and I am going to have this link bookmarked for future references. Thank you!
+
+--Srinivasa Varadhan Agaram Chakravarthy
+
 =========
 
 # Citations
@@ -170,6 +194,7 @@ keywords: {Automobiles;Task analysis;Autonomous vehicles;Path planning;Global Po
 URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8516589&isnumber=8516425
 
 2. Peggy (Yuchun) Wang and Caitlin Hogan, "Path Planning with Dynamic Obstacle Avoidance for a Jumping-Enabled Robot", AA228/CS238 class report, Department of Computer Science, Stanford University, URL: https://web.stanford.edu/class/aa228/reports/2018/final113.pdf
+
 
 # Others
 
