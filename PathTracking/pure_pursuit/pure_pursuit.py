@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 k = 0.1  # look forward gain
 Lfc = 1.0  # look-ahead distance
-Kp = 1.0  # speed propotional gain
+Kp = 1.0  # speed proportional gain
 dt = 0.1  # [s]
 L = 2.9  # [m] wheel base of vehicle
 
@@ -84,9 +84,9 @@ def calc_target_index(state, cx, cy):
 
     # search look ahead target point index
     while Lf > L and (ind + 1) < len(cx):
-        dx = cx[ind + 1] - cx[ind]
-        dy = cy[ind + 1] - cy[ind]
-        L += math.sqrt(dx ** 2 + dy ** 2)
+        dx = cx[ind] - state.x
+        dy = cy[ind] - state.y
+        L = math.sqrt(dx ** 2 + dy ** 2)
         ind += 1
 
     return ind
