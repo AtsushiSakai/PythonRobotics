@@ -61,9 +61,6 @@ def pure_pursuit_control(state, cx, cy, pind):
 
     alpha = math.atan2(ty - state.y, tx - state.x) - state.yaw
 
-    if state.v < 0:  # back
-        alpha = math.pi - alpha
-
     Lf = k * state.v + Lfc
 
     delta = math.atan2(2.0 * L * math.sin(alpha) / Lf, 1.0)
@@ -90,6 +87,20 @@ def calc_target_index(state, cx, cy):
         ind += 1
 
     return ind
+
+
+def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
+    """
+    Plot arrow
+    """
+
+    if not isinstance(x, float):
+        for (ix, iy, iyaw) in zip(x, y, yaw):
+            plot_arrow(ix, iy, iyaw)
+    else:
+        plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),
+                  fc=fc, ec=ec, head_width=width, head_length=width)
+        plt.plot(x, y)
 
 
 def main():
@@ -128,7 +139,8 @@ def main():
 
         if show_animation:  # pragma: no cover
             plt.cla()
-            plt.plot(cx, cy, ".r", label="course")
+            plot_arrow(state.x, state.y, state.yaw)
+            plt.plot(cx, cy, "-r", label="course")
             plt.plot(x, y, "-b", label="trajectory")
             plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")
             plt.axis("equal")
