@@ -184,6 +184,12 @@ Dear AtsushiSakai, Your visualizations are awesome, and I am going to have this 
 
 --Srinivasa Varadhan Agaram Chakravarthy
 
+---
+
+Dear AtsushiSakai, <br>Thank you for this great resource! I very much appreciate all your hard work and effort.
+
+--Mridul Aanjaneya
+
 =========
 
 # Citations
