@@ -7,6 +7,12 @@ If you found other users, please make an issue to let me know.
 
 - [CSCI/ARTI 4530/6530: Introduction to Robotics (Fall 2018),  University of Georgia ](http://cobweb.cs.uga.edu/~ramviyas/csci_x530.html)
 
+# Stargazers location map
+
+You can check stargazer's locations of this project from:
+
+- [Stargazers location map](https://drive.google.com/open?id=1bBXS9IQmZ3Tfe1wNGvJbObRt9Htt4PGC&usp=sharing)
+
 # Individual users comments
 
 These are comments from user's using [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/AtsushiSakai)
