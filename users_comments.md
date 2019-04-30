@@ -196,6 +196,12 @@ Dear AtsushiSakai, <br>Thank you for this great resource! I very much appreciate
 
 --Mridul Aanjaneya
 
+---
+
+Thank you for the python robotics sample code and visualizations!! This is my new favorite thing on the internet.
+
+--selamg@mit.edu
+
 =========
 
 # Citations
