@@ -93,7 +93,7 @@ def calc_target_index(state, cx, cy):
         while True:
             index = index + 1 if (index + 1) < len(cx) else index
             distance_next_index = calc_distance(state, cx[index], cy[index])
-            if distance_this_index < distance_next_index
+            if distance_this_index < distance_next_index:
                 break
             distance_this_index = distance_next_index
         old_nearest_point_index = index
