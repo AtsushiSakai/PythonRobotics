@@ -87,6 +87,7 @@ def calc_target_index(state, cx, cy):
         dy = [state.rear_y - icy for icy in cy]
         d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
         ind = d.index(min(d))
+        old_nearest_point_index = ind
     else:
         index = old_nearest_point_index
         distance_this_index = calc_distance(state, cx[index], cy[index])
