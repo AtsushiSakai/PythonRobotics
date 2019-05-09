@@ -9,6 +9,8 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
+old_nearest_point_index = None
+
 k = 0.1  # look forward gain
 Lfc = 1.0  # look-ahead distance
 Kp = 1.0  # speed proportional gain
@@ -71,14 +73,31 @@ def pure_pursuit_control(state, cx, cy, pind):
 
     return delta, ind
 
+def calc_distance(state, point_x, point_y):
+    dx = state.rear_x - point_x
+    dy = state.rear_y - point_y
+    return math.sqrt(distance_x ** 2 + distance_y ** 2)
+
 
 def calc_target_index(state, cx, cy):
 
-    # search nearest point index
-    dx = [state.rear_x - icx for icx in cx]
-    dy = [state.rear_y - icy for icy in cy]
-    d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
-    ind = d.index(min(d))
+    if old_nearest_point_index is None:
+        # search nearest point index
+        dx = [state.rear_x - icx for icx in cx]
+        dy = [state.rear_y - icy for icy in cy]
+        d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
+        ind = d.index(min(d))
+    else:
+        index = old_nearest_point_index
+        distance_this_index = calc_distance(state, cx[index], cy[index])
+        while True:
+            index = index + 1 if (index + 1) < len(cx) else index
+            distance_next_index = calc_distance(state, cx[index], cy[index])
+            if distance_this_index < distance_next_index
+                break
+            distance_this_index = distance_next_index
+        old_nearest_point_index = index
+
     L = 0.0
 
     Lf = k * state.v + Lfc
