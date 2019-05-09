@@ -202,6 +202,12 @@ Thank you for the python robotics sample code and visualizations!! This is my ne
 
 --selamg@mit.edu
 
+---
+
+Mr AtsushiSakai .. <br>Your work and teaching is light for me <br>thank you very much for giving time and effort to make it public for us
+
+--Karim Anass
+
 =========
 
 # Citations
