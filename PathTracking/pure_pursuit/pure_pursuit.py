@@ -26,6 +26,8 @@ class State:
         self.y = y
         self.yaw = yaw
         self.v = v
+        self.rear_x = self.x - ((L / 2) * math.cos(self.yaw))
+        self.rear_y = self.y - ((L / 2) * math.sin(self.yaw))
 
 
 def update(state, a, delta):
@@ -34,6 +36,8 @@ def update(state, a, delta):
     state.y = state.y + state.v * math.sin(state.yaw) * dt
     state.yaw = state.yaw + state.v / L * math.tan(delta) * dt
     state.v = state.v + a * dt
+    state.rear_x = state.x - ((L / 2) * math.cos(state.yaw))
+    state.rear_y = state.y - ((L / 2) * math.sin(state.yaw))
 
     return state
 
@@ -59,7 +63,7 @@ def pure_pursuit_control(state, cx, cy, pind):
         ty = cy[-1]
         ind = len(cx) - 1
 
-    alpha = math.atan2(ty - state.y, tx - state.x) - state.yaw
+    alpha = math.atan2(ty - state.rear_y, tx - state.rear_x) - state.yaw
 
     Lf = k * state.v + Lfc
 
@@ -71,8 +75,8 @@ def pure_pursuit_control(state, cx, cy, pind):
 def calc_target_index(state, cx, cy):
 
     # search nearest point index
-    dx = [state.x - icx for icx in cx]
-    dy = [state.y - icy for icy in cy]
+    dx = [state.rear_x - icx for icx in cx]
+    dy = [state.rear_y - icy for icy in cy]
     d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
     ind = d.index(min(d))
     L = 0.0
@@ -81,8 +85,8 @@ def calc_target_index(state, cx, cy):
 
     # search look ahead target point index
     while Lf > L and (ind + 1) < len(cx):
-        dx = cx[ind] - state.x
-        dy = cy[ind] - state.y
+        dx = cx[ind] - state.rear_x
+        dy = cy[ind] - state.rear_y
         L = math.sqrt(dx ** 2 + dy ** 2)
         ind += 1
 
