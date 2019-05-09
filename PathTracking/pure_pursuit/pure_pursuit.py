@@ -74,12 +74,15 @@ def pure_pursuit_control(state, cx, cy, pind):
     return delta, ind
 
 def calc_distance(state, point_x, point_y):
+
     dx = state.rear_x - point_x
     dy = state.rear_y - point_y
-    return math.sqrt(distance_x ** 2 + distance_y ** 2)
+    return math.sqrt(dx ** 2 + dy ** 2)
 
 
 def calc_target_index(state, cx, cy):
+
+    global old_nearest_point_index
 
     if old_nearest_point_index is None:
         # search nearest point index
