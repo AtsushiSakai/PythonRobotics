@@ -9,15 +9,15 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
-old_nearest_point_index = None
 
 k = 0.1  # look forward gain
-Lfc = 1.0  # look-ahead distance
+Lfc = 2.0  # look-ahead distance
 Kp = 1.0  # speed proportional gain
 dt = 0.1  # [s]
 L = 2.9  # [m] wheel base of vehicle
 
 
+old_nearest_point_index = None
 show_animation = True
 
 
