@@ -36,13 +36,13 @@ def observation(xTrue, xd, u):
     xTrue = motion_model(xTrue, u)
 
     # add noise to gps x-y
-    zx = xTrue[0, 0] + np.random.randn() * Rsim[0, 0]
-    zy = xTrue[1, 0] + np.random.randn() * Rsim[1, 1]
+    zx = xTrue[0, 0] + np.random.randn() * Qsim[0, 0]
+    zy = xTrue[1, 0] + np.random.randn() * Qsim[1, 1]
     z = np.array([[zx, zy]]).T
 
     # add noise to input
-    ud1 = u[0, 0] + np.random.randn() * Qsim[0, 0]
-    ud2 = u[1, 0] + np.random.randn() * Qsim[1, 1]
+    ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
+    ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1]
     ud = np.array([[ud1, ud2]]).T
 
     xd = motion_model(xd, ud)
