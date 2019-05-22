@@ -249,8 +249,8 @@ def sample_points(sx, sy, gx, gy, rr, ox, oy, obkdtree):
     sample_x, sample_y = [], []
 
     while len(sample_x) <= N_SAMPLE:
-        tx = (random.random() - minx) * (maxx - minx)
-        ty = (random.random() - miny) * (maxy - miny)
+        tx = (random.random() * (maxx - minx)) + minx
+        ty = (random.random() * (maxy - miny)) + miny
 
         index, dist = obkdtree.search(np.array([tx, ty]).reshape(2, 1))
 
