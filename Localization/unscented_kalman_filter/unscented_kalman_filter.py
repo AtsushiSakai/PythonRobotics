@@ -32,8 +32,8 @@ show_animation = True
 
 def calc_input():
     v = 1.0  # [m/s]
-    yawRate = 0.1  # [rad/s]
-    u = np.array([[v, yawRate]]).T
+    yawrate = 0.1  # [rad/s]
+    u = np.array([[v, yawrate]]).T
     return u
 
 
