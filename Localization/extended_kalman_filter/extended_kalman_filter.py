@@ -62,7 +62,7 @@ def motion_model(x, u):
                   [0.0, DT],
                   [1.0, 0.0]])
 
-    x = F@x + B@u
+    x = F @ x + B @ u
 
     return x
 
@@ -74,7 +74,7 @@ def observation_model(x):
         [0, 1, 0, 0]
     ])
 
-    z = H@x
+    z = H @ x
 
     return z
 
@@ -120,16 +120,16 @@ def ekf_estimation(xEst, PEst, z, u):
     #  Predict
     xPred = motion_model(xEst, u)
     jF = jacobF(xPred, u)
-    PPred = jF@PEst@jF.T + Q
+    PPred = jF @ PEst @ jF.T + Q
 
     #  Update
     jH = jacobH(xPred)
     zPred = observation_model(xPred)
     y = z - zPred
-    S = jH@PPred@jH.T + R
-    K = PPred@jH.T@np.linalg.inv(S)
-    xEst = xPred + K@y
-    PEst = (np.eye(len(xEst)) - K@jH)@PPred
+    S = jH @ PPred @ jH.T + R
+    K = PPred @ jH.T @ np.linalg.inv(S)
+    xEst = xPred + K @ y
+    PEst = (np.eye(len(xEst)) - K @ jH) @ PPred
 
     return xEst, PEst
 
@@ -153,7 +153,7 @@ def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
     angle = math.atan2(eigvec[bigind, 1], eigvec[bigind, 0])
     R = np.array([[math.cos(angle), math.sin(angle)],
                   [-math.sin(angle), math.cos(angle)]])
-    fx = R@(np.array([x, y]))
+    fx = R @ np.array([x, y])
     px = np.array(fx[0, :] + xEst[0, 0]).flatten()
     py = np.array(fx[1, :] + xEst[1, 0]).flatten()
     plt.plot(px, py, "--r")
