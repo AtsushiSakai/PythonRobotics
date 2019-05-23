@@ -11,13 +11,31 @@ import scipy.linalg
 import math
 import matplotlib.pyplot as plt
 
-# Estimation parameter of UKF
-Q = np.diag([0.1, 0.1, np.deg2rad(1.0), 1.0])**2
-R = np.diag([1.0, np.deg2rad(40.0)])**2
+# Simulation parameters:
 
-#  Simulation parameter
-Qsim = np.diag([0.5, 0.5])**2
-Rsim = np.diag([1.0, np.deg2rad(30.0)])**2
+# Process noise covariance
+Qsim = np.diag([
+    0.01, # variance of location on x-axis
+    0.01, # variance of location on y-axis
+    np.deg2rad(10.0), # variance of yaw-rate
+    0.01 # variance of velocity
+])**2
+
+# Observation noise covariance
+Rsim = np.diag([
+    0.5, # variance of measurement on x-axis
+    0.5 # variance of measurement on y-axis
+])**2
+
+
+# Estimation parameter of EKF:
+
+# Process noise covariance
+Q = Qsim * 1.5 # Qsim over-estimated by factor 1.5
+
+# Observation noise covariance
+R = Rsim * 1.5 # Rsim over-estimated by factor 1.5
+
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
@@ -33,27 +51,17 @@ show_animation = True
 def calc_input():
     v = 1.0  # [m/s]
     yawrate = 0.1  # [rad/s]
-    u = np.array([[v, yawrate]]).T
+    u = np.array([[v], [yawrate]])
     return u
 
 
 def observation(xTrue, xd, u):
 
-    xTrue = motion_model(xTrue, u)
+    xd = motion_model(xd, u) # assumes lack of noise
+    xTrue = motion_model(xTrue, u) + Qsim @ np.random.randn(4, 1)
+    z = observation_model(xTrue) + Rsim @ np.random.randn(2, 1)
 
-    # add noise to gps x-y
-    zx = xTrue[0, 0] + np.random.randn() * Qsim[0, 0]
-    zy = xTrue[1, 0] + np.random.randn() * Qsim[1, 1]
-    z = np.array([[zx, zy]]).T
-
-    # add noise to input
-    ud1 = u[0] + np.random.randn() * Rsim[0, 0]
-    ud2 = u[1] + np.random.randn() * Rsim[1, 1]
-    ud = np.array([ud1, ud2])
-
-    xd = motion_model(xd, ud)
-
-    return xTrue, z, xd, ud
+    return xTrue, xd, z
 
 
 def motion_model(x, u):
@@ -225,9 +233,9 @@ def main():
         time += DT
         u = calc_input()
 
-        xTrue, z, xDR, ud = observation(xTrue, xDR, u)
+        xTrue, xDR, z = observation(xTrue, xDR, u)
 
-        xEst, PEst = ukf_estimation(xEst, PEst, z, ud, wm, wc, gamma)
+        xEst, PEst = ukf_estimation(xEst, PEst, z, u, wm, wc, gamma)
 
         # store data history
         hxEst = np.hstack((hxEst, xEst))
