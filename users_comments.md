@@ -220,6 +220,12 @@ I've learned the robotics from the traditional way of solving problem through fi
 
 --Ewing Kang
 
+---
+
+Hey, I'm a student and I just recently got into robotics, and visited your repository multiple times. Today I was super happy to find the link to Patreon! I am impressed by didactic quality of the repo, keep up the good work!
+
+--Carolina Bianchi
+
 
 =========
 
