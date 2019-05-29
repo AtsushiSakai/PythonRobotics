@@ -161,12 +161,18 @@ def generate_roadmap(sample_x, sample_y, rr, obkdtree):
 
 def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
     """
+    sx: start x position [m]
+    sy: start y position [m]
     gx: goal x position [m]
-    gx: goal x position [m]
+    gy: goal y position [m]
     ox: x position list of Obstacles [m]
     oy: y position list of Obstacles [m]
-    reso: grid resolution [m]
-    rr: robot radius[m]
+    rr: robot radius [m]
+    road_map: ??? [m]
+    sample_x: ??? [m]
+    sample_y: ??? [m]
+    
+    @return: Two lists of path coordinates ([x1, x2, ...], [y1, y2, ...]), empty list when no path was found
     """
 
     nstart = Node(sx, sy, 0.0, -1)
@@ -175,9 +181,12 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
     openset, closedset = dict(), dict()
     openset[len(road_map) - 2] = nstart
 
+    path_found = True
+    
     while True:
         if not openset:
             print("Cannot find path")
+            path_found = False
             break
 
         c_id = min(openset, key=lambda o: openset[o].cost)
@@ -217,6 +226,9 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
                     openset[n_id].pind = c_id
             else:
                 openset[n_id] = node
+    
+    if path_found is False:
+        return [], []
 
     # generate final course
     rx, ry = [ngoal.x], [ngoal.y]
