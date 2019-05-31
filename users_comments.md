@@ -208,6 +208,25 @@ Mr AtsushiSakai .. <br>Your work and teaching is light for me <br>thank you very
 
 --Karim Anass
 
+---
+
+Thank You
+
+--Anonymous
+
+---
+
+I've learned the robotics from the traditional way of solving problem through finding packages and reading papers. This amazing project is unbelievably helpful for new-comers to learn and get familiar with the algorithms. Gods know how many hours you've taken to sort all the materials and written everything into one single coherent project. I'm truly amazed and deepest appreciation.
+
+--Ewing Kang
+
+---
+
+Hey, I'm a student and I just recently got into robotics, and visited your repository multiple times. Today I was super happy to find the link to Patreon! I am impressed by didactic quality of the repo, keep up the good work!
+
+--Carolina Bianchi
+
+
 =========
 
 # Citations
