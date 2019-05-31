@@ -242,24 +242,11 @@ Ref:
 - [SLAM simulations by Tim Bailey](http://www-personal.acfr.usyd.edu.au/tbailey/software/slam_simulations.htm)
 
 
-## Graph based SLAM
+## Pose Optimization SLAM
 
-This is a graph based SLAM example.
+This is a graph based Pose Optimization SLAM example.
 
-The blue line is ground truth.
-
-The black line is dead reckoning.
-
-The red line is the estimated trajectory with Graph based SLAM.
-
-The black stars are landmarks for graph edge generation.
-
-![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/GraphBasedSLAM/animation.gif)
-
-Ref:
-
-- [A Tutorial on Graph-Based SLAM](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)
-
+![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/PoseOptimizationSLAM/animation.gif)
 
 # Path Planning
 
