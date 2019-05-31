@@ -10,7 +10,6 @@ import math
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
-from math import cos, sin, radians, pi
 
 EXTEND_AREA = 1.0
 
@@ -103,9 +102,7 @@ def generate_ray_casting_grid_map(ox, oy, xyreso, yawreso, breshen = True):
     # occupancy grid computed with bresenham ray casting
     if breshen:
         for (x, y) in zip(ox, oy):
-            d = math.sqrt(x**2 + y**2)
             angle = atan_zero_to_twopi(y, x)
-            angleid = int(math.floor(angle / yawreso))
             ix = int(round((x - minx) / xyreso)) # x coordinte of the the occupied area
             iy = int(round((y - miny) / xyreso)) # y coordinte of the the occupied area
             laser_beams = bresenham((centix, centiy), (ix, iy)) # line form the lidar to the cooupied point
