@@ -2,8 +2,8 @@
 
 1. Download data
 
-    python data_downloader.py
+>$ python data_downloader.py
 
 2. run SLAM
 
-    python pose_optimization_slam.py
+>$ python pose_optimization_slam.py
