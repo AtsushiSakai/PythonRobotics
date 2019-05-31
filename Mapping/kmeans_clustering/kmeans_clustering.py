@@ -73,7 +73,7 @@ def update_clusters(clusters):
         mind = min(dlist)
         min_id = dlist.index(mind)
         clusters.labels[ip] = min_id
-        cost += min_id
+        cost += mind
 
     return clusters, cost
 
