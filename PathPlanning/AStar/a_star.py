@@ -14,50 +14,45 @@ import math
 
 show_animation = True
 
-
 class Node:
 
     def __init__(self, x, y, cost, pind):
-        self.x = x
-        self.y = y
+        self.x = x # index of grid
+        self.y = y # index of grid
         self.cost = cost
         self.pind = pind
 
     def __str__(self):
         return str(self.x) + "," + str(self.y) + "," + str(self.cost) + "," + str(self.pind)
 
-
-def calc_final_path(ngoal, closedset, reso):
-    # generate final course
-    rx, ry = [ngoal.x * reso], [ngoal.y * reso]
-    pind = ngoal.pind
-    while pind != -1:
-        n = closedset[pind]
-        rx.append(n.x * reso)
-        ry.append(n.y * reso)
-        pind = n.pind
-
-    return rx, ry
-
-
 def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
     """
-    gx: goal x position [m]
-    gx: goal x position [m]
-    ox: x position list of Obstacles [m]
-    oy: y position list of Obstacles [m]
-    reso: grid resolution [m]
-    rr: robot radius[m]
+    A star path search
+
+    input:
+        sx: start x position [m]
+        sy: start y position [m]
+        gx: goal x position [m]
+        gx: goal x position [m]
+        ox: x position list of Obstacles [m]
+        oy: y position list of Obstacles [m]
+        reso: grid resolution [m]
+        rr: robot radius[m]
+
+    output:
+        rx: x position list of the final path
+        ry: y position list of the final path
     """
 
-    nstart = Node(round(sx / reso), round(sy / reso), 0.0, -1)
-    ngoal = Node(round(gx / reso), round(gy / reso), 0.0, -1)
     ox = [iox / reso for iox in ox]
     oy = [ioy / reso for ioy in oy]
 
     obmap, minx, miny, maxx, maxy, xw, yw = calc_obstacle_map(ox, oy, reso, rr)
 
     motion = get_motion_model()
+
+    nstart = Node(calc_xyindex(sx, minx, reso), calc_xyindex(sy, minx, reso), 0.0, -1)
+    ngoal = Node(calc_xyindex(gx, minx, reso), calc_xyindex(gy, minx, reso), 0.0, -1)
 
     openset, closedset = dict(), dict()
     openset[calc_index(nstart, xw, minx, miny)] = nstart
@@ -69,7 +64,7 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
 
         # show graph
         if show_animation:  # pragma: no cover
-            plt.plot(current.x * reso, current.y * reso, "xc")
+            plt.plot(calc_position(current.x, minx, reso), calc_position(current.y, miny, reso), "xc")
             if len(closedset.keys()) % 10 == 0:
                 plt.pause(0.001)
 
@@ -81,6 +76,7 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
 
         # Remove the item from the open set
         del openset[c_id]
+
         # Add it to the closed set
         closedset[c_id] = current
 
@@ -94,7 +90,7 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
             if n_id in closedset:
                 continue
 
-            if not verify_node(node, obmap, minx, miny, maxx, maxy):
+            if not verify_node(node, obmap, minx, miny, maxx, maxy, reso):
                 continue
 
             if n_id not in openset:
@@ -104,9 +100,24 @@ def a_star_planning(sx, sy, gx, gy, ox, oy, reso, rr):
                     # This path is the best until now. record it!
                     openset[n_id] = node
 
-    rx, ry = calc_final_path(ngoal, closedset, reso)
+    rx, ry = calc_final_path(ngoal, closedset, reso, minx, miny)
 
     return rx, ry
+
+
+
+def calc_final_path(ngoal, closedset, reso, minx, miny):
+    # generate final course
+    rx, ry = [calc_position(ngoal.x, minx, reso)], [calc_position(ngoal.y, miny, reso)]
+    pind = ngoal.pind
+    while pind != -1:
+        n = closedset[pind]
+        rx.append(calc_position(n.x, minx, reso))
+        ry.append(calc_position(n.y, miny, reso))
+        pind = n.pind
+
+    return rx, ry
+
 
 
 def calc_heuristic(n1, n2):
@@ -114,16 +125,24 @@ def calc_heuristic(n1, n2):
     d = w * math.sqrt((n1.x - n2.x)**2 + (n1.y - n2.y)**2)
     return d
 
+def calc_position(index, minp, reso):
+    return index*reso+minp
 
-def verify_node(node, obmap, minx, miny, maxx, maxy):
+def calc_xyindex(position, minp, reso):
+    return round((position - minp)/reso)
 
-    if node.x < minx:
+def verify_node(node, obmap, minx, miny, maxx, maxy, reso):
+
+    px = calc_position(node.x, minx, reso)
+    py = calc_position(node.y, miny, reso)
+
+    if px < minx:
         return False
-    elif node.y < miny:
+    elif py < miny:
         return False
-    elif node.x >= maxx:
+    elif px >= maxx:
         return False
-    elif node.y >= maxy:
+    elif py >= maxy:
         return False
 
     if obmap[node.x][node.y]:
@@ -132,21 +151,21 @@ def verify_node(node, obmap, minx, miny, maxx, maxy):
     return True
 
 
-def calc_obstacle_map(ox, oy, reso, vr):
+def calc_obstacle_map(ox, oy, reso, rr):
 
     minx = round(min(ox))
     miny = round(min(oy))
     maxx = round(max(ox))
     maxy = round(max(oy))
-    #  print("minx:", minx)
-    #  print("miny:", miny)
-    #  print("maxx:", maxx)
-    #  print("maxy:", maxy)
+    print("minx:", minx)
+    print("miny:", miny)
+    print("maxx:", maxx)
+    print("maxy:", maxy)
 
     xwidth = round(maxx - minx)
     ywidth = round(maxy - miny)
-    #  print("xwidth:", xwidth)
-    #  print("ywidth:", ywidth)
+    print("xwidth:", xwidth)
+    print("ywidth:", ywidth)
 
     # obstacle map generation
     obmap = [[False for i in range(ywidth)] for i in range(xwidth)]
@@ -154,10 +173,9 @@ def calc_obstacle_map(ox, oy, reso, vr):
         x = ix + minx
         for iy in range(ywidth):
             y = iy + miny
-            #  print(x, y)
             for iox, ioy in zip(ox, oy):
                 d = math.sqrt((iox - x)**2 + (ioy - y)**2)
-                if d <= vr / reso:
+                if d <= rr:
                     obmap[ix][iy] = True
                     break
 
@@ -191,37 +209,37 @@ def main():
     gx = 50.0  # [m]
     gy = 50.0  # [m]
     grid_size = 1.0  # [m]
-    robot_size = 1.0  # [m]
+    robot_radius = 1.0  # [m]
 
+    # set obstable positions
     ox, oy = [], []
-
-    for i in range(60):
+    for i in range(-10, 60):
         ox.append(i)
-        oy.append(0.0)
-    for i in range(60):
+        oy.append(-10.0)
+    for i in range(-10, 60):
         ox.append(60.0)
         oy.append(i)
-    for i in range(61):
+    for i in range(-10, 61):
         ox.append(i)
         oy.append(60.0)
-    for i in range(61):
-        ox.append(0.0)
+    for i in range(-10, 61):
+        ox.append(-10.0)
         oy.append(i)
-    for i in range(40):
+    for i in range(-10, 40):
         ox.append(20.0)
         oy.append(i)
-    for i in range(40):
+    for i in range(0, 40):
         ox.append(40.0)
         oy.append(60.0 - i)
 
     if show_animation:  # pragma: no cover
         plt.plot(ox, oy, ".k")
-        plt.plot(sx, sy, "xr")
+        plt.plot(sx, sy, "og")
         plt.plot(gx, gy, "xb")
         plt.grid(True)
         plt.axis("equal")
 
-    rx, ry = a_star_planning(sx, sy, gx, gy, ox, oy, grid_size, robot_size)
+    rx, ry = a_star_planning(sx, sy, gx, gy, ox, oy, grid_size, robot_radius)
 
     if show_animation:  # pragma: no cover
         plt.plot(rx, ry, "-r")
