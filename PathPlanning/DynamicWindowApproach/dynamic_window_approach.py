@@ -31,8 +31,9 @@ class Config():
         self.yawrate_reso = 0.1 * math.pi / 180.0  # [rad/s]
         self.dt = 0.1  # [s]
         self.predict_time = 3.0  # [s]
-        self.to_goal_cost_gain = 1.0
+        self.to_goal_cost_gain = 0.15
         self.speed_cost_gain = 1.0
+        self.ob_cost_gain = 1.0
         self.robot_radius = 1.0  # [m]
 
 
@@ -133,18 +134,16 @@ def calc_obstacle_cost(traj, ob, config):
             if minr >= r:
                 minr = r
 
-    return 1.0 / minr  # OK
+    return config.ob_cost_gain / minr  # OK
 
 
 def calc_to_goal_cost(traj, goal, config):
-    # calc to goal cost. It is 2D norm.
+    # calc to goal cost.
 
-    goal_magnitude = math.sqrt(goal[0]**2 + goal[1]**2)
-    traj_magnitude = math.sqrt(traj[-1, 0]**2 + traj[-1, 1]**2)
-    dot_product = (goal[0] * traj[-1, 0]) + (goal[1] * traj[-1, 1])
-    error = dot_product / (goal_magnitude * traj_magnitude)
-    error_angle = math.acos(error)
-    cost = config.to_goal_cost_gain * error_angle
+    dx = goal[0] - traj[-1, 0]
+    dy = goal[1] - traj[-1, 1]
+    error_angle = math.atan2(dy, dx)
+    cost = config.to_goal_cost_gain * abs(error_angle - traj[-1, 2])
 
     return cost
 
