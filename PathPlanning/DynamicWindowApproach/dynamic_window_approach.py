@@ -33,7 +33,6 @@ class Config():
         self.predict_time = 3.0  # [s]
         self.to_goal_cost_gain = 0.15
         self.speed_cost_gain = 1.0
-        self.ob_cost_gain = 1.0
         self.robot_radius = 1.0  # [m]
 
 
@@ -134,7 +133,7 @@ def calc_obstacle_cost(traj, ob, config):
             if minr >= r:
                 minr = r
 
-    return config.ob_cost_gain / minr  # OK
+    return 1.0 / minr  # OK
 
 
 def calc_to_goal_cost(traj, goal, config):
