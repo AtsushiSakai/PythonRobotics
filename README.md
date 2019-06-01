@@ -545,7 +545,11 @@ MIT
 
 # Use-case
 
-See: [users\_comments](https://github.com/AtsushiSakai/PythonRobotics/blob/master/users_comments.md)
+If this project helps your robotics project, please let me know with [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/AtsushiSakai).
+
+Your robot's video, which is using PythonRobotics, is very welcome!!
+
+This is a list of other user's comment and references:[users\_comments](https://github.com/AtsushiSakai/PythonRobotics/blob/master/users_comments.md)
 
 # Contribution
 
