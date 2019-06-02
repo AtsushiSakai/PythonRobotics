@@ -6,17 +6,22 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import numpy as np
 import math
+import numpy as np
 import matplotlib.pyplot as plt
 
-# Estimation parameter of EKF
-Q = np.diag([0.1, 0.1, np.deg2rad(1.0), 1.0])**2  # predict state covariance
+# Covariance for EKF simulation
+Q = np.diag([
+    0.1, # variance of location on x-axis
+    0.1, # variance of location on y-axis
+    np.deg2rad(1.0), # variance of yaw angle
+    1.0 # variance of velocity
+    ])**2  # predict state covariance
 R = np.diag([1.0, 1.0])**2  # Observation x,y position covariance
 
 #  Simulation parameter
-Qsim = np.diag([1.0, np.deg2rad(30.0)])**2
-Rsim = np.diag([0.5, 0.5])**2
+INPUT_NOISE = np.diag([1.0, np.deg2rad(30.0)])**2
+GPS_NOISE = np.diag([0.5, 0.5])**2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
@@ -27,7 +32,7 @@ show_animation = True
 def calc_input():
     v = 1.0  # [m/s]
     yawrate = 0.1  # [rad/s]
-    u = np.array([[v, yawrate]]).T
+    u = np.array([[v], [yawrate]])
     return u
 
 
@@ -36,14 +41,10 @@ def observation(xTrue, xd, u):
     xTrue = motion_model(xTrue, u)
 
     # add noise to gps x-y
-    zx = xTrue[0, 0] + np.random.randn() * Rsim[0, 0]
-    zy = xTrue[1, 0] + np.random.randn() * Rsim[1, 1]
-    z = np.array([[zx, zy]]).T
+    z = observation_model(xTrue) + GPS_NOISE @ np.random.randn(2, 1)
 
     # add noise to input
-    ud1 = u[0, 0] + np.random.randn() * Qsim[0, 0]
-    ud2 = u[1, 0] + np.random.randn() * Qsim[1, 1]
-    ud = np.array([[ud1, ud2]]).T
+    ud = u + INPUT_NOISE @ np.random.randn(2, 1)
 
     xd = motion_model(xd, ud)
 
@@ -62,19 +63,18 @@ def motion_model(x, u):
                   [0.0, DT],
                   [1.0, 0.0]])
 
-    x = F@x + B@u
+    x = F @ x + B @ u
 
     return x
 
 
 def observation_model(x):
-    #  Observation Model
     H = np.array([
         [1, 0, 0, 0],
         [0, 1, 0, 0]
     ])
 
-    z = H@x
+    z = H @ x
 
     return z
 
