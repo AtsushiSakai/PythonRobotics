@@ -8,10 +8,11 @@ author: Erno Horvath, Csaba Hajdu based on Atsushi Sakai's scripts (@Atsushi_twi
 
 import math
 import numpy as np
-import cv2
 import matplotlib.pyplot as plt
+from collections import deque
 
 EXTEND_AREA = 1.0
+
 
 def file_read(f):
     """
@@ -26,6 +27,7 @@ def file_read(f):
     angles = np.array(angles)
     distances = np.array(distances)
     return angles, distances
+
 
 def bresenham(start, end):
     """
@@ -70,6 +72,7 @@ def bresenham(start, end):
     points = np.array(points)
     return points
 
+
 def calc_grid_map_config(ox, oy, xyreso):
     """
     Calculates the size, and the maximum distances according to the the measurement center
@@ -83,13 +86,72 @@ def calc_grid_map_config(ox, oy, xyreso):
     print("The grid map is ", xw, "x", yw, ".")
     return minx, miny, maxx, maxy, xw, yw
 
+
 def atan_zero_to_twopi(y, x):
     angle = math.atan2(y, x)
     if angle < 0.0:
         angle += math.pi * 2.0
     return angle
 
-def generate_ray_casting_grid_map(ox, oy, xyreso, yawreso, breshen = True):
+
+def init_floodfill(cpoint,  opoints, xypoints, mincoord, xyreso):
+    """
+    cpoint: center point
+    opoints: detected obstacles points (x,y)
+    xypoints: (x,y) point pairs
+    """
+    centix, centiy = cpoint
+    prev_ix, prev_iy = centix - 1, centiy
+    ox, oy = opoints
+    xw, yw = xypoints
+    minx, miny = mincoord
+    pmap = (np.ones((xw, yw))) * 0.5
+    for (x, y) in zip(ox, oy):
+        ix = int(round((x - minx) / xyreso))  # x coordinate of the the occupied area
+        iy = int(round((y - miny) / xyreso))  # y coordinate of the the occupied area
+        free_area = bresenham((prev_ix, prev_iy), (ix, iy))
+        for fa in free_area:
+            pmap[fa[0]][fa[1]] = 0  # free area 0.0
+        prev_ix = ix
+        prev_iy = iy
+    return pmap
+
+
+def flood_fill(cpoint, pmap):
+    """
+    cpoint: starting point (x,y) of fill
+    pmap: occupancy map generated from Bresenham ray-tracing
+    """
+    # Fill empty areas with queue method
+    sx, sy = pmap.shape
+    fringe = deque()
+    fringe.appendleft(cpoint)
+    while len(fringe)>0:
+        n = fringe.pop()
+        nx, ny = n
+        # West
+        if nx > 0:
+            if pmap[nx - 1, ny] == 0.5:
+                pmap[nx - 1, ny] = 0.0
+                fringe.appendleft((nx - 1, ny))
+        # East
+        if nx < sx - 1:
+            if pmap[nx + 1, ny] == 0.5:
+                pmap[nx + 1, ny] = 0.0
+                fringe.appendleft((nx + 1, ny))
+        # North
+        if ny > 0:
+            if pmap[nx, ny - 1] == 0.5:
+                pmap[nx, ny - 1] = 0.0
+                fringe.appendleft((nx, ny - 1))
+        # South
+        if ny < sy - 1:
+            if pmap[nx, ny + 1] == 0.5:
+                pmap[nx, ny + 1] = 0.0
+                fringe.appendleft((nx, ny + 1))
+
+
+def generate_ray_casting_grid_map(ox, oy, xyreso, breshen=True):
     """
     The breshen boolean tells if it's computed with bresenham ray casting (True) or with flood fill (False)
     """
@@ -97,14 +159,11 @@ def generate_ray_casting_grid_map(ox, oy, xyreso, yawreso, breshen = True):
     pmap = np.ones((xw, yw))/2 # default 0.5 -- [[0.5 for i in range(yw)] for i in range(xw)] 
     centix = int(round(-minx / xyreso)) # center x coordinate of the grid map
     centiy = int(round(-miny / xyreso)) # center y coordinate of the grid map
-    #print(centix, centiy)
-    prev_ix, prev_iy = centix - 1, centiy
     # occupancy grid computed with bresenham ray casting
     if breshen:
         for (x, y) in zip(ox, oy):
-            angle = atan_zero_to_twopi(y, x)
-            ix = int(round((x - minx) / xyreso)) # x coordinte of the the occupied area
-            iy = int(round((y - miny) / xyreso)) # y coordinte of the the occupied area
+            ix = int(round((x - minx) / xyreso)) # x coordinate of the the occupied area
+            iy = int(round((y - miny) / xyreso)) # y coordinate of the the occupied area
             laser_beams = bresenham((centix, centiy), (ix, iy)) # line form the lidar to the cooupied point
             for laser_beam in laser_beams:
                 pmap[laser_beam[0]][laser_beam[1]] = 0.0 # free area 0.0
@@ -114,19 +173,10 @@ def generate_ray_casting_grid_map(ox, oy, xyreso, yawreso, breshen = True):
             pmap[ix+1][iy+1] = 1.0 # extend the occupied area
     # occupancy grid computed with with flood fill
     else:
-        pmap = (np.ones((xw, yw), dtype=np.uint8)) * 5 # food fill does not work with float numbers such as 0.5; so 5 is the default and later it is divided by 10
-        for (x, y) in zip(ox, oy):        
-            ix = int(round((x - minx) / xyreso)) # x coordinte of the the occupied area
-            iy = int(round((y - miny) / xyreso)) # y coordinte of the the occupied area
-            free_area = bresenham((prev_ix, prev_iy), (ix, iy))
-            for fa in free_area:
-                pmap[fa[0]][fa[1]] = 0 # free area 0.0                  
-            prev_ix = ix
-            prev_iy = iy
-        cv2.floodFill(pmap, None, (centix, centiy), 0) # filling the free spaces with 0, stating from the center
+        pmap = init_floodfill((centix, centiy), (ox, oy), (xw, yw),  (minx, miny), xyreso)
+        flood_fill((centix, centiy), pmap)
         pmap = np.array(pmap, dtype=np.float)
-        pmap /= 10
-        for (x, y) in zip(ox, oy):        
+        for (x, y) in zip(ox, oy):
             ix = int(round((x - minx) / xyreso))
             iy = int(round((y - miny) / xyreso))
             pmap[ix][iy] = 1.0     # occupied area 1.0
@@ -135,25 +185,25 @@ def generate_ray_casting_grid_map(ox, oy, xyreso, yawreso, breshen = True):
             pmap[ix+1][iy+1] = 1.0 # extend the occupied area
     return pmap, minx, maxx, miny, maxy, xyreso
 
+
 def main():
     """
     Example usage
     """
     print(__file__, "start")
     xyreso = 0.02  # x-y grid resolution
-    yawreso = math.radians(3.1)  # yaw angle resolution [rad]
     ang, dist = file_read("lidar01.csv")
     ox = np.sin(ang) * dist
     oy = np.cos(ang) * dist
-    pmap, minx, maxx, miny, maxy, xyreso = generate_ray_casting_grid_map(ox, oy, xyreso, yawreso, True)
+    pmap, minx, maxx, miny, maxy, xyreso = generate_ray_casting_grid_map(ox, oy, xyreso, True)
     xyres = np.array(pmap).shape
     plt.figure(1, figsize=(10,4))
     plt.subplot(122)
-    plt.imshow(pmap, cmap = "PiYG_r") # cmap = "binary" "PiYG_r" "PiYG_r" "bone" "bone_r" "RdYlGn_r"
+    plt.imshow(pmap, cmap="PiYG_r") # cmap = "binary" "PiYG_r" "PiYG_r" "bone" "bone_r" "RdYlGn_r"
     plt.clim(-0.4, 1.4)
-    plt.gca().set_xticks(np.arange(-.5, xyres[1], 1), minor = True)
-    plt.gca().set_yticks(np.arange(-.5, xyres[0], 1), minor = True)
-    plt.grid(True, which="minor", color="w", linewidth = .6, alpha = 0.5)
+    plt.gca().set_xticks(np.arange(-.5, xyres[1], 1), minor=True)
+    plt.gca().set_yticks(np.arange(-.5, xyres[0], 1), minor=True)
+    plt.grid(True, which="minor", color="w", linewidth=0.6, alpha=0.5)
     plt.colorbar()
     plt.subplot(121)
     plt.plot([oy, np.zeros(np.size(oy))], [ox, np.zeros(np.size(oy))], "ro-")
@@ -164,7 +214,7 @@ def main():
     plt.ylim((top, bottom)) # rescale y axis, to match the grid orientation
     plt.grid(True)
     plt.show()
+
         
 if __name__ == '__main__':
     main()     
-        
