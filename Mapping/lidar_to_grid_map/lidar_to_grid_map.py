@@ -126,7 +126,7 @@ def flood_fill(cpoint, pmap):
     sx, sy = pmap.shape
     fringe = deque()
     fringe.appendleft(cpoint)
-    while len(fringe)>0:
+    while fringe:
         n = fringe.pop()
         nx, ny = n
         # West
