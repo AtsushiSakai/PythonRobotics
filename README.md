@@ -27,6 +27,7 @@ Python codes for robotics algorithm.
    * [Mapping](#mapping)
       * [Gaussian grid map](#gaussian-grid-map)
       * [Ray casting grid map](#ray-casting-grid-map)
+      * [Lidar to grid map](#lidar-to-grid-map)	  
       * [k-means object clustering](#k-means-object-clustering)
       * [Rectangle fitting](#rectangle-fitting)
    * [SLAM](#slam)
@@ -191,6 +192,12 @@ This is a 2D Gaussian grid mapping example.
 This is a 2D ray casting grid mapping example.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/raycasting_grid_map/animation.gif)
+
+## Lidar to grid map
+
+This example shows how to convert a 2D range measurement to a grid map.
+
+![2](Mapping/lidar_to_grid_map/animation.gif)
 
 ## k-means object clustering
 
