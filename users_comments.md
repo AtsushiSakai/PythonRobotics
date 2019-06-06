@@ -226,6 +226,11 @@ Hey, I'm a student and I just recently got into robotics, and visited your repos
 
 --Carolina Bianchi
 
+---
+
+Dear AtsushiSakai, thanks a lot for the PythonRobotics git repository. I'm a college student who is trying to make a mini autonomous robot for my final project submission, I still haven't started using your code but by the look of it I'm sure it will be of greater use. Will let you know how my project is coming up.
+
+--Pragdheesh
 
 =========
 
