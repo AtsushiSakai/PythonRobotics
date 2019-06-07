@@ -13,6 +13,13 @@ You can check stargazer's locations of this project from:
 
 - [Stargazers location map](https://drive.google.com/open?id=1bBXS9IQmZ3Tfe1wNGvJbObRt9Htt4PGC&usp=sharing)
 
+
+# Related projects
+
+This is a list of related projects. 
+
+- [onlytailei/CppRobotics: cpp implementation of robotics algorithms including localization, mapping, SLAM, path planning and control](https://github.com/onlytailei/CppRobotics)
+
 # Individual users comments
 
 These are comments from user's using [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/AtsushiSakai)
