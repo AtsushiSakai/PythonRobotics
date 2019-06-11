@@ -9,13 +9,15 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
+
 k = 0.1  # look forward gain
-Lfc = 1.0  # look-ahead distance
+Lfc = 2.0  # look-ahead distance
 Kp = 1.0  # speed proportional gain
 dt = 0.1  # [s]
 L = 2.9  # [m] wheel base of vehicle
 
 
+old_nearest_point_index = None
 show_animation = True
 
 
@@ -26,6 +28,8 @@ class State:
         self.y = y
         self.yaw = yaw
         self.v = v
+        self.rear_x = self.x - ((L / 2) * math.cos(self.yaw))
+        self.rear_y = self.y - ((L / 2) * math.sin(self.yaw))
 
 
 def update(state, a, delta):
@@ -34,6 +38,8 @@ def update(state, a, delta):
     state.y = state.y + state.v * math.sin(state.yaw) * dt
     state.yaw = state.yaw + state.v / L * math.tan(delta) * dt
     state.v = state.v + a * dt
+    state.rear_x = state.x - ((L / 2) * math.cos(state.yaw))
+    state.rear_y = state.y - ((L / 2) * math.sin(state.yaw))
 
     return state
 
@@ -59,7 +65,7 @@ def pure_pursuit_control(state, cx, cy, pind):
         ty = cy[-1]
         ind = len(cx) - 1
 
-    alpha = math.atan2(ty - state.y, tx - state.x) - state.yaw
+    alpha = math.atan2(ty - state.rear_y, tx - state.rear_x) - state.yaw
 
     Lf = k * state.v + Lfc
 
@@ -67,22 +73,43 @@ def pure_pursuit_control(state, cx, cy, pind):
 
     return delta, ind
 
+def calc_distance(state, point_x, point_y):
+
+    dx = state.rear_x - point_x
+    dy = state.rear_y - point_y
+    return math.sqrt(dx ** 2 + dy ** 2)
+
 
 def calc_target_index(state, cx, cy):
 
-    # search nearest point index
-    dx = [state.x - icx for icx in cx]
-    dy = [state.y - icy for icy in cy]
-    d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
-    ind = d.index(min(d))
+    global old_nearest_point_index
+
+    if old_nearest_point_index is None:
+        # search nearest point index
+        dx = [state.rear_x - icx for icx in cx]
+        dy = [state.rear_y - icy for icy in cy]
+        d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
+        ind = d.index(min(d))
+        old_nearest_point_index = ind
+    else:
+        ind = old_nearest_point_index
+        distance_this_index = calc_distance(state, cx[ind], cy[ind])
+        while True:
+            ind = ind + 1 if (ind + 1) < len(cx) else ind
+            distance_next_index = calc_distance(state, cx[ind], cy[ind])
+            if distance_this_index < distance_next_index:
+                break
+            distance_this_index = distance_next_index
+        old_nearest_point_index = ind
+
     L = 0.0
 
     Lf = k * state.v + Lfc
 
     # search look ahead target point index
     while Lf > L and (ind + 1) < len(cx):
-        dx = cx[ind] - state.x
-        dy = cy[ind] - state.y
+        dx = cx[ind] - state.rear_x
+        dy = cy[ind] - state.rear_y
         L = math.sqrt(dx ** 2 + dy ** 2)
         ind += 1
 

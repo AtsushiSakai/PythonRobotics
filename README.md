@@ -14,6 +14,7 @@ Python codes for robotics algorithm.
 
 
 
+
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -26,12 +27,13 @@ Python codes for robotics algorithm.
    * [Mapping](#mapping)
       * [Gaussian grid map](#gaussian-grid-map)
       * [Ray casting grid map](#ray-casting-grid-map)
+      * [Lidar to grid map](#lidar-to-grid-map)	  
       * [k-means object clustering](#k-means-object-clustering)
       * [Rectangle fitting](#rectangle-fitting)
    * [SLAM](#slam)
       * [Iterative Closest Point (ICP) Matching](#iterative-closest-point-icp-matching)
       * [FastSLAM 1.0](#fastslam-10)
-      * [Graph based SLAM](#graph-based-slam)
+      * [Pose Optimization SLAM](#pose-optimization-slam)
    * [Path Planning](#path-planning)
       * [Dynamic Window Approach](#dynamic-window-approach)
       * [Grid based search](#grid-based-search)
@@ -191,6 +193,12 @@ This is a 2D ray casting grid mapping example.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/raycasting_grid_map/animation.gif)
 
+## Lidar to grid map
+
+This example shows how to convert a 2D range measurement to a grid map.
+
+![2](Mapping/lidar_to_grid_map/animation.gif)
+
 ## k-means object clustering
 
 This is a 2D object clustering with k-means algorithm.
@@ -242,24 +250,11 @@ Ref:
 - [SLAM simulations by Tim Bailey](http://www-personal.acfr.usyd.edu.au/tbailey/software/slam_simulations.htm)
 
 
-## Graph based SLAM
+## Pose Optimization SLAM
 
-This is a graph based SLAM example.
+This is a graph based pose optimization SLAM example.
 
-The blue line is ground truth.
-
-The black line is dead reckoning.
-
-The red line is the estimated trajectory with Graph based SLAM.
-
-The black stars are landmarks for graph edge generation.
-
-![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/GraphBasedSLAM/animation.gif)
-
-Ref:
-
-- [A Tutorial on Graph-Based SLAM](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)
-
+![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/PoseOptimizationSLAM/animation.gif)
 
 # Path Planning
 
@@ -557,7 +552,11 @@ MIT
 
 # Use-case
 
-See: [users\_comments](https://github.com/AtsushiSakai/PythonRobotics/blob/master/users_comments.md)
+If this project helps your robotics project, please let me know with [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/AtsushiSakai).
+
+Your robot's video, which is using PythonRobotics, is very welcome!!
+
+This is a list of other user's comment and references:[users\_comments](https://github.com/AtsushiSakai/PythonRobotics/blob/master/users_comments.md)
 
 # Contribution
 
@@ -596,6 +595,7 @@ This is a list: [Users comments](https://github.com/AtsushiSakai/PythonRobotics/
 - [Antonin RAFFIN](https://github.com/araffin)
 
 - [Alexis Paques](https://github.com/AlexisTM)
+
 
 
 

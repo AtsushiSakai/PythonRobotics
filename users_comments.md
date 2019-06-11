@@ -13,6 +13,13 @@ You can check stargazer's locations of this project from:
 
 - [Stargazers location map](https://drive.google.com/open?id=1bBXS9IQmZ3Tfe1wNGvJbObRt9Htt4PGC&usp=sharing)
 
+
+# Related projects
+
+This is a list of related projects. 
+
+- [onlytailei/CppRobotics: cpp implementation of robotics algorithms including localization, mapping, SLAM, path planning and control](https://github.com/onlytailei/CppRobotics)
+
 # Individual users comments
 
 These are comments from user's using [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/AtsushiSakai)
@@ -196,6 +203,42 @@ Dear AtsushiSakai, <br>Thank you for this great resource! I very much appreciate
 
 --Mridul Aanjaneya
 
+---
+
+Thank you for the python robotics sample code and visualizations!! This is my new favorite thing on the internet.
+
+--selamg@mit.edu
+
+---
+
+Mr AtsushiSakai .. <br>Your work and teaching is light for me <br>thank you very much for giving time and effort to make it public for us
+
+--Karim Anass
+
+---
+
+Thank You
+
+--Anonymous
+
+---
+
+I've learned the robotics from the traditional way of solving problem through finding packages and reading papers. This amazing project is unbelievably helpful for new-comers to learn and get familiar with the algorithms. Gods know how many hours you've taken to sort all the materials and written everything into one single coherent project. I'm truly amazed and deepest appreciation.
+
+--Ewing Kang
+
+---
+
+Hey, I'm a student and I just recently got into robotics, and visited your repository multiple times. Today I was super happy to find the link to Patreon! I am impressed by didactic quality of the repo, keep up the good work!
+
+--Carolina Bianchi
+
+---
+
+Dear AtsushiSakai, thanks a lot for the PythonRobotics git repository. I'm a college student who is trying to make a mini autonomous robot for my final project submission, I still haven't started using your code but by the look of it I'm sure it will be of greater use. Will let you know how my project is coming up.
+
+--Pragdheesh
+
 =========
 
 # Citations
@@ -211,4 +254,6 @@ URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8516589&isnumber=85
 # Others
 
 - Autonomous Vehicle Readings https://richardkelley.io/readings
+
+- 36 Amazing Python Open Source Projects (v.2019) – Mybridge for Professionals https://medium.mybridge.co/36-amazing-python-open-source-projects-v-2019-2fe058d79450
 
