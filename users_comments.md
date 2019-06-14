@@ -239,7 +239,19 @@ Dear AtsushiSakai, thanks a lot for the PythonRobotics git repository. I'm a col
 
 --Pragdheesh
 
-=========
+---
+
+Hello AtsushiSakai, <br> <br>Thank you very much for sharing your work!
+
+--Uma K
+
+---
+
+Hey Atsushi <br>We are working on a multiagent simulation game and this project gave us really good insights. <br>In future, I would like to contribute to this project with our multiagent task allocation among robots and multi robot map merging( Which is a big hurdle as we found). <br>Thanks for what you are doing for open source. <br>
+
+--Mayank
+
+---
 
 # Citations
 
