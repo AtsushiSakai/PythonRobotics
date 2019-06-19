@@ -1,3 +1,6 @@
+
+
+
 """
 Path Planning Sample Code with RRT*
 
@@ -12,6 +15,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 show_animation = True
+
+
+class Node():
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.cost = 0.0
+        self.parent = None
 
 
 class RRT():
@@ -39,11 +51,12 @@ class RRT():
         self.maxIter = maxIter
         self.obstacleList = obstacleList
 
-    def Planning(self, animation=True):
+    def Planning(self, animation=True, search_until_maxiter=True):
         """
-        Pathplanning
+        rrt path planning
 
         animation: flag for animation on or off
+        search_until_maxiter: search until max iteration for path improving or not
         """
 
         self.nodeList = [self.start]
@@ -51,35 +64,39 @@ class RRT():
             rnd = self.get_random_point()
             nind = self.GetNearestListIndex(self.nodeList, rnd)
 
-            newNode = self.steer(rnd, nind)
-            #  print(newNode.cost)
+            new_node = self.steer(rnd, nind)
 
-            if self.__CollisionCheck(newNode, self.obstacleList):
-                nearinds = self.find_near_nodes(newNode)
-                newNode = self.choose_parent(newNode, nearinds)
-                self.nodeList.append(newNode)
-                self.rewire(newNode, nearinds)
+            if self.__CollisionCheck(new_node, self.obstacleList):
+                nearinds = self.find_near_nodes(new_node)
+                new_node = self.choose_parent(new_node, nearinds)
+                self.nodeList.append(new_node)
+                self.rewire(new_node, nearinds)
 
             if animation and i % 5 == 0:
                 self.DrawGraph(rnd)
 
-            # generate coruse
-            lastIndex = self.get_best_last_index()
-            if lastIndex is None:
-                continue
-            path = self.gen_final_course(lastIndex)
-            return path
+            # generate course
+            if not search_until_maxiter:
+                lastIndex = self.get_best_last_index()
+                if lastIndex:
+                    return self.gen_final_course(lastIndex)
+
+        print("reached max iteration")
+
+        lastIndex = self.get_best_last_index()
+        if lastIndex:
+            return self.gen_final_course(lastIndex)
 
         return None
 
-    def choose_parent(self, newNode, nearinds):
+    def choose_parent(self, new_node, nearinds):
         if not nearinds:
-            return newNode
+            return new_node
 
         dlist = []
         for i in nearinds:
-            dx = newNode.x - self.nodeList[i].x
-            dy = newNode.y - self.nodeList[i].y
+            dx = new_node.x - self.nodeList[i].x
+            dy = new_node.y - self.nodeList[i].y
             d = math.sqrt(dx ** 2 + dy ** 2)
             theta = math.atan2(dy, dx)
             if self.check_collision_extend(self.nodeList[i], theta, d):
@@ -92,30 +109,30 @@ class RRT():
 
         if mincost == float("inf"):
             print("mincost is inf")
-            return newNode
+            return new_node
 
-        newNode.cost = mincost
-        newNode.parent = minind
+        new_node.cost = mincost
+        new_node.parent = minind
 
-        return newNode
+        return new_node
 
     def steer(self, rnd, nind):
 
         # expand tree
-        nearestNode = self.nodeList[nind]
-        theta = math.atan2(rnd[1] - nearestNode.y, rnd[0] - nearestNode.x)
-        newNode = Node(rnd[0], rnd[1])
+        nearest_node = self.nodeList[nind]
+        theta = math.atan2(rnd[1] - nearest_node.y, rnd[0] - nearest_node.x)
+        new_node = Node(rnd[0], rnd[1])
         currentDistance = math.sqrt(
-            (rnd[1] - nearestNode.y) ** 2 + (rnd[0] - nearestNode.x) ** 2)
+            (rnd[1] - nearest_node.y) ** 2 + (rnd[0] - nearest_node.x) ** 2)
         # Find a point within expandDis of nind, and closest to rnd
         if currentDistance <= self.expandDis:
             pass
         else:
-            newNode.x = nearestNode.x + self.expandDis * math.cos(theta)
-            newNode.y = nearestNode.y + self.expandDis * math.sin(theta)
-        newNode.cost = float("inf")
-        newNode.parent = None
-        return newNode
+            new_node.x = nearest_node.x + self.expandDis * math.cos(theta)
+            new_node.y = nearest_node.y + self.expandDis * math.sin(theta)
+        new_node.cost = float("inf")
+        new_node.parent = None
+        return new_node
 
     def get_random_point(self):
 
@@ -155,25 +172,24 @@ class RRT():
     def calc_dist_to_goal(self, x, y):
         return np.linalg.norm([x - self.end.x, y - self.end.y])
 
-    def find_near_nodes(self, newNode):
+    def find_near_nodes(self, new_node):
         nnode = len(self.nodeList)
         r = 50.0 * math.sqrt((math.log(nnode) / nnode))
-        #  r = self.expandDis * 5.0
-        dlist = [(node.x - newNode.x) ** 2 +
-                 (node.y - newNode.y) ** 2 for node in self.nodeList]
+        dlist = [(node.x - new_node.x) ** 2 +
+                 (node.y - new_node.y) ** 2 for node in self.nodeList]
         nearinds = [dlist.index(i) for i in dlist if i <= r ** 2]
         return nearinds
 
-    def rewire(self, newNode, nearinds):
+    def rewire(self, new_node, nearinds):
         nnode = len(self.nodeList)
         for i in nearinds:
             nearNode = self.nodeList[i]
 
-            dx = newNode.x - nearNode.x
-            dy = newNode.y - nearNode.y
+            dx = new_node.x - nearNode.x
+            dy = new_node.y - nearNode.y
             d = math.sqrt(dx ** 2 + dy ** 2)
 
-            scost = newNode.cost + d
+            scost = new_node.cost + d
 
             if nearNode.cost > scost:
                 theta = math.atan2(dy, dx)
@@ -232,18 +248,6 @@ class RRT():
         return True  # safe
 
 
-class Node():
-    """
-    RRT Node
-    """
-
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.cost = 0.0
-        self.parent = None
-
-
 def main():
     print("Start " + __file__)
 
@@ -260,7 +264,7 @@ def main():
     # Set Initial parameters
     rrt = RRT(start=[0, 0], goal=[10, 10],
               randArea=[-2, 15], obstacleList=obstacleList)
-    path = rrt.Planning(animation=show_animation)
+    path = rrt.Planning(animation=show_animation, search_until_maxiter=False)
 
     if path is None:
         print("Cannot find path")
@@ -278,3 +282,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
