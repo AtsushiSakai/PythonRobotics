@@ -63,12 +63,14 @@ class RRT():
             if animation and i % 5 == 0:
                 self.DrawGraph(rnd)
 
-        # generate coruse
-        lastIndex = self.get_best_last_index()
-        if lastIndex is None:
-            return None
-        path = self.gen_final_course(lastIndex)
-        return path
+            # generate coruse
+            lastIndex = self.get_best_last_index()
+            if lastIndex is None:
+                continue
+            path = self.gen_final_course(lastIndex)
+            return path
+
+        return None
 
     def choose_parent(self, newNode, nearinds):
         if not nearinds:
