@@ -4,6 +4,9 @@ Ensemble Kalman Filter(EnKF) localization sample
 
 author: Ryohei Sasaki(rsasaki0109)
 
+Ref:
+- [Ensemble Kalman filtering](https://rmets.onlinelibrary.wiley.com/doi/10.1256/qj.05.135)
+
 """
 
 import numpy as np
@@ -124,7 +127,7 @@ def enkf_localization(px, xEst, PEst, z, u):
     px_hat=px + K @ (np.tile(z_lm_pos,(NP,1)).T- pz)
 
     xEst=np.average(px_hat, axis=1).reshape(4,1)
-    pEst=calc_covariance(xEst, px_hat)
+    PEst=calc_covariance(xEst, px_hat)
 
     return xEst, PEst, px_hat
 
