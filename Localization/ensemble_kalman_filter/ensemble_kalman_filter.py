@@ -1,6 +1,6 @@
 """
 
-Ensemble Kalman Filter localization sample
+Ensemble Kalman Filter(EnKF) localization sample
 
 author: Ryohei Sasaki(rsasaki0109)
 
