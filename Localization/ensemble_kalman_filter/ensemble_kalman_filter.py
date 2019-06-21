@@ -1,3 +1,4 @@
+
 """
 
 Ensemble Kalman Filter(EnKF) localization sample
@@ -34,7 +35,6 @@ def calc_input():
     return u
 
 
-
 def observation(xTrue, xd, u, RFID):
 
     xTrue = motion_model(xTrue, u)
@@ -50,7 +50,7 @@ def observation(xTrue, xd, u, RFID):
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Qsim[0, 0]  # add noise
             anglen = angle + np.random.randn() * Qsim[1, 1]  # add noise
-            zi = np.array([dn, anglen,RFID[i, 0], RFID[i, 1]])
+            zi = np.array([dn, anglen, RFID[i, 0], RFID[i, 1]])
             z = np.vstack((z, zi))
 
     # add noise to input
@@ -78,18 +78,23 @@ def motion_model(x, u):
 
 
 def calc_LM_Pos(x, landmarks):
-    landmarks_pos=np.zeros((2*landmarks.shape[0],1))
-    for (i,lm) in enumerate(landmarks):
-        landmarks_pos[2*i] = x[0, 0] + lm[0] * math.cos(x[2, 0] + lm[1]) + np.random.randn() * Qsim[0, 0]/np.sqrt(2)
-        landmarks_pos[2*i+1] = x[1, 0] + lm[0] * math.sin(x[2, 0] + lm[1]) + np.random.randn() * Qsim[0, 0]/np.sqrt(2)
+    landmarks_pos = np.zeros((2*landmarks.shape[0], 1))
+    for (i, lm) in enumerate(landmarks):
+        landmarks_pos[2*i] = x[0, 0] + lm[0] * \
+            math.cos(x[2, 0] + lm[1]) + np.random.randn() * \
+            Qsim[0, 0]/np.sqrt(2)
+        landmarks_pos[2*i+1] = x[1, 0] + lm[0] * \
+            math.sin(x[2, 0] + lm[1]) + np.random.randn() * \
+            Qsim[0, 0]/np.sqrt(2)
     return landmarks_pos
+
 
 def calc_covariance(xEst, px):
     cov = np.zeros((3, 3))
 
     for i in range(px.shape[1]):
         dx = (px[:, i] - xEst)[0:3]
-        cov +=  dx.dot(dx.T)
+        cov += dx.dot(dx.T)
 
     return cov
 
@@ -108,26 +113,26 @@ def enkf_localization(px, xEst, PEst, z, u):
         ud = np.array([[ud1, ud2]]).T
         x = motion_model(x, ud)
         px[:, ip] = x[:, 0]
-        z_pos=calc_LM_Pos(x, z)
+        z_pos = calc_LM_Pos(x, z)
         pz[:, ip] = z_pos[:, 0]
 
-    x_ave=np.mean(px, axis=1)
-    x_dif=px - np.tile(x_ave,(NP,1)).T
+    x_ave = np.mean(px, axis=1)
+    x_dif = px - np.tile(x_ave, (NP, 1)).T
 
-    z_ave=np.mean(pz, axis=1)
-    z_dif=pz - np.tile(z_ave,(NP,1)).T
+    z_ave = np.mean(pz, axis=1)
+    z_dif = pz - np.tile(z_ave, (NP, 1)).T
 
-    U = 1/(NP-1)* x_dif @ z_dif.T
-    V = 1/(NP-1)* z_dif @ z_dif.T 
+    U = 1/(NP-1) * x_dif @ z_dif.T
+    V = 1/(NP-1) * z_dif @ z_dif.T
 
-    K = U @ np.linalg.inv(V) # Kalman Gain
+    K = U @ np.linalg.inv(V)  # Kalman Gain
 
-    z_lm_pos = z[:,[2,3]].reshape(-1,)
+    z_lm_pos = z[:, [2, 3]].reshape(-1,)
 
-    px_hat=px + K @ (np.tile(z_lm_pos,(NP,1)).T- pz)
+    px_hat = px + K @ (np.tile(z_lm_pos, (NP, 1)).T - pz)
 
-    xEst=np.average(px_hat, axis=1).reshape(4,1)
-    PEst=calc_covariance(xEst, px_hat)
+    xEst = np.average(px_hat, axis=1).reshape(4, 1)
+    PEst = calc_covariance(xEst, px_hat)
 
     return xEst, PEst, px_hat
 
@@ -171,6 +176,7 @@ def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
 def pi_2_pi(angle):
     return (angle + math.pi) % (2 * math.pi) - math.pi
 
+
 def main():
     print(__file__ + " start!!")
 
@@ -181,7 +187,7 @@ def main():
                      [10.0, 10.0],
                      [0.0, 15.0],
                      [-5.0, 20.0]])
-    
+
     # State Vector [x y yaw v]'
     xEst = np.zeros((4, 1))
     xTrue = np.zeros((4, 1))
@@ -230,3 +236,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
