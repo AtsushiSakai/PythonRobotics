@@ -30,8 +30,9 @@ install:
   - conda install scipy
   - conda install matplotlib
   - conda install pandas
+  - conda config --add channels oxfordcontrol
   - conda install -c conda-forge lapack
-  - conda install -c cvxgrp cvxpy
+  - conda install -c cvxgrp cvxpy=1.0.24
   - conda install coveralls
 
 script:
