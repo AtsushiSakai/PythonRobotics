@@ -1,6 +1,6 @@
 """
 
-A* grid based planning
+A* grid planning
 
 author: Atsushi Sakai(@Atsushi_twi)
         Nikos Kanargias (nkana@tee.gr)
@@ -14,11 +14,12 @@ import math
 
 show_animation = True
 
+
 class AStarPlanner:
 
     def __init__(self, ox, oy, reso, rr):
         """
-        Intialize map for a star planning
+        Initialize grid map for a star planning
 
         ox: x position list of Obstacles [m]
         oy: y position list of Obstacles [m]
@@ -61,19 +62,19 @@ class AStarPlanner:
         ngoal = self.Node(self.calc_xyindex(gx, self.minx),
                           self.calc_xyindex(gy, self.miny), 0.0, -1)
 
-        openset, closedset = dict(), dict()
-        openset[self.calc_index(nstart)] = nstart
+        open_set, closed_set = dict(), dict()
+        open_set[self.calc_grid_index(nstart)] = nstart
 
         while 1:
             c_id = min(
-                openset, key=lambda o: openset[o].cost + self.calc_heuristic(ngoal, openset[o]))
-            current = openset[c_id]
+                open_set, key=lambda o: open_set[o].cost + self.calc_heuristic(ngoal, open_set[o]))
+            current = open_set[c_id]
 
             # show graph
             if show_animation:  # pragma: no cover
-                plt.plot(self.calc_position(current.x, self.minx),
-                         self.calc_position(current.y, self.miny), "xc")
-                if len(closedset.keys()) % 10 == 0:
+                plt.plot(self.calc_grid_position(current.x, self.minx),
+                         self.calc_grid_position(current.y, self.miny), "xc")
+                if len(closed_set.keys()) % 10 == 0:
                     plt.pause(0.001)
 
             if current.x == ngoal.x and current.y == ngoal.y:
@@ -83,66 +84,76 @@ class AStarPlanner:
                 break
 
             # Remove the item from the open set
-            del openset[c_id]
+            del open_set[c_id]
 
             # Add it to the closed set
-            closedset[c_id] = current
+            closed_set[c_id] = current
 
             # expand search grid based on motion model
             for i, _ in enumerate(self.motion):
                 node = self.Node(current.x + self.motion[i][0],
                                  current.y + self.motion[i][1],
                                  current.cost + self.motion[i][2], c_id)
-                n_id = self.calc_index(node)
+                n_id = self.calc_grid_index(node)
 
-                if n_id in closedset:
+                # If the node is in closed_set, do nothing
+                if n_id in closed_set:
                     continue
 
+                # If the node is not safe, do nothing
                 if not self.verify_node(node):
                     continue
 
-                if n_id not in openset:
-                    openset[n_id] = node  # Discover a new node
+                if n_id not in open_set:
+                    open_set[n_id] = node  # discovered a new node
                 else:
-                    if openset[n_id].cost >= node.cost:
-                        # This path is the best until now. record it!
-                        openset[n_id] = node
+                    if open_set[n_id].cost >= node.cost:
+                        # This path is the best until now. record it
+                        open_set[n_id] = node
 
-        rx, ry = self.calc_final_path(ngoal, closedset)
+        rx, ry = self.calc_final_path(ngoal, closed_set)
 
         return rx, ry
 
     def calc_final_path(self, ngoal, closedset):
         # generate final course
-        rx, ry = [self.calc_position(ngoal.x, self.minx)], [
-            self.calc_position(ngoal.y, self.miny)]
+        rx, ry = [self.calc_grid_position(ngoal.x, self.minx)], [
+            self.calc_grid_position(ngoal.y, self.miny)]
         pind = ngoal.pind
         while pind != -1:
             n = closedset[pind]
-            rx.append(self.calc_position(n.x, self.minx))
-            ry.append(self.calc_position(n.y, self.miny))
+            rx.append(self.calc_grid_position(n.x, self.minx))
+            ry.append(self.calc_grid_position(n.y, self.miny))
             pind = n.pind
 
         return rx, ry
 
-    def calc_heuristic(self, n1, n2):
+    @staticmethod
+    def calc_heuristic(n1, n2):
         w = 1.0  # weight of heuristic
-        d = w * math.sqrt((n1.x - n2.x)**2 + (n1.y - n2.y)**2)
+        d = w * math.sqrt((n1.x - n2.x) ** 2 + (n1.y - n2.y) ** 2)
         return d
 
-    def calc_position(self, index, minp):
-        pos = index*self.reso+minp
+    def calc_grid_position(self, index, minp):
+        """
+        calc grid position
+
+        :param index:
+        :param minp:
+        :return:
+        """
+        pos = index * self.reso + minp
         return pos
 
-    def calc_xyindex(self, position, minp):
-        return round((position - minp)/self.reso)
+    def calc_xyindex(self, position, min_pos):
+        return round((position - min_pos) / self.reso)
 
-    def calc_index(self, node):
+    def calc_grid_index(self, node):
         return (node.y - self.miny) * self.xwidth + (node.x - self.minx)
 
     def verify_node(self, node):
-        px = self.calc_position(node.x, self.minx)
-        py = self.calc_position(node.y, self.miny)
+        px = self.calc_grid_position(node.x, self.minx)
+        py = self.calc_grid_position(node.y, self.miny)
 
         if px < self.minx:
             return False
@@ -153,6 +164,7 @@ class AStarPlanner:
         elif py >= self.maxy:
             return False
 
+        # collision check
         if self.obmap[node.x][node.y]:
             return False
 
@@ -169,8 +181,8 @@ class AStarPlanner:
         print("maxx:", self.maxx)
         print("maxy:", self.maxy)
 
-        self.xwidth = round((self.maxx - self.minx)/self.reso)
-        self.ywidth = round((self.maxy - self.miny)/self.reso)
+        self.xwidth = round((self.maxx - self.minx) / self.reso)
+        self.ywidth = round((self.maxy - self.miny) / self.reso)
         print("xwidth:", self.xwidth)
         print("ywidth:", self.ywidth)
 
@@ -178,16 +190,17 @@ class AStarPlanner:
         self.obmap = [[False for i in range(self.ywidth)]
                       for i in range(self.xwidth)]
         for ix in range(self.xwidth):
-            x = self.calc_position(ix, self.minx)
+            x = self.calc_grid_position(ix, self.minx)
             for iy in range(self.ywidth):
-                y = self.calc_position(iy, self.miny)
+                y = self.calc_grid_position(iy, self.miny)
                 for iox, ioy in zip(ox, oy):
-                    d = math.sqrt((iox - x)**2 + (ioy - y)**2)
+                    d = math.sqrt((iox - x) ** 2 + (ioy - y) ** 2)
                     if d <= self.rr:
                         self.obmap[ix][iy] = True
                         break
 
-    def get_motion_model(self):
+    @staticmethod
+    def get_motion_model():
         # dx, dy, cost
         motion = [[1, 0, 1],
                   [0, 1, 1],
