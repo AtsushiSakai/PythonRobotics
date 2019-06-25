@@ -3,8 +3,8 @@ language: python
 matrix:
   include:
     - os: linux
-    #- os: osx
-      #python: "3.6-dev"
+    - os: osx
+      python: "3.6-dev"
 
 python:
   - 3.6
@@ -21,18 +21,12 @@ before_install:
     # Useful for debugging any issues with conda
     - conda info -a
     - conda install python==3.6.8
-    #- conda env create -f ./environment.yml
-    #- activate python_robotics
-
 
 install:
   - conda install numpy==1.15
   - conda install scipy
   - conda install matplotlib
   - conda install pandas
-  #- conda config --add channels oxfordcontrol
-  #- conda install -c conda-forge lapack
-  #- conda install -c cvxgrp cvxpy=1.0.24
   - pip install cvxpy
   - conda install coveralls
 
