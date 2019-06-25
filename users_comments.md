@@ -265,6 +265,10 @@ Dear Atsushi Sakai, <br> <br>This is probably one of the best open-source roboti
 
 ---
 
+hanks frnd, for ur contibusion
+
+—
+
 # Citations
 
 1. B. Blaga, M. Deac, R. W. Y. Al-doori, M. Negru and R. Dǎnescu, "Miniature Autonomous Vehicle Development on Raspberry Pi," 2018 IEEE 14th International Conference on Intelligent Computer Communication and Processing (ICCP), Cluj-Napoca, Romania, 2018, pp. 229-236.
