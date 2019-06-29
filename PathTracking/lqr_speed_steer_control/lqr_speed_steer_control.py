@@ -1,8 +1,3 @@
-import cubic_spline_planner
-import scipy.linalg as la
-import matplotlib.pyplot as plt
-import math
-import numpy as np
 """
 
 Path tracking simulation with LQR speed and steering control
@@ -10,8 +5,15 @@ Path tracking simulation with LQR speed and steering control
 author Atsushi Sakai (@Atsushi_twi)
 
 """
+import math
 import sys
+
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.linalg as la
+
 sys.path.append("../../PathPlanning/CubicSpline/")
+import cubic_spline_planner
 
 
 # LQR parameter
@@ -59,6 +61,7 @@ def solve_DARE(A, B, Q, R):
     solve a discrete time_Algebraic Riccati equation (DARE)
     """
     X = Q
+    Xn = Q
     maxiter = 150
     eps = 0.01
 
@@ -85,9 +88,9 @@ def dlqr(A, B, Q, R):
     # compute the LQR gain
     K = la.inv(B.T @ X @ B + R) @ (B.T @ X @ A)
 
-    eigVals, eigVecs = la.eig(A - B @ K)
+    eigs = la.eig(A - B @ K)
 
-    return K, X, eigVals
+    return K, X, eigs[0]
 
 
 def lqr_steering_control(state, cx, cy, cyaw, ck, pe, pth_e, sp):
