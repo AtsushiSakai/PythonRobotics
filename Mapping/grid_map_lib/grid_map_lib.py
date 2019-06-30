@@ -185,13 +185,14 @@ class GridMap:
 
         return inside
 
-    def plot_grid_map(self):
+    def plot_grid_map(self, ax=None):
 
         grid_data = np.reshape(np.array(self.data), (self.height, self.width))
-        fig, ax = plt.subplots()
+        if not ax:
+            fig, ax = plt.subplots()
         heat_map = ax.pcolor(grid_data, cmap="Blues", vmin=0.0, vmax=1.0)
         plt.axis("equal")
-        plt.show()
+        # plt.show()
 
         return heat_map
 
