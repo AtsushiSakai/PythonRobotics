@@ -267,7 +267,13 @@ Dear Atsushi Sakai, <br> <br>This is probably one of the best open-source roboti
 
 hanks frnd, for ur contibusion
 
-—
+—--
+
+Thank you for python robotics!!
+
+--Manuel Miguez
+
+---
 
 # Citations
 
