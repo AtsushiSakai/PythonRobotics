@@ -36,7 +36,7 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - "python -m pip install --upgrade pip"
+  #- "python -m pip install --upgrade pip"
   #- conda install numpy==1.15
   #- conda install scipy
   #- conda install matplotlib
