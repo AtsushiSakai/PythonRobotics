@@ -6,14 +6,12 @@ environment:
     CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
 
 matrix:
-  
   - PYTHON: "C:\\Python36-x64"
     PYTHON_VERSION: "3.6.x" # currently 3.6.5
     PYTHON_ARCH: "64"
 
 init:
   - "ECHO %MINICONDA% %PYTHON_VERSION% %PYTHON_ARCH%"
-
 
 install:
   # If there is a newer build queued for the same PR, cancel this one.
