@@ -36,15 +36,6 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  #- "python -m pip install --upgrade pip"
-  #- conda install numpy==1.15
-  #- conda install scipy
-  #- conda install matplotlib
-  #- conda install pandas
-  #- conda config --add channels conda-forge
-  #- conda install -c conda-forge lapack
-  #- conda install -c cvxgrp cvxpy
-  #- conda install coveralls
   - conda env create -f C:\\projects\pythonrobotics\environment.yml
   - activate python_robotics
 
