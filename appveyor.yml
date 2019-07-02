@@ -7,8 +7,10 @@ environment:
 
 
   matrix:
-  - PYTHON_VERSION: 3.6
-    MINICONDA: "C:\\Miniconda36-x64"
+  
+  - PYTHON: "C:\\Python36-x64"
+    PYTHON_VERSION: "3.6.x" # currently 3.6.5
+    PYTHON_ARCH: "64"
 
 init:
   - "ECHO %MINICONDA% %PYTHON_VERSION% %PYTHON_ARCH%"
