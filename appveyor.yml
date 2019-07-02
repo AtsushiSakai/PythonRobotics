@@ -6,8 +6,8 @@ environment:
     CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
 
   matrix:
-    - PYTHON_VERSION: 3.6
-      MINICONDA: C:\Miniconda4
+    - MINICONDA: C:\Miniconda36-x64
+
 
 
 init:
