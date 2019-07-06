@@ -12,9 +12,6 @@
 
 Python codes for robotics algorithm.
 
-
-
-
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -27,7 +24,7 @@ Python codes for robotics algorithm.
    * [Mapping](#mapping)
       * [Gaussian grid map](#gaussian-grid-map)
       * [Ray casting grid map](#ray-casting-grid-map)
-      * [Lidar to grid map](#lidar-to-grid-map)	  
+      * [Lidar to grid map](#lidar-to-grid-map)
       * [k-means object clustering](#k-means-object-clustering)
       * [Rectangle fitting](#rectangle-fitting)
    * [SLAM](#slam)
@@ -40,6 +37,7 @@ Python codes for robotics algorithm.
          * [Dijkstra algorithm](#dijkstra-algorithm)
          * [A* algorithm](#a-algorithm)
          * [Potential Field algorithm](#potential-field-algorithm)
+         * [Potential Field algorithm](#potential-field-algorithm-1)
       * [State Lattice Planning](#state-lattice-planning)
          * [Biased polar sampling](#biased-polar-sampling)
          * [Lane sampling](#lane-sampling)
@@ -298,6 +296,12 @@ In the animation, the blue heat map shows potential value on each grid.
 Ref:
 
 - [Robotic Motion Planning:Potential Functions](https://www.cs.cmu.edu/~motionplanning/lecture/Chap4-Potential-Field_howie.pdf)
+
+### Potential Field algorithm
+
+This is a 2D grid based coverage path planning simulation.
+
+![PotentialField](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/GridBasedSweepCPP/animation.gif)
 
 ## State Lattice Planning
 
@@ -595,6 +599,7 @@ This is a list: [Users comments](https://github.com/AtsushiSakai/PythonRobotics/
 - [Antonin RAFFIN](https://github.com/araffin)
 
 - [Alexis Paques](https://github.com/AlexisTM)
+
 
 
 
