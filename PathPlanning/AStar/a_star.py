@@ -9,8 +9,9 @@ See Wikipedia article (https://en.wikipedia.org/wiki/A*_search_algorithm)
 
 """
 
-import matplotlib.pyplot as plt
 import math
+
+import matplotlib.pyplot as plt
 
 show_animation = True
 
@@ -66,6 +67,10 @@ class AStarPlanner:
         open_set[self.calc_grid_index(nstart)] = nstart
 
         while 1:
+            if len(open_set) == 0:
+                print("Open set is empty..")
+                break
+
             c_id = min(
                 open_set, key=lambda o: open_set[o].cost + self.calc_heuristic(ngoal, open_set[o]))
             current = open_set[c_id]
@@ -89,25 +94,25 @@ class AStarPlanner:
             # Add it to the closed set
             closed_set[c_id] = current
 
-            # expand search grid based on motion model
+            # expand_grid search grid based on motion model
             for i, _ in enumerate(self.motion):
                 node = self.Node(current.x + self.motion[i][0],
                                  current.y + self.motion[i][1],
                                  current.cost + self.motion[i][2], c_id)
                 n_id = self.calc_grid_index(node)
 
-                # If the node is in closed_set, do nothing
-                if n_id in closed_set:
-                    continue
 
                 # If the node is not safe, do nothing
                 if not self.verify_node(node):
                     continue
 
+                if n_id in closed_set:
+                    continue
+
                 if n_id not in open_set:
                     open_set[n_id] = node  # discovered a new node
                 else:
-                    if open_set[n_id].cost >= node.cost:
+                    if open_set[n_id].cost > node.cost:
                         # This path is the best until now. record it
                         open_set[n_id] = node
 

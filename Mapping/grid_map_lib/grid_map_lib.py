@@ -98,9 +98,13 @@ class GridMap:
         :param val: grid value
         """
 
+        if (x_ind is None) or (y_ind is None):
+            print(x_ind, y_ind)
+            return False, False
+
         grid_ind = int(y_ind * self.width + x_ind)
 
-        if 0 <= grid_ind <= self.ndata:
+        if 0 <= grid_ind < self.ndata:
             self.data[grid_ind] = val
             return True  # OK
         else:
@@ -163,6 +167,23 @@ class GridMap:
             return True
         else:
             return False
+
+    def expand_grid(self):
+        xinds, yinds = [], []
+
+        for ix in range(self.width):
+            for iy in range(self.height):
+                if self.check_occupied_from_xy_index(ix, iy):
+                    xinds.append(ix)
+                    yinds.append(iy)
+
+        for (ix, iy) in zip(xinds, yinds):
+            self.set_value_from_xy_index(ix + 1, iy, val=1.0)
+            self.set_value_from_xy_index(ix, iy + 1, val=1.0)
+            self.set_value_from_xy_index(ix + 1, iy + 1, val=1.0)
+            self.set_value_from_xy_index(ix - 1, iy, val=1.0)
+            self.set_value_from_xy_index(ix, iy - 1, val=1.0)
+            self.set_value_from_xy_index(ix - 1, iy - 1, val=1.0)
 
     @staticmethod
     def check_inside_polygon(iox, ioy, x, y):
