@@ -5,14 +5,13 @@ environment:
     # See: http://stackoverflow.com/a/13751649/163740
     CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
 
-
   matrix:
-  - PYTHON_VERSION: 3.6
-    MINICONDA: "C:\\Miniconda36-x64"
+    - MINICONDA: C:\Miniconda36-x64
+
+
 
 init:
   - "ECHO %MINICONDA% %PYTHON_VERSION% %PYTHON_ARCH%"
-
 
 install:
   # If there is a newer build queued for the same PR, cancel this one.
@@ -37,15 +36,6 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - "python -m pip install --upgrade pip"
-  #- conda install numpy==1.15
-  #- conda install scipy
-  #- conda install matplotlib
-  #- conda install pandas
-  #- conda config --add channels conda-forge
-  #- conda install -c conda-forge lapack
-  #- conda install -c cvxgrp cvxpy
-  #- conda install coveralls
   - conda env create -f C:\\projects\pythonrobotics\environment.yml
   - activate python_robotics
 
