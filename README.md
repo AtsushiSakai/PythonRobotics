@@ -12,6 +12,7 @@
 
 Python codes for robotics algorithm.
 
+
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -37,7 +38,7 @@ Python codes for robotics algorithm.
          * [Dijkstra algorithm](#dijkstra-algorithm)
          * [A* algorithm](#a-algorithm)
          * [Potential Field algorithm](#potential-field-algorithm)
-         * [Potential Field algorithm](#potential-field-algorithm-1)
+         * [Grid based coverage path planning](#grid-based-coverage-path-planning)
       * [State Lattice Planning](#state-lattice-planning)
          * [Biased polar sampling](#biased-polar-sampling)
          * [Lane sampling](#lane-sampling)
@@ -297,7 +298,7 @@ Ref:
 
 - [Robotic Motion Planning:Potential Functions](https://www.cs.cmu.edu/~motionplanning/lecture/Chap4-Potential-Field_howie.pdf)
 
-### Potential Field algorithm
+### Grid based coverage path planning
 
 This is a 2D grid based coverage path planning simulation.
 
@@ -599,6 +600,7 @@ This is a list: [Users comments](https://github.com/AtsushiSakai/PythonRobotics/
 - [Antonin RAFFIN](https://github.com/araffin)
 
 - [Alexis Paques](https://github.com/AlexisTM)
+
 
 
 
