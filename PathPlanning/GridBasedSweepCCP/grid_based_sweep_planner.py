@@ -15,7 +15,7 @@ sys.path.append(os.path.relpath("../../Mapping/grid_map_lib/"))
 try:
     from grid_map_lib import GridMap
 except ImportError:
-    exit()
+    raise
 
 do_animation = True
 
