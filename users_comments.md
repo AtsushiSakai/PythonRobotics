@@ -275,6 +275,12 @@ Thank you for python robotics!!
 
 ---
 
+Great job
+
+--Anonymous
+
+---
+
 # Citations
 
 1. B. Blaga, M. Deac, R. W. Y. Al-doori, M. Negru and R. Dǎnescu, "Miniature Autonomous Vehicle Development on Raspberry Pi," 2018 IEEE 14th International Conference on Intelligent Computer Communication and Processing (ICCP), Cluj-Napoca, Romania, 2018, pp. 229-236.
