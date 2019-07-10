@@ -275,6 +275,18 @@ Thank you for python robotics!!
 
 ---
 
+Great job
+
+--Anonymous
+
+---
+
+Dear Atsushi Sakai <br>Thank you for the Python Robotics
+
+--Alex Liberzon
+
+---
+
 # Citations
 
 1. B. Blaga, M. Deac, R. W. Y. Al-doori, M. Negru and R. Dǎnescu, "Miniature Autonomous Vehicle Development on Raspberry Pi," 2018 IEEE 14th International Conference on Intelligent Computer Communication and Processing (ICCP), Cluj-Napoca, Romania, 2018, pp. 229-236.
@@ -283,6 +295,8 @@ keywords: {Automobiles;Task analysis;Autonomous vehicles;Path planning;Global Po
 URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8516589&isnumber=8516425
 
 2. Peggy (Yuchun) Wang and Caitlin Hogan, "Path Planning with Dynamic Obstacle Avoidance for a Jumping-Enabled Robot", AA228/CS238 class report, Department of Computer Science, Stanford University, URL: https://web.stanford.edu/class/aa228/reports/2018/final113.pdf
+
+3. Welburn, E, Hakim Khalili, H, Gupta, A, Watson, S & Carrasco, J 2019, A Navigational System for Quadcopter Remote Inspection of Offshore Substations. in The Fifteenth International Conference on Autonomic and Autonomous Systems 2019. URL:https://www.research.manchester.ac.uk/portal/files/107169964/ICAS19_A_Navigational_System_for_Quadcopter_Remote_Inspection_of_Offshore_Substations.pdf
 
 
 # Others
