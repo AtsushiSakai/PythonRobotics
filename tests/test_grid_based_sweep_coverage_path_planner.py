@@ -1,7 +1,12 @@
+import os
+import sys
 from unittest import TestCase
 
-import grid_based_sweep_coverage_path_planner
-
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../PathPlanning/GridBasedSweepCPP")
+try:
+    import grid_based_sweep_coverage_path_planner
+except:
+    raise
 
 class TestPlanning(TestCase):
 

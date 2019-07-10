@@ -39,7 +39,6 @@ class SweepSearcher:
         self.goaly = goaly
 
     def move_target_grid(self, cxind, cyind, gmap):
-
         nxind = self.moving_direction + cxind
         nyind = cyind
 
@@ -96,7 +95,8 @@ class SweepSearcher:
         self.update_turning_window()
 
     def search_start_grid(self, grid_map):
-        xinds = [], y_ind = 0
+        xinds = []
+        y_ind = 0
         if self.sweep_direction == self.SweepDirection.DOWN:
             xinds, y_ind = search_free_grid_index_at_edge_y(grid_map, from_upper=True)
         elif self.sweep_direction == self.SweepDirection.UP:
@@ -191,7 +191,8 @@ def setup_grid_map(ox, oy, reso, sweep_direction, offset_grid=10):
 
     grid_map.expand_grid()
 
-    xinds_goaly = [], goaly = 0
+    xinds_goaly = []
+    goaly = 0
     if sweep_direction == SweepSearcher.SweepDirection.UP:
         xinds_goaly, goaly = search_free_grid_index_at_edge_y(grid_map, from_upper=True)
     elif sweep_direction == SweepSearcher.SweepDirection.DOWN:
