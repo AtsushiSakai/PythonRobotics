@@ -1,19 +1,21 @@
 """
-Path Planning Sample Code with Closed loop RRT for car like robot.
+Path planning Sample Code with Closed loop RRT for car like robot.
 
 author: AtsushiSakai(@Atsushi_twi)
 
 """
 
-import random
-import math
 import copy
-import numpy as np
-import pure_pursuit
-import matplotlib.pyplot as plt
-
-import sys
+import math
 import os
+import random
+import sys
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+import pure_pursuit
+
 sys.path.append(os.path.dirname(
     os.path.abspath(__file__)) + "/../ReedsSheppPath/")
 
@@ -32,11 +34,11 @@ STEP_SIZE = 0.1
 
 class RRT():
     """
-    Class for RRT Planning
+    Class for RRT planning
     """
 
     def __init__(self, start, goal, obstacleList, randArea,
-                 maxIter=200):
+                 maxIter=50):
         """
         Setting Parameter
 
@@ -77,6 +79,7 @@ class RRT():
         self.try_goal_path()
 
         for i in range(self.maxIter):
+            print("loop:", i)
             rnd = self.get_random_point()
             nind = self.GetNearestListIndex(self.nodeList, rnd)
 
@@ -113,7 +116,7 @@ class RRT():
 
         best_time = float("inf")
 
-        fx = None
+        fx, fy, fyaw, fv, ft, fa, fd = None, None, None, None, None, None, None
 
         # pure pursuit tracking
         for ind in path_indexs:
@@ -246,7 +249,7 @@ class RRT():
         return node
 
     def get_best_last_indexs(self):
-        #  print("get_best_last_index")
+        #  print("search_finish_node")
 
         YAWTH = np.deg2rad(1.0)
         XYTH = 0.5
@@ -387,7 +390,7 @@ class Node():
         self.parent = None
 
 
-def main(gx=6.0, gy=7.0, gyaw=np.deg2rad(90.0), maxIter=500):
+def main(gx=6.0, gy=7.0, gyaw=np.deg2rad(90.0), maxIter=200):
     print("Start" + __file__)
     # ====Search Path with RRT====
     obstacleList = [

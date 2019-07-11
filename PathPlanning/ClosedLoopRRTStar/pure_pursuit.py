@@ -5,9 +5,11 @@ Path tracking simulation with pure pursuit steering control and PID speed contro
 author: Atsushi Sakai
 
 """
-import numpy as np
 import math
+
 import matplotlib.pyplot as plt
+import numpy as np
+
 import unicycle_model
 
 Kp = 2.0  # speed propotional gain
@@ -75,7 +77,7 @@ def calc_target_index(state, cx, cy):
 
     while Lf > L and (ind + 1) < len(cx):
         dx = cx[ind + 1] - cx[ind]
-        dy = cx[ind + 1] - cx[ind]
+        dy = cy[ind + 1] - cy[ind]
         L += math.sqrt(dx ** 2 + dy ** 2)
         ind += 1
 
@@ -153,6 +155,7 @@ def set_stop_point(target_speed, cx, cy, cyaw):
     forward = True
 
     d = []
+    is_back = False
 
     # Set stop point
     for i in range(len(cx) - 1):
