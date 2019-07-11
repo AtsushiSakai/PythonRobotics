@@ -569,6 +569,12 @@ A small PR like bug fix is welcome.
 
 If your PR is merged multiple times, I will add your account to the author list.
 
+# Citing
+
+If you use this project's code for your academic work, we encourage you to cite [our papers](https://arxiv.org/abs/1808.10703) 
+
+If you use this project's code in industry, we'd love to hear from you as well; feel free to reach out to the developers directly.
+
 # Support
 
 If you or your company would like to support this project, please consider:
