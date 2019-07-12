@@ -22,7 +22,7 @@ def LQRplanning(sx, sy, gx, gy):
 
     rx, ry = [sx], [sy]
 
-    x = np.matrix([sx - gx, sy - gy]).T  # State vector
+    x = np.array([sx - gx, sy - gy]).reshape(2, 1)  # State vector
 
     # Linear system model
     A, B = get_system_model()
@@ -35,7 +35,7 @@ def LQRplanning(sx, sy, gx, gy):
 
         u = LQR_control(A, B, x)
 
-        x = A * x + B * u
+        x = A @ x + B @ u
 
         rx.append(x[0, 0] + gx)
         ry.append(x[1, 0] + gy)
@@ -47,7 +47,7 @@ def LQRplanning(sx, sy, gx, gy):
             break
 
         # animation
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.plot(sx, sy, "or")
             plt.plot(gx, gy, "ob")
             plt.plot(rx, ry, "-r")
@@ -73,7 +73,6 @@ def solve_DARE(A, B, Q, R):
         Xn = A.T * X * A - A.T * X * B * \
             la.inv(R + B.T * X * B) * B.T * X * A + Q
         if (abs(Xn - X)).max() < eps:
-            X = Xn
             break
         X = Xn
 
@@ -91,18 +90,18 @@ def dlqr(A, B, Q, R):
     X = solve_DARE(A, B, Q, R)
 
     # compute the LQR gain
-    K = np.matrix(la.inv(B.T * X * B + R) * (B.T * X * A))
+    K = la.inv(B.T @ X @ B + R) @ (B.T @ X @ A)
 
-    eigVals, eigVecs = la.eig(A - B * K)
+    eigVals, eigVecs = la.eig(A - B @ K)
 
     return K, X, eigVals
 
 
 def get_system_model():
 
-    A = np.matrix([[DT, 1.0],
-                   [0.0, DT]])
-    B = np.matrix([0.0, 1.0]).T
+    A = np.array([[DT, 1.0],
+                  [0.0, DT]])
+    B = np.array([0.0, 1.0]).reshape(2, 1)
 
     return A, B
 
@@ -111,7 +110,7 @@ def LQR_control(A, B, x):
 
     Kopt, X, ev = dlqr(A, B, np.eye(2), np.eye(1))
 
-    u = -Kopt * x
+    u = -Kopt @ x
 
     return u
 
@@ -130,30 +129,12 @@ def main():
 
         rx, ry = LQRplanning(sx, sy, gx, gy)
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.plot(sx, sy, "or")
             plt.plot(gx, gy, "ob")
             plt.plot(rx, ry, "-r")
             plt.axis("equal")
             plt.pause(1.0)
-
-
-def main1():
-    print(__file__ + " start!!")
-
-    sx = 6.0
-    sy = 6.0
-    gx = 10.0
-    gy = 10.0
-
-    rx, ry = LQRplanning(sx, sy, gx, gy)
-
-    if show_animation:
-        plt.plot(sx, sy, "or")
-        plt.plot(gx, gy, "ob")
-        plt.plot(rx, ry, "-r")
-        plt.axis("equal")
-        plt.show()
 
 
 if __name__ == '__main__':

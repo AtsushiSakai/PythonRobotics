@@ -1,7 +1,9 @@
 """
+
 Lookup Table generation for model predictive trajectory generator
 
 author: Atsushi Sakai
+
 """
 from matplotlib import pyplot as plt
 import numpy as np
@@ -12,9 +14,9 @@ import pandas as pd
 
 
 def calc_states_list():
-    maxyaw = math.radians(-30.0)
+    maxyaw = np.deg2rad(-30.0)
 
-    x = np.arange(1.0, 30.0, 5.0)
+    x = np.arange(10.0, 30.0, 5.0)
     y = np.arange(0.0, 20.0, 2.0)
     yaw = np.arange(-maxyaw, maxyaw, maxyaw)
 
@@ -23,7 +25,7 @@ def calc_states_list():
         for iy in y:
             for ix in x:
                 states.append([ix, iy, iyaw])
-    # print(len(states))
+    print("nstate:", len(states))
 
     return states
 
@@ -75,8 +77,8 @@ def generate_lookup_table():
             state[0], state[1], state[2], lookuptable)
 
         target = motion_model.State(x=state[0], y=state[1], yaw=state[2])
-        init_p = np.matrix(
-            [math.sqrt(state[0] ** 2 + state[1] ** 2), bestp[4], bestp[5]]).T
+        init_p = np.array(
+            [math.sqrt(state[0] ** 2 + state[1] ** 2), bestp[4], bestp[5]]).reshape(3, 1)
 
         x, y, yaw, p = planner.optimize_trajectory(target, k0, init_p)
 

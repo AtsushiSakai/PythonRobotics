@@ -5,14 +5,16 @@ Path tracking simulation with LQR speed and steering control
 author Atsushi Sakai (@Atsushi_twi)
 
 """
-import sys
-sys.path.append("../../PathPlanning/CubicSpline/")
-
-import numpy as np
 import math
+import sys
+
 import matplotlib.pyplot as plt
+import numpy as np
 import scipy.linalg as la
+
+sys.path.append("../../PathPlanning/CubicSpline/")
 import cubic_spline_planner
+
 
 # LQR parameter
 Q = np.eye(5)
@@ -21,7 +23,7 @@ R = np.eye(2)
 # parameters
 dt = 0.1  # time tick[s]
 L = 0.5  # Wheel base of the vehicle [m]
-max_steer = math.radians(45.0)  # maximum steering angle[rad]
+max_steer = np.deg2rad(45.0)  # maximum steering angle[rad]
 
 show_animation = True
 
@@ -51,13 +53,7 @@ def update(state, a, delta):
 
 
 def pi_2_pi(angle):
-    while (angle > math.pi):
-        angle = angle - 2.0 * math.pi
-
-    while (angle < -math.pi):
-        angle = angle + 2.0 * math.pi
-
-    return angle
+    return (angle + math.pi) % (2 * math.pi) - math.pi
 
 
 def solve_DARE(A, B, Q, R):
@@ -65,14 +61,14 @@ def solve_DARE(A, B, Q, R):
     solve a discrete time_Algebraic Riccati equation (DARE)
     """
     X = Q
+    Xn = Q
     maxiter = 150
     eps = 0.01
 
     for i in range(maxiter):
-        Xn = A.T * X * A - A.T * X * B * \
-            la.inv(R + B.T * X * B) * B.T * X * A + Q
+        Xn = A.T @ X @ A - A.T @ X @ B @ \
+            la.inv(R + B.T @ X @ B) @ B.T @ X @ A + Q
         if (abs(Xn - X)).max() < eps:
-            X = Xn
             break
         X = Xn
 
@@ -90,11 +86,11 @@ def dlqr(A, B, Q, R):
     X = solve_DARE(A, B, Q, R)
 
     # compute the LQR gain
-    K = np.matrix(la.inv(B.T * X * B + R) * (B.T * X * A))
+    K = la.inv(B.T @ X @ B + R) @ (B.T @ X @ A)
 
-    eigVals, eigVecs = la.eig(A - B * K)
+    eigs = la.eig(A - B @ K)
 
-    return K, X, eigVals
+    return K, X, eigs[0]
 
 
 def lqr_steering_control(state, cx, cy, cyaw, ck, pe, pth_e, sp):
@@ -106,7 +102,7 @@ def lqr_steering_control(state, cx, cy, cyaw, ck, pe, pth_e, sp):
     v = state.v
     th_e = pi_2_pi(state.yaw - cyaw[ind])
 
-    A = np.matrix(np.zeros((5, 5)))
+    A = np.zeros((5, 5))
     A[0, 0] = 1.0
     A[0, 1] = dt
     A[1, 2] = v
@@ -115,13 +111,13 @@ def lqr_steering_control(state, cx, cy, cyaw, ck, pe, pth_e, sp):
     A[4, 4] = 1.0
     # print(A)
 
-    B = np.matrix(np.zeros((5, 2)))
+    B = np.zeros((5, 2))
     B[3, 0] = v / L
     B[4, 1] = dt
 
     K, _, _ = dlqr(A, B, Q, R)
 
-    x = np.matrix(np.zeros((5, 1)))
+    x = np.zeros((5, 1))
 
     x[0, 0] = e
     x[1, 0] = (e - pe) / dt
@@ -129,7 +125,7 @@ def lqr_steering_control(state, cx, cy, cyaw, ck, pe, pth_e, sp):
     x[3, 0] = (th_e - pth_e) / dt
     x[4, 0] = v - tv
 
-    ustar = -K * x
+    ustar = -K @ x
 
     # calc steering input
 
@@ -148,11 +144,13 @@ def calc_nearest_index(state, cx, cy, cyaw):
     dx = [state.x - icx for icx in cx]
     dy = [state.y - icy for icy in cy]
 
-    d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
+    d = [idx ** 2 + idy ** 2 for (idx, idy) in zip(dx, dy)]
 
     mind = min(d)
 
     ind = d.index(mind)
+
+    mind = math.sqrt(mind)
 
     dxl = cx[ind] - state.x
     dyl = cy[ind] - state.y
@@ -177,7 +175,6 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
     yaw = [state.yaw]
     v = [state.v]
     t = [0.0]
-    target_ind = calc_nearest_index(state, cx, cy, cyaw)
 
     e, e_th = 0.0, 0.0
 
@@ -212,8 +209,8 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
             plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")
             plt.axis("equal")
             plt.grid(True)
-            plt.title("speed[km/h]:" + str(round(state.v * 3.6, 2)) +
-                      ",target index:" + str(target_ind))
+            plt.title("speed[km/h]:" + str(round(state.v * 3.6, 2))
+                      + ",target index:" + str(target_ind))
             plt.pause(0.0001)
 
     return t, x, y, yaw, v
@@ -263,9 +260,9 @@ def main():
 
     t, x, y, yaw, v = closed_loop_prediction(cx, cy, cyaw, ck, sp, goal)
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.close()
-        flg, _ = plt.subplots(1)
+        plt.subplots(1)
         plt.plot(ax, ay, "xb", label="waypoints")
         plt.plot(cx, cy, "-r", label="target course")
         plt.plot(x, y, "-g", label="tracking")
@@ -275,14 +272,14 @@ def main():
         plt.ylabel("y[m]")
         plt.legend()
 
-        flg, ax = plt.subplots(1)
-        plt.plot(s, [math.degrees(iyaw) for iyaw in cyaw], "-r", label="yaw")
+        plt.subplots(1)
+        plt.plot(s, [np.rad2deg(iyaw) for iyaw in cyaw], "-r", label="yaw")
         plt.grid(True)
         plt.legend()
         plt.xlabel("line length[m]")
         plt.ylabel("yaw angle[deg]")
 
-        flg, ax = plt.subplots(1)
+        plt.subplots(1)
         plt.plot(s, ck, "-r", label="curvature")
         plt.grid(True)
         plt.legend()

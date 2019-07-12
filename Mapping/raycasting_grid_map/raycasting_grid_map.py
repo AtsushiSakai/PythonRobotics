@@ -114,14 +114,15 @@ def main():
     print(__file__ + " start!!")
 
     xyreso = 0.25  # x-y grid resolution [m]
-    yawreso = math.radians(10.0)  # yaw angle resolution [rad]
+    yawreso = np.deg2rad(10.0)  # yaw angle resolution [rad]
 
     for i in range(5):
         ox = (np.random.rand(4) - 0.5) * 10.0
         oy = (np.random.rand(4) - 0.5) * 10.0
         pmap, minx, maxx, miny, maxy, xyreso = generate_ray_casting_grid_map(
             ox, oy, xyreso, yawreso)
-        if show_animation:
+
+        if show_animation:  # pragma: no cover
             plt.cla()
             draw_heatmap(pmap, minx, maxx, miny, maxy, xyreso)
             plt.plot(ox, oy, "xr")

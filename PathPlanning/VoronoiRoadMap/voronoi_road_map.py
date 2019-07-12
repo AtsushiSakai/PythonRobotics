@@ -43,7 +43,7 @@ class KDTree:
         self.tree = scipy.spatial.cKDTree(data)
 
     def search(self, inp, k=1):
-        u"""
+        """
         Search NN
 
         inp: input data, single frame or multi frame
@@ -60,12 +60,12 @@ class KDTree:
                 dist.append(idist)
 
             return index, dist
-        else:
-            dist, index = self.tree.query(inp, k=k)
-            return index, dist
+
+        dist, index = self.tree.query(inp, k=k)
+        return index, dist
 
     def search_in_distance(self, inp, r):
-        u"""
+        """
         find points with in a distance r
         """
 
@@ -78,7 +78,7 @@ def VRM_planning(sx, sy, gx, gy, ox, oy, rr):
     obkdtree = KDTree(np.vstack((ox, oy)).T)
 
     sample_x, sample_y = sample_points(sx, sy, gx, gy, rr, ox, oy, obkdtree)
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.plot(sample_x, sample_y, ".b")
 
     road_map = generate_roadmap(sample_x, sample_y, rr, obkdtree)
@@ -104,14 +104,14 @@ def is_collision(sx, sy, gx, gy, rr, okdtree):
     nstep = round(d / D)
 
     for i in range(nstep):
-        idxs, dist = okdtree.search(np.matrix([x, y]).T)
+        idxs, dist = okdtree.search(np.array([x, y]).reshape(2, 1))
         if dist[0] <= rr:
             return True  # collision
         x += D * math.cos(yaw)
         y += D * math.sin(yaw)
 
     # goal point check
-    idxs, dist = okdtree.search(np.matrix([gx, gy]).T)
+    idxs, dist = okdtree.search(np.array([gx, gy]).reshape(2, 1))
     if dist[0] <= rr:
         return True  # collision
 
@@ -135,8 +135,9 @@ def generate_roadmap(sample_x, sample_y, rr, obkdtree):
     for (i, ix, iy) in zip(range(nsample), sample_x, sample_y):
 
         index, dists = skdtree.search(
-            np.matrix([ix, iy]).T, k=nsample)
-        inds = index[0][0]
+            np.array([ix, iy]).reshape(2, 1), k=nsample)
+
+        inds = index[0]
         edge_id = []
         #  print(index)
 
@@ -174,7 +175,7 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
     openset[len(road_map) - 2] = nstart
 
     while True:
-        if len(openset) == 0:
+        if not openset:
             print("Cannot find path")
             break
 
@@ -182,7 +183,7 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
         current = openset[c_id]
 
         # show graph
-        if show_animation and len(closedset.keys()) % 2 == 0:
+        if show_animation and len(closedset.keys()) % 2 == 0:  # pragma: no cover
             plt.plot(current.x, current.y, "xg")
             plt.pause(0.001)
 
@@ -228,9 +229,9 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
     return rx, ry
 
 
-def plot_road_map(road_map, sample_x, sample_y):
+def plot_road_map(road_map, sample_x, sample_y):  # pragma: no cover
 
-    for i in range(len(road_map)):
+    for i, _ in enumerate(road_map):
         for ii in range(len(road_map[i])):
             ind = road_map[i][ii]
 
@@ -286,7 +287,7 @@ def main():
         ox.append(40.0)
         oy.append(60.0 - i)
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.plot(ox, oy, ".k")
         plt.plot(sx, sy, "^r")
         plt.plot(gx, gy, "^c")
@@ -295,9 +296,9 @@ def main():
 
     rx, ry = VRM_planning(sx, sy, gx, gy, ox, oy, robot_size)
 
-    assert len(rx) != 0, 'Cannot found path'
+    assert rx, 'Cannot found path'
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.plot(rx, ry, "-r")
         plt.show()
 

@@ -1,9 +1,6 @@
 """
-
 Iterative Closest Point (ICP) SLAM example
-
 author: Atsushi Sakai (@Atsushi_twi)
-
 """
 
 import math
@@ -20,17 +17,14 @@ show_animation = True
 def ICP_matching(ppoints, cpoints):
     """
     Iterative Closest Point matching
-
     - input
     ppoints: 2D points in the previous frame
     cpoints: 2D points in the current frame
-
     - output
     R: Rotation matrix
     T: Translation vector
-
     """
-    H = None  # homogeneraous transformation matrix
+    H = None  # homogeneous transformation matrix
 
     dError = 1000.0
     preError = 1000.0
@@ -39,7 +33,7 @@ def ICP_matching(ppoints, cpoints):
     while dError >= EPS:
         count += 1
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             plt.plot(ppoints[0, :], ppoints[1, :], ".r")
             plt.plot(cpoints[0, :], cpoints[1, :], ".b")
@@ -51,9 +45,9 @@ def ICP_matching(ppoints, cpoints):
         Rt, Tt = SVD_motion_estimation(ppoints[:, inds], cpoints)
 
         # update current points
-        cpoints = (Rt * cpoints) + Tt
+        cpoints = (Rt @ cpoints) + Tt[:, np.newaxis]
 
-        H = update_homogenerous_matrix(H, Rt, Tt)
+        H = update_homogeneous_matrix(H, Rt, Tt)
 
         dError = abs(preError - error)
         preError = error
@@ -66,15 +60,15 @@ def ICP_matching(ppoints, cpoints):
             print("Not Converge...", error, dError, count)
             break
 
-    R = np.matrix(H[0:2, 0:2])
-    T = np.matrix(H[0:2, 2])
+    R = np.array(H[0:2, 0:2])
+    T = np.array(H[0:2, 2])
 
     return R, T
 
 
-def update_homogenerous_matrix(Hin, R, T):
+def update_homogeneous_matrix(Hin, R, T):
 
-    H = np.matrix(np.zeros((3, 3)))
+    H = np.zeros((3, 3))
 
     H[0, 0] = R[0, 0]
     H[1, 0] = R[1, 0]
@@ -82,13 +76,13 @@ def update_homogenerous_matrix(Hin, R, T):
     H[1, 1] = R[1, 1]
     H[2, 2] = 1.0
 
-    H[0, 2] = T[0, 0]
-    H[1, 2] = T[1, 0]
+    H[0, 2] = T[0]
+    H[1, 2] = T[1]
 
     if Hin is None:
         return H
     else:
-        return Hin * H
+        return Hin @ H
 
 
 def nearest_neighbor_assosiation(ppoints, cpoints):
@@ -117,17 +111,17 @@ def nearest_neighbor_assosiation(ppoints, cpoints):
 
 def SVD_motion_estimation(ppoints, cpoints):
 
-    pm = np.matrix(np.mean(ppoints, axis=1))
-    cm = np.matrix(np.mean(cpoints, axis=1))
+    pm = np.mean(ppoints, axis=1)
+    cm = np.mean(cpoints, axis=1)
 
-    pshift = np.matrix(ppoints - pm)
-    cshift = np.matrix(cpoints - cm)
+    pshift = ppoints - pm[:, np.newaxis]
+    cshift = cpoints - cm[:, np.newaxis]
 
-    W = cshift * pshift.T
+    W = cshift @ pshift.T
     u, s, vh = np.linalg.svd(W)
 
-    R = (u * vh).T
-    t = pm - R * cm
+    R = (u @ vh).T
+    t = pm - (R @ cm)
 
     return R, t
 
@@ -138,7 +132,7 @@ def main():
     # simulation parameters
     nPoint = 10
     fieldLength = 50.0
-    motion = [0.5, 2.0, math.radians(-10.0)]  # movement [x[m],y[m],yaw[deg]]
+    motion = [0.5, 2.0, np.deg2rad(-10.0)]  # movement [x[m],y[m],yaw[deg]]
 
     nsim = 3  # number of simulation
 
@@ -147,16 +141,18 @@ def main():
         # previous points
         px = (np.random.rand(nPoint) - 0.5) * fieldLength
         py = (np.random.rand(nPoint) - 0.5) * fieldLength
-        ppoints = np.matrix(np.vstack((px, py)))
+        ppoints = np.vstack((px, py))
 
         # current points
         cx = [math.cos(motion[2]) * x - math.sin(motion[2]) * y + motion[0]
               for (x, y) in zip(px, py)]
         cy = [math.sin(motion[2]) * x + math.cos(motion[2]) * y + motion[1]
               for (x, y) in zip(px, py)]
-        cpoints = np.matrix(np.vstack((cx, cy)))
+        cpoints = np.vstack((cx, cy))
 
         R, T = ICP_matching(ppoints, cpoints)
+        print("R:", R)
+        print("T:", T)
 
 
 if __name__ == '__main__':

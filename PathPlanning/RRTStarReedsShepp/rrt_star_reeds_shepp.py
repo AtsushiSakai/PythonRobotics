@@ -5,16 +5,20 @@ Path Planning Sample Code with RRT for car like robot.
 author: AtsushiSakai(@Atsushi_twi)
 
 """
-
-import sys
-sys.path.append("../ReedsSheppPath/")
-
-import random
-import math
-import copy
-import numpy as np
-import reeds_shepp_path_planning
 import matplotlib.pyplot as plt
+import numpy as np
+import copy
+import math
+import random
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/../ReedsSheppPath/")
+
+try:
+    import reeds_shepp_path_planning
+except:
+    raise
 
 show_animation = True
 STEP_SIZE = 0.1
@@ -80,7 +84,7 @@ class RRT():
         return path
 
     def choose_parent(self, newNode, nearinds):
-        if len(nearinds) == 0:
+        if not nearinds:
             return newNode
 
         dlist = []
@@ -106,13 +110,7 @@ class RRT():
         return newNode
 
     def pi_2_pi(self, angle):
-        while(angle > math.pi):
-            angle = angle - 2.0 * math.pi
-
-        while(angle < -math.pi):
-            angle = angle + 2.0 * math.pi
-
-        return angle
+        return (angle + math.pi) % (2 * math.pi) - math.pi
 
     def steer(self, rnd, nind):
 
@@ -154,7 +152,7 @@ class RRT():
     def get_best_last_index(self):
         #  print("get_best_last_index")
 
-        YAWTH = math.radians(3.0)
+        YAWTH = np.deg2rad(3.0)
         XYTH = 0.5
 
         goalinds = []
@@ -172,7 +170,7 @@ class RRT():
         #  print("OK YAW TH num is")
         #  print(len(fgoalinds))
 
-        if len(fgoalinds) == 0:
+        if not fgoalinds:
             return None
 
         mincost = min([self.nodeList[i].cost for i in fgoalinds])
@@ -188,7 +186,6 @@ class RRT():
             node = self.nodeList[goalind]
             for (ix, iy) in zip(reversed(node.path_x), reversed(node.path_y)):
                 path.append([ix, iy])
-            #  path.append([node.x, node.y])
             goalind = node.parent
         path.append([self.start.x, self.start.y])
         return path
@@ -224,10 +221,7 @@ class RRT():
                 #  print("rewire")
                 self.nodeList[i] = tNode
 
-    def DrawGraph(self, rnd=None):
-        """
-        Draw Graph
-        """
+    def DrawGraph(self, rnd=None):  # pragma: no cover
         plt.clf()
         if rnd is not None:
             plt.plot(rnd.x, rnd.y, "^k")
@@ -289,18 +283,10 @@ class Node():
         self.parent = None
 
 
-def main():
-    print("Start rrt start planning")
+def main(maxIter=200):
+    print("Start " + __file__)
 
     # ====Search Path with RRT====
-    #  obstacleList = [
-    #  (5, 5, 1),
-    #  (3, 6, 2),
-    #  (3, 8, 2),
-    #  (3, 10, 2),
-    #  (7, 5, 2),
-    #  (9, 5, 2)
-    #  ]  # [x,y,size(radius)]
     obstacleList = [
         (5, 5, 1),
         (4, 6, 1),
@@ -314,14 +300,16 @@ def main():
     ]  # [x,y,size(radius)]
 
     # Set Initial parameters
-    start = [0.0, 0.0, math.radians(0.0)]
-    goal = [6.0, 7.0, math.radians(90.0)]
+    start = [0.0, 0.0, np.deg2rad(0.0)]
+    goal = [6.0, 7.0, np.deg2rad(90.0)]
 
-    rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
+    rrt = RRT(start, goal, randArea=[-2.0, 15.0],
+              obstacleList=obstacleList,
+              maxIter=maxIter)
     path = rrt.Planning(animation=show_animation)
 
     # Draw final path
-    if show_animation:
+    if show_animation:  # pragma: no cover
         rrt.DrawGraph()
         plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
         plt.grid(True)

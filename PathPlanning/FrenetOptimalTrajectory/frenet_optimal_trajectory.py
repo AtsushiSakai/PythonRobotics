@@ -18,6 +18,8 @@ import copy
 import math
 import cubic_spline_planner
 
+SIM_LOOP = 500
+
 # Parameter
 MAX_SPEED = 50.0 / 3.6  # maximum speed [m/s]
 MAX_ACCEL = 2.0  # maximum acceleration [m/ss]
@@ -42,11 +44,11 @@ KLON = 1.0
 show_animation = True
 
 
-class quinic_polynomial:
+class quintic_polynomial:
 
     def __init__(self, xs, vxs, axs, xe, vxe, axe, T):
 
-        # calc coefficient of quinic polynomial
+        # calc coefficient of quintic polynomial
         self.xs = xs
         self.vxs = vxs
         self.axs = axs
@@ -86,17 +88,18 @@ class quinic_polynomial:
         xt = 2 * self.a2 + 6 * self.a3 * t + 12 * self.a4 * t**2 + 20 * self.a5 * t**3
 
         return xt
-    
+
     def calc_third_derivative(self, t):
         xt = 6 * self.a3 + 24 * self.a4 * t + 60 * self.a5 * t**2
 
         return xt
 
+
 class quartic_polynomial:
 
     def __init__(self, xs, vxs, axs, vxe, axe, T):
 
-        # calc coefficient of quinic polynomial
+        # calc coefficient of quintic polynomial
         self.xs = xs
         self.vxs = vxs
         self.axs = axs
@@ -132,7 +135,7 @@ class quartic_polynomial:
         xt = 2 * self.a2 + 6 * self.a3 * t + 12 * self.a4 * t**2
 
         return xt
-    
+
     def calc_third_derivative(self, t):
         xt = 6 * self.a3 + 24 * self.a4 * t
 
@@ -173,7 +176,7 @@ def calc_frenet_paths(c_speed, c_d, c_d_d, c_d_dd, s0):
         for Ti in np.arange(MINT, MAXT, DT):
             fp = Frenet_path()
 
-            lat_qp = quinic_polynomial(c_d, c_d_d, c_d_dd, di, 0.0, 0.0, Ti)
+            lat_qp = quintic_polynomial(c_d, c_d_d, c_d_dd, di, 0.0, 0.0, Ti)
 
             fp.t = [t for t in np.arange(0.0, Ti, DT)]
             fp.d = [lat_qp.calc_point(t) for t in fp.t]
@@ -256,7 +259,7 @@ def check_collision(fp, ob):
 def check_paths(fplist, ob):
 
     okind = []
-    for i in range(len(fplist)):
+    for i, _ in enumerate(fplist):
         if any([v > MAX_SPEED for v in fplist[i].s_d]):  # Max speed check
             continue
         elif any([abs(a) > MAX_ACCEL for a in fplist[i].s_dd]):  # Max accel check
@@ -328,7 +331,7 @@ def main():
 
     area = 20.0  # animation area length [m]
 
-    for i in range(500):
+    for i in range(SIM_LOOP):
         path = frenet_optimal_planning(
             csp, s0, c_speed, c_d, c_d_d, c_d_dd, ob)
 
@@ -342,7 +345,7 @@ def main():
             print("Goal")
             break
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             plt.plot(tx, ty)
             plt.plot(ob[:, 0], ob[:, 1], "xk")
@@ -355,7 +358,7 @@ def main():
             plt.pause(0.0001)
 
     print("Finish")
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.grid(True)
         plt.pause(0.0001)
         plt.show()

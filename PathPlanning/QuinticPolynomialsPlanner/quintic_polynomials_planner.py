@@ -145,8 +145,8 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
             print("find path!!")
             break
 
-    if show_animation:
-        for i in range(len(rx)):
+    if show_animation:  # pragma: no cover
+        for i, _ in enumerate(rx):
             plt.cla()
             plt.grid(True)
             plt.axis("equal")
@@ -163,7 +163,7 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
     return time, rx, ry, ryaw, rv, ra, rj
 
 
-def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
+def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no cover
     """
     Plot arrow
     """
@@ -182,12 +182,12 @@ def main():
 
     sx = 10.0  # start x position [m]
     sy = 10.0  # start y position [m]
-    syaw = math.radians(10.0)  # start yaw angle [rad]
+    syaw = np.deg2rad(10.0)  # start yaw angle [rad]
     sv = 1.0  # start speed [m/s]
     sa = 0.1  # start accel [m/ss]
     gx = 30.0  # goal x position [m]
     gy = -10.0  # goal y position [m]
-    gyaw = math.radians(20.0)  # goal yaw angle [rad]
+    gyaw = np.deg2rad(20.0)  # goal yaw angle [rad]
     gv = 1.0  # goal speed [m/s]
     ga = 0.1  # goal accel [m/ss]
     max_accel = 1.0  # max accel [m/ss]
@@ -197,11 +197,11 @@ def main():
     time, x, y, yaw, v, a, j = quinic_polynomials_planner(
         sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_accel, max_jerk, dt)
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.plot(x, y, "-r")
 
         plt.subplots()
-        plt.plot(time, [math.degrees(i) for i in yaw], "-r")
+        plt.plot(time, [np.rad2deg(i) for i in yaw], "-r")
         plt.xlabel("Time[s]")
         plt.ylabel("Yaw[deg]")
         plt.grid(True)

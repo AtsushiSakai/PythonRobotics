@@ -1,7 +1,7 @@
 """
-cubic spline planner
+Cubic spline planner
 
-Author: Atsushi Sakai
+Author: Atsushi Sakai(@Atsushi_twi)
 
 """
 import math
@@ -10,7 +10,7 @@ import bisect
 
 
 class Spline:
-    u"""
+    """
     Cubic Spline class
     """
 
@@ -40,7 +40,7 @@ class Spline:
             self.b.append(tb)
 
     def calc(self, t):
-        u"""
+        """
         Calc position
 
         if t is outside of the input x, return None
@@ -60,7 +60,7 @@ class Spline:
         return result
 
     def calcd(self, t):
-        u"""
+        """
         Calc first derivative
 
         if t is outside of the input x, return None
@@ -77,7 +77,7 @@ class Spline:
         return result
 
     def calcdd(self, t):
-        u"""
+        """
         Calc second derivative
         """
 
@@ -92,13 +92,13 @@ class Spline:
         return result
 
     def __search_index(self, x):
-        u"""
+        """
         search data segment index
         """
         return bisect.bisect(self.x, x) - 1
 
     def __calc_A(self, h):
-        u"""
+        """
         calc matrix A for spline coefficient c
         """
         A = np.zeros((self.nx, self.nx))
@@ -116,19 +116,18 @@ class Spline:
         return A
 
     def __calc_B(self, h):
-        u"""
+        """
         calc matrix B for spline coefficient c
         """
         B = np.zeros(self.nx)
         for i in range(self.nx - 2):
             B[i + 1] = 3.0 * (self.a[i + 2] - self.a[i + 1]) / \
                 h[i + 1] - 3.0 * (self.a[i + 1] - self.a[i]) / h[i]
-        #  print(B)
         return B
 
 
 class Spline2D:
-    u"""
+    """
     2D Cubic Spline class
 
     """
@@ -148,7 +147,7 @@ class Spline2D:
         return s
 
     def calc_position(self, s):
-        u"""
+        """
         calc position
         """
         x = self.sx.calc(s)
@@ -157,18 +156,18 @@ class Spline2D:
         return x, y
 
     def calc_curvature(self, s):
-        u"""
+        """
         calc curvature
         """
         dx = self.sx.calcd(s)
         ddx = self.sx.calcdd(s)
         dy = self.sy.calcd(s)
         ddy = self.sy.calcdd(s)
-        k = (ddy * dx - ddx * dy) / (dx ** 2 + dy ** 2)
+        k = (ddy * dx - ddx * dy) / ((dx ** 2 + dy ** 2)**(3 / 2))
         return k
 
     def calc_yaw(self, s):
-        u"""
+        """
         calc yaw
         """
         dx = self.sx.calcd(s)
@@ -210,7 +209,7 @@ def main():
         ryaw.append(sp.calc_yaw(i_s))
         rk.append(sp.calc_curvature(i_s))
 
-    flg, ax = plt.subplots(1)
+    plt.subplots(1)
     plt.plot(x, y, "xb", label="input")
     plt.plot(rx, ry, "-r", label="spline")
     plt.grid(True)
@@ -219,14 +218,14 @@ def main():
     plt.ylabel("y[m]")
     plt.legend()
 
-    flg, ax = plt.subplots(1)
-    plt.plot(s, [math.degrees(iyaw) for iyaw in ryaw], "-r", label="yaw")
+    plt.subplots(1)
+    plt.plot(s, [np.rad2deg(iyaw) for iyaw in ryaw], "-r", label="yaw")
     plt.grid(True)
     plt.legend()
     plt.xlabel("line length[m]")
     plt.ylabel("yaw angle[deg]")
 
-    flg, ax = plt.subplots(1)
+    plt.subplots(1)
     plt.plot(s, rk, "-r", label="curvature")
     plt.grid(True)
     plt.legend()

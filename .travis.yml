@@ -1,8 +1,14 @@
 language: python
+
+matrix:
+  include:
+    - os: linux
+
 python:
   - 3.6
 
 before_install:
+    - sudo apt-get update
     - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
     - chmod +x miniconda.sh
     - bash miniconda.sh -b -p $HOME/miniconda
@@ -12,16 +18,19 @@ before_install:
     - conda update -q conda
     # Useful for debugging any issues with conda
     - conda info -a
+    - conda install python==3.6.8
 
 install:
-  - pip install scipy
-  - pip install numpy
-  - pip install matplotlib
-  - pip install pandas
+  - conda install numpy==1.15
+  - conda install scipy
+  - conda install matplotlib
+  - conda install pandas
   - pip install cvxpy
-  - conda install -y -c cvxgrp cvxpy
-  - conda install -y -c anaconda cvxopt
+  - conda install coveralls
 
 script:
   - python --version
   - ./runtests.sh
+
+after_success:
+  - coveralls

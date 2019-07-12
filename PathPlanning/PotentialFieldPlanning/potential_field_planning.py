@@ -52,7 +52,7 @@ def calc_repulsive_potential(x, y, ox, oy, rr):
     # search nearest obstacle
     minid = -1
     dmin = float("inf")
-    for i in range(len(ox)):
+    for i, _ in enumerate(ox):
         d = np.hypot(x - ox[i], y - oy[i])
         if dmin >= d:
             dmin = d
@@ -106,7 +106,7 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
     while d >= reso:
         minp = float("inf")
         minix, miniy = -1, -1
-        for i in range(len(motion)):
+        for i, _ in enumerate(motion):
             inx = int(ix + motion[i][0])
             iny = int(iy + motion[i][1])
             if inx >= len(pmap) or iny >= len(pmap[0]):
@@ -157,7 +157,7 @@ def main():
         plt.axis("equal")
 
     # path generation
-    rx, ry = potential_field_planning(
+    _, _ = potential_field_planning(
         sx, sy, gx, gy, ox, oy, grid_size, robot_radius)
 
     if show_animation:

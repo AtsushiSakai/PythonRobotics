@@ -6,15 +6,20 @@ author: AtsushiSakai(@Atsushi_twi)
 
 """
 
-import sys
-sys.path.append("../LQRPlanner/")
-
-import random
-import math
-import copy
-import numpy as np
 import matplotlib.pyplot as plt
-import LQRplanner
+import numpy as np
+import copy
+import math
+import random
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../LQRPlanner/")
+
+try:
+    import LQRplanner
+except:
+    raise
+
 
 show_animation = True
 
@@ -83,7 +88,7 @@ class RRT():
         return path
 
     def choose_parent(self, newNode, nearinds):
-        if len(nearinds) == 0:
+        if not nearinds:
             return newNode
 
         dlist = []
@@ -109,13 +114,7 @@ class RRT():
         return newNode
 
     def pi_2_pi(self, angle):
-        while(angle > math.pi):
-            angle = angle - 2.0 * math.pi
-
-        while(angle < -math.pi):
-            angle = angle + 2.0 * math.pi
-
-        return angle
+        return (angle + math.pi) % (2 * math.pi) - math.pi
 
     def sample_path(self, wx, wy, step):
 
@@ -179,7 +178,7 @@ class RRT():
             if self.calc_dist_to_goal(node.x, node.y) <= XYTH:
                 goalinds.append(i)
 
-        if len(goalinds) == 0:
+        if not goalinds:
             return None
 
         mincost = min([self.nodeList[i].cost for i in goalinds])
@@ -205,8 +204,8 @@ class RRT():
     def find_near_nodes(self, newNode):
         nnode = len(self.nodeList)
         r = 50.0 * math.sqrt((math.log(nnode) / nnode))
-        dlist = [(node.x - newNode.x) ** 2 +
-                 (node.y - newNode.y) ** 2
+        dlist = [(node.x - newNode.x) ** 2
+                 + (node.y - newNode.y) ** 2
                  for node in self.nodeList]
         nearinds = [dlist.index(i) for i in dlist if i <= r ** 2]
         return nearinds
@@ -248,8 +247,8 @@ class RRT():
         plt.pause(0.01)
 
     def get_nearest_index(self, nodeList, rnd):
-        dlist = [(node.x - rnd.x) ** 2 +
-                 (node.y - rnd.y) ** 2
+        dlist = [(node.x - rnd.x) ** 2
+                 + (node.y - rnd.y) ** 2
                  for node in nodeList]
         minind = dlist.index(min(dlist))
 
@@ -285,8 +284,8 @@ class Node():
         self.parent = None
 
 
-def main():
-    print("Start rrt start planning")
+def main(maxIter=200):
+    print("Start " + __file__)
 
     # ====Search Path with RRT====
     obstacleList = [
@@ -302,11 +301,13 @@ def main():
     start = [0.0, 0.0]
     goal = [6.0, 7.0]
 
-    rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
+    rrt = RRT(start, goal, randArea=[-2.0, 15.0],
+              obstacleList=obstacleList,
+              maxIter=maxIter)
     path = rrt.planning(animation=show_animation)
 
     # Draw final path
-    if show_animation:
+    if show_animation:  # pragma: no cover
         rrt.draw_graph()
         plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
         plt.grid(True)

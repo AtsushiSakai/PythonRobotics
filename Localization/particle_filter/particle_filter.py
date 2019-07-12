@@ -12,11 +12,11 @@ import matplotlib.pyplot as plt
 
 # Estimation parameter of PF
 Q = np.diag([0.1])**2  # range error
-R = np.diag([1.0, math.radians(40.0)])**2  # input error
+R = np.diag([1.0, np.deg2rad(40.0)])**2  # input error
 
 #  Simulation parameter
 Qsim = np.diag([0.2])**2
-Rsim = np.diag([1.0, math.radians(30.0)])**2
+Rsim = np.diag([1.0, np.deg2rad(30.0)])**2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
@@ -32,7 +32,7 @@ show_animation = True
 def calc_input():
     v = 1.0  # [m/s]
     yawrate = 0.1  # [rad/s]
-    u = np.matrix([v, yawrate]).T
+    u = np.array([[v, yawrate]]).T
     return u
 
 
@@ -41,7 +41,7 @@ def observation(xTrue, xd, u, RFID):
     xTrue = motion_model(xTrue, u)
 
     # add noise to gps x-y
-    z = np.matrix(np.zeros((0, 3)))
+    z = np.zeros((0, 3))
 
     for i in range(len(RFID[:, 0])):
 
@@ -50,13 +50,13 @@ def observation(xTrue, xd, u, RFID):
         d = math.sqrt(dx**2 + dy**2)
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Qsim[0, 0]  # add noise
-            zi = np.matrix([dn, RFID[i, 0], RFID[i, 1]])
+            zi = np.array([[dn, RFID[i, 0], RFID[i, 1]]])
             z = np.vstack((z, zi))
 
     # add noise to input
     ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
     ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1]
-    ud = np.matrix([ud1, ud2]).T
+    ud = np.array([[ud1, ud2]]).T
 
     xd = motion_model(xd, ud)
 
@@ -65,17 +65,17 @@ def observation(xTrue, xd, u, RFID):
 
 def motion_model(x, u):
 
-    F = np.matrix([[1.0, 0, 0, 0],
-                   [0, 1.0, 0, 0],
-                   [0, 0, 1.0, 0],
-                   [0, 0, 0, 0]])
+    F = np.array([[1.0, 0, 0, 0],
+                  [0, 1.0, 0, 0],
+                  [0, 0, 1.0, 0],
+                  [0, 0, 0, 0]])
 
-    B = np.matrix([[DT * math.cos(x[2, 0]), 0],
-                   [DT * math.sin(x[2, 0]), 0],
-                   [0.0, DT],
-                   [1.0, 0.0]])
+    B = np.array([[DT * math.cos(x[2, 0]), 0],
+                  [DT * math.sin(x[2, 0]), 0],
+                  [0.0, DT],
+                  [1.0, 0.0]])
 
-    x = F * x + B * u
+    x = F.dot(x) + B.dot(u)
 
     return x
 
@@ -88,11 +88,11 @@ def gauss_likelihood(x, sigma):
 
 
 def calc_covariance(xEst, px, pw):
-    cov = np.matrix(np.zeros((3, 3)))
+    cov = np.zeros((3, 3))
 
     for i in range(px.shape[1]):
         dx = (px[:, i] - xEst)[0:3]
-        cov += pw[0, i] * dx * dx.T
+        cov += pw[0, i] * dx.dot(dx.T)
 
     return cov
 
@@ -103,16 +103,15 @@ def pf_localization(px, pw, xEst, PEst, z, u):
     """
 
     for ip in range(NP):
-        x = px[:, ip]
+        x = np.array([px[:, ip]]).T
         w = pw[0, ip]
-
-        #  Predict with ramdom input sampling
+        #  Predict with random input sampling
         ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
         ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1]
-        ud = np.matrix([ud1, ud2]).T
+        ud = np.array([[ud1, ud2]]).T
         x = motion_model(x, ud)
 
-        #  Calc Inportance Weight
+        #  Calc Importance Weight
         for i in range(len(z[:, 0])):
             dx = x[0, 0] - z[i, 1]
             dy = x[1, 0] - z[i, 2]
@@ -120,12 +119,12 @@ def pf_localization(px, pw, xEst, PEst, z, u):
             dz = prez - z[i, 0]
             w = w * gauss_likelihood(dz, math.sqrt(Q[0, 0]))
 
-        px[:, ip] = x
+        px[:, ip] = x[:, 0]
         pw[0, ip] = w
 
     pw = pw / pw.sum()  # normalize
 
-    xEst = px * pw.T
+    xEst = px.dot(pw.T)
     PEst = calc_covariance(xEst, px, pw)
 
     px, pw = resampling(px, pw)
@@ -138,26 +137,26 @@ def resampling(px, pw):
     low variance re-sampling
     """
 
-    Neff = 1.0 / (pw * pw.T)[0, 0]  # Effective particle number
+    Neff = 1.0 / (pw.dot(pw.T))[0, 0]  # Effective particle number
     if Neff < NTh:
         wcum = np.cumsum(pw)
         base = np.cumsum(pw * 0.0 + 1 / NP) - 1 / NP
-        resampleid = base + np.random.rand(base.shape[1]) / NP
+        resampleid = base + np.random.rand(base.shape[0]) / NP
 
         inds = []
         ind = 0
         for ip in range(NP):
-            while resampleid[0, ip] > wcum[0, ind]:
+            while resampleid[ip] > wcum[ind]:
                 ind += 1
             inds.append(ind)
 
         px = px[:, inds]
-        pw = np.matrix(np.zeros((1, NP))) + 1.0 / NP  # init weight
+        pw = np.zeros((1, NP)) + 1.0 / NP  # init weight
 
     return px, pw
 
 
-def plot_covariance_ellipse(xEst, PEst):
+def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
     Pxy = PEst[0:2, 0:2]
     eigval, eigvec = np.linalg.eig(Pxy)
 
@@ -170,20 +169,24 @@ def plot_covariance_ellipse(xEst, PEst):
 
     t = np.arange(0, 2 * math.pi + 0.1, 0.1)
 
-    #eigval[bigind] or eiqval[smallind] were occassionally negative numbers extremely
-    #close to 0 (~10^-20), catch these cases and set the respective variable to 0
-    try: a = math.sqrt(eigval[bigind])
-    except ValueError: a = 0
+    # eigval[bigind] or eiqval[smallind] were occassionally negative numbers extremely
+    # close to 0 (~10^-20), catch these cases and set the respective variable to 0
+    try:
+        a = math.sqrt(eigval[bigind])
+    except ValueError:
+        a = 0
 
-    try: b = math.sqrt(eigval[smallind])
-    except ValueError: b = 0
+    try:
+        b = math.sqrt(eigval[smallind])
+    except ValueError:
+        b = 0
 
     x = [a * math.cos(it) for it in t]
     y = [b * math.sin(it) for it in t]
     angle = math.atan2(eigvec[bigind, 1], eigvec[bigind, 0])
-    R = np.matrix([[math.cos(angle), math.sin(angle)],
-                   [-math.sin(angle), math.cos(angle)]])
-    fx = R * np.matrix([x, y])
+    R = np.array([[math.cos(angle), math.sin(angle)],
+                  [-math.sin(angle), math.cos(angle)]])
+    fx = R.dot(np.array([[x, y]]))
     px = np.array(fx[0, :] + xEst[0, 0]).flatten()
     py = np.array(fx[1, :] + xEst[1, 0]).flatten()
     plt.plot(px, py, "--r")
@@ -201,13 +204,13 @@ def main():
                      [-5.0, 20.0]])
 
     # State Vector [x y yaw v]'
-    xEst = np.matrix(np.zeros((4, 1)))
-    xTrue = np.matrix(np.zeros((4, 1)))
+    xEst = np.zeros((4, 1))
+    xTrue = np.zeros((4, 1))
     PEst = np.eye(4)
 
-    px = np.matrix(np.zeros((4, NP)))  # Particle store
-    pw = np.matrix(np.zeros((1, NP))) + 1.0 / NP  # Particle weight
-    xDR = np.matrix(np.zeros((4, 1)))  # Dead reckoning
+    px = np.zeros((4, NP))  # Particle store
+    pw = np.zeros((1, NP)) + 1.0 / NP  # Particle weight
+    xDR = np.zeros((4, 1))  # Dead reckoning
 
     # history
     hxEst = xEst

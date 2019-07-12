@@ -5,14 +5,18 @@ Path tracking simulation with iterative linear model predictive control for spee
 author: Atsushi Sakai (@Atsushi_twi)
 
 """
+import matplotlib.pyplot as plt
+import cvxpy
+import math
+import numpy as np
 import sys
 sys.path.append("../../PathPlanning/CubicSpline/")
 
-import numpy as np
-import math
-import cvxpy
-import matplotlib.pyplot as plt
-import cubic_spline_planner
+try:
+    import cubic_spline_planner
+except:
+    raise
+
 
 NX = 4  # x = x, y, v, yaw
 NU = 2  # a = [accel, steer]
@@ -45,8 +49,8 @@ WHEEL_WIDTH = 0.2  # [m]
 TREAD = 0.7  # [m]
 WB = 2.5  # [m]
 
-MAX_STEER = math.radians(45.0)  # maximum steering angle [rad]
-MAX_DSTEER = math.radians(30.0)  # maximum steering speed [rad/s]
+MAX_STEER = np.deg2rad(45.0)  # maximum steering angle [rad]
+MAX_DSTEER = np.deg2rad(30.0)  # maximum steering speed [rad/s]
 MAX_SPEED = 55.0 / 3.6  # maximum speed [m/s]
 MIN_SPEED = -20.0 / 3.6  # minimum speed [m/s]
 MAX_ACCEL = 1.0  # maximum accel [m/ss]
@@ -79,7 +83,7 @@ def pi_2_pi(angle):
 
 def get_linear_model_matrix(v, phi, delta):
 
-    A = np.matrix(np.zeros((NX, NX)))
+    A = np.zeros((NX, NX))
     A[0, 0] = 1.0
     A[1, 1] = 1.0
     A[2, 2] = 1.0
@@ -88,27 +92,27 @@ def get_linear_model_matrix(v, phi, delta):
     A[0, 3] = - DT * v * math.sin(phi)
     A[1, 2] = DT * math.sin(phi)
     A[1, 3] = DT * v * math.cos(phi)
-    A[3, 2] = DT * math.tan(delta)
+    A[3, 2] = DT * math.tan(delta) / WB
 
-    B = np.matrix(np.zeros((NX, NU)))
+    B = np.zeros((NX, NU))
     B[2, 0] = DT
     B[3, 1] = DT * v / (WB * math.cos(delta) ** 2)
 
-    C = np.matrix(np.zeros((NX, 1)))
-    C[0, 0] = DT * v * math.sin(phi) * phi
-    C[1, 0] = - DT * v * math.cos(phi) * phi
-    C[3, 0] = v * delta / (WB * math.cos(delta) ** 2)
+    C = np.zeros(NX)
+    C[0] = DT * v * math.sin(phi) * phi
+    C[1] = - DT * v * math.cos(phi) * phi
+    C[3] = - DT * v * delta / (WB * math.cos(delta) ** 2)
 
     return A, B, C
 
 
-def plot_car(x, y, yaw, steer=0.0, cabcolor="-r", truckcolor="-k"):
+def plot_car(x, y, yaw, steer=0.0, cabcolor="-r", truckcolor="-k"):  # pragma: no cover
 
-    outline = np.matrix([[-BACKTOWHEEL, (LENGTH - BACKTOWHEEL), (LENGTH - BACKTOWHEEL), -BACKTOWHEEL, -BACKTOWHEEL],
-                         [WIDTH / 2, WIDTH / 2, - WIDTH / 2, -WIDTH / 2, WIDTH / 2]])
+    outline = np.array([[-BACKTOWHEEL, (LENGTH - BACKTOWHEEL), (LENGTH - BACKTOWHEEL), -BACKTOWHEEL, -BACKTOWHEEL],
+                        [WIDTH / 2, WIDTH / 2, - WIDTH / 2, -WIDTH / 2, WIDTH / 2]])
 
-    fr_wheel = np.matrix([[WHEEL_LEN, -WHEEL_LEN, -WHEEL_LEN, WHEEL_LEN, WHEEL_LEN],
-                          [-WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD, WHEEL_WIDTH - TREAD, WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD]])
+    fr_wheel = np.array([[WHEEL_LEN, -WHEEL_LEN, -WHEEL_LEN, WHEEL_LEN, WHEEL_LEN],
+                         [-WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD, WHEEL_WIDTH - TREAD, WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD]])
 
     rr_wheel = np.copy(fr_wheel)
 
@@ -117,22 +121,22 @@ def plot_car(x, y, yaw, steer=0.0, cabcolor="-r", truckcolor="-k"):
     rl_wheel = np.copy(rr_wheel)
     rl_wheel[1, :] *= -1
 
-    Rot1 = np.matrix([[math.cos(yaw), math.sin(yaw)],
-                      [-math.sin(yaw), math.cos(yaw)]])
-    Rot2 = np.matrix([[math.cos(steer), math.sin(steer)],
-                      [-math.sin(steer), math.cos(steer)]])
+    Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
+                     [-math.sin(yaw), math.cos(yaw)]])
+    Rot2 = np.array([[math.cos(steer), math.sin(steer)],
+                     [-math.sin(steer), math.cos(steer)]])
 
-    fr_wheel = (fr_wheel.T * Rot2).T
-    fl_wheel = (fl_wheel.T * Rot2).T
+    fr_wheel = (fr_wheel.T.dot(Rot2)).T
+    fl_wheel = (fl_wheel.T.dot(Rot2)).T
     fr_wheel[0, :] += WB
     fl_wheel[0, :] += WB
 
-    fr_wheel = (fr_wheel.T * Rot1).T
-    fl_wheel = (fl_wheel.T * Rot1).T
+    fr_wheel = (fr_wheel.T.dot(Rot1)).T
+    fl_wheel = (fl_wheel.T.dot(Rot1)).T
 
-    outline = (outline.T * Rot1).T
-    rr_wheel = (rr_wheel.T * Rot1).T
-    rl_wheel = (rl_wheel.T * Rot1).T
+    outline = (outline.T.dot(Rot1)).T
+    rr_wheel = (rr_wheel.T.dot(Rot1)).T
+    rl_wheel = (rl_wheel.T.dot(Rot1)).T
 
     outline[0, :] += x
     outline[1, :] += y
@@ -188,25 +192,27 @@ def calc_nearest_index(state, cx, cy, cyaw, pind):
     dx = [state.x - icx for icx in cx[pind:(pind + N_IND_SEARCH)]]
     dy = [state.y - icy for icy in cy[pind:(pind + N_IND_SEARCH)]]
 
-    d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
+    d = [idx ** 2 + idy ** 2 for (idx, idy) in zip(dx, dy)]
 
-    min_d = min(d)
+    mind = min(d)
 
-    ind = d.index(min_d) + pind
+    ind = d.index(mind) + pind
+
+    mind = math.sqrt(mind)
 
     dxl = cx[ind] - state.x
     dyl = cy[ind] - state.y
 
     angle = pi_2_pi(cyaw[ind] - math.atan2(dyl, dxl))
     if angle < 0:
-        min_d *= -1
+        mind *= -1
 
-    return ind, min_d
+    return ind, mind
 
 
 def predict_motion(x0, oa, od, xref):
     xbar = xref * 0.0
-    for i in range(len(x0)):
+    for i, _ in enumerate(x0):
         xbar[i, 0] = x0[i]
 
     state = State(x=x0[0], y=x0[1], yaw=x0[3], v=x0[2])
@@ -252,8 +258,8 @@ def linear_mpc_control(xref, xbar, x0, dref):
     dref: reference steer angle
     """
 
-    x = cvxpy.Variable(NX, T + 1)
-    u = cvxpy.Variable(NU, T)
+    x = cvxpy.Variable((NX, T + 1))
+    u = cvxpy.Variable((NU, T))
 
     cost = 0.0
     constraints = []
@@ -270,19 +276,19 @@ def linear_mpc_control(xref, xbar, x0, dref):
 
         if t < (T - 1):
             cost += cvxpy.quad_form(u[:, t + 1] - u[:, t], Rd)
-            constraints += [cvxpy.abs(u[1, t + 1] - u[1, t])
-                            < MAX_DSTEER * DT]
+            constraints += [cvxpy.abs(u[1, t + 1] - u[1, t]) <=
+                            MAX_DSTEER * DT]
 
     cost += cvxpy.quad_form(xref[:, T] - x[:, T], Qf)
 
     constraints += [x[:, 0] == x0]
     constraints += [x[2, :] <= MAX_SPEED]
     constraints += [x[2, :] >= MIN_SPEED]
-    constraints += [cvxpy.abs(u[0, :]) < MAX_ACCEL]
-    constraints += [cvxpy.abs(u[1, :]) < MAX_STEER]
+    constraints += [cvxpy.abs(u[0, :]) <= MAX_ACCEL]
+    constraints += [cvxpy.abs(u[1, :]) <= MAX_STEER]
 
     prob = cvxpy.Problem(cvxpy.Minimize(cost), constraints)
-    prob.solve(verbose=False)
+    prob.solve(solver=cvxpy.ECOS, verbose=False)
 
     if prob.status == cvxpy.OPTIMAL or prob.status == cvxpy.OPTIMAL_INACCURATE:
         ox = get_nparray_from_matrix(x.value[0, :])
@@ -344,18 +350,12 @@ def check_goal(state, goal, tind, nind):
     dy = state.y - goal[1]
     d = math.sqrt(dx ** 2 + dy ** 2)
 
-    if (d <= GOAL_DIS):
-        isgoal = True
-    else:
-        isgoal = False
+    isgoal = (d <= GOAL_DIS)
 
     if abs(tind - nind) >= 5:
         isgoal = False
 
-    if (abs(state.v) <= STOP_SPEED):
-        isstop = True
-    else:
-        isstop = False
+    isstop = (abs(state.v) <= STOP_SPEED)
 
     if isgoal and isstop:
         return True
@@ -363,7 +363,7 @@ def check_goal(state, goal, tind, nind):
     return False
 
 
-def do_simulation(cx, cy, cyaw, ck, sp, dl):
+def do_simulation(cx, cy, cyaw, ck, sp, dl, initial_state):
     """
     Simulation
 
@@ -377,7 +377,14 @@ def do_simulation(cx, cy, cyaw, ck, sp, dl):
     """
 
     goal = [cx[-1], cy[-1]]
-    state = State(x=cx[0], y=cy[0], yaw=cyaw[0], v=0.0)
+
+    state = initial_state
+
+    # initial yaw compensation
+    if state.yaw - cyaw[0] >= math.pi:
+        state.yaw -= math.pi * 2.0
+    elif state.yaw - cyaw[0] <= -math.pi:
+        state.yaw += math.pi * 2.0
 
     time = 0.0
     x = [state.x]
@@ -420,7 +427,7 @@ def do_simulation(cx, cy, cyaw, ck, sp, dl):
             print("Goal")
             break
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             if ox is not None:
                 plt.plot(ox, oy, "xr", label="MPC")
@@ -431,8 +438,8 @@ def do_simulation(cx, cy, cyaw, ck, sp, dl):
             plot_car(state.x, state.y, state.yaw, steer=di)
             plt.axis("equal")
             plt.grid(True)
-            plt.title("Time[s]:" + str(round(time, 2)) +
-                      ", speed[km/h]:" + str(round(state.v * 3.6, 2)))
+            plt.title("Time[s]:" + str(round(time, 2))
+                      + ", speed[km/h]:" + str(round(state.v * 3.6, 2)))
             plt.pause(0.0001)
 
     return t, x, y, yaw, v, d, a
@@ -471,14 +478,45 @@ def smooth_yaw(yaw):
 
     for i in range(len(yaw) - 1):
         dyaw = yaw[i + 1] - yaw[i]
+
         while dyaw >= math.pi / 2.0:
             yaw[i + 1] -= math.pi * 2.0
             dyaw = yaw[i + 1] - yaw[i]
+
         while dyaw <= -math.pi / 2.0:
             yaw[i + 1] += math.pi * 2.0
             dyaw = yaw[i + 1] - yaw[i]
 
     return yaw
+
+
+def get_straight_course(dl):
+    ax = [0.0, 5.0, 10.0, 20.0, 30.0, 40.0, 50.0]
+    ay = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+        ax, ay, ds=dl)
+
+    return cx, cy, cyaw, ck
+
+
+def get_straight_course2(dl):
+    ax = [0.0, -10.0, -20.0, -40.0, -50.0, -60.0, -70.0]
+    ay = [0.0, -1.0, 1.0, 0.0, -1.0, 1.0, 0.0]
+    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+        ax, ay, ds=dl)
+
+    return cx, cy, cyaw, ck
+
+
+def get_straight_course3(dl):
+    ax = [0.0, -10.0, -20.0, -40.0, -50.0, -60.0, -70.0]
+    ay = [0.0, -1.0, 1.0, 0.0, -1.0, 1.0, 0.0]
+    cx, cy, cyaw, ck, s = cubic_spline_planner.calc_spline_course(
+        ax, ay, ds=dl)
+
+    cyaw = [i - math.pi for i in cyaw]
+
+    return cx, cy, cyaw, ck
 
 
 def get_forward_course(dl):
@@ -512,14 +550,53 @@ def main():
     print(__file__ + " start!!")
 
     dl = 1.0  # course tick
-    #  cx, cy, cyaw, ck = get_forward_course(dl)
+    # cx, cy, cyaw, ck = get_straight_course(dl)
+    # cx, cy, cyaw, ck = get_straight_course2(dl)
+    # cx, cy, cyaw, ck = get_straight_course3(dl)
+    # cx, cy, cyaw, ck = get_forward_course(dl)
     cx, cy, cyaw, ck = get_switch_back_course(dl)
 
     sp = calc_speed_profile(cx, cy, cyaw, TARGET_SPEED)
 
-    t, x, y, yaw, v, d, a = do_simulation(cx, cy, cyaw, ck, sp, dl)
+    initial_state = State(x=cx[0], y=cy[0], yaw=cyaw[0], v=0.0)
 
-    if show_animation:
+    t, x, y, yaw, v, d, a = do_simulation(
+        cx, cy, cyaw, ck, sp, dl, initial_state)
+
+    if show_animation:  # pragma: no cover
+        plt.close("all")
+        plt.subplots()
+        plt.plot(cx, cy, "-r", label="spline")
+        plt.plot(x, y, "-g", label="tracking")
+        plt.grid(True)
+        plt.axis("equal")
+        plt.xlabel("x[m]")
+        plt.ylabel("y[m]")
+        plt.legend()
+
+        plt.subplots()
+        plt.plot(t, v, "-r", label="speed")
+        plt.grid(True)
+        plt.xlabel("Time [s]")
+        plt.ylabel("Speed [kmh]")
+
+        plt.show()
+
+
+def main2():
+    print(__file__ + " start!!")
+
+    dl = 1.0  # course tick
+    cx, cy, cyaw, ck = get_straight_course3(dl)
+
+    sp = calc_speed_profile(cx, cy, cyaw, TARGET_SPEED)
+
+    initial_state = State(x=cx[0], y=cy[0], yaw=0.0, v=0.0)
+
+    t, x, y, yaw, v, d, a = do_simulation(
+        cx, cy, cyaw, ck, sp, dl, initial_state)
+
+    if show_animation:  # pragma: no cover
         plt.close("all")
         plt.subplots()
         plt.plot(cx, cy, "-r", label="spline")
@@ -541,3 +618,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    # main2()

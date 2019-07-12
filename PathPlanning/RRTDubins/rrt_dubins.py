@@ -4,13 +4,21 @@ Path Planning Sample Code with RRT for car like robot.
 author: AtsushiSakai(@Atsushi_twi)
 
 """
-
-import random
-import math
-import copy
-import numpy as np
-import dubins_path_planning
 import matplotlib.pyplot as plt
+import numpy as np
+import copy
+import math
+import random
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/../DubinsPath/")
+
+try:
+    import dubins_path_planning
+except:
+    raise
+
 
 show_animation = True
 
@@ -69,41 +77,8 @@ class RRT():
         path = self.gen_final_course(lastIndex)
         return path
 
-    def choose_parent(self, newNode, nearinds):
-        if len(nearinds) == 0:
-            return newNode
-
-        dlist = []
-        for i in nearinds:
-            dx = newNode.x - self.nodeList[i].x
-            dy = newNode.y - self.nodeList[i].y
-            d = math.sqrt(dx ** 2 + dy ** 2)
-            theta = math.atan2(dy, dx)
-            if self.check_collision_extend(self.nodeList[i], theta, d):
-                dlist.append(self.nodeList[i].cost + d)
-            else:
-                dlist.append(float("inf"))
-
-        mincost = min(dlist)
-        minind = nearinds[dlist.index(mincost)]
-
-        if mincost == float("inf"):
-            print("mincost is inf")
-            return newNode
-
-        newNode.cost = mincost
-        newNode.parent = minind
-
-        return newNode
-
     def pi_2_pi(self, angle):
-        while(angle >= math.pi):
-            angle = angle - 2.0 * math.pi
-
-        while(angle <= -math.pi):
-            angle = angle + 2.0 * math.pi
-
-        return angle
+        return (angle + math.pi) % (2 * math.pi) - math.pi
 
     def steer(self, rnd, nind):
         #  print(rnd)
@@ -168,7 +143,7 @@ class RRT():
     def calc_dist_to_goal(self, x, y):
         return np.linalg.norm([x - self.end.x, y - self.end.y])
 
-    def DrawGraph(self, rnd=None):
+    def DrawGraph(self, rnd=None):  # pragma: no cover
         plt.clf()
         if rnd is not None:
             plt.plot(rnd[0], rnd[1], "^k")
@@ -189,9 +164,9 @@ class RRT():
         plt.pause(0.01)
 
     def GetNearestListIndex(self, nodeList, rnd):
-        dlist = [(node.x - rnd[0]) ** 2 +
-                 (node.y - rnd[1]) ** 2 +
-                 (node.yaw - rnd[2] ** 2) for node in nodeList]
+        dlist = [(node.x - rnd[0]) ** 2
+                 + (node.y - rnd[1]) ** 2
+                 + (node.yaw - rnd[2] ** 2) for node in nodeList]
         minind = dlist.index(min(dlist))
 
         return minind
@@ -226,7 +201,7 @@ class Node():
 
 
 def main():
-    print("Start rrt planning")
+    print("Start " + __file__)
     # ====Search Path with RRT====
     obstacleList = [
         (5, 5, 1),
@@ -238,14 +213,14 @@ def main():
     ]  # [x,y,size(radius)]
 
     # Set Initial parameters
-    start = [0.0, 0.0, math.radians(0.0)]
-    goal = [10.0, 10.0, math.radians(0.0)]
+    start = [0.0, 0.0, np.deg2rad(0.0)]
+    goal = [10.0, 10.0, np.deg2rad(0.0)]
 
     rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
     path = rrt.Planning(animation=show_animation)
 
     # Draw final path
-    if show_animation:
+    if show_animation:  # pragma: no cover
         rrt.DrawGraph()
         plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
         plt.grid(True)
