@@ -1,14 +1,14 @@
 """
 
-Path Planning with Bezier curve.
+Path planning with Bezier curve.
 
 author: Atsushi Sakai(@Atsushi_twi)
 
 """
 
-import scipy.special
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import scipy.special
 
 show_animation = True
 
