@@ -17,7 +17,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
                 "/../RRT/")
 
 try:
-    from RRT.rrt import RRT
+    from rrt import RRT
 except ImportError:
     raise
 
