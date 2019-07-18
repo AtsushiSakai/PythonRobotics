@@ -12,7 +12,6 @@
 
 Python codes for robotics algorithm.
 
-
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -45,7 +44,7 @@ Python codes for robotics algorithm.
       * [Probabilistic Road-Map (PRM) planning](#probabilistic-road-map-prm-planning)
       * [Rapidly-Exploring Random Trees (RRT)](#rapidly-exploring-random-trees-rrt)
          * [RRT*](#rrt)
-         * [RRT* with reeds-sheep path](#rrt-with-reeds-sheep-path)
+         * [RRT* with reeds-shepp path](#rrt-with-reeds-shepp-path)
          * [LQR-RRT*](#lqr-rrt)
       * [Quintic polynomials planning](#quintic-polynomials-planning)
       * [Reeds Shepp planning](#reeds-shepp-planning)
@@ -69,6 +68,7 @@ Python codes for robotics algorithm.
    * [License](#license)
    * [Use-case](#use-case)
    * [Contribution](#contribution)
+   * [Citing](#citing)
    * [Support](#support)
    * [Authors](#authors)
 
@@ -360,11 +360,11 @@ Ref:
 
 - [Sampling-based Algorithms for Optimal Motion Planning](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.419.5503&rep=rep1&type=pdf)
 
-### RRT\* with reeds-sheep path
+### RRT\* with reeds-shepp path
 
 ![Robotics/animation.gif at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTStarReedsShepp/animation.gif))
 
-Path planning for a car robot with RRT\* and reeds sheep path planner.
+Path planning for a car robot with RRT\* and reeds shepp path planner.
 
 ### LQR-RRT\*
 
@@ -606,6 +606,7 @@ This is a list: [Users comments](https://github.com/AtsushiSakai/PythonRobotics/
 - [Antonin RAFFIN](https://github.com/araffin)
 
 - [Alexis Paques](https://github.com/AlexisTM)
+
 
 
 
