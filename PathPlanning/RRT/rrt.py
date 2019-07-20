@@ -27,17 +27,19 @@ class RRT:
         def __init__(self, x, y):
             self.x = x
             self.y = y
+            self.path_x = []
+            self.path_y = []
             self.parent = None
 
-    def __init__(self, start, goal, obstacle_list,
-                 rand_area, expand_dis=1.0, goal_sample_rate=5, max_iter=500):
+    def __init__(self, start, goal, obstacle_list, rand_area,
+                 expand_dis=3.0, path_resolution=1.0, goal_sample_rate=5, max_iter=500):
         """
         Setting Parameter
 
         start:Start Position [x,y]
         goal:Goal Position [x,y]
         obstacleList:obstacle Positions [[x,y,size],...]
-        randArea:Ramdom Samping Area [min,max]
+        randArea:Random Sampling Area [min,max]
 
         """
         self.start = self.Node(start[0], start[1])
@@ -45,6 +47,7 @@ class RRT:
         self.min_rand = rand_area[0]
         self.max_rand = rand_area[1]
         self.expand_dis = expand_dis
+        self.path_resolution = path_resolution
         self.goal_sample_rate = goal_sample_rate
         self.max_iter = max_iter
         self.obstacle_list = obstacle_list
@@ -63,7 +66,7 @@ class RRT:
             nearest_ind = self.get_nearest_list_index(self.node_list, rnd_node)
             nearest_node = self.node_list[nearest_ind]
 
-            new_node = self.steer(nearest_node, rnd_node)
+            new_node = self.steer(nearest_node, rnd_node, self.expand_dis)
             new_node.parent = nearest_node
 
             if not self.check_collision(new_node, self.obstacle_list):
@@ -82,16 +85,25 @@ class RRT:
 
         return None  # cannot find path
 
-    def steer(self, from_node, to_node):
-        d, theta = self.calc_distance_and_angle(from_node, to_node)
-        if d > self.expand_dis:
-            x = from_node.x + self.expand_dis * math.cos(theta)
-            y = from_node.y + self.expand_dis * math.sin(theta)
-        else:
-            x = to_node.x
-            y = to_node.y
+    def steer(self, from_node, to_node, extend_length=float("inf")):
 
-        new_node = self.Node(x, y)
+        new_node = self.Node(from_node.x, from_node.y)
+        d, theta = self.calc_distance_and_angle(new_node, to_node)
+
+        new_node.path_x = [new_node.x]
+        new_node.path_y = [new_node.y]
+
+        if extend_length > d:
+            extend_length = d
+
+        n_expand = math.floor(extend_length / self.path_resolution)
+
+        for _ in range(n_expand):
+            new_node.x += self.path_resolution * math.cos(theta)
+            new_node.y += self.path_resolution * math.sin(theta)
+            new_node.path_x.append(new_node.x)
+            new_node.path_y.append(new_node.y)
+
         new_node.parent = from_node
 
         return new_node
@@ -149,10 +161,11 @@ class RRT:
     @staticmethod
     def check_collision(node, obstacleList):
         for (ox, oy, size) in obstacleList:
-            dx = ox - node.x
-            dy = oy - node.y
-            d = dx * dx + dy * dy
-            if d <= size ** 2:
+            dx_list = [ox - x for x in node.path_x]
+            dy_list = [oy - y for y in node.path_y]
+            d_list = [dx * dx + dy * dy for (dx, dy) in zip(dx_list, dy_list)]
+
+            if min(d_list) <= size ** 2:
                 return False  # collision
 
         return True  # safe

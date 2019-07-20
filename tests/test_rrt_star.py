@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
 
 try:
     import rrt_star as m
-except:
+except ImportError:
     raise
 
 
