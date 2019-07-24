@@ -304,6 +304,9 @@ URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8516589&isnumber=85
 
 3. Welburn, E, Hakim Khalili, H, Gupta, A, Watson, S & Carrasco, J 2019, A Navigational System for Quadcopter Remote Inspection of Offshore Substations. in The Fifteenth International Conference on Autonomic and Autonomous Systems 2019. URL:https://www.research.manchester.ac.uk/portal/files/107169964/ICAS19_A_Navigational_System_for_Quadcopter_Remote_Inspection_of_Offshore_Substations.pdf
 
+4. E. Horváth, C. Hajdu, C. Radu and Á. Ballagi, "Range Sensor-based Occupancy Grid Mapping with Signatures," 2019 20th International Carpathian Control Conference (ICCC), Krakow-Wieliczka, Poland, 2019, pp. 1-5.
+URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8765684&isnumber=8765679
+
 
 # Others
 
