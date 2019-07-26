@@ -320,3 +320,5 @@ URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8765684&isnumber=87
 
 - 36 Amazing Python Open Source Projects (v.2019) – Mybridge for Professionals https://medium.mybridge.co/36-amazing-python-open-source-projects-v-2019-2fe058d79450
 
+- Real-time Model Predictive Control (MPC), ACADO, Python | Work-is-Playing http://grauonline.de/wordpress/?page_id=3244
+
