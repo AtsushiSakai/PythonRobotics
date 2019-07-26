@@ -491,6 +491,8 @@ Ref:
 
 - [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/Model_predictive_speed_and_steering_control.ipynb)
 
+- [Real\-time Model Predictive Control \(MPC\), ACADO, Python \| Work\-is\-Playing](http://grauonline.de/wordpress/?page_id=3244)
+
 ## Nonlinear Model predictive control with C-GMRES
 
 A motion planning and path tracking simulation with NMPC of C-GMRES 
