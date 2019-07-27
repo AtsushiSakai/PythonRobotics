@@ -67,15 +67,13 @@ class RRT:
             nearest_node = self.node_list[nearest_ind]
 
             new_node = self.steer(nearest_node, rnd_node, self.expand_dis)
-            new_node.parent = nearest_node
 
-            if not self.check_collision(new_node, self.obstacle_list):
-                continue
+            if self.check_collision(new_node, self.obstacle_list):
+                self.node_list.append(new_node)
 
-            self.node_list.append(new_node)
-            print("nNodelist:", len(self.node_list))
+            if animation and i % 5 == 0:
+                self.draw_graph(rnd_node)
 
-            # check goal
             if self.calc_dist_to_goal(new_node.x, new_node.y) <= self.expand_dis:
                 print("Goal!!")
                 return self.generate_final_course(len(self.node_list) - 1)
