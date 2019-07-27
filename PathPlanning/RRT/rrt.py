@@ -19,7 +19,7 @@ class RRT:
     Class for RRT planning
     """
 
-    class Node():
+    class Node:
         """
         RRT Node
         """
@@ -104,6 +104,13 @@ class RRT:
             new_node.path_x.append(new_node.x)
             new_node.path_y.append(new_node.y)
 
+        d, _ = self.calc_distance_and_angle(new_node, to_node)
+        if d <= self.path_resolution:
+            new_node.x = to_node.x
+            new_node.y = to_node.y
+            new_node.path_x[-1] = to_node.x
+            new_node.path_y[-1] = to_node.y
+
         new_node.parent = from_node
 
         return new_node
@@ -137,9 +144,7 @@ class RRT:
             plt.plot(rnd.x, rnd.y, "^k")
         for node in self.node_list:
             if node.parent:
-                plt.plot([node.x, node.parent.x],
-                         [node.y, node.parent.y],
-                         "-g")
+                plt.plot(node.path_x, node.path_y, "-g")
 
         for (ox, oy, size) in self.obstacle_list:
             plt.plot(ox, oy, "ok", ms=30 * size)

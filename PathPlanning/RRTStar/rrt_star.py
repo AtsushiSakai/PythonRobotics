@@ -53,7 +53,7 @@ class RRTStar(RRT):
         """
         self.connect_circle_dist = connect_circle_dist
 
-    def planning(self, animation=True, search_until_maxiter=True):
+    def planning(self, animation=True, search_until_max_iter=True):
         """
         rrt star path planning
 
@@ -63,7 +63,7 @@ class RRTStar(RRT):
 
         self.node_list = [self.start]
         for i in range(self.max_iter):
-            print(i, len(self.node_list))
+            print("Iter:", i, ", number of nodes:", len(self.node_list))
             rnd = self.get_random_node()
             nearest_ind = self.get_nearest_list_index(self.node_list, rnd)
             new_node = self.steer(self.node_list[nearest_ind], rnd, self.expand_dis)
@@ -78,10 +78,10 @@ class RRTStar(RRT):
             if animation and i % 5 == 0:
                 self.draw_graph(rnd)
 
-            if (not search_until_maxiter) and new_node:  # check reaching the goal
-                d, _ = self.calc_distance_and_angle(new_node, self.end)
-                if d <= self.expand_dis:
-                    return self.generate_final_course(len(self.node_list) - 1)
+            if (not search_until_max_iter) and new_node:  # check reaching the goal
+                last_index = self.search_best_goal_node()
+                if last_index:
+                    return self.generate_final_course(last_index)
 
         print("reached max iteration")
 
@@ -90,25 +90,6 @@ class RRTStar(RRT):
             return self.generate_final_course(last_index)
 
         return None
-
-    def connect_nodes(self, from_node, to_node):
-        new_node = self.Node(from_node.x, from_node.y)
-        d, theta = self.calc_distance_and_angle(new_node, to_node)
-
-        new_node.path_x = [new_node.x]
-        new_node.path_y = [new_node.y]
-
-        n_expand = math.floor(d / self.path_resolution)
-
-        for _ in range(n_expand):
-            new_node.x += self.path_resolution * math.cos(theta)
-            new_node.y += self.path_resolution * math.sin(theta)
-            new_node.path_x.append(new_node.x)
-            new_node.path_y.append(new_node.y)
-
-        new_node.parent = from_node
-
-        return new_node
 
     def choose_parent(self, new_node, near_inds):
         if not near_inds:
@@ -130,8 +111,8 @@ class RRTStar(RRT):
             return None
 
         min_ind = near_inds[costs.index(min_cost)]
+        new_node = self.steer(self.node_list[min_ind], new_node)
         new_node.parent = self.node_list[min_ind]
-        new_node = self.steer(new_node.parent, new_node)
         new_node.cost = min_cost
 
         return new_node
@@ -162,14 +143,14 @@ class RRTStar(RRT):
         for i in near_inds:
             near_node = self.node_list[i]
             edge_node = self.steer(new_node, near_node)
-            edge_node.cost = self.calc_new_cost(near_node, new_node)
+            edge_node.cost = self.calc_new_cost(new_node, near_node)
 
             no_collision = self.check_collision(edge_node, self.obstacle_list)
             improved_cost = near_node.cost > edge_node.cost
 
             if no_collision and improved_cost:
+                near_node = edge_node
                 near_node.parent = new_node
-                near_node.cost = edge_node.cost
                 self.propagate_cost_to_leaves(new_node)
 
     def calc_new_cost(self, from_node, to_node):
@@ -177,6 +158,7 @@ class RRTStar(RRT):
         return from_node.cost + d
 
     def propagate_cost_to_leaves(self, parent_node):
+
         for node in self.node_list:
             if node.parent == parent_node:
                 node.cost = self.calc_new_cost(parent_node, node)
