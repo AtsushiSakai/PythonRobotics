@@ -100,7 +100,7 @@ class RRTStar(RRT):
         for i in near_inds:
             near_node = self.node_list[i]
             t_node = self.steer(near_node, new_node)
-            if self.check_collision(t_node, self.obstacle_list):
+            if t_node and self.check_collision(t_node, self.obstacle_list):
                 costs.append(self.calc_new_cost(near_node, new_node))
             else:
                 costs.append(float("inf"))  # the cost of collision node
@@ -143,6 +143,8 @@ class RRTStar(RRT):
         for i in near_inds:
             near_node = self.node_list[i]
             edge_node = self.steer(new_node, near_node)
+            if not edge_node:
+                continue
             edge_node.cost = self.calc_new_cost(new_node, near_node)
 
             no_collision = self.check_collision(edge_node, self.obstacle_list)

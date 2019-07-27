@@ -5,10 +5,10 @@ Reeds Shepp path planner sample code
 author Atsushi Sakai(@Atsushi_twi)
 
 """
-import numpy as np
 import math
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+import numpy as np
 
 show_animation = True
 
@@ -353,7 +353,7 @@ def calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size):
 
 
 def reeds_shepp_path_planning(sx, sy, syaw,
-                              gx, gy, gyaw, maxc, step_size):
+                              gx, gy, gyaw, maxc, step_size=0.2):
 
     paths = calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size)
 

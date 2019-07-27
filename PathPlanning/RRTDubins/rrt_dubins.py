@@ -1,5 +1,5 @@
 """
-Path planning Sample Code with RRT for car like robot.
+Path planning Sample Code with RRT with Dubins path
 
 author: AtsushiSakai(@Atsushi_twi)
 
