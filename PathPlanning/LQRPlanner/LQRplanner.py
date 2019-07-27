@@ -6,19 +6,20 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import matplotlib.pyplot as plt
-import numpy as np
-import scipy.linalg as la
 import math
 import random
 
-show_animation = True
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.linalg as la
+
+SHOW_ANIMATION = True
 
 MAX_TIME = 100.0  # Maximum simulation time
 DT = 0.1  # Time tick
 
 
-def LQRplanning(sx, sy, gx, gy):
+def LQRplanning(sx, sy, gx, gy, show_animation=SHOW_ANIMATION):
 
     rx, ry = [sx], [sy]
 
@@ -129,7 +130,7 @@ def main():
 
         rx, ry = LQRplanning(sx, sy, gx, gy)
 
-        if show_animation:  # pragma: no cover
+        if SHOW_ANIMATION:  # pragma: no cover
             plt.plot(sx, sy, "or")
             plt.plot(gx, gy, "ob")
             plt.plot(rx, ry, "-r")
