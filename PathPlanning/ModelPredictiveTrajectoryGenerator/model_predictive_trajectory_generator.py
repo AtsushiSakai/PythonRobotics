@@ -6,9 +6,11 @@ author: Atsushi Sakai(@Atsushi_twi)
 
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
 import math
+
+import matplotlib.pyplot as plt
+import numpy as np
+
 import motion_model
 
 # optimization parameter
@@ -37,7 +39,7 @@ def calc_diff(target, x, y, yaw):
     return d
 
 
-def calc_J(target, p, h, k0):
+def calc_j(target, p, h, k0):
     xp, yp, yawp = motion_model.generate_last_state(
         p[0, 0] + h[0], p[1, 0], p[2, 0], k0)
     dp = calc_diff(target, [xp], [yp], [yawp])
@@ -68,7 +70,6 @@ def calc_J(target, p, h, k0):
 
 
 def selection_learning_param(dp, p, k0, target):
-
     mincost = float("inf")
     mina = 1.0
     maxa = 2.0
@@ -110,7 +111,7 @@ def optimize_trajectory(target, k0, p):
             print("path is ok cost is:" + str(cost))
             break
 
-        J = calc_J(target, p, h, k0)
+        J = calc_j(target, p, h, k0)
         try:
             dp = - np.linalg.inv(J) @ dc
         except np.linalg.linalg.LinAlgError:
