@@ -1,18 +1,19 @@
 """
 
-Quinitc Polynomials Planner
+Quintic Polynomials Planner
 
 author: Atsushi Sakai (@Atsushi_twi)
 
 Ref:
 
-- [Local Path Planning And Motion Control For Agv In Positioning](http://ieeexplore.ieee.org/document/637936/)
+- [Local Path planning And Motion Control For Agv In Positioning](http://ieeexplore.ieee.org/document/637936/)
 
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
 import math
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 # parameter
 MAX_T = 100.0  # maximum time to the goal [s]
@@ -21,7 +22,7 @@ MIN_T = 5.0  # minimum time to the goal[s]
 show_animation = True
 
 
-class quinic_polynomial:
+class QuinticPolynomial:
 
     def __init__(self, xs, vxs, axs, xe, vxe, axe, T):
 
@@ -72,9 +73,9 @@ class quinic_polynomial:
         return xt
 
 
-def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_accel, max_jerk, dt):
+def quintic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_accel, max_jerk, dt):
     """
-    quinic polynomial planner
+    quintic polynomial planner
 
     input
         sx: start x position [m]
@@ -109,9 +110,11 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
     axg = ga * math.cos(gyaw)
     ayg = ga * math.sin(gyaw)
 
+    time, rx, ry, ryaw, rv, ra, rj = [], [], [], [], [], [], []
+
     for T in np.arange(MIN_T, MAX_T, MIN_T):
-        xqp = quinic_polynomial(sx, vxs, axs, gx, vxg, axg, T)
-        yqp = quinic_polynomial(sy, vys, ays, gy, vyg, ayg, T)
+        xqp = QuinticPolynomial(sx, vxs, axs, gx, vxg, axg, T)
+        yqp = QuinticPolynomial(sy, vys, ays, gy, vyg, ayg, T)
 
         time, rx, ry, ryaw, rv, ra, rj = [], [], [], [], [], [], []
 
@@ -146,7 +149,7 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
             break
 
     if show_animation:  # pragma: no cover
-        for i, _ in enumerate(rx):
+        for i, _ in enumerate(time):
             plt.cla()
             plt.grid(True)
             plt.axis("equal")
@@ -194,7 +197,7 @@ def main():
     max_jerk = 0.5  # max jerk [m/sss]
     dt = 0.1  # time tick [s]
 
-    time, x, y, yaw, v, a, j = quinic_polynomials_planner(
+    time, x, y, yaw, v, a, j = quintic_polynomials_planner(
         sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_accel, max_jerk, dt)
 
     if show_animation:  # pragma: no cover
