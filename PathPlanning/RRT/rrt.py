@@ -63,7 +63,7 @@ class RRT:
         self.node_list = [self.start]
         for i in range(self.max_iter):
             rnd_node = self.get_random_node()
-            nearest_ind = self.get_nearest_list_index(self.node_list, rnd_node)
+            nearest_ind = self.get_nearest_node_index(self.node_list, rnd_node)
             nearest_node = self.node_list[nearest_ind]
 
             new_node = self.steer(nearest_node, rnd_node, self.expand_dis)
@@ -154,7 +154,7 @@ class RRT:
         plt.pause(0.01)
 
     @staticmethod
-    def get_nearest_list_index(node_list, rnd_node):
+    def get_nearest_node_index(node_list, rnd_node):
         dlist = [(node.x - rnd_node.x) ** 2 + (node.y - rnd_node.y)
                  ** 2 for node in node_list]
         minind = dlist.index(min(dlist))
