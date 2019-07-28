@@ -18,7 +18,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../LQRPlanner/")
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../RRTStar/")
 
 try:
-    import LQRplanner
+    from LQRplanner import LQRPlanner
     from rrt_star import RRTStar
 except ImportError:
     raise
@@ -58,6 +58,8 @@ class LQRRRTStar(RRTStar):
         self.curvature = 1.0
         self.goal_xy_th = 0.5
         self.step_size = step_size
+
+        self.lqr_planner = LQRPlanner()
 
     def planning(self, animation=True, search_until_max_iter=True):
         """
@@ -131,7 +133,7 @@ class LQRRRTStar(RRTStar):
 
     def calc_new_cost(self, from_node, to_node):
 
-        wx, wy = LQRplanner.LQRplanning(
+        wx, wy = self.lqr_planner.lqr_planning(
             from_node.x, from_node.y, to_node.x, to_node.y, show_animation=False)
 
         px, py, course_lengths = self.sample_path(wx, wy, self.step_size)
@@ -182,7 +184,7 @@ class LQRRRTStar(RRTStar):
 
     def steer(self, from_node, to_node):
 
-        wx, wy = LQRplanner.LQRplanning(
+        wx, wy = self.lqr_planner.lqr_planning(
             from_node.x, from_node.y, to_node.x, to_node.y, show_animation=False)
 
         px, py, course_lens = self.sample_path(wx, wy, self.step_size)
