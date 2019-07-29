@@ -1,3 +1,19 @@
+# User's demos
+
+## WHILL MODEL CR with move to a pose control
+
+This is an electric wheelchair control demo by [Katsushun89](https://github.com/Katsushun89).
+
+[WHILL Model CR](https://whill.jp/model-cr) is the control target, [M5Stack](https://m5stack.com/) is used for the controller, and [toio](https://toio.io/) is used for the control input device.
+
+[move-to-a-pose-control](https://pythonrobotics.readthedocs.io/en/latest/modules/path_tracking.html#move-to-a-pose-control) is used for its control algorithm ([code link](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/move_to_pose/move_to_pose.py)).
+
+![1](https://github.com/AtsushiSakai/PythonRoboticsGifs/blob/master/Users/WHILL_Model_CR_with_move_to_a_pose/WHLL_Model_CR_with_move_to_a_pose.gif)
+
+Ref:
+
+- [toioと同じように動くWHILL Model CR (in Japanese)](https://qiita.com/KatsuShun89/items/68fde7544ecfe36096d2)
+
 
 # Educational users
 
