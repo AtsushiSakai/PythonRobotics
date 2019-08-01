@@ -333,6 +333,19 @@ Benefit a lot for your GitHub repository of PythonRobotics. Thanks so much.
 
 ---
 
+Thanks!
+
+--Reinzor
+
+---
+
+Thanks for writing these algorithms. They are very helpful for learning robotics.
+
+--Arihant Lunawat
+
+---
+
+
 # Citations
 
 1. B. Blaga, M. Deac, R. W. Y. Al-doori, M. Negru and R. Dǎnescu, "Miniature Autonomous Vehicle Development on Raspberry Pi," 2018 IEEE 14th International Conference on Intelligent Computer Communication and Processing (ICCP), Cluj-Napoca, Romania, 2018, pp. 229-236.
