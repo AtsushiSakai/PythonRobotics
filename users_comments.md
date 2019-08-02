@@ -360,6 +360,8 @@ URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8516589&isnumber=85
 4. E. Horváth, C. Hajdu, C. Radu and Á. Ballagi, "Range Sensor-based Occupancy Grid Mapping with Signatures," 2019 20th International Carpathian Control Conference (ICCC), Krakow-Wieliczka, Poland, 2019, pp. 1-5.
 URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8765684&isnumber=8765679
 
+5. Josie Hughes, Masaru Shimizu, and Arnoud Visser, "A Review of Robot Rescue Simulation Platforms for Robotics Education"
+URL: https://2019.robocup.org/downloads/program/HughesEtAl2019.pdf
 
 # Others
 
