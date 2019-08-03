@@ -20,7 +20,7 @@ from scipy.ndimage import gaussian_filter
 from scipy.stats import norm
 
 # Parameters
-EXTEND_AREA = 10.0  # [m] grid map extention length
+EXTEND_AREA = 10.0  # [m] grid map extended length
 SIM_TIME = 50.0  # simulation time [s]
 DT = 0.1  # time tick [s]
 MAX_RANGE = 10.0  # maximum observation range
@@ -34,7 +34,7 @@ MINY = -5.0
 MAXX = 15.0
 MAXY = 25.0
 
-# simulation paramters
+# simulation parameters
 NOISE_RANGE = 2.0  # [m] 1σ range noise parameter
 NOISE_SPEED = 0.5  # [m/s] 1σ speed noise parameter
 
@@ -42,11 +42,11 @@ NOISE_SPEED = 0.5  # [m/s] 1σ speed noise parameter
 show_animation = True
 
 
-class GridMap:
+class grid_map():
 
     def __init__(self):
         self.data = None
-        self.xy_reso = None
+        self.xyreso = None
         self.minx = None
         self.miny = None
         self.maxx = None
@@ -158,7 +158,8 @@ def normalize_probability(gmap):
 
 
 def init_gmap(xyreso, minx, miny, maxx, maxy):
-    gmap = GridMap()
+
+    gmap = grid_map()
 
     gmap.xy_reso = xyreso
     gmap.minx = minx
