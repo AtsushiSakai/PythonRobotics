@@ -11,12 +11,13 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import math
-import numpy as np
-import matplotlib.pyplot as plt
 import copy
-from scipy.stats import norm
+import math
+
+import matplotlib.pyplot as plt
+import numpy as np
 from scipy.ndimage import gaussian_filter
+from scipy.stats import norm
 
 # Parameters
 EXTEND_AREA = 10.0  # [m] grid map extended length
@@ -41,11 +42,11 @@ NOISE_SPEED = 0.5  # [m/s] 1σ speed noise parameter
 show_animation = True
 
 
-class grid_map():
+class GridMap():
 
     def __init__(self):
         self.data = None
-        self.xyreso = None
+        self.xy_reso = None
         self.minx = None
         self.miny = None
         self.maxx = None
@@ -56,20 +57,19 @@ class grid_map():
         self.dy = 0.0  # movement distance
 
 
-def histogram_filter_localization(gmap, u, z, yaw):
+def histogram_filter_localization(grid_map, u, z, yaw):
+    grid_map = motion_update(grid_map, u, yaw)
 
-    gmap = motion_update(gmap, u, yaw)
+    grid_map = observation_update(grid_map, z, RANGE_STD)
 
-    gmap = observation_update(gmap, z, RANGE_STD)
-
-    return gmap
+    return grid_map
 
 
 def calc_gaussian_observation_pdf(gmap, z, iz, ix, iy, std):
 
     # predicted range
-    x = ix * gmap.xyreso + gmap.minx
-    y = iy * gmap.xyreso + gmap.miny
+    x = ix * gmap.xy_reso + gmap.minx
+    y = iy * gmap.xy_reso + gmap.miny
     d = math.sqrt((x - z[iz, 1])**2 + (y - z[iz, 2])**2)
 
     # likelihood
@@ -93,8 +93,8 @@ def observation_update(gmap, z, std):
 
 def calc_input():
     v = 1.0  # [m/s]
-    yawrate = 0.1  # [rad/s]
-    u = np.array([v, yawrate]).reshape(2, 1)
+    yaw_rate = 0.1  # [rad/s]
+    u = np.array([v, yaw_rate]).reshape(2, 1)
     return u
 
 
@@ -115,7 +115,7 @@ def motion_model(x, u):
     return x
 
 
-def draw_heatmap(data, mx, my):
+def draw_heat_map(data, mx, my):
     maxp = max([max(igmap) for igmap in data])
     plt.pcolor(mx, my, data, vmax=maxp, cmap=plt.cm.get_cmap("Blues"))
     plt.axis("equal")
@@ -156,60 +156,57 @@ def normalize_probability(gmap):
     return gmap
 
 
-def init_gmap(xyreso, minx, miny, maxx, maxy):
+def init_gmap(xy_reso, minx, miny, maxx, maxy):
+    grid_map = GridMap()
 
-    gmap = grid_map()
+    grid_map.xy_reso = xy_reso
+    grid_map.minx = minx
+    grid_map.miny = miny
+    grid_map.maxx = maxx
+    grid_map.maxy = maxy
+    grid_map.xw = int(round((grid_map.maxx - grid_map.minx) / grid_map.xy_reso))
+    grid_map.yw = int(round((grid_map.maxy - grid_map.miny) / grid_map.xy_reso))
 
-    gmap.xy_reso = xyreso
-    gmap.minx = minx
-    gmap.miny = miny
-    gmap.maxx = maxx
-    gmap.maxy = maxy
-    gmap.xw = int(round((gmap.maxx - gmap.minx) / gmap.xy_reso))
-    gmap.yw = int(round((gmap.maxy - gmap.miny) / gmap.xy_reso))
+    grid_map.data = [[1.0 for _ in range(grid_map.yw)] for _ in range(grid_map.xw)]
+    grid_map = normalize_probability(grid_map)
 
-    gmap.data = [[1.0 for _ in range(gmap.yw)] for _ in range(gmap.xw)]
-    gmap = normalize_probability(gmap)
-
-    return gmap
-
-
-def map_shift(gmap, xshift, yshift):
-
-    tgmap = copy.deepcopy(gmap.data)
-
-    for ix in range(gmap.xw):
-        for iy in range(gmap.yw):
-            nix = ix + xshift
-            niy = iy + yshift
-
-            if 0 <= nix < gmap.xw and 0 <= niy < gmap.yw:
-                gmap.data[ix + xshift][iy + yshift] = tgmap[ix][iy]
-
-    return gmap
+    return grid_map
 
 
-def motion_update(gmap, u, yaw):
+def map_shift(grid_map, x_shift, y_shift):
+    tgmap = copy.deepcopy(grid_map.data)
 
-    gmap.dx += DT * math.cos(yaw) * u[0]
-    gmap.dy += DT * math.sin(yaw) * u[0]
+    for ix in range(grid_map.xw):
+        for iy in range(grid_map.yw):
+            nix = ix + x_shift
+            niy = iy + y_shift
 
-    xshift = gmap.dx // gmap.xyreso
-    yshift = gmap.dy // gmap.xyreso
+            if 0 <= nix < grid_map.xw and 0 <= niy < grid_map.yw:
+                grid_map.data[ix + x_shift][iy + y_shift] = tgmap[ix][iy]
 
-    if abs(xshift) >= 1.0 or abs(yshift) >= 1.0:  # map should be shifted
-        gmap = map_shift(gmap, int(xshift), int(yshift))
-        gmap.dx -= xshift * gmap.xyreso
-        gmap.dy -= yshift * gmap.xyreso
+    return grid_map
 
-    gmap.data = gaussian_filter(gmap.data, sigma=MOTION_STD)
 
-    return gmap
+def motion_update(grid_map, u, yaw):
+    grid_map.dx += DT * math.cos(yaw) * u[0]
+    grid_map.dy += DT * math.sin(yaw) * u[0]
+
+    x_shift = grid_map.dx // grid_map.xy_reso
+    y_shift = grid_map.dy // grid_map.xy_reso
+
+    if abs(x_shift) >= 1.0 or abs(y_shift) >= 1.0:  # map should be shifted
+        grid_map = map_shift(grid_map, int(x_shift), int(y_shift))
+        grid_map.dx -= x_shift * grid_map.xy_reso
+        grid_map.dy -= y_shift * grid_map.xy_reso
+
+    grid_map.data = gaussian_filter(grid_map.data, sigma=MOTION_STD)
+
+    return grid_map
 
 
 def calc_grid_index(gmap):
-    mx, my = np.mgrid[slice(gmap.minx - gmap.xyreso / 2.0, gmap.maxx + gmap.xyreso / 2.0, gmap.xyreso),
-                      slice(gmap.miny - gmap.xyreso / 2.0, gmap.maxy + gmap.xyreso / 2.0, gmap.xyreso)]
+    mx, my = np.mgrid[slice(gmap.minx - gmap.xy_reso / 2.0, gmap.maxx + gmap.xy_reso / 2.0, gmap.xy_reso),
+                      slice(gmap.miny - gmap.xy_reso / 2.0, gmap.maxy + gmap.xy_reso / 2.0, gmap.xy_reso)]
 
     return mx, my
 
@@ -226,8 +223,8 @@ def main():
     time = 0.0
 
     xTrue = np.zeros((4, 1))
-    gmap = init_gmap(XY_RESO, MINX, MINY, MAXX, MAXY)
-    mx, my = calc_grid_index(gmap)  # for grid map visualization
+    grid_map = init_gmap(XY_RESO, MINX, MINY, MAXX, MAXY)
+    mx, my = calc_grid_index(grid_map)  # for grid map visualization
 
     while SIM_TIME >= time:
         time += DT
@@ -238,11 +235,11 @@ def main():
         yaw = xTrue[2, 0]  # Orientation is known
         xTrue, z, ud = observation(xTrue, u, RFID)
 
-        gmap = histogram_filter_localization(gmap, u, z, yaw)
+        grid_map = histogram_filter_localization(grid_map, u, z, yaw)
 
         if show_animation:
             plt.cla()
-            draw_heatmap(gmap.data, mx, my)
+            draw_heat_map(grid_map.data, mx, my)
             plt.plot(xTrue[0, :], xTrue[1, :], "xr")
             plt.plot(RFID[:, 0], RFID[:, 1], ".k")
             for i in range(z.shape[0]):
