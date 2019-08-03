@@ -24,7 +24,6 @@ try:
 except ImportError:
     raise
 
-
 show_animation = True
 
 
@@ -105,7 +104,7 @@ class RRTDubins(RRT):
 
         return None
 
-    def draw_graph(self, rnd=None):
+    def draw_graph(self, rnd=None):  # pragma: no cover
         plt.clf()
         if rnd is not None:
             plt.plot(rnd.x, rnd.y, "^k")
@@ -123,7 +122,7 @@ class RRTDubins(RRT):
         self.plot_start_goal_arrow()
         plt.pause(0.01)
 
-    def plot_start_goal_arrow(self):
+    def plot_start_goal_arrow(self):  # pragma: no cover
         dubins_path_planning.plot_arrow(
             self.start.x, self.start.y, self.start.yaw)
         dubins_path_planning.plot_arrow(
