@@ -11,13 +11,12 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import copy
 import math
-
-import matplotlib.pyplot as plt
 import numpy as np
-from scipy.ndimage import gaussian_filter
+import matplotlib.pyplot as plt
+import copy
 from scipy.stats import norm
+from scipy.ndimage import gaussian_filter
 
 # Parameters
 EXTEND_AREA = 10.0  # [m] grid map extended length
