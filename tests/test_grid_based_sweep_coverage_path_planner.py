@@ -6,7 +6,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../PathPlanning/G
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../Mapping/grid_map_lib")
 try:
     import grid_based_sweep_coverage_path_planner
-except:
+except ImportError:
     raise
 
 class TestPlanning(TestCase):

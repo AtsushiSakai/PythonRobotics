@@ -19,7 +19,7 @@ class RRT:
     Class for RRT planning
     """
 
-    class Node():
+    class Node:
         """
         RRT Node
         """
@@ -27,17 +27,19 @@ class RRT:
         def __init__(self, x, y):
             self.x = x
             self.y = y
+            self.path_x = []
+            self.path_y = []
             self.parent = None
 
-    def __init__(self, start, goal, obstacle_list,
-                 rand_area, expand_dis=1.0, goal_sample_rate=5, max_iter=500):
+    def __init__(self, start, goal, obstacle_list, rand_area,
+                 expand_dis=3.0, path_resolution=1.0, goal_sample_rate=5, max_iter=500):
         """
         Setting Parameter
 
         start:Start Position [x,y]
         goal:Goal Position [x,y]
         obstacleList:obstacle Positions [[x,y,size],...]
-        randArea:Ramdom Samping Area [min,max]
+        randArea:Random Sampling Area [min,max]
 
         """
         self.start = self.Node(start[0], start[1])
@@ -45,9 +47,10 @@ class RRT:
         self.min_rand = rand_area[0]
         self.max_rand = rand_area[1]
         self.expand_dis = expand_dis
+        self.path_resolution = path_resolution
         self.goal_sample_rate = goal_sample_rate
         self.max_iter = max_iter
-        self.obstacleList = obstacle_list
+        self.obstacle_list = obstacle_list
         self.node_list = []
 
     def planning(self, animation=True):
@@ -59,35 +62,54 @@ class RRT:
 
         self.node_list = [self.start]
         for i in range(self.max_iter):
-            rnd = self.get_random_point()
-            nearest_ind = self.get_nearest_list_index(self.node_list, rnd)
+            rnd_node = self.get_random_node()
+            nearest_ind = self.get_nearest_node_index(self.node_list, rnd_node)
             nearest_node = self.node_list[nearest_ind]
 
-            new_node = self.steer(rnd, nearest_node)
-            new_node.parent = nearest_node
+            new_node = self.steer(nearest_node, rnd_node, self.expand_dis)
 
-            if not self.check_collision(new_node, self.obstacleList):
-                continue
+            if self.check_collision(new_node, self.obstacle_list):
+                self.node_list.append(new_node)
 
-            self.node_list.append(new_node)
-            print("nNodelist:", len(self.node_list))
+            if animation and i % 5 == 0:
+                self.draw_graph(rnd_node)
 
-            # check goal
             if self.calc_dist_to_goal(new_node.x, new_node.y) <= self.expand_dis:
                 print("Goal!!")
                 return self.generate_final_course(len(self.node_list) - 1)
 
             if animation and i % 5:
-                self.draw_graph(rnd)
+                self.draw_graph(rnd_node)
 
         return None  # cannot find path
 
-    def steer(self, rnd, nearest_node):
-        new_node = self.Node(rnd[0], rnd[1])
-        d, theta = self.calc_distance_and_angle(nearest_node, new_node)
-        if d > self.expand_dis:
-            new_node.x = nearest_node.x + self.expand_dis * math.cos(theta)
-            new_node.y = nearest_node.y + self.expand_dis * math.sin(theta)
+    def steer(self, from_node, to_node, extend_length=float("inf")):
+
+        new_node = self.Node(from_node.x, from_node.y)
+        d, theta = self.calc_distance_and_angle(new_node, to_node)
+
+        new_node.path_x = [new_node.x]
+        new_node.path_y = [new_node.y]
+
+        if extend_length > d:
+            extend_length = d
+
+        n_expand = math.floor(extend_length / self.path_resolution)
+
+        for _ in range(n_expand):
+            new_node.x += self.path_resolution * math.cos(theta)
+            new_node.y += self.path_resolution * math.sin(theta)
+            new_node.path_x.append(new_node.x)
+            new_node.path_y.append(new_node.y)
+
+        d, _ = self.calc_distance_and_angle(new_node, to_node)
+        if d <= self.path_resolution:
+            new_node.x = to_node.x
+            new_node.y = to_node.y
+            new_node.path_x[-1] = to_node.x
+            new_node.path_y[-1] = to_node.y
+
+        new_node.parent = from_node
 
         return new_node
 
@@ -106,25 +128,23 @@ class RRT:
         dy = y - self.end.y
         return math.sqrt(dx ** 2 + dy ** 2)
 
-    def get_random_point(self):
+    def get_random_node(self):
         if random.randint(0, 100) > self.goal_sample_rate:
-            rnd = [random.uniform(self.min_rand, self.max_rand),
-                   random.uniform(self.min_rand, self.max_rand)]
+            rnd = self.Node(random.uniform(self.min_rand, self.max_rand),
+                            random.uniform(self.min_rand, self.max_rand))
         else:  # goal point sampling
-            rnd = [self.end.x, self.end.y]
+            rnd = self.Node(self.end.x, self.end.y)
         return rnd
 
     def draw_graph(self, rnd=None):
         plt.clf()
         if rnd is not None:
-            plt.plot(rnd[0], rnd[1], "^k")
+            plt.plot(rnd.x, rnd.y, "^k")
         for node in self.node_list:
             if node.parent:
-                plt.plot([node.x, node.parent.x],
-                         [node.y, node.parent.y],
-                         "-g")
+                plt.plot(node.path_x, node.path_y, "-g")
 
-        for (ox, oy, size) in self.obstacleList:
+        for (ox, oy, size) in self.obstacle_list:
             plt.plot(ox, oy, "ok", ms=30 * size)
 
         plt.plot(self.start.x, self.start.y, "xr")
@@ -134,8 +154,8 @@ class RRT:
         plt.pause(0.01)
 
     @staticmethod
-    def get_nearest_list_index(node_list, rnd):
-        dlist = [(node.x - rnd[0]) ** 2 + (node.y - rnd[1])
+    def get_nearest_node_index(node_list, rnd_node):
+        dlist = [(node.x - rnd_node.x) ** 2 + (node.y - rnd_node.y)
                  ** 2 for node in node_list]
         minind = dlist.index(min(dlist))
 
@@ -144,10 +164,11 @@ class RRT:
     @staticmethod
     def check_collision(node, obstacleList):
         for (ox, oy, size) in obstacleList:
-            dx = ox - node.x
-            dy = oy - node.y
-            d = dx * dx + dy * dy
-            if d <= size ** 2:
+            dx_list = [ox - x for x in node.path_x]
+            dy_list = [oy - y for y in node.path_y]
+            d_list = [dx * dx + dy * dy for (dx, dy) in zip(dx_list, dy_list)]
+
+            if min(d_list) <= size ** 2:
                 return False  # collision
 
         return True  # safe

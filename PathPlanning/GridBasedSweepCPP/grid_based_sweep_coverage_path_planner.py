@@ -259,7 +259,7 @@ def planning(ox, oy, reso,
     return rx, ry
 
 
-def planning_animation(ox, oy, reso):
+def planning_animation(ox, oy, reso):  # pragma: no cover
     px, py = planning(ox, oy, reso)
 
     # animation
@@ -281,7 +281,7 @@ def planning_animation(ox, oy, reso):
     plt.pause(0.1)
 
 
-def main():
+def main():  # pragma: no cover
     print("start!!")
 
     ox = [0.0, 20.0, 50.0, 100.0, 130.0, 40.0, 0.0]

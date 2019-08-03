@@ -1,6 +1,7 @@
-from unittest import TestCase
-import sys
 import os
+import sys
+from unittest import TestCase
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../")
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
                 "/../PathPlanning/ClosedLoopRRTStar/")
@@ -17,7 +18,7 @@ class Test(TestCase):
 
     def test1(self):
         m.show_animation = False
-        m.main(gx=1.0, gy=0.0, gyaw=0.0, maxIter=5)
+        m.main(gx=1.0, gy=0.0, gyaw=0.0, max_iter=5)
 
 
 if __name__ == '__main__':  # pragma: no cover

@@ -1,203 +1,205 @@
 """
-Path Planning Sample Code with RRT for car like robot.
+Path planning Sample Code with RRT with Dubins path
 
 author: AtsushiSakai(@Atsushi_twi)
 
 """
-import matplotlib.pyplot as plt
-import numpy as np
 import copy
 import math
+import os
 import random
 import sys
-import os
+
+import matplotlib.pyplot as plt
+import numpy as np
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
                 "/../DubinsPath/")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/../RRT/")
 
 try:
+    from rrt import RRT
     import dubins_path_planning
-except:
+except ImportError:
     raise
-
 
 show_animation = True
 
 
-class RRT():
+class RRTDubins(RRT):
     """
-    Class for RRT Planning
+    Class for RRT planning with Dubins path
     """
 
-    def __init__(self, start, goal, obstacleList, randArea,
-                 goalSampleRate=10, maxIter=1000):
+    class Node(RRT.Node):
+        """
+        RRT Node
+        """
+
+        def __init__(self, x, y, yaw):
+            super().__init__(x, y)
+            self.cost = 0
+            self.yaw = yaw
+            self.path_yaw = []
+
+    def __init__(self, start, goal, obstacle_list, rand_area,
+                 goal_sample_rate=10,
+                 max_iter=200,
+                 ):
         """
         Setting Parameter
 
         start:Start Position [x,y]
         goal:Goal Position [x,y]
         obstacleList:obstacle Positions [[x,y,size],...]
-        randArea:Ramdom Samping Area [min,max]
+        randArea:Random Sampling Area [min,max]
 
         """
-        self.start = Node(start[0], start[1], start[2])
-        self.end = Node(goal[0], goal[1], goal[2])
-        self.minrand = randArea[0]
-        self.maxrand = randArea[1]
-        self.goalSampleRate = goalSampleRate
-        self.maxIter = maxIter
-        self.obstacleList = obstacleList
+        self.start = self.Node(start[0], start[1], start[2])
+        self.end = self.Node(goal[0], goal[1], goal[2])
+        self.min_rand = rand_area[0]
+        self.max_rand = rand_area[1]
+        self.goal_sample_rate = goal_sample_rate
+        self.max_iter = max_iter
+        self.obstacle_list = obstacle_list
 
-    def Planning(self, animation=False):
+        self.curvature = 1.0  # for dubins path
+        self.goal_yaw_th = np.deg2rad(1.0)
+        self.goal_xy_th = 0.5
+
+    def planning(self, animation=True, search_until_max_iter=True):
         """
-        Pathplanning
+        execute planning
 
         animation: flag for animation on or off
         """
 
-        self.nodeList = [self.start]
-        for i in range(self.maxIter):
-            rnd = self.get_random_point()
-            nind = self.GetNearestListIndex(self.nodeList, rnd)
+        self.node_list = [self.start]
+        for i in range(self.max_iter):
+            print("Iter:", i, ", number of nodes:", len(self.node_list))
+            rnd = self.get_random_node()
+            nearest_ind = self.get_nearest_node_index(self.node_list, rnd)
+            new_node = self.steer(self.node_list[nearest_ind], rnd)
 
-            newNode = self.steer(rnd, nind)
-
-            if self.__CollisionCheck(newNode, self.obstacleList):
-                self.nodeList.append(newNode)
+            if self.check_collision(new_node, self.obstacle_list):
+                self.node_list.append(new_node)
 
             if animation and i % 5 == 0:
-                self.DrawGraph(rnd=rnd)
+                self.plot_start_goal_arrow()
+                self.draw_graph(rnd)
 
-        # generate coruse
-        lastIndex = self.get_best_last_index()
-        #  print(lastIndex)
+            if (not search_until_max_iter) and new_node:  # check reaching the goal
+                last_index = self.search_best_goal_node()
+                if last_index:
+                    return self.generate_final_course(last_index)
 
-        if lastIndex is None:
-            return None
+        print("reached max iteration")
 
-        path = self.gen_final_course(lastIndex)
-        return path
-
-    def pi_2_pi(self, angle):
-        return (angle + math.pi) % (2 * math.pi) - math.pi
-
-    def steer(self, rnd, nind):
-        #  print(rnd)
-        curvature = 1.0
-
-        nearestNode = self.nodeList[nind]
-
-        px, py, pyaw, mode, clen = dubins_path_planning.dubins_path_planning(
-            nearestNode.x, nearestNode.y, nearestNode.yaw, rnd[0], rnd[1], rnd[2], curvature)
-
-        newNode = copy.deepcopy(nearestNode)
-        newNode.x = px[-1]
-        newNode.y = py[-1]
-        newNode.yaw = pyaw[-1]
-
-        newNode.path_x = px
-        newNode.path_y = py
-        newNode.path_yaw = pyaw
-        newNode.cost += clen
-        newNode.parent = nind
-
-        return newNode
-
-    def get_random_point(self):
-
-        if random.randint(0, 100) > self.goalSampleRate:
-            rnd = [random.uniform(self.minrand, self.maxrand),
-                   random.uniform(self.minrand, self.maxrand),
-                   random.uniform(-math.pi, math.pi)
-                   ]
-        else:  # goal point sampling
-            rnd = [self.end.x, self.end.y, self.end.yaw]
-
-        return rnd
-
-    def get_best_last_index(self):
-        #  print("get_best_last_index")
-
-        disglist = [self.calc_dist_to_goal(
-            node.x, node.y) for node in self.nodeList]
-        goalinds = [disglist.index(i) for i in disglist if i <= 0.1]
-        #  print(goalinds)
-
-        mincost = min([self.nodeList[i].cost for i in goalinds])
-        for i in goalinds:
-            if self.nodeList[i].cost == mincost:
-                return i
+        last_index = self.search_best_goal_node()
+        if last_index:
+            return self.generate_final_course(last_index)
+        else:
+            print("Cannot find path")
 
         return None
 
-    def gen_final_course(self, goalind):
-        path = [[self.end.x, self.end.y]]
-        while self.nodeList[goalind].parent is not None:
-            node = self.nodeList[goalind]
-            for (ix, iy) in zip(reversed(node.path_x), reversed(node.path_y)):
-                path.append([ix, iy])
-            #  path.append([node.x, node.y])
-            goalind = node.parent
-        path.append([self.start.x, self.start.y])
-        return path
-
-    def calc_dist_to_goal(self, x, y):
-        return np.linalg.norm([x - self.end.x, y - self.end.y])
-
-    def DrawGraph(self, rnd=None):  # pragma: no cover
+    def draw_graph(self, rnd=None):  # pragma: no cover
         plt.clf()
         if rnd is not None:
-            plt.plot(rnd[0], rnd[1], "^k")
-        for node in self.nodeList:
-            if node.parent is not None:
+            plt.plot(rnd.x, rnd.y, "^k")
+        for node in self.node_list:
+            if node.parent:
                 plt.plot(node.path_x, node.path_y, "-g")
 
-        for (ox, oy, size) in self.obstacleList:
+        for (ox, oy, size) in self.obstacle_list:
             plt.plot(ox, oy, "ok", ms=30 * size)
 
+        plt.plot(self.start.x, self.start.y, "xr")
+        plt.plot(self.end.x, self.end.y, "xr")
+        plt.axis([-2, 15, -2, 15])
+        plt.grid(True)
+        self.plot_start_goal_arrow()
+        plt.pause(0.01)
+
+    def plot_start_goal_arrow(self):  # pragma: no cover
         dubins_path_planning.plot_arrow(
             self.start.x, self.start.y, self.start.yaw)
         dubins_path_planning.plot_arrow(
             self.end.x, self.end.y, self.end.yaw)
 
-        plt.axis([-2, 15, -2, 15])
-        plt.grid(True)
-        plt.pause(0.01)
+    def steer(self, from_node, to_node):
 
-    def GetNearestListIndex(self, nodeList, rnd):
-        dlist = [(node.x - rnd[0]) ** 2
-                 + (node.y - rnd[1]) ** 2
-                 + (node.yaw - rnd[2] ** 2) for node in nodeList]
-        minind = dlist.index(min(dlist))
+        px, py, pyaw, mode, course_length = dubins_path_planning.dubins_path_planning(
+            from_node.x, from_node.y, from_node.yaw,
+            to_node.x, to_node.y, to_node.yaw, self.curvature)
 
-        return minind
+        new_node = copy.deepcopy(from_node)
+        new_node.x = px[-1]
+        new_node.y = py[-1]
+        new_node.yaw = pyaw[-1]
 
-    def __CollisionCheck(self, node, obstacleList):
+        new_node.path_x = px
+        new_node.path_y = py
+        new_node.path_yaw = pyaw
+        new_node.cost += course_length
+        new_node.parent = from_node
 
-        for (ox, oy, size) in obstacleList:
-            for (ix, iy) in zip(node.path_x, node.path_y):
-                dx = ox - ix
-                dy = oy - iy
-                d = dx * dx + dy * dy
-                if d <= size ** 2:
-                    return False  # collision
+        return new_node
 
-        return True  # safe
+    def calc_new_cost(self, from_node, to_node):
 
+        _, _, _, _, course_length = dubins_path_planning.dubins_path_planning(
+            from_node.x, from_node.y, from_node.yaw,
+            to_node.x, to_node.y, to_node.yaw, self.curvature)
 
-class Node():
-    """
-    RRT Node
-    """
+        return from_node.cost + course_length
 
-    def __init__(self, x, y, yaw):
-        self.x = x
-        self.y = y
-        self.yaw = yaw
-        self.path_x = []
-        self.path_y = []
-        self.path_yaw = []
-        self.cost = 0.0
-        self.parent = None
+    def get_random_node(self):
+
+        if random.randint(0, 100) > self.goal_sample_rate:
+            rnd = self.Node(random.uniform(self.min_rand, self.max_rand),
+                            random.uniform(self.min_rand, self.max_rand),
+                            random.uniform(-math.pi, math.pi)
+                            )
+        else:  # goal point sampling
+            rnd = self.Node(self.end.x, self.end.y, self.end.yaw)
+
+        return rnd
+
+    def search_best_goal_node(self):
+
+        goal_indexes = []
+        for (i, node) in enumerate(self.node_list):
+            if self.calc_dist_to_goal(node.x, node.y) <= self.goal_xy_th:
+                goal_indexes.append(i)
+
+        # angle check
+        final_goal_indexes = []
+        for i in goal_indexes:
+            if abs(self.node_list[i].yaw - self.end.yaw) <= self.goal_yaw_th:
+                final_goal_indexes.append(i)
+
+        if not final_goal_indexes:
+            return None
+
+        min_cost = min([self.node_list[i].cost for i in final_goal_indexes])
+        for i in final_goal_indexes:
+            if self.node_list[i].cost == min_cost:
+                return i
+
+        return None
+
+    def generate_final_course(self, goal_index):
+        print("final")
+        path = [[self.end.x, self.end.y]]
+        node = self.node_list[goal_index]
+        while node.parent:
+            for (ix, iy) in zip(reversed(node.path_x), reversed(node.path_y)):
+                path.append([ix, iy])
+            node = node.parent
+        path.append([self.start.x, self.start.y])
+        return path
 
 
 def main():
@@ -216,12 +218,12 @@ def main():
     start = [0.0, 0.0, np.deg2rad(0.0)]
     goal = [10.0, 10.0, np.deg2rad(0.0)]
 
-    rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
-    path = rrt.Planning(animation=show_animation)
+    rrt_dubins = RRTDubins(start, goal, obstacleList, [-2.0, 15.0])
+    path = rrt_dubins.planning(animation=show_animation)
 
     # Draw final path
     if show_animation:  # pragma: no cover
-        rrt.DrawGraph()
+        rrt_dubins.draw_graph()
         plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
         plt.grid(True)
         plt.pause(0.001)
