@@ -11,13 +11,12 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import copy
 import math
-
-import matplotlib.pyplot as plt
 import numpy as np
-from scipy.ndimage import gaussian_filter
+import matplotlib.pyplot as plt
+import copy
 from scipy.stats import norm
+from scipy.ndimage import gaussian_filter
 
 # Parameters
 EXTEND_AREA = 10.0  # [m] grid map extention length
@@ -42,11 +41,11 @@ NOISE_SPEED = 0.5  # [m/s] 1σ speed noise parameter
 show_animation = True
 
 
-class GridMap:
+class grid_map():
 
     def __init__(self):
         self.data = None
-        self.xy_reso = None
+        self.xyreso = None
         self.minx = None
         self.miny = None
         self.maxx = None
@@ -158,7 +157,8 @@ def normalize_probability(gmap):
 
 
 def init_gmap(xyreso, minx, miny, maxx, maxy):
-    gmap = GridMap()
+
+    gmap = grid_map()
 
     gmap.xy_reso = xyreso
     gmap.minx = minx
