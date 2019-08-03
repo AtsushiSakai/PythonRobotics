@@ -11,12 +11,13 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import math
-import numpy as np
-import matplotlib.pyplot as plt
 import copy
-from scipy.stats import norm
+import math
+
+import matplotlib.pyplot as plt
+import numpy as np
 from scipy.ndimage import gaussian_filter
+from scipy.stats import norm
 
 # Parameters
 EXTEND_AREA = 10.0  # [m] grid map extention length
@@ -41,7 +42,7 @@ NOISE_SPEED = 0.5  # [m/s] 1σ speed noise parameter
 show_animation = True
 
 
-class grid_map():
+class GridMap:
 
     def __init__(self):
         self.data = None
@@ -117,7 +118,7 @@ def motion_model(x, u):
 
 def draw_heatmap(data, mx, my):
     maxp = max([max(igmap) for igmap in data])
-    plt.pcolor(mx, my, data, vmax=maxp, cmap=plt.cm.Blues)
+    plt.pcolor(mx, my, data, vmax=maxp, cmap=plt.cm.get_cmap("Blues"))
     plt.axis("equal")
 
 
@@ -157,8 +158,7 @@ def normalize_probability(gmap):
 
 
 def init_gmap(xyreso, minx, miny, maxx, maxy):
-
-    gmap = grid_map()
+    gmap = GridMap()
 
     gmap.xyreso = xyreso
     gmap.minx = minx
@@ -168,7 +168,7 @@ def init_gmap(xyreso, minx, miny, maxx, maxy):
     gmap.xw = int(round((gmap.maxx - gmap.minx) / gmap.xyreso))
     gmap.yw = int(round((gmap.maxy - gmap.miny) / gmap.xyreso))
 
-    gmap.data = [[1.0 for i in range(gmap.yw)] for i in range(gmap.xw)]
+    gmap.data = [[1.0 for _ in range(gmap.yw)] for _ in range(gmap.xw)]
     gmap = normalize_probability(gmap)
 
     return gmap
@@ -183,7 +183,7 @@ def map_shift(gmap, xshift, yshift):
             nix = ix + xshift
             niy = iy + yshift
 
-            if nix >= 0 and nix < gmap.xw and niy >= 0 and niy < gmap.yw:
+            if 0 <= nix < gmap.xw and 0 <= niy < gmap.yw:
                 gmap.data[ix + xshift][iy + yshift] = tgmap[ix][iy]
 
     return gmap
