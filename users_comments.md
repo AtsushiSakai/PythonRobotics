@@ -345,6 +345,12 @@ Thanks for writing these algorithms. They are very helpful for learning robotics
 
 ---
 
+Dear AtsushiSakai, <br>Thank you for providing us this great repository for playing and look around:)!
+
+--Hsin-Wen
+
+
+
 
 # Citations
 
