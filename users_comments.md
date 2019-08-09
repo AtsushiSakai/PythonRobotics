@@ -349,7 +349,11 @@ Dear AtsushiSakai, <br>Thank you for providing us this great repository for play
 
 --Hsin-Wen
 
+---
 
+Thanks for PythonRobotics!
+
+--Nick V
 
 
 # Citations
