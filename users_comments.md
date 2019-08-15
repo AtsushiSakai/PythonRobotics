@@ -355,6 +355,14 @@ Thanks for PythonRobotics!
 
 --Nick V
 
+---
+
+Dear AtsushiSakai, thank you so much for this material, it's so useful to me, i'm really glad with it =D
+
+--Juanda
+
+---
+
 
 # Citations
 
