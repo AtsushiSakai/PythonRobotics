@@ -5,12 +5,16 @@ Path tracking simulation with rear wheel feedback steering control and PID speed
 author: Atsushi Sakai(@Atsushi_twi)
 
 """
+import matplotlib.pyplot as plt
+import math
+import numpy as np
 import sys
 sys.path.append("../../PathPlanning/CubicSpline/")
 
-import math
-import matplotlib.pyplot as plt
-import cubic_spline_planner
+try:
+    import cubic_spline_planner
+except:
+    raise
 
 
 Kp = 1.0  # speed propotional gain
@@ -202,7 +206,7 @@ def main():
     # Test
     assert goal_flag, "Cannot goal"
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.close()
         plt.subplots(1)
         plt.plot(ax, ay, "xb", label="input")

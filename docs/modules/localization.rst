@@ -66,6 +66,6 @@ Ref:
 .. _PROBABILISTIC ROBOTICS: http://www.probabilistic-robotics.org/
 .. _Discriminatively Trained Unscented Kalman Filter for Mobile Robot Localization: https://www.researchgate.net/publication/267963417_Discriminatively_Trained_Unscented_Kalman_Filter_for_Mobile_Robot_Localization
 
-.. |2| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/Localization/unscented_kalman_filter/animation.gif
-.. |3| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/Localization/particle_filter/animation.gif
-.. |4| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/Localization/histogram_filter/animation.gif
+.. |2| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/unscented_kalman_filter/animation.gif
+.. |3| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/particle_filter/animation.gif
+.. |4| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/histogram_filter/animation.gif

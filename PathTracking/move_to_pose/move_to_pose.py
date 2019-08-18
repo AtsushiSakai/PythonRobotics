@@ -48,15 +48,13 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
         x_diff = x_goal - x
         y_diff = y_goal - y
 
-        """
-        Restrict alpha and beta (angle differences) to the range
-        [-pi, pi] to prevent unstable behavior e.g. difference going
-        from 0 rad to 2*pi rad with slight turn
-        """
+        # Restrict alpha and beta (angle differences) to the range
+        # [-pi, pi] to prevent unstable behavior e.g. difference going
+        # from 0 rad to 2*pi rad with slight turn
 
         rho = np.sqrt(x_diff**2 + y_diff**2)
-        alpha = (np.arctan2(y_diff, x_diff) -
-                 theta + np.pi) % (2 * np.pi) - np.pi
+        alpha = (np.arctan2(y_diff, x_diff)
+                 - theta + np.pi) % (2 * np.pi) - np.pi
         beta = (theta_goal - theta - alpha + np.pi) % (2 * np.pi) - np.pi
 
         v = Kp_rho * rho
@@ -69,7 +67,7 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
         x = x + v * np.cos(theta) * dt
         y = y + v * np.sin(theta) * dt
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             plt.arrow(x_start, y_start, np.cos(theta_start),
                       np.sin(theta_start), color='r', width=0.1)
@@ -78,7 +76,7 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
             plot_vehicle(x, y, theta, x_traj, y_traj)
 
 
-def plot_vehicle(x, y, theta, x_traj, y_traj):
+def plot_vehicle(x, y, theta, x_traj, y_traj):  # pragma: no cover
     # Corners of triangular vehicle when pointing to the right (0 radians)
     p1_i = np.array([0.5, 0, 1]).T
     p2_i = np.array([-0.5, 0.25, 1]).T

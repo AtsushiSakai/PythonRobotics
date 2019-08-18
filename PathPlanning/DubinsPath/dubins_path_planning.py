@@ -6,8 +6,9 @@ author Atsushi Sakai(@Atsushi_twi)
 
 """
 import math
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 show_animation = True
 
@@ -136,8 +137,8 @@ def LRL(alpha, beta, d):
     return t, p, q, mode
 
 
-def dubins_path_planning_from_origin(ex, ey, eyaw, c):
-    # nomalize
+def dubins_path_planning_from_origin(ex, ey, eyaw, c, D_ANGLE):
+    # normalize
     dx = ex
     dy = ey
     D = math.sqrt(dx ** 2.0 + dy ** 2.0)
@@ -165,12 +166,12 @@ def dubins_path_planning_from_origin(ex, ey, eyaw, c):
             bcost = cost
 
     #  print(bmode)
-    px, py, pyaw = generate_course([bt, bp, bq], bmode, c)
+    px, py, pyaw = generate_course([bt, bp, bq], bmode, c, D_ANGLE)
 
     return px, py, pyaw, bmode, bcost
 
 
-def dubins_path_planning(sx, sy, syaw, ex, ey, eyaw, c):
+def dubins_path_planning(sx, sy, syaw, ex, ey, eyaw, c, D_ANGLE=np.deg2rad(10.0)):
     """
     Dubins path plannner
 
@@ -199,18 +200,18 @@ def dubins_path_planning(sx, sy, syaw, ex, ey, eyaw, c):
     leyaw = eyaw - syaw
 
     lpx, lpy, lpyaw, mode, clen = dubins_path_planning_from_origin(
-        lex, ley, leyaw, c)
+        lex, ley, leyaw, c, D_ANGLE)
 
-    px = [math.cos(-syaw) * x + math.sin(-syaw) *
-          y + sx for x, y in zip(lpx, lpy)]
-    py = [- math.sin(-syaw) * x + math.cos(-syaw) *
-          y + sy for x, y in zip(lpx, lpy)]
+    px = [math.cos(-syaw) * x + math.sin(-syaw)
+          * y + sx for x, y in zip(lpx, lpy)]
+    py = [- math.sin(-syaw) * x + math.cos(-syaw)
+          * y + sy for x, y in zip(lpx, lpy)]
     pyaw = [pi_2_pi(iyaw + syaw) for iyaw in lpyaw]
 
     return px, py, pyaw, mode, clen
 
 
-def generate_course(length, mode, c):
+def generate_course(length, mode, c, D_ANGLE):
 
     px = [0.0]
     py = [0.0]
@@ -218,21 +219,21 @@ def generate_course(length, mode, c):
 
     for m, l in zip(mode, length):
         pd = 0.0
-        if m is "S":
+        if m == "S":
             d = 1.0 * c
         else:  # turning couse
-            d = np.deg2rad(3.0)
+            d = D_ANGLE
 
         while pd < abs(l - d):
             #  print(pd, l)
             px.append(px[-1] + d / c * math.cos(pyaw[-1]))
             py.append(py[-1] + d / c * math.sin(pyaw[-1]))
 
-            if m is "L":  # left turn
+            if m == "L":  # left turn
                 pyaw.append(pyaw[-1] + d)
-            elif m is "S":  # Straight
+            elif m == "S":  # Straight
                 pyaw.append(pyaw[-1])
-            elif m is "R":  # right turn
+            elif m == "R":  # right turn
                 pyaw.append(pyaw[-1] - d)
             pd += d
 
@@ -240,18 +241,18 @@ def generate_course(length, mode, c):
         px.append(px[-1] + d / c * math.cos(pyaw[-1]))
         py.append(py[-1] + d / c * math.sin(pyaw[-1]))
 
-        if m is "L":  # left turn
+        if m == "L":  # left turn
             pyaw.append(pyaw[-1] + d)
-        elif m is "S":  # Straight
+        elif m == "S":  # Straight
             pyaw.append(pyaw[-1])
-        elif m is "R":  # right turn
+        elif m == "R":  # right turn
             pyaw.append(pyaw[-1] - d)
         pd += d
 
     return px, py, pyaw
 
 
-def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
+def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no cover
     """
     Plot arrow
     """

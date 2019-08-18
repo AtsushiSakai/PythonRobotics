@@ -11,13 +11,18 @@ import scipy.linalg
 import math
 import matplotlib.pyplot as plt
 
-# Estimation parameter of UKF
-Q = np.diag([0.1, 0.1, np.deg2rad(1.0), 1.0])**2
-R = np.diag([1.0, np.deg2rad(40.0)])**2
+# Covariance for UKF simulation
+Q = np.diag([
+    0.1, # variance of location on x-axis
+    0.1, # variance of location on y-axis
+    np.deg2rad(1.0), # variance of yaw angle
+    1.0 # variance of velocity
+    ])**2  # predict state covariance
+R = np.diag([1.0, 1.0])**2  # Observation x,y position covariance
 
 #  Simulation parameter
-Qsim = np.diag([0.5, 0.5])**2
-Rsim = np.diag([1.0, np.deg2rad(30.0)])**2
+INPUT_NOISE = np.diag([1.0, np.deg2rad(30.0)])**2
+GPS_NOISE = np.diag([0.5, 0.5])**2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
@@ -42,14 +47,10 @@ def observation(xTrue, xd, u):
     xTrue = motion_model(xTrue, u)
 
     # add noise to gps x-y
-    zx = xTrue[0, 0] + np.random.randn() * Qsim[0, 0]
-    zy = xTrue[1, 0] + np.random.randn() * Qsim[1, 1]
-    z = np.array([[zx, zy]]).T
+    z = observation_model(xTrue) + GPS_NOISE @ np.random.randn(2, 1)
 
     # add noise to input
-    ud1 = u[0] + np.random.randn() * Rsim[0, 0]
-    ud2 = u[1] + np.random.randn() * Rsim[1, 1]
-    ud = np.array([ud1, ud2])
+    ud = u + INPUT_NOISE @ np.random.randn(2, 1)
 
     xd = motion_model(xd, ud)
 
@@ -100,7 +101,9 @@ def generate_sigma_points(xEst, PEst, gamma):
 
 
 def predict_sigma_motion(sigma, u):
-    #  Sigma Points prediction with motion model
+    """
+        Sigma Points prediction with motion model
+    """
     for i in range(sigma.shape[1]):
         sigma[:, i:i + 1] = motion_model(sigma[:, i:i + 1], u)
 
@@ -108,7 +111,9 @@ def predict_sigma_motion(sigma, u):
 
 
 def predict_sigma_observation(sigma):
-    # Sigma Points prediction with observation model
+    """
+        Sigma Points prediction with observation model
+    """
     for i in range(sigma.shape[1]):
         sigma[0:2, i] = observation_model(sigma[:, i])
 
@@ -161,7 +166,7 @@ def ukf_estimation(xEst, PEst, z, u, wm, wc, gamma):
     return xEst, PEst
 
 
-def plot_covariance_ellipse(xEst, PEst):
+def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
     Pxy = PEst[0:2, 0:2]
     eigval, eigvec = np.linalg.eig(Pxy)
 

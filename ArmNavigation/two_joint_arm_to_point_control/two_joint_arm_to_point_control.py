@@ -61,7 +61,7 @@ def two_joint_arm(GOAL_TH=0.0, theta1=0.0, theta2=0.0):
             return theta1, theta2
 
 
-def plot_arm(theta1, theta2, x, y):
+def plot_arm(theta1, theta2, x, y):  # pragma: no cover
     shoulder = np.array([0, 0])
     elbow = shoulder + np.array([l1 * np.cos(theta1), l1 * np.sin(theta1)])
     wrist = elbow + \
@@ -94,7 +94,7 @@ def ang_diff(theta1, theta2):
     return (theta1 - theta2 + np.pi) % (2 * np.pi) - np.pi
 
 
-def click(event):
+def click(event):  # pragma: no cover
     global x, y
     x = event.xdata
     y = event.ydata
@@ -111,7 +111,7 @@ def animation():
             GOAL_TH=0.01, theta1=theta1, theta2=theta2)
 
 
-def main():
+def main():  # pragma: no cover
     fig = plt.figure()
     fig.canvas.mpl_connect("button_press_event", click)
     two_joint_arm()

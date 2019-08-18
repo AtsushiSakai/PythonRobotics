@@ -402,7 +402,7 @@ def main():
         hxDR = np.hstack((hxDR, xDR))
         hxTrue = np.hstack((hxTrue, xTrue))
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             plt.plot(RFID[:, 0], RFID[:, 1], "*k")
 

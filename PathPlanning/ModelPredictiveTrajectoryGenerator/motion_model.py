@@ -18,7 +18,7 @@ class State:
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2*math.pi) - math.pi
+    return (angle + math.pi) % (2 * math.pi) - math.pi
 
 
 def update(state, v, delta, dt, L):
@@ -74,5 +74,6 @@ def generate_last_state(s, km, kf, k0):
 
     state = State()
 
-    [update(state, v, ikp, dt, L) for ikp in kp]
+    _ = [update(state, v, ikp, dt, L) for ikp in kp]
+
     return state.x, state.y, state.yaw

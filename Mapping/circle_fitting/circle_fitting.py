@@ -75,13 +75,13 @@ def ray_casting_filter(xl, yl, thetal, rangel, angle_reso):
     rangedb = [float("inf") for _ in range(
         int(math.floor((math.pi * 2.0) / angle_reso)) + 1)]
 
-    for i in range(len(thetal)):
+    for i, _ in enumerate(thetal):
         angleid = math.floor(thetal[i] / angle_reso)
 
         if rangedb[angleid] > rangel[i]:
             rangedb[angleid] = rangel[i]
 
-    for i in range(len(rangedb)):
+    for i, _ in enumerate(rangedb):
         t = i * angle_reso
         if rangedb[i] != float("inf"):
             rx.append(rangedb[i] * math.cos(t))
@@ -90,7 +90,7 @@ def ray_casting_filter(xl, yl, thetal, rangel, angle_reso):
     return rx, ry
 
 
-def plot_circle(x, y, size, color="-b"):
+def plot_circle(x, y, size, color="-b"):  # pragma: no cover
     deg = list(range(0, 360, 5))
     deg.append(0)
     xl = [x + size * math.cos(np.deg2rad(d)) for d in deg]
@@ -122,7 +122,7 @@ def main():
         ex, ey, er, error = circle_fitting(x, y)
         print("Error:", error)
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             plt.axis("equal")
             plt.plot(0.0, 0.0, "*r")

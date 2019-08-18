@@ -18,6 +18,8 @@ import copy
 import math
 import cubic_spline_planner
 
+SIM_LOOP = 500
+
 # Parameter
 MAX_SPEED = 50.0 / 3.6  # maximum speed [m/s]
 MAX_ACCEL = 2.0  # maximum acceleration [m/ss]
@@ -257,7 +259,7 @@ def check_collision(fp, ob):
 def check_paths(fplist, ob):
 
     okind = []
-    for i in range(len(fplist)):
+    for i, _ in enumerate(fplist):
         if any([v > MAX_SPEED for v in fplist[i].s_d]):  # Max speed check
             continue
         elif any([abs(a) > MAX_ACCEL for a in fplist[i].s_dd]):  # Max accel check
@@ -329,7 +331,7 @@ def main():
 
     area = 20.0  # animation area length [m]
 
-    for i in range(500):
+    for i in range(SIM_LOOP):
         path = frenet_optimal_planning(
             csp, s0, c_speed, c_d, c_d_d, c_d_dd, ob)
 
@@ -343,7 +345,7 @@ def main():
             print("Goal")
             break
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             plt.plot(tx, ty)
             plt.plot(ob[:, 0], ob[:, 1], "xk")
@@ -356,7 +358,7 @@ def main():
             plt.pause(0.0001)
 
     print("Finish")
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.grid(True)
         plt.pause(0.0001)
         plt.show()

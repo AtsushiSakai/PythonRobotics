@@ -4,17 +4,21 @@ Path tracking simulation with Stanley steering control and PID speed control.
 
 author: Atsushi Sakai (@Atsushi_twi)
 
+Ref:
+    - [Stanley: The robot that won the DARPA grand challenge](http://isl.ecst.csuchico.edu/DOCS/darpa2005/DARPA%202005%20Stanley.pdf)
+    - [Autonomous Automobile Path Tracking](https://www.ri.cmu.edu/pub_files/2009/2/Automatic_Steering_Methods_for_Autonomous_Automobile_Path_Tracking.pdf)
+
 """
-from __future__ import division, print_function
-
+import numpy as np
+import matplotlib.pyplot as plt
 import sys
-
 sys.path.append("../../PathPlanning/CubicSpline/")
 
-import matplotlib.pyplot as plt
-import numpy as np
+try:
+    import cubic_spline_planner
+except:
+    raise
 
-import cubic_spline_planner
 
 k = 0.5  # control gain
 Kp = 1.0  # speed propotional gain
@@ -123,7 +127,7 @@ def calc_target_index(state, cx, cy):
     :param cy: [float]
     :return: (int, float)
     """
-    # Calc front axle position
+   # Calc front axle position
     fx = state.x + L * np.cos(state.yaw)
     fy = state.y + L * np.sin(state.yaw)
 
@@ -131,13 +135,13 @@ def calc_target_index(state, cx, cy):
     dx = [fx - icx for icx in cx]
     dy = [fy - icy for icy in cy]
     d = [np.sqrt(idx ** 2 + idy ** 2) for (idx, idy) in zip(dx, dy)]
-    error_front_axle = min(d)
-    target_idx = d.index(error_front_axle)
+    closest_error = min(d)
+    target_idx = d.index(closest_error)
 
-    target_yaw = normalize_angle(np.arctan2(
-        fy - cy[target_idx], fx - cx[target_idx]) - state.yaw)
-    if target_yaw > 0.0:
-        error_front_axle = - error_front_axle
+    # Project RMS error onto front axle vector
+    front_axle_vec = [-np.cos(state.yaw + np.pi / 2),
+                      - np.sin(state.yaw + np.pi / 2)]
+    error_front_axle = np.dot([dx[target_idx], dy[target_idx]], front_axle_vec)
 
     return target_idx, error_front_axle
 
@@ -180,7 +184,7 @@ def main():
         v.append(state.v)
         t.append(time)
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             plt.plot(cx, cy, ".r", label="course")
             plt.plot(x, y, "-b", label="trajectory")
@@ -193,7 +197,7 @@ def main():
     # Test
     assert last_idx >= target_idx, "Cannot reach goal"
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.plot(cx, cy, ".r", label="course")
         plt.plot(x, y, "-b", label="trajectory")
         plt.legend()

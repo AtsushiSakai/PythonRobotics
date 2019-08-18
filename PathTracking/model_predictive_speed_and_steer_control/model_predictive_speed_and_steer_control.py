@@ -5,14 +5,18 @@ Path tracking simulation with iterative linear model predictive control for spee
 author: Atsushi Sakai (@Atsushi_twi)
 
 """
+import matplotlib.pyplot as plt
+import cvxpy
+import math
+import numpy as np
 import sys
 sys.path.append("../../PathPlanning/CubicSpline/")
 
-import numpy as np
-import math
-import cvxpy
-import matplotlib.pyplot as plt
-import cubic_spline_planner
+try:
+    import cubic_spline_planner
+except:
+    raise
+
 
 NX = 4  # x = x, y, v, yaw
 NU = 2  # a = [accel, steer]
@@ -97,18 +101,18 @@ def get_linear_model_matrix(v, phi, delta):
     C = np.zeros(NX)
     C[0] = DT * v * math.sin(phi) * phi
     C[1] = - DT * v * math.cos(phi) * phi
-    C[3] = - v * delta / (WB * math.cos(delta) ** 2)
+    C[3] = - DT * v * delta / (WB * math.cos(delta) ** 2)
 
     return A, B, C
 
 
-def plot_car(x, y, yaw, steer=0.0, cabcolor="-r", truckcolor="-k"):
+def plot_car(x, y, yaw, steer=0.0, cabcolor="-r", truckcolor="-k"):  # pragma: no cover
 
     outline = np.array([[-BACKTOWHEEL, (LENGTH - BACKTOWHEEL), (LENGTH - BACKTOWHEEL), -BACKTOWHEEL, -BACKTOWHEEL],
-                         [WIDTH / 2, WIDTH / 2, - WIDTH / 2, -WIDTH / 2, WIDTH / 2]])
+                        [WIDTH / 2, WIDTH / 2, - WIDTH / 2, -WIDTH / 2, WIDTH / 2]])
 
     fr_wheel = np.array([[WHEEL_LEN, -WHEEL_LEN, -WHEEL_LEN, WHEEL_LEN, WHEEL_LEN],
-                          [-WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD, WHEEL_WIDTH - TREAD, WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD]])
+                         [-WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD, WHEEL_WIDTH - TREAD, WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD]])
 
     rr_wheel = np.copy(fr_wheel)
 
@@ -118,9 +122,9 @@ def plot_car(x, y, yaw, steer=0.0, cabcolor="-r", truckcolor="-k"):
     rl_wheel[1, :] *= -1
 
     Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
-                      [-math.sin(yaw), math.cos(yaw)]])
+                     [-math.sin(yaw), math.cos(yaw)]])
     Rot2 = np.array([[math.cos(steer), math.sin(steer)],
-                      [-math.sin(steer), math.cos(steer)]])
+                     [-math.sin(steer), math.cos(steer)]])
 
     fr_wheel = (fr_wheel.T.dot(Rot2)).T
     fl_wheel = (fl_wheel.T.dot(Rot2)).T
@@ -208,7 +212,7 @@ def calc_nearest_index(state, cx, cy, cyaw, pind):
 
 def predict_motion(x0, oa, od, xref):
     xbar = xref * 0.0
-    for i in range(len(x0)):
+    for i, _ in enumerate(x0):
         xbar[i, 0] = x0[i]
 
     state = State(x=x0[0], y=x0[1], yaw=x0[3], v=x0[2])
@@ -272,8 +276,8 @@ def linear_mpc_control(xref, xbar, x0, dref):
 
         if t < (T - 1):
             cost += cvxpy.quad_form(u[:, t + 1] - u[:, t], Rd)
-            constraints += [cvxpy.abs(u[1, t + 1] - u[1, t])
-                            <= MAX_DSTEER * DT]
+            constraints += [cvxpy.abs(u[1, t + 1] - u[1, t]) <=
+                            MAX_DSTEER * DT]
 
     cost += cvxpy.quad_form(xref[:, T] - x[:, T], Qf)
 
@@ -346,18 +350,12 @@ def check_goal(state, goal, tind, nind):
     dy = state.y - goal[1]
     d = math.sqrt(dx ** 2 + dy ** 2)
 
-    if (d <= GOAL_DIS):
-        isgoal = True
-    else:
-        isgoal = False
+    isgoal = (d <= GOAL_DIS)
 
     if abs(tind - nind) >= 5:
         isgoal = False
 
-    if (abs(state.v) <= STOP_SPEED):
-        isstop = True
-    else:
-        isstop = False
+    isstop = (abs(state.v) <= STOP_SPEED)
 
     if isgoal and isstop:
         return True
@@ -429,7 +427,7 @@ def do_simulation(cx, cy, cyaw, ck, sp, dl, initial_state):
             print("Goal")
             break
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             if ox is not None:
                 plt.plot(ox, oy, "xr", label="MPC")
@@ -440,8 +438,8 @@ def do_simulation(cx, cy, cyaw, ck, sp, dl, initial_state):
             plot_car(state.x, state.y, state.yaw, steer=di)
             plt.axis("equal")
             plt.grid(True)
-            plt.title("Time[s]:" + str(round(time, 2)) +
-                      ", speed[km/h]:" + str(round(state.v * 3.6, 2)))
+            plt.title("Time[s]:" + str(round(time, 2))
+                      + ", speed[km/h]:" + str(round(state.v * 3.6, 2)))
             plt.pause(0.0001)
 
     return t, x, y, yaw, v, d, a
@@ -554,9 +552,9 @@ def main():
     dl = 1.0  # course tick
     # cx, cy, cyaw, ck = get_straight_course(dl)
     # cx, cy, cyaw, ck = get_straight_course2(dl)
-    cx, cy, cyaw, ck = get_straight_course3(dl)
+    # cx, cy, cyaw, ck = get_straight_course3(dl)
     # cx, cy, cyaw, ck = get_forward_course(dl)
-    # CX, cy, cyaw, ck = get_switch_back_course(dl)
+    cx, cy, cyaw, ck = get_switch_back_course(dl)
 
     sp = calc_speed_profile(cx, cy, cyaw, TARGET_SPEED)
 
@@ -565,7 +563,7 @@ def main():
     t, x, y, yaw, v, d, a = do_simulation(
         cx, cy, cyaw, ck, sp, dl, initial_state)
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.close("all")
         plt.subplots()
         plt.plot(cx, cy, "-r", label="spline")
@@ -598,7 +596,7 @@ def main2():
     t, x, y, yaw, v, d, a = do_simulation(
         cx, cy, cyaw, ck, sp, dl, initial_state)
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.close("all")
         plt.subplots()
         plt.plot(cx, cy, "-r", label="spline")
@@ -619,5 +617,5 @@ def main2():
 
 
 if __name__ == '__main__':
-    # main()
-    main2()
+    main()
+    # main2()

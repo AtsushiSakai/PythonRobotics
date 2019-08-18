@@ -53,7 +53,7 @@ def animate(grid, arm, route):
         theta2 = 2 * pi * node[1] / M - pi
         arm.update_joints([theta1, theta2])
         plt.subplot(1, 2, 2)
-        arm.plot(plt, obstacles=obstacles)
+        arm.plot_arm(plt, obstacles=obstacles)
         plt.xlim(-2.0, 2.0)
         plt.ylim(-3.0, 3.0)
         plt.show()
@@ -92,8 +92,7 @@ def detect_collision(line_seg, circle):
         closest_point = a_vec + line_vec * proj / line_mag
     if np.linalg.norm(closest_point - c_vec) > radius:
         return False
-    else:
-        return True
+    return True
 
 
 def get_occupancy_grid(arm, obstacles):
@@ -143,21 +142,16 @@ def astar_torus(grid, start_node, goal_node):
     Returns:
         Obstacle-free route in joint space from start_node to goal_node
     """
+    colors = ['white', 'black', 'red', 'pink', 'yellow', 'green', 'orange']
+    levels = [0, 1, 2, 3, 4, 5, 6, 7]
+    cmap, norm = from_levels_and_colors(levels, colors)
+
     grid[start_node] = 4
     grid[goal_node] = 5
 
     parent_map = [[() for _ in range(M)] for _ in range(M)]
 
-    X, Y = np.meshgrid([i for i in range(M)], [i for i in range(M)])
-    heuristic_map = np.abs(X - goal_node[1]) + np.abs(Y - goal_node[0])
-    for i in range(heuristic_map.shape[0]):
-        for j in range(heuristic_map.shape[1]):
-            heuristic_map[i, j] = min(heuristic_map[i, j],
-                                      i + 1 + heuristic_map[M - 1, j],
-                                      M - i + heuristic_map[0, j],
-                                      j + 1 + heuristic_map[i, M - 1],
-                                      M - j + heuristic_map[i, 0]
-                                      )
+    heuristic_map = calc_heuristic_map(M, goal_node)
 
     explored_heuristic_map = np.full((M, M), np.inf)
     distance_map = np.full((M, M), np.inf)
@@ -178,26 +172,7 @@ def astar_torus(grid, start_node, goal_node):
 
         i, j = current_node[0], current_node[1]
 
-        neighbors = []
-        if i - 1 >= 0:
-            neighbors.append((i - 1, j))
-        else:
-            neighbors.append((M - 1, j))
-
-        if i + 1 < M:
-            neighbors.append((i + 1, j))
-        else:
-            neighbors.append((0, j))
-
-        if j - 1 >= 0:
-            neighbors.append((i, j - 1))
-        else:
-            neighbors.append((i, M - 1))
-
-        if j + 1 < M:
-            neighbors.append((i, j + 1))
-        else:
-            neighbors.append((i, 0))
+        neighbors = find_neighbors(i, j)
 
         for neighbor in neighbors:
             if grid[neighbor] == 0 or grid[neighbor] == 5:
@@ -205,23 +180,64 @@ def astar_torus(grid, start_node, goal_node):
                 explored_heuristic_map[neighbor] = heuristic_map[neighbor]
                 parent_map[neighbor[0]][neighbor[1]] = current_node
                 grid[neighbor] = 3
-        '''
-        plt.cla()
-        plt.imshow(grid, cmap=cmap, norm=norm, interpolation=None)
-        plt.show()
-        plt.pause(1e-5)
-        '''
 
     if np.isinf(explored_heuristic_map[goal_node]):
         route = []
         print("No route found.")
     else:
         route = [goal_node]
-        while parent_map[route[0][0]][route[0][1]] is not ():
+        while parent_map[route[0][0]][route[0][1]] != ():
             route.insert(0, parent_map[route[0][0]][route[0][1]])
 
         print("The route found covers %d grid cells." % len(route))
+        for i in range(1, len(route)):
+            grid[route[i]] = 6
+            plt.cla()
+            plt.imshow(grid, cmap=cmap, norm=norm, interpolation=None)
+            plt.show()
+            plt.pause(1e-2)
+
     return route
+
+
+def find_neighbors(i, j):
+    neighbors = []
+    if i - 1 >= 0:
+        neighbors.append((i - 1, j))
+    else:
+        neighbors.append((M - 1, j))
+
+    if i + 1 < M:
+        neighbors.append((i + 1, j))
+    else:
+        neighbors.append((0, j))
+
+    if j - 1 >= 0:
+        neighbors.append((i, j - 1))
+    else:
+        neighbors.append((i, M - 1))
+
+    if j + 1 < M:
+        neighbors.append((i, j + 1))
+    else:
+        neighbors.append((i, 0))
+
+    return neighbors
+
+
+def calc_heuristic_map(M, goal_node):
+    X, Y = np.meshgrid([i for i in range(M)], [i for i in range(M)])
+    heuristic_map = np.abs(X - goal_node[1]) + np.abs(Y - goal_node[0])
+    for i in range(heuristic_map.shape[0]):
+        for j in range(heuristic_map.shape[1]):
+            heuristic_map[i, j] = min(heuristic_map[i, j],
+                                      i + 1 + heuristic_map[M - 1, j],
+                                      M - i + heuristic_map[0, j],
+                                      j + 1 + heuristic_map[i, M - 1],
+                                      M - j + heuristic_map[i, 0]
+                                      )
+
+    return heuristic_map
 
 
 class NLinkArm(object):
@@ -256,7 +272,7 @@ class NLinkArm(object):
 
         self.end_effector = np.array(self.points[self.n_links]).T
 
-    def plot(self, myplt, obstacles=[]):
+    def plot_arm(self, myplt, obstacles=[]):  # pragma: no cover
         myplt.cla()
 
         for obstacle in obstacles:

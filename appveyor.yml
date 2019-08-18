@@ -5,15 +5,14 @@ environment:
     # See: http://stackoverflow.com/a/13751649/163740
     CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
 
-
   matrix:
-  - PYTHON_VERSION: 3.6
-    MINICONDA: "C:\\Miniconda36-x64"
+    - MINICONDA: C:\Miniconda36-x64
+
+
 
 init:
   - "ECHO %MINICONDA% %PYTHON_VERSION% %PYTHON_ARCH%"
 
-  
 install:
   # If there is a newer build queued for the same PR, cancel this one.
   # The AppVeyor 'rollout builds' option is supposed to serve the same
@@ -39,7 +38,7 @@ install:
   - conda info -a
   - conda env create -f C:\\projects\pythonrobotics\environment.yml
   - activate python_robotics
-  
+
   # Check that we have the expected version and architecture for Python
   - "python --version"
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""

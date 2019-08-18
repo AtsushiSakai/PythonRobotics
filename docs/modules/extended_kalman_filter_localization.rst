@@ -15,7 +15,7 @@ Extended Kalman Filter Localization
 
 
 
-.. figure:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/Localization/extended_kalman_filter/animation.gif
+.. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/extended_kalman_filter/animation.gif
    :alt: EKF
 
    EKF

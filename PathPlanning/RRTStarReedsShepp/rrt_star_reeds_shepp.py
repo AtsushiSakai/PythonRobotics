@@ -1,300 +1,232 @@
 """
 
-Path Planning Sample Code with RRT for car like robot.
+Path planning Sample Code with RRT with Reeds-Shepp path
 
 author: AtsushiSakai(@Atsushi_twi)
 
 """
-
-import sys
-sys.path.append("../ReedsSheppPath/")
-
-import random
-import math
 import copy
-import numpy as np
-import reeds_shepp_path_planning
+import math
+import os
+import random
+import sys
+
 import matplotlib.pyplot as plt
+import numpy as np
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/../ReedsSheppPath/")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/../RRTStar/")
+
+try:
+    import reeds_shepp_path_planning
+    from rrt_star import RRTStar
+except ImportError:
+    raise
 
 show_animation = True
-STEP_SIZE = 0.1
-curvature = 1.0
 
 
-class RRT():
+class RRTStarReedsShepp(RRTStar):
     """
-    Class for RRT Planning
+    Class for RRT star planning with Reeds Shepp path
     """
 
-    def __init__(self, start, goal, obstacleList, randArea,
-                 goalSampleRate=10, maxIter=400):
+    class Node(RRTStar.Node):
+        """
+        RRT Node
+        """
+
+        def __init__(self, x, y, yaw):
+            super().__init__(x, y)
+            self.yaw = yaw
+            self.path_yaw = []
+
+    def __init__(self, start, goal, obstacle_list, rand_area,
+                 max_iter=200,
+                 connect_circle_dist=50.0
+                 ):
         """
         Setting Parameter
 
         start:Start Position [x,y]
         goal:Goal Position [x,y]
         obstacleList:obstacle Positions [[x,y,size],...]
-        randArea:Ramdom Samping Area [min,max]
+        randArea:Random Sampling Area [min,max]
 
         """
-        self.start = Node(start[0], start[1], start[2])
-        self.end = Node(goal[0], goal[1], goal[2])
-        self.minrand = randArea[0]
-        self.maxrand = randArea[1]
-        self.goalSampleRate = goalSampleRate
-        self.maxIter = maxIter
-        self.obstacleList = obstacleList
+        self.start = self.Node(start[0], start[1], start[2])
+        self.end = self.Node(goal[0], goal[1], goal[2])
+        self.min_rand = rand_area[0]
+        self.max_rand = rand_area[1]
+        self.max_iter = max_iter
+        self.obstacle_list = obstacle_list
+        self.connect_circle_dist = connect_circle_dist
 
-    def Planning(self, animation=True):
+        self.curvature = 1.0
+        self.goal_yaw_th = np.deg2rad(1.0)
+        self.goal_xy_th = 0.5
+
+    def planning(self, animation=True, search_until_max_iter=True):
         """
-        Pathplanning
+        planning
 
         animation: flag for animation on or off
         """
 
-        self.nodeList = [self.start]
-        for i in range(self.maxIter):
-            rnd = self.get_random_point()
-            nind = self.GetNearestListIndex(self.nodeList, rnd)
+        self.node_list = [self.start]
+        for i in range(self.max_iter):
+            print("Iter:", i, ", number of nodes:", len(self.node_list))
+            rnd = self.get_random_node()
+            nearest_ind = self.get_nearest_node_index(self.node_list, rnd)
+            new_node = self.steer(self.node_list[nearest_ind], rnd)
 
-            newNode = self.steer(rnd, nind)
-            if newNode is None:
-                continue
-
-            if self.CollisionCheck(newNode, self.obstacleList):
-                nearinds = self.find_near_nodes(newNode)
-                newNode = self.choose_parent(newNode, nearinds)
-                if newNode is None:
-                    continue
-                self.nodeList.append(newNode)
-                self.rewire(newNode, nearinds)
+            if self.check_collision(new_node, self.obstacle_list):
+                near_indexes = self.find_near_nodes(new_node)
+                new_node = self.choose_parent(new_node, near_indexes)
+                if new_node:
+                    self.node_list.append(new_node)
+                    self.rewire(new_node, near_indexes)
+                    self.try_goal_path(new_node)
 
             if animation and i % 5 == 0:
-                self.DrawGraph(rnd=rnd)
+                self.plot_start_goal_arrow()
+                self.draw_graph(rnd)
 
-        # generate coruse
-        lastIndex = self.get_best_last_index()
-        if lastIndex is None:
-            return None
-        path = self.gen_final_course(lastIndex)
-        return path
+            if (not search_until_max_iter) and new_node:  # check reaching the goal
+                last_index = self.search_best_goal_node()
+                if last_index:
+                    return self.generate_final_course(last_index)
 
-    def choose_parent(self, newNode, nearinds):
-        if len(nearinds) == 0:
-            return newNode
+        print("reached max iteration")
 
-        dlist = []
-        for i in nearinds:
-            tNode = self.steer(newNode, i)
-            if tNode is None:
-                continue
-
-            if self.CollisionCheck(tNode, self.obstacleList):
-                dlist.append(tNode.cost)
-            else:
-                dlist.append(float("inf"))
-
-        mincost = min(dlist)
-        minind = nearinds[dlist.index(mincost)]
-
-        if mincost == float("inf"):
-            print("mincost is inf")
-            return newNode
-
-        newNode = self.steer(newNode, minind)
-
-        return newNode
-
-    def pi_2_pi(self, angle):
-        return (angle + math.pi) % (2 * math.pi) - math.pi
-
-    def steer(self, rnd, nind):
-
-        nearestNode = self.nodeList[nind]
-
-        px, py, pyaw, mode, clen = reeds_shepp_path_planning.reeds_shepp_path_planning(
-            nearestNode.x, nearestNode.y, nearestNode.yaw, rnd.x, rnd.y, rnd.yaw, curvature, STEP_SIZE)
-
-        if px is None:
-            return None
-
-        newNode = copy.deepcopy(nearestNode)
-        newNode.x = px[-1]
-        newNode.y = py[-1]
-        newNode.yaw = pyaw[-1]
-
-        newNode.path_x = px
-        newNode.path_y = py
-        newNode.path_yaw = pyaw
-        newNode.cost += sum([abs(c) for c in clen])
-        newNode.parent = nind
-
-        return newNode
-
-    def get_random_point(self):
-
-        if random.randint(0, 100) > self.goalSampleRate:
-            rnd = [random.uniform(self.minrand, self.maxrand),
-                   random.uniform(self.minrand, self.maxrand),
-                   random.uniform(-math.pi, math.pi)
-                   ]
-        else:  # goal point sampling
-            rnd = [self.end.x, self.end.y, self.end.yaw]
-
-        node = Node(rnd[0], rnd[1], rnd[2])
-
-        return node
-
-    def get_best_last_index(self):
-        #  print("get_best_last_index")
-
-        YAWTH = np.deg2rad(3.0)
-        XYTH = 0.5
-
-        goalinds = []
-        for (i, node) in enumerate(self.nodeList):
-            if self.calc_dist_to_goal(node.x, node.y) <= XYTH:
-                goalinds.append(i)
-        #  print("OK XY TH num is")
-        #  print(len(goalinds))
-
-        # angle check
-        fgoalinds = []
-        for i in goalinds:
-            if abs(self.nodeList[i].yaw - self.end.yaw) <= YAWTH:
-                fgoalinds.append(i)
-        #  print("OK YAW TH num is")
-        #  print(len(fgoalinds))
-
-        if len(fgoalinds) == 0:
-            return None
-
-        mincost = min([self.nodeList[i].cost for i in fgoalinds])
-        for i in fgoalinds:
-            if self.nodeList[i].cost == mincost:
-                return i
+        last_index = self.search_best_goal_node()
+        if last_index:
+            return self.generate_final_course(last_index)
+        else:
+            print("Cannot find path")
 
         return None
 
-    def gen_final_course(self, goalind):
-        path = [[self.end.x, self.end.y]]
-        while self.nodeList[goalind].parent is not None:
-            node = self.nodeList[goalind]
-            for (ix, iy) in zip(reversed(node.path_x), reversed(node.path_y)):
-                path.append([ix, iy])
-            #  path.append([node.x, node.y])
-            goalind = node.parent
-        path.append([self.start.x, self.start.y])
-        return path
+    def try_goal_path(self, node):
 
-    def calc_dist_to_goal(self, x, y):
-        return np.linalg.norm([x - self.end.x, y - self.end.y])
+        goal = self.Node(self.end.x, self.end.y, self.end.yaw)
 
-    def find_near_nodes(self, newNode):
-        nnode = len(self.nodeList)
-        r = 50.0 * math.sqrt((math.log(nnode) / nnode))
-        #  r = self.expandDis * 5.0
-        dlist = [(node.x - newNode.x) ** 2 +
-                 (node.y - newNode.y) ** 2 +
-                 (node.yaw - newNode.yaw) ** 2
-                 for node in self.nodeList]
-        nearinds = [dlist.index(i) for i in dlist if i <= r ** 2]
-        return nearinds
+        new_node = self.steer(node, goal)
+        if new_node is None:
+            return
 
-    def rewire(self, newNode, nearinds):
+        if self.check_collision(new_node, self.obstacle_list):
+            self.node_list.append(new_node)
 
-        nnode = len(self.nodeList)
-
-        for i in nearinds:
-            nearNode = self.nodeList[i]
-            tNode = self.steer(nearNode, nnode - 1)
-            if tNode is None:
-                continue
-
-            obstacleOK = self.CollisionCheck(tNode, self.obstacleList)
-            imporveCost = nearNode.cost > tNode.cost
-
-            if obstacleOK and imporveCost:
-                #  print("rewire")
-                self.nodeList[i] = tNode
-
-    def DrawGraph(self, rnd=None):
-        """
-        Draw Graph
-        """
+    def draw_graph(self, rnd=None):
         plt.clf()
         if rnd is not None:
             plt.plot(rnd.x, rnd.y, "^k")
-        for node in self.nodeList:
-            if node.parent is not None:
+        for node in self.node_list:
+            if node.parent:
                 plt.plot(node.path_x, node.path_y, "-g")
-                #  plt.plot([node.x, self.nodeList[node.parent].x], [
-                #  node.y, self.nodeList[node.parent].y], "-g")
 
-        for (ox, oy, size) in self.obstacleList:
+        for (ox, oy, size) in self.obstacle_list:
             plt.plot(ox, oy, "ok", ms=30 * size)
 
+        plt.plot(self.start.x, self.start.y, "xr")
+        plt.plot(self.end.x, self.end.y, "xr")
+        plt.axis([-2, 15, -2, 15])
+        plt.grid(True)
+        self.plot_start_goal_arrow()
+        plt.pause(0.01)
+
+    def plot_start_goal_arrow(self):
         reeds_shepp_path_planning.plot_arrow(
             self.start.x, self.start.y, self.start.yaw)
         reeds_shepp_path_planning.plot_arrow(
             self.end.x, self.end.y, self.end.yaw)
 
-        plt.axis([-2, 15, -2, 15])
-        plt.grid(True)
-        plt.pause(0.01)
+    def steer(self, from_node, to_node):
 
-        #  plt.show()
-        #  input()
+        px, py, pyaw, mode, course_lengths = reeds_shepp_path_planning.reeds_shepp_path_planning(
+            from_node.x, from_node.y, from_node.yaw,
+            to_node.x, to_node.y, to_node.yaw, self.curvature)
 
-    def GetNearestListIndex(self, nodeList, rnd):
-        dlist = [(node.x - rnd.x) ** 2 +
-                 (node.y - rnd.y) ** 2 +
-                 (node.yaw - rnd.yaw) ** 2 for node in nodeList]
-        minind = dlist.index(min(dlist))
+        if not px:
+            return None
 
-        return minind
+        new_node = copy.deepcopy(from_node)
+        new_node.x = px[-1]
+        new_node.y = py[-1]
+        new_node.yaw = pyaw[-1]
 
-    def CollisionCheck(self, node, obstacleList):
+        new_node.path_x = px
+        new_node.path_y = py
+        new_node.path_yaw = pyaw
+        new_node.cost += sum([abs(l) for l in course_lengths])
+        new_node.parent = from_node
 
-        for (ox, oy, size) in obstacleList:
-            for (ix, iy) in zip(node.path_x, node.path_y):
-                dx = ox - ix
-                dy = oy - iy
-                d = dx * dx + dy * dy
-                if d <= size ** 2:
-                    return False  # collision
+        return new_node
 
-        return True  # safe
+    def calc_new_cost(self, from_node, to_node):
+
+        _, _, _, _, course_lengths = reeds_shepp_path_planning.reeds_shepp_path_planning(
+            from_node.x, from_node.y, from_node.yaw,
+            to_node.x, to_node.y, to_node.yaw, self.curvature)
+        if not course_lengths:
+            return float("inf")
+
+        return from_node.cost + sum([abs(l) for l in course_lengths])
+
+    def get_random_node(self):
+
+        rnd = self.Node(random.uniform(self.min_rand, self.max_rand),
+                        random.uniform(self.min_rand, self.max_rand),
+                        random.uniform(-math.pi, math.pi)
+                        )
+
+        return rnd
+
+    def search_best_goal_node(self):
+
+        goal_indexes = []
+        for (i, node) in enumerate(self.node_list):
+            if self.calc_dist_to_goal(node.x, node.y) <= self.goal_xy_th:
+                goal_indexes.append(i)
+        print("goal_indexes:", len(goal_indexes))
+
+        # angle check
+        final_goal_indexes = []
+        for i in goal_indexes:
+            if abs(self.node_list[i].yaw - self.end.yaw) <= self.goal_yaw_th:
+                final_goal_indexes.append(i)
+
+        print("final_goal_indexes:", len(final_goal_indexes))
+
+        if not final_goal_indexes:
+            return None
+
+        min_cost = min([self.node_list[i].cost for i in final_goal_indexes])
+        print("min_cost:", min_cost)
+        for i in final_goal_indexes:
+            if self.node_list[i].cost == min_cost:
+                return i
+
+        return None
+
+    def generate_final_course(self, goal_index):
+        path = [[self.end.x, self.end.y, self.end.yaw]]
+        node = self.node_list[goal_index]
+        while node.parent:
+            for (ix, iy, iyaw) in zip(reversed(node.path_x), reversed(node.path_y), reversed(node.path_yaw)):
+                path.append([ix, iy, iyaw])
+            node = node.parent
+        path.append([self.start.x, self.start.y, self.start.yaw])
+        return path
 
 
-class Node():
-    """
-    RRT Node
-    """
-
-    def __init__(self, x, y, yaw):
-        self.x = x
-        self.y = y
-        self.yaw = yaw
-        self.path_x = []
-        self.path_y = []
-        self.path_yaw = []
-        self.cost = 0.0
-        self.parent = None
-
-
-def main():
-    print("Start rrt start planning")
+def main(max_iter=100):
+    print("Start " + __file__)
 
     # ====Search Path with RRT====
-    #  obstacleList = [
-    #  (5, 5, 1),
-    #  (3, 6, 2),
-    #  (3, 8, 2),
-    #  (3, 10, 2),
-    #  (7, 5, 2),
-    #  (9, 5, 2)
-    #  ]  # [x,y,size(radius)]
     obstacleList = [
         (5, 5, 1),
         (4, 6, 1),
@@ -311,13 +243,15 @@ def main():
     start = [0.0, 0.0, np.deg2rad(0.0)]
     goal = [6.0, 7.0, np.deg2rad(90.0)]
 
-    rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
-    path = rrt.Planning(animation=show_animation)
+    rrt_star_reeds_shepp = RRTStarReedsShepp(start, goal,
+                                             obstacleList,
+                                             [-2.0, 15.0], max_iter=max_iter)
+    path = rrt_star_reeds_shepp.planning(animation=show_animation)
 
     # Draw final path
-    if show_animation:
-        rrt.DrawGraph()
-        plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
+    if path and show_animation:  # pragma: no cover
+        rrt_star_reeds_shepp.draw_graph()
+        plt.plot([x for (x, y, yaw) in path], [y for (x, y, yaw) in path], '-r')
         plt.grid(True)
         plt.pause(0.001)
         plt.show()

@@ -1,7 +1,9 @@
 """
-Dijkstra grid based planning
+
+Grid based Dijkstra planning
 
 author: Atsushi Sakai(@Atsushi_twi)
+
 """
 
 import matplotlib.pyplot as plt
@@ -9,210 +11,235 @@ import math
 
 show_animation = True
 
+class Dijkstra:
 
-class Node:
+    def __init__(self, ox, oy, reso, rr):
+        """
+        Initialize map for a star planning
 
-    def __init__(self, x, y, cost, pind):
-        self.x = x
-        self.y = y
-        self.cost = cost
-        self.pind = pind
+        ox: x position list of Obstacles [m]
+        oy: y position list of Obstacles [m]
+        reso: grid resolution [m]
+        rr: robot radius[m]
+        """
 
-    def __str__(self):
-        return str(self.x) + "," + str(self.y) + "," + str(self.cost) + "," + str(self.pind)
+        self.reso = reso
+        self.rr = rr
+        self.calc_obstacle_map(ox, oy)
+        self.motion = self.get_motion_model()
 
+    class Node:
+        def __init__(self, x, y, cost, pind):
+            self.x = x  # index of grid
+            self.y = y  # index of grid
+            self.cost = cost
+            self.pind = pind
 
-def dijkstra_planning(sx, sy, gx, gy, ox, oy, reso, rr):
-    """
-    gx: goal x position [m]
-    gx: goal x position [m]
-    ox: x position list of Obstacles [m]
-    oy: y position list of Obstacles [m]
-    reso: grid resolution [m]
-    rr: robot radius[m]
-    """
+        def __str__(self):
+            return str(self.x) + "," + str(self.y) + "," + str(self.cost) + "," + str(self.pind)
 
-    nstart = Node(round(sx / reso), round(sy / reso), 0.0, -1)
-    ngoal = Node(round(gx / reso), round(gy / reso), 0.0, -1)
-    ox = [iox / reso for iox in ox]
-    oy = [ioy / reso for ioy in oy]
+    def planning(self, sx, sy, gx, gy):
+        """
+        dijkstra path search
 
-    obmap, minx, miny, maxx, maxy, xw, yw = calc_obstacle_map(ox, oy, reso, rr)
+        input:
+            sx: start x position [m]
+            sy: start y position [m]
+            gx: goal x position [m]
+            gx: goal x position [m]
 
-    motion = get_motion_model()
+        output:
+            rx: x position list of the final path
+            ry: y position list of the final path
+        """
 
-    openset, closedset = dict(), dict()
-    openset[calc_index(nstart, xw, minx, miny)] = nstart
+        nstart = self.Node(self.calc_xyindex(sx, self.minx),
+                           self.calc_xyindex(sy, self.miny), 0.0, -1)
+        ngoal = self.Node(self.calc_xyindex(gx, self.minx),
+                          self.calc_xyindex(gy, self.miny), 0.0, -1)
 
-    while 1:
-        c_id = min(openset, key=lambda o: openset[o].cost)
-        current = openset[c_id]
-        #  print("current", current)
+        openset, closedset = dict(), dict()
+        openset[self.calc_index(nstart)] = nstart
 
-        # show graph
-        if show_animation:
-            plt.plot(current.x * reso, current.y * reso, "xc")
-            if len(closedset.keys()) % 10 == 0:
-                plt.pause(0.001)
+        while 1:
+            c_id = min(openset, key=lambda o: openset[o].cost)
+            current = openset[c_id]
 
-        if current.x == ngoal.x and current.y == ngoal.y:
-            print("Find goal")
-            ngoal.pind = current.pind
-            ngoal.cost = current.cost
-            break
+            # show graph
+            if show_animation:  # pragma: no cover
+                plt.plot(self.calc_position(current.x, self.minx),
+                         self.calc_position(current.y, self.miny), "xc")
+                if len(closedset.keys()) % 10 == 0:
+                    plt.pause(0.001)
 
-        # Remove the item from the open set
-        del openset[c_id]
-        # Add it to the closed set
-        closedset[c_id] = current
+            if current.x == ngoal.x and current.y == ngoal.y:
+                print("Find goal")
+                ngoal.pind = current.pind
+                ngoal.cost = current.cost
+                break
 
-        # expand search grid based on motion model
-        for i in range(len(motion)):
-            node = Node(current.x + motion[i][0], current.y + motion[i][1],
-                        current.cost + motion[i][2], c_id)
-            n_id = calc_index(node, xw, minx, miny)
+            # Remove the item from the open set
+            del openset[c_id]
 
-            if not verify_node(node, obmap, minx, miny, maxx, maxy):
-                continue
+            # Add it to the closed set
+            closedset[c_id] = current
 
-            if n_id in closedset:
-                continue
-            # Otherwise if it is already in the open set
-            if n_id in openset:
-                if openset[n_id].cost > node.cost:
-                    openset[n_id].cost = node.cost
-                    openset[n_id].pind = c_id
-            else:
-                openset[n_id] = node
+            # expand search grid based on motion model
+            for i, _ in enumerate(self.motion):
+                node = self.Node(current.x + self.motion[i][0],
+                                 current.y + self.motion[i][1],
+                                 current.cost + self.motion[i][2], c_id)
+                n_id = self.calc_index(node)
 
-    rx, ry = calc_final_path(ngoal, closedset, reso)
+                if n_id in closedset:
+                    continue
 
-    return rx, ry
+                if not self.verify_node(node):
+                    continue
 
+                if n_id not in openset:
+                    openset[n_id] = node  # Discover a new node
+                else:
+                    if openset[n_id].cost >= node.cost:
+                        # This path is the best until now. record it!
+                        openset[n_id] = node
 
-def calc_final_path(ngoal, closedset, reso):
-    # generate final course
-    rx, ry = [ngoal.x * reso], [ngoal.y * reso]
-    pind = ngoal.pind
-    while pind != -1:
-        n = closedset[pind]
-        rx.append(n.x * reso)
-        ry.append(n.y * reso)
-        pind = n.pind
+        rx, ry = self.calc_final_path(ngoal, closedset)
 
-    return rx, ry
+        return rx, ry
 
+    def calc_final_path(self, ngoal, closedset):
+        # generate final course
+        rx, ry = [self.calc_position(ngoal.x, self.minx)], [
+            self.calc_position(ngoal.y, self.miny)]
+        pind = ngoal.pind
+        while pind != -1:
+            n = closedset[pind]
+            rx.append(self.calc_position(n.x, self.minx))
+            ry.append(self.calc_position(n.y, self.miny))
+            pind = n.pind
 
-def verify_node(node, obmap, minx, miny, maxx, maxy):
+        return rx, ry
 
-    if obmap[node.x][node.y]:
-        return False
+    def calc_heuristic(self, n1, n2):
+        w = 1.0  # weight of heuristic
+        d = w * math.sqrt((n1.x - n2.x)**2 + (n1.y - n2.y)**2)
+        return d
 
-    if node.x < minx:
-        return False
-    elif node.y < miny:
-        return False
-    elif node.x > maxx:
-        return False
-    elif node.y > maxy:
-        return False
+    def calc_position(self, index, minp):
+        pos = index*self.reso+minp
+        return pos
 
-    return True
+    def calc_xyindex(self, position, minp):
+        return round((position - minp)/self.reso)
 
+    def calc_index(self, node):
+        return (node.y - self.miny) * self.xwidth + (node.x - self.minx)
 
-def calc_obstacle_map(ox, oy, reso, vr):
+    def verify_node(self, node):
+        px = self.calc_position(node.x, self.minx)
+        py = self.calc_position(node.y, self.miny)
 
-    minx = round(min(ox))
-    miny = round(min(oy))
-    maxx = round(max(ox))
-    maxy = round(max(oy))
-    #  print("minx:", minx)
-    #  print("miny:", miny)
-    #  print("maxx:", maxx)
-    #  print("maxy:", maxy)
+        if px < self.minx:
+            return False
+        elif py < self.miny:
+            return False
+        elif px >= self.maxx:
+            return False
+        elif py >= self.maxy:
+            return False
 
-    xwidth = round(maxx - minx)
-    ywidth = round(maxy - miny)
-    #  print("xwidth:", xwidth)
-    #  print("ywidth:", ywidth)
+        if self.obmap[node.x][node.y]:
+            return False
 
-    # obstacle map generation
-    obmap = [[False for i in range(xwidth)] for i in range(ywidth)]
-    for ix in range(xwidth):
-        x = ix + minx
-        for iy in range(ywidth):
-            y = iy + miny
-            #  print(x, y)
-            for iox, ioy in zip(ox, oy):
-                d = math.sqrt((iox - x)**2 + (ioy - y)**2)
-                if d <= vr / reso:
-                    obmap[ix][iy] = True
-                    break
+        return True
 
-    return obmap, minx, miny, maxx, maxy, xwidth, ywidth
+    def calc_obstacle_map(self, ox, oy):
 
+        self.minx = round(min(ox))
+        self.miny = round(min(oy))
+        self.maxx = round(max(ox))
+        self.maxy = round(max(oy))
+        print("minx:", self.minx)
+        print("miny:", self.miny)
+        print("maxx:", self.maxx)
+        print("maxy:", self.maxy)
 
-def calc_index(node, xwidth, xmin, ymin):
-    return (node.y - ymin) * xwidth + (node.x - xmin)
+        self.xwidth = round((self.maxx - self.minx)/self.reso)
+        self.ywidth = round((self.maxy - self.miny)/self.reso)
+        print("xwidth:", self.xwidth)
+        print("ywidth:", self.ywidth)
 
+        # obstacle map generation
+        self.obmap = [[False for i in range(self.ywidth)]
+                      for i in range(self.xwidth)]
+        for ix in range(self.xwidth):
+            x = self.calc_position(ix, self.minx)
+            for iy in range(self.ywidth):
+                y = self.calc_position(iy, self.miny)
+                for iox, ioy in zip(ox, oy):
+                    d = math.sqrt((iox - x)**2 + (ioy - y)**2)
+                    if d <= self.rr:
+                        self.obmap[ix][iy] = True
+                        break
 
-def get_motion_model():
-    # dx, dy, cost
-    motion = [[1, 0, 1],
-              [0, 1, 1],
-              [-1, 0, 1],
-              [0, -1, 1],
-              [-1, -1, math.sqrt(2)],
-              [-1, 1, math.sqrt(2)],
-              [1, -1, math.sqrt(2)],
-              [1, 1, math.sqrt(2)]]
+    def get_motion_model(self):
+        # dx, dy, cost
+        motion = [[1, 0, 1],
+                  [0, 1, 1],
+                  [-1, 0, 1],
+                  [0, -1, 1],
+                  [-1, -1, math.sqrt(2)],
+                  [-1, 1, math.sqrt(2)],
+                  [1, -1, math.sqrt(2)],
+                  [1, 1, math.sqrt(2)]]
 
-    return motion
+        return motion
 
 
 def main():
     print(__file__ + " start!!")
 
     # start and goal position
-    sx = 10.0  # [m]
-    sy = 10.0  # [m]
+    sx = -5.0  # [m]
+    sy = -5.0  # [m]
     gx = 50.0  # [m]
     gy = 50.0  # [m]
-    grid_size = 1.0  # [m]
-    robot_size = 1.0  # [m]
+    grid_size = 2.0  # [m]
+    robot_radius = 1.0  # [m]
 
-    ox = []
-    oy = []
-
-    for i in range(60):
+    # set obstacle positions
+    ox, oy = [], []
+    for i in range(-10, 60):
         ox.append(i)
-        oy.append(0.0)
-    for i in range(60):
+        oy.append(-10.0)
+    for i in range(-10, 60):
         ox.append(60.0)
         oy.append(i)
-    for i in range(61):
+    for i in range(-10, 61):
         ox.append(i)
         oy.append(60.0)
-    for i in range(61):
-        ox.append(0.0)
+    for i in range(-10, 61):
+        ox.append(-10.0)
         oy.append(i)
-    for i in range(40):
+    for i in range(-10, 40):
         ox.append(20.0)
         oy.append(i)
-    for i in range(40):
+    for i in range(0, 40):
         ox.append(40.0)
         oy.append(60.0 - i)
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.plot(ox, oy, ".k")
-        plt.plot(sx, sy, "xr")
+        plt.plot(sx, sy, "og")
         plt.plot(gx, gy, "xb")
         plt.grid(True)
         plt.axis("equal")
 
-    rx, ry = dijkstra_planning(sx, sy, gx, gy, ox, oy, grid_size, robot_size)
+    dijkstra = Dijkstra(ox, oy, grid_size, robot_radius)
+    rx, ry = dijkstra.planning(sx, sy, gx, gy)
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.plot(rx, ry, "-r")
         plt.show()
 

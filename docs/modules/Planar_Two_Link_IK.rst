@@ -2,7 +2,7 @@
 Two joint arm to point control
 ------------------------------
 
-.. figure:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/ArmNavigation/two_joint_arm_to_point_control/animation.gif
+.. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/ArmNavigation/two_joint_arm_to_point_control/animation.gif
    :alt: TwoJointArmToPointControl
 
    TwoJointArmToPointControl

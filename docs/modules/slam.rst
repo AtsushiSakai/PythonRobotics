@@ -86,8 +86,8 @@ Ref:
 .. _SLAM simulations by Tim Bailey: http://www-personal.acfr.usyd.edu.au/tbailey/software/slam_simulations.htm
 .. _A Tutorial on Graph-Based SLAM: http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf
 
-.. |3| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/iterative_closest_point/animation.gif
-.. |4| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/EKFSLAM/animation.gif
-.. |5| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/FastSLAM1/animation.gif
-.. |6| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/FastSLAM2/animation.gif
-.. |7| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/GraphBasedSLAM/animation.gif
+.. |3| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/iterative_closest_point/animation.gif
+.. |4| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/EKFSLAM/animation.gif
+.. |5| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/FastSLAM1/animation.gif
+.. |6| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/FastSLAM2/animation.gif
+.. |7| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/GraphBasedSLAM/animation.gif

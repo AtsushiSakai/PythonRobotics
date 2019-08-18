@@ -45,7 +45,7 @@ class KDTree:
         self.tree = scipy.spatial.cKDTree(data)
 
     def search(self, inp, k=1):
-        u"""
+        """
         Search NN
 
         inp: input data, single frame or multi frame
@@ -62,12 +62,12 @@ class KDTree:
                 dist.append(idist)
 
             return index, dist
-        else:
-            dist, index = self.tree.query(inp, k=k)
-            return index, dist
+
+        dist, index = self.tree.query(inp, k=k)
+        return index, dist
 
     def search_in_distance(self, inp, r):
-        u"""
+        """
         find points with in a distance r
         """
 
@@ -161,12 +161,18 @@ def generate_roadmap(sample_x, sample_y, rr, obkdtree):
 
 def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
     """
+    sx: start x position [m]
+    sy: start y position [m]
     gx: goal x position [m]
-    gx: goal x position [m]
+    gy: goal y position [m]
     ox: x position list of Obstacles [m]
     oy: y position list of Obstacles [m]
-    reso: grid resolution [m]
-    rr: robot radius[m]
+    rr: robot radius [m]
+    road_map: ??? [m]
+    sample_x: ??? [m]
+    sample_y: ??? [m]
+    
+    @return: Two lists of path coordinates ([x1, x2, ...], [y1, y2, ...]), empty list when no path was found
     """
 
     nstart = Node(sx, sy, 0.0, -1)
@@ -175,9 +181,12 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
     openset, closedset = dict(), dict()
     openset[len(road_map) - 2] = nstart
 
+    path_found = True
+    
     while True:
-        if len(openset) == 0:
+        if not openset:
             print("Cannot find path")
+            path_found = False
             break
 
         c_id = min(openset, key=lambda o: openset[o].cost)
@@ -217,6 +226,9 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
                     openset[n_id].pind = c_id
             else:
                 openset[n_id] = node
+    
+    if path_found is False:
+        return [], []
 
     # generate final course
     rx, ry = [ngoal.x], [ngoal.y]
@@ -230,9 +242,9 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
     return rx, ry
 
 
-def plot_road_map(road_map, sample_x, sample_y):
+def plot_road_map(road_map, sample_x, sample_y):  # pragma: no cover
 
-    for i in range(len(road_map)):
+    for i, _ in enumerate(road_map):
         for ii in range(len(road_map[i])):
             ind = road_map[i][ii]
 
@@ -249,8 +261,8 @@ def sample_points(sx, sy, gx, gy, rr, ox, oy, obkdtree):
     sample_x, sample_y = [], []
 
     while len(sample_x) <= N_SAMPLE:
-        tx = (random.random() - minx) * (maxx - minx)
-        ty = (random.random() - miny) * (maxy - miny)
+        tx = (random.random() * (maxx - minx)) + minx
+        ty = (random.random() * (maxy - miny)) + miny
 
         index, dist = obkdtree.search(np.array([tx, ty]).reshape(2, 1))
 
@@ -307,7 +319,7 @@ def main():
 
     rx, ry = PRM_planning(sx, sy, gx, gy, ox, oy, robot_size)
 
-    assert len(rx) != 0, 'Cannot found path'
+    assert rx, 'Cannot found path'
 
     if show_animation:
         plt.plot(rx, ry, "-r")

@@ -21,7 +21,7 @@ MOVING_TO_GOAL = 2
 show_animation = True
 
 
-def main():
+def main():  # pragma: no cover
     """
     Creates an arm using the NLinkArm class and uses its inverse kinematics
     to move it to the desired position.
@@ -159,5 +159,5 @@ def ang_diff(theta1, theta2):
 
 
 if __name__ == '__main__':
-    main()
-    # animation()
+    # main()
+    animation()

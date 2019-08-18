@@ -5,15 +5,18 @@ Path tracking simulation with LQR steering control and PID speed control.
 author Atsushi Sakai (@Atsushi_twi)
 
 """
-
+import scipy.linalg as la
+import matplotlib.pyplot as plt
+import math
+import numpy as np
 import sys
 sys.path.append("../../PathPlanning/CubicSpline/")
 
-import numpy as np
-import math
-import matplotlib.pyplot as plt
-import scipy.linalg as la
-import cubic_spline_planner
+try:
+    import cubic_spline_planner
+except:
+    raise
+
 
 Kp = 1.0  # speed proportional gain
 
@@ -76,7 +79,6 @@ def solve_DARE(A, B, Q, R):
         Xn = A.T @ X @ A - A.T @ X @ B @ \
             la.inv(R + B.T @ X @ B) @ B.T @ X @ A + Q
         if (abs(Xn - X)).max() < eps:
-            X = Xn
             break
         X = Xn
 
@@ -206,8 +208,8 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
             plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")
             plt.axis("equal")
             plt.grid(True)
-            plt.title("speed[km/h]:" + str(round(state.v * 3.6, 2)) +
-                      ",target index:" + str(target_ind))
+            plt.title("speed[km/h]:" + str(round(state.v * 3.6, 2))
+                      + ",target index:" + str(target_ind))
             plt.pause(0.0001)
 
     return t, x, y, yaw, v
@@ -253,7 +255,7 @@ def main():
 
     t, x, y, yaw, v = closed_loop_prediction(cx, cy, cyaw, ck, sp, goal)
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.close()
         plt.subplots(1)
         plt.plot(ax, ay, "xb", label="input")

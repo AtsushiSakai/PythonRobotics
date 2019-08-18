@@ -24,7 +24,7 @@ def ICP_matching(ppoints, cpoints):
     R: Rotation matrix
     T: Translation vector
     """
-    H = None  # homogeneraous transformation matrix
+    H = None  # homogeneous transformation matrix
 
     dError = 1000.0
     preError = 1000.0
@@ -33,7 +33,7 @@ def ICP_matching(ppoints, cpoints):
     while dError >= EPS:
         count += 1
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             plt.plot(ppoints[0, :], ppoints[1, :], ".r")
             plt.plot(cpoints[0, :], cpoints[1, :], ".b")
@@ -47,7 +47,7 @@ def ICP_matching(ppoints, cpoints):
         # update current points
         cpoints = (Rt @ cpoints) + Tt[:, np.newaxis]
 
-        H = update_homogenerous_matrix(H, Rt, Tt)
+        H = update_homogeneous_matrix(H, Rt, Tt)
 
         dError = abs(preError - error)
         preError = error
@@ -66,7 +66,7 @@ def ICP_matching(ppoints, cpoints):
     return R, T
 
 
-def update_homogenerous_matrix(Hin, R, T):
+def update_homogeneous_matrix(Hin, R, T):
 
     H = np.zeros((3, 3))
 
@@ -82,7 +82,7 @@ def update_homogenerous_matrix(Hin, R, T):
     if Hin is None:
         return H
     else:
-        return Hin * H
+        return Hin @ H
 
 
 def nearest_neighbor_assosiation(ppoints, cpoints):

@@ -17,14 +17,19 @@ from matplotlib.collections import LineCollection
 import sys
 import os
 sys.path.append(os.path.relpath("../Eta3SplinePath"))
-from eta3_spline_path import eta3_path, eta3_path_segment
+
+try:
+    from eta3_spline_path import eta3_path, eta3_path_segment
+except:
+    raise
 
 show_animation = True
 
 
 class MaxVelocityNotReached(Exception):
     def __init__(self, actual_vel, max_vel):
-        self.message = 'Actual velocity {} does not equal desired max velocity {}!'.format(actual_vel, max_vel)
+        self.message = 'Actual velocity {} does not equal desired max velocity {}!'.format(
+            actual_vel, max_vel)
 
 
 class eta3_trajectory(eta3_path):
@@ -34,6 +39,7 @@ class eta3_trajectory(eta3_path):
     input
         segments: list of `eta3_trajectory_segment` instances defining a continuous trajectory
     """
+
     def __init__(self, segments, max_vel, v0=0.0, a0=0.0, max_accel=2.0, max_jerk=5.0):
        # ensure that all inputs obey the assumptions of the model
         assert max_vel > 0 and v0 >= 0 and a0 >= 0 and max_accel > 0 and max_jerk > 0 \
@@ -47,8 +53,9 @@ class eta3_trajectory(eta3_path):
         self.max_jerk = float(max_jerk)
         length_array = np.array([s.segment_length for s in self.segments])
         # add a zero to the beginning for finding the correct segment_id
-        self.cum_lengths = np.concatenate((np.array([0]), np.cumsum(length_array)))
-        ## compute velocity profile on top of the path
+        self.cum_lengths = np.concatenate(
+            (np.array([0]), np.cumsum(length_array)))
+        # compute velocity profile on top of the path
         self.velocity_profile()
         self.ui_prev = 0
         self.prev_seg_id = 0
@@ -84,16 +91,17 @@ class eta3_trajectory(eta3_path):
         # solve for the maximum achievable velocity based on the kinematic limits imposed by max_accel and max_jerk
         # this leads to a quadratic equation in v_max: a*v_max**2 + b*v_max + c = 0
         a = 1 / self.max_accel
-        b = 3. * self.max_accel / (2. * self.max_jerk) + v_s1 / self.max_accel - (self.max_accel**2 / self.max_jerk + v_s1) / self.max_accel
+        b = 3. * self.max_accel / (2. * self.max_jerk) + v_s1 / self.max_accel - (
+            self.max_accel**2 / self.max_jerk + v_s1) / self.max_accel
         c = s_s1 + s_sf - self.total_length - 7. * self.max_accel**3 / (3. * self.max_jerk**2) \
             - v_s1 * (self.max_accel / self.max_jerk + v_s1 / self.max_accel) \
-            + (self.max_accel**2 / self.max_jerk + v_s1 / self.max_accel)**2 / (2. * self.max_accel)
-        v_max = ( -b + np.sqrt(b**2 - 4. * a * c) ) / (2. * a)
-        
-        # v_max represents the maximum velocity that could be attained if there was no cruise period 
+            + (self.max_accel**2 / self.max_jerk + v_s1 /
+               self.max_accel)**2 / (2. * self.max_accel)
+        v_max = (-b + np.sqrt(b**2 - 4. * a * c)) / (2. * a)
+
+        # v_max represents the maximum velocity that could be attained if there was no cruise period
         # (i.e. driving at constant speed without accelerating or jerking)
         # if this velocity is less than our desired max velocity, the max velocity needs to be updated
-        # XXX the way to handle this `if` condition needs to be more thoroughly worked through
         if self.max_vel > v_max:
             # when this condition is tripped, there will be no cruise period (s_cruise=0)
             self.max_vel = v_max
@@ -112,22 +120,25 @@ class eta3_trajectory(eta3_path):
         # Section 1: accelerate at max_accel
         index = 1
         # compute change in velocity over the section
-        delta_v = (self.max_vel - self.max_jerk * (self.max_accel / self.max_jerk)**2 / 2.) - self.vels[index-1]
+        delta_v = (self.max_vel - self.max_jerk * (self.max_accel /
+                                                   self.max_jerk)**2 / 2.) - self.vels[index - 1]
         self.times[index] = delta_v / self.max_accel
-        self.vels[index] = self.vels[index-1] + self.max_accel * self.times[index]
-        self.seg_lengths[index] = self.vels[index-1] * self.times[index] + self.max_accel * self.times[index]**2 / 2.
+        self.vels[index] = self.vels[index - 1] + \
+            self.max_accel * self.times[index]
+        self.seg_lengths[index] = self.vels[index - 1] * \
+            self.times[index] + self.max_accel * self.times[index]**2 / 2.
 
         # Section 2: decrease acceleration (down to 0) until max speed is hit
         index = 2
         self.times[index] = self.max_accel / self.max_jerk
-        self.vels[index] = self.vels[index-1] + self.max_accel * self.times[index] \
+        self.vels[index] = self.vels[index - 1] + self.max_accel * self.times[index] \
             - self.max_jerk * self.times[index]**2 / 2.
-        
+
         # as a check, the velocity at the end of the section should be self.max_vel
         if not np.isclose(self.vels[index], self.max_vel):
             raise MaxVelocityNotReached(self.vels[index], self.max_vel)
 
-        self.seg_lengths[index] = self.vels[index-1] * self.times[index] + self.max_accel * self.times[index]**2 / 2. \
+        self.seg_lengths[index] = self.vels[index - 1] * self.times[index] + self.max_accel * self.times[index]**2 / 2. \
             - self.max_jerk * self.times[index]**3 / 6.
 
         # Section 3: will be done last
@@ -135,21 +146,25 @@ class eta3_trajectory(eta3_path):
         # Section 4: apply min jerk until min acceleration is hit
         index = 4
         self.times[index] = self.max_accel / self.max_jerk
-        self.vels[index] = self.max_vel - self.max_jerk * self.times[index]**2 / 2.
-        self.seg_lengths[index] = self.max_vel * self.times[index] - self.max_jerk * self.times[index]**3 / 6.
+        self.vels[index] = self.max_vel - \
+            self.max_jerk * self.times[index]**2 / 2.
+        self.seg_lengths[index] = self.max_vel * self.times[index] - \
+            self.max_jerk * self.times[index]**3 / 6.
 
         # Section 5: continue deceleration at max rate
         index = 5
         # compute velocity change over sections
-        delta_v = self.vels[index-1] - v_sf
+        delta_v = self.vels[index - 1] - v_sf
         self.times[index] = delta_v / self.max_accel
-        self.vels[index] = self.vels[index-1] - self.max_accel * self.times[index]
-        self.seg_lengths[index] = self.vels[index-1] * self.times[index] - self.max_accel * self.times[index]**2 / 2.
+        self.vels[index] = self.vels[index - 1] - \
+            self.max_accel * self.times[index]
+        self.seg_lengths[index] = self.vels[index - 1] * \
+            self.times[index] - self.max_accel * self.times[index]**2 / 2.
 
         # Section 6(final): max jerk to get to zero velocity and zero acceleration simultaneously
         index = 6
         self.times[index] = t_sf
-        self.vels[index] = self.vels[index-1] - self.max_jerk * t_sf**2 / 2.
+        self.vels[index] = self.vels[index - 1] - self.max_jerk * t_sf**2 / 2.
 
         try:
             assert np.isclose(self.vels[index], 0)
@@ -164,7 +179,8 @@ class eta3_trajectory(eta3_path):
             # the length of the cruise section is whatever length hasn't already been accounted for
             # NOTE: the total array self.seg_lengths is summed because the entry for the cruise segment is
             # initialized to 0!
-            self.seg_lengths[index] = self.total_length - self.seg_lengths.sum()
+            self.seg_lengths[index] = self.total_length - \
+                self.seg_lengths.sum()
             self.vels[index] = self.max_vel
             self.times[index] = self.seg_lengths[index] / self.max_vel
 
@@ -174,8 +190,11 @@ class eta3_trajectory(eta3_path):
         self.total_time = self.times.sum()
 
     def get_interp_param(self, seg_id, s, ui, tol=0.001):
-        f = lambda u: self.segments[seg_id].f_length(u)[0] - s
-        fprime = lambda u: self.segments[seg_id].s_dot(u)
+        def f(u):
+            return self.segments[seg_id].f_length(u)[0] - s
+
+        def fprime(u):
+            return self.segments[seg_id].s_dot(u)
         while (ui >= 0 and ui <= 1) and abs(f(ui)) > tol:
             ui -= f(ui) / fprime(ui)
         ui = max(0, min(ui, 1))
@@ -190,12 +209,14 @@ class eta3_trajectory(eta3_path):
         elif time <= self.times[:2].sum():
             delta_t = time - self.times[0]
             linear_velocity = self.vels[0] + self.max_accel * delta_t
-            s = self.seg_lengths[0] + self.vels[0] * delta_t + self.max_accel * delta_t**2 / 2.
+            s = self.seg_lengths[0] + self.vels[0] * \
+                delta_t + self.max_accel * delta_t**2 / 2.
             linear_accel = self.max_accel
         elif time <= self.times[:3].sum():
             delta_t = time - self.times[:2].sum()
-            linear_velocity = self.vels[1] + self.max_accel * delta_t - self.max_jerk * delta_t**2 / 2.
-            s = self.seg_lengths[:2].sum() + self.vels[1] * delta_t + self.max_accel * delta_t**2 /2. \
+            linear_velocity = self.vels[1] + self.max_accel * \
+                delta_t - self.max_jerk * delta_t**2 / 2.
+            s = self.seg_lengths[:2].sum() + self.vels[1] * delta_t + self.max_accel * delta_t**2 / 2. \
                 - self.max_jerk * delta_t**3 / 6.
             linear_accel = self.max_accel - self.max_jerk * delta_t
         elif time <= self.times[:4].sum():
@@ -206,19 +227,22 @@ class eta3_trajectory(eta3_path):
         elif time <= self.times[:5].sum():
             delta_t = time - self.times[:4].sum()
             linear_velocity = self.vels[3] - self.max_jerk * delta_t**2 / 2.
-            s = self.seg_lengths[:4].sum() + self.vels[3] * delta_t - self.max_jerk * delta_t**3 / 6.
+            s = self.seg_lengths[:4].sum() + self.vels[3] * \
+                delta_t - self.max_jerk * delta_t**3 / 6.
             linear_accel = -self.max_jerk * delta_t
         elif time <= self.times[:-1].sum():
             delta_t = time - self.times[:5].sum()
             linear_velocity = self.vels[4] - self.max_accel * delta_t
-            s = self.seg_lengths[:5].sum() + self.vels[4] * delta_t - self.max_accel * delta_t**2 / 2.
+            s = self.seg_lengths[:5].sum() + self.vels[4] * \
+                delta_t - self.max_accel * delta_t**2 / 2.
             linear_accel = -self.max_accel
         elif time < self.times.sum():
             delta_t = time - self.times[:-1].sum()
-            linear_velocity = self.vels[5] - self.max_accel * delta_t + self.max_jerk * delta_t**2 / 2.
+            linear_velocity = self.vels[5] - self.max_accel * \
+                delta_t + self.max_jerk * delta_t**2 / 2.
             s = self.seg_lengths[:-1].sum() + self.vels[5] * delta_t - self.max_accel * delta_t**2 / 2. \
                 + self.max_jerk * delta_t**3 / 6.
-            linear_accel = -self.max_accel + self.max_jerk*delta_t
+            linear_accel = -self.max_accel + self.max_jerk * delta_t
         else:
             linear_velocity = 0.
             s = self.total_length
@@ -232,15 +256,15 @@ class eta3_trajectory(eta3_path):
         else:
             # compute interpolation parameter using length from current segment's starting point
             curr_segment_length = s - self.cum_lengths[seg_id]
-            ui = self.get_interp_param(seg_id=seg_id, s=curr_segment_length, ui=self.ui_prev)
-        
+            ui = self.get_interp_param(
+                seg_id=seg_id, s=curr_segment_length, ui=self.ui_prev)
+
         if not seg_id == self.prev_seg_id:
             self.ui_prev = 0
         else:
             self.ui_prev = ui
-        
+
         self.prev_seg_id = seg_id
-        # TODO(jwd): normalize!
         # compute angular velocity of current point= (ydd*xd - xdd*yd) / (xd**2 + yd**2)
         d = self.segments[seg_id].calc_deriv(ui, order=1)
         dd = self.segments[seg_id].calc_deriv(ui, order=2)
@@ -250,7 +274,8 @@ class eta3_trajectory(eta3_path):
             # ut - time-derivative of interpolation parameter u
             ut = linear_velocity / su
             # utt - time-derivative of ut
-            utt = linear_accel / su - (d[0] * dd[0] + d[1] * dd[1]) / su**2 * ut
+            utt = linear_accel / su - \
+                (d[0] * dd[0] + d[1] * dd[1]) / su**2 * ut
             xt = d[0] * ut
             yt = d[1] * ut
             xtt = dd[0] * ut**2 + d[0] * utt
@@ -261,7 +286,8 @@ class eta3_trajectory(eta3_path):
 
         # combine path point with orientation and velocities
         pos = self.segments[seg_id].calc_point(ui)
-        state = np.array([pos[0], pos[1], np.arctan2(d[1], d[0]), linear_velocity, angular_velocity])
+        state = np.array([pos[0], pos[1], np.arctan2(
+            d[1], d[0]), linear_velocity, angular_velocity])
         return state
 
 
@@ -278,15 +304,16 @@ def test1(max_vel=0.5):
         trajectory_segments.append(eta3_path_segment(
             start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
 
-        traj = eta3_trajectory(trajectory_segments, max_vel=max_vel, max_accel=0.5)
-        
+        traj = eta3_trajectory(trajectory_segments,
+                               max_vel=max_vel, max_accel=0.5)
+
         # interpolate at several points along the path
         times = np.linspace(0, traj.total_time, 101)
         state = np.empty((5, times.size))
         for j, t in enumerate(times):
             state[:, j] = traj.calc_traj_point(t)
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             # plot the path
             plt.plot(state[0, :], state[1, :])
             plt.pause(1.0)
@@ -311,8 +338,9 @@ def test2(max_vel=0.5):
         trajectory_segments.append(eta3_path_segment(
             start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
 
-        traj = eta3_trajectory(trajectory_segments, max_vel=max_vel, max_accel=0.5)
-        
+        traj = eta3_trajectory(trajectory_segments,
+                               max_vel=max_vel, max_accel=0.5)
+
         # interpolate at several points along the path
         times = np.linspace(0, traj.total_time, 101)
         state = np.empty((5, times.size))
@@ -346,7 +374,7 @@ def test3(max_vel=2.0):
     end_pose = [5.5, 1.5, 0]
     kappa = [0, 0, 0, 0]
     # NOTE: INTEGRATOR ERROR EXPLODES WHEN eta[:1] IS ZERO!
-    #was: eta = [0, 0, 0, 0, 0, 0], now is:
+    # was: eta = [0, 0, 0, 0, 0, 0], now is:
     eta = [0.5, 0.5, 0, 0, 0, 0]
     trajectory_segments.append(eta3_path_segment(
         start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
@@ -376,7 +404,8 @@ def test3(max_vel=2.0):
         start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
 
     # construct the whole path
-    traj = eta3_trajectory(trajectory_segments, max_vel=max_vel, max_accel=0.5, max_jerk=1)
+    traj = eta3_trajectory(trajectory_segments,
+                           max_vel=max_vel, max_accel=0.5, max_jerk=1)
 
     # interpolate at several points along the path
     times = np.linspace(0, traj.total_time, 1001)
@@ -392,8 +421,8 @@ def test3(max_vel=2.0):
         points = np.array([x, y]).T.reshape(-1, 1, 2)
         segs = np.concatenate([points[:-1], points[1:]], axis=1)
         lc = LineCollection(segs, cmap=plt.get_cmap('inferno'))
-        ax.set_xlim(np.min(x)-1, np.max(x)+1)
-        ax.set_ylim(np.min(y)-1, np.max(y)+1)
+        ax.set_xlim(np.min(x) - 1, np.max(x) + 1)
+        ax.set_ylim(np.min(y) - 1, np.max(y) + 1)
         lc.set_array(state[3, :])
         lc.set_linewidth(3)
         ax.add_collection(lc)
@@ -422,8 +451,8 @@ def main():
     """
     recreate path from reference (see Table 1)
     """
-    #test1()
-    #test2()
+    # test1()
+    # test2()
     test3()
 
 

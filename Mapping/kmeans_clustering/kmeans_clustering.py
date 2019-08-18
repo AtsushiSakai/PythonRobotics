@@ -73,7 +73,7 @@ def update_clusters(clusters):
         mind = min(dlist)
         min_id = dlist.index(mind)
         clusters.labels[ip] = min_id
-        cost += min_id
+        cost += mind
 
     return clusters, cost
 
@@ -124,7 +124,7 @@ def calc_association(cx, cy, clusters):
 
     inds = []
 
-    for ic in range(len(cx)):
+    for ic, _ in enumerate(cx):
         tcx = cx[ic]
         tcy = cy[ic]
 
@@ -161,7 +161,7 @@ def main():
         clusters = kmeans_clustering(rx, ry, ncluster)
 
         # for animation
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
             inds = calc_association(cx, cy, clusters)
             for ic in inds:

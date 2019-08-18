@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 import sys
-if 'cvxpy' in sys.modules:
+if 'cvxpy' in sys.modules:  # pragma: no cover
     sys.path.append("./PathTracking/model_predictive_speed_and_steer_control/")
 
     from PathTracking.model_predictive_speed_and_steer_control import model_predictive_speed_and_steer_control as m

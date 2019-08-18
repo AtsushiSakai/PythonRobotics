@@ -5,7 +5,6 @@ Nonlinear MPC simulation with CGMRES
 author Atsushi Sakai (@Atsushi_twi)
 
 Ref:
-- 非線形モデル予測制御におけるCGMRES法をpythonで実装する - Qiita https://qiita.com/MENDY/items/4108190a579395053924 (in Japanese)
 
 - Shunichi09/nonlinear_control: Implementing the nonlinear model predictive control, sliding mode control https://github.com/Shunichi09/nonlinear_control
 
@@ -275,6 +274,8 @@ class NMPCController_with_CGMRES():
         e = np.zeros((self.max_iteration + 1, 1))
         e[0] = 1.0
 
+        ys_pre = None
+
         for i in range(self.max_iteration):
             du_1 = vs[::self.input_num, i] * self.ht
             du_2 = vs[1::self.input_num, i] * self.ht
@@ -370,7 +371,7 @@ class NMPCController_with_CGMRES():
         return np.array(F)
 
 
-def plot_figures(plant_system, controller, iteration_num, dt):
+def plot_figures(plant_system, controller, iteration_num, dt):  # pragma: no cover
     # figure
     # time history
     fig_p = plt.figure()
@@ -461,7 +462,7 @@ def plot_figures(plant_system, controller, iteration_num, dt):
     plt.show()
 
 
-def plot_car(x, y, yaw, steer=0.0, cabcolor="-r", truckcolor="-k"):
+def plot_car(x, y, yaw, steer=0.0, cabcolor="-r", truckcolor="-k"):  # pragma: no cover
 
     # Vehicle parameters
     LENGTH = 0.4  # [m]
@@ -476,8 +477,8 @@ def plot_car(x, y, yaw, steer=0.0, cabcolor="-r", truckcolor="-k"):
                         [WIDTH / 2, WIDTH / 2, - WIDTH / 2, -WIDTH / 2, WIDTH / 2]])
 
     fr_wheel = np.array([[WHEEL_LEN, -WHEEL_LEN, -WHEEL_LEN, WHEEL_LEN, WHEEL_LEN],
-                         [-WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD, WHEEL_WIDTH
-                          - TREAD, WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD]])
+                         [-WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD, WHEEL_WIDTH -
+                          TREAD, WHEEL_WIDTH - TREAD, -WHEEL_WIDTH - TREAD]])
 
     rr_wheel = np.copy(fr_wheel)
 
@@ -583,7 +584,7 @@ def main():
         # update state
         plant_system.update_state(u_1s[0], u_2s[0])
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         animation(plant_system, controller, dt)
         plot_figures(plant_system, controller, iteration_num, dt)
 
