@@ -363,6 +363,12 @@ Dear AtsushiSakai, thank you so much for this material, it's so useful to me, i'
 
 ---
 
+Dear Atsushi Thanks for compiling such a vast resource for robotics motion planning.
+
+--Kartik Prakash
+
+---
+
 
 # Citations
 
