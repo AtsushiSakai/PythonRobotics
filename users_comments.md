@@ -369,6 +369,12 @@ Dear Atsushi Thanks for compiling such a vast resource for robotics motion plann
 
 ---
 
+Thanks for your job! <br>I have learned a lot from it!
+
+--ZhongyiShen
+
+---
+
 
 # Citations
 
