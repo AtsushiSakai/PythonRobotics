@@ -235,22 +235,28 @@ class Optimizer3D:
         duy = dRdqw * dqdu[0,1] + dRdqx * dqdu[1, 1] + dRdqy * dqdu[2, 1] + dRdqz * dqdu[3, 1]
         duz = dRdqw * dqdu[0,2] + dRdqx * dqdu[1, 2] + dRdqy * dqdu[2, 2] + dRdqz * dqdu[3, 2]
         return dux, duy, duz
-
+    
     def dRV_dQuat(self, q):
+        
+        qw = q.qw[0]
+        qx = q.qx[0]
+        qy = q.qy[0]
+        qz = q.qz[0]
 
-        if 1 - q.qw**2 < 1e-7:
+        if 1 - qw**2 < 1e-7:
             ret = np.array(
             [[ 0.0, 2.0, 0.0, 0.0],
              [ 0.0, 0.0, 2.0, 0.0],
              [ 0.0, 0.0, 0.0, 2.0]]
             )
             return ret
-        c = 1/(1 - q.qw**2)
-        d = np.arccos(q.qw)/(np.sqrt(1-q.qw**2))
+        
+        c = 1/(1 - qw**2)
+        d = np.arccos(qw)/(np.sqrt(1-qw**2))
         ret = 2.0 * np.array(
-            [[ c*q.qx*(d*q.qw-1),   d, 0.0, 0.0],
-             [ c*q.qy*(d*q.qw-1), 0.0,   d, 0.0],
-             [ c*q.qz*(d*q.qw-1), 0.0, 0.0,   d]]
+            [[ c*qx*(d*qw-1),   d, 0.0, 0.0],
+             [ c*qy*(d*qw-1), 0.0,   d, 0.0],
+             [ c*qz*(d*qw-1), 0.0, 0.0,   d]]
             )
         return ret
 
