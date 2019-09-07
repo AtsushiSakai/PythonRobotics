@@ -38,7 +38,6 @@ MAXY = 25.0
 NOISE_RANGE = 2.0  # [m] 1σ range noise parameter
 NOISE_SPEED = 0.5  # [m/s] 1σ speed noise parameter
 
-
 show_animation = True
 
 
@@ -66,11 +65,10 @@ def histogram_filter_localization(grid_map, u, z, yaw):
 
 
 def calc_gaussian_observation_pdf(gmap, z, iz, ix, iy, std):
-
     # predicted range
     x = ix * gmap.xy_reso + gmap.minx
     y = iy * gmap.xy_reso + gmap.miny
-    d = math.sqrt((x - z[iz, 1])**2 + (y - z[iz, 2])**2)
+    d = math.sqrt((x - z[iz, 1]) ** 2 + (y - z[iz, 2]) ** 2)
 
     # likelihood
     pdf = (1.0 - norm.cdf(abs(d - z[iz, 0]), 0.0, std))
@@ -79,7 +77,6 @@ def calc_gaussian_observation_pdf(gmap, z, iz, ix, iy, std):
 
 
 def observation_update(gmap, z, std):
-
     for iz in range(z.shape[0]):
         for ix in range(gmap.xw):
             for iy in range(gmap.yw):
@@ -99,7 +96,6 @@ def calc_input():
 
 
 def motion_model(x, u):
-
     F = np.array([[1.0, 0, 0, 0],
                   [0, 1.0, 0, 0],
                   [0, 0, 1.0, 0],
@@ -122,7 +118,6 @@ def draw_heat_map(data, mx, my):
 
 
 def observation(xTrue, u, RFID):
-
     xTrue = motion_model(xTrue, u)
 
     z = np.zeros((0, 3))
@@ -131,7 +126,7 @@ def observation(xTrue, u, RFID):
 
         dx = xTrue[0, 0] - RFID[i, 0]
         dy = xTrue[1, 0] - RFID[i, 1]
-        d = math.sqrt(dx**2 + dy**2)
+        d = math.sqrt(dx ** 2 + dy ** 2)
         if d <= MAX_RANGE:
             # add noise to range observation
             dn = d + np.random.randn() * NOISE_RANGE
@@ -146,7 +141,6 @@ def observation(xTrue, u, RFID):
 
 
 def normalize_probability(gmap):
-
     sump = sum([sum(igmap) for igmap in gmap.data])
 
     for ix in range(gmap.xw):
@@ -214,11 +208,11 @@ def calc_grid_index(gmap):
 def main():
     print(__file__ + " start!!")
 
-    # RFID positions [x, y]
-    RFID = np.array([[10.0, 0.0],
-                     [10.0, 10.0],
-                     [0.0, 15.0],
-                     [-5.0, 20.0]])
+    # RF_ID positions [x, y]
+    RF_ID = np.array([[10.0, 0.0],
+                      [10.0, 10.0],
+                      [0.0, 15.0],
+                      [-5.0, 20.0]])
 
     time = 0.0
 
@@ -233,7 +227,7 @@ def main():
         u = calc_input()
 
         yaw = xTrue[2, 0]  # Orientation is known
-        xTrue, z, ud = observation(xTrue, u, RFID)
+        xTrue, z, ud = observation(xTrue, u, RF_ID)
 
         grid_map = histogram_filter_localization(grid_map, u, z, yaw)
 
@@ -241,10 +235,10 @@ def main():
             plt.cla()
             draw_heat_map(grid_map.data, mx, my)
             plt.plot(xTrue[0, :], xTrue[1, :], "xr")
-            plt.plot(RFID[:, 0], RFID[:, 1], ".k")
+            plt.plot(RF_ID[:, 0], RF_ID[:, 1], ".k")
             for i in range(z.shape[0]):
                 plt.plot([xTrue[0, :], z[i, 1]], [
-                         xTrue[1, :], z[i, 2]], "-k")
+                    xTrue[1, :], z[i, 2]], "-k")
             plt.title("Time[s]:" + str(time)[0: 4])
             plt.pause(0.1)
 

@@ -609,19 +609,6 @@ This is a list: [Users comments](https://github.com/AtsushiSakai/PythonRobotics/
 
 - [Alexis Paques](https://github.com/AlexisTM)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- [Ryohei Sasaki](https://github.com/rsasaki0109)
 
 
