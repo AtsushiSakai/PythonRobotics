@@ -249,11 +249,20 @@ Ref:
 - [SLAM simulations by Tim Bailey](http://www-personal.acfr.usyd.edu.au/tbailey/software/slam_simulations.htm)
 
 
-## Pose Optimization SLAM
+## Pose Optimization SLAM 2D
 
-This is a graph based pose optimization SLAM example.
+This is a graph based 2D pose optimization SLAM example.
 
-![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/PoseOptimizationSLAM/animation.gif)
+![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/PoseOptimizationSLAM2D/animation.gif)
+
+
+## Pose Optimization SLAM 3D
+
+This is a graph based 3D pose optimization SLAM example.
+
+![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/PoseOptimizationSLAM3D/animation.gif)
+
+
 
 # Path Planning
 
