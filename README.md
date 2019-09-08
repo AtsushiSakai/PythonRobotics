@@ -12,6 +12,7 @@
 
 Python codes for robotics algorithm.
 
+
 # Table of Contents
    * [What is this?](#what-is-this)
    * [Requirements](#requirements)
@@ -30,7 +31,8 @@ Python codes for robotics algorithm.
    * [SLAM](#slam)
       * [Iterative Closest Point (ICP) Matching](#iterative-closest-point-icp-matching)
       * [FastSLAM 1.0](#fastslam-10)
-      * [Pose Optimization SLAM](#pose-optimization-slam)
+      * [Pose Optimization SLAM 2D](#pose-optimization-slam-2d)
+      * [Pose Optimization SLAM 3D](#pose-optimization-slam-3d)
    * [Path Planning](#path-planning)
       * [Dynamic Window Approach](#dynamic-window-approach)
       * [Grid based search](#grid-based-search)
@@ -619,5 +621,6 @@ This is a list: [Users comments](https://github.com/AtsushiSakai/PythonRobotics/
 - [Alexis Paques](https://github.com/AlexisTM)
 
 - [Ryohei Sasaki](https://github.com/rsasaki0109)
+
 
 
