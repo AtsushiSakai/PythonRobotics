@@ -74,7 +74,7 @@ class RRT:
             if animation and i % 5 == 0:
                 self.draw_graph(rnd_node)
 
-            if self.calc_dist_to_goal(new_node.x, new_node.y) <= self.expand_dis:
+            if self.calc_dist_to_goal(self.node_list[-1].x, self.node_list[-1].y) <= self.expand_dis:
                 print("Goal!!")
                 return self.generate_final_course(len(self.node_list) - 1)
 
