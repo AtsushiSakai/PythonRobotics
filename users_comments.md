@@ -398,6 +398,9 @@ URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8765684&isnumber=87
 5. Josie Hughes, Masaru Shimizu, and Arnoud Visser, "A Review of Robot Rescue Simulation Platforms for Robotics Education"
 URL: https://2019.robocup.org/downloads/program/HughesEtAl2019.pdf
 
+6. Hughes, Josie, Masaru Shimizu, and Arnoud Visser. "A review of robot rescue simulation platforms for robotics education." (2019).
+URL: https://www.semanticscholar.org/paper/A-Review-of-Robot-Rescue-Simulation-Platforms-for-Hughes-Shimizu/318a4bcb97a44661422ae1430d950efc408097da
+
 # Others
 
 - Autonomous Vehicle Readings https://richardkelley.io/readings
