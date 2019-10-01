@@ -103,7 +103,7 @@ See this paper for more details:
 
 - pandas
 
-- [cvxpy](http://www.cvxpy.org/en/latest/) 
+- [cvxpy](https://www.cvxpy.org/index.html) 
 
 # Documentation
 
