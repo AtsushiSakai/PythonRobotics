@@ -10,6 +10,7 @@ import math
 import random
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 show_animation = True
 
@@ -104,10 +105,8 @@ class RRT:
 
         d, _ = self.calc_distance_and_angle(new_node, to_node)
         if d <= self.path_resolution:
-            new_node.x = to_node.x
-            new_node.y = to_node.y
-            new_node.path_x[-1] = to_node.x
-            new_node.path_y[-1] = to_node.y
+            new_node.path_x.append(to_node.x)
+            new_node.path_y.append(to_node.y)
 
         new_node.parent = from_node
 
@@ -142,16 +141,25 @@ class RRT:
             plt.plot(rnd.x, rnd.y, "^k")
         for node in self.node_list:
             if node.parent:
-                plt.plot(node.path_x, node.path_y, "-g")
+                plt.plot(node.path_x, node.path_y, "-xg")
 
         for (ox, oy, size) in self.obstacle_list:
-            plt.plot(ox, oy, "ok", ms=30 * size)
+            self.plot_circle(ox, oy, size)
 
         plt.plot(self.start.x, self.start.y, "xr")
         plt.plot(self.end.x, self.end.y, "xr")
+        plt.axis("equal")
         plt.axis([-2, 15, -2, 15])
         plt.grid(True)
         plt.pause(0.01)
+
+    @staticmethod
+    def plot_circle(x, y, size, color="-b"):  # pragma: no cover
+        deg = list(range(0, 360, 5))
+        deg.append(0)
+        xl = [x + size * math.cos(np.deg2rad(d)) for d in deg]
+        yl = [y + size * math.sin(np.deg2rad(d)) for d in deg]
+        plt.plot(xl, yl, color)
 
     @staticmethod
     def get_nearest_node_index(node_list, rnd_node):
@@ -182,7 +190,7 @@ class RRT:
         return d, theta
 
 
-def main(gx=5.0, gy=10.0):
+def main(gx=6.0, gy=10.0):
     print("start " + __file__)
 
     # ====Search Path with RRT====
@@ -193,7 +201,7 @@ def main(gx=5.0, gy=10.0):
         (3, 10, 2),
         (7, 5, 2),
         (9, 5, 2)
-    ]  # [x,y,size]
+    ]  # [x, y, radius]
     # Set Initial parameters
     rrt = RRT(start=[0, 0],
               goal=[gx, gy],
