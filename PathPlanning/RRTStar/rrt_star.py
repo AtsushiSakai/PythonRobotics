@@ -52,6 +52,7 @@ class RRTStar(RRT):
 
         """
         self.connect_circle_dist = connect_circle_dist
+        self.goal_node = self.Node(goal[0], goal[1])
 
     def planning(self, animation=True, search_until_max_iter=True):
         """
@@ -121,7 +122,14 @@ class RRTStar(RRT):
         dist_to_goal_list = [self.calc_dist_to_goal(n.x, n.y) for n in self.node_list]
         goal_inds = [dist_to_goal_list.index(i) for i in dist_to_goal_list if i <= self.expand_dis]
 
-        if not goal_inds:
+        # safe_goal_inds = goal_inds
+        safe_goal_inds = []
+        for goal_ind in goal_inds:
+            t_node = self.steer(self.node_list[goal_ind], self.goal_node)
+            if self.check_collision(t_node, self.obstacle_list):
+                safe_goal_inds.append(goal_ind)
+
+        if not safe_goal_inds:
             return None
 
         min_cost = min([self.node_list[i].cost for i in goal_inds])
@@ -177,12 +185,13 @@ def main():
         (3, 8, 2),
         (3, 10, 2),
         (7, 5, 2),
-        (9, 5, 2)
+        (9, 5, 2),
+        (8, 10, 1),
     ]  # [x,y,size(radius)]
 
     # Set Initial parameters
     rrt_star = RRTStar(start=[0, 0],
-                       goal=[10, 10],
+                       goal=[6, 10],
                        rand_area=[-2, 15],
                        obstacle_list=obstacle_list)
     path = rrt_star.planning(animation=show_animation)

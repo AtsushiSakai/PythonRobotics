@@ -33,7 +33,7 @@ class RRT:
             self.parent = None
 
     def __init__(self, start, goal, obstacle_list, rand_area,
-                 expand_dis=3.0, path_resolution=1.0, goal_sample_rate=5, max_iter=500):
+                 expand_dis=3.0, path_resolution=0.5, goal_sample_rate=5, max_iter=500):
         """
         Setting Parameter
 
@@ -76,8 +76,9 @@ class RRT:
                 self.draw_graph(rnd_node)
 
             if self.calc_dist_to_goal(self.node_list[-1].x, self.node_list[-1].y) <= self.expand_dis:
-                print("Goal!!")
-                return self.generate_final_course(len(self.node_list) - 1)
+                final_node = self.steer(self.node_list[-1], self.end, self.expand_dis)
+                if self.check_collision(final_node, self.obstacle_list):
+                    return self.generate_final_course(len(self.node_list) - 1)
 
             if animation and i % 5:
                 self.draw_graph(rnd_node)
@@ -141,7 +142,7 @@ class RRT:
             plt.plot(rnd.x, rnd.y, "^k")
         for node in self.node_list:
             if node.parent:
-                plt.plot(node.path_x, node.path_y, "-xg")
+                plt.plot(node.path_x, node.path_y, "-g")
 
         for (ox, oy, size) in self.obstacle_list:
             self.plot_circle(ox, oy, size)
@@ -200,7 +201,8 @@ def main(gx=6.0, gy=10.0):
         (3, 8, 2),
         (3, 10, 2),
         (7, 5, 2),
-        (9, 5, 2)
+        (9, 5, 2),
+        (8, 10, 1)
     ]  # [x, y, radius]
     # Set Initial parameters
     rrt = RRT(start=[0, 0],

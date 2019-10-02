@@ -76,8 +76,6 @@ def line_collision_check(first, second, obstacleList):
         if d <= size:
             return False
 
-    #  print("OK")
-
     return True  # OK
 
 
@@ -127,7 +125,7 @@ def main():
         (7, 5, 2),
         (9, 5, 2)
     ]  # [x,y,size]
-    rrt = RRT(start=[0, 0], goal=[5, 10],
+    rrt = RRT(start=[0, 0], goal=[6, 10],
               rand_area=[-2, 15], obstacle_list=obstacleList)
     path = rrt.planning(animation=show_animation)
 
@@ -141,7 +139,7 @@ def main():
         plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
 
         plt.plot([x for (x, y) in smoothedPath], [
-            y for (x, y) in smoothedPath], '-b')
+            y for (x, y) in smoothedPath], '-c')
 
         plt.grid(True)
         plt.pause(0.01)  # Need for Mac
