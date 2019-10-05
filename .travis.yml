@@ -5,7 +5,7 @@ matrix:
     - os: linux
 
 python:
-  - 3.6
+  - 3.7
 
 before_install:
     - sudo apt-get update
@@ -18,7 +18,7 @@ before_install:
     - conda update -q conda
     # Useful for debugging any issues with conda
     - conda info -a
-    - conda install python==3.6.8
+#    - conda install python==3.6.8
 
 install:
   - conda install numpy==1.15
