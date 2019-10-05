@@ -59,7 +59,7 @@ class RRTStar(RRT):
         rrt star path planning
 
         animation: flag for animation on or off
-        search_until_maxiter: search until max iteration for path improving or not
+        search_until_max_iter: search until max iteration for path improving or not
         """
 
         self.node_list = [self.start]
@@ -122,7 +122,6 @@ class RRTStar(RRT):
         dist_to_goal_list = [self.calc_dist_to_goal(n.x, n.y) for n in self.node_list]
         goal_inds = [dist_to_goal_list.index(i) for i in dist_to_goal_list if i <= self.expand_dis]
 
-        # safe_goal_inds = goal_inds
         safe_goal_inds = []
         for goal_ind in goal_inds:
             t_node = self.steer(self.node_list[goal_ind], self.goal_node)
@@ -132,8 +131,8 @@ class RRTStar(RRT):
         if not safe_goal_inds:
             return None
 
-        min_cost = min([self.node_list[i].cost for i in goal_inds])
-        for i in goal_inds:
+        min_cost = min([self.node_list[i].cost for i in safe_goal_inds])
+        for i in safe_goal_inds:
             if self.node_list[i].cost == min_cost:
                 return i
 
@@ -187,6 +186,7 @@ def main():
         (7, 5, 2),
         (9, 5, 2),
         (8, 10, 1),
+        (6, 12, 1),
     ]  # [x,y,size(radius)]
 
     # Set Initial parameters
