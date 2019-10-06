@@ -1,4 +1,6 @@
-<img src="https://github.com/AtsushiSakai/PythonRobotics/raw/master/icon.png?raw=true" align="right" width="300" alt="header pic"/>
+<div style="text-align:right">
+<img src="https://github.com/AtsushiSakai/PythonRobotics/raw/master/icon.png?raw=true" width="300" alt="header pic"/>
+</div>
 
 # PythonRobotics
 [![Build Status](https://travis-ci.org/AtsushiSakai/PythonRobotics.svg?branch=master)](https://travis-ci.org/AtsushiSakai/PythonRobotics)
