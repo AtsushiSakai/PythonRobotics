@@ -6,17 +6,18 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import numpy as np
 import math
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Estimation parameter of PF
-Q = np.diag([0.1])**2  # range error
-R = np.diag([1.0, np.deg2rad(40.0)])**2  # input error
+Q = np.diag([0.1]) ** 2  # range error
+R = np.diag([1.0, np.deg2rad(40.0)]) ** 2  # input error
 
 #  Simulation parameter
-Qsim = np.diag([0.2])**2
-Rsim = np.diag([1.0, np.deg2rad(30.0)])**2
+Qsim = np.diag([0.2]) ** 2
+Rsim = np.diag([1.0, np.deg2rad(30.0)]) ** 2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
@@ -37,7 +38,6 @@ def calc_input():
 
 
 def observation(xTrue, xd, u, RFID):
-
     xTrue = motion_model(xTrue, u)
 
     # add noise to gps x-y
@@ -47,7 +47,7 @@ def observation(xTrue, xd, u, RFID):
 
         dx = xTrue[0, 0] - RFID[i, 0]
         dy = xTrue[1, 0] - RFID[i, 1]
-        d = math.sqrt(dx**2 + dy**2)
+        d = math.sqrt(dx ** 2 + dy ** 2)
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Qsim[0, 0]  # add noise
             zi = np.array([[dn, RFID[i, 0], RFID[i, 1]]])
@@ -64,7 +64,6 @@ def observation(xTrue, xd, u, RFID):
 
 
 def motion_model(x, u):
-
     F = np.array([[1.0, 0, 0, 0],
                   [0, 1.0, 0, 0],
                   [0, 0, 1.0, 0],
@@ -97,7 +96,7 @@ def calc_covariance(xEst, px, pw):
     return cov
 
 
-def pf_localization(px, pw, xEst, PEst, z, u):
+def pf_localization(px, pw, z, u):
     """
     Localization with Particle filter
     """
@@ -105,6 +104,7 @@ def pf_localization(px, pw, xEst, PEst, z, u):
     for ip in range(NP):
         x = np.array([px[:, ip]]).T
         w = pw[0, ip]
+
         #  Predict with random input sampling
         ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
         ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1]
@@ -115,8 +115,8 @@ def pf_localization(px, pw, xEst, PEst, z, u):
         for i in range(len(z[:, 0])):
             dx = x[0, 0] - z[i, 1]
             dy = x[1, 0] - z[i, 2]
-            prez = math.sqrt(dx**2 + dy**2)
-            dz = prez - z[i, 0]
+            pre_z = math.sqrt(dx ** 2 + dy ** 2)
+            dz = pre_z - z[i, 0]
             w = w * gauss_likelihood(dz, math.sqrt(Q[0, 0]))
 
         px[:, ip] = x[:, 0]
@@ -223,7 +223,7 @@ def main():
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u, RFID)
 
-        xEst, PEst, px, pw = pf_localization(px, pw, xEst, PEst, z, ud)
+        xEst, PEst, px, pw = pf_localization(px, pw, z, ud)
 
         # store data history
         hxEst = np.hstack((hxEst, xEst))
