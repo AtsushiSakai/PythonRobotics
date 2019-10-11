@@ -1,7 +1,5 @@
 import sys
 from math import sqrt
-import math
-import os
 import numpy as np
 import json
 
@@ -44,13 +42,10 @@ class RacingLine:
                     race_x.append(g)
                     race_y.append(h)
 
-            
-        rx = np.array(race_x)
-
         return race_x, race_y, ins_x, ins_y, out_x, out_y
 
     def curved_abscissa(self):
-        sum_partial = []
+        
         c_a = [0] * len(self.race_x)
 
         for i in range(len(self.race_x)):
