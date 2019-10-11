@@ -382,7 +382,7 @@ def frenet_optimal_planning(csp, s0, c_speed, c_d, c_d_d, c_d_dd, ob):
     fplist = check_paths(fplist, ob)
 
 
-    if(len(fplist) == 0):
+    if not fplist:
         for i, _ in enumerate(fplist):
             if(fplist[i].s_d == 0):
                 fplist = calc_frenet_paths_low_velocity(c_speed, c_d, c_d_d, c_d_dd, s0)

@@ -22,21 +22,21 @@ class RacingLine:
             o = data['Outside']
             t = data['Inside']
             p = data['Racing']
-            for i in range(len(t)):
+            for i, _ in enumerate(t):
                 d = t[i]
                 n = d[0]
                 m = d[1]
                 ins_x.append(n)
                 ins_y.append(m)
 
-            for j in range(len(o)):
+            for j, _ in enumerate(o):
                 c = o[j]
                 x = c[0]
                 y = c[1]
                 out_x.append(x)
                 out_y.append(y)
 
-            for e in range(len(p)):
+            for e, _ in enumerate(p):
                 if e%20 != 0:
                     z = p[e]
                     g = z[0]
