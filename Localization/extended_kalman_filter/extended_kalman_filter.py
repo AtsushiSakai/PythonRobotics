@@ -7,21 +7,22 @@ author: Atsushi Sakai (@Atsushi_twi)
 """
 
 import math
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Covariance for EKF simulation
 Q = np.diag([
-    0.1, # variance of location on x-axis
-    0.1, # variance of location on y-axis
-    np.deg2rad(1.0), # variance of yaw angle
-    1.0 # variance of velocity
-    ])**2  # predict state covariance
-R = np.diag([1.0, 1.0])**2  # Observation x,y position covariance
+    0.1,  # variance of location on x-axis
+    0.1,  # variance of location on y-axis
+    np.deg2rad(1.0),  # variance of yaw angle
+    1.0  # variance of velocity
+]) ** 2  # predict state covariance
+R = np.diag([1.0, 1.0]) ** 2  # Observation x,y position covariance
 
 #  Simulation parameter
-INPUT_NOISE = np.diag([1.0, np.deg2rad(30.0)])**2
-GPS_NOISE = np.diag([0.5, 0.5])**2
+INPUT_NOISE = np.diag([1.0, np.deg2rad(30.0)]) ** 2
+GPS_NOISE = np.diag([0.5, 0.5]) ** 2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
@@ -37,7 +38,6 @@ def calc_input():
 
 
 def observation(xTrue, xd, u):
-
     xTrue = motion_model(xTrue, u)
 
     # add noise to gps x-y
@@ -52,7 +52,6 @@ def observation(xTrue, xd, u):
 
 
 def motion_model(x, u):
-
     F = np.array([[1.0, 0, 0, 0],
                   [0, 1.0, 0, 0],
                   [0, 0, 1.0, 0],
@@ -79,7 +78,7 @@ def observation_model(x):
     return z
 
 
-def jacobF(x, u):
+def jacob_f(x, u):
     """
     Jacobian of Motion Model
 
@@ -105,7 +104,7 @@ def jacobF(x, u):
     return jF
 
 
-def jacobH(x):
+def jacob_h():
     # Jacobian of Observation Model
     jH = np.array([
         [1, 0, 0, 0],
@@ -116,20 +115,19 @@ def jacobH(x):
 
 
 def ekf_estimation(xEst, PEst, z, u):
-
     #  Predict
     xPred = motion_model(xEst, u)
-    jF = jacobF(xPred, u)
-    PPred = jF@PEst@jF.T + Q
+    jF = jacob_f(xPred, u)
+    PPred = jF @ PEst @ jF.T + Q
 
     #  Update
-    jH = jacobH(xPred)
+    jH = jacob_h()
     zPred = observation_model(xPred)
     y = z - zPred
-    S = jH@PPred@jH.T + R
-    K = PPred@jH.T@np.linalg.inv(S)
-    xEst = xPred + K@y
-    PEst = (np.eye(len(xEst)) - K@jH)@PPred
+    S = jH @ PPred @ jH.T + R
+    K = PPred @ jH.T @ np.linalg.inv(S)
+    xEst = xPred + K @ y
+    PEst = (np.eye(len(xEst)) - K @ jH) @ PPred
 
     return xEst, PEst
 
@@ -151,9 +149,9 @@ def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
     x = [a * math.cos(it) for it in t]
     y = [b * math.sin(it) for it in t]
     angle = math.atan2(eigvec[bigind, 1], eigvec[bigind, 0])
-    R = np.array([[math.cos(angle), math.sin(angle)],
-                  [-math.sin(angle), math.cos(angle)]])
-    fx = R@(np.array([x, y]))
+    rot = np.array([[math.cos(angle), math.sin(angle)],
+                    [-math.sin(angle), math.cos(angle)]])
+    fx = rot @ (np.array([x, y]))
     px = np.array(fx[0, :] + xEst[0, 0]).flatten()
     py = np.array(fx[1, :] + xEst[1, 0]).flatten()
     plt.plot(px, py, "--r")

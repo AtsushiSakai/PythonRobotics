@@ -4,16 +4,16 @@ author: Atsushi Sakai (@Atsushi_twi)
 """
 
 import math
-import numpy as np
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+import numpy as np
 
 # EKF state covariance
-Cx = np.diag([0.5, 0.5, np.deg2rad(30.0)])**2
+Cx = np.diag([0.5, 0.5, np.deg2rad(30.0)]) ** 2
 
 #  Simulation parameter
-Qsim = np.diag([0.2, np.deg2rad(1.0)])**2
-Rsim = np.diag([1.0, np.deg2rad(10.0)])**2
+Q_sim = np.diag([0.2, np.deg2rad(1.0)]) ** 2
+R_sim = np.diag([1.0, np.deg2rad(10.0)]) ** 2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
@@ -26,7 +26,6 @@ show_animation = True
 
 
 def ekf_slam(xEst, PEst, u, z):
-
     # Predict
     S = STATE_SIZE
     xEst[0:S] = motion_model(xEst[0:S], u)
@@ -36,18 +35,18 @@ def ekf_slam(xEst, PEst, u, z):
 
     # Update
     for iz in range(len(z[:, 0])):  # for each observation
-        minid = search_correspond_LM_ID(xEst, PEst, z[iz, 0:2])
+        minid = search_correspond_landmark_id(xEst, PEst, z[iz, 0:2])
 
-        nLM = calc_n_LM(xEst)
+        nLM = calc_n_lm(xEst)
         if minid == nLM:
             print("New LM")
             # Extend state and covariance matrix
-            xAug = np.vstack((xEst, calc_LM_Pos(xEst, z[iz, :])))
+            xAug = np.vstack((xEst, calc_landmark_position(xEst, z[iz, :])))
             PAug = np.vstack((np.hstack((PEst, np.zeros((len(xEst), LM_SIZE)))),
                               np.hstack((np.zeros((LM_SIZE, len(xEst))), initP))))
             xEst = xAug
             PEst = PAug
-        lm = get_LM_Pos_from_state(xEst, minid)
+        lm = get_landmark_position_from_state(xEst, minid)
         y, S, H = calc_innovation(lm, xEst, PEst, z[iz, 0:2], minid)
 
         K = (PEst @ H.T) @ np.linalg.inv(S)
@@ -67,7 +66,6 @@ def calc_input():
 
 
 def observation(xTrue, xd, u, RFID):
-
     xTrue = motion_model(xTrue, u)
 
     # add noise to gps x-y
@@ -77,25 +75,24 @@ def observation(xTrue, xd, u, RFID):
 
         dx = RFID[i, 0] - xTrue[0, 0]
         dy = RFID[i, 1] - xTrue[1, 0]
-        d = math.sqrt(dx**2 + dy**2)
+        d = math.sqrt(dx ** 2 + dy ** 2)
         angle = pi_2_pi(math.atan2(dy, dx) - xTrue[2, 0])
         if d <= MAX_RANGE:
-            dn = d + np.random.randn() * Qsim[0, 0]  # add noise
-            anglen = angle + np.random.randn() * Qsim[1, 1]  # add noise
+            dn = d + np.random.randn() * Q_sim[0, 0] ** 0.5  # add noise
+            anglen = angle + np.random.randn() * Q_sim[1, 1] ** 0.5  # add noise
             zi = np.array([dn, anglen, i])
             z = np.vstack((z, zi))
 
     # add noise to input
     ud = np.array([[
-        u[0, 0] + np.random.randn() * Rsim[0, 0],
-        u[1, 0] + np.random.randn() * Rsim[1, 1]]]).T
+        u[0, 0] + np.random.randn() * R_sim[0, 0] ** 0.5,
+        u[1, 0] + np.random.randn() * R_sim[1, 1] ** 0.5]]).T
 
     xd = motion_model(xd, ud)
     return xTrue, z, xd, ud
 
 
 def motion_model(x, u):
-
     F = np.array([[1.0, 0, 0],
                   [0, 1.0, 0],
                   [0, 0, 1.0]])
@@ -108,15 +105,14 @@ def motion_model(x, u):
     return x
 
 
-def calc_n_LM(x):
+def calc_n_lm(x):
     n = int((len(x) - STATE_SIZE) / LM_SIZE)
     return n
 
 
 def jacob_motion(x, u):
-
     Fx = np.hstack((np.eye(STATE_SIZE), np.zeros(
-        (STATE_SIZE, LM_SIZE * calc_n_LM(x)))))
+        (STATE_SIZE, LM_SIZE * calc_n_lm(x)))))
 
     jF = np.array([[0.0, 0.0, -DT * u[0] * math.sin(x[2, 0])],
                    [0.0, 0.0, DT * u[0] * math.cos(x[2, 0])],
@@ -127,35 +123,34 @@ def jacob_motion(x, u):
     return G, Fx,
 
 
-def calc_LM_Pos(x, z):
+def calc_landmark_position(x, z):
     zp = np.zeros((2, 1))
 
     zp[0, 0] = x[0, 0] + z[0] * math.cos(x[2, 0] + z[1])
     zp[1, 0] = x[1, 0] + z[0] * math.sin(x[2, 0] + z[1])
-    #zp[0, 0] = x[0, 0] + z[0, 0] * math.cos(x[2, 0] + z[0, 1])
-    #zp[1, 0] = x[1, 0] + z[0, 0] * math.sin(x[2, 0] + z[0, 1])
+    # zp[0, 0] = x[0, 0] + z[0, 0] * math.cos(x[2, 0] + z[0, 1])
+    # zp[1, 0] = x[1, 0] + z[0, 0] * math.sin(x[2, 0] + z[0, 1])
 
     return zp
 
 
-def get_LM_Pos_from_state(x, ind):
-
+def get_landmark_position_from_state(x, ind):
     lm = x[STATE_SIZE + LM_SIZE * ind: STATE_SIZE + LM_SIZE * (ind + 1), :]
 
     return lm
 
 
-def search_correspond_LM_ID(xAug, PAug, zi):
+def search_correspond_landmark_id(xAug, PAug, zi):
     """
     Landmark association with Mahalanobis distance
     """
 
-    nLM = calc_n_LM(xAug)
+    nLM = calc_n_lm(xAug)
 
     mdist = []
 
     for i in range(nLM):
-        lm = get_LM_Pos_from_state(xAug, i)
+        lm = get_landmark_position_from_state(xAug, i)
         y, S, H = calc_innovation(lm, xAug, PAug, zi, i)
         mdist.append(y.T @ np.linalg.inv(S) @ y)
 
@@ -173,19 +168,19 @@ def calc_innovation(lm, xEst, PEst, z, LMid):
     zp = np.array([[math.sqrt(q), pi_2_pi(zangle)]])
     y = (z - zp).T
     y[1] = pi_2_pi(y[1])
-    H = jacobH(q, delta, xEst, LMid + 1)
+    H = jacob_h(q, delta, xEst, LMid + 1)
     S = H @ PEst @ H.T + Cx[0:2, 0:2]
 
     return y, S, H
 
 
-def jacobH(q, delta, x, i):
+def jacob_h(q, delta, x, i):
     sq = math.sqrt(q)
     G = np.array([[-sq * delta[0, 0], - sq * delta[1, 0], 0, sq * delta[0, 0], sq * delta[1, 0]],
                   [delta[1, 0], - delta[0, 0], - 1.0, - delta[1, 0], delta[0, 0]]])
 
     G = G / q
-    nLM = calc_n_LM(x)
+    nLM = calc_n_lm(x)
     F1 = np.hstack((np.eye(3), np.zeros((3, 2 * nLM))))
     F2 = np.hstack((np.zeros((2, 3)), np.zeros((2, 2 * (i - 1))),
                     np.eye(2), np.zeros((2, 2 * nLM - 2 * i))))
@@ -246,7 +241,7 @@ def main():
             plt.plot(xEst[0], xEst[1], ".r")
 
             # plot landmark
-            for i in range(calc_n_LM(xEst)):
+            for i in range(calc_n_lm(xEst)):
                 plt.plot(xEst[STATE_SIZE + i * 2],
                          xEst[STATE_SIZE + i * 2 + 1], "xg")
 
