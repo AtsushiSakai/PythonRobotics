@@ -6,18 +6,18 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import numpy as np
 import math
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+import numpy as np
 
 # Fast SLAM covariance
-Q = np.diag([3.0, np.deg2rad(10.0)])**2
-R = np.diag([1.0, np.deg2rad(20.0)])**2
+Q = np.diag([3.0, np.deg2rad(10.0)]) ** 2
+R = np.diag([1.0, np.deg2rad(20.0)]) ** 2
 
 #  Simulation parameter
-Qsim = np.diag([0.3, np.deg2rad(2.0)])**2
-Rsim = np.diag([0.5, np.deg2rad(10.0)])**2
+Qsim = np.diag([0.3, np.deg2rad(2.0)]) ** 2
+Rsim = np.diag([0.5, np.deg2rad(10.0)]) ** 2
 OFFSET_YAWRATE_NOISE = 0.01
 
 DT = 0.1  # time tick [s]
@@ -46,7 +46,6 @@ class Particle:
 
 
 def fast_slam1(particles, u, z):
-
     particles = predict_particles(particles, u)
 
     particles = update_with_observation(particles, z)
@@ -57,7 +56,6 @@ def fast_slam1(particles, u, z):
 
 
 def normalize_weight(particles):
-
     sumw = sum([p.w for p in particles])
 
     try:
@@ -73,7 +71,6 @@ def normalize_weight(particles):
 
 
 def calc_final_state(particles):
-
     xEst = np.zeros((STATE_SIZE, 1))
 
     particles = normalize_weight(particles)
@@ -90,13 +87,12 @@ def calc_final_state(particles):
 
 
 def predict_particles(particles, u):
-
     for i in range(N_PARTICLE):
         px = np.zeros((STATE_SIZE, 1))
         px[0, 0] = particles[i].x
         px[1, 0] = particles[i].y
         px[2, 0] = particles[i].yaw
-        ud = u + (np.random.randn(1, 2) @ R).T  # add noise
+        ud = u + (np.random.randn(1, 2) @ R ** 0.5).T  # add noise
         px = motion_model(px, ud)
         particles[i].x = px[0, 0]
         particles[i].y = px[1, 0]
@@ -105,8 +101,7 @@ def predict_particles(particles, u):
     return particles
 
 
-def add_new_lm(particle, z, Q):
-
+def add_new_lm(particle, z, Q_cov):
     r = z[0]
     b = z[1]
     lm_id = int(z[2])
@@ -121,15 +116,15 @@ def add_new_lm(particle, z, Q):
     Gz = np.array([[c, -r * s],
                    [s, r * c]])
 
-    particle.lmP[2 * lm_id:2 * lm_id + 2] = Gz @ Q @ Gz.T
+    particle.lmP[2 * lm_id:2 * lm_id + 2] = Gz @ Q_cov @ Gz.T
 
     return particle
 
 
-def compute_jacobians(particle, xf, Pf, Q):
+def compute_jacobians(particle, xf, Pf, Q_cov):
     dx = xf[0, 0] - particle.x
     dy = xf[1, 0] - particle.y
-    d2 = dx**2 + dy**2
+    d2 = dx ** 2 + dy ** 2
     d = math.sqrt(d2)
 
     zp = np.array(
@@ -141,14 +136,14 @@ def compute_jacobians(particle, xf, Pf, Q):
     Hf = np.array([[dx / d, dy / d],
                    [-dy / d2, dx / d2]])
 
-    Sf = Hf @ Pf @ Hf.T + Q
+    Sf = Hf @ Pf @ Hf.T + Q_cov
 
     return zp, Hv, Hf, Sf
 
 
-def update_KF_with_cholesky(xf, Pf, v, Q, Hf):
+def update_kf_with_cholesky(xf, Pf, v, Q_cov, Hf):
     PHt = Pf @ Hf.T
-    S = Hf @ PHt + Q
+    S = Hf @ PHt + Q_cov
 
     S = (S + S.T) * 0.5
     SChol = np.linalg.cholesky(S).T
@@ -162,8 +157,7 @@ def update_KF_with_cholesky(xf, Pf, v, Q, Hf):
     return x, P
 
 
-def update_landmark(particle, z, Q):
-
+def update_landmark(particle, z, Q_cov):
     lm_id = int(z[2])
     xf = np.array(particle.lm[lm_id, :]).reshape(2, 1)
     Pf = np.array(particle.lmP[2 * lm_id:2 * lm_id + 2, :])
@@ -173,7 +167,7 @@ def update_landmark(particle, z, Q):
     dz = z[0:2].reshape(2, 1) - zp
     dz[1, 0] = pi_2_pi(dz[1, 0])
 
-    xf, Pf = update_KF_with_cholesky(xf, Pf, dz, Q, Hf)
+    xf, Pf = update_kf_with_cholesky(xf, Pf, dz, Q_cov, Hf)
 
     particle.lm[lm_id, :] = xf.T
     particle.lmP[2 * lm_id:2 * lm_id + 2, :] = Pf
@@ -181,11 +175,11 @@ def update_landmark(particle, z, Q):
     return particle
 
 
-def compute_weight(particle, z, Q):
+def compute_weight(particle, z, Q_cov):
     lm_id = int(z[2])
     xf = np.array(particle.lm[lm_id, :]).reshape(2, 1)
     Pf = np.array(particle.lmP[2 * lm_id:2 * lm_id + 2])
-    zp, Hv, Hf, Sf = compute_jacobians(particle, xf, Pf, Q)
+    zp, Hv, Hf, Sf = compute_jacobians(particle, xf, Pf, Q_cov)
 
     dx = z[0:2].reshape(2, 1) - zp
     dx[1, 0] = pi_2_pi(dx[1, 0])
@@ -205,7 +199,6 @@ def compute_weight(particle, z, Q):
 
 
 def update_with_observation(particles, z):
-
     for iz in range(len(z[0, :])):
 
         lmid = int(z[2, iz])
@@ -247,7 +240,7 @@ def resampling(particles):
         inds = []
         ind = 0
         for ip in range(N_PARTICLE):
-            while ((ind < wcum.shape[0] - 1) and (resampleid[ip] > wcum[ind])):
+            while (ind < wcum.shape[0] - 1) and (resampleid[ip] > wcum[ind]):
                 ind += 1
             inds.append(ind)
 
@@ -264,7 +257,6 @@ def resampling(particles):
 
 
 def calc_input(time):
-
     if time <= 3.0:  # wait at first
         v = 0.0
         yawrate = 0.0
@@ -278,7 +270,6 @@ def calc_input(time):
 
 
 def observation(xTrue, xd, u, RFID):
-
     # calc true state
     xTrue = motion_model(xTrue, u)
 
@@ -288,17 +279,17 @@ def observation(xTrue, xd, u, RFID):
 
         dx = RFID[i, 0] - xTrue[0, 0]
         dy = RFID[i, 1] - xTrue[1, 0]
-        d = math.sqrt(dx**2 + dy**2)
+        d = math.sqrt(dx ** 2 + dy ** 2)
         angle = pi_2_pi(math.atan2(dy, dx) - xTrue[2, 0])
         if d <= MAX_RANGE:
-            dn = d + np.random.randn() * Qsim[0, 0]  # add noise
-            anglen = angle + np.random.randn() * Qsim[1, 1]  # add noise
+            dn = d + np.random.randn() * Qsim[0, 0] ** 0.5  # add noise
+            anglen = angle + np.random.randn() * Qsim[1, 1] ** 0.5  # add noise
             zi = np.array([dn, pi_2_pi(anglen), i]).reshape(3, 1)
             z = np.hstack((z, zi))
 
     # add noise to input
-    ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
-    ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1] + OFFSET_YAWRATE_NOISE
+    ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0] ** 0.5
+    ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1] ** 0.5 + OFFSET_YAWRATE_NOISE
     ud = np.array([ud1, ud2]).reshape(2, 1)
 
     xd = motion_model(xd, ud)
@@ -307,7 +298,6 @@ def observation(xTrue, xd, u, RFID):
 
 
 def motion_model(x, u):
-
     F = np.array([[1.0, 0, 0],
                   [0, 1.0, 0],
                   [0, 0, 1.0]])
@@ -354,7 +344,7 @@ def main():
     hxTrue = xTrue
     hxDR = xTrue
 
-    particles = [Particle(N_LM) for i in range(N_PARTICLE)]
+    particles = [Particle(N_LM) for _ in range(N_PARTICLE)]
 
     while SIM_TIME >= time:
         time += DT

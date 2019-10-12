@@ -78,7 +78,7 @@ def observation_model(x):
     return z
 
 
-def jacobF(x, u):
+def jacob_f(x, u):
     """
     Jacobian of Motion Model
 
@@ -104,7 +104,7 @@ def jacobF(x, u):
     return jF
 
 
-def jacobH(x):
+def jacob_h():
     # Jacobian of Observation Model
     jH = np.array([
         [1, 0, 0, 0],
@@ -117,11 +117,11 @@ def jacobH(x):
 def ekf_estimation(xEst, PEst, z, u):
     #  Predict
     xPred = motion_model(xEst, u)
-    jF = jacobF(xPred, u)
+    jF = jacob_f(xPred, u)
     PPred = jF @ PEst @ jF.T + Q
 
     #  Update
-    jH = jacobH(xPred)
+    jH = jacob_h()
     zPred = observation_model(xPred)
     y = z - zPred
     S = jH @ PPred @ jH.T + R
@@ -149,9 +149,9 @@ def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
     x = [a * math.cos(it) for it in t]
     y = [b * math.sin(it) for it in t]
     angle = math.atan2(eigvec[bigind, 1], eigvec[bigind, 0])
-    R = np.array([[math.cos(angle), math.sin(angle)],
-                  [-math.sin(angle), math.cos(angle)]])
-    fx = R @ (np.array([x, y]))
+    rot = np.array([[math.cos(angle), math.sin(angle)],
+                    [-math.sin(angle), math.cos(angle)]])
+    fx = rot @ (np.array([x, y]))
     px = np.array(fx[0, :] + xEst[0, 0]).flatten()
     py = np.array(fx[1, :] + xEst[1, 0]).flatten()
     plt.plot(px, py, "--r")
