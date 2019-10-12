@@ -47,8 +47,6 @@ class Config():
         self.obstacle_cost_gain = 1.0
         self.robot_radius = 1.0  # [m] for collision check
 
-
-
 def motion(x, u, dt):
     """
     motion model
@@ -138,24 +136,14 @@ def calc_obstacle_cost(traj, ob, config):
     """
         calc obstacle cost inf: collision
     """
-
-    skip_n = 2 # for speed up
-    minr = float("inf")
-
-    for ii in range(0, len(traj[:, 1]), skip_n):
-        for i in range(len(ob[:, 0])):
-            ox = ob[i, 0]
-            oy = ob[i, 1]
-            dx = traj[ii, 0] - ox
-            dy = traj[ii, 1] - oy
-
-            r = math.sqrt(dx**2 + dy**2)
-            if r <= config.robot_radius:
-                return float("Inf")  # collision
-
-            if minr >= r:
-                minr = r
-
+    ox = ob[:, 0]
+    oy = ob[:, 1]
+    dx = traj[:, 0] - ox[:, None]
+    dy = traj[:, 1] - oy[:, None]
+    r = np.sqrt(np.square(dx) + np.square(dy))
+    if (r <= config.robot_radius).any():
+        return float("Inf")
+    minr = np.min(r)
     return 1.0 / minr  # OK
 
 
@@ -178,7 +166,7 @@ def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
     plt.plot(x, y)
 
 
-def main(gx=10, gy=10):
+def main(gx=10.0, gy=10.0):
     print(__file__ + " start!!")
     # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
     x = np.array([0.0, 0.0, math.pi / 8.0, 0.0, 0.0])
@@ -194,7 +182,12 @@ def main(gx=10, gy=10):
                    [5.0, 9.0],
                    [8.0, 9.0],
                    [7.0, 9.0],
-                   [12.0, 12.0]
+                   [8.0, 10.0],
+                   [9.0, 11.0],
+                   [12.0, 13.0],
+                   [12.0, 12.0],
+                   [15.0, 15.0],
+                   [13.0, 13.0]
                    ])
 
     # input [forward speed, yawrate]
@@ -204,7 +197,6 @@ def main(gx=10, gy=10):
 
     while True:
         u, ptraj = dwa_control(x, u, config, goal, ob)
-
         x = motion(x, u, config.dt) # simulate robot
         traj = np.vstack((traj, x))  # store state history
 
