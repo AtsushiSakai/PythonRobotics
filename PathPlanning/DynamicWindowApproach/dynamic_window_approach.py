@@ -155,7 +155,8 @@ def calc_to_goal_cost(traj, goal, config):
     dx = goal[0] - traj[-1, 0]
     dy = goal[1] - traj[-1, 1]
     error_angle = math.atan2(dy, dx)
-    cost = abs(error_angle - traj[-1, 2])
+    cost_angle = error_angle - traj[-1, 2]
+    cost = abs(math.atan2(math.sin(cost_angle), math.cos(cost_angle)))
 
     return cost
 

@@ -401,6 +401,9 @@ URL: https://2019.robocup.org/downloads/program/HughesEtAl2019.pdf
 6. Hughes, Josie, Masaru Shimizu, and Arnoud Visser. "A review of robot rescue simulation platforms for robotics education." (2019).
 URL: https://www.semanticscholar.org/paper/A-Review-of-Robot-Rescue-Simulation-Platforms-for-Hughes-Shimizu/318a4bcb97a44661422ae1430d950efc408097da
 
+7. Ghosh, Ritwika, et al. "CyPhyHouse: A Programming, Simulation, and Deployment Toolchain for Heterogeneous Distributed Coordination." arXiv preprint arXiv:1910.01557 (2019).
+URL: https://arxiv.org/abs/1910.01557
+
 # Others
 
 - Autonomous Vehicle Readings https://richardkelley.io/readings
