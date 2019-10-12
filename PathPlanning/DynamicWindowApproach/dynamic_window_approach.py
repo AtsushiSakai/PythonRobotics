@@ -139,22 +139,14 @@ def calc_obstacle_cost(traj, ob, config):
         calc obstacle cost inf: collision
     """
 
-    skip_n = 2 # for speed up
-    minr = float("inf")
-
-    for ii in range(0, len(traj[:, 1]), skip_n):
-        for i in range(len(ob[:, 0])):
-            ox = ob[i, 0]
-            oy = ob[i, 1]
-            dx = traj[ii, 0] - ox
-            dy = traj[ii, 1] - oy
-
-            r = math.sqrt(dx**2 + dy**2)
-            if r <= config.robot_radius:
-                return float("Inf")  # collision
-
-            if minr >= r:
-                minr = r
+    ox = ob[:, 0]
+    oy = ob[:, 1]
+    dx = traj[:, 0] - ox[:, None]
+    dy = traj[:, 1] - oy[:, None]
+    r = np.sqrt(np.square(dx) + np.square(dy))
+    if (r <= config.robot_radius).any():
+        return float("Inf")
+    minr = np.min(r)
 
     return 1.0 / minr  # OK
 
