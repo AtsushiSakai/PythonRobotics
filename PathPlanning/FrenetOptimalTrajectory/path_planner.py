@@ -30,19 +30,19 @@ MAX_CURVATURE = 100.0  # maximum curvature [1/m]
 MAX_ROAD_WIDTH = 7.0  # maximum road width [m]
 D_ROAD_W = 1.0  # road width sampling length [m]
 DT = 0.2  # time tick [s]
-MAXT = 4.0  # max prediction time [m]
+# MAXT = 4.0  # max prediction time [m]
 MINT = 2.0  # min prediction time [m]
 TARGET_SPEED = 60.0 / 3.6  # target speed [m/s]
 D_T_S = 10.0 / 3.6  # target speed sampling length [m/s]
 N_S_SAMPLE = 0.2  # sampling number of target speed
-ROBOT_RADIUS = 1.0  # robot radius [m]
+ROBOT_RADIUS = 2.0  # robot radius [m]
 
 # cost weights
 KJ = 0.1
 KT = 0.1
-KD = 5.0
+KD = 1.0
 KLAT = 5.0
-KLON = 1.0
+KLON = 3.0
 
 show_animation = True
 
@@ -166,8 +166,10 @@ class Frenet_path:
         self.ds = []
         self.c = []
 
+        self.MAXT = 4.0
 
-def calc_frenet_paths(c_speed, c_d, c_d_d, c_d_dd, s0):
+
+def calc_frenet_paths(c_speed, c_d, c_d_d, c_d_dd, s0, pred_time):
 
     frenet_paths = []
 
@@ -175,7 +177,7 @@ def calc_frenet_paths(c_speed, c_d, c_d_d, c_d_dd, s0):
     for di in np.arange(-MAX_ROAD_WIDTH, MAX_ROAD_WIDTH, D_ROAD_W):
 
         # Lateral motion planning
-        for Ti in np.arange(MINT, MAXT, DT):
+        for Ti in np.arange(MINT, pred_time, DT):
             fp = Frenet_path()
 
             lat_qp = quintic_polynomial(c_d, c_d_d, c_d_dd, di, 0.0, 0.0, Ti)
@@ -211,17 +213,19 @@ def calc_frenet_paths(c_speed, c_d, c_d_d, c_d_dd, s0):
     return frenet_paths
 
 
-def calc_frenet_paths_follow_mode(c_speed, c_d, c_d_d, c_d_dd, s0):
+def calc_frenet_paths_follow_mode(c_speed, c_d, c_d_d, c_d_dd, s0, pred_time, s0_target, c_speed_target):
 
     frenet_paths = []
-    dist_safe = 20.0
-    tau = 3.0
+    dist_safe = 0.0
+    tau = 2.0
+
+    print(pred_time)
 
     # generate path to each offset goal
     for di in np.arange(-MAX_ROAD_WIDTH, MAX_ROAD_WIDTH, D_ROAD_W):
 
         # Lateral motion planning
-        for Ti in np.arange(MINT, MAXT, DT):
+        for Ti in np.arange(MINT, pred_time, DT):
             fp = Frenet_path()
 
             lat_qp = quintic_polynomial(c_d, c_d_d, c_d_dd, di, 0.0, 0.0, Ti)
@@ -237,15 +241,15 @@ def calc_frenet_paths_follow_mode(c_speed, c_d, c_d_d, c_d_dd, s0):
             tfp = copy.deepcopy(fp)
 
             #  calculate leading vehicle pos, vel, acc 
-            s_lv1 = s0 + c_speed * Ti
-            s_lv1dot = c_speed
+            s_lv1 = s0_target + c_speed_target * Ti
+            s_lv1dot = c_speed_target
             s_lv1ddot = 0
 
             #  calculate target pos, vel, acc
             s_target = s_lv1 - (dist_safe + tau * s_lv1dot)
             s_targetdot = s_lv1dot
             s_targetddot = 0
-            lon_qp = quintic_polynomial(s0, c_speed, 0.0, s_target, s_targetdot - 10.0, -10.0, Ti)
+            lon_qp = quintic_polynomial(s0, c_speed, 0.0, s_target, s_targetdot, 0.0, Ti)
 
             tfp.s = [lon_qp.calc_point(t) for t in fp.t]
             tfp.s_d = [lon_qp.calc_first_derivative(t) for t in fp.t]
@@ -268,11 +272,11 @@ def calc_frenet_paths_follow_mode(c_speed, c_d, c_d_d, c_d_dd, s0):
 
 
 
-def calc_frenet_paths_low_velocity(c_speed, c_d, c_d_d, c_d_dd, s0):
+def calc_frenet_paths_low_velocity(c_speed, c_d, c_d_d, c_d_dd, s0, pred_time):
     frenet_paths = []
 
     # Longitudinal motion planning (Velocity keeping)
-    for Ti in np.arange(MINT, MAXT, DT):
+    for Ti in np.arange(MINT, pred_time, DT):
         tfp = Frenet_path()
 
         for tv in np.arange(TARGET_SPEED - D_T_S * N_S_SAMPLE, TARGET_SPEED + D_T_S * N_S_SAMPLE, D_T_S):
@@ -361,39 +365,57 @@ def check_paths(fplist, ob):
     okind = []
     for i, _ in enumerate(fplist):
         if any([v > MAX_SPEED for v in fplist[i].s_d]):  # Max speed check
+            print("velocity")
             continue
         elif any([abs(a) > MAX_ACCEL for a in fplist[i].s_dd]):  # Max accel check
+            print("acceleration")
+            print(fplist[i].s_dd)
             continue
         elif any([abs(c) > MAX_CURVATURE for c in fplist[i].c]):  # Max curvature check
+            print("curvature")
             continue
         elif not check_collision(fplist[i], ob):
+            print("collision")
             continue
 
         okind.append(i)
+
+    print(len(okind))
+
     
     return [fplist[i] for i in okind]
 
 
-def frenet_optimal_planning(csp, s0, c_speed, c_d, c_d_d, c_d_dd, ob):
+    print(len(okind))
 
-    fplist = calc_frenet_paths(c_speed, c_d, c_d_d, c_d_dd, s0)
-    fplist = calc_global_paths(fplist, csp)
-    fplist = check_paths(fplist, ob)
-
-
-    if not fplist:
-        for i, _ in enumerate(fplist):
-            if(fplist[i].s_d == 0):
-                fplist = calc_frenet_paths_low_velocity(c_speed, c_d, c_d_d, c_d_dd, s0)
-                fplist = calc_global_paths(fplist, csp)
-                fplist = check_paths(fplist, ob)
-            else:
-                print("Follow Mode")
-                fplist = calc_frenet_paths_follow_mode(c_speed, c_d, c_d_d, c_d_dd, s0)
-                fplist = calc_global_paths(fplist, csp)
-                fplist = check_paths(fplist, ob)
+    
+    return [fplist[i] for i in okind]
 
 
+def frenet_optimal_planning(csp, s0, c_speed, c_d, c_d_d, c_d_dd, ob, pred_time, s0_target, c_speed_target):
+
+    if(c_speed == 0.0):
+        print("###############")
+        print("Low Velocities")
+        print("###############")
+        fplist = calc_frenet_paths_low_velocity(c_speed, c_d, c_d_d, c_d_dd, s0, pred_time)
+        fplist = calc_global_paths(fplist, csp)
+        fplist = check_paths(fplist, ob)
+    else:
+        print("###############")
+        print("Vel keeping")
+        print("###############")
+        fplist = calc_frenet_paths(c_speed, c_d, c_d_d, c_d_dd, s0, pred_time)
+        fplist = calc_global_paths(fplist, csp)
+        fplist = check_paths(fplist, ob)
+        if not fplist:
+            print("###############")
+            print("No trajectories, Follow Mode")
+            print("###############")
+            fplist = calc_frenet_paths_follow_mode(c_speed, c_d, c_d_d, c_d_dd, s0, pred_time, s0_target, c_speed_target)
+            fplist = calc_global_paths(fplist, csp)
+            fplist = check_paths(fplist, ob)
+            
     # find minimum cost path
     mincost = float("inf")
     bestpath = None
@@ -404,9 +426,9 @@ def frenet_optimal_planning(csp, s0, c_speed, c_d, c_d_d, c_d_dd, ob):
 
     return bestpath
 
-def frenet_optimal_planning_target(csp, s0, c_speed, c_d, c_d_d, c_d_dd):
+def frenet_optimal_planning_target(csp, s0, c_speed, c_d, c_d_d, c_d_dd, pred_time):
 
-    fplist = calc_frenet_paths(c_speed, c_d, c_d_d, c_d_dd, s0)
+    fplist = calc_frenet_paths(c_speed, c_d, c_d_d, c_d_dd, s0, pred_time)
     fplist = calc_global_paths(fplist, csp)
    
     # find minimum cost path
@@ -438,7 +460,7 @@ def generate_target_course(x, y):
 def main(json_file):
     print(__file__ + " start!!")
 
-    rc = racing_line.RacingLine()
+    rc = racing_line.RacingLine
 
     rx,ry,insx,insy,outx,outy = rc.json_parser(json_file) 
 
@@ -470,7 +492,7 @@ def main(json_file):
     c_d_dd = 0.0  # current lateral acceleration [m/s]
     s0 = 0.  # current course position
 
-    c_speed_target = 0.0 / 3.6  # current speed [m/s]
+    c_speed_target = 10.0 / 3.6  # current speed [m/s]
     c_d_target = 0.0  # current lateral position [m]
     c_d_d_target = 0.0  # current lateral speed [m/s]
     c_d_dd_target = 0.0  # current lateral acceleration [m/s]
@@ -478,12 +500,14 @@ def main(json_file):
 
     area = 30.0  # animation area length [m]
 
+    pred_time = 4.0
+
     for i in range(SIM_LOOP):
 
         # start = time.time()
 
         path_target = frenet_optimal_planning_target(csp_target, s0_target, 
-        c_speed_target, c_d_target, c_d_d_target, c_d_dd_target)
+        c_speed_target, c_d_target, c_d_d_target, c_d_dd_target, pred_time)
       
         ob_targetx.append(path_target.x[1])
         ob_targety.append(path_target.y[1])
@@ -492,7 +516,8 @@ def main(json_file):
 
 
         path = frenet_optimal_planning(
-            csp, s0, c_speed, c_d, c_d_d, c_d_dd, ob_target)
+            csp, s0, c_speed, c_d, c_d_d, c_d_dd, ob_target, pred_time, \
+                s0_target, c_speed_target)
 
         del ob_targetx[-1]
         del ob_targety[-1]
@@ -522,12 +547,14 @@ def main(json_file):
             plt.plot(tx, ty)
             plt.plot(ob_target[0], ob_target[1], "xk")
             plt.plot(path.x[1:], path.y[1:], "-or")
-            plt.plot(path.x[1], path.y[1], "vc")
+            # plt.plot(path.x[1], path.y[1], "vc")
+            circle = plt.Circle((path.x[1], path.y[1]), ROBOT_RADIUS, color='b', fill=False)
+            plt.gcf().gca().add_artist(circle)
             plt.plot(path_target.x[1:], path_target.y[1:], "-ob")
             plt.plot(path_target.x[1], path_target.y[1], "vc")
             plt.xlim(path.x[1] - area, path.x[1] + area)
             plt.ylim(path.y[1] - area, path.y[1] + area)
-            plt.title("v[km/h]:" + str(c_speed * 3.6)[0:4] + " " + "vt[km/h]:" + str(c_speed_target * 3.6)[0:4])
+            plt.title("v[km/h]:" + str(c_speed * 3.6)[0:4] + " " + "vt[km/h]:" + str(c_speed_target * 3.6)[0:4] + " " + "a:" + str(path.s_dd[1])[0:4])
             plt.grid(True)
             plt.pause(0.0001)
 

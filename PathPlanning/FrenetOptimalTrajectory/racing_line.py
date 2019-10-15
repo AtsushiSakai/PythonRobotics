@@ -6,7 +6,7 @@ import json
 
 class RacingLine:
 
-    def json_parser(self, json_file):
+    def json_parser(json_file):
 
         race_x = []
         race_y = []
@@ -21,38 +21,45 @@ class RacingLine:
             t = data['Inside']
             p = data['Racing']
             for i, _ in enumerate(t):
-                d = t[i]
-                n = d[0]
-                m = d[1]
-                ins_x.append(n)
-                ins_y.append(m)
+                if i%10 == 0:
+                    d = t[i]
+                    n = d[0]
+                    m = d[1]
+                    ins_x.append(n)
+                    ins_y.append(m)
 
             for j, _ in enumerate(o):
-                c = o[j]
-                x = c[0]
-                y = c[1]
-                out_x.append(x)
-                out_y.append(y)
+                if j%10 == 0:
+                    c = o[j]
+                    x = c[0]
+                    y = c[1]
+                    out_x.append(x)
+                    out_y.append(y)
 
             for e, _ in enumerate(p):
-                if e%20 != 0:
+                if e%10 == 0:
                     z = p[e]
                     g = z[0]
                     h = z[1]
                     race_x.append(g)
                     race_y.append(h)
 
+            # print(len(ins_x))
+
         return race_x, race_y, ins_x, ins_y, out_x, out_y
 
-    def curved_abscissa(self):
+    def curved_abscissa(x, y):
         
-        c_a = [0] * len(self.race_x)
+        c_a = [0] * len(x)
 
-        for i in range(len(self.race_x)):
+        for i in range(len(x)):
             if(i == 0):
                 c_a[0] = 0
             else:     
-                c_a[i] = sqrt(pow(self.race_x[i] - self.race_x[i-1],2)+pow(self.race_y[i] - self.race_y[i-1],2)) + c_a[i-1]
+                c_a[i] = sqrt(pow(x[i] - x[i-1],2) + \
+                    pow(y[i] - y[i-1],2)) + c_a[i-1]
+        
+        # print(round(c_a[-1]))
 
         return c_a
 
@@ -62,9 +69,9 @@ class RacingLine:
             print('')
 
 def main(json_file):
-    rc = RacingLine()
-    rc.json_parser(json_file)
-    rc.curved_abscissa()
+    rc = RacingLine
+    a = rc.json_parser(json_file)
+    rc.curved_abscissa(a[0], a[1])
 
 
 
