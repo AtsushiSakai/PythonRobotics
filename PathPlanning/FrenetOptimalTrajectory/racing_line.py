@@ -52,7 +52,7 @@ class RacingLine:
         
         c_a = [0] * len(x)
 
-        for i in range(len(x)):
+        for i, _ in enumerate(x):
             if(i == 0):
                 c_a[0] = 0
             else:     

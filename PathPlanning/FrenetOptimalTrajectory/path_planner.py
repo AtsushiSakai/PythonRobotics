@@ -379,9 +379,6 @@ def check_paths(fplist, ob):
             continue
 
         okind.append(i)
-
-    print(len(okind))
-
     
     return [fplist[i] for i in okind]
 
