@@ -382,13 +382,6 @@ def check_paths(fplist, ob):
     
     return [fplist[i] for i in okind]
 
-
-    print(len(okind))
-
-    
-    return [fplist[i] for i in okind]
-
-
 def frenet_optimal_planning(csp, s0, c_speed, c_d, c_d_d, c_d_dd, ob, pred_time, s0_target, c_speed_target):
 
     if(c_speed == 0.0):
