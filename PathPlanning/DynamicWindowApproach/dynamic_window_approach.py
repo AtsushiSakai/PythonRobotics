@@ -7,26 +7,26 @@ author: Atsushi Sakai (@Atsushi_twi)
 """
 
 import math
-import numpy as np
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+import numpy as np
 
 show_animation = True
 
 
-def dwa_control(x, u, config, goal, ob):
+def dwa_control(x, config, goal, ob):
     """
         Dynamic Window Approach control
     """
 
     dw = calc_dynamic_window(x, config)
 
-    u, traj = calc_final_input(x, u, dw, config, goal, ob)
+    u, trajectory = calc_final_input(x, dw, config, goal, ob)
 
-    return u, traj
+    return u, trajectory
 
 
-class Config():
+class Config:
     """
     simulation parameter class
     """
@@ -46,7 +46,6 @@ class Config():
         self.speed_cost_gain = 1.0
         self.obstacle_cost_gain = 1.0
         self.robot_radius = 1.0  # [m] for collision check
-
 
 
 def motion(x, u, dt):
@@ -101,27 +100,26 @@ def predict_trajectory(x_init, v, y, config):
     return traj
 
 
-def calc_final_input(x, u, dw, config, goal, ob):
+def calc_final_input(x, dw, config, goal, ob):
     """
-    calculation final input with dinamic window
+    calculation final input with dynamic window
     """
 
     x_init = x[:]
     min_cost = float("inf")
     best_u = [0.0, 0.0]
-    best_traj = np.array([x])
+    best_trajectory = np.array([x])
 
-    # evalucate all trajectory with sampled input in dynamic window
+    # evaluate all trajectory with sampled input in dynamic window
     for v in np.arange(dw[0], dw[1], config.v_reso):
         for y in np.arange(dw[2], dw[3], config.yawrate_reso):
 
-            traj = predict_trajectory(x_init, v, y, config)
+            trajectory = predict_trajectory(x_init, v, y, config)
 
             # calc cost
-            to_goal_cost = config.to_goal_cost_gain * calc_to_goal_cost(traj, goal, config)
-            speed_cost = config.speed_cost_gain * \
-                (config.max_speed - traj[-1, 3])
-            ob_cost = config.obstacle_cost_gain*calc_obstacle_cost(traj, ob, config)
+            to_goal_cost = config.to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
+            speed_cost = config.speed_cost_gain * (config.max_speed - trajectory[-1, 3])
+            ob_cost = config.obstacle_cost_gain * calc_obstacle_cost(trajectory, ob, config)
 
             final_cost = to_goal_cost + speed_cost + ob_cost
 
@@ -129,37 +127,34 @@ def calc_final_input(x, u, dw, config, goal, ob):
             if min_cost >= final_cost:
                 min_cost = final_cost
                 best_u = [v, y]
-                best_traj = traj
+                best_trajectory = trajectory
 
-    return best_u, best_traj
+    return best_u, best_trajectory
 
 
-def calc_obstacle_cost(traj, ob, config):
+def calc_obstacle_cost(trajectory, ob, config):
     """
         calc obstacle cost inf: collision
     """
-
     ox = ob[:, 0]
     oy = ob[:, 1]
-    dx = traj[:, 0] - ox[:, None]
-    dy = traj[:, 1] - oy[:, None]
+    dx = trajectory[:, 0] - ox[:, None]
+    dy = trajectory[:, 1] - oy[:, None]
     r = np.sqrt(np.square(dx) + np.square(dy))
     if (r <= config.robot_radius).any():
         return float("Inf")
-    minr = np.min(r)
+    min_r = np.min(r)
+    return 1.0 / min_r  # OK
 
-    return 1.0 / minr  # OK
-
-
-def calc_to_goal_cost(traj, goal, config):
+def calc_to_goal_cost(trajectory, goal):
     """
         calc to goal cost with angle difference
     """
 
-    dx = goal[0] - traj[-1, 0]
-    dy = goal[1] - traj[-1, 1]
+    dx = goal[0] - trajectory[-1, 0]
+    dy = goal[1] - trajectory[-1, 1]
     error_angle = math.atan2(dy, dx)
-    cost_angle = error_angle - traj[-1, 2]
+    cost_angle = error_angle - trajectory[-1, 2]
     cost = abs(math.atan2(math.sin(cost_angle), math.cos(cost_angle)))
 
     return cost
@@ -171,7 +166,7 @@ def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
     plt.plot(x, y)
 
 
-def main(gx=10, gy=10):
+def main(gx=10.0, gy=10.0):
     print(__file__ + " start!!")
     # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
     x = np.array([0.0, 0.0, math.pi / 8.0, 0.0, 0.0])
@@ -187,23 +182,27 @@ def main(gx=10, gy=10):
                    [5.0, 9.0],
                    [8.0, 9.0],
                    [7.0, 9.0],
-                   [12.0, 12.0]
+                   [8.0, 10.0],
+                   [9.0, 11.0],
+                   [12.0, 13.0],
+                   [12.0, 12.0],
+                   [15.0, 15.0],
+                   [13.0, 13.0]
                    ])
 
     # input [forward speed, yawrate]
     u = np.array([0.0, 0.0])
     config = Config()
-    traj = np.array(x)
+    trajectory = np.array(x)
 
     while True:
-        u, ptraj = dwa_control(x, u, config, goal, ob)
-
-        x = motion(x, u, config.dt) # simulate robot
-        traj = np.vstack((traj, x))  # store state history
+        u, predicted_trajectory = dwa_control(x, config, goal, ob)
+        x = motion(x, u, config.dt)  # simulate robot
+        trajectory = np.vstack((trajectory, x))  # store state history
 
         if show_animation:
             plt.cla()
-            plt.plot(ptraj[:, 0], ptraj[:, 1], "-g")
+            plt.plot(predicted_trajectory[:, 0], predicted_trajectory[:, 1], "-g")
             plt.plot(x[0], x[1], "xr")
             plt.plot(goal[0], goal[1], "xb")
             plt.plot(ob[:, 0], ob[:, 1], "ok")
@@ -213,14 +212,14 @@ def main(gx=10, gy=10):
             plt.pause(0.0001)
 
         # check reaching goal
-        dist_to_goal = math.sqrt((x[0] - goal[0])**2 + (x[1] - goal[1])**2)  
+        dist_to_goal = math.sqrt((x[0] - goal[0]) ** 2 + (x[1] - goal[1]) ** 2)
         if dist_to_goal <= config.robot_radius:
             print("Goal!!")
             break
 
     print("Done")
     if show_animation:
-        plt.plot(traj[:, 0], traj[:, 1], "-r")
+        plt.plot(trajectory[:, 0], trajectory[:, 1], "-r")
         plt.pause(0.0001)
 
     plt.show()
