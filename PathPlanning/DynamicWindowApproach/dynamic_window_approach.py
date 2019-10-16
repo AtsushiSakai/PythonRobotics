@@ -59,6 +59,15 @@ class Config:
         self.robot_width = 0.5 # [m] for collision check
         self.robot_length = 1.2 # [m] for collision check
 
+    @property
+    def robot_type(self):
+        return self._robot_type
+
+    @robot_type.setter
+    def robot_type(self, value):
+        if not isinstance(value, RobotType):
+            raise TypeError("robot_type must be an instance of RobotType")
+        self._robot_type = value
 
 def motion(x, u, dt):
     """
