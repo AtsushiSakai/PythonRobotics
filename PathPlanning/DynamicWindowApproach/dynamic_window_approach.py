@@ -2,10 +2,11 @@
 
 Mobile robot motion planning sample with Dynamic Window Approach
 
-author: Atsushi Sakai (@Atsushi_twi)
+author: Atsushi Sakai (@Atsushi_twi), Goktug Karakasli
 
 """
 
+from enum import Enum
 import math
 
 import matplotlib.pyplot as plt
@@ -25,6 +26,9 @@ def dwa_control(x, config, goal, ob):
 
     return u, trajectory
 
+class RobotType(Enum):
+    circle = 0
+    rectangle = 1
 
 class Config:
     """
@@ -45,13 +49,13 @@ class Config:
         self.to_goal_cost_gain = 0.15
         self.speed_cost_gain = 1.0
         self.obstacle_cost_gain = 1.0
-        self.robot_type = 'circle' # circle or rectangle
+        self.robot_type = RobotType.circle
 
-        # if robot_type == circle
+        # if robot_type == RobotType.circle
         # Also used to check if goal is reached in both types
         self.robot_radius = 1.0  # [m] for collision check
 
-        # if robot_type == rectangle
+        # if robot_type == RobotType.rectangle
         self.robot_width = 0.5 # [m] for collision check
         self.robot_length = 1.2 # [m] for collision check
 
@@ -150,7 +154,7 @@ def calc_obstacle_cost(trajectory, ob, config):
     dy = trajectory[:, 1] - oy[:, None]
     r = np.sqrt(np.square(dx) + np.square(dy))
 
-    if config.robot_type == 'rectangle':
+    if config.robot_type == RobotType.rectangle:
         yaw = trajectory[:, 2]
         rot = np.array([[np.cos(yaw), -np.sin(yaw)], [np.sin(yaw), np.cos(yaw)]])
         local_ob = ob[:, None] - trajectory[:, 0:2]
@@ -164,7 +168,7 @@ def calc_obstacle_cost(trajectory, ob, config):
         if (np.logical_and(np.logical_and(upper_check, right_check),
                            np.logical_and(bottom_check, left_check))).any():
             return float("Inf")
-    elif config.robot_type == 'circle':
+    elif config.robot_type == RobotType.circle:
         if (r <= config.robot_radius).any():
             return float("Inf")
 
@@ -192,7 +196,7 @@ def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
 
 
 def plot_robot(x, y, yaw, config):  # pragma: no cover
-    if config.robot_type == 'rectangle':
+    if config.robot_type == RobotType.rectangle:
         outline = np.array([[-config.robot_length/2, config.robot_length/2,
                              (config.robot_length/2), -config.robot_length/2,
                              -config.robot_length/2],
@@ -206,7 +210,7 @@ def plot_robot(x, y, yaw, config):  # pragma: no cover
         outline[1, :] += y
         plt.plot(np.array(outline[0, :]).flatten(),
                  np.array(outline[1, :]).flatten(), "-k")
-    elif config.robot_type == 'circle':
+    elif config.robot_type == RobotType.circle:
         circle = plt.Circle((x, y), config.robot_radius, color="b")
         plt.gcf().gca().add_artist(circle)
         out_x, out_y = (np.array([x, y]) +
@@ -214,7 +218,7 @@ def plot_robot(x, y, yaw, config):  # pragma: no cover
         plt.plot([x, out_x], [y, out_y], "-k")
 
 
-def main(gx=10.0, gy=10.0, robot_type='circle'):
+def main(gx=10.0, gy=10.0, robot_type=RobotType.circle):
     print(__file__ + " start!!")
     # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
     x = np.array([0.0, 0.0, math.pi / 8.0, 0.0, 0.0])
