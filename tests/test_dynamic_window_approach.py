@@ -19,7 +19,7 @@ class Test(TestCase):
 
     def test2(self):
         m.show_animation = False
-        m.main(gx=1.0, gy=1.0, robot_type='rectangle')
+        m.main(gx=1.0, gy=1.0, robot_type=m.RobotType.rectangle)
 
 
 if __name__ == '__main__':  # pragma: no cover
