@@ -6,8 +6,8 @@ author: Atsushi Sakai (@Atsushi_twi), Goktug Karakasli
 
 """
 
-from enum import Enum
 import math
+from enum import Enum
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -17,7 +17,7 @@ show_animation = True
 
 def dwa_control(x, config, goal, ob):
     """
-        Dynamic Window Approach control
+    Dynamic Window Approach control
     """
 
     dw = calc_dynamic_window(x, config)
@@ -26,9 +26,11 @@ def dwa_control(x, config, goal, ob):
 
     return u, trajectory
 
+
 class RobotType(Enum):
     circle = 0
     rectangle = 1
+
 
 class Config:
     """
@@ -56,8 +58,8 @@ class Config:
         self.robot_radius = 1.0  # [m] for collision check
 
         # if robot_type == RobotType.rectangle
-        self.robot_width = 0.5 # [m] for collision check
-        self.robot_length = 1.2 # [m] for collision check
+        self.robot_width = 0.5  # [m] for collision check
+        self.robot_length = 1.2  # [m] for collision check
 
     @property
     def robot_type(self):
@@ -68,6 +70,7 @@ class Config:
         if not isinstance(value, RobotType):
             raise TypeError("robot_type must be an instance of RobotType")
         self._robot_type = value
+
 
 def motion(x, u, dt):
     """
@@ -98,7 +101,7 @@ def calc_dynamic_window(x, config):
           x[4] - config.max_dyawrate * config.dt,
           x[4] + config.max_dyawrate * config.dt]
 
-    #  [vmin,vmax, yawrate min, yawrate max]
+    #  [vmin,vmax, yaw_rate min, yaw_rate max]
     dw = [max(Vs[0], Vd[0]), min(Vs[1], Vd[1]),
           max(Vs[2], Vd[2]), min(Vs[3], Vd[3])]
 
@@ -171,10 +174,10 @@ def calc_obstacle_cost(trajectory, ob, config):
         local_ob = local_ob.reshape(-1, local_ob.shape[-1])
         local_ob = np.array([local_ob @ -x for x in rot])
         local_ob = local_ob.reshape(-1, local_ob.shape[-1])
-        upper_check = local_ob[:, 0] <= config.robot_length/2
-        right_check = local_ob[:, 1] <= config.robot_width/2
-        bottom_check = local_ob[:, 0] >= -config.robot_length/2
-        left_check = local_ob[:, 1] >= -config.robot_width/2
+        upper_check = local_ob[:, 0] <= config.robot_length / 2
+        right_check = local_ob[:, 1] <= config.robot_width / 2
+        bottom_check = local_ob[:, 0] >= -config.robot_length / 2
+        left_check = local_ob[:, 1] >= -config.robot_width / 2
         if (np.logical_and(np.logical_and(upper_check, right_check),
                            np.logical_and(bottom_check, left_check))).any():
             return float("Inf")
@@ -184,6 +187,7 @@ def calc_obstacle_cost(trajectory, ob, config):
 
     min_r = np.min(r)
     return 1.0 / min_r  # OK
+
 
 def calc_to_goal_cost(trajectory, goal):
     """
@@ -207,9 +211,9 @@ def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
 
 def plot_robot(x, y, yaw, config):  # pragma: no cover
     if config.robot_type == RobotType.rectangle:
-        outline = np.array([[-config.robot_length/2, config.robot_length/2,
-                             (config.robot_length/2), -config.robot_length/2,
-                             -config.robot_length/2],
+        outline = np.array([[-config.robot_length / 2, config.robot_length / 2,
+                             (config.robot_length / 2), -config.robot_length / 2,
+                             -config.robot_length / 2],
                             [config.robot_width / 2, config.robot_width / 2,
                              - config.robot_width / 2, -config.robot_width / 2,
                              config.robot_width / 2]])
@@ -252,8 +256,7 @@ def main(gx=10.0, gy=10.0, robot_type=RobotType.circle):
                    [13.0, 13.0]
                    ])
 
-    # input [forward speed, yawrate]
-    u = np.array([0.0, 0.0])
+    # input [forward speed, yaw_rate]
     config = Config()
     config.robot_type = robot_type
     trajectory = np.array(x)
@@ -290,4 +293,4 @@ def main(gx=10.0, gy=10.0, robot_type=RobotType.circle):
 
 
 if __name__ == '__main__':
-    main()
+    main(robot_type=RobotType.rectangle)
