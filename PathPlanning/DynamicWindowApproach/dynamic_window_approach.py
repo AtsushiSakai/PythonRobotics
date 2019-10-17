@@ -2,10 +2,11 @@
 
 Mobile robot motion planning sample with Dynamic Window Approach
 
-author: Atsushi Sakai (@Atsushi_twi)
+author: Atsushi Sakai (@Atsushi_twi), Goktug Karakasli
 
 """
 
+from enum import Enum
 import math
 
 import matplotlib.pyplot as plt
@@ -25,6 +26,9 @@ def dwa_control(x, config, goal, ob):
 
     return u, trajectory
 
+class RobotType(Enum):
+    circle = 0
+    rectangle = 1
 
 class Config:
     """
@@ -45,8 +49,25 @@ class Config:
         self.to_goal_cost_gain = 0.15
         self.speed_cost_gain = 1.0
         self.obstacle_cost_gain = 1.0
+        self.robot_type = RobotType.circle
+
+        # if robot_type == RobotType.circle
+        # Also used to check if goal is reached in both types
         self.robot_radius = 1.0  # [m] for collision check
 
+        # if robot_type == RobotType.rectangle
+        self.robot_width = 0.5 # [m] for collision check
+        self.robot_length = 1.2 # [m] for collision check
+
+    @property
+    def robot_type(self):
+        return self._robot_type
+
+    @robot_type.setter
+    def robot_type(self, value):
+        if not isinstance(value, RobotType):
+            raise TypeError("robot_type must be an instance of RobotType")
+        self._robot_type = value
 
 def motion(x, u, dt):
     """
@@ -141,11 +162,28 @@ def calc_obstacle_cost(trajectory, ob, config):
     dx = trajectory[:, 0] - ox[:, None]
     dy = trajectory[:, 1] - oy[:, None]
     r = np.sqrt(np.square(dx) + np.square(dy))
-    if (r <= config.robot_radius).any():
-        return float("Inf")
+
+    if config.robot_type == RobotType.rectangle:
+        yaw = trajectory[:, 2]
+        rot = np.array([[np.cos(yaw), -np.sin(yaw)], [np.sin(yaw), np.cos(yaw)]])
+        rot = np.transpose(rot, [2, 0, 1])
+        local_ob = ob[:, None] - trajectory[:, 0:2]
+        local_ob = local_ob.reshape(-1, local_ob.shape[-1])
+        local_ob = np.array([local_ob @ -x for x in rot])
+        local_ob = local_ob.reshape(-1, local_ob.shape[-1])
+        upper_check = local_ob[:, 0] <= config.robot_length/2
+        right_check = local_ob[:, 1] <= config.robot_width/2
+        bottom_check = local_ob[:, 0] >= -config.robot_length/2
+        left_check = local_ob[:, 1] >= -config.robot_width/2
+        if (np.logical_and(np.logical_and(upper_check, right_check),
+                           np.logical_and(bottom_check, left_check))).any():
+            return float("Inf")
+    elif config.robot_type == RobotType.circle:
+        if (r <= config.robot_radius).any():
+            return float("Inf")
+
     min_r = np.min(r)
     return 1.0 / min_r  # OK
-
 
 def calc_to_goal_cost(trajectory, goal):
     """
@@ -167,7 +205,30 @@ def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
     plt.plot(x, y)
 
 
-def main(gx=10.0, gy=10.0):
+def plot_robot(x, y, yaw, config):  # pragma: no cover
+    if config.robot_type == RobotType.rectangle:
+        outline = np.array([[-config.robot_length/2, config.robot_length/2,
+                             (config.robot_length/2), -config.robot_length/2,
+                             -config.robot_length/2],
+                            [config.robot_width / 2, config.robot_width / 2,
+                             - config.robot_width / 2, -config.robot_width / 2,
+                             config.robot_width / 2]])
+        Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
+                         [-math.sin(yaw), math.cos(yaw)]])
+        outline = (outline.T.dot(Rot1)).T
+        outline[0, :] += x
+        outline[1, :] += y
+        plt.plot(np.array(outline[0, :]).flatten(),
+                 np.array(outline[1, :]).flatten(), "-k")
+    elif config.robot_type == RobotType.circle:
+        circle = plt.Circle((x, y), config.robot_radius, color="b")
+        plt.gcf().gca().add_artist(circle)
+        out_x, out_y = (np.array([x, y]) +
+                        np.array([np.cos(yaw), np.sin(yaw)]) * config.robot_radius)
+        plt.plot([x, out_x], [y, out_y], "-k")
+
+
+def main(gx=10.0, gy=10.0, robot_type=RobotType.circle):
     print(__file__ + " start!!")
     # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
     x = np.array([0.0, 0.0, math.pi / 8.0, 0.0, 0.0])
@@ -194,6 +255,7 @@ def main(gx=10.0, gy=10.0):
     # input [forward speed, yawrate]
     u = np.array([0.0, 0.0])
     config = Config()
+    config.robot_type = robot_type
     trajectory = np.array(x)
 
     while True:
@@ -207,6 +269,7 @@ def main(gx=10.0, gy=10.0):
             plt.plot(x[0], x[1], "xr")
             plt.plot(goal[0], goal[1], "xb")
             plt.plot(ob[:, 0], ob[:, 1], "ok")
+            plot_robot(x[0], x[1], x[2], config)
             plot_arrow(x[0], x[1], x[2])
             plt.axis("equal")
             plt.grid(True)
