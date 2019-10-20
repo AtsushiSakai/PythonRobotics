@@ -9,6 +9,9 @@ try:
 except ImportError:
     raise
 
+grid_based_sweep_coverage_path_planner.do_animation = False
+
+
 class TestPlanning(TestCase):
 
     def test_planning1(self):

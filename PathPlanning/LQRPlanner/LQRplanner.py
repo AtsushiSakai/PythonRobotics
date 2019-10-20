@@ -25,7 +25,7 @@ class LQRPlanner:
         self.MAX_ITER = 150
         self.EPS = 0.01
 
-    def lqr_planning(self, sx, sy, gx, gy, show_animation=SHOW_ANIMATION):
+    def lqr_planning(self, sx, sy, gx, gy, show_animation=True):
 
         rx, ry = [sx], [sy]
 
@@ -129,7 +129,7 @@ def main():
         gx = random.uniform(-area, area)
         gy = random.uniform(-area, area)
 
-        rx, ry = lqr_planner.lqr_planning(sx, sy, gx, gy)
+        rx, ry = lqr_planner.lqr_planning(sx, sy, gx, gy, show_animation=SHOW_ANIMATION)
 
         if SHOW_ANIMATION:  # pragma: no cover
             plt.plot(sx, sy, "or")
