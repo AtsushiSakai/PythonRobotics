@@ -141,9 +141,8 @@ def re_sampling(px, pw):
     N_eff = 1.0 / (pw.dot(pw.T))[0, 0]  # Effective particle number
     if N_eff < NTh:
         w_cum = np.cumsum(pw)
-        base = np.cumsum(pw * 0.0 + 1 / NP) - 1 / NP
-        re_sample_id = base + np.random.rand(base.shape[0]) / NP
-
+        base = np.arange(0.0, 1.0, 1/NP)
+        re_sample_id = base + np.random.uniform(0, 1/NP)
         indexes = []
         ind = 0
         for ip in range(NP):
