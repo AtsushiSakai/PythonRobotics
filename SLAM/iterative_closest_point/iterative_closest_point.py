@@ -1,6 +1,6 @@
 """
 Iterative Closest Point (ICP) SLAM example
-author: Atsushi Sakai (@Atsushi_twi)
+author: Atsushi Sakai (@Atsushi_twi), Göktuğ Karakaşlı
 """
 
 import math
@@ -39,7 +39,7 @@ def ICP_matching(ppoints, cpoints):
             plt.plot(cpoints[0, :], cpoints[1, :], ".b")
             plt.plot(0.0, 0.0, "xr")
             plt.axis("equal")
-            plt.pause(1.0)
+            plt.pause(0.1)
 
         inds, error = nearest_neighbor_assosiation(ppoints, cpoints)
         Rt, Tt = SVD_motion_estimation(ppoints[:, inds], cpoints)
@@ -93,18 +93,10 @@ def nearest_neighbor_assosiation(ppoints, cpoints):
     error = sum(d)
 
     # calc index with nearest neighbor assosiation
-    inds = []
-    for i in range(cpoints.shape[1]):
-        minid = -1
-        mind = float("inf")
-        for ii in range(ppoints.shape[1]):
-            d = np.linalg.norm(ppoints[:, ii] - cpoints[:, i])
-
-            if mind >= d:
-                mind = d
-                minid = ii
-
-        inds.append(minid)
+    d = np.linalg.norm(
+            np.repeat(cpoints, ppoints.shape[1], axis=1) - np.tile(ppoints, (1,
+                cpoints.shape[1])), axis=0)
+    inds = np.argmin(d.reshape(cpoints.shape[1], ppoints.shape[1]), axis=1)
 
     return inds, error
 
@@ -130,7 +122,7 @@ def main():
     print(__file__ + " start!!")
 
     # simulation parameters
-    nPoint = 10
+    nPoint = 1000
     fieldLength = 50.0
     motion = [0.5, 2.0, np.deg2rad(-10.0)]  # movement [x[m],y[m],yaw[deg]]
 
