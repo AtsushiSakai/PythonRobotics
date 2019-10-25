@@ -93,18 +93,10 @@ def nearest_neighbor_assosiation(ppoints, cpoints):
     error = sum(d)
 
     # calc index with nearest neighbor assosiation
-    inds = []
-    for i in range(cpoints.shape[1]):
-        minid = -1
-        mind = float("inf")
-        for ii in range(ppoints.shape[1]):
-            d = np.linalg.norm(ppoints[:, ii] - cpoints[:, i])
-
-            if mind >= d:
-                mind = d
-                minid = ii
-
-        inds.append(minid)
+    d = np.linalg.norm(
+            np.repeat(cpoints, ppoints.shape[1], axis=1) - np.tile(ppoints, (1,
+                cpoints.shape[1])), axis=0)
+    inds = np.argmin(d.reshape(cpoints.shape[1], ppoints.shape[1]), axis=1)
 
     return inds, error
 
