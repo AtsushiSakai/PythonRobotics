@@ -128,8 +128,9 @@ def pf_localization(px, pw, z, u):
     xEst = px.dot(pw.T)
     PEst = calc_covariance(xEst, px, pw)
 
-    px, pw = re_sampling(px, pw)
-
+    N_eff = 1.0 / (pw.dot(pw.T))[0, 0]  # Effective particle number
+    if N_eff < NTh:
+        px, pw = re_sampling(px, pw)
     return xEst, PEst, px, pw
 
 
@@ -138,21 +139,18 @@ def re_sampling(px, pw):
     low variance re-sampling
     """
 
-    N_eff = 1.0 / (pw.dot(pw.T))[0, 0]  # Effective particle number
-    if N_eff < NTh:
-        w_cum = np.cumsum(pw)
-        base = np.cumsum(pw * 0.0 + 1 / NP) - 1 / NP
-        re_sample_id = base + np.random.rand(base.shape[0]) / NP
+    w_cum = np.cumsum(pw)
+    base = np.arange(0.0, 1.0, 1/NP)
+    re_sample_id = base + np.random.uniform(0, 1/NP)
+    indexes = []
+    ind = 0
+    for ip in range(NP):
+        while re_sample_id[ip] > w_cum[ind]:
+            ind += 1
+        indexes.append(ind)
 
-        indexes = []
-        ind = 0
-        for ip in range(NP):
-            while re_sample_id[ip] > w_cum[ind]:
-                ind += 1
-            indexes.append(ind)
-
-        px = px[:, indexes]
-        pw = np.zeros((1, NP)) + 1.0 / NP  # init weight
+    px = px[:, indexes]
+    pw = np.zeros((1, NP)) + 1.0 / NP  # init weight
 
     return px, pw
 
