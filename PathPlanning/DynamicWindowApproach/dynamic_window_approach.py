@@ -2,7 +2,7 @@
 
 Mobile robot motion planning sample with Dynamic Window Approach
 
-author: Atsushi Sakai (@Atsushi_twi), Goktug Karakasli
+author: Atsushi Sakai (@Atsushi_twi), Göktuğ Karakaşlı
 
 """
 
@@ -172,7 +172,7 @@ def calc_obstacle_cost(trajectory, ob, config):
         rot = np.transpose(rot, [2, 0, 1])
         local_ob = ob[:, None] - trajectory[:, 0:2]
         local_ob = local_ob.reshape(-1, local_ob.shape[-1])
-        local_ob = np.array([local_ob @ -x for x in rot])
+        local_ob = np.array([local_ob @ x for x in rot])
         local_ob = local_ob.reshape(-1, local_ob.shape[-1])
         upper_check = local_ob[:, 0] <= config.robot_length / 2
         right_check = local_ob[:, 1] <= config.robot_width / 2
