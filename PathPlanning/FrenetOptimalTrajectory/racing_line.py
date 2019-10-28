@@ -1,12 +1,11 @@
 import sys
 from math import sqrt
-import numpy as np
 import json
 
 
 class RacingLine:
 
-    def json_parser(json_file):
+    def json_parser(self, json_file):
 
         race_x = []
         race_y = []
@@ -48,7 +47,7 @@ class RacingLine:
 
         return race_x, race_y, ins_x, ins_y, out_x, out_y
 
-    def curved_abscissa(x, y):
+    def curved_abscissa(self, x, y):
         
         c_a = [0] * len(x)
 
@@ -69,7 +68,7 @@ class RacingLine:
             print('')
 
 def main(json_file):
-    rc = RacingLine
+    rc = RacingLine()
     a = rc.json_parser(json_file)
     rc.curved_abscissa(a[0], a[1])
 
