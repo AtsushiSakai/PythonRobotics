@@ -15,8 +15,6 @@ Ref:
 import numpy as np
 import matplotlib.pyplot as plt
 import copy
-import math
-import cubic_spline_planner
 import racing_line
 import sys
 
@@ -50,7 +48,7 @@ show_animation = True
 
 
 
-def calc_frenet_paths_lv(c_speed, c_d, c_d_d, c_d_dd, s0, s0_target, c_speed_target):  # Low velocities
+def calc_frenet_paths_lv(c_speed, c_d, c_d_d, c_d_dd, s0):  # Low velocities
 
     frenet_paths = []
 
@@ -155,7 +153,7 @@ def frenet_optimal_planning(csp, s0, c_speed, c_d, c_d_d, c_d_dd, ob, s0_target,
     if(c_speed == 0.0):
         print("###############")
         print("Low Velocities")
-        fplist = calc_frenet_paths_lv(c_speed, c_d, c_d_d, c_d_dd, s0, 0.0, 0.0)
+        fplist = calc_frenet_paths_lv(c_speed, c_d, c_d_d, c_d_dd, s0)
         fplist = frenet_optimal_trajectory.calc_global_paths(fplist, csp)
         fplist = frenet_optimal_trajectory.check_paths(fplist, ob)
     else:
