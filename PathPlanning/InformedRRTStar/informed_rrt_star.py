@@ -84,6 +84,7 @@ class InformedRRTStar:
                 self.rewire(newNode, nearInds)
 
                 if self.is_near_goal(newNode):
+                    if self.check_segment_collision(newNode.x, newNode.y, self.goal.x , self.goal.y):
                     solutionSet.add(newNode)
                     lastIndex = len(self.node_list) - 1
                     tempPath = self.get_final_course(lastIndex)
@@ -240,18 +241,22 @@ class InformedRRTStar:
         projection = v + t * (w - v) # Projection falls on the segment
         return (p-projection).dot(p-projection)
 
+    def check_segment_collision(self, x1, y1, x2, y2):
+        for (ox, oy, size) in self.obstacle_list:
+            dd = self.distance_squared_point_to_segment(
+                np.array([x1, y1]),
+                np.array([x2, y2]),
+                np.array([ox, oy]))
+            if dd <= size**2:
+                return False  # collision
+        return True
+
+
     def check_collision(self, nearNode, theta, d):
         tmpNode = copy.deepcopy(nearNode)
         endx = tmpNode.x + math.cos(theta)*d
         endy = tmpNode.y + math.sin(theta)*d
-        for (ox, oy, size) in self.obstacle_list:
-            dd = self.distance_squared_point_to_segment(
-                np.array([tmpNode.x, tmpNode.y]),
-                np.array([endx, endy]),
-                np.array([ox, oy]))
-            if dd <= 1.1 * size**2:
-                return False  # collision
-        return True
+        return self.check_segment_collision(tmpNode.x, tmpNode.y, endx, endy)
 
     def get_final_course(self, lastIndex):
         path = [[self.goal.x, self.goal.y]]
