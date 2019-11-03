@@ -74,9 +74,9 @@ class InformedRRTStar:
             newNode = self.get_new_node(theta, nind, nearestNode)
             d = self.line_cost(nearestNode, newNode)
 
-            isCollision = self.check_collision(nearestNode, theta, d)
+            noCollision = self.check_collision(nearestNode, theta, d)
 
-            if isCollision:
+            if noCollision:
                 nearInds = self.find_near_nodes(newNode)
                 newNode = self.choose_parent(newNode, nearInds)
 
