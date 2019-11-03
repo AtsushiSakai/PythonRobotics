@@ -85,13 +85,13 @@ class InformedRRTStar:
 
                 if self.is_near_goal(newNode):
                     if self.check_segment_collision(newNode.x, newNode.y, self.goal.x , self.goal.y):
-                    solutionSet.add(newNode)
-                    lastIndex = len(self.node_list) - 1
-                    tempPath = self.get_final_course(lastIndex)
-                    tempPathLen = self.get_path_len(tempPath)
-                    if tempPathLen < pathLen:
-                        path = tempPath
-                        cBest = tempPathLen
+                        solutionSet.add(newNode)
+                        lastIndex = len(self.node_list) - 1
+                        tempPath = self.get_final_course(lastIndex)
+                        tempPathLen = self.get_path_len(tempPath)
+                        if tempPathLen < pathLen:
+                            path = tempPath
+                            cBest = tempPathLen
 
             if animation:
                 self.draw_graph(xCenter=xCenter,
