@@ -74,10 +74,9 @@ class InformedRRTStar:
             newNode = self.get_new_node(theta, nind, nearestNode)
             d = self.line_cost(nearestNode, newNode)
 
-            isCollision = self.collision_check(newNode, self.obstacle_list)
-            isCollisionEx = self.check_collision_extend(nearestNode, theta, d)
+            noCollision = self.check_collision(nearestNode, theta, d)
 
-            if isCollision and isCollisionEx:
+            if noCollision:
                 nearInds = self.find_near_nodes(newNode)
                 newNode = self.choose_parent(newNode, nearInds)
 
@@ -85,13 +84,14 @@ class InformedRRTStar:
                 self.rewire(newNode, nearInds)
 
                 if self.is_near_goal(newNode):
-                    solutionSet.add(newNode)
-                    lastIndex = len(self.node_list) - 1
-                    tempPath = self.get_final_course(lastIndex)
-                    tempPathLen = self.get_path_len(tempPath)
-                    if tempPathLen < pathLen:
-                        path = tempPath
-                        cBest = tempPathLen
+                    if self.check_segment_collision(newNode.x, newNode.y, self.goal.x , self.goal.y):
+                        solutionSet.add(newNode)
+                        lastIndex = len(self.node_list) - 1
+                        tempPath = self.get_final_course(lastIndex)
+                        tempPathLen = self.get_path_len(tempPath)
+                        if tempPathLen < pathLen:
+                            path = tempPath
+                            cBest = tempPathLen
 
             if animation:
                 self.draw_graph(xCenter=xCenter,
@@ -110,7 +110,7 @@ class InformedRRTStar:
             dy = newNode.y - self.node_list[i].y
             d = math.sqrt(dx ** 2 + dy ** 2)
             theta = math.atan2(dy, dx)
-            if self.check_collision_extend(self.node_list[i], theta, d):
+            if self.check_collision(self.node_list[i], theta, d):
                 dList.append(self.node_list[i].cost + d)
             else:
                 dList.append(float('inf'))
@@ -194,17 +194,6 @@ class InformedRRTStar:
         minIndex = dList.index(min(dList))
         return minIndex
 
-    @staticmethod
-    def collision_check(newNode, obstacleList):
-        for (ox, oy, size) in obstacleList:
-            dx = ox - newNode.x
-            dy = oy - newNode.y
-            d = dx * dx + dy * dy
-            if d <= 1.1 * size ** 2:
-                return False  # collision
-
-        return True  # safe
-
     def get_new_node(self, theta, nind, nearestNode):
         newNode = copy.deepcopy(nearestNode)
 
@@ -234,20 +223,40 @@ class InformedRRTStar:
             if nearNode.cost > scost:
                 theta = math.atan2(newNode.y - nearNode.y,
                                    newNode.x - nearNode.x)
-                if self.check_collision_extend(nearNode, theta, d):
+                if self.check_collision(nearNode, theta, d):
                     nearNode.parent = n_node - 1
                     nearNode.cost = scost
+                    
+    @staticmethod
+    def distance_squared_point_to_segment(v, w, p):
+        # Return minimum distance between line segment vw and point p
+        if (np.array_equal(v, w)):
+            return (p-v).dot(p-v) # v == w case
+        l2 = (w-v).dot(w-v) # i.e. |w-v|^2 -  avoid a sqrt
+        # Consider the line extending the segment, parameterized as v + t (w - v).
+        # We find projection of point p onto the line. 
+        # It falls where t = [(p-v) . (w-v)] / |w-v|^2
+        # We clamp t from [0,1] to handle points outside the segment vw.
+        t = max(0, min(1, (p - v).dot(w - v) / l2))
+        projection = v + t * (w - v) # Projection falls on the segment
+        return (p-projection).dot(p-projection)
 
-    def check_collision_extend(self, nearNode, theta, d):
-        tmpNode = copy.deepcopy(nearNode)
-
-        for i in range(int(d / self.expand_dis)):
-            tmpNode.x += self.expand_dis * math.cos(theta)
-            tmpNode.y += self.expand_dis * math.sin(theta)
-            if not self.collision_check(tmpNode, self.obstacle_list):
-                return False
-
+    def check_segment_collision(self, x1, y1, x2, y2):
+        for (ox, oy, size) in self.obstacle_list:
+            dd = self.distance_squared_point_to_segment(
+                np.array([x1, y1]),
+                np.array([x2, y2]),
+                np.array([ox, oy]))
+            if dd <= size**2:
+                return False  # collision
         return True
+
+
+    def check_collision(self, nearNode, theta, d):
+        tmpNode = copy.deepcopy(nearNode)
+        endx = tmpNode.x + math.cos(theta)*d
+        endy = tmpNode.y + math.sin(theta)*d
+        return self.check_segment_collision(tmpNode.x, tmpNode.y, endx, endy)
 
     def get_final_course(self, lastIndex):
         path = [[self.goal.x, self.goal.y]]
