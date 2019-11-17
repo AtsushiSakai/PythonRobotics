@@ -40,7 +40,6 @@ class InformedRRTStar:
         self.node_list = [self.start]
         # max length we expect to find in our 'informed' sample space, starts as infinite
         cBest = float('inf')
-        pathLen = float('inf')
         solutionSet = set()
         path = None
 
@@ -89,10 +88,9 @@ class InformedRRTStar:
                         lastIndex = len(self.node_list) - 1
                         tempPath = self.get_final_course(lastIndex)
                         tempPathLen = self.get_path_len(tempPath)
-                        if tempPathLen < pathLen:
+                        if tempPathLen < cBest:
                             path = tempPath
                             cBest = tempPathLen
-
             if animation:
                 self.draw_graph(xCenter=xCenter,
                                 cBest=cBest, cMin=cMin,
