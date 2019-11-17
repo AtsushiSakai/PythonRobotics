@@ -31,8 +31,6 @@ Python codes for robotics algorithm.
    * [SLAM](#slam)
       * [Iterative Closest Point (ICP) Matching](#iterative-closest-point-icp-matching)
       * [FastSLAM 1.0](#fastslam-10)
-      * [Pose Optimization SLAM 2D](#pose-optimization-slam-2d)
-      * [Pose Optimization SLAM 3D](#pose-optimization-slam-3d)
    * [Path Planning](#path-planning)
       * [Dynamic Window Approach](#dynamic-window-approach)
       * [Grid based search](#grid-based-search)
@@ -249,21 +247,6 @@ Ref:
 - [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
 
 - [SLAM simulations by Tim Bailey](http://www-personal.acfr.usyd.edu.au/tbailey/software/slam_simulations.htm)
-
-
-## Pose Optimization SLAM 2D
-
-This is a graph based 2D pose optimization SLAM example.
-
-![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/PoseOptimizationSLAM2D/animation.gif)
-
-
-## Pose Optimization SLAM 3D
-
-This is a graph based 3D pose optimization SLAM example.
-
-![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/PoseOptimizationSLAM3D/animation.gif)
-
 
 
 # Path Planning
