@@ -177,7 +177,7 @@ def calc_innovation(lm, xEst, PEst, z, LMid):
 def jacob_h(q, delta, x, i):
     sq = math.sqrt(q)
     G = np.array([[-sq * delta[0, 0], - sq * delta[1, 0], 0, sq * delta[0, 0], sq * delta[1, 0]],
-                  [delta[1, 0], - delta[0, 0], - 1.0, - delta[1, 0], delta[0, 0]]])
+                  [delta[1, 0], - delta[0, 0], - q, - delta[1, 0], delta[0, 0]]])
 
     G = G / q
     nLM = calc_n_lm(x)
