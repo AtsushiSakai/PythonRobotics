@@ -1,5 +1,6 @@
 """
 Extended Kalman Filter SLAM example
+
 author: Atsushi Sakai (@Atsushi_twi)
 """
 
@@ -35,10 +36,10 @@ def ekf_slam(xEst, PEst, u, z):
 
     # Update
     for iz in range(len(z[:, 0])):  # for each observation
-        minid = search_correspond_landmark_id(xEst, PEst, z[iz, 0:2])
+        min_id = search_correspond_landmark_id(xEst, PEst, z[iz, 0:2])
 
         nLM = calc_n_lm(xEst)
-        if minid == nLM:
+        if min_id == nLM:
             print("New LM")
             # Extend state and covariance matrix
             xAug = np.vstack((xEst, calc_landmark_position(xEst, z[iz, :])))
@@ -46,8 +47,8 @@ def ekf_slam(xEst, PEst, u, z):
                               np.hstack((np.zeros((LM_SIZE, len(xEst))), initP))))
             xEst = xAug
             PEst = PAug
-        lm = get_landmark_position_from_state(xEst, minid)
-        y, S, H = calc_innovation(lm, xEst, PEst, z[iz, 0:2], minid)
+        lm = get_landmark_position_from_state(xEst, min_id)
+        y, S, H = calc_innovation(lm, xEst, PEst, z[iz, 0:2], min_id)
 
         K = (PEst @ H.T) @ np.linalg.inv(S)
         xEst = xEst + (K @ y)
@@ -60,8 +61,8 @@ def ekf_slam(xEst, PEst, u, z):
 
 def calc_input():
     v = 1.0  # [m/s]
-    yawrate = 0.1  # [rad/s]
-    u = np.array([[v, yawrate]]).T
+    yaw_rate = 0.1  # [rad/s]
+    u = np.array([[v, yaw_rate]]).T
     return u
 
 
@@ -79,8 +80,8 @@ def observation(xTrue, xd, u, RFID):
         angle = pi_2_pi(math.atan2(dy, dx) - xTrue[2, 0])
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Q_sim[0, 0] ** 0.5  # add noise
-            anglen = angle + np.random.randn() * Q_sim[1, 1] ** 0.5  # add noise
-            zi = np.array([dn, anglen, i])
+            angle_n = angle + np.random.randn() * Q_sim[1, 1] ** 0.5  # add noise
+            zi = np.array([dn, angle_n, i])
             z = np.vstack((z, zi))
 
     # add noise to input
@@ -128,8 +129,6 @@ def calc_landmark_position(x, z):
 
     zp[0, 0] = x[0, 0] + z[0] * math.cos(x[2, 0] + z[1])
     zp[1, 0] = x[1, 0] + z[0] * math.sin(x[2, 0] + z[1])
-    # zp[0, 0] = x[0, 0] + z[0, 0] * math.cos(x[2, 0] + z[0, 1])
-    # zp[1, 0] = x[1, 0] + z[0, 0] * math.sin(x[2, 0] + z[0, 1])
 
     return zp
 
@@ -147,25 +146,25 @@ def search_correspond_landmark_id(xAug, PAug, zi):
 
     nLM = calc_n_lm(xAug)
 
-    mdist = []
+    min_dist = []
 
     for i in range(nLM):
         lm = get_landmark_position_from_state(xAug, i)
         y, S, H = calc_innovation(lm, xAug, PAug, zi, i)
-        mdist.append(y.T @ np.linalg.inv(S) @ y)
+        min_dist.append(y.T @ np.linalg.inv(S) @ y)
 
-    mdist.append(M_DIST_TH)  # new landmark
+    min_dist.append(M_DIST_TH)  # new landmark
 
-    minid = mdist.index(min(mdist))
+    min_id = min_dist.index(min(min_dist))
 
-    return minid
+    return min_id
 
 
 def calc_innovation(lm, xEst, PEst, z, LMid):
     delta = lm - xEst[0:2]
     q = (delta.T @ delta)[0, 0]
-    zangle = math.atan2(delta[1, 0], delta[0, 0]) - xEst[2, 0]
-    zp = np.array([[math.sqrt(q), pi_2_pi(zangle)]])
+    z_angle = math.atan2(delta[1, 0], delta[0, 0]) - xEst[2, 0]
+    zp = np.array([[math.sqrt(q), pi_2_pi(z_angle)]])
     y = (z - zp).T
     y[1] = pi_2_pi(y[1])
     H = jacob_h(q, delta, xEst, LMid + 1)
