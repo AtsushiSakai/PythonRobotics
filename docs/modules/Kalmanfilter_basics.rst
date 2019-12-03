@@ -180,7 +180,7 @@ Central Limit Theorem
 ^^^^^^^^^^^^^^^^^^^^^
 
 According to this theorem, the average of n samples of random and
-independant variables tends to follow a normal distribution as we
+independent variables tends to follow a normal distribution as we
 increase the sample size.(Generally, for n>=30)
 
 .. code-block:: ipython3
