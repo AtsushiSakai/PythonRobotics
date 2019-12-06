@@ -31,7 +31,7 @@ def ekf_slam(xEst, PEst, u, z):
     S = STATE_SIZE
     xEst[0:S] = motion_model(xEst[0:S], u)
     G, Fx = jacob_motion(xEst[0:S], u)
-    PEst[0:S, 0:S] = G.T * PEst[0:S, 0:S] * G + Fx.T * Cx * Fx
+    PEst[0:S, 0:S] = G.T @ PEst[0:S, 0:S] @ G + Fx.T @ Cx @ Fx
     initP = np.eye(2)
 
     # Update
@@ -119,7 +119,7 @@ def jacob_motion(x, u):
                    [0.0, 0.0, DT * u[0] * math.cos(x[2, 0])],
                    [0.0, 0.0, 0.0]])
 
-    G = np.eye(STATE_SIZE) + Fx.T * jF * Fx
+    G = np.eye(STATE_SIZE) + Fx.T @ jF @ Fx
 
     return G, Fx,
 
