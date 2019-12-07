@@ -230,7 +230,7 @@ def calc_global_paths(fplist, csp):
             dx = fp.x[i + 1] - fp.x[i]
             dy = fp.y[i + 1] - fp.y[i]
             fp.yaw.append(math.atan2(dy, dx))
-            fp.ds.append(math.sqrt(dx**2 + dy**2))
+            fp.ds.append(math.hypot(dx, dy))
 
         fp.yaw.append(fp.yaw[-1])
         fp.ds.append(fp.ds[-1])
