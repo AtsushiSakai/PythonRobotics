@@ -77,7 +77,7 @@ def calc_distance(state, point_x, point_y):
 
     dx = state.rear_x - point_x
     dy = state.rear_y - point_y
-    return math.sqrt(dx ** 2 + dy ** 2)
+    return math.hypot(dx, dy)
 
 
 def calc_target_index(state, cx, cy):
@@ -88,7 +88,7 @@ def calc_target_index(state, cx, cy):
         # search nearest point index
         dx = [state.rear_x - icx for icx in cx]
         dy = [state.rear_y - icy for icy in cy]
-        d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
+        d = [idx ** 2 + idy ** 2 for (idx, idy) in zip(dx, dy)]
         ind = d.index(min(d))
         old_nearest_point_index = ind
     else:
@@ -110,7 +110,7 @@ def calc_target_index(state, cx, cy):
     while Lf > L and (ind + 1) < len(cx):
         dx = cx[ind] - state.rear_x
         dy = cy[ind] - state.rear_y
-        L = math.sqrt(dx ** 2 + dy ** 2)
+        L = math.hypot(dx, dy)
         ind += 1
 
     return ind
