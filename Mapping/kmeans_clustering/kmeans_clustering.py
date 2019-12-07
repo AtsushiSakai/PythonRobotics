@@ -68,7 +68,7 @@ class Clusters:
             dx = [icx - px for icx in self.center_x]
             dy = [icy - py for icy in self.center_y]
 
-            dist_list = [math.sqrt(idx ** 2 + idy ** 2) for (idx, idy) in zip(dx, dy)]
+            dist_list = [math.hypot(idx, idy) for (idx, idy) in zip(dx, dy)]
             min_dist = min(dist_list)
             min_id = dist_list.index(min_dist)
             self.labels[ip] = min_id
