@@ -164,7 +164,7 @@ def calc_obstacle_cost(trajectory, ob, config):
     oy = ob[:, 1]
     dx = trajectory[:, 0] - ox[:, None]
     dy = trajectory[:, 1] - oy[:, None]
-    r = np.sqrt(np.square(dx) + np.square(dy))
+    r = np.hypot(dx, dy)
 
     if config.robot_type == RobotType.rectangle:
         yaw = trajectory[:, 2]
