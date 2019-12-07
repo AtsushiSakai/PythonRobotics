@@ -40,7 +40,7 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
 
     x_traj, y_traj = [], []
 
-    rho = np.sqrt(x_diff**2 + y_diff**2)
+    rho = np.hypot(x_diff, y_diff)
     while rho > 0.001:
         x_traj.append(x)
         y_traj.append(y)
@@ -52,7 +52,7 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
         # [-pi, pi] to prevent unstable behavior e.g. difference going
         # from 0 rad to 2*pi rad with slight turn
 
-        rho = np.sqrt(x_diff**2 + y_diff**2)
+        rho = np.hypot(x_diff, y_diff)
         alpha = (np.arctan2(y_diff, x_diff)
                  - theta + np.pi) % (2 * np.pi) - np.pi
         beta = (theta_goal - theta - alpha + np.pi) % (2 * np.pi) - np.pi
