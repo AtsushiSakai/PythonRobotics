@@ -57,7 +57,7 @@ def precasting(minx, miny, xw, yw, xyreso, yawreso):
             px = ix * xyreso + minx
             py = iy * xyreso + miny
 
-            d = math.sqrt(px**2 + py**2)
+            d = math.hypot(px, py)
             angle = atan_zero_to_twopi(py, px)
             angleid = int(math.floor(angle / yawreso))
 
@@ -85,7 +85,7 @@ def generate_ray_casting_grid_map(ox, oy, xyreso, yawreso):
 
     for (x, y) in zip(ox, oy):
 
-        d = math.sqrt(x**2 + y**2)
+        d = math.hypot(x, y)
         angle = atan_zero_to_twopi(y, x)
         angleid = int(math.floor(angle / yawreso))
 
