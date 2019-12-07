@@ -2,7 +2,7 @@
 
 Mobile robot motion planning sample with Dynamic Window Approach
 
-author: Atsushi Sakai (@Atsushi_twi), Goktug Karakasli
+author: Atsushi Sakai (@Atsushi_twi), Göktuğ Karakaşlı
 
 """
 
