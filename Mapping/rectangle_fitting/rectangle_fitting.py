@@ -162,7 +162,7 @@ class LShapeFitting():
             C = set()
             R = self.R0 + self.Rd * np.linalg.norm([ox[i], oy[i]])
             for j, _ in enumerate(ox):
-                d = np.sqrt((ox[i] - ox[j])**2 + (oy[i] - oy[j])**2)
+                d = np.hypot(ox[i] - ox[j], oy[i] - oy[j])
                 if d <= R:
                     C.add(j)
             S.append(C)
