@@ -163,6 +163,8 @@ def main():
         # for animation
         if show_animation:  # pragma: no cover
             plt.cla()
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             inds = calc_association(cx, cy, clusters)
             for ic in inds:
                 x, y = calc_labeled_points(ic, clusters)

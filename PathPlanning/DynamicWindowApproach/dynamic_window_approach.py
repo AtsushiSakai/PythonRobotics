@@ -268,6 +268,8 @@ def main(gx=10.0, gy=10.0, robot_type=RobotType.circle):
 
         if show_animation:
             plt.cla()
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(predicted_trajectory[:, 0], predicted_trajectory[:, 1], "-g")
             plt.plot(x[0], x[1], "xr")
             plt.plot(goal[0], goal[1], "xb")

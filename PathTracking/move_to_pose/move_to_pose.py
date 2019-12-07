@@ -93,6 +93,9 @@ def plot_vehicle(x, y, theta, x_traj, y_traj):  # pragma: no cover
 
     plt.plot(x_traj, y_traj, 'b--')
 
+    plt.gcf().canvas.mpl_connect('key_release_event',
+            lambda event: [exit(0) if event.key == 'escape' else None])
+
     plt.xlim(0, 20)
     plt.ylim(0, 20)
 

@@ -213,6 +213,8 @@ def sweep_path_search(sweep_searcher, gmap, grid_search_animation=False):
 
     if grid_search_animation:
         fig, ax = plt.subplots()
+        fig.canvas.mpl_connect('key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
 
     while True:
         cxind, cyind = sweep_searcher.move_target_grid(cxind, cyind, gmap)
@@ -266,6 +268,8 @@ def planning_animation(ox, oy, reso):  # pragma: no cover
     if do_animation:
         for ipx, ipy in zip(px, py):
             plt.cla()
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(ox, oy, "-xb")
             plt.plot(px, py, "-r")
             plt.plot(ipx, ipy, "or")

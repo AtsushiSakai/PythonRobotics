@@ -327,6 +327,8 @@ def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
 
         if show_animation:  # pragma: no cover
             plt.plot(current.xlist[-1], current.ylist[-1], "xc")
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             if len(closedList.keys()) % 10 == 0:
                 plt.pause(0.001)
 

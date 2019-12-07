@@ -166,6 +166,8 @@ def main():
 
         if show_animation:  # pragma: no cover
             plt.cla()
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             plot_arrow(state.x, state.y, state.yaw)
             plt.plot(cx, cy, "-r", label="course")
             plt.plot(x, y, "-b", label="trajectory")

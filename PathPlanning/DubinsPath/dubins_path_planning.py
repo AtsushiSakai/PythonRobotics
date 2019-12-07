@@ -318,6 +318,8 @@ def test():
 
         if show_animation:
             plt.cla()
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(px, py, label="final course " + str(mode))
 
             #  plotting

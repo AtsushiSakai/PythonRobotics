@@ -224,6 +224,8 @@ def do_simulation(cx, cy, cyaw, ck, speed_profile, goal):
 
         if target_ind % 1 == 0 and show_animation:
             plt.cla()
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(cx, cy, "-r", label="course")
             plt.plot(x, y, "ob", label="trajectory")
             plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")

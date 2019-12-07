@@ -534,6 +534,8 @@ class BITStar(object):
     def draw_graph(self, xCenter=None, cBest=None, cMin=None, etheta=None,
                    samples=None, start=None, end=None):
         plt.clf()
+        plt.gcf().canvas.mpl_connect('key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
         for rnd in samples:
             if rnd is not None:
                 plt.plot(rnd[0], rnd[1], "^k")

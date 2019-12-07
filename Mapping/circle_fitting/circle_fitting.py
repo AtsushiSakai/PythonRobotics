@@ -124,6 +124,8 @@ def main():
 
         if show_animation:  # pragma: no cover
             plt.cla()
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             plt.axis("equal")
             plt.plot(0.0, 0.0, "*r")
             plot_circle(cx, cy, cr)

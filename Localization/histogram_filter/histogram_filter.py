@@ -233,6 +233,8 @@ def main():
 
         if show_animation:
             plt.cla()
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             draw_heat_map(grid_map.data, mx, my)
             plt.plot(xTrue[0, :], xTrue[1, :], "xr")
             plt.plot(RF_ID[:, 0], RF_ID[:, 1], ".k")
