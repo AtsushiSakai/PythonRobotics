@@ -348,7 +348,7 @@ def check_goal(state, goal, tind, nind):
     # check goal
     dx = state.x - goal[0]
     dy = state.y - goal[1]
-    d = math.sqrt(dx ** 2 + dy ** 2)
+    d = math.hypot(dx, dy)
 
     isgoal = (d <= GOAL_DIS)
 
