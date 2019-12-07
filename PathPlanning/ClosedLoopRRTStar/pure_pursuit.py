@@ -68,17 +68,17 @@ def calc_target_index(state, cx, cy):
     dx = [state.x - icx for icx in cx]
     dy = [state.y - icy for icy in cy]
 
-    d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
+    d = np.hypot(dx, dy)
     mindis = min(d)
 
-    ind = d.index(mindis)
+    ind = np.argmin(d)
 
     L = 0.0
 
     while Lf > L and (ind + 1) < len(cx):
         dx = cx[ind + 1] - cx[ind]
         dy = cy[ind + 1] - cy[ind]
-        L += math.sqrt(dx ** 2 + dy ** 2)
+        L += math.hypot(dx, dy)
         ind += 1
 
     #  print(mindis)
@@ -121,7 +121,7 @@ def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
         # check goal
         dx = state.x - goal[0]
         dy = state.y - goal[1]
-        if math.sqrt(dx ** 2 + dy ** 2) <= goal_dis:
+        if math.hypot(dx, dy) <= goal_dis:
             find_goal = True
             break
 
