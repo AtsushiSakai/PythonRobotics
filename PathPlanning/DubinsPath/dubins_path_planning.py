@@ -141,7 +141,7 @@ def dubins_path_planning_from_origin(ex, ey, eyaw, c, D_ANGLE):
     # normalize
     dx = ex
     dy = ey
-    D = math.sqrt(dx ** 2.0 + dy ** 2.0)
+    D = math.hypot(dx, dy)
     d = D * c
     #  print(dx, dy, D, d)
 
