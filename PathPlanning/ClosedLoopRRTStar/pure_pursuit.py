@@ -161,7 +161,7 @@ def set_stop_point(target_speed, cx, cy, cyaw):
     for i in range(len(cx) - 1):
         dx = cx[i + 1] - cx[i]
         dy = cy[i + 1] - cy[i]
-        d.append(math.sqrt(dx ** 2.0 + dy ** 2.0))
+        d.append(math.hypot(dx, dy))
         iyaw = cyaw[i]
         move_direction = math.atan2(dy, dx)
         is_back = abs(move_direction - iyaw) >= math.pi / 2.0
