@@ -26,7 +26,7 @@ def calc_4points_bezier_path(sx, sy, syaw, ex, ey, eyaw, offset):
     :param offset: (float)
     :return: (numpy array, numpy array)
     """
-    dist = np.sqrt((sx - ex) ** 2 + (sy - ey) ** 2) / offset
+    dist = np.hypot(sx - ex, sy - ey) / offset
     control_points = np.array(
         [[sx, sy],
          [sx + dist * np.cos(syaw), sy + dist * np.sin(syaw)],
