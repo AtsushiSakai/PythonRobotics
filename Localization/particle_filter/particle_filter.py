@@ -47,7 +47,7 @@ def observation(xTrue, xd, u, RF_ID):
 
         dx = xTrue[0, 0] - RF_ID[i, 0]
         dy = xTrue[1, 0] - RF_ID[i, 1]
-        d = math.sqrt(dx ** 2 + dy ** 2)
+        d = math.hypot(dx, dy)
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Q_sim[0, 0] ** 0.5  # add noise
             zi = np.array([[dn, RF_ID[i, 0], RF_ID[i, 1]]])
@@ -116,7 +116,7 @@ def pf_localization(px, pw, z, u):
         for i in range(len(z[:, 0])):
             dx = x[0, 0] - z[i, 1]
             dy = x[1, 0] - z[i, 2]
-            pre_z = math.sqrt(dx ** 2 + dy ** 2)
+            pre_z = math.hypot(dx, dy)
             dz = pre_z - z[i, 0]
             w = w * gauss_likelihood(dz, math.sqrt(Q[0, 0]))
 

@@ -95,7 +95,7 @@ def is_collision(sx, sy, gx, gy, rr, okdtree):
     dx = gx - sx
     dy = gy - sy
     yaw = math.atan2(gy - sy, gx - sx)
-    d = math.sqrt(dx**2 + dy**2)
+    d = math.hypot(dx, dy)
 
     if d >= MAX_EDGE_LEN:
         return True
@@ -203,7 +203,7 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
             n_id = road_map[c_id][i]
             dx = sample_x[n_id] - current.x
             dy = sample_y[n_id] - current.y
-            d = math.sqrt(dx**2 + dy**2)
+            d = math.hypot(dx, dy)
             node = Node(sample_x[n_id], sample_y[n_id],
                         current.cost + d, c_id)
 

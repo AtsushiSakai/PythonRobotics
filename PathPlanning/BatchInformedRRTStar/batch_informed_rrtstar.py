@@ -180,8 +180,8 @@ class BITStar(object):
         cBest = self.g_scores[self.goalId]
 
         # Computing the sampling space
-        cMin = math.sqrt(pow(self.start[0] - self.goal[0], 2)
-                         + pow(self.start[1] - self.goal[1], 2)) / 1.5
+        cMin = math.hypot(self.start[0] - self.goal[0],
+                          self.start[1] - self.goal[1]) / 1.5
         xCenter = np.array([[(self.start[0] + self.goal[0]) / 2.0],
                             [(self.start[1] + self.goal[1]) / 2.0], [0]])
         a1 = np.array([[(self.goal[0] - self.start[0]) / cMin],

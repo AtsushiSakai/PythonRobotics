@@ -118,7 +118,7 @@ def find_sweep_direction_and_start_posi(ox, oy):
     for i in range(len(ox) - 1):
         dx = ox[i + 1] - ox[i]
         dy = oy[i + 1] - oy[i]
-        d = np.sqrt(dx ** 2 + dy ** 2)
+        d = np.hypot(dx, dy)
 
         if d > max_dist:
             max_dist = d

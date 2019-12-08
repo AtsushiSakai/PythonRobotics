@@ -68,7 +68,7 @@ def calc_gaussian_observation_pdf(gmap, z, iz, ix, iy, std):
     # predicted range
     x = ix * gmap.xy_reso + gmap.minx
     y = iy * gmap.xy_reso + gmap.miny
-    d = math.sqrt((x - z[iz, 1]) ** 2 + (y - z[iz, 2]) ** 2)
+    d = math.hypot(x - z[iz, 1], y - z[iz, 2])
 
     # likelihood
     pdf = (1.0 - norm.cdf(abs(d - z[iz, 0]), 0.0, std))
@@ -126,7 +126,7 @@ def observation(xTrue, u, RFID):
 
         dx = xTrue[0, 0] - RFID[i, 0]
         dy = xTrue[1, 0] - RFID[i, 1]
-        d = math.sqrt(dx ** 2 + dy ** 2)
+        d = math.hypot(dx, dy)
         if d <= MAX_RANGE:
             # add noise to range observation
             dn = d + np.random.randn() * NOISE_RANGE

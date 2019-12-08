@@ -44,7 +44,7 @@ def observation(xTrue, xd, u, RFID):
 
         dx = RFID[i, 0] - xTrue[0, 0]
         dy = RFID[i, 1] - xTrue[1, 0]
-        d = math.sqrt(dx ** 2 + dy ** 2)
+        d = math.hypot(dx, dy)
         angle = pi_2_pi(math.atan2(dy, dx) - xTrue[2, 0])
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Q_sim[0, 0] ** 0.5  # add noise

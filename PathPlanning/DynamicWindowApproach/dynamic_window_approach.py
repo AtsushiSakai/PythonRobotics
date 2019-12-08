@@ -164,7 +164,7 @@ def calc_obstacle_cost(trajectory, ob, config):
     oy = ob[:, 1]
     dx = trajectory[:, 0] - ox[:, None]
     dy = trajectory[:, 1] - oy[:, None]
-    r = np.sqrt(np.square(dx) + np.square(dy))
+    r = np.hypot(dx, dy)
 
     if config.robot_type == RobotType.rectangle:
         yaw = trajectory[:, 2]
@@ -279,7 +279,7 @@ def main(gx=10.0, gy=10.0, robot_type=RobotType.circle):
             plt.pause(0.0001)
 
         # check reaching goal
-        dist_to_goal = math.sqrt((x[0] - goal[0]) ** 2 + (x[1] - goal[1]) ** 2)
+        dist_to_goal = math.hypot(x[0] - goal[0], x[1] - goal[1])
         if dist_to_goal <= config.robot_radius:
             print("Goal!!")
             break

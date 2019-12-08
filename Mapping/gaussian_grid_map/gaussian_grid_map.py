@@ -31,7 +31,7 @@ def generate_gaussian_grid_map(ox, oy, xyreso, std):
             # Search minimum distance
             mindis = float("inf")
             for (iox, ioy) in zip(ox, oy):
-                d = math.sqrt((iox - x)**2 + (ioy - y)**2)
+                d = math.hypot(iox - x, ioy - y)
                 if mindis >= d:
                     mindis = d
 

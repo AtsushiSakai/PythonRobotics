@@ -6,7 +6,6 @@ author: AtsushiSakai(@Atsushi_twi)
 
 """
 
-import math
 import os
 import sys
 
@@ -119,9 +118,8 @@ class ClosedLoopRRTStar(RRTStarReedsShepp):
             print("final angle is bad")
             find_goal = False
 
-        travel = sum([abs(iv) * unicycle_model.dt for iv in v])
-        origin_travel = sum([math.sqrt(dx ** 2 + dy ** 2)
-                             for (dx, dy) in zip(np.diff(cx), np.diff(cy))])
+        travel = unicycle_model.dt * sum(np.abs(v))
+        origin_travel = sum(np.hypot(np.diff(cx), np.diff(cy)))
 
         if (travel / origin_travel) >= self.invalid_travel_ratio:
             print("path is too long")

@@ -148,7 +148,7 @@ def jacobian_inverse(link_lengths, joint_angles):
 def distance_to_goal(current_pos, goal_pos):
     x_diff = goal_pos[0] - current_pos[0]
     y_diff = goal_pos[1] - current_pos[1]
-    return np.array([x_diff, y_diff]).T, np.math.sqrt(x_diff**2 + y_diff**2)
+    return np.array([x_diff, y_diff]).T, np.hypot(x_diff, y_diff)
 
 
 def ang_diff(theta1, theta2):

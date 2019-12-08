@@ -106,7 +106,7 @@ class InformedRRTStar:
         for i in nearInds:
             dx = newNode.x - self.node_list[i].x
             dy = newNode.y - self.node_list[i].y
-            d = math.sqrt(dx ** 2 + dy ** 2)
+            d = math.hypot(dx, dy)
             theta = math.atan2(dy, dx)
             if self.check_collision(self.node_list[i], theta, d):
                 dList.append(self.node_list[i].cost + d)
@@ -224,7 +224,7 @@ class InformedRRTStar:
                 if self.check_collision(nearNode, theta, d):
                     nearNode.parent = n_node - 1
                     nearNode.cost = scost
-                    
+
     @staticmethod
     def distance_squared_point_to_segment(v, w, p):
         # Return minimum distance between line segment vw and point p
@@ -232,7 +232,7 @@ class InformedRRTStar:
             return (p-v).dot(p-v) # v == w case
         l2 = (w-v).dot(w-v) # i.e. |w-v|^2 -  avoid a sqrt
         # Consider the line extending the segment, parameterized as v + t (w - v).
-        # We find projection of point p onto the line. 
+        # We find projection of point p onto the line.
         # It falls where t = [(p-v) . (w-v)] / |w-v|^2
         # We clamp t from [0,1] to handle points outside the segment vw.
         t = max(0, min(1, (p - v).dot(w - v) / l2))

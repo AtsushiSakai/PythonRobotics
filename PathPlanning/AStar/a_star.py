@@ -136,7 +136,7 @@ class AStarPlanner:
     @staticmethod
     def calc_heuristic(n1, n2):
         w = 1.0  # weight of heuristic
-        d = w * math.sqrt((n1.x - n2.x) ** 2 + (n1.y - n2.y) ** 2)
+        d = w * math.hypot(n1.x - n2.x, n1.y - n2.y)
         return d
 
     def calc_grid_position(self, index, minp):
@@ -199,7 +199,7 @@ class AStarPlanner:
             for iy in range(self.ywidth):
                 y = self.calc_grid_position(iy, self.miny)
                 for iox, ioy in zip(ox, oy):
-                    d = math.sqrt((iox - x) ** 2 + (ioy - y) ** 2)
+                    d = math.hypot(iox - x, ioy - y)
                     if d <= self.rr:
                         self.obmap[ix][iy] = True
                         break

@@ -126,7 +126,7 @@ class RRT:
     def calc_dist_to_goal(self, x, y):
         dx = x - self.end.x
         dy = y - self.end.y
-        return math.sqrt(dx ** 2 + dy ** 2)
+        return math.hypot(dx, dy)
 
     def get_random_node(self):
         if random.randint(0, 100) > self.goal_sample_rate:
@@ -186,7 +186,7 @@ class RRT:
     def calc_distance_and_angle(from_node, to_node):
         dx = to_node.x - from_node.x
         dy = to_node.y - from_node.y
-        d = math.sqrt(dx ** 2 + dy ** 2)
+        d = math.hypot(dx, dy)
         theta = math.atan2(dy, dx)
         return d, theta
 

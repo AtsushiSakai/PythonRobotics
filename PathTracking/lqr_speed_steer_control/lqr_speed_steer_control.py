@@ -212,7 +212,7 @@ def do_simulation(cx, cy, cyaw, ck, speed_profile, goal):
         # check goal
         dx = state.x - goal[0]
         dy = state.y - goal[1]
-        if math.sqrt(dx ** 2 + dy ** 2) <= goal_dis:
+        if math.hypot(dx, dy) <= goal_dis:
             print("Goal")
             break
 
