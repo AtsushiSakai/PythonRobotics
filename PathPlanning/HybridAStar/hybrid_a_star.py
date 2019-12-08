@@ -150,7 +150,7 @@ def calc_next_node(current, steer, direction, config, ox, oy, kdtree):
 
     arc_l = XY_GRID_RESOLUTION * 1.5
     xlist, ylist, yawlist = [], [], []
-    for dist in np.arange(0, arc_l, MOTION_RESOLUTION):
+    for _ in np.arange(0, arc_l, MOTION_RESOLUTION):
         x, y, yaw = move(x, y, yaw, MOTION_RESOLUTION * direction, steer)
         xlist.append(x)
         ylist.append(y)
