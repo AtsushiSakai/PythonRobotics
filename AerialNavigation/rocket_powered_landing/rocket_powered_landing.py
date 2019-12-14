@@ -567,7 +567,7 @@ def plot_animation(X, U):  # pragma: no cover
 
     fig = plt.figure()
     ax = fig.gca(projection='3d')
-    rig.canvas.mpl_connect('key_release_event',
+    fig.canvas.mpl_connect('key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
 
     for k in range(K):
