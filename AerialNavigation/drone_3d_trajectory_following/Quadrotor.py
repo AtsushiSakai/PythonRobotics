@@ -8,7 +8,6 @@ from math import cos, sin
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 class Quadrotor():
     def __init__(self, x=0, y=0, z=0, roll=0, pitch=0, yaw=0, size=0.25, show_animation=True):
         self.p1 = np.array([size / 2, 0, 0, 1]).T
@@ -24,6 +23,10 @@ class Quadrotor():
         if self.show_animation:
             plt.ion()
             fig = plt.figure()
+            # for stopping simulation with the esc key.
+            fig.canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
+
             self.ax = fig.add_subplot(111, projection='3d')
 
         self.update_pose(x, y, z, roll, pitch, yaw)

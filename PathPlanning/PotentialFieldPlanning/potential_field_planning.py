@@ -98,6 +98,9 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
 
     if show_animation:
         draw_heatmap(pmap)
+        # for stopping simulation with the esc key.
+        plt.gcf().canvas.mpl_connect('key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
         plt.plot(ix, iy, "*k")
         plt.plot(gix, giy, "*m")
 
