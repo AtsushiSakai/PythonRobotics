@@ -58,8 +58,8 @@ class Config:
         self.robot_radius = 1.0  # [m] for collision check
 
         # if robot_type == RobotType.rectangle
-        self.robot_width = 0.5  # [m] for collision check
-        self.robot_length = 1.2  # [m] for collision check
+        self.robot_width = 1.0  # [m] for collision check
+        self.robot_length = 2.0  # [m] for collision check
 
     @property
     def robot_type(self):
@@ -86,6 +86,20 @@ def motion(x, u, dt):
     return x
 
 
+def vectorized_motion(x, u, dt):
+    """
+    vectorized motion model
+    """
+
+    x[:, 2] += u[:, 1] * dt
+    x[:, 0] += u[:, 0] * np.cos(x[:, 2]) * dt
+    x[:, 1] += u[:, 0] * np.sin(x[:, 2]) * dt
+    x[:, 3] = u[:, 0]
+    x[:, 4] = u[:, 1]
+
+    return x
+
+
 def calc_dynamic_window(x, config):
     """
     calculation dynamic window based on current state x
@@ -107,100 +121,91 @@ def calc_dynamic_window(x, config):
 
     return dw
 
-
-def predict_trajectory(x_init, v, y, config):
-    """
-    predict trajectory with an input
-    """
-
-    x = np.array(x_init)
-    traj = np.array(x)
-    time = 0
-    while time <= config.predict_time:
-        x = motion(x, [v, y], config.dt)
-        traj = np.vstack((traj, x))
-        time += config.dt
-
-    return traj
+def predict_trajectories(x_init, samples, config):
+    x = np.ones((samples.shape[0], x_init.shape[0])) * x_init
+    trajectory = np.array(x)
+    for _ in range(len(np.arange(0, config.predict_time, config.dt))):
+        x = vectorized_motion(x, np.array(samples), config.dt)
+        trajectory = np.dstack([trajectory, x])
+    trajectories = np.transpose(trajectory, [0, 2, 1])
+    return trajectories
 
 
 def calc_final_input(x, dw, config, goal, ob):
     """
-    calculation final input with dynamic window
+    calculation final input with dinamic window
     """
 
-    x_init = x[:]
-    min_cost = float("inf")
-    best_u = [0.0, 0.0]
-    best_trajectory = np.array([x])
+    samples = np.dstack(np.meshgrid(np.arange(dw[2], dw[3], config.yawrate_reso),
+        np.arange(dw[0], dw[1], config.v_reso)))
+    samples = samples.reshape(-1, 2)
+    samples = np.flip(samples)
 
-    # evaluate all trajectory with sampled input in dynamic window
-    for v in np.arange(dw[0], dw[1], config.v_reso):
-        for y in np.arange(dw[2], dw[3], config.yawrate_reso):
+    trajectories = predict_trajectories(x[:], samples, config)
+    to_goal_costs = config.to_goal_cost_gain * calc_to_goal_cost(trajectories, goal)
+    speed_costs = config.speed_cost_gain * (config.max_speed - trajectories[:, -1, 3])
+    ob_costs = config.obstacle_cost_gain*calc_obstacle_cost(trajectories, ob, config)
 
-            trajectory = predict_trajectory(x_init, v, y, config)
+    final_costs = to_goal_costs + speed_costs + ob_costs
 
-            # calc cost
-            to_goal_cost = config.to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
-            speed_cost = config.speed_cost_gain * (config.max_speed - trajectory[-1, 3])
-            ob_cost = config.obstacle_cost_gain * calc_obstacle_cost(trajectory, ob, config)
+    idx = np.argmin(final_costs)
+    best_u = samples[idx].T
+    best_trajectory = trajectories[idx]
 
-            final_cost = to_goal_cost + speed_cost + ob_cost
-
-            # search minimum trajectory
-            if min_cost >= final_cost:
-                min_cost = final_cost
-                best_u = [v, y]
-                best_trajectory = trajectory
 
     return best_u, best_trajectory
 
 
-def calc_obstacle_cost(trajectory, ob, config):
+def calc_obstacle_cost(trajectories, ob, config):
     """
         calc obstacle cost inf: collision
     """
     ox = ob[:, 0]
     oy = ob[:, 1]
-    dx = trajectory[:, 0] - ox[:, None]
-    dy = trajectory[:, 1] - oy[:, None]
-    r = np.hypot(dx, dy)
+    dx = (np.repeat(trajectories[:, :, 0], len(ox), axis=1) -
+          np.tile(ox, (*trajectories.shape[0:2], 1)).reshape(trajectories.shape[0], -1))
+    dy = (np.repeat(trajectories[:, :, 1], len(oy), axis=1) -
+          np.tile(oy, (*trajectories.shape[0:2], 1)).reshape(trajectories.shape[0], -1))
+
+    r = np.sqrt(np.square(dx) + np.square(dy))
 
     if config.robot_type == RobotType.rectangle:
-        yaw = trajectory[:, 2]
+        yaw = trajectories[:, :, 2]
         rot = np.array([[np.cos(yaw), -np.sin(yaw)], [np.sin(yaw), np.cos(yaw)]])
-        rot = np.transpose(rot, [2, 0, 1])
-        local_ob = ob[:, None] - trajectory[:, 0:2]
-        local_ob = local_ob.reshape(-1, local_ob.shape[-1])
-        local_ob = np.array([local_ob @ x for x in rot])
-        local_ob = local_ob.reshape(-1, local_ob.shape[-1])
-        upper_check = local_ob[:, 0] <= config.robot_length / 2
-        right_check = local_ob[:, 1] <= config.robot_width / 2
-        bottom_check = local_ob[:, 0] >= -config.robot_length / 2
-        left_check = local_ob[:, 1] >= -config.robot_width / 2
-        if (np.logical_and(np.logical_and(upper_check, right_check),
-                           np.logical_and(bottom_check, left_check))).any():
-            return float("Inf")
+        rot = np.transpose(rot, [2, 3, 0, 1])
+        local_obs = (np.tile(ob, (*trajectories.shape[0:2], 1)) -
+                    np.repeat(trajectories[:, :, :2], len(oy), axis=1))
+
+        a = np.tile(local_obs, (rot.shape[1], 1)).reshape(-1, 2)
+        b = np.repeat(rot, local_obs.shape[1], axis=1).reshape(-1, 2, 2)
+        out = np.einsum('...i,...ij', a, b)
+        out = out.reshape(len(r), rot.shape[1] * local_obs.shape[1], 2)
+
+        upper_check = out[:, :, 0] <= config.robot_length / 2
+        right_check = out[:, :, 1] <= config.robot_width/2
+        bottom_check = out[:, :, 0] >= -config.robot_length / 2
+        left_check = out[:, :, 1] >= -config.robot_width/2
+        check = np.logical_and(np.logical_and(upper_check, right_check),
+                       np.logical_and(bottom_check, left_check))
     elif config.robot_type == RobotType.circle:
-        if (r <= config.robot_radius).any():
-            return float("Inf")
+        check = r <= config.robot_radius
+    check = np.sum(check, axis=1)
+    minr = np.min(r, axis=1)
+    scores = 1.0 / minr
+    return np.where(check == 0, scores, float("Inf"))
 
-    min_r = np.min(r)
-    return 1.0 / min_r  # OK
 
-
-def calc_to_goal_cost(trajectory, goal):
+def calc_to_goal_cost(trajectories, goal):
     """
         calc to goal cost with angle difference
     """
 
-    dx = goal[0] - trajectory[-1, 0]
-    dy = goal[1] - trajectory[-1, 1]
-    error_angle = math.atan2(dy, dx)
-    cost_angle = error_angle - trajectory[-1, 2]
-    cost = abs(math.atan2(math.sin(cost_angle), math.cos(cost_angle)))
-
-    return cost
+    dx = goal[0] - trajectories[:, -1, 0]
+    dy = goal[1] - trajectories[:, -1, 1]
+    error_angle = np.arctan2(dy, dx)
+    cost_angle = error_angle - trajectories[:, -1, 2]
+    costs = np.abs(np.arctan2(np.sin(cost_angle), np.cos(cost_angle)))
+    return costs
 
 
 def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
