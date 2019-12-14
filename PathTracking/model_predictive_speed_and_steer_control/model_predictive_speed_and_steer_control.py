@@ -429,6 +429,7 @@ def do_simulation(cx, cy, cyaw, ck, sp, dl, initial_state):
 
         if show_animation:  # pragma: no cover
             plt.cla()
+            # for stopping simulation with the esc key.
             plt.gcf().canvas.mpl_connect('key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
             if ox is not None:

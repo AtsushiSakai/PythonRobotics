@@ -69,6 +69,7 @@ class Dijkstra:
             if show_animation:  # pragma: no cover
                 plt.plot(self.calc_position(current.x, self.minx),
                          self.calc_position(current.y, self.miny), "xc")
+                # for stopping simulation with the esc key.
                 plt.gcf().canvas.mpl_connect('key_release_event',
                         lambda event: [exit(0) if event.key == 'escape' else None])
                 if len(closedset.keys()) % 10 == 0:

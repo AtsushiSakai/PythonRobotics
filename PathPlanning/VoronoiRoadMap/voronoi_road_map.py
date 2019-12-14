@@ -185,6 +185,7 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
         # show graph
         if show_animation and len(closedset.keys()) % 2 == 0:  # pragma: no cover
             plt.plot(current.x, current.y, "xg")
+            # for stopping simulation with the esc key.
             plt.gcf().canvas.mpl_connect('key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
             plt.pause(0.001)

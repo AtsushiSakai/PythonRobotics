@@ -135,6 +135,7 @@ def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
 
         if target_ind % 1 == 0 and animation:  # pragma: no cover
             plt.cla()
+            # for stopping simulation with the esc key.
             plt.gcf().canvas.mpl_connect('key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(cx, cy, "-r", label="course")

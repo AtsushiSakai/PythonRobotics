@@ -23,6 +23,7 @@ class Quadrotor():
         if self.show_animation:
             plt.ion()
             fig = plt.figure()
+            # for stopping simulation with the esc key.
             fig.canvas.mpl_connect('key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
 

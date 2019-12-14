@@ -213,6 +213,7 @@ def sweep_path_search(sweep_searcher, gmap, grid_search_animation=False):
 
     if grid_search_animation:
         fig, ax = plt.subplots()
+        # for stopping simulation with the esc key.
         fig.canvas.mpl_connect('key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
 
@@ -268,6 +269,7 @@ def planning_animation(ox, oy, reso):  # pragma: no cover
     if do_animation:
         for ipx, ipy in zip(px, py):
             plt.cla()
+            # for stopping simulation with the esc key.
             plt.gcf().canvas.mpl_connect('key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(ox, oy, "-xb")

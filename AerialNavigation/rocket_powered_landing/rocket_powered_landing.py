@@ -567,6 +567,7 @@ def plot_animation(X, U):  # pragma: no cover
 
     fig = plt.figure()
     ax = fig.gca(projection='3d')
+    # for stopping simulation with the esc key.
     fig.canvas.mpl_connect('key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
 

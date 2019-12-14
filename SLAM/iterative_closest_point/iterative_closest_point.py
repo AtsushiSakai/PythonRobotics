@@ -36,6 +36,7 @@ def icp_matching(previous_points, current_points):
 
         if show_animation:  # pragma: no cover
             plt.cla()
+            # for stopping simulation with the esc key.
             plt.gcf().canvas.mpl_connect('key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(previous_points[0, :], previous_points[1, :], ".r")

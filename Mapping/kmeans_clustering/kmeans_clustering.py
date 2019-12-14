@@ -133,6 +133,7 @@ def main():
         # for animation
         if show_animation:  # pragma: no cover
             plt.cla()
+            # for stopping simulation with the esc key.
             plt.gcf().canvas.mpl_connect('key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
             clusters.plot_cluster()

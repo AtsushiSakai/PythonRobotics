@@ -114,6 +114,7 @@ def animation():
 def main():  # pragma: no cover
     fig = plt.figure()
     fig.canvas.mpl_connect("button_press_event", click)
+    # for stopping simulation with the esc key.
     fig.canvas.mpl_connect('key_release_event',
             lambda event: [exit(0) if event.key == 'escape' else None])
     two_joint_arm()

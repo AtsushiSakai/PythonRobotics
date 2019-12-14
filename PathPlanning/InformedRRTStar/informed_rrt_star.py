@@ -267,6 +267,7 @@ class InformedRRTStar:
 
     def draw_graph(self, xCenter=None, cBest=None, cMin=None, etheta=None, rnd=None):
         plt.clf()
+        # for stopping simulation with the esc key.
         plt.gcf().canvas.mpl_connect('key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
         if rnd is not None:
