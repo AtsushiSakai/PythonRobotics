@@ -124,7 +124,7 @@ def calc_dynamic_window(x, config):
 def predict_trajectories(x_init, samples, config):
     x = np.ones((samples.shape[0], x_init.shape[0])) * x_init
     trajectory = np.array(x)
-    for _ in range(len(np.arange(0, config.predict_time, config.dt))):
+    for _ in range(len(np.arange(0, config.predict_time+config.dt, config.dt))):
         x = vectorized_motion(x, np.array(samples), config.dt)
         trajectory = np.dstack([trajectory, x])
     trajectories = np.transpose(trajectory, [0, 2, 1])
@@ -137,7 +137,7 @@ def calc_final_input(x, dw, config, goal, ob):
     """
 
     samples = np.dstack(np.meshgrid(np.arange(dw[2], dw[3], config.yawrate_reso),
-        np.arange(dw[0], dw[1], config.v_reso)))
+                                    np.arange(dw[0], dw[1], config.v_reso)))
     samples = samples.reshape(-1, 2)
     samples = np.flip(samples)
 
