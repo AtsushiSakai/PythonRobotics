@@ -88,11 +88,11 @@ def gauss_likelihood(x, sigma):
 
 def calc_covariance(xEst, px, pw):
     cov = np.zeros((3, 3))
-
-    for i in range(px.shape[1]):
-        dx = (px[:, i] - xEst)[0:3]
-        cov += pw[0, i] * dx.dot(dx.T)
-    cov /= NP
+    # https://www.gnu.org/software/gsl/doc/html/statistics.html#weighted-samples
+    # https://www.visiondummy.com/2014/04/draw-error-ellipse-representing-covariance-matrix/
+    # 99% sqrt(9.210) ≈ 3.0347
+    tx = 3.0347 * (NP * pw) * ((px - xEst)[0:3] ** 2)
+    cov = tx @ tx.T
 
     return cov
 
