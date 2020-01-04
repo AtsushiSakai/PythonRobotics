@@ -3,6 +3,7 @@
 Path tracking simulation with pure pursuit steering control and PID speed control.
 
 author: Atsushi Sakai (@Atsushi_twi)
+        Guillaume Jacquenot (@Gjacquenot)
 
 """
 import numpy as np
