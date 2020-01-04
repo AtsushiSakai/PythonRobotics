@@ -607,6 +607,6 @@ This is a list: [Users comments](https://github.com/AtsushiSakai/PythonRobotics/
 
 - [Göktuğ Karakaşlı](https://github.com/goktug97)
 
-
+- [Guillaume Jacquenot](https://github.com/Gjacquenot)
 
 
