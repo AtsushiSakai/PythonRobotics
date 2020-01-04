@@ -26,14 +26,7 @@ class QuinticPolynomial:
 
     def __init__(self, xs, vxs, axs, xe, vxe, axe, T):
 
-        # calc coefficient of quinic polynomial
-        self.xs = xs
-        self.vxs = vxs
-        self.axs = axs
-        self.xe = xe
-        self.vxe = vxe
-        self.axe = axe
-
+        # calc coefficient of quintic polynomial
         self.a0 = xs
         self.a1 = vxs
         self.a2 = axs / 2.0
