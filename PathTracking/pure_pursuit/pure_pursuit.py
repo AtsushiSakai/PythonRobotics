@@ -80,8 +80,8 @@ class Trajectory:
             # search nearest point index
             dx = [state.rear_x - icx for icx in self.cx]
             dy = [state.rear_y - icy for icy in self.cy]
-            d = [idx ** 2 + idy ** 2 for (idx, idy) in zip(dx, dy)]
-            ind = d.index(min(d))
+            d = np.hypot(dx, dy)
+            ind = np.argmin(d)
             self.old_nearest_point_index = ind
         else:
             ind = self.old_nearest_point_index
@@ -100,9 +100,7 @@ class Trajectory:
 
         # search look ahead target point index
         while Lf > L and (ind + 1) < len(self.cx):
-            dx = self.cx[ind] - state.rear_x
-            dy = self.cy[ind] - state.rear_y
-            L = math.hypot(dx, dy)
+            L = state.calc_distance(self.cx[ind], self.cy[ind])
             ind += 1
 
         return ind
