@@ -136,7 +136,7 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
     """
 
     if not isinstance(x, float):
-        for (ix, iy, iyaw) in zip(x, y, yaw):
+        for ix, iy, iyaw in zip(x, y, yaw):
             plot_arrow(ix, iy, iyaw)
     else:
         plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),
