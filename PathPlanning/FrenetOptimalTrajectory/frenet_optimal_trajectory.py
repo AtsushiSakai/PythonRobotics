@@ -49,13 +49,6 @@ class quintic_polynomial:
     def __init__(self, xs, vxs, axs, xe, vxe, axe, T):
 
         # calc coefficient of quintic polynomial
-        self.xs = xs
-        self.vxs = vxs
-        self.axs = axs
-        self.xe = xe
-        self.vxe = vxe
-        self.axe = axe
-
         self.a0 = xs
         self.a1 = vxs
         self.a2 = axs / 2.0
@@ -99,12 +92,7 @@ class quartic_polynomial:
 
     def __init__(self, xs, vxs, axs, vxe, axe, T):
 
-        # calc coefficient of quintic polynomial
-        self.xs = xs
-        self.vxs = vxs
-        self.axs = axs
-        self.vxe = vxe
-        self.axe = axe
+        # calc coefficient of quartic polynomial
 
         self.a0 = xs
         self.a1 = vxs
@@ -184,7 +172,7 @@ def calc_frenet_paths(c_speed, c_d, c_d_d, c_d_dd, s0):
             fp.d_dd = [lat_qp.calc_second_derivative(t) for t in fp.t]
             fp.d_ddd = [lat_qp.calc_third_derivative(t) for t in fp.t]
 
-            # Loongitudinal motion planning (Velocity keeping)
+            # Longitudinal motion planning (Velocity keeping)
             for tv in np.arange(TARGET_SPEED - D_T_S * N_S_SAMPLE, TARGET_SPEED + D_T_S * N_S_SAMPLE, D_T_S):
                 tfp = copy.deepcopy(fp)
                 lon_qp = quartic_polynomial(s0, c_speed, 0.0, tv, 0.0, Ti)
