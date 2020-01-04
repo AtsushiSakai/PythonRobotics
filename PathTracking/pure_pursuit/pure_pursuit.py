@@ -75,7 +75,7 @@ class Trajectory:
         self.cy = cy
         self.old_nearest_point_index = None
 
-    def __call__(self, state):
+    def search_target_index(self, state):
         if self.old_nearest_point_index is None:
             # search nearest point index
             dx = [state.rear_x - icx for icx in self.cx]
@@ -110,7 +110,7 @@ class Trajectory:
 
 def pure_pursuit_control(state, trajectory, pind):
 
-    ind = trajectory(state)
+    ind = trajectory.search_target_index(state)
 
     if pind >= ind:
         ind = pind
@@ -163,7 +163,7 @@ def main():
     states = States()
     states.append(time, state)
     trajectory = Trajectory(cx, cy)
-    target_ind = trajectory(state)
+    target_ind = trajectory.search_target_index(state)
 
     while T >= time and lastIndex > target_ind:
         ai = PIDControl(target_speed, state.v)
