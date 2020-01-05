@@ -26,6 +26,7 @@ class QuinticPolynomial:
 
     def __init__(self, xs, vxs, axs, xe, vxe, axe, time):
         # calc coefficient of quintic polynomial
+        # See jupyter notebook document for derivation of this equation.
         self.a0 = xs
         self.a1 = vxs
         self.a2 = axs / 2.0
