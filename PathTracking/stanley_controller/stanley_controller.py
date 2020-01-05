@@ -185,6 +185,9 @@ def main():
 
         if show_animation:  # pragma: no cover
             plt.cla()
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(cx, cy, ".r", label="course")
             plt.plot(x, y, "-b", label="trajectory")
             plt.plot(cx[target_idx], cy[target_idx], "xg", label="target")

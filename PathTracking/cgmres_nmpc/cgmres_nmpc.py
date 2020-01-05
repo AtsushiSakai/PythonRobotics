@@ -546,6 +546,9 @@ def animation(plant, controller, dt):
             steer = math.atan2(controller.history_u_2[t] * WB / v, 1.0)
 
         plt.cla()
+        # for stopping simulation with the esc key.
+        plt.gcf().canvas.mpl_connect('key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
         plt.plot(plant.history_x, plant.history_y, "-r", label="trajectory")
         plot_car(x, y, yaw, steer=steer)
         plt.axis("equal")

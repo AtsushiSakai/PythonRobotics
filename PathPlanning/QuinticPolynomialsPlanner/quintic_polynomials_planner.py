@@ -26,14 +26,7 @@ class QuinticPolynomial:
 
     def __init__(self, xs, vxs, axs, xe, vxe, axe, T):
 
-        # calc coefficient of quinic polynomial
-        self.xs = xs
-        self.vxs = vxs
-        self.axs = axs
-        self.xe = xe
-        self.vxe = vxe
-        self.axe = axe
-
+        # calc coefficient of quintic polynomial
         self.a0 = xs
         self.a1 = vxs
         self.a2 = axs / 2.0
@@ -151,6 +144,9 @@ def quintic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_
     if show_animation:  # pragma: no cover
         for i, _ in enumerate(time):
             plt.cla()
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             plt.grid(True)
             plt.axis("equal")
             plot_arrow(sx, sy, syaw)

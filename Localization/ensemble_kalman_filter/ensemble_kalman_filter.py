@@ -213,6 +213,9 @@ def main():
 
         if show_animation:
             plt.cla()
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
 
             for i in range(len(z[:, 0])):
                 plt.plot([xTrue[0, 0], z[i, 2]], [xTrue[1, 0], z[i, 3]], "-k")

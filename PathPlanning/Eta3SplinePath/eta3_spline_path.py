@@ -213,6 +213,9 @@ def test1():
         if show_animation:
             # plot the path
             plt.plot(pos[0, :], pos[1, :])
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             plt.pause(1.0)
 
     if show_animation:

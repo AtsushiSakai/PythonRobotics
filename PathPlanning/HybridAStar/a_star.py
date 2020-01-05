@@ -78,6 +78,9 @@ def dp_planning(sx, sy, gx, gy, ox, oy, reso, rr):
         # show graph
         if show_animation:  # pragma: no cover
             plt.plot(current.x * reso, current.y * reso, "xc")
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             if len(closedset.keys()) % 10 == 0:
                 plt.pause(0.001)
 

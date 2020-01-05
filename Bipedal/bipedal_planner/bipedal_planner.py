@@ -111,6 +111,9 @@ class BipedalPlanner(object):
                     if c > len(com_trajectory_for_plot):
                         # set up plotter
                         plt.cla()
+                        # for stopping simulation with the esc key.
+                        plt.gcf().canvas.mpl_connect('key_release_event',
+                                lambda event: [exit(0) if event.key == 'escape' else None])
                         ax.set_zlim(0, z_c * 2)
                         ax.set_aspect('equal', 'datalim')
 

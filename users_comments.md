@@ -404,6 +404,9 @@ URL: https://www.semanticscholar.org/paper/A-Review-of-Robot-Rescue-Simulation-P
 7. Ghosh, Ritwika, et al. "CyPhyHouse: A Programming, Simulation, and Deployment Toolchain for Heterogeneous Distributed Coordination." arXiv preprint arXiv:1910.01557 (2019).
 URL: https://arxiv.org/abs/1910.01557
 
+8. Hahn, Carsten, et al. "Dynamic Path Planning with Stable Growing Neural Gas." (2019).
+URL: https://pdfs.semanticscholar.org/5c06/f3cb9542a51e1bf1a32523c1bc7fea6cecc5.pdf
+
 # Others
 
 - Autonomous Vehicle Readings https://richardkelley.io/readings
