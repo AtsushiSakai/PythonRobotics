@@ -33,7 +33,7 @@ class Dijkstra:
             self.x = x  # index of grid
             self.y = y  # index of grid
             self.cost = cost
-            self.pind = pind
+            self.pind = pind # index of previous Node
 
         def __str__(self):
             return str(self.x) + "," + str(self.y) + "," + str(self.cost) + "," + str(self.pind)
@@ -88,10 +88,10 @@ class Dijkstra:
             closedset[c_id] = current
 
             # expand search grid based on motion model
-            for i, _ in enumerate(self.motion):
-                node = self.Node(current.x + self.motion[i][0],
-                                 current.y + self.motion[i][1],
-                                 current.cost + self.motion[i][2], c_id)
+            for move_x, move_y, move_cost in self.motion:
+                node = self.Node(current.x + move_x,
+                                 current.y + move_y,
+                                 current.cost + move_cost, c_id)
                 n_id = self.calc_index(node)
 
                 if n_id in closedset:
@@ -123,11 +123,6 @@ class Dijkstra:
             pind = n.pind
 
         return rx, ry
-
-    def calc_heuristic(self, n1, n2):
-        w = 1.0  # weight of heuristic
-        d = w * math.hypot(n1.x - n2.x, n1.y - n2.y)
-        return d
 
     def calc_position(self, index, minp):
         pos = index*self.reso+minp
@@ -241,6 +236,9 @@ def main():
 
     dijkstra = Dijkstra(ox, oy, grid_size, robot_radius)
     rx, ry = dijkstra.planning(sx, sy, gx, gy)
+
+    print(rx)
+    print(ry)
 
     if show_animation:  # pragma: no cover
         plt.plot(rx, ry, "-r")
