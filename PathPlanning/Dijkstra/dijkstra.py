@@ -237,9 +237,6 @@ def main():
     dijkstra = Dijkstra(ox, oy, grid_size, robot_radius)
     rx, ry = dijkstra.planning(sx, sy, gx, gy)
 
-    print(rx)
-    print(ry)
-
     if show_animation:  # pragma: no cover
         plt.plot(rx, ry, "-r")
         plt.show()
