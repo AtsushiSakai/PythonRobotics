@@ -140,7 +140,7 @@ def re_sampling(px, pw):
     """
 
     w_cum = np.cumsum(pw)
-    base = np.arange(0.0, 1.0, 1/NP)
+    base = np.arange(0.0, 1.0, 1./NP)
     re_sample_id = base + np.random.uniform(0, 1/NP)
     indexes = []
     ind = 0
