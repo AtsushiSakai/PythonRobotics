@@ -22,7 +22,7 @@ def dwa_control(x, config, goal, ob):
 
     dw = calc_dynamic_window(x, config)
 
-    u, trajectory = calc_final_input(x, dw, config, goal, ob)
+    u, trajectory = calc_control_and_trajectory(x, dw, config, goal, ob)
 
     return u, trajectory
 
@@ -101,7 +101,7 @@ def calc_dynamic_window(x, config):
           x[4] - config.max_dyawrate * config.dt,
           x[4] + config.max_dyawrate * config.dt]
 
-    #  [vmin,vmax, yaw_rate min, yaw_rate max]
+    #  [vmin, vmax, yaw_rate min, yaw_rate max]
     dw = [max(Vs[0], Vd[0]), min(Vs[1], Vd[1]),
           max(Vs[2], Vd[2]), min(Vs[3], Vd[3])]
 
@@ -124,7 +124,7 @@ def predict_trajectory(x_init, v, y, config):
     return traj
 
 
-def calc_final_input(x, dw, config, goal, ob):
+def calc_control_and_trajectory(x, dw, config, goal, ob):
     """
     calculation final input with dynamic window
     """
