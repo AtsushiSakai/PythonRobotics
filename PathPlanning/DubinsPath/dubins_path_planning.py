@@ -212,7 +212,6 @@ def dubins_path_planning(sx, sy, syaw, ex, ey, eyaw, c, D_ANGLE=np.deg2rad(10.0)
 
 
 def generate_course(length, mode, c, D_ANGLE):
-
     px = [0.0]
     py = [0.0]
     pyaw = [0.0]
@@ -299,7 +298,6 @@ def main():
 
 
 def test():
-
     NTEST = 5
 
     for i in range(NTEST):
@@ -320,7 +318,7 @@ def test():
             plt.cla()
             # for stopping simulation with the esc key.
             plt.gcf().canvas.mpl_connect('key_release_event',
-                    lambda event: [exit(0) if event.key == 'escape' else None])
+                                         lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(px, py, label="final course " + str(mode))
 
             #  plotting
