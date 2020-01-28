@@ -57,4 +57,3 @@ class Test(TestCase):
                 start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature)
 
             self.check_edge_condition(px, py, pyaw, start_x, start_y, start_yaw, end_x, end_y, end_yaw)
-
