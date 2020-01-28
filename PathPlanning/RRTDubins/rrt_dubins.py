@@ -137,6 +137,9 @@ class RRTDubins(RRT):
             from_node.x, from_node.y, from_node.yaw,
             to_node.x, to_node.y, to_node.yaw, self.curvature)
 
+        if len(px) <= 1:  # cannot find a dubins path
+            return None
+
         new_node = copy.deepcopy(from_node)
         new_node.x = px[-1]
         new_node.y = py[-1]
