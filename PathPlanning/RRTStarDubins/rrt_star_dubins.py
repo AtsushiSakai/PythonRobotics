@@ -114,7 +114,7 @@ class RRTStarDubins(RRTStar):
         plt.clf()
         # for stopping simulation with the esc key.
         plt.gcf().canvas.mpl_connect('key_release_event',
-                lambda event: [exit(0) if event.key == 'escape' else None])
+                                     lambda event: [exit(0) if event.key == 'escape' else None])
         if rnd is not None:
             plt.plot(rnd.x, rnd.y, "^k")
         for node in self.node_list:
@@ -142,6 +142,9 @@ class RRTStarDubins(RRTStar):
         px, py, pyaw, mode, course_length = dubins_path_planning.dubins_path_planning(
             from_node.x, from_node.y, from_node.yaw,
             to_node.x, to_node.y, to_node.yaw, self.curvature)
+
+        if len(px) <= 1:  # cannot find a dubins path
+            return None
 
         new_node = copy.deepcopy(from_node)
         new_node.x = px[-1]
