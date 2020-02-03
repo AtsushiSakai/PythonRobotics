@@ -119,8 +119,6 @@ All animation gifs are stored here: [AtsushiSakai/PythonRoboticsGifs: Animation 
 
 > git clone https://github.com/AtsushiSakai/PythonRobotics.git
 
-> cd PythonRobotics/
-
 
 2. Install the required libraries. You can use environment.yml with conda command.
 
@@ -553,7 +551,7 @@ MIT
 
 # Use-case
 
-If this project helps your robotics project, please let me know with [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/AtsushiSakai).
+If this project helps your robotics project, please let me know with creating an issue.
 
 Your robot's video, which is using PythonRobotics, is very welcome!!
 
@@ -561,7 +559,7 @@ This is a list of other user's comment and references:[users\_comments](https://
 
 # Contribution
 
-A small PR like bug fix is welcome.
+Any contribution is welcome!!
 
 If your PR is merged multiple times, I will add your account to the author list.
 
@@ -575,23 +573,15 @@ If you use this project's code in industry, we'd love to hear from you as well; 
 
 If you or your company would like to support this project, please consider:
 
+- [Sponsor @AtsushiSakai on GitHub Sponsors](https://github.com/sponsors/AtsushiSakai)
+
 - [Become a backer or sponsor on Patreon](https://www.patreon.com/myenigma)
 
 - [One-time donation via PayPal](https://www.paypal.me/myenigmapay/)
 
-You can add your name or your company logo in README if you are a patron.
-
-E-mail consultant is also available.
-
- 　
-
-Your comment using [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/AtsushiSakai) is also welcome. 
-
-This is a list: [Users comments](https://github.com/AtsushiSakai/PythonRobotics/blob/master/users_comments.md)
-
 # Authors
 
-- [Atsushi Sakai](https://github.com/AtsushiSakai/) ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
+- [Atsushi Sakai](https://github.com/AtsushiSakai/)
 
 - [Daniel Ingram](https://github.com/daniel-s-ingram)
 
