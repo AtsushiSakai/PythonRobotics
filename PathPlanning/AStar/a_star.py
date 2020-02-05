@@ -51,7 +51,7 @@ class AStarPlanner:
             sx: start x position [m]
             sy: start y position [m]
             gx: goal x position [m]
-            gx: goal x position [m]
+            gy: goal y position [m]
 
         output:
             rx: x position list of the final path
