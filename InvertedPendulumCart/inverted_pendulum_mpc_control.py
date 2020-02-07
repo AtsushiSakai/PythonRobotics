@@ -145,16 +145,16 @@ def plot_cart(xt, theta):
     by += radius * 2.0
 
     angles = np.arange(0.0, math.pi * 2.0, math.radians(3.0))
-    ox = [radius * math.cos(a) for a in angles]
-    oy = [radius * math.sin(a) for a in angles]
+    ox = np.array([radius * math.cos(a) for a in angles])
+    oy = np.array([radius * math.sin(a) for a in angles])
 
     rwx = np.copy(ox) + cart_w / 4.0 + xt
     rwy = np.copy(oy) + radius
     lwx = np.copy(ox) - cart_w / 4.0 + xt
     lwy = np.copy(oy) + radius
 
-    wx = np.copy(ox) + float(bx[0, -1])
-    wy = np.copy(oy) + float(by[0, -1])
+    wx = np.copy(ox) + bx[-1]
+    wy = np.copy(oy) + by[-1]
 
     plt.plot(flatten(cx), flatten(cy), "-b")
     plt.plot(flatten(bx), flatten(by), "-k")
