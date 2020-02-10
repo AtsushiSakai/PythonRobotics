@@ -34,7 +34,7 @@ class RRTStar(RRT):
             self.cost = 0.0
 
     def __init__(self, start, goal, obstacle_list, rand_area,
-                 expand_dis=3.0,
+                 expand_dis=30.0,
                  path_resolution=1.0,
                  goal_sample_rate=20,
                  max_iter=300,
@@ -141,6 +141,9 @@ class RRTStar(RRT):
     def find_near_nodes(self, new_node):
         nnode = len(self.node_list) + 1
         r = self.connect_circle_dist * math.sqrt((math.log(nnode) / nnode))
+        # if expand_dist exists, search vertices in a range no more than expand_dist
+        if hasattr(self, 'expand_dis'): 
+            r = min(r, self.expand_dis)
         dist_list = [(node.x - new_node.x) ** 2 +
                      (node.y - new_node.y) ** 2 for node in self.node_list]
         near_inds = [dist_list.index(i) for i in dist_list if i <= r ** 2]
@@ -158,8 +161,7 @@ class RRTStar(RRT):
             improved_cost = near_node.cost > edge_node.cost
 
             if no_collision and improved_cost:
-                near_node = edge_node
-                near_node.parent = new_node
+                self.node_list[i] = edge_node
                 self.propagate_cost_to_leaves(new_node)
 
     def calc_new_cost(self, from_node, to_node):
