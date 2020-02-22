@@ -30,7 +30,8 @@ class SweepSearcher:
         RIGHT = 1
         LEFT = -1
 
-    def __init__(self, moving_direction, sweep_direction, x_inds_goal_y, goal_y):
+    def __init__(self,
+                 moving_direction, sweep_direction, x_inds_goal_y, goal_y):
         self.moving_direction = moving_direction
         self.sweep_direction = sweep_direction
         self.turing_window = []
@@ -88,6 +89,8 @@ class SweepSearcher:
         return True
 
     def update_turning_window(self):
+        # turning window definition
+        # robot can move grid based on it.
         self.turing_window = [
             (self.moving_direction, 0.0),
             (self.moving_direction, self.sweep_direction),
@@ -189,35 +192,34 @@ def search_free_grid_index_at_edge_y(grid_map, from_upper=False):
 def setup_grid_map(ox, oy, reso, sweep_direction, offset_grid=10):
     width = math.ceil((max(ox) - min(ox)) / reso) + offset_grid
     height = math.ceil((max(oy) - min(oy)) / reso) + offset_grid
-    center_x = np.mean(ox)
-    center_y = np.mean(oy)
+    center_x = (np.max(ox)+np.min(ox))/2.0
+    center_y = (np.max(oy)+np.min(oy))/2.0
 
     grid_map = GridMap(width, height, reso, center_x, center_y)
-
+    grid_map.print_grid_map_info()
     grid_map.set_value_from_polygon(ox, oy, 1.0, inside=False)
-
     grid_map.expand_grid()
 
-    xinds_goaly = []
-    goaly = 0
+    x_inds_goal_y = []
+    goal_y = 0
     if sweep_direction == SweepSearcher.SweepDirection.UP:
-        xinds_goaly, goaly = search_free_grid_index_at_edge_y(grid_map,
+        x_inds_goal_y, goal_y = search_free_grid_index_at_edge_y(grid_map,
                                                               from_upper=True)
     elif sweep_direction == SweepSearcher.SweepDirection.DOWN:
-        xinds_goaly, goaly = search_free_grid_index_at_edge_y(grid_map,
+        x_inds_goal_y, goal_y = search_free_grid_index_at_edge_y(grid_map,
                                                               from_upper=False)
 
-    return grid_map, xinds_goaly, goaly
+    return grid_map, x_inds_goal_y, goal_y
 
 
-def sweep_path_search(sweep_searcher, gmap, grid_search_animation=False):
+def sweep_path_search(sweep_searcher, grid_map, grid_search_animation=False):
     # search start grid
-    cxind, cyind = sweep_searcher.search_start_grid(gmap)
-    if not gmap.set_value_from_xy_index(cxind, cyind, 0.5):
+    cxind, cyind = sweep_searcher.search_start_grid(grid_map)
+    if not grid_map.set_value_from_xy_index(cxind, cyind, 0.5):
         print("Cannot find start grid")
         return [], []
 
-    x, y = gmap.calc_grid_central_xy_position_from_xy_index(cxind, cyind)
+    x, y = grid_map.calc_grid_central_xy_position_from_xy_index(cxind, cyind)
     px, py = [x], [y]
 
     fig, ax = None, None
@@ -229,26 +231,26 @@ def sweep_path_search(sweep_searcher, gmap, grid_search_animation=False):
                                    exit(0) if event.key == 'escape' else None])
 
     while True:
-        cxind, cyind = sweep_searcher.move_target_grid(cxind, cyind, gmap)
+        cxind, cyind = sweep_searcher.move_target_grid(cxind, cyind, grid_map)
 
-        if sweep_searcher.is_search_done(gmap) or (
+        if sweep_searcher.is_search_done(grid_map) or (
                 cxind is None or cyind is None):
             print("Done")
             break
 
-        x, y = gmap.calc_grid_central_xy_position_from_xy_index(
+        x, y = grid_map.calc_grid_central_xy_position_from_xy_index(
             cxind, cyind)
 
         px.append(x)
         py.append(y)
 
-        gmap.set_value_from_xy_index(cxind, cyind, 0.5)
+        grid_map.set_value_from_xy_index(cxind, cyind, 0.5)
 
         if grid_search_animation:
-            gmap.plot_grid_map(ax=ax)
+            grid_map.plot_grid_map(ax=ax)
             plt.pause(1.0)
 
-    gmap.plot_grid_map()
+    grid_map.plot_grid_map()
 
     return px, py
 
@@ -307,11 +309,6 @@ def planning_animation(ox, oy, reso):  # pragma: no cover
 def main():  # pragma: no cover
     print("start!!")
 
-    ox = [0.0, 50.0, 50.0, 0.0, 0.0]
-    oy = [0.0, 0.0, 50.0, 50.0, 0.0]
-    reso = 0.4
-    planning_animation(ox, oy, reso)
-
     ox = [0.0, 20.0, 50.0, 100.0, 130.0, 40.0, 0.0]
     oy = [0.0, -20.0, 0.0, 30.0, 60.0, 80.0, 0.0]
     reso = 5.0
@@ -328,7 +325,6 @@ def main():  # pragma: no cover
     planning_animation(ox, oy, reso)
 
     plt.show()
-
     print("done!!")
 
 
