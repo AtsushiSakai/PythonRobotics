@@ -51,7 +51,7 @@ class GridMap:
 
         grid_ind = self.calc_grid_index_from_xy_index(x_ind, y_ind)
 
-        if 0 <= grid_ind <= self.ndata:
+        if 0 <= grid_ind < self.ndata:
             return self.data[grid_ind]
         else:
             return None
@@ -163,7 +163,7 @@ class GridMap:
 
         val = self.get_value_from_xy_index(xind, yind)
 
-        if val >= occupied_val:
+        if val is None or val >= occupied_val:
             return True
         else:
             return False

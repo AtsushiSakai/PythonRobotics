@@ -30,22 +30,23 @@ class SweepSearcher:
         RIGHT = 1
         LEFT = -1
 
-    def __init__(self, mdirection, sdirection, xinds_goaly, goaly):
-        self.moving_direction = mdirection
-        self.sweep_direction = sdirection
+    def __init__(self, moving_direction, sweep_direction, x_inds_goal_y, goal_y):
+        self.moving_direction = moving_direction
+        self.sweep_direction = sweep_direction
         self.turing_window = []
         self.update_turning_window()
-        self.xinds_goaly = xinds_goaly
-        self.goaly = goaly
+        self.xinds_goaly = x_inds_goal_y
+        self.goaly = goal_y
 
     def move_target_grid(self, cxind, cyind, gmap):
         nxind = self.moving_direction + cxind
         nyind = cyind
 
         # found safe grid
-        if not gmap.check_occupied_from_xy_index(nxind, nyind, occupied_val=0.5):
+        if not gmap.check_occupied_from_xy_index(nxind, nyind,
+                                                 occupied_val=0.5):
             return nxind, nyind
-        else:  # occupided
+        else:  # occupied
             ncxind, ncyind = self.find_safe_turning_grid(cxind, cyind, gmap)
             if (ncxind is None) and (ncyind is None):
                 # moving backward
@@ -56,27 +57,31 @@ class SweepSearcher:
                     return None, None
             else:
                 # keep moving until end
-                while not gmap.check_occupied_from_xy_index(ncxind + self.moving_direction, ncyind, occupied_val=0.5):
+                while not gmap.check_occupied_from_xy_index(
+                        ncxind + self.moving_direction, ncyind,
+                        occupied_val=0.5):
                     ncxind += self.moving_direction
                 self.swap_moving_direction()
             return ncxind, ncyind
 
     def find_safe_turning_grid(self, cxind, cyind, gmap):
 
-        for (dxind, dyind) in self.turing_window:
+        for (d_x_ind, d_y_ind) in self.turing_window:
 
-            nxind = dxind + cxind
-            nyind = dyind + cyind
+            next_x_ind = d_x_ind + cxind
+            next_y_ind = d_y_ind + cyind
 
             # found safe grid
-            if not gmap.check_occupied_from_xy_index(nxind, nyind, occupied_val=0.5):
-                return nxind, nyind
+            if not gmap.check_occupied_from_xy_index(next_x_ind, next_y_ind,
+                                                     occupied_val=0.5):
+                return next_x_ind, next_y_ind
 
         return None, None
 
-    def is_search_done(self, gmap):
+    def is_search_done(self, grid_map):
         for ix in self.xinds_goaly:
-            if not gmap.check_occupied_from_xy_index(ix, self.goaly, occupied_val=0.5):
+            if not grid_map.check_occupied_from_xy_index(ix, self.goaly,
+                                                         occupied_val=0.5):
                 return False
 
         # all lower grid is occupied
@@ -95,22 +100,24 @@ class SweepSearcher:
         self.update_turning_window()
 
     def search_start_grid(self, grid_map):
-        xinds = []
+        x_inds = []
         y_ind = 0
         if self.sweep_direction == self.SweepDirection.DOWN:
-            xinds, y_ind = search_free_grid_index_at_edge_y(grid_map, from_upper=True)
+            x_inds, y_ind = search_free_grid_index_at_edge_y(
+                grid_map, from_upper=True)
         elif self.sweep_direction == self.SweepDirection.UP:
-            xinds, y_ind = search_free_grid_index_at_edge_y(grid_map, from_upper=False)
+            x_inds, y_ind = search_free_grid_index_at_edge_y(
+                grid_map, from_upper=False)
 
         if self.moving_direction == self.MovingDirection.RIGHT:
-            return min(xinds), y_ind
+            return min(x_inds), y_ind
         elif self.moving_direction == self.MovingDirection.LEFT:
-            return max(xinds), y_ind
+            return max(x_inds), y_ind
 
         raise ValueError("self.moving direction is invalid ")
 
 
-def find_sweep_direction_and_start_posi(ox, oy):
+def find_sweep_direction_and_start_position(ox, oy):
     # find sweep_direction
     max_dist = 0.0
     vec = [0.0, 0.0]
@@ -194,9 +201,11 @@ def setup_grid_map(ox, oy, reso, sweep_direction, offset_grid=10):
     xinds_goaly = []
     goaly = 0
     if sweep_direction == SweepSearcher.SweepDirection.UP:
-        xinds_goaly, goaly = search_free_grid_index_at_edge_y(grid_map, from_upper=True)
+        xinds_goaly, goaly = search_free_grid_index_at_edge_y(grid_map,
+                                                              from_upper=True)
     elif sweep_direction == SweepSearcher.SweepDirection.DOWN:
-        xinds_goaly, goaly = search_free_grid_index_at_edge_y(grid_map, from_upper=False)
+        xinds_goaly, goaly = search_free_grid_index_at_edge_y(grid_map,
+                                                              from_upper=False)
 
     return grid_map, xinds_goaly, goaly
 
@@ -211,16 +220,19 @@ def sweep_path_search(sweep_searcher, gmap, grid_search_animation=False):
     x, y = gmap.calc_grid_central_xy_position_from_xy_index(cxind, cyind)
     px, py = [x], [y]
 
+    fig, ax = None, None
     if grid_search_animation:
         fig, ax = plt.subplots()
         # for stopping simulation with the esc key.
         fig.canvas.mpl_connect('key_release_event',
-                lambda event: [exit(0) if event.key == 'escape' else None])
+                               lambda event: [
+                                   exit(0) if event.key == 'escape' else None])
 
     while True:
         cxind, cyind = sweep_searcher.move_target_grid(cxind, cyind, gmap)
 
-        if sweep_searcher.is_search_done(gmap) or (cxind is None or cyind is None):
+        if sweep_searcher.is_search_done(gmap) or (
+                cxind is None or cyind is None):
             print("Done")
             break
 
@@ -245,13 +257,16 @@ def planning(ox, oy, reso,
              moving_direction=SweepSearcher.MovingDirection.RIGHT,
              sweeping_direction=SweepSearcher.SweepDirection.UP,
              ):
-    sweep_vec, sweep_start_posi = find_sweep_direction_and_start_posi(ox, oy)
+    sweep_vec, sweep_start_posi = find_sweep_direction_and_start_position(
+        ox, oy)
 
     rox, roy = convert_grid_coordinate(ox, oy, sweep_vec, sweep_start_posi)
 
-    gmap, xinds_goaly, goaly = setup_grid_map(rox, roy, reso, sweeping_direction)
+    gmap, xinds_goaly, goaly = setup_grid_map(rox, roy, reso,
+                                              sweeping_direction)
 
-    sweep_searcher = SweepSearcher(moving_direction, sweeping_direction, xinds_goaly, goaly)
+    sweep_searcher = SweepSearcher(moving_direction, sweeping_direction,
+                                   xinds_goaly, goaly)
 
     px, py = sweep_path_search(sweep_searcher, gmap)
 
@@ -270,8 +285,9 @@ def planning_animation(ox, oy, reso):  # pragma: no cover
         for ipx, ipy in zip(px, py):
             plt.cla()
             # for stopping simulation with the esc key.
-            plt.gcf().canvas.mpl_connect('key_release_event',
-                    lambda event: [exit(0) if event.key == 'escape' else None])
+            plt.gcf().canvas.mpl_connect(
+                'key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(ox, oy, "-xb")
             plt.plot(px, py, "-r")
             plt.plot(ipx, ipy, "or")
@@ -285,10 +301,16 @@ def planning_animation(ox, oy, reso):  # pragma: no cover
     plt.axis("equal")
     plt.grid(True)
     plt.pause(0.1)
+    plt.close()
 
 
 def main():  # pragma: no cover
     print("start!!")
+
+    ox = [0.0, 50.0, 50.0, 0.0, 0.0]
+    oy = [0.0, 0.0, 50.0, 50.0, 0.0]
+    reso = 0.4
+    planning_animation(ox, oy, reso)
 
     ox = [0.0, 20.0, 50.0, 100.0, 130.0, 40.0, 0.0]
     oy = [0.0, -20.0, 0.0, 30.0, 60.0, 80.0, 0.0]
