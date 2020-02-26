@@ -17,7 +17,7 @@ class DijkstraSearch:
         Node class for dijkstra search
         """
 
-        def __init__(self, x, y, cost, parent):
+        def __init__(self, x, y, cost=None, parent=None):
             self.x = x
             self.y = y
             self.cost = cost
