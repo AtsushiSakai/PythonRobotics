@@ -34,7 +34,7 @@ class VisibilityRoadMap:
 
         road_map_info = self.generate_road_map_info(nodes, obstacles)
 
-        if show_animation:
+        if self.do_plot:
             self.plot_road_map(nodes, road_map_info)
             plt.pause(1.0)
 
@@ -197,7 +197,7 @@ def main():
         ),
         ObstaclePolygon(
             [20.0, 30.0, 30.0, 20.0],
-            [40.0, 45.0, 70.0, 50.0],
+            [40.0, 45.0, 60.0, 50.0],
         )
     ]
 
@@ -206,6 +206,7 @@ def main():
         plt.plot(gx, gy, "ob")
         for ob in obstacles:
             ob.plot()
+        plt.axis("equal")
         plt.pause(1.0)
 
     rx, ry = VisibilityRoadMap(robot_radius, do_plot=show_animation).planning(
@@ -214,7 +215,6 @@ def main():
     if show_animation:  # pragma: no cover
         plt.plot(rx, ry, "-r")
         plt.pause(0.1)
-        plt.axis("equal")
         plt.show()
 
 
