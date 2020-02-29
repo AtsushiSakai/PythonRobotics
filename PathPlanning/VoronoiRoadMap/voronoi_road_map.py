@@ -23,21 +23,22 @@ class VoronoiRoadMapPlanner:
         self.N_KNN = 10  # number of edge from one sampled point
         self.MAX_EDGE_LEN = 30.0  # [m] Maximum edge length
 
-    def planning(self, sx, sy, gx, gy, ox, oy, rr):
+    def planning(self, sx, sy, gx, gy, ox, oy, robot_radius):
         obstacle_tree = KDTree(np.vstack((ox, oy)).T)
 
         sample_x, sample_y = self.voronoi_sampling(sx, sy, gx, gy, ox, oy)
         if show_animation:  # pragma: no cover
             plt.plot(sample_x, sample_y, ".b")
 
-        road_map = self.generate_road_map(sample_x, sample_y, rr, obstacle_tree)
+        road_map_info = self.generate_road_map_info(
+            sample_x, sample_y, robot_radius, obstacle_tree)
 
-        rx, ry = DijkstraSearch(show_animation).search(sx, sy, gx, gy, road_map,
-                                                       sample_x, sample_y)
-
+        rx, ry = DijkstraSearch(show_animation).search(sx, sy, gx, gy,
+                                                       sample_x, sample_y,
+                                                       road_map_info)
         return rx, ry
 
-    def is_collision(self, sx, sy, gx, gy, rr, obstacle_kdtree):
+    def is_collision(self, sx, sy, gx, gy, rr, obstacle_kd_tree):
         x = sx
         y = sy
         dx = gx - sx
@@ -52,25 +53,25 @@ class VoronoiRoadMapPlanner:
         n_step = round(d / D)
 
         for i in range(n_step):
-            ids, dist = obstacle_kdtree.search(np.array([x, y]).reshape(2, 1))
+            ids, dist = obstacle_kd_tree.search(np.array([x, y]).reshape(2, 1))
             if dist[0] <= rr:
                 return True  # collision
             x += D * math.cos(yaw)
             y += D * math.sin(yaw)
 
         # goal point check
-        ids, dist = obstacle_kdtree.search(np.array([gx, gy]).reshape(2, 1))
+        ids, dist = obstacle_kd_tree.search(np.array([gx, gy]).reshape(2, 1))
         if dist[0] <= rr:
             return True  # collision
 
         return False  # OK
 
-    def generate_road_map(self, node_x, node_y, rr, obstacle_tree):
+    def generate_road_map_info(self, node_x, node_y, rr, obstacle_tree):
         """
         Road map generation
 
-        sample_x: [m] x positions of sampled points
-        sample_y: [m] y positions of sampled points
+        node_x: [m] x positions of sampled points
+        node_y: [m] y positions of sampled points
         rr: Robot Radius[m]
         obstacle_tree: KDTree object of obstacles
         """

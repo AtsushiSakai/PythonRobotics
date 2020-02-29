@@ -1,6 +1,6 @@
 """
 
-Visibility Graph Planner
+Visibility Road Map Planner
 
 author: Atsushi Sakai (@Atsushi_twi)
 
@@ -8,35 +8,47 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 import os
 import sys
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                "/../VoronoiRoadMap/")
-
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+
+from PathPlanning.VisibilityRoadMap.geometry import Geometry
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/../VoronoiRoadMap/")
 from dijkstra_search import DijkstraSearch
 
 show_animation = True
 
 
-class VisibilityGraphPlanner:
+class VisibilityRoadMap:
 
-    def __init__(self, robot_radius):
+    def __init__(self, robot_radius, do_plot=False):
         self.robot_radius = robot_radius
+        self.do_plot = do_plot
 
     def planning(self, start_x, start_y, goal_x, goal_y, obstacles):
-        nodes = self.extract_graph_node(start_x, start_y, goal_x, goal_y,
-                                        obstacles)
-        graph = self.generate_graph(nodes, obstacles)
 
-        # rx, ry = DijkstraSearch().search(graph)
+        nodes = self.generate_graph_node(start_x, start_y, goal_x, goal_y,
+                                         obstacles)
 
-        rx, ry = [], []
+        road_map_info = self.generate_road_map_info(nodes, obstacles)
+
+        if show_animation:
+            self.plot_road_map(nodes, road_map_info)
+            plt.pause(1.0)
+
+        rx, ry = DijkstraSearch(show_animation).search(
+            start_x, start_y,
+            goal_x, goal_y,
+            [node.x for node in nodes],
+            [node.y for node in nodes],
+            road_map_info
+        )
 
         return rx, ry
 
-    def extract_graph_node(self, start_x, start_y, goal_x, goal_y, obstacles):
+    def generate_graph_node(self, start_x, start_y, goal_x, goal_y, obstacles):
 
         # add start and goal as nodes
         nodes = [DijkstraSearch.Node(start_x, start_y),
@@ -57,11 +69,11 @@ class VisibilityGraphPlanner:
         return nodes
 
     def calc_vertexes_in_configuration_space(self, x_list, y_list):
-        x_list=x_list[0:-1]
-        y_list=y_list[0:-1]
+        x_list = x_list[0:-1]
+        y_list = y_list[0:-1]
         cvx_list, cvy_list = [], []
 
-        n_data=len(x_list)
+        n_data = len(x_list)
 
         for index in range(n_data):
             offset_x, offset_y = self.calc_offset_xy(
@@ -74,31 +86,39 @@ class VisibilityGraphPlanner:
 
         return cvx_list, cvy_list
 
-    def generate_graph(self, nodes, obstacles):
+    def generate_road_map_info(self, nodes, obstacles):
 
-        graph = []
+        road_map_info_list = []
 
         for target_node in nodes:
-            for node in nodes:
+            road_map_info = []
+            for node_id, node in enumerate(nodes):
+                if np.hypot(target_node.x - node.x,
+                            target_node.y - node.y) <= 0.1:
+                    continue
+
+                is_valid = True
                 for obstacle in obstacles:
                     if not self.is_edge_valid(target_node, node, obstacle):
-                        print("bb")
+                        is_valid = False
                         break
-                    print(target_node, node)
-                    print("aa")
-                    plt.plot([target_node.x, node.x],[target_node.y, node.y], "-r")
+                if is_valid:
+                    road_map_info.append(node_id)
 
-        return graph
+            road_map_info_list.append(road_map_info)
 
-    def is_edge_valid(self, target_node, node, obstacle):
+        return road_map_info_list
 
-        for i in range(len(obstacle.x_list)-1):
-            p1 = np.array([target_node.x, target_node.y])
-            p2 = np.array([node.x, node.y])
-            p3 = np.array([obstacle.x_list[i], obstacle.y_list[i]])
-            p4 = np.array([obstacle.y_list[i+1], obstacle.y_list[i+1]])
+    @staticmethod
+    def is_edge_valid(target_node, node, obstacle):
 
-            if is_seg_intersect(p1, p2, p3, p4):
+        for i in range(len(obstacle.x_list) - 1):
+            p1 = Geometry.Point(target_node.x, target_node.y)
+            p2 = Geometry.Point(node.x, node.y)
+            p3 = Geometry.Point(obstacle.x_list[i], obstacle.y_list[i])
+            p4 = Geometry.Point(obstacle.x_list[i + 1], obstacle.y_list[i + 1])
+
+            if Geometry.is_seg_intersect(p1, p2, p3, p4):
                 return False
 
         return True
@@ -108,25 +128,18 @@ class VisibilityGraphPlanner:
         n_vec = math.atan2(ny - y, nx - x)
         offset_vec = math.atan2(math.sin(p_vec) + math.sin(n_vec),
                                 math.cos(p_vec) + math.cos(
-                                    n_vec))+math.pi/2.0
+                                    n_vec)) + math.pi / 2.0
         offset_x = x + self.robot_radius * math.cos(offset_vec)
         offset_y = y + self.robot_radius * math.sin(offset_vec)
         return offset_x, offset_y
 
+    @staticmethod
+    def plot_road_map(nodes, road_map_info_list):
+        for i, node in enumerate(nodes):
+            for index in road_map_info_list[i]:
+                plt.plot([node.x, nodes[index].x],
+                         [node.y, nodes[index].y], "-b")
 
-def is_seg_intersect(a1, a2, b1, b2):
-
-    xdiff = [a1[0] - a2[0], b1[0] - b2[0]]
-    ydiff = [a1[1] - a2[1], b1[1] - b2[1]]
-
-    def det(a, b):
-        return a[0] * b[1] - a[1] * b[0]
-
-    div = det(xdiff, ydiff)
-    if div == 0:
-        return False
-    else:
-        return True
 
 class ObstaclePolygon:
 
@@ -161,7 +174,7 @@ class ObstaclePolygon:
         self.y_list.append(self.y_list[0])
 
     def plot(self):
-        plt.plot(self.x_list, self.y_list, "-b")
+        plt.plot(self.x_list, self.y_list, "-k")
 
 
 def main():
@@ -170,26 +183,36 @@ def main():
     # start and goal position
     sx, sy = 10.0, 10.0  # [m]
     gx, gy = 50.0, 50.0  # [m]
+
     robot_radius = 5.0  # [m]
 
-    obstacles = [ObstaclePolygon(
-        [20.0, 30.0, 15.0],
-        [20.0, 20.0, 30.0],
-    ), ObstaclePolygon(
-        [30.0, 45.0, 50.0, 40.0],
-        [50.0, 40.0, 20.0, 40.0],
-    )]
+    obstacles = [
+        ObstaclePolygon(
+            [20.0, 30.0, 15.0],
+            [20.0, 20.0, 30.0],
+        ),
+        ObstaclePolygon(
+            [40.0, 45.0, 50.0, 40.0],
+            [50.0, 40.0, 20.0, 40.0],
+        ),
+        ObstaclePolygon(
+            [20.0, 30.0, 30.0, 20.0],
+            [40.0, 45.0, 70.0, 50.0],
+        )
+    ]
 
     if show_animation:  # pragma: no cover
         plt.plot(sx, sy, "or")
         plt.plot(gx, gy, "ob")
         [ob.plot() for ob in obstacles]
+        plt.pause(1.0)
 
-    rx, ry = VisibilityGraphPlanner(robot_radius).planning(sx, sy, gx, gy,
-                                                           obstacles)
-    # assert rx, 'Cannot found path'
+    rx, ry = VisibilityRoadMap(robot_radius, do_plot=show_animation).planning(
+        sx, sy, gx, gy, obstacles)
+
     if show_animation:  # pragma: no cover
         plt.plot(rx, ry, "-r")
+        plt.pause(0.1)
         plt.axis("equal")
         plt.show()
 
