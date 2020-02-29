@@ -121,7 +121,7 @@ class DijkstraSearch:
         return False
 
     def find_id(self, node_x_list, node_y_list, target_node):
-        for i in range(len(node_x_list)):
+        for i, _ in enumerate(node_x_list):
             if self.is_same_node_with_xy(node_x_list[i], node_y_list[i],
                                          target_node):
                 return i

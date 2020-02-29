@@ -24,11 +24,6 @@ class Dijkstra:
         rr: robot radius[m]
         """
 
-        self.resolution = resolution
-        self.robot_radius = robot_radius
-        self.calc_obstacle_map(ox, oy)
-        self.motion = self.get_motion_model()
-
         self.min_x = None
         self.min_y = None
         self.max_x = None
@@ -36,6 +31,11 @@ class Dijkstra:
         self.x_width = None
         self.y_width = None
         self.obstacle_map = None
+
+        self.resolution = resolution
+        self.robot_radius = robot_radius
+        self.calc_obstacle_map(ox, oy)
+        self.motion = self.get_motion_model()
 
     class Node:
         def __init__(self, x, y, cost, parent):
@@ -151,11 +151,11 @@ class Dijkstra:
 
         if px < self.min_x:
             return False
-        elif py < self.min_y:
+        if py < self.min_y:
             return False
-        elif px >= self.max_x:
+        if px >= self.max_x:
             return False
-        elif py >= self.max_y:
+        if py >= self.max_y:
             return False
 
         if self.obstacle_map[node.x][node.y]:
@@ -169,15 +169,15 @@ class Dijkstra:
         self.min_y = round(min(oy))
         self.max_x = round(max(ox))
         self.max_y = round(max(oy))
-        print("minx:", self.min_x)
-        print("miny:", self.min_y)
-        print("maxx:", self.max_x)
-        print("maxy:", self.max_y)
+        print("min_x:", self.min_x)
+        print("min_y:", self.min_y)
+        print("max_x:", self.max_x)
+        print("max_y:", self.max_y)
 
         self.x_width = round((self.max_x - self.min_x) / self.resolution)
         self.y_width = round((self.max_y - self.min_y) / self.resolution)
-        print("xwidth:", self.x_width)
-        print("ywidth:", self.y_width)
+        print("x_width:", self.x_width)
+        print("y_width:", self.y_width)
 
         # obstacle map generation
         self.obstacle_map = [[False for _ in range(self.y_width)]

@@ -204,7 +204,8 @@ def main():
     if show_animation:  # pragma: no cover
         plt.plot(sx, sy, "or")
         plt.plot(gx, gy, "ob")
-        [ob.plot() for ob in obstacles]
+        for ob in obstacles:
+            ob.plot()
         plt.pause(1.0)
 
     rx, ry = VisibilityRoadMap(robot_radius, do_plot=show_animation).planning(

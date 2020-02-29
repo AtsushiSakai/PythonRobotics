@@ -18,10 +18,9 @@ class Geometry:
                     float(q.x - p.x) * (r.y - q.y))
             if val > 0:
                 return 1
-            elif val < 0:
+            if val < 0:
                 return 2
-            else:
-                return 0
+            return 0
 
         # Find the 4 orientations required for
         # the general and special cases
