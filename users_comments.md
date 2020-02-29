@@ -23,6 +23,8 @@ If you found other users, please make an issue to let me know.
 
 - [CSCI/ARTI 4530/6530: Introduction to Robotics (Fall 2018),  University of Georgia ](http://cobweb.cs.uga.edu/~ramviyas/csci_x530.html)
 
+- [CIT Modules & Programmes \- COMP9073 \- Automation with Python](https://courses.cit.ie/index.cfm/page/module/moduleId/14416)
+
 # Stargazers location map
 
 You can check stargazer's locations of this project from:
@@ -415,3 +417,4 @@ URL: https://pdfs.semanticscholar.org/5c06/f3cb9542a51e1bf1a32523c1bc7fea6cecc5.
 
 - Real-time Model Predictive Control (MPC), ACADO, Python | Work-is-Playing http://grauonline.de/wordpress/?page_id=3244
 
+- 💡 Greatest of GitHub - Python Robotics (Amazing!) - YouTube https://www.youtube.com/watch?v=f_pPaYx6Gu0&feature=emb_logo
