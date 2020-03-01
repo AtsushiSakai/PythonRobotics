@@ -1,6 +1,6 @@
 """
 
-Path Plannting with B-Spline
+Path Planning with B-Spline
 
 author: Atsushi Sakai (@Atsushi_twi)
 
@@ -8,16 +8,13 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.interpolate as si
-
-# parameter
-N = 3  # B Spline order
+import scipy.interpolate as scipy_interpolate
 
 
-def bspline_planning(x, y, sn):
+def b_spline_planning(x, y, sn, degree=3):
     t = range(len(x))
-    x_tup = si.splrep(t, x, k=N)
-    y_tup = si.splrep(t, y, k=N)
+    x_tup = scipy_interpolate.splrep(t, x, k=degree)
+    y_tup = scipy_interpolate.splrep(t, y, k=degree)
 
     x_list = list(x_tup)
     xl = x.tolist()
@@ -28,8 +25,8 @@ def bspline_planning(x, y, sn):
     y_list[1] = yl + [0.0, 0.0, 0.0, 0.0]
 
     ipl_t = np.linspace(0.0, len(x) - 1, sn)
-    rx = si.splev(ipl_t, x_list)
-    ry = si.splev(ipl_t, y_list)
+    rx = scipy_interpolate.splev(ipl_t, x_list)
+    ry = scipy_interpolate.splev(ipl_t, y_list)
 
     return rx, ry
 
@@ -37,14 +34,14 @@ def bspline_planning(x, y, sn):
 def main():
     print(__file__ + " start!!")
     # way points
-    x = np.array([-1.0, 3.0, 4.0, 2.0, 1.0])
-    y = np.array([0.0, -3.0, 1.0, 1.0, 3.0])
+    way_x = np.array([-1.0, 3.0, 4.0, 2.0, 1.0])
+    way_y = np.array([0.0, -3.0, 1.0, 1.0, 3.0])
     sn = 100  # sampling number
 
-    rx, ry = bspline_planning(x, y, sn)
+    rx, ry = b_spline_planning(way_x, way_y, sn)
 
     # show results
-    plt.plot(x, y, '-og', label="Waypoints")
+    plt.plot(way_x, way_y, '-og', label="way points")
     plt.plot(rx, ry, '-r', label="B-Spline path")
     plt.grid(True)
     plt.legend()
