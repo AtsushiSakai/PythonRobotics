@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import scipy.interpolate as scipy_interpolate
 
 
-def approximate_b_spline_path(x: list, y: list, n_path_points: int,
+def approximate_b_spline_path(x: int, y: list, n_path_points: int,
                               degree: int = 3) -> tuple:
     """
     approximate points with a B-Spline path
