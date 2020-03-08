@@ -1,3 +1,4 @@
 name: Mypy Check
+on: [push]
 uses: jpetrucciani/mypy-check@0.761
 
