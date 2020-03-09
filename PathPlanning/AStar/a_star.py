@@ -41,7 +41,8 @@ class AStarPlanner:
             self.pind = pind
 
         def __str__(self):
-            return str(self.x) + "," + str(self.y) + "," + str(self.cost) + "," + str(self.pind)
+            return str(self.x) + "," + str(self.y) + "," + str(
+                self.cost) + "," + str(self.pind)
 
     def planning(self, sx, sy, gx, gy):
         """
@@ -72,7 +73,10 @@ class AStarPlanner:
                 break
 
             c_id = min(
-                open_set, key=lambda o: open_set[o].cost + self.calc_heuristic(ngoal, open_set[o]))
+                open_set,
+                key=lambda o: open_set[o].cost + self.calc_heuristic(ngoal,
+                                                                     open_set[
+                                                                         o]))
             current = open_set[c_id]
 
             # show graph
@@ -81,7 +85,8 @@ class AStarPlanner:
                          self.calc_grid_position(current.y, self.miny), "xc")
                 # for stopping simulation with the esc key.
                 plt.gcf().canvas.mpl_connect('key_release_event',
-                        lambda event: [exit(0) if event.key == 'escape' else None])
+                                             lambda event: [exit(
+                                                 0) if event.key == 'escape' else None])
                 if len(closed_set.keys()) % 10 == 0:
                     plt.pause(0.001)
 
@@ -103,7 +108,6 @@ class AStarPlanner:
                                  current.y + self.motion[i][1],
                                  current.cost + self.motion[i][2], c_id)
                 n_id = self.calc_grid_index(node)
-
 
                 # If the node is not safe, do nothing
                 if not self.verify_node(node):
