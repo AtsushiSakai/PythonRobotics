@@ -9,7 +9,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.6, 3.7]
+        python-version: [3.7]
 
     steps:
     - uses: actions/checkout@v1
@@ -29,6 +29,21 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: install coverage
-      run: pip install coverage   
-    - name: Test
+      run: pip install coverage
+    - name: install mypy
+      run: pip install mypy
+    - name: mypy check
+      run: |
+        find AerialNavigation -name "*.py" | xargs mypy
+        find ArmNavigation -name "*.py" | xargs mypy
+        find Bipedal -name "*.py" | xargs mypy
+        find InvertedPendulumCart -name "*.py" | xargs mypy
+        find Localization -name "*.py" | xargs mypy
+        find Mapping -name "*.py" | xargs mypy
+        find PathPlanning -name "*.py" | xargs mypy
+        find PathTracking -name "*.py" | xargs mypy
+        find SLAM -name "*.py" | xargs mypy
+    - name: do all unit tests
       run: bash runtests.sh
+
+

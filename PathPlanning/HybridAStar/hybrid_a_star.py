@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append("../ReedsSheppPath/")
 try:
-    from a_star import dp_planning  # , calc_obstacle_map
+    from a_star_heuristic import dp_planning  # , calc_obstacle_map
     import reeds_shepp_path_planning as rs
     from car import move, check_car_collision, MAX_STEER, WB, plot_car
 except:
