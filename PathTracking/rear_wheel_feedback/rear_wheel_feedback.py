@@ -16,7 +16,6 @@ try:
 except:
     raise
 
-
 Kp = 1.0  # speed propotional gain
 # steering control parameter
 KTH = 1.0
@@ -26,33 +25,23 @@ dt = 0.1  # [s]
 L = 2.9  # [m]
 
 show_animation = True
-#  show_animation = False
-
 
 class State:
-
     def __init__(self, x=0.0, y=0.0, yaw=0.0, v=0.0):
         self.x = x
         self.y = y
         self.yaw = yaw
         self.v = v
 
-
-def update(state, a, delta):
-
-    state.x = state.x + state.v * math.cos(state.yaw) * dt
-    state.y = state.y + state.v * math.sin(state.yaw) * dt
-    state.yaw = state.yaw + state.v / L * math.tan(delta) * dt
-    state.v = state.v + a * dt
-
-    return state
-
+    def update(self, a, delta, dt):
+        self.x   = self.x + self.v * math.cos(self.yaw) * dt
+        self.y   = self.y + self.v * math.sin(self.yaw) * dt
+        self.yaw = self.yaw + self.v / L * math.tan(delta) * dt
+        self.v   = self.v + a * dt
 
 def PIDControl(target, current):
     a = Kp * (target - current)
-
     return a
-
 
 def pi_2_pi(angle):
     while(angle > math.pi):
@@ -62,7 +51,6 @@ def pi_2_pi(angle):
         angle = angle + 2.0 * math.pi
 
     return angle
-
 
 def rear_wheel_feedback_control(state, cx, cy, cyaw, ck, preind):
     ind, e = calc_nearest_index(state, cx, cy, cyaw)
@@ -78,7 +66,6 @@ def rear_wheel_feedback_control(state, cx, cy, cyaw, ck, preind):
         return 0.0, ind
 
     delta = math.atan2(L * omega / v, 1.0)
-    #  print(k, v, e, th_e, omega, delta)
 
     return delta, ind
 
@@ -104,9 +91,7 @@ def calc_nearest_index(state, cx, cy, cyaw):
 
     return ind, mind
 
-
 def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
-
     T = 500.0  # max simulation time
     goal_dis = 0.3
     stop_speed = 0.05
@@ -126,7 +111,7 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
         di, target_ind = rear_wheel_feedback_control(
             state, cx, cy, cyaw, ck, target_ind)
         ai = PIDControl(speed_profile[target_ind], state.v)
-        state = update(state, ai, di)
+        state.update(ai, di, dt)
 
         if abs(state.v) <= stop_speed:
             target_ind += 1
@@ -163,11 +148,8 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
 
     return t, x, y, yaw, v, goal_flag
 
-
 def calc_speed_profile(cx, cy, cyaw, target_speed):
-
     speed_profile = [target_speed] * len(cx)
-
     direction = 1.0
 
     # Set stop point
@@ -189,7 +171,6 @@ def calc_speed_profile(cx, cy, cyaw, target_speed):
     speed_profile[-1] = 0.0
 
     return speed_profile
-
 
 def main():
     print("rear wheel feedback tracking start!!")
@@ -236,7 +217,6 @@ def main():
         plt.ylabel("curvature [1/m]")
 
         plt.show()
-
 
 if __name__ == '__main__':
     main()
