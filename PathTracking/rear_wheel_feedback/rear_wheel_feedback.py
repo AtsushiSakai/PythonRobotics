@@ -8,7 +8,6 @@ author: Atsushi Sakai(@Atsushi_twi)
 import matplotlib.pyplot as plt
 import math
 import numpy as np
-import sys
 
 from scipy import interpolate
 from scipy import optimize
@@ -24,11 +23,12 @@ L = 2.9  # [m]
 show_animation = True
 
 class State:
-    def __init__(self, x=0.0, y=0.0, yaw=0.0, v=0.0):
+    def __init__(self, x=0.0, y=0.0, yaw=0.0, v=0.0, direction=1):
         self.x = x
         self.y = y
         self.yaw = yaw
         self.v = v
+        self.direction = direction
 
     def update(self, a, delta, dt):
         self.x   = self.x + self.v * math.cos(self.yaw) * dt
@@ -52,36 +52,36 @@ class TrackSpline:
 
         self.length = s[-1]
     
-    def yaw(self, s):
+    def calc_yaw(self, s):
         dx, dy = self.dX(s), self.dY(s)
         return np.arctan2(dy, dx)
     
-    def curvature(self, s):
+    def calc_curvature(self, s):
         dx, dy   = self.dX(s), self.dY(s)
         ddx, ddy   = self.ddX(s), self.ddY(s)
         return (ddy * dx - ddx * dy) / ((dx ** 2 + dy ** 2)**(3 / 2))
     
-    def __findClosestPoint(self, s0, x, y):
-        def f(_s, *args):
+    def __find_nearest_point(self, s0, x, y):
+        def calc_distance(_s, *args):
             _x, _y= self.X(_s), self.Y(_s)
             return (_x - args[0])**2 + (_y - args[1])**2
         
-        def jac(_s, *args):
+        def calc_distance_jacobian(_s, *args):
             _x, _y = self.X(_s), self.Y(_s)
             _dx, _dy = self.dX(_s), self.dY(_s)
             return 2*_dx*(_x - args[0])+2*_dy*(_y-args[1])
 
-        minimum = optimize.fmin_cg(f, s0, jac, args=(x, y), full_output=True, disp=False)
+        minimum = optimize.fmin_cg(calc_distance, s0, calc_distance_jacobian, args=(x, y), full_output=True, disp=False)
         return minimum
 
-    def TrackError(self, x, y, s0):
-        ret = self.__findClosestPoint(s0, x, y)
+    def calc_track_error(self, x, y, s0):
+        ret = self.__find_nearest_point(s0, x, y)
         
         s = ret[0][0]
         e = ret[1]
 
-        k   = self.curvature(s)
-        yaw = self.yaw(s)
+        k   = self.calc_curvature(s)
+        yaw = self.calc_yaw(s)
 
         dxl = self.X(s) - x
         dyl = self.Y(s) - y
@@ -91,7 +91,7 @@ class TrackSpline:
 
         return e, k, yaw, s
 
-def PIDControl(target, current):
+def pid_control(target, current):
     a = Kp * (target - current)
     return a
 
@@ -119,10 +119,9 @@ def rear_wheel_feedback_control(state, e, k, yaw_r):
     return delta
 
 
-def closed_loop_prediction(track, speed_profile, goal):
+def simulate(track, goal):
     T = 500.0  # max simulation time
     goal_dis = 0.3
-    stop_speed = 0.05
 
     state = State(x=-0.0, y=-0.0, yaw=0.0, v=0.0)
 
@@ -135,13 +134,14 @@ def closed_loop_prediction(track, speed_profile, goal):
     goal_flag = False
 
     s = np.arange(0, track.length, 0.1)
-    e, k, yaw_r, s0 = track.TrackError(state.x, state.y, 0.0)
+    e, k, yaw_r, s0 = track.calc_track_error(state.x, state.y, 0.0)
 
     while T >= time:
-        e, k, yaw_r, s0 = track.TrackError(state.x, state.y, s0)
+        e, k, yaw_r, s0 = track.calc_track_error(state.x, state.y, s0)
         di = rear_wheel_feedback_control(state, e, k, yaw_r)
-        #ai = PIDControl(speed_profile[target_ind], state.v)
-        ai = PIDControl(speed_profile, state.v)
+
+        speed_r = calc_target_speed(state, yaw_r)
+        ai = pid_control(speed_r, state.v)
         state.update(ai, di, dt)
 
         time = time + dt
@@ -175,29 +175,20 @@ def closed_loop_prediction(track, speed_profile, goal):
 
     return t, x, y, yaw, v, goal_flag
 
-def calc_speed_profile(track, target_speed, s):
-    speed_profile = [target_speed] * len(cx)
-    direction = 1.0
+def calc_target_speed(state, yaw_r):
+    target_speed = 10.0 / 3.6
 
-    # Set stop point
-    for i in range(len(cx) - 1):
-        dyaw = cyaw[i + 1] - cyaw[i]
-        switch = math.pi / 4.0 <= dyaw < math.pi / 2.0
+    dyaw = yaw_r - state.yaw
+    switch = math.pi / 4.0 <= dyaw < math.pi / 2.0
 
-        if switch:
-            direction *= -1
-
-        if direction != 1.0:
-            speed_profile[i] = - target_speed
-        else:
-            speed_profile[i] = target_speed
-
-        if switch:
-            speed_profile[i] = 0.0
-
-    speed_profile[-1] = 0.0
-
-    return speed_profile
+    if switch:
+        state.direction *= -1
+        return 0.0
+    
+    if state.direction != 1:
+        return -target_speed
+    else:
+        return target_speed
 
 def main():
     print("rear wheel feedback tracking start!!")
@@ -208,13 +199,7 @@ def main():
     track = TrackSpline(ax, ay)
     s = np.arange(0, track.length, 0.1)
 
-    target_speed = 10.0 / 3.6
-
-    # Note: disable backward direction temporary
-    #sp = calc_speed_profile(track, target_speed, s)
-    sp = target_speed 
-
-    t, x, y, yaw, v, goal_flag = closed_loop_prediction(track, sp, goal)
+    t, x, y, yaw, v, goal_flag = simulate(track, goal)
 
     # Test
     assert goal_flag, "Cannot goal"
@@ -232,14 +217,14 @@ def main():
         plt.legend()
 
         plt.subplots(1)
-        plt.plot(s, np.rad2deg(track.yaw(s)), "-r", label="yaw")
+        plt.plot(s, np.rad2deg(track.calc_yaw(s)), "-r", label="yaw")
         plt.grid(True)
         plt.legend()
         plt.xlabel("line length[m]")
         plt.ylabel("yaw angle[deg]")
 
         plt.subplots(1)
-        plt.plot(s, track.curvature(s), "-r", label="curvature")
+        plt.plot(s, track.calc_curvature(s), "-r", label="curvature")
         plt.grid(True)
         plt.legend()
         plt.xlabel("line length[m]")
