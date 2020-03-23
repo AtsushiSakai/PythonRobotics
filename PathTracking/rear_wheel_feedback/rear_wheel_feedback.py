@@ -36,7 +36,7 @@ class State:
         self.yaw = self.yaw + self.v / L * math.tan(delta) * dt
         self.v   = self.v + a * dt
 
-class TrackSpline:
+class CubicSplinePath:
     def __init__(self, x, y):
         x, y = map(np.asarray, (x, y))
         s = np.append([0],(np.cumsum(np.diff(x)**2) + np.cumsum(np.diff(y)**2))**0.5)
@@ -187,8 +187,8 @@ def calc_target_speed(state, yaw_r):
     
     if state.direction != 1:
         return -target_speed
-    else:
-        return target_speed
+
+    return target_speed
 
 def main():
     print("rear wheel feedback tracking start!!")
@@ -196,7 +196,7 @@ def main():
     ay = [0.0, 0.0, 5.0, 6.5, 3.0, 5.0, -2.0]
     goal = [ax[-1], ay[-1]]
 
-    track = TrackSpline(ax, ay)
+    track = CubicSplinePath(ax, ay)
     s = np.arange(0, track.length, 0.1)
 
     t, x, y, yaw, v, goal_flag = simulate(track, goal)
