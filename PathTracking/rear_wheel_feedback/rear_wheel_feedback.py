@@ -104,9 +104,9 @@ def pi_2_pi(angle):
 
     return angle
 
-def rear_wheel_feedback_control(state, e, k, yaw_r):
+def rear_wheel_feedback_control(state, e, k, yaw_ref):
     v = state.v
-    th_e = pi_2_pi(state.yaw - yaw_r)
+    th_e = pi_2_pi(state.yaw - yaw_ref)
 
     omega = v * k * math.cos(th_e) / (1.0 - k * e) - \
         KTH * abs(v) * th_e - KE * v * math.sin(th_e) * e / th_e
@@ -134,14 +134,14 @@ def simulate(track, goal):
     goal_flag = False
 
     s = np.arange(0, track.length, 0.1)
-    e, k, yaw_r, s0 = track.calc_track_error(state.x, state.y, 0.0)
+    e, k, yaw_ref, s0 = track.calc_track_error(state.x, state.y, 0.0)
 
     while T >= time:
-        e, k, yaw_r, s0 = track.calc_track_error(state.x, state.y, s0)
-        di = rear_wheel_feedback_control(state, e, k, yaw_r)
+        e, k, yaw_ref, s0 = track.calc_track_error(state.x, state.y, s0)
+        di = rear_wheel_feedback_control(state, e, k, yaw_ref)
 
-        speed_r = calc_target_speed(state, yaw_r)
-        ai = pid_control(speed_r, state.v)
+        speed_ref = calc_target_speed(state, yaw_ref)
+        ai = pid_control(speed_ref, state.v)
         state.update(ai, di, dt)
 
         time = time + dt
