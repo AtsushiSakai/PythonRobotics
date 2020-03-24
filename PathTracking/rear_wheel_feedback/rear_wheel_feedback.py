@@ -175,10 +175,10 @@ def simulate(track, goal):
 
     return t, x, y, yaw, v, goal_flag
 
-def calc_target_speed(state, yaw_r):
+def calc_target_speed(state, yaw_ref):
     target_speed = 10.0 / 3.6
 
-    dyaw = yaw_r - state.yaw
+    dyaw = yaw_ref - state.yaw
     switch = math.pi / 4.0 <= dyaw < math.pi / 2.0
 
     if switch:
