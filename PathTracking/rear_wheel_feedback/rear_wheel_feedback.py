@@ -119,7 +119,7 @@ def rear_wheel_feedback_control(state, e, k, yaw_ref):
     return delta
 
 
-def simulate(track, goal):
+def simulate(path_ref, goal):
     T = 500.0  # max simulation time
     goal_dis = 0.3
 
@@ -133,11 +133,11 @@ def simulate(track, goal):
     t = [0.0]
     goal_flag = False
 
-    s = np.arange(0, track.length, 0.1)
-    e, k, yaw_ref, s0 = track.calc_track_error(state.x, state.y, 0.0)
+    s = np.arange(0, path_ref.length, 0.1)
+    e, k, yaw_ref, s0 = path_ref.calc_track_error(state.x, state.y, 0.0)
 
     while T >= time:
-        e, k, yaw_ref, s0 = track.calc_track_error(state.x, state.y, s0)
+        e, k, yaw_ref, s0 = path_ref.calc_track_error(state.x, state.y, s0)
         di = rear_wheel_feedback_control(state, e, k, yaw_ref)
 
         speed_ref = calc_target_speed(state, yaw_ref)
@@ -165,9 +165,9 @@ def simulate(track, goal):
             # for stopping simulation with the esc key.
             plt.gcf().canvas.mpl_connect('key_release_event',
                     lambda event: [exit(0) if event.key == 'escape' else None])
-            plt.plot(track.X(s), track.Y(s), "-r", label="course")
+            plt.plot(path_ref.X(s), path_ref.Y(s), "-r", label="course")
             plt.plot(x, y, "ob", label="trajectory")
-            plt.plot(track.X(s0), track.Y(s0), "xg", label="target")
+            plt.plot(path_ref.X(s0), path_ref.Y(s0), "xg", label="target")
             plt.axis("equal")
             plt.grid(True)
             plt.title("speed[km/h]:{:.2f}, target s-param:{:.2f}".format(round(state.v * 3.6, 2), s0))
@@ -196,10 +196,10 @@ def main():
     ay = [0.0, 0.0, 5.0, 6.5, 3.0, 5.0, -2.0]
     goal = [ax[-1], ay[-1]]
 
-    track = CubicSplinePath(ax, ay)
-    s = np.arange(0, track.length, 0.1)
+    reference_path = CubicSplinePath(ax, ay)
+    s = np.arange(0, reference_path.length, 0.1)
 
-    t, x, y, yaw, v, goal_flag = simulate(track, goal)
+    t, x, y, yaw, v, goal_flag = simulate(reference_path, goal)
 
     # Test
     assert goal_flag, "Cannot goal"
@@ -208,7 +208,7 @@ def main():
         plt.close()
         plt.subplots(1)
         plt.plot(ax, ay, "xb", label="input")
-        plt.plot(track.X(s), track.Y(s), "-r", label="spline")
+        plt.plot(reference_path.X(s), reference_path.Y(s), "-r", label="spline")
         plt.plot(x, y, "-g", label="tracking")
         plt.grid(True)
         plt.axis("equal")
@@ -217,14 +217,14 @@ def main():
         plt.legend()
 
         plt.subplots(1)
-        plt.plot(s, np.rad2deg(track.calc_yaw(s)), "-r", label="yaw")
+        plt.plot(s, np.rad2deg(reference_path.calc_yaw(s)), "-r", label="yaw")
         plt.grid(True)
         plt.legend()
         plt.xlabel("line length[m]")
         plt.ylabel("yaw angle[deg]")
 
         plt.subplots(1)
-        plt.plot(s, track.calc_curvature(s), "-r", label="curvature")
+        plt.plot(s, reference_path.calc_curvature(s), "-r", label="curvature")
         plt.grid(True)
         plt.legend()
         plt.xlabel("line length[m]")
