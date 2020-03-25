@@ -1,0 +1,3 @@
+# Ignore LaTeX generated files
+graphSLAM_formulation.*
+!graphSLAM_formulation.tex
