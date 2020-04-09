@@ -1,18 +1,18 @@
 """
 
-A* grid planning
+DFS grid planning
 
-author: Atsushi Sakai(@Atsushi_twi)
-        Nikos Kanargias (nkana@tee.gr)
+author: Erwin Lejeune (@spida_rwin)
 
-See Wikipedia article (https://en.wikipedia.org/wiki/A*_search_algorithm)
+See Wikipedia article (https://en.wikipedia.org/wiki/depth-First_search)
 
 """
 
 import math
 
 import matplotlib.pyplot as plt
-from random import shuffle
+
+import random
 
 show_animation = True
 
@@ -35,16 +35,20 @@ class DFSPlanner:
         self.motion = self.get_motion_model()
 
     class Node:
-        def __init__(self, x, y):
+        def __init__(self, x, y, cost, pind, parent):
             self.x = x  # index of grid
             self.y = y  # index of grid
+            self.cost = cost
+            self.pind = pind
+            self.parent = parent
 
         def __str__(self):
-            return str(self.x) + "," + str(self.y)
+            return str(self.x) + "," + str(self.y) + "," + str(
+                self.cost) + "," + str(self.pind)
 
     def planning(self, sx, sy, gx, gy):
         """
-        DFS path search
+        Depth First search
 
         input:
             sx: start x position [m]
@@ -58,61 +62,83 @@ class DFSPlanner:
         """
 
         nstart = self.Node(self.calc_xyindex(sx, self.minx),
-                           self.calc_xyindex(sy, self.miny))
+                           self.calc_xyindex(sy, self.miny), 0.0, -1, None)
         ngoal = self.Node(self.calc_xyindex(gx, self.minx),
-                          self.calc_xyindex(gy, self.miny))
+                          self.calc_xyindex(gy, self.miny), 0.0, -1, None)
 
-        waiting_list = [nstart]
-        visited = []
+        open_set, closed_set = dict(), dict()
+        open_set[self.calc_grid_index(nstart)] = nstart
 
-        while(waiting_list):
-            
-            current = waiting_list.pop()
+        while 1:
+            if len(open_set) == 0:
+                print("Open set is empty..")
+                break
 
-            # Add the popped node to the visited list
-            if current not in visited:
-                visited.append(current)
-                # show graph
-                if show_animation:  # pragma: no cover
-                    plt.plot(self.calc_grid_position(current.x, self.minx),
-                            self.calc_grid_position(current.y, self.miny), "xc")
-                    # for stopping simulation with the esc key.
-                    plt.gcf().canvas.mpl_connect('key_release_event',
-                                                lambda event: [exit(
-                                                    0) if event.key == 'escape' else None])
-                    plt.pause(0.000001)
-                if current.x == ngoal.x and current.y == ngoal.y:
-                    print("Found goal")
-                    break
+            c_id = max(
+                open_set,
+                key=lambda o: open_set[o].pind)
+
+            current = open_set[c_id]
+
+            # show graph
+            if show_animation:  # pragma: no cover
+                plt.plot(self.calc_grid_position(current.x, self.minx),
+                         self.calc_grid_position(current.y, self.miny), "xc")
+                # for stopping simulation with the esc key.
+                plt.gcf().canvas.mpl_connect('key_release_event',
+                                             lambda event: [exit(
+                                                 0) if event.key == 'escape' else None])
+                if len(closed_set.keys()) % 10 == 0:
+                    plt.pause(0.001)
+
+            if current.x == ngoal.x and current.y == ngoal.y:
+                print("Find goal")
+                ngoal.pind = current.pind
+                ngoal.cost = current.cost
+                break
+
+            # Remove the item from the open set
+            del open_set[c_id]
+
+            # Add it to the closed set
+            closed_set[c_id] = current
 
             # expand_grid search grid based on motion model
             successors = [self.Node(current.x + self.motion[i][0],
-                                 current.y + self.motion[i][1]) for i, _ in enumerate(self.motion)]
+                                 current.y + self.motion[i][1],
+                                 current.cost + self.motion[i][2], c_id+1, current) for i, _ in enumerate(self.motion)]
 
-            # shuffle the child nodes to avoid bias
-            shuffle(successors)
-            for child_node in successors:
+            random.shuffle(successors)
+            for node in successors:
+                n_id = self.calc_grid_index(node)
+
                 # If the node is not safe, do nothing
-                if not self.verify_node(child_node):
+                if not self.verify_node(node):
                     continue
-                
-                if child_node not in visited:
-                    waiting_list.append(child_node)
 
-        rx, ry = self.calc_final_path(ngoal, visited)
+                if n_id not in closed_set:
+                    open_set[n_id] = node
 
+        rx, ry = self.calc_final_path(ngoal, closed_set)
         return rx, ry
 
-    def calc_final_path(self, ngoal, visited):
+    def calc_final_path(self, ngoal, closedset):
         # generate final course
         rx, ry = [self.calc_grid_position(ngoal.x, self.minx)], [
             self.calc_grid_position(ngoal.y, self.miny)]
-
-        for node in visited:
-            rx.append(self.calc_grid_position(node.x, self.minx))
-            ry.append(self.calc_grid_position(node.y, self.miny))
+        n = closedset[ngoal.pind]
+        while n.parent is not None:
+            rx.append(self.calc_grid_position(n.x, self.minx))
+            ry.append(self.calc_grid_position(n.y, self.miny))
+            n = n.parent
 
         return rx, ry
+
+    @staticmethod
+    def calc_heuristic(n1, n2):
+        w = 1.0  # weight of heuristic
+        d = w * math.hypot(n1.x - n2.x, n1.y - n2.y)
+        return d
 
     def calc_grid_position(self, index, minp):
         """
@@ -181,15 +207,15 @@ class DFSPlanner:
 
     @staticmethod
     def get_motion_model():
-        # dx, dy
-        motion = [[1, 0],
-                  [0, 1],
-                  [-1, 1],
-                  [1, -1],
-                  [-1, 0],
-                  [0, -1],
-                  [-1, -1],
-                  [1, 1]]
+        # dx, dy, cost
+        motion = [[1, 0, 1],
+                  [0, 1, 1],
+                  [-1, 0, 1],
+                  [0, -1, 1],
+                  [-1, -1, math.sqrt(2)],
+                  [-1, 1, math.sqrt(2)],
+                  [1, -1, math.sqrt(2)],
+                  [1, 1, math.sqrt(2)]]
 
         return motion
 
@@ -233,11 +259,12 @@ def main():
         plt.grid(True)
         plt.axis("equal")
 
-    dfs = DFSPlanner(ox, oy, grid_size, robot_radius)
-    rx, ry = dfs.planning(sx, sy, gx, gy)
+    DFS = DFSPlanner(ox, oy, grid_size, robot_radius)
+    rx, ry = DFS.planning(sx, sy, gx, gy)
 
     if show_animation:  # pragma: no cover
         plt.plot(rx, ry, "-r")
+        plt.pause(0.01)
         plt.show()
 
 
