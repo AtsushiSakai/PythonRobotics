@@ -105,7 +105,7 @@ class BFSPlanner:
                                  current.y + self.motion[i][1],
                                  current.cost + self.motion[i][2], c_id+1, current) for i, _ in enumerate(self.motion)]
 
-            #random.shuffle(successors)
+            random.shuffle(successors)
             for node in successors:
                 n_id = self.calc_grid_index(node)
 
