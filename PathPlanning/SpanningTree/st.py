@@ -1,6 +1,6 @@
 """
 
-ST grid planning
+Spanning Tree grid planning
 
 author: Erwin Lejeune (@spida_rwin)
 
@@ -19,7 +19,7 @@ class STPlanner:
 
     def __init__(self, ox, oy, reso, rr):
         """
-        Initialize grid map for a star planning
+        Initialize grid map for spanning tree planning
 
         ox: x position list of Obstacles [m]
         oy: y position list of Obstacles [m]

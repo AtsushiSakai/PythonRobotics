@@ -1,6 +1,6 @@
 """
 
-DFS grid planning
+Depth-First grid planning
 
 author: Erwin Lejeune (@spida_rwin)
 
@@ -21,7 +21,7 @@ class DFSPlanner:
 
     def __init__(self, ox, oy, reso, rr):
         """
-        Initialize grid map for a star planning
+        Initialize grid map for DFS planning
 
         ox: x position list of Obstacles [m]
         oy: y position list of Obstacles [m]

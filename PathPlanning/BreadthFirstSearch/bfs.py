@@ -1,6 +1,6 @@
 """
 
-BFS grid planning
+Breadth-First grid planning
 
 author: Erwin Lejeune (@spida_rwin)
 
@@ -21,7 +21,7 @@ class BFSPlanner:
 
     def __init__(self, ox, oy, reso, rr):
         """
-        Initialize grid map for a star planning
+        Initialize grid map for bfs planning
 
         ox: x position list of Obstacles [m]
         oy: y position list of Obstacles [m]
