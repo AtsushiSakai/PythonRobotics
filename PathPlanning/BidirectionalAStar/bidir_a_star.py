@@ -321,9 +321,6 @@ def main():
     bidir_a_star = BidirAStarPlanner(ox, oy, grid_size, robot_radius)
     rx, ry = bidir_a_star.planning(sx, sy, gx, gy)
 
-    print(rx)
-    print(ry)
-
     if show_animation:  # pragma: no cover
         plt.plot(rx, ry, "-r")
         plt.pause(.0001)
