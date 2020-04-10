@@ -16,7 +16,7 @@ class Dijkstra:
 
     def __init__(self, ox, oy, resolution, robot_radius):
         """
-        Initialize map for a star planning
+        Initialize map for dijkstra planning
 
         ox: x position list of Obstacles [m]
         oy: y position list of Obstacles [m]
