@@ -270,6 +270,7 @@ def main():
 
     if show_animation:  # pragma: no cover
         plt.plot(rx, ry, "-r")
+        plt.pause(0.01)
         plt.show()
 
 
