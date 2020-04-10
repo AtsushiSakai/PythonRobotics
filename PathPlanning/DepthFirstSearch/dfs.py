@@ -95,6 +95,7 @@ class DFSPlanner:
                 print("Find goal")
                 ngoal.pind = current.pind
                 ngoal.cost = current.cost
+                closed_set[current.pind] = current
                 break
 
             # Remove the item from the open set
