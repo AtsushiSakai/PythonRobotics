@@ -4,7 +4,7 @@ Bidirectional A* grid planning
 
 author: Erwin Lejeune (@spida_rwin)
 
-See Wikipedia article (https://en.wikipedia.org/wiki/A*_search_algorithm)
+See Wikipedia article (https://en.wikipedia.org/wiki/Bidirectional_search)
 
 """
 
@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 show_animation = True
 
 
-class AStarPlanner:
+class BidirAStarPlanner:
 
     def __init__(self, ox, oy, reso, rr):
         """
@@ -45,7 +45,7 @@ class AStarPlanner:
 
     def planning(self, sx, sy, gx, gy):
         """
-        A star path search
+        Bidirectional A star path search
 
         input:
             sx: start x position [m]
@@ -318,8 +318,8 @@ def main():
         plt.grid(True)
         plt.axis("equal")
 
-    a_star = AStarPlanner(ox, oy, grid_size, robot_radius)
-    rx, ry = a_star.planning(sx, sy, gx, gy)
+    bidir_a_star = BidirAStarPlanner(ox, oy, grid_size, robot_radius)
+    rx, ry = bidir_a_star.planning(sx, sy, gx, gy)
 
     print(rx)
     print(ry)
