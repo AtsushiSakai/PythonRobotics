@@ -20,11 +20,11 @@ AREA_WIDTH = 30.0  # potential area width [m]
 show_animation = True
 
 
-def calc_potential_field(gx, gy, ox, oy, reso, rr):
-    minx = min(ox) - AREA_WIDTH / 2.0
-    miny = min(oy) - AREA_WIDTH / 2.0
-    maxx = max(ox) + AREA_WIDTH / 2.0
-    maxy = max(oy) + AREA_WIDTH / 2.0
+def calc_potential_field(gx, gy, ox, oy, reso, rr, sx, sy):
+    minx = min(min(ox),sx,gx) - AREA_WIDTH / 2.0
+    miny = min(min(oy),sy,gy) - AREA_WIDTH / 2.0
+    maxx = max(max(ox),sx,gx) + AREA_WIDTH / 2.0
+    maxy = max(max(oy),sy,gy) + AREA_WIDTH / 2.0
     xw = int(round((maxx - minx) / reso))
     yw = int(round((maxy - miny) / reso))
 
@@ -87,7 +87,7 @@ def get_motion_model():
 def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
 
     # calc potential field
-    pmap, minx, miny = calc_potential_field(gx, gy, ox, oy, reso, rr)
+    pmap, minx, miny = calc_potential_field(gx, gy, ox, oy, reso, rr, sx, sy)
 
     # search path
     d = np.hypot(sx - gx, sy - gy)
