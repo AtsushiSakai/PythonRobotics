@@ -104,13 +104,13 @@ class DepthFirstSearchPlanner:
             # Add it to the closed set
             closed_set[c_id] = current
 
-            # expand_grid search grid based on motion model
-            successors = [self.Node(current.x + self.motion[i][0],
-                                 current.y + self.motion[i][1],
-                                 current.cost + self.motion[i][2], c_id+1, current) for i, _ in enumerate(self.motion)]
+            random.shuffle(self.motion)
 
-            random.shuffle(successors)
-            for node in successors:
+            # expand_grid search grid based on motion model
+            for i, _ in enumerate(self.motion):
+                node = self.Node(current.x + self.motion[i][0],
+                                 current.y + self.motion[i][1],
+                                 current.cost + self.motion[i][2], c_id+1, current)
                 n_id = self.calc_grid_index(node)
 
                 # If the node is not safe, do nothing
@@ -128,7 +128,7 @@ class DepthFirstSearchPlanner:
         rx, ry = [self.calc_grid_position(ngoal.x, self.minx)], [
             self.calc_grid_position(ngoal.y, self.miny)]
         n = closedset[ngoal.pind]
-        while n.parent is not None:
+        while n is not None:
             rx.append(self.calc_grid_position(n.x, self.minx))
             ry.append(self.calc_grid_position(n.y, self.miny))
             n = n.parent
