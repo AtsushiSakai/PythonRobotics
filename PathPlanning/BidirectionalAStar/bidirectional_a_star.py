@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 show_animation = True
 
 
-class BidirAStarPlanner:
+class BidirectionalAStarPlanner:
 
     def __init__(self, ox, oy, reso, rr):
         """
@@ -125,44 +125,48 @@ class BidirAStarPlanner:
 
             # expand_grid search grid based on motion model
             for i, _ in enumerate(self.motion):
-                node = self.Node(current_A.x + self.motion[i][0],
+                continue_A = False
+                continue_B = False
+
+                child_node_A = self.Node(current_A.x + self.motion[i][0],
                                  current_A.y + self.motion[i][1],
                                  current_A.cost + self.motion[i][2], c_id_A)
-                n_id = self.calc_grid_index(node)
 
-                # If the node is not safe, do nothing
-                if not self.verify_node(node):
-                    continue
-
-                if n_id in closed_set_A:
-                    continue
-
-                if n_id not in open_set_A:
-                    open_set_A[n_id] = node  # discovered a new node
-                else:
-                    if open_set_A[n_id].cost > node.cost:
-                        # This path is the best until now. record it
-                        open_set_A[n_id] = node
-            
-            for i, _ in enumerate(self.motion):
-                node = self.Node(current_B.x + self.motion[i][0],
+                child_node_B = self.Node(current_B.x + self.motion[i][0],
                                  current_B.y + self.motion[i][1],
                                  current_B.cost + self.motion[i][2], c_id_B)
-                n_id = self.calc_grid_index(node)
+
+                n_id_A = self.calc_grid_index(child_node_A)
+                n_id_B = self.calc_grid_index(child_node_B)
 
                 # If the node is not safe, do nothing
-                if not self.verify_node(node):
-                    continue
+                if not self.verify_node(child_node_A):
+                    continue_A = True
+                
+                if not self.verify_node(child_node_B):
+                    continue_B = True
 
-                if n_id in closed_set_B:
-                    continue
+                if n_id_A in closed_set_A:
+                    continue_A = True
+                
+                if n_id_B in closed_set_B:
+                    continue_B = True
 
-                if n_id not in open_set_B:
-                    open_set_B[n_id] = node  # discovered a new node
-                else:
-                    if open_set_B[n_id].cost > node.cost:
-                        # This path is the best until now. record it
-                        open_set_B[n_id] = node
+                if not(continue_A):
+                    if n_id_A not in open_set_A:
+                        open_set_A[n_id_A] = child_node_A  # discovered a new node
+                    else:
+                        if open_set_A[n_id_A].cost > child_node_A.cost:
+                            # This path is the best until now. record it
+                            open_set_A[n_id_A] = child_node_A
+            
+                if not(continue_B):
+                    if n_id_B not in open_set_B:
+                        open_set_B[n_id_B] = child_node_B  # discovered a new node
+                    else:
+                        if open_set_B[n_id_B].cost > child_node_B.cost:
+                            # This path is the best until now. record it
+                            open_set_B[n_id_B] = child_node_B
 
         rx, ry = self.calc_final_path_bidir(meetpointA, meetpointB, closed_set_A, closed_set_B)
 
@@ -318,7 +322,7 @@ def main():
         plt.grid(True)
         plt.axis("equal")
 
-    bidir_a_star = BidirAStarPlanner(ox, oy, grid_size, robot_radius)
+    bidir_a_star = BidirectionalAStarPlanner(ox, oy, grid_size, robot_radius)
     rx, ry = bidir_a_star.planning(sx, sy, gx, gy)
 
     if show_animation:  # pragma: no cover
