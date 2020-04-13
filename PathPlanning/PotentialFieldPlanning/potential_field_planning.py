@@ -106,14 +106,17 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
 
     rx, ry = [sx], [sy]
     motion = get_motion_model()
+    previous_id = [(None, None)] * 3
+
     while d >= reso:
         minp = float("inf")
         minix, miniy = -1, -1
         for i, _ in enumerate(motion):
             inx = int(ix + motion[i][0])
             iny = int(iy + motion[i][1])
-            if inx >= len(pmap) or iny >= len(pmap[0]):
+            if inx >= len(pmap) or iny >= len(pmap[0]) or inx < 0 or iny < 0:
                 p = float("inf")  # outside area
+                print ("outside potential!")
             else:
                 p = pmap[inx][iny]
             if minp > p:
@@ -127,6 +130,18 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
         d = np.hypot(gx - xp, gy - yp)
         rx.append(xp)
         ry.append(yp)
+
+        if ((None, None) not in previous_id and
+                (previous_id[0] == previous_id[1] or previous_id[1] == previous_id[2]
+                 or previous_id[0] == previous_id[2])):
+            print ("Oscillation detected!!!")
+            print previous_id
+            break
+
+        # roll previous
+        previous_id[0] = previous_id[1]
+        previous_id[1] = previous_id[2]
+        previous_id[2] = (ix, iy)
 
         if show_animation:
             plt.plot(ix, iy, ".r")
