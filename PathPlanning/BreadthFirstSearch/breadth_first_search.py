@@ -100,6 +100,8 @@ class BreadthFirstSearchPlanner:
             # Remove the item from the open set
             del open_set[c_id]
 
+            random.shuffle(self.motion)
+
             # expand_grid search grid based on motion model
             for i, _ in enumerate(self.motion):
                 node = self.Node(current.x + self.motion[i][0],
@@ -123,13 +125,10 @@ class BreadthFirstSearchPlanner:
         rx, ry = [self.calc_grid_position(ngoal.x, self.minx)], [
             self.calc_grid_position(ngoal.y, self.miny)]
         n = closedset[ngoal.pind]
-        while n.parent is not None:
+        while n is not None:
             rx.append(self.calc_grid_position(n.x, self.minx))
             ry.append(self.calc_grid_position(n.y, self.miny))
             n = n.parent
-
-        rx.append(self.calc_grid_position(n.x, self.minx))
-        ry.append(self.calc_grid_position(n.y, self.miny))
 
         return rx, ry
 
