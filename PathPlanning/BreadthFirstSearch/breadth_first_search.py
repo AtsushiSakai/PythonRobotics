@@ -17,7 +17,7 @@ import random
 show_animation = True
 
 
-class BFSPlanner:
+class BreadthFirstSearchPlanner:
 
     def __init__(self, ox, oy, reso, rr):
         """
@@ -48,7 +48,7 @@ class BFSPlanner:
 
     def planning(self, sx, sy, gx, gy):
         """
-        Breadth First search
+        Breadth First search based planning
 
         input:
             sx: start x position [m]
@@ -101,12 +101,10 @@ class BFSPlanner:
             del open_set[c_id]
 
             # expand_grid search grid based on motion model
-            successors = [self.Node(current.x + self.motion[i][0],
+            for i, _ in enumerate(self.motion):
+                node = self.Node(current.x + self.motion[i][0],
                                  current.y + self.motion[i][1],
-                                 current.cost + self.motion[i][2], c_id+1, current) for i, _ in enumerate(self.motion)]
-
-            random.shuffle(successors)
-            for node in successors:
+                                 current.cost + self.motion[i][2], c_id+1, current)
                 n_id = self.calc_grid_index(node)
 
                 # If the node is not safe, do nothing
@@ -131,12 +129,6 @@ class BFSPlanner:
             n = n.parent
 
         return rx, ry
-
-    @staticmethod
-    def calc_heuristic(n1, n2):
-        w = 1.0  # weight of heuristic
-        d = w * math.hypot(n1.x - n2.x, n1.y - n2.y)
-        return d
 
     def calc_grid_position(self, index, minp):
         """
@@ -257,7 +249,7 @@ def main():
         plt.grid(True)
         plt.axis("equal")
 
-    bfs = BFSPlanner(ox, oy, grid_size, robot_radius)
+    bfs = BreadthFirstSearchPlanner(ox, oy, grid_size, robot_radius)
     rx, ry = bfs.planning(sx, sy, gx, gy)
 
     if show_animation:  # pragma: no cover
