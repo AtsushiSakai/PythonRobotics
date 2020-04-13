@@ -21,10 +21,10 @@ show_animation = True
 
 
 def calc_potential_field(gx, gy, ox, oy, reso, rr, sx, sy):
-    minx = min(min(ox),sx,gx) - AREA_WIDTH / 2.0
-    miny = min(min(oy),sy,gy) - AREA_WIDTH / 2.0
-    maxx = max(max(ox),sx,gx) + AREA_WIDTH / 2.0
-    maxy = max(max(oy),sy,gy) + AREA_WIDTH / 2.0
+    minx = min(min(ox), sx, gx) - AREA_WIDTH / 2.0
+    miny = min(min(oy), sy, gy) - AREA_WIDTH / 2.0
+    maxx = max(max(ox), sx, gx) + AREA_WIDTH / 2.0
+    maxy = max(max(oy), sy, gy) + AREA_WIDTH / 2.0
     xw = int(round((maxx - minx) / reso))
     yw = int(round((maxy - miny) / reso))
 
@@ -116,7 +116,7 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
             iny = int(iy + motion[i][1])
             if inx >= len(pmap) or iny >= len(pmap[0]) or inx < 0 or iny < 0:
                 p = float("inf")  # outside area
-                print ("outside potential!")
+                print("outside potential!")
             else:
                 p = pmap[inx][iny]
             if minp > p:
@@ -132,10 +132,11 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
         ry.append(yp)
 
         if ((None, None) not in previous_id and
-                (previous_id[0] == previous_id[1] or previous_id[1] == previous_id[2]
+                (previous_id[0] == previous_id[1]
+                 or previous_id[1] == previous_id[2]
                  or previous_id[0] == previous_id[2])):
-            print ("Oscillation detected!!!")
-            print previous_id
+            print("Oscillation detected!!!")
+            print(previous_id)
             break
 
         # roll previous
