@@ -17,7 +17,7 @@ import random
 show_animation = True
 
 
-class DFSPlanner:
+class DepthFirstSearchPlanner:
 
     def __init__(self, ox, oy, reso, rr):
         """
@@ -134,12 +134,6 @@ class DFSPlanner:
             n = n.parent
 
         return rx, ry
-
-    @staticmethod
-    def calc_heuristic(n1, n2):
-        w = 1.0  # weight of heuristic
-        d = w * math.hypot(n1.x - n2.x, n1.y - n2.y)
-        return d
 
     def calc_grid_position(self, index, minp):
         """
@@ -260,8 +254,8 @@ def main():
         plt.grid(True)
         plt.axis("equal")
 
-    DFS = DFSPlanner(ox, oy, grid_size, robot_radius)
-    rx, ry = DFS.planning(sx, sy, gx, gy)
+    dfs = DepthFirstSearchPlanner(ox, oy, grid_size, robot_radius)
+    rx, ry = dfs.planning(sx, sy, gx, gy)
 
     if show_animation:  # pragma: no cover
         plt.plot(rx, ry, "-r")
