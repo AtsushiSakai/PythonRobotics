@@ -128,6 +128,9 @@ class BreadthFirstSearchPlanner:
             ry.append(self.calc_grid_position(n.y, self.miny))
             n = n.parent
 
+        rx.append(self.calc_grid_position(n.x, self.minx))
+        ry.append(self.calc_grid_position(n.y, self.miny))
+
         return rx, ry
 
     def calc_grid_position(self, index, minp):
