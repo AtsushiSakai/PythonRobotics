@@ -106,7 +106,7 @@ class BreadthFirstSearchPlanner:
             for i, _ in enumerate(self.motion):
                 node = self.Node(current.x + self.motion[i][0],
                                  current.y + self.motion[i][1],
-                                 current.cost + self.motion[i][2], c_id+1, current)
+                                 current.cost + self.motion[i][2], c_id+1, None)
                 n_id = self.calc_grid_index(node)
 
                 # If the node is not safe, do nothing
@@ -114,6 +114,7 @@ class BreadthFirstSearchPlanner:
                     continue
 
                 if n_id not in closed_set:
+                    node.parent = current
                     closed_set[n_id] = node
                     open_set[n_id] = node
 
