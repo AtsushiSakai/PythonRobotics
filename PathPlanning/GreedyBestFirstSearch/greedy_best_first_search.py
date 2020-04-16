@@ -21,7 +21,7 @@ class GreedyBestFirstSearchPlanner:
 
     def __init__(self, ox, oy, reso, rr):
         """
-        Initialize grid map for spanning tree planning
+        Initialize grid map for greedy best-first planning
 
         ox: x position list of Obstacles [m]
         oy: y position list of Obstacles [m]
@@ -48,7 +48,7 @@ class GreedyBestFirstSearchPlanner:
 
     def planning(self, sx, sy, gx, gy):
         """
-        Depth First search
+        Greedy Best-First search
 
         input:
             sx: start x position [m]
@@ -104,11 +104,10 @@ class GreedyBestFirstSearchPlanner:
                 break
 
             # expand_grid search grid based on motion model
-            random.shuffle(self.motion)
             for i, _ in enumerate(self.motion):
                 node = self.Node(current.x + self.motion[i][0],
                                  current.y + self.motion[i][1],
-                                 current.cost + self.motion[i][2], c_id+1, current)
+                                 current.cost + self.motion[i][2], c_id, current)
 
                 n_id = self.calc_grid_index(node)
 
