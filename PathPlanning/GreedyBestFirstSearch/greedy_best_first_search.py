@@ -1,6 +1,6 @@
 """
 
-Best-First grid planning
+Greedy Best-First grid planning
 
 author: Erwin Lejeune (@spida_rwin)
 
@@ -17,7 +17,7 @@ import random
 show_animation = True
 
 
-class BestFirstSearchPlanner:
+class GreedyBestFirstSearchPlanner:
 
     def __init__(self, ox, oy, reso, rr):
         """
@@ -260,7 +260,7 @@ def main():
         plt.grid(True)
         plt.axis("equal")
 
-    bestfirst = BestFirstSearchPlanner(ox, oy, grid_size, robot_radius)
+    bestfirst = GreedyBestFirstSearchPlanner(ox, oy, grid_size, robot_radius)
     rx, ry = bestfirst.planning(sx, sy, gx, gy)
 
     if show_animation:  # pragma: no cover
