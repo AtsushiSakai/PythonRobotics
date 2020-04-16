@@ -4,7 +4,7 @@ Depth-First grid planning
 
 author: Erwin Lejeune (@spida_rwin)
 
-See Wikipedia article (https://en.wikipedia.org/wiki/depth-First_search)
+See Wikipedia article (https://en.wikipedia.org/wiki/Depth-first_search)
 
 """
 
@@ -188,8 +188,8 @@ class DepthFirstSearchPlanner:
         print("ywidth:", self.ywidth)
 
         # obstacle map generation
-        self.obmap = [[False for i in range(self.ywidth)]
-                      for i in range(self.xwidth)]
+        self.obmap = [[False for _ in range(self.ywidth)]
+                      for _ in range(self.xwidth)]
         for ix in range(self.xwidth):
             x = self.calc_grid_position(ix, self.minx)
             for iy in range(self.ywidth):
