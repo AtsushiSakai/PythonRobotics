@@ -12,8 +12,6 @@ import math
 
 import matplotlib.pyplot as plt
 
-import random
-
 show_animation = True
 
 
@@ -21,7 +19,7 @@ class DepthFirstSearchPlanner:
 
     def __init__(self, ox, oy, reso, rr):
         """
-        Initialize grid map for DFS planning
+        Initialize grid map for Depth-First planning
 
         ox: x position list of Obstacles [m]
         oy: y position list of Obstacles [m]
