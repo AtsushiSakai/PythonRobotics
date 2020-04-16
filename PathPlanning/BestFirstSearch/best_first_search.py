@@ -76,9 +76,7 @@ class BestFirstSearchPlanner:
 
             c_id = min(
                 open_set,
-                key=lambda o: open_set[o].cost + self.calc_heuristic(ngoal,
-                                                                     open_set[
-                                                                         o]))
+                key=lambda o: self.calc_heuristic(ngoal, open_set[o]))
 
             current = open_set[c_id]
 
@@ -111,7 +109,7 @@ class BestFirstSearchPlanner:
                 node = self.Node(current.x + self.motion[i][0],
                                  current.y + self.motion[i][1],
                                  current.cost + self.motion[i][2], c_id+1, current)
-                                 
+
                 n_id = self.calc_grid_index(node)
 
                 # If the node is not safe, do nothing
