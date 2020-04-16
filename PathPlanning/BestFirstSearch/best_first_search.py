@@ -4,6 +4,8 @@ Best-First grid planning
 
 author: Erwin Lejeune (@spida_rwin)
 
+See Wikipedia article (https://en.wikipedia.org/wiki/Best-first_search)
+
 """
 
 import math
