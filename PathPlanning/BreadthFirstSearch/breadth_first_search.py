@@ -74,11 +74,11 @@ class BreadthFirstSearchPlanner:
                 print("Open set is empty..")
                 break
 
-            c_id = min(
-                open_set,
-                key=lambda o: open_set[o].pind)
+            current = open_set.pop(list(open_set.keys())[0])
 
-            current = open_set[c_id]
+            c_id = self.calc_grid_index(current)
+
+            closed_set[c_id] = current
 
             # show graph
             if show_animation:  # pragma: no cover
@@ -97,25 +97,19 @@ class BreadthFirstSearchPlanner:
                 ngoal.cost = current.cost
                 break
 
-            # Remove the item from the open set
-            del open_set[c_id]
-
-            random.shuffle(self.motion)
-
             # expand_grid search grid based on motion model
             for i, _ in enumerate(self.motion):
                 node = self.Node(current.x + self.motion[i][0],
                                  current.y + self.motion[i][1],
-                                 current.cost + self.motion[i][2], c_id+1, None)
+                                 current.cost + self.motion[i][2], c_id, None)
                 n_id = self.calc_grid_index(node)
 
                 # If the node is not safe, do nothing
                 if not self.verify_node(node):
                     continue
 
-                if n_id not in closed_set:
+                if (n_id not in closed_set) and (n_id not in open_set):
                     node.parent = current
-                    closed_set[n_id] = node
                     open_set[n_id] = node
 
         rx, ry = self.calc_final_path(ngoal, closed_set)
@@ -186,8 +180,8 @@ class BreadthFirstSearchPlanner:
         print("ywidth:", self.ywidth)
 
         # obstacle map generation
-        self.obmap = [[False for _ in range(self.ywidth)]
-                      for _ in range(self.xwidth)]
+        self.obmap = [[False for i in range(self.ywidth)]
+                      for i in range(self.xwidth)]
         for ix in range(self.xwidth):
             x = self.calc_grid_position(ix, self.minx)
             for iy in range(self.ywidth):
