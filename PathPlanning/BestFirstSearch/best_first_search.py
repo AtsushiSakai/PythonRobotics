@@ -128,7 +128,7 @@ class BestFirstSearchPlanner:
         rx, ry = [self.calc_grid_position(ngoal.x, self.minx)], [
             self.calc_grid_position(ngoal.y, self.miny)]
         n = closedset[ngoal.pind]
-        while n.parent is not None:
+        while n is not None:
             rx.append(self.calc_grid_position(n.x, self.minx))
             ry.append(self.calc_grid_position(n.y, self.miny))
             n = n.parent
