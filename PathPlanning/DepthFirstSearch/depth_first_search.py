@@ -74,11 +74,8 @@ class DepthFirstSearchPlanner:
                 print("Open set is empty..")
                 break
 
-            c_id = max(
-                open_set,
-                key=lambda o: open_set[o].pind)
-
-            current = open_set[c_id]
+            current = open_set.pop(list(open_set.keys())[-1])
+            c_id = self.calc_grid_index(current)
 
             # show graph
             if show_animation:  # pragma: no cover
@@ -88,29 +85,19 @@ class DepthFirstSearchPlanner:
                 plt.gcf().canvas.mpl_connect('key_release_event',
                                              lambda event: [exit(
                                                  0) if event.key == 'escape' else None])
-                if len(closed_set.keys()) % 10 == 0:
-                    plt.pause(0.001)
+                plt.pause(0.01)
 
             if current.x == ngoal.x and current.y == ngoal.y:
                 print("Find goal")
                 ngoal.pind = current.pind
                 ngoal.cost = current.cost
-                closed_set[current.pind] = current
                 break
-
-            # Remove the item from the open set
-            del open_set[c_id]
-
-            # Add it to the closed set
-            closed_set[c_id] = current
-
-            random.shuffle(self.motion)
 
             # expand_grid search grid based on motion model
             for i, _ in enumerate(self.motion):
                 node = self.Node(current.x + self.motion[i][0],
                                  current.y + self.motion[i][1],
-                                 current.cost + self.motion[i][2], c_id+1, current)
+                                 current.cost + self.motion[i][2], c_id, None)
                 n_id = self.calc_grid_index(node)
 
                 # If the node is not safe, do nothing
@@ -119,6 +106,8 @@ class DepthFirstSearchPlanner:
 
                 if n_id not in closed_set:
                     open_set[n_id] = node
+                    closed_set[n_id] = node
+                    node.parent = current
 
         rx, ry = self.calc_final_path(ngoal, closed_set)
         return rx, ry
