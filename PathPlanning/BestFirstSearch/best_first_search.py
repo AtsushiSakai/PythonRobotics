@@ -1,6 +1,6 @@
 """
 
-Greedy Best-First grid planning
+Best-First grid planning
 
 author: Erwin Lejeune (@spida_rwin)
 
@@ -15,11 +15,11 @@ import matplotlib.pyplot as plt
 show_animation = True
 
 
-class GreedyBestFirstSearchPlanner:
+class BestFirstSearchPlanner:
 
     def __init__(self, ox, oy, reso, rr):
         """
-        Initialize grid map for greedy best-first planning
+        Initialize grid map for best-first planning
 
         ox: x position list of Obstacles [m]
         oy: y position list of Obstacles [m]
@@ -46,7 +46,7 @@ class GreedyBestFirstSearchPlanner:
 
     def planning(self, sx, sy, gx, gy):
         """
-        Greedy Best-First search
+        Best-First search
 
         input:
             sx: start x position [m]
@@ -100,7 +100,7 @@ class GreedyBestFirstSearchPlanner:
                 ngoal.pind = current.pind
                 ngoal.cost = current.cost
                 break
-
+                    
             # expand_grid search grid based on motion model
             for i, _ in enumerate(self.motion):
                 node = self.Node(current.x + self.motion[i][0],
@@ -112,9 +112,17 @@ class GreedyBestFirstSearchPlanner:
                 # If the node is not safe, do nothing
                 if not self.verify_node(node):
                     continue
+                
+                if n_id in closed_set:
+                    continue
 
-                if (n_id not in closed_set) and (n_id not in open_set):
-                    open_set[n_id] = node
+                if n_id not in open_set:
+                    open_set[n_id] = node  # discovered a new node
+                    
+                else:
+                    if open_set[n_id].cost > node.cost:
+                        # This path is the best until now. record it
+                        open_set[n_id] = node
 
         closed_set[ngoal.pind] = current
         rx, ry = self.calc_final_path(ngoal, closed_set)
@@ -257,7 +265,7 @@ def main():
         plt.grid(True)
         plt.axis("equal")
 
-    bestfirst = GreedyBestFirstSearchPlanner(ox, oy, grid_size, robot_radius)
+    bestfirst = BestFirstSearchPlanner(ox, oy, grid_size, robot_radius)
     rx, ry = bestfirst.planning(sx, sy, gx, gy)
 
     if show_animation:  # pragma: no cover
