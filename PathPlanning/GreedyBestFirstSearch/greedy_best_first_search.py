@@ -1,6 +1,6 @@
 """
 
-Best-First grid planning
+Greedy Best-First grid planning
 
 author: Erwin Lejeune (@spida_rwin)
 
@@ -19,7 +19,7 @@ class BestFirstSearchPlanner:
 
     def __init__(self, ox, oy, reso, rr):
         """
-        Initialize grid map for best-first planning
+        Initialize grid map for greedy best-first planning
 
         ox: x position list of Obstacles [m]
         oy: y position list of Obstacles [m]
@@ -112,17 +112,17 @@ class BestFirstSearchPlanner:
                 # If the node is not safe, do nothing
                 if not self.verify_node(node):
                     continue
-                
+
                 if n_id in closed_set:
                     continue
-
+                
                 if n_id not in open_set:
-                    open_set[n_id] = node  # discovered a new node
-                    
+                    open_set[n_id] = node
+
                 else:
                     if open_set[n_id].cost > node.cost:
-                        # This path is the best until now. record it
                         open_set[n_id] = node
+
 
         closed_set[ngoal.pind] = current
         rx, ry = self.calc_final_path(ngoal, closed_set)
@@ -265,8 +265,8 @@ def main():
         plt.grid(True)
         plt.axis("equal")
 
-    bestfirst = BestFirstSearchPlanner(ox, oy, grid_size, robot_radius)
-    rx, ry = bestfirst.planning(sx, sy, gx, gy)
+    greedybestfirst = BestFirstSearchPlanner(ox, oy, grid_size, robot_radius)
+    rx, ry = greedybestfirst.planning(sx, sy, gx, gy)
 
     if show_animation:  # pragma: no cover
         plt.plot(rx, ry, "-r")
