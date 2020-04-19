@@ -118,11 +118,11 @@ class BidirectionalBreadthFirstSearchPlanner:
                 continue_B = False
 
                 node_A = self.Node(current_A.x + self.motion[i][0],
-                                 current_A.y + self.motion[i][1],
-                                 current_A.cost + self.motion[i][2], c_id_A, None)
+                                   current_A.y + self.motion[i][1],
+                                   current_A.cost + self.motion[i][2], c_id_A, None)
                 node_B = self.Node(current_B.x + self.motion[i][0],
-                                 current_B.y + self.motion[i][1],
-                                 current_B.cost + self.motion[i][2], c_id_B, None)
+                                   current_B.y + self.motion[i][1],
+                                   current_B.cost + self.motion[i][2], c_id_B, None)
             
                 n_id_A = self.calc_grid_index(node_A)
                 n_id_B = self.calc_grid_index(node_B)
@@ -134,11 +134,11 @@ class BidirectionalBreadthFirstSearchPlanner:
                 if not self.verify_node(node_B):
                     continue_B = True
 
-                if (n_id_A not in closed_set_A) and (n_id_A not in open_set_A) and not(continue_A):
+                if (n_id_A not in closed_set_A) and (n_id_A not in open_set_A) and not continue_A:
                     node_A.parent = current_A
                     open_set_A[n_id_A] = node_A
                 
-                if (n_id_B not in closed_set_B) and (n_id_B not in open_set_B) and not(continue_B):
+                if (n_id_B not in closed_set_B) and (n_id_B not in open_set_B) and not continue_B:
                     node_B.parent = current_B
                     open_set_B[n_id_B] = node_B
 
