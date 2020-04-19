@@ -82,13 +82,13 @@ class BidirectionalAStarPlanner:
 
             c_id_A = min(
                 open_set_A,
-                key=lambda o: self.find_lowest_cost(open_set_A, o, current_B))
+                key=lambda o: self.find_total_cost(open_set_A, o, current_B))
 
             current_A = open_set_A[c_id_A]
 
             c_id_B = min(
                 open_set_B,
-                key=lambda o: self.find_lowest_cost(open_set_B, o, current_A))
+                key=lambda o: self.find_total_cost(open_set_B, o, current_A))
 
             current_B = open_set_B[c_id_B]
 
@@ -148,7 +148,7 @@ class BidirectionalAStarPlanner:
                 if n_id_B in closed_set_B:
                     continue_B = True
 
-                if not(continue_A):
+                if not continue_A:
                     if n_id_A not in open_set_A:
                         # discovered a new node
                         open_set_A[n_id_A] = child_node_A
@@ -157,7 +157,7 @@ class BidirectionalAStarPlanner:
                             # This path is the best until now. record it
                             open_set_A[n_id_A] = child_node_A
 
-                if not(continue_B):
+                if not continue_B:
                     if n_id_B not in open_set_B:
                         # discovered a new node
                         open_set_B[n_id_B] = child_node_B
@@ -202,10 +202,11 @@ class BidirectionalAStarPlanner:
         d = w * math.hypot(n1.x - n2.x, n1.y - n2.y)
         return d
 
-    def find_lowest_cost(self, open_set, lambda_, n1):
-        cost = open_set[lambda_].cost + \
-            self.calc_heuristic(n1, open_set[lambda_])
-        return cost
+    def find_total_cost(self, open_set, lambda_, n1):
+        g_cost = open_set[lambda_].cost
+        h_cost = self.calc_heuristic(n1, open_set[lambda_])
+        f_cost = g_cost + h_cost
+        return f_cost
 
     def calc_grid_position(self, index, minp):
         """
