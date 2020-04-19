@@ -75,24 +75,20 @@ class BidirectionalAStarPlanner:
             if len(open_set_A) == 0:
                 print("Open set A is empty..")
                 break
-            
+
             if len(open_set_B) == 0:
                 print("Open set B is empty..")
                 break
 
             c_id_A = min(
                 open_set_A,
-                key=lambda o: open_set_A[o].cost + self.calc_heuristic(current_B,
-                                                                     open_set_A[
-                                                                         o]))
-                                
+                key=lambda o: self.find_lowest_cost(open_set_A, o, current_B))
+
             current_A = open_set_A[c_id_A]
 
             c_id_B = min(
                 open_set_B,
-                key=lambda o: open_set_B[o].cost + self.calc_heuristic(current_A,
-                                                                     open_set_B[
-                                                                         o]))
+                key=lambda o: self.find_lowest_cost(open_set_B, o, current_A))
 
             current_B = open_set_B[c_id_B]
 
@@ -129,12 +125,12 @@ class BidirectionalAStarPlanner:
                 continue_B = False
 
                 child_node_A = self.Node(current_A.x + self.motion[i][0],
-                                 current_A.y + self.motion[i][1],
-                                 current_A.cost + self.motion[i][2], c_id_A)
+                                         current_A.y + self.motion[i][1],
+                                         current_A.cost + self.motion[i][2], c_id_A)
 
                 child_node_B = self.Node(current_B.x + self.motion[i][0],
-                                 current_B.y + self.motion[i][1],
-                                 current_B.cost + self.motion[i][2], c_id_B)
+                                         current_B.y + self.motion[i][1],
+                                         current_B.cost + self.motion[i][2], c_id_B)
 
                 n_id_A = self.calc_grid_index(child_node_A)
                 n_id_B = self.calc_grid_index(child_node_B)
@@ -142,33 +138,36 @@ class BidirectionalAStarPlanner:
                 # If the node is not safe, do nothing
                 if not self.verify_node(child_node_A):
                     continue_A = True
-                
+
                 if not self.verify_node(child_node_B):
                     continue_B = True
 
                 if n_id_A in closed_set_A:
                     continue_A = True
-                
+
                 if n_id_B in closed_set_B:
                     continue_B = True
 
                 if not(continue_A):
                     if n_id_A not in open_set_A:
-                        open_set_A[n_id_A] = child_node_A  # discovered a new node
+                        # discovered a new node
+                        open_set_A[n_id_A] = child_node_A
                     else:
                         if open_set_A[n_id_A].cost > child_node_A.cost:
                             # This path is the best until now. record it
                             open_set_A[n_id_A] = child_node_A
-            
+
                 if not(continue_B):
                     if n_id_B not in open_set_B:
-                        open_set_B[n_id_B] = child_node_B  # discovered a new node
+                        # discovered a new node
+                        open_set_B[n_id_B] = child_node_B
                     else:
                         if open_set_B[n_id_B].cost > child_node_B.cost:
                             # This path is the best until now. record it
                             open_set_B[n_id_B] = child_node_B
 
-        rx, ry = self.calc_final_path_bidir(meetpointA, meetpointB, closed_set_A, closed_set_B)
+        rx, ry = self.calc_final_path_bidir(
+            meetpointA, meetpointB, closed_set_A, closed_set_B)
 
         return rx, ry
 
@@ -202,6 +201,11 @@ class BidirectionalAStarPlanner:
         w = 1.0  # weight of heuristic
         d = w * math.hypot(n1.x - n2.x, n1.y - n2.y)
         return d
+
+    def find_lowest_cost(self, open_set, lambda_, n1):
+        cost = open_set[lambda_].cost + \
+            self.calc_heuristic(n1, open_set[lambda_])
+        return cost
 
     def calc_grid_position(self, index, minp):
         """
