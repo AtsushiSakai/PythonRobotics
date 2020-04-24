@@ -126,11 +126,13 @@ class BidirectionalAStarPlanner:
 
                 child_node_A = self.Node(current_A.x + self.motion[i][0],
                                          current_A.y + self.motion[i][1],
-                                         current_A.cost + self.motion[i][2], c_id_A)
+                                         current_A.cost + self.motion[i][2], 
+                                         c_id_A)
 
                 child_node_B = self.Node(current_B.x + self.motion[i][0],
                                          current_B.y + self.motion[i][1],
-                                         current_B.cost + self.motion[i][2], c_id_B)
+                                         current_B.cost + self.motion[i][2], 
+                                         c_id_B)
 
                 n_id_A = self.calc_grid_index(child_node_A)
                 n_id_B = self.calc_grid_index(child_node_B)
@@ -166,12 +168,12 @@ class BidirectionalAStarPlanner:
                             # This path is the best until now. record it
                             open_set_B[n_id_B] = child_node_B
 
-        rx, ry = self.calc_final_path_bidir(
+        rx, ry = self.calc_final_bidirectional_path(
             meetpointA, meetpointB, closed_set_A, closed_set_B)
 
         return rx, ry
 
-    def calc_final_path_bidir(self, meetnode_A, meetnode_B, closed_set_A, closed_set_B):
+    def calc_final_bidirectional_path(self, meetnode_A, meetnode_B, closed_set_A, closed_set_B):
         rx_A, ry_A = self.calc_final_path(meetnode_A, closed_set_A)
         rx_B, ry_B = self.calc_final_path(meetnode_B, closed_set_B)
 
@@ -299,7 +301,7 @@ def main():
     grid_size = 2.0  # [m]
     robot_radius = 1.0  # [m]
 
-    # set obstable positions
+    # set obstacle positions
     ox, oy = [], []
     for i in range(-10, 60):
         ox.append(i)
