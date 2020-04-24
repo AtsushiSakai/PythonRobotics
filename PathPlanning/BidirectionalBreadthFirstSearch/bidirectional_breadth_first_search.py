@@ -105,7 +105,7 @@ class BidirectionalBreadthFirstSearchPlanner:
                 meetpointA = closed_set_A[c_id_A]
                 meetpointB = closed_set_B[c_id_A]
                 break
-        
+
             elif c_id_B in closed_set_A:
                 print("Find goal")
                 meetpointA = closed_set_A[c_id_B]
@@ -119,30 +119,33 @@ class BidirectionalBreadthFirstSearchPlanner:
 
                 node_A = self.Node(current_A.x + self.motion[i][0],
                                    current_A.y + self.motion[i][1],
-                                   current_A.cost + self.motion[i][2], c_id_A, None)
+                                   current_A.cost + self.motion[i][2],
+                                   c_id_A, None)
                 node_B = self.Node(current_B.x + self.motion[i][0],
                                    current_B.y + self.motion[i][1],
-                                   current_B.cost + self.motion[i][2], c_id_B, None)
-            
+                                   current_B.cost + self.motion[i][2],
+                                   c_id_B, None)
+
                 n_id_A = self.calc_grid_index(node_A)
                 n_id_B = self.calc_grid_index(node_B)
 
                 # If the node is not safe, do nothing
                 if not self.verify_node(node_A):
                     continue_A = True
-                
+
                 if not self.verify_node(node_B):
                     continue_B = True
 
                 if (n_id_A not in closed_set_A) and (n_id_A not in open_set_A) and not continue_A:
                     node_A.parent = current_A
                     open_set_A[n_id_A] = node_A
-                
+
                 if (n_id_B not in closed_set_B) and (n_id_B not in open_set_B) and not continue_B:
                     node_B.parent = current_B
                     open_set_B[n_id_B] = node_B
 
-        rx, ry = self.calc_final_path_bidir(meetpointA, meetpointB, closed_set_A, closed_set_B)
+        rx, ry = self.calc_final_path_bidir(
+            meetpointA, meetpointB, closed_set_A, closed_set_B)
         return rx, ry
 
     def calc_final_path_bidir(self, meetPointA, meetPointB, closedSetA, closedSetB):
@@ -260,7 +263,7 @@ def main():
     grid_size = 2.0  # [m]
     robot_radius = 1.0  # [m]
 
-    # set obstable positions
+    # set obstacle positions
     ox, oy = [], []
     for i in range(-10, 60):
         ox.append(i)
@@ -288,7 +291,8 @@ def main():
         plt.grid(True)
         plt.axis("equal")
 
-    bi_bfs = BidirectionalBreadthFirstSearchPlanner(ox, oy, grid_size, robot_radius)
+    bi_bfs = BidirectionalBreadthFirstSearchPlanner(
+        ox, oy, grid_size, robot_radius)
     rx, ry = bi_bfs.planning(sx, sy, gx, gy)
 
     if show_animation:  # pragma: no cover
