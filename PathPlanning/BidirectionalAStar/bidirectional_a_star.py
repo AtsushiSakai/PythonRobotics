@@ -1,11 +1,10 @@
 """
 
-A* grid planning
+Bidirectional A* grid planning
 
-author: Atsushi Sakai(@Atsushi_twi)
-        Nikos Kanargias (nkana@tee.gr)
+author: Erwin Lejeune (@spida_rwin)
 
-See Wikipedia article (https://en.wikipedia.org/wiki/A*_search_algorithm)
+See Wikipedia article (https://en.wikipedia.org/wiki/Bidirectional_search)
 
 """
 
@@ -16,7 +15,7 @@ import matplotlib.pyplot as plt
 show_animation = True
 
 
-class AStarPlanner:
+class BidirectionalAStarPlanner:
 
     def __init__(self, ox, oy, reso, rr):
         """
@@ -46,7 +45,7 @@ class AStarPlanner:
 
     def planning(self, sx, sy, gx, gy):
         """
-        A star path search
+        Bidirectional A star path search
 
         input:
             sx: start x position [m]
@@ -64,66 +63,125 @@ class AStarPlanner:
         ngoal = self.Node(self.calc_xyindex(gx, self.minx),
                           self.calc_xyindex(gy, self.miny), 0.0, -1)
 
-        open_set, closed_set = dict(), dict()
-        open_set[self.calc_grid_index(nstart)] = nstart
+        open_set_A, closed_set_A = dict(), dict()
+        open_set_B, closed_set_B = dict(), dict()
+        open_set_A[self.calc_grid_index(nstart)] = nstart
+        open_set_B[self.calc_grid_index(ngoal)] = ngoal
+
+        current_A = nstart
+        current_B = ngoal
 
         while 1:
-            if len(open_set) == 0:
-                print("Open set is empty..")
+            if len(open_set_A) == 0:
+                print("Open set A is empty..")
                 break
 
-            c_id = min(
-                open_set,
-                key=lambda o: open_set[o].cost + self.calc_heuristic(ngoal,
-                                                                     open_set[
-                                                                         o]))
-            current = open_set[c_id]
+            if len(open_set_B) == 0:
+                print("Open set B is empty..")
+                break
+
+            c_id_A = min(
+                open_set_A,
+                key=lambda o: self.find_total_cost(open_set_A, o, current_B))
+
+            current_A = open_set_A[c_id_A]
+
+            c_id_B = min(
+                open_set_B,
+                key=lambda o: self.find_total_cost(open_set_B, o, current_A))
+
+            current_B = open_set_B[c_id_B]
 
             # show graph
             if show_animation:  # pragma: no cover
-                plt.plot(self.calc_grid_position(current.x, self.minx),
-                         self.calc_grid_position(current.y, self.miny), "xc")
+                plt.plot(self.calc_grid_position(current_A.x, self.minx),
+                         self.calc_grid_position(current_A.y, self.miny), "xc")
+                plt.plot(self.calc_grid_position(current_B.x, self.minx),
+                         self.calc_grid_position(current_B.y, self.miny), "xc")
                 # for stopping simulation with the esc key.
                 plt.gcf().canvas.mpl_connect('key_release_event',
                                              lambda event: [exit(
                                                  0) if event.key == 'escape' else None])
-                if len(closed_set.keys()) % 10 == 0:
+                if len(closed_set_A.keys()) % 10 == 0:
                     plt.pause(0.001)
 
-            if current.x == ngoal.x and current.y == ngoal.y:
-                print("Find goal")
-                ngoal.pind = current.pind
-                ngoal.cost = current.cost
+            if current_A.x == current_B.x and current_A.y == current_B.y:
+                print("Found goal")
+                meetpointA = current_A
+                meetpointB = current_B
                 break
 
             # Remove the item from the open set
-            del open_set[c_id]
+            del open_set_A[c_id_A]
+            del open_set_B[c_id_B]
 
             # Add it to the closed set
-            closed_set[c_id] = current
+            closed_set_A[c_id_A] = current_A
+            closed_set_B[c_id_B] = current_B
 
             # expand_grid search grid based on motion model
             for i, _ in enumerate(self.motion):
-                node = self.Node(current.x + self.motion[i][0],
-                                 current.y + self.motion[i][1],
-                                 current.cost + self.motion[i][2], c_id)
-                n_id = self.calc_grid_index(node)
+                continue_A = False
+                continue_B = False
+
+                child_node_A = self.Node(current_A.x + self.motion[i][0],
+                                         current_A.y + self.motion[i][1],
+                                         current_A.cost + self.motion[i][2], 
+                                         c_id_A)
+
+                child_node_B = self.Node(current_B.x + self.motion[i][0],
+                                         current_B.y + self.motion[i][1],
+                                         current_B.cost + self.motion[i][2], 
+                                         c_id_B)
+
+                n_id_A = self.calc_grid_index(child_node_A)
+                n_id_B = self.calc_grid_index(child_node_B)
 
                 # If the node is not safe, do nothing
-                if not self.verify_node(node):
-                    continue
+                if not self.verify_node(child_node_A):
+                    continue_A = True
 
-                if n_id in closed_set:
-                    continue
+                if not self.verify_node(child_node_B):
+                    continue_B = True
 
-                if n_id not in open_set:
-                    open_set[n_id] = node  # discovered a new node
-                else:
-                    if open_set[n_id].cost > node.cost:
-                        # This path is the best until now. record it
-                        open_set[n_id] = node
+                if n_id_A in closed_set_A:
+                    continue_A = True
 
-        rx, ry = self.calc_final_path(ngoal, closed_set)
+                if n_id_B in closed_set_B:
+                    continue_B = True
+
+                if not continue_A:
+                    if n_id_A not in open_set_A:
+                        # discovered a new node
+                        open_set_A[n_id_A] = child_node_A
+                    else:
+                        if open_set_A[n_id_A].cost > child_node_A.cost:
+                            # This path is the best until now. record it
+                            open_set_A[n_id_A] = child_node_A
+
+                if not continue_B:
+                    if n_id_B not in open_set_B:
+                        # discovered a new node
+                        open_set_B[n_id_B] = child_node_B
+                    else:
+                        if open_set_B[n_id_B].cost > child_node_B.cost:
+                            # This path is the best until now. record it
+                            open_set_B[n_id_B] = child_node_B
+
+        rx, ry = self.calc_final_bidirectional_path(
+            meetpointA, meetpointB, closed_set_A, closed_set_B)
+
+        return rx, ry
+
+    def calc_final_bidirectional_path(self, meetnode_A, meetnode_B, closed_set_A, closed_set_B):
+        rx_A, ry_A = self.calc_final_path(meetnode_A, closed_set_A)
+        rx_B, ry_B = self.calc_final_path(meetnode_B, closed_set_B)
+
+        rx_A.reverse()
+        ry_A.reverse()
+
+        rx = rx_A + rx_B
+        ry = ry_A + ry_B
 
         return rx, ry
 
@@ -145,6 +203,12 @@ class AStarPlanner:
         w = 1.0  # weight of heuristic
         d = w * math.hypot(n1.x - n2.x, n1.y - n2.y)
         return d
+
+    def find_total_cost(self, open_set, lambda_, n1):
+        g_cost = open_set[lambda_].cost
+        h_cost = self.calc_heuristic(n1, open_set[lambda_])
+        f_cost = g_cost + h_cost
+        return f_cost
 
     def calc_grid_position(self, index, minp):
         """
@@ -199,8 +263,8 @@ class AStarPlanner:
         print("ywidth:", self.ywidth)
 
         # obstacle map generation
-        self.obmap = [[False for i in range(self.ywidth)]
-                      for i in range(self.xwidth)]
+        self.obmap = [[False for _ in range(self.ywidth)]
+                      for _ in range(self.xwidth)]
         for ix in range(self.xwidth):
             x = self.calc_grid_position(ix, self.minx)
             for iy in range(self.ywidth):
@@ -237,7 +301,7 @@ def main():
     grid_size = 2.0  # [m]
     robot_radius = 1.0  # [m]
 
-    # set obstable positions
+    # set obstacle positions
     ox, oy = [], []
     for i in range(-10, 60):
         ox.append(i)
@@ -261,17 +325,17 @@ def main():
     if show_animation:  # pragma: no cover
         plt.plot(ox, oy, ".k")
         plt.plot(sx, sy, "og")
-        plt.plot(gx, gy, "xb")
+        plt.plot(gx, gy, "ob")
         plt.grid(True)
         plt.axis("equal")
 
-    a_star = AStarPlanner(ox, oy, grid_size, robot_radius)
-    rx, ry = a_star.planning(sx, sy, gx, gy)
+    bidir_a_star = BidirectionalAStarPlanner(ox, oy, grid_size, robot_radius)
+    rx, ry = bidir_a_star.planning(sx, sy, gx, gy)
 
     if show_animation:  # pragma: no cover
         plt.plot(rx, ry, "-r")
+        plt.pause(.0001)
         plt.show()
-        plt.pause(0.001)
 
 
 if __name__ == '__main__':
