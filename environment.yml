@@ -7,5 +7,4 @@ dependencies:
 - numpy
 - pandas
 - coverage
-- pip:
-    - cvxpy
+- cvxpy
