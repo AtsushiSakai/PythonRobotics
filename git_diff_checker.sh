@@ -57,26 +57,22 @@ function search_branch_commit(){
 
 function search_diff_files(){
     local branch_commit=$1
-    local diff_files=()
-    git diff --name-only ${branch_commit}
+    local diff_files=(), diff_extensions=()
     mapfile -t diff_files < <(git diff --name-only ${branch_commit})
-#    filename=$(basename -- "$fullfile")
-#    extension="${filename##*.}"
-#declare -A hm
-#hm[hello]=1
-#hm[world]=1
-#hm[hello]=1
-#if [ "${hm[hello}" ] ; then ... ; fi
 
     declare -A hm
     for diff_file in "${diff_files[@]}"
     do
         filename=$(basename -- "$diff_file")
         extension="${filename##*.}"
-        hm[extension]=1
-        echo ${extension}
+        hm[${extension}]=1
     done
+    diff_extensions=(${!hm[@]})
 
+    for diff_extension in "${diff_extension[@]}"
+    do
+        echo diff_extension
+    done
 }
 
 function main(){
