@@ -5,7 +5,7 @@ A* grid planning
 author: Atsushi Sakai(@Atsushi_twi)
         Nikos Kanargias (nkana@tee.gr)
 
-See Wikipedia article (https://en.wikipedia.org/wiki/A*_search_algorithm)
+See Wikipedia article (https://en.wikipedia.org/wiki/A*_search_algorithm)   testsete
 
 """
 
