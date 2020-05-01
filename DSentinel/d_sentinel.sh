@@ -8,6 +8,7 @@ set -eo pipefail
 
 PLUGIN_DIR="/plugins/"
 CURRENT_DIR=$(pwd)
+GIT_ROOT_DIR=$(git rev-parse --show-toplevel)
 
 #######################################
 # get commit history
@@ -104,14 +105,8 @@ function get_diff_file_extensions(){
 function get_diff(){
     local branch_commit=$1
     local extension=$2
-    echo ${branch_commit}
-    echo ${extension}
-
-    find . -name '*.py'
-#    git diff --unified=0 ${branch_commit} -- '***.py'
-    git diff -- '*'
-    echo $rev
-
+    local -n rev=$3
+    rev="$(git diff --unified=0 ${branch_commit} -- ${GIT_ROOT_DIR}'/*'.${extension})"
 }
 
 #####################################################
@@ -136,7 +131,8 @@ function check_diff(){
         local check_cmd="check_diff_${diff_extension}"
         if type ${check_cmd} > /dev/null 2>&1; then
             echo "command ${check_cmd} found, so lets check these ${diff_extension} diff file"
-            get_diff ${branch_commit} ${diff_extension}
+            get_diff ${branch_commit} ${diff_extension} diff
+            check_cmd="${check_cmd} '${diff}'"
             eval "${check_cmd}"
         else
             echo "command ${check_cmd} not found"
