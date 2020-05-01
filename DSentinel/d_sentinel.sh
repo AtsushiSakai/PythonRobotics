@@ -101,6 +101,19 @@ function get_diff_file_extensions(){
     rev=(${!hash_map[@]})
 }
 
+function get_diff(){
+    local branch_commit=$1
+    local extension=$2
+    echo ${branch_commit}
+    echo ${extension}
+
+    find . -name '*.py'
+#    git diff --unified=0 ${branch_commit} -- '***.py'
+    git diff -- '*'
+    echo $rev
+
+}
+
 #####################################################
 # Check diff based on plugin checkers
 # Plugin check function name have to be check_diff_<exttention> (ex: check_diff_py)
@@ -112,7 +125,9 @@ function get_diff_file_extensions(){
 #   None
 #####################################################
 function check_diff(){
-    local diff_files=("$@")
+    local args=("$@")
+    local branch_commit=$1
+    local diff_files=("${args[@]:1}")
     local diff_extensions=()
     get_diff_file_extensions diff_extensions ${diff_files[@]}
 
@@ -121,6 +136,7 @@ function check_diff(){
         local check_cmd="check_diff_${diff_extension}"
         if type ${check_cmd} > /dev/null 2>&1; then
             echo "command ${check_cmd} found, so lets check these ${diff_extension} diff file"
+            get_diff ${branch_commit} ${diff_extension}
             eval "${check_cmd}"
         else
             echo "command ${check_cmd} not found"
@@ -128,6 +144,16 @@ function check_diff(){
     done
 }
 
+#####################################################
+# Load all scripts in the plugin directory
+# Globals:
+#   CURRENT_DIR: current directory
+#   PLUGIN_DIR: plugin directory
+# Arguments:
+#   None
+# Outputs:
+#   None
+#####################################################
 function load_plugins(){
     echo "load_plugins"
     for f in ${CURRENT_DIR}${PLUGIN_DIR}*
@@ -158,7 +184,7 @@ function main(){
 
     search_branch_commit ${current_branch} ${target_branch} branch_commit
     search_diff_files ${branch_commit} diff_files
-    check_diff ${diff_files[@]}
+    check_diff ${branch_commit} ${diff_files[@]}
 
     echo "Done!!"
 }
