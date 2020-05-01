@@ -2,6 +2,8 @@
 
 function check_diff_py(){
     echo "check_diff_py"
-    echo "$1"
-    echo "$1" | pycodestyle --diff --max-line-length=1 | echo -e $(cat)
+    git diff --unified=0 $1 -- ${GIT_ROOT_DIR}'/*'.py | pycodestyle --diff | cat
+    git diff --unified=0 084c86244798f67fd1fbd29212a9ea36e67e3a97 -- *py | pycodestyle --diff
+    echo ${PIPESTATUS[@]}
+#    git diff --unified=0 $1 -- ${GIT_ROOT_DIR}'/*'.py | pycodestyle --diff | echo $(cat)
 }

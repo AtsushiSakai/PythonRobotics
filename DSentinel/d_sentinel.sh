@@ -131,8 +131,7 @@ function check_diff(){
         local check_cmd="check_diff_${diff_extension}"
         if type ${check_cmd} > /dev/null 2>&1; then
             echo "command ${check_cmd} found, so lets check these ${diff_extension} diff file"
-            get_diff ${branch_commit} ${diff_extension} diff
-            check_cmd="${check_cmd} '${diff}'"
+            check_cmd="${check_cmd} '${branch_commit}'"
             eval "${check_cmd}"
         else
             echo "command ${check_cmd} not found"
