@@ -1,11 +1,10 @@
 """
 
-A* grid planning
+Breadth-First grid planning
 
-author: Atsushi Sakai(@Atsushi_twi)
-        Nikos Kanargias (nkana@tee.gr)
+author: Erwin Lejeune (@spida_rwin)
 
-See Wikipedia article (https://en.wikipedia.org/wiki/A*_search_algorithm)
+See Wikipedia article (https://en.wikipedia.org/wiki/Breadth-first_search)
 
 """
 
@@ -16,11 +15,11 @@ import matplotlib.pyplot as plt
 show_animation = True
 
 
-class AStarPlanner:
+class BreadthFirstSearchPlanner:
 
     def __init__(self, ox, oy, reso, rr):
         """
-        Initialize grid map for a star planning
+        Initialize grid map for bfs planning
 
         ox: x position list of Obstacles [m]
         oy: y position list of Obstacles [m]
@@ -34,11 +33,12 @@ class AStarPlanner:
         self.motion = self.get_motion_model()
 
     class Node:
-        def __init__(self, x, y, cost, pind):
+        def __init__(self, x, y, cost, pind, parent):
             self.x = x  # index of grid
             self.y = y  # index of grid
             self.cost = cost
             self.pind = pind
+            self.parent = parent
 
         def __str__(self):
             return str(self.x) + "," + str(self.y) + "," + str(
@@ -46,7 +46,7 @@ class AStarPlanner:
 
     def planning(self, sx, sy, gx, gy):
         """
-        A star path search
+        Breadth First search based planning
 
         input:
             sx: start x position [m]
@@ -60,9 +60,9 @@ class AStarPlanner:
         """
 
         nstart = self.Node(self.calc_xyindex(sx, self.minx),
-                           self.calc_xyindex(sy, self.miny), 0.0, -1)
+                           self.calc_xyindex(sy, self.miny), 0.0, -1, None)
         ngoal = self.Node(self.calc_xyindex(gx, self.minx),
-                          self.calc_xyindex(gy, self.miny), 0.0, -1)
+                          self.calc_xyindex(gy, self.miny), 0.0, -1, None)
 
         open_set, closed_set = dict(), dict()
         open_set[self.calc_grid_index(nstart)] = nstart
@@ -72,12 +72,11 @@ class AStarPlanner:
                 print("Open set is empty..")
                 break
 
-            c_id = min(
-                open_set,
-                key=lambda o: open_set[o].cost + self.calc_heuristic(ngoal,
-                                                                     open_set[
-                                                                         o]))
-            current = open_set[c_id]
+            current = open_set.pop(list(open_set.keys())[0])
+
+            c_id = self.calc_grid_index(current)
+
+            closed_set[c_id] = current
 
             # show graph
             if show_animation:  # pragma: no cover
@@ -96,55 +95,35 @@ class AStarPlanner:
                 ngoal.cost = current.cost
                 break
 
-            # Remove the item from the open set
-            del open_set[c_id]
-
-            # Add it to the closed set
-            closed_set[c_id] = current
-
             # expand_grid search grid based on motion model
             for i, _ in enumerate(self.motion):
                 node = self.Node(current.x + self.motion[i][0],
                                  current.y + self.motion[i][1],
-                                 current.cost + self.motion[i][2], c_id)
+                                 current.cost + self.motion[i][2], c_id, None)
                 n_id = self.calc_grid_index(node)
 
                 # If the node is not safe, do nothing
                 if not self.verify_node(node):
                     continue
 
-                if n_id in closed_set:
-                    continue
-
-                if n_id not in open_set:
-                    open_set[n_id] = node  # discovered a new node
-                else:
-                    if open_set[n_id].cost > node.cost:
-                        # This path is the best until now. record it
-                        open_set[n_id] = node
+                if (n_id not in closed_set) and (n_id not in open_set):
+                    node.parent = current
+                    open_set[n_id] = node
 
         rx, ry = self.calc_final_path(ngoal, closed_set)
-
         return rx, ry
 
     def calc_final_path(self, ngoal, closedset):
         # generate final course
         rx, ry = [self.calc_grid_position(ngoal.x, self.minx)], [
             self.calc_grid_position(ngoal.y, self.miny)]
-        pind = ngoal.pind
-        while pind != -1:
-            n = closedset[pind]
+        n = closedset[ngoal.pind]
+        while n is not None:
             rx.append(self.calc_grid_position(n.x, self.minx))
             ry.append(self.calc_grid_position(n.y, self.miny))
-            pind = n.pind
+            n = n.parent
 
         return rx, ry
-
-    @staticmethod
-    def calc_heuristic(n1, n2):
-        w = 1.0  # weight of heuristic
-        d = w * math.hypot(n1.x - n2.x, n1.y - n2.y)
-        return d
 
     def calc_grid_position(self, index, minp):
         """
@@ -199,8 +178,8 @@ class AStarPlanner:
         print("ywidth:", self.ywidth)
 
         # obstacle map generation
-        self.obmap = [[False for i in range(self.ywidth)]
-                      for i in range(self.xwidth)]
+        self.obmap = [[False for _ in range(self.ywidth)]
+                      for _ in range(self.xwidth)]
         for ix in range(self.xwidth):
             x = self.calc_grid_position(ix, self.minx)
             for iy in range(self.ywidth):
@@ -265,13 +244,13 @@ def main():
         plt.grid(True)
         plt.axis("equal")
 
-    a_star = AStarPlanner(ox, oy, grid_size, robot_radius)
-    rx, ry = a_star.planning(sx, sy, gx, gy)
+    bfs = BreadthFirstSearchPlanner(ox, oy, grid_size, robot_radius)
+    rx, ry = bfs.planning(sx, sy, gx, gy)
 
     if show_animation:  # pragma: no cover
         plt.plot(rx, ry, "-r")
+        plt.pause(0.01)
         plt.show()
-        plt.pause(0.001)
 
 
 if __name__ == '__main__':
