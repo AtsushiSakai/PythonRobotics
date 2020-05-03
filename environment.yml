@@ -4,7 +4,7 @@ dependencies:
 - pip
 - matplotlib
 - scipy
-- numpy==1.15
+- numpy
 - pandas
 - coverage
 - pip:
