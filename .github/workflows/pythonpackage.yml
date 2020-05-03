@@ -9,7 +9,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.7]
+        python-version: [3.7, 3.8]
 
     steps:
     - uses: actions/checkout@v1
@@ -38,9 +38,10 @@ jobs:
         find PathPlanning -name "*.py" | xargs mypy
         find PathTracking -name "*.py" | xargs mypy
         find SLAM -name "*.py" | xargs mypy
-    - name: do all unit tests
-      run: bash runtests.sh
     - name: do diff style check
       run: bash rundiffstylecheck.sh
+    - name: do all unit tests
+      run: bash runtests.sh
+
 
 
