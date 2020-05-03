@@ -46,7 +46,7 @@ class BidirectionalBreadthFirstSearchPlanner:
 
     def planning(self, sx, sy, gx, gy):
         """
-        Breadth First search based planning
+        Bidirectional Breadth First search based planning
 
         input:
             sx: start x position [m]
