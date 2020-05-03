@@ -46,7 +46,7 @@ class BestFirstSearchPlanner:
 
     def planning(self, sx, sy, gx, gy):
         """
-        Best-First search
+        Greedy Best-First search
 
         input:
             sx: start x position [m]
@@ -237,7 +237,7 @@ def main():
     grid_size = 2.0  # [m]
     robot_radius = 1.0  # [m]
 
-    # set obstable positions
+    # set obstacle positions
     ox, oy = [], []
     for i in range(-10, 60):
         ox.append(i)
