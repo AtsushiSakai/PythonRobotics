@@ -81,8 +81,9 @@ class DepthFirstSearchPlanner:
                          self.calc_grid_position(current.y, self.miny), "xc")
                 # for stopping simulation with the esc key.
                 plt.gcf().canvas.mpl_connect('key_release_event',
-                                             lambda event: [exit(
-                                                 0) if event.key == 'escape' else None])
+                                             lambda event:
+                                             [exit(0) if event.key == 'escape'
+                                              else None])
                 plt.pause(0.01)
 
             if current.x == ngoal.x and current.y == ngoal.y:

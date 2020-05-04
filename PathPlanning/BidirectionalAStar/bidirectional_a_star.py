@@ -100,8 +100,9 @@ class BidirectionalAStarPlanner:
                          self.calc_grid_position(current_B.y, self.miny), "xc")
                 # for stopping simulation with the esc key.
                 plt.gcf().canvas.mpl_connect('key_release_event',
-                                             lambda event: [exit(
-                                                 0) if event.key == 'escape' else None])
+                                             lambda event:
+                                             [exit(0) if event.key == 'escape'
+                                              else None])
                 if len(closed_set_A.keys()) % 10 == 0:
                     plt.pause(0.001)
 
@@ -126,12 +127,12 @@ class BidirectionalAStarPlanner:
 
                 child_node_A = self.Node(current_A.x + self.motion[i][0],
                                          current_A.y + self.motion[i][1],
-                                         current_A.cost + self.motion[i][2], 
+                                         current_A.cost + self.motion[i][2],
                                          c_id_A)
 
                 child_node_B = self.Node(current_B.x + self.motion[i][0],
                                          current_B.y + self.motion[i][1],
-                                         current_B.cost + self.motion[i][2], 
+                                         current_B.cost + self.motion[i][2],
                                          c_id_B)
 
                 n_id_A = self.calc_grid_index(child_node_A)
@@ -173,9 +174,10 @@ class BidirectionalAStarPlanner:
 
         return rx, ry
 
-    def calc_final_bidirectional_path(self, meetnode_A, meetnode_B, closed_set_A, closed_set_B):
-        rx_A, ry_A = self.calc_final_path(meetnode_A, closed_set_A)
-        rx_B, ry_B = self.calc_final_path(meetnode_B, closed_set_B)
+    # takes two sets and two meeting nodes and return the optimal path
+    def calc_final_bidirectional_path(self, n1, n2, setA, setB):
+        rx_A, ry_A = self.calc_final_path(n1, setA)
+        rx_B, ry_B = self.calc_final_path(n2, setB)
 
         rx_A.reverse()
         ry_A.reverse()
