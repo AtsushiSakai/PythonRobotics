@@ -95,8 +95,9 @@ class BidirectionalBreadthFirstSearchPlanner:
                          self.calc_grid_position(current_B.y, self.miny), "xc")
                 # for stopping simulation with the esc key.
                 plt.gcf().canvas.mpl_connect('key_release_event',
-                                        lambda event: [exit(
-                                        0) if event.key == 'escape' else None])
+                                             lambda event:
+                                             [exit(0) if
+                                              event.key == 'escape' else None])
                 if len(closed_set_A.keys()) % 10 == 0:
                     plt.pause(0.001)
 
@@ -114,8 +115,8 @@ class BidirectionalBreadthFirstSearchPlanner:
 
             # expand_grid search grid based on motion model
             for i, _ in enumerate(self.motion):
-                continue_A = False
-                continue_B = False
+                breakA = False
+                breakB = False
 
                 node_A = self.Node(current_A.x + self.motion[i][0],
                                    current_A.y + self.motion[i][1],
@@ -131,18 +132,20 @@ class BidirectionalBreadthFirstSearchPlanner:
 
                 # If the node is not safe, do nothing
                 if not self.verify_node(node_A):
-                    continue_A = True
+                    breakA = True
 
                 if not self.verify_node(node_B):
-                    continue_B = True
+                    breakB = True
 
-                if (n_id_A not in closed_set_A) and (n_id_A
-                                        not in open_set_A) and not continue_A:
+                if (n_id_A not in closed_set_A) and (n_id_A not in
+                                                     open_set_A) and (not
+                                                                      breakA):
                     node_A.parent = current_A
                     open_set_A[n_id_A] = node_A
 
-                if (n_id_B not in closed_set_B) and (n_id_B 
-                                        not in open_set_B) and not continue_B:
+                if (n_id_B not in closed_set_B) and (n_id_B not in
+                                                     open_set_B) and (not
+                                                                      breakB):
                     node_B.parent = current_B
                     open_set_B[n_id_B] = node_B
 
