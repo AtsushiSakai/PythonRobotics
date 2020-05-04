@@ -84,8 +84,8 @@ class BestFirstSearchPlanner:
                          self.calc_grid_position(current.y, self.miny), "xc")
                 # for stopping simulation with the esc key.
                 plt.gcf().canvas.mpl_connect('key_release_event',
-                                             lambda event: [exit(
-                                                 0) if event.key == 'escape' else None])
+                                        lambda event: [exit(
+                                        0) if event.key == 'escape' else None])
                 if len(closed_set.keys()) % 10 == 0:
                     plt.pause(0.001)
 
@@ -100,12 +100,13 @@ class BestFirstSearchPlanner:
                 ngoal.pind = current.pind
                 ngoal.cost = current.cost
                 break
-                    
+
             # expand_grid search grid based on motion model
             for i, _ in enumerate(self.motion):
                 node = self.Node(current.x + self.motion[i][0],
                                  current.y + self.motion[i][1],
-                                 current.cost + self.motion[i][2], c_id, current)
+                                 current.cost + self.motion[i][2], 
+                                 c_id, current)
 
                 n_id = self.calc_grid_index(node)
 
@@ -115,15 +116,14 @@ class BestFirstSearchPlanner:
 
                 if n_id in closed_set:
                     continue
-                
+
                 if n_id not in open_set:
                     open_set[n_id] = node
 
                 else:
                     if open_set[n_id].cost > node.cost:
                         open_set[n_id] = node
-
-
+        
         closed_set[ngoal.pind] = current
         rx, ry = self.calc_final_path(ngoal, closed_set)
         return rx, ry
