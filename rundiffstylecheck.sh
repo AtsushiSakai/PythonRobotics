@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "$(basename $0) start!"
-VERSION=v0.1.5
+VERSION=v0.1.6
 wget https://github.com/AtsushiSakai/DiffSentinel/archive/${VERSION}.zip
 unzip ${VERSION}.zip
 ./DiffSentinel*/starter.sh HEAD origin/master
