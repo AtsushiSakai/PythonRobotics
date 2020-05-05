@@ -598,4 +598,6 @@ If you or your company would like to support this project, please consider:
 
 - [Guillaume Jacquenot](https://github.com/Gjacquenot)
 
+- [Erwin Lejeune](https://github.com/guilyx)
+
 
