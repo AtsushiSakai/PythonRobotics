@@ -100,8 +100,9 @@ class BidirectionalAStarPlanner:
                          self.calc_grid_position(current_B.y, self.miny), "xc")
                 # for stopping simulation with the esc key.
                 plt.gcf().canvas.mpl_connect('key_release_event',
-                                             lambda event: [exit(
-                                                 0) if event.key == 'escape' else None])
+                                             lambda event:
+                                             [exit(0) if event.key == 'escape'
+                                              else None])
                 if len(closed_set_A.keys()) % 10 == 0:
                     plt.pause(0.001)
 
@@ -121,61 +122,50 @@ class BidirectionalAStarPlanner:
 
             # expand_grid search grid based on motion model
             for i, _ in enumerate(self.motion):
-                continue_A = False
-                continue_B = False
 
-                child_node_A = self.Node(current_A.x + self.motion[i][0],
-                                         current_A.y + self.motion[i][1],
-                                         current_A.cost + self.motion[i][2], 
-                                         c_id_A)
+                c_nodes = [self.Node(current_A.x + self.motion[i][0],
+                                     current_A.y + self.motion[i][1],
+                                     current_A.cost + self.motion[i][2],
+                                     c_id_A),
+                           self.Node(current_B.x + self.motion[i][0],
+                                     current_B.y + self.motion[i][1],
+                                     current_B.cost + self.motion[i][2],
+                                     c_id_B)]
 
-                child_node_B = self.Node(current_B.x + self.motion[i][0],
-                                         current_B.y + self.motion[i][1],
-                                         current_B.cost + self.motion[i][2], 
-                                         c_id_B)
-
-                n_id_A = self.calc_grid_index(child_node_A)
-                n_id_B = self.calc_grid_index(child_node_B)
+                n_ids = [self.calc_grid_index(c_nodes[0]),
+                         self.calc_grid_index(c_nodes[1])]
 
                 # If the node is not safe, do nothing
-                if not self.verify_node(child_node_A):
-                    continue_A = True
+                continue_ = self.check_nodes_and_sets(c_nodes, closed_set_A,
+                                                      closed_set_B, n_ids)
 
-                if not self.verify_node(child_node_B):
-                    continue_B = True
-
-                if n_id_A in closed_set_A:
-                    continue_A = True
-
-                if n_id_B in closed_set_B:
-                    continue_B = True
-
-                if not continue_A:
-                    if n_id_A not in open_set_A:
+                if not continue_[0]:
+                    if n_ids[0] not in open_set_A:
                         # discovered a new node
-                        open_set_A[n_id_A] = child_node_A
+                        open_set_A[n_ids[0]] = c_nodes[0]
                     else:
-                        if open_set_A[n_id_A].cost > child_node_A.cost:
+                        if open_set_A[n_ids[0]].cost > c_nodes[0].cost:
                             # This path is the best until now. record it
-                            open_set_A[n_id_A] = child_node_A
+                            open_set_A[n_ids[0]] = c_nodes[0]
 
-                if not continue_B:
-                    if n_id_B not in open_set_B:
+                if not continue_[1]:
+                    if n_ids[1] not in open_set_B:
                         # discovered a new node
-                        open_set_B[n_id_B] = child_node_B
+                        open_set_B[n_ids[1]] = c_nodes[1]
                     else:
-                        if open_set_B[n_id_B].cost > child_node_B.cost:
+                        if open_set_B[n_ids[1]].cost > c_nodes[1].cost:
                             # This path is the best until now. record it
-                            open_set_B[n_id_B] = child_node_B
+                            open_set_B[n_ids[1]] = c_nodes[1]
 
         rx, ry = self.calc_final_bidirectional_path(
             meetpointA, meetpointB, closed_set_A, closed_set_B)
 
         return rx, ry
 
-    def calc_final_bidirectional_path(self, meetnode_A, meetnode_B, closed_set_A, closed_set_B):
-        rx_A, ry_A = self.calc_final_path(meetnode_A, closed_set_A)
-        rx_B, ry_B = self.calc_final_path(meetnode_B, closed_set_B)
+    # takes two sets and two meeting nodes and return the optimal path
+    def calc_final_bidirectional_path(self, n1, n2, setA, setB):
+        rx_A, ry_A = self.calc_final_path(n1, setA)
+        rx_B, ry_B = self.calc_final_path(n2, setB)
 
         rx_A.reverse()
         ry_A.reverse()
@@ -197,6 +187,16 @@ class BidirectionalAStarPlanner:
             pind = n.pind
 
         return rx, ry
+
+    def check_nodes_and_sets(self, c_nodes, closedSet_A, closedSet_B, n_ids):
+        continue_ = [False, False]
+        if not self.verify_node(c_nodes[0]) or n_ids[0] in closedSet_A:
+            continue_[0] = True
+
+        if not self.verify_node(c_nodes[1]) or n_ids[1] in closedSet_B:
+            continue_[1] = True
+
+        return continue_
 
     @staticmethod
     def calc_heuristic(n1, n2):

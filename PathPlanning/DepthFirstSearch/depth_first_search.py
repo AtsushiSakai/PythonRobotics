@@ -81,8 +81,9 @@ class DepthFirstSearchPlanner:
                          self.calc_grid_position(current.y, self.miny), "xc")
                 # for stopping simulation with the esc key.
                 plt.gcf().canvas.mpl_connect('key_release_event',
-                                             lambda event: [exit(
-                                                 0) if event.key == 'escape' else None])
+                                             lambda event:
+                                             [exit(0) if event.key == 'escape'
+                                              else None])
                 plt.pause(0.01)
 
             if current.x == ngoal.x and current.y == ngoal.y:
@@ -213,7 +214,7 @@ def main():
     grid_size = 2.0  # [m]
     robot_radius = 1.0  # [m]
 
-    # set obstable positions
+    # set obstacle positions
     ox, oy = [], []
     for i in range(-10, 60):
         ox.append(i)

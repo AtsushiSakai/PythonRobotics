@@ -84,8 +84,9 @@ class BreadthFirstSearchPlanner:
                          self.calc_grid_position(current.y, self.miny), "xc")
                 # for stopping simulation with the esc key.
                 plt.gcf().canvas.mpl_connect('key_release_event',
-                                             lambda event: [exit(
-                                                 0) if event.key == 'escape' else None])
+                                             lambda event:
+                                             [exit(0) if event.key == 'escape'
+                                              else None])
                 if len(closed_set.keys()) % 10 == 0:
                     plt.pause(0.001)
 
@@ -216,7 +217,7 @@ def main():
     grid_size = 2.0  # [m]
     robot_radius = 1.0  # [m]
 
-    # set obstable positions
+    # set obstacle positions
     ox, oy = [], []
     for i in range(-10, 60):
         ox.append(i)
