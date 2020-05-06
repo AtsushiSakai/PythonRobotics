@@ -12,13 +12,13 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 import sys
-sys.path.append("../ReedsSheppPath/")
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__))
+                + "/../ReedsSheppPath")
 try:
     from a_star_heuristic import dp_planning  # , calc_obstacle_map
-    if 'tests/../' in sys.path:
-        from PathPlanning.ReedsSheppPath import reeds_shepp_path_planning as rs
-    else:
-        import reeds_shepp_path_planning as rs
+    import reeds_shepp_path_planning as rs
     from car import move, check_car_collision, MAX_STEER, WB, plot_car
 except Exception:
     raise
