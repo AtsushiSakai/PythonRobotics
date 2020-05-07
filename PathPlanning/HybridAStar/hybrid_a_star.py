@@ -12,19 +12,22 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 import sys
-sys.path.append("../ReedsSheppPath/")
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__))
+                + "/../ReedsSheppPath")
 try:
     from a_star_heuristic import dp_planning  # , calc_obstacle_map
     import reeds_shepp_path_planning as rs
     from car import move, check_car_collision, MAX_STEER, WB, plot_car
-except:
+except Exception:
     raise
 
 
 XY_GRID_RESOLUTION = 2.0  # [m]
 YAW_GRID_RESOLUTION = np.deg2rad(15.0)  # [rad]
 MOTION_RESOLUTION = 0.1  # [m] path interporate resolution
-N_STEER = 20.0  # number of steer command
+N_STEER = 20  # number of steer command
 H_COST = 1.0
 VR = 1.0  # robot radius
 
@@ -131,7 +134,8 @@ class Config:
 
 def calc_motion_inputs():
 
-    for steer in np.concatenate((np.linspace(-MAX_STEER, MAX_STEER, N_STEER),[0.0])):
+    for steer in np.concatenate((np.linspace(-MAX_STEER, MAX_STEER,
+                                             N_STEER), [0.0])):
         for d in [1, -1]:
             yield [steer, d]
 
@@ -225,7 +229,8 @@ def update_node_with_analystic_expantion(current, goal,
     apath = analytic_expantion(current, goal, c, ox, oy, kdtree)
 
     if apath:
-        plt.plot(apath.x, apath.y)
+        if show_animation:
+            plt.plot(apath.x, apath.y)
         fx = apath.x[1:]
         fy = apath.y[1:]
         fyaw = apath.yaw[1:]
@@ -337,6 +342,7 @@ def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
             current, ngoal, config, ox, oy, obkdtree)
 
         if isupdated:
+            print("path found")
             break
 
         for neighbor in get_neighbors(current, config, ox, oy, obkdtree):
@@ -437,12 +443,16 @@ def main():
     start = [10.0, 10.0, np.deg2rad(90.0)]
     goal = [50.0, 50.0, np.deg2rad(-90.0)]
 
-    plt.plot(ox, oy, ".k")
-    rs.plot_arrow(start[0], start[1], start[2], fc='g')
-    rs.plot_arrow(goal[0], goal[1], goal[2])
+    print("start : ", start)
+    print("goal : ", goal)
 
-    plt.grid(True)
-    plt.axis("equal")
+    if show_animation:
+        plt.plot(ox, oy, ".k")
+        rs.plot_arrow(start[0], start[1], start[2], fc='g')
+        rs.plot_arrow(goal[0], goal[1], goal[2])
+
+        plt.grid(True)
+        plt.axis("equal")
 
     path = hybrid_a_star_planning(
         start, goal, ox, oy, XY_GRID_RESOLUTION, YAW_GRID_RESOLUTION)
@@ -451,14 +461,15 @@ def main():
     y = path.ylist
     yaw = path.yawlist
 
-    for ix, iy, iyaw in zip(x, y, yaw):
-        plt.cla()
-        plt.plot(ox, oy, ".k")
-        plt.plot(x, y, "-r", label="Hybrid A* path")
-        plt.grid(True)
-        plt.axis("equal")
-        plot_car(ix, iy, iyaw)
-        plt.pause(0.0001)
+    if show_animation:
+        for ix, iy, iyaw in zip(x, y, yaw):
+            plt.cla()
+            plt.plot(ox, oy, ".k")
+            plt.plot(x, y, "-r", label="Hybrid A* path")
+            plt.grid(True)
+            plt.axis("equal")
+            plot_car(ix, iy, iyaw)
+            plt.pause(0.0001)
 
     print(__file__ + " done!!")
 
