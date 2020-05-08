@@ -11,6 +11,8 @@ jobs:
       matrix:
         python-version: [3.8]
 
+    name: Python ${{ matrix.python-version }} CI
+
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
