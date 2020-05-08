@@ -6,22 +6,20 @@ name: MacOS_CI
 # events but only for the master branch
 on: [push, pull_request]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ '3.8' ]
-      name: Python ${{ matrix.python-version }} sample
-      steps:
-        - uses: actions/checkout@v2
-        - name: Setup python
-          uses: actions/setup-python@v2
-          with:
-            python-version: ${{ matrix.python-version }}
-        - run: python my_script.py
+        python-version: [ '2.x', '3.x', 'pypy2', 'pypy3' ]
+    name: Python ${{ matrix.python-version }} sample
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - run: python my_script.py
 
 
