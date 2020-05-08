@@ -1,3 +1,5 @@
+os: Visual Studio 2019
+
 environment:
   global:
     # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the

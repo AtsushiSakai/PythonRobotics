@@ -17,49 +17,49 @@ jobs:
           with:
             python-version: ${{ matrix.python-version }}
 
-      - name: Update bash
-      - run: brew install bash
+        - name: Update bash
+        - run: brew install bash
 
-      - name: git checkout
-      - uses: actions/checkout@v2
-      - run: git fetch --prune --unshallow
+        - name: git checkout
+        - uses: actions/checkout@v2
+        - run: git fetch --prune --unshallow
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
+        - name: Set up Python ${{ matrix.python-version }}
+          uses: actions/setup-python@v2
+          with:
+            python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+        - name: Install dependencies
+          run: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
 
-      - name: install coverage
-        run: pip install coverage
+        - name: install coverage
+          run: pip install coverage
 
-      - name: install mypy
-        run: pip install mypy
+        - name: install mypy
+          run: pip install mypy
 
-      - name: install pycodestyle
-        run: pip install pycodestyle
+        - name: install pycodestyle
+          run: pip install pycodestyle
 
-      - name: mypy check
-        run: |
-          find AerialNavigation -name "*.py" | xargs mypy
-          find ArmNavigation -name "*.py" | xargs mypy
-          find Bipedal -name "*.py" | xargs mypy
-          find InvertedPendulumCart -name "*.py" | xargs mypy
-          find Localization -name "*.py" | xargs mypy
-          find Mapping -name "*.py" | xargs mypy
-          find PathPlanning -name "*.py" | xargs mypy
-          find PathTracking -name "*.py" | xargs mypy
-          find SLAM -name "*.py" | xargs mypy
+        - name: mypy check
+          run: |
+            find AerialNavigation -name "*.py" | xargs mypy
+            find ArmNavigation -name "*.py" | xargs mypy
+            find Bipedal -name "*.py" | xargs mypy
+            find InvertedPendulumCart -name "*.py" | xargs mypy
+            find Localization -name "*.py" | xargs mypy
+            find Mapping -name "*.py" | xargs mypy
+            find PathPlanning -name "*.py" | xargs mypy
+            find PathTracking -name "*.py" | xargs mypy
+            find SLAM -name "*.py" | xargs mypy
 
-      - name: do diff style check
-        run: bash rundiffstylecheck.sh
+        - name: do diff style check
+          run: bash rundiffstylecheck.sh
 
-      - name: do all unit tests
-        run: bash runtests.sh
+        - name: do all unit tests
+          run: bash runtests.sh
 
 
 
