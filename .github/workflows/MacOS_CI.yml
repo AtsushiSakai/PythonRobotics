@@ -15,9 +15,11 @@ jobs:
     - name: Update bash
     - run: brew install bash
 
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: git checkout
     - uses: actions/checkout@v2
     - run: git fetch --prune --unshallow
+
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
