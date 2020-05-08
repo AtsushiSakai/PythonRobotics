@@ -5,7 +5,7 @@ matrix:
     - os: linux
 
 python:
-  - 3.7
+  - 3.8
 
 before_install:
     - sudo apt-get update

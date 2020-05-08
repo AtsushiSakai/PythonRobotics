@@ -1,3 +1,5 @@
+os: Visual Studio 2019
+
 environment:
   global:
     # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the
@@ -6,7 +8,8 @@ environment:
     CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
 
   matrix:
-    - MINICONDA: C:\Miniconda37-x64
+    - MINICONDA: C:\Miniconda38-x64
+      PYTHON_VERSION: "3.8"
 
 init:
   - "ECHO %MINICONDA% %PYTHON_VERSION% %PYTHON_ARCH%"
@@ -24,13 +27,12 @@ install:
   - ECHO "Filesystem root:"
   - ps: "ls \"C:/\""
 
-  - ECHO "Installed SDKs:"
-  - ps: "ls \"C:/Program Files/Microsoft SDKs/Windows\""
-
   # Prepend newly installed Python to the PATH of this build (this cannot be
   # done from inside the powershell script as it would require to restart
   # the parent CMD process).
-  - "SET PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
+  - SET PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%
+  - SET PATH=%PYTHON%;%PYTHON%\Scripts;%PYTHON%\Library\bin;%PATH%
+  - SET PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
