@@ -90,7 +90,7 @@ See this paper for more details:
 
 # Requirements
 
-- Python 3.7.x (2.7 is not supported)
+- Python 3.8.x
 
 - numpy
 
