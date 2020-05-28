@@ -2,8 +2,10 @@ from unittest import TestCase
 
 import sys
 sys.path.append("./Bipedal/bipedal_planner/")
-
-from Bipedal.bipedal_planner import bipedal_planner as m
+try:
+    from Bipedal.bipedal_planner import bipedal_planner as m
+except Exception:
+    raise
 
 print(__file__)
 
