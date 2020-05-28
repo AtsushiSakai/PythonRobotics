@@ -115,7 +115,8 @@ class BipedalPlanner(object):
                         plt.gcf().canvas.mpl_connect('key_release_event',
                                 lambda event: [exit(0) if event.key == 'escape' else None])
                         ax.set_zlim(0, z_c * 2)
-                        ax.set_aspect('equal', 'datalim')
+                        ax.set_xlim(0, 1)
+                        ax.set_ylim(-0.5, 0.5)
 
                         # update com_trajectory_for_plot
                         com_trajectory_for_plot.append(self.com_trajectory[c])
