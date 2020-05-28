@@ -83,17 +83,18 @@ class BipedalPlanner(object):
                 [[math.cos(f_theta_next), -math.sin(f_theta_next)],
                  [math.sin(f_theta_next), math.cos(f_theta_next)]])
 
-            T_c = math.sqrt(z_c / self.g)
-            C = math.cosh(t_sup / T_c)
-            S = math.sinh(t_sup / T_c)
+            Tc = math.sqrt(z_c / self.g)
+            C = math.cosh(t_sup / Tc)
+            S = math.sinh(t_sup / Tc)
 
-            px, py = list(np.array(
-                [px, py]) + np.dot(rotate_mat,
-                                   np.array([f_x, -1 * math.pow(-1, n) * f_y])))
+            px, py = list(np.array([px, py])
+                          + np.dot(rotate_mat,
+                                   np.array([f_x, -1 * math.pow(-1, n) * f_y])
+                                   ))
             x_, y_ = list(np.dot(rotate_mat_next, np.array(
                 [f_x_next / 2., math.pow(-1, n) * f_y_next / 2.])))
             vx_, vy_ = list(np.dot(rotate_mat_next, np.array(
-                [(1 + C) / (T_c * S) * x_, (C - 1) / (T_c * S) * y_])))
+                [(1 + C) / (Tc * S) * x_, (C - 1) / (Tc * S) * y_])))
             self.ref_p.append([px, py, f_theta])
 
             # calculate reference COM
@@ -101,11 +102,11 @@ class BipedalPlanner(object):
             yd, yd_dot = py + y_, vy_
 
             # calculate modified footsteps
-            D = a * math.pow(C - 1, 2) + b * math.pow(S / T_c, 2)
-            px_star = -a * (C - 1) / D * (xd - C * xi - T_c * S * xi_dot) \
-                      - b * S / (T_c * D) * (xd_dot - S / T_c * xi - C * xi_dot)
-            py_star = -a * (C - 1) / D * (yd - C * yi - T_c * S * yi_dot) \
-                      - b * S / (T_c * D) * (yd_dot - S / T_c * yi - C * yi_dot)
+            D = a * math.pow(C - 1, 2) + b * math.pow(S / Tc, 2)
+            px_star = -a * (C - 1) / D * (xd - C * xi - Tc * S * xi_dot) \
+                      - b * S / (Tc * D) * (xd_dot - S / Tc * xi - C * xi_dot)
+            py_star = -a * (C - 1) / D * (yd - C * yi - Tc * S * yi_dot) \
+                      - b * S / (Tc * D) * (yd_dot - S / Tc * yi - C * yi_dot)
             self.act_p.append([px_star, py_star, f_theta])
 
             # plot
