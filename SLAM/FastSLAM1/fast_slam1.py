@@ -101,7 +101,7 @@ def predict_particles(particles, u):
     return particles
 
 
-def add_new_lm(particle, z, Q_cov):
+def add_new_landmark(particle, z, Q_cov):
     r = z[0]
     b = z[1]
     lm_id = int(z[2])
@@ -113,10 +113,14 @@ def add_new_lm(particle, z, Q_cov):
     particle.lm[lm_id, 1] = particle.y + r * s
 
     # covariance
-    Gz = np.array([[c, -r * s],
-                   [s, r * c]])
-
-    particle.lmP[2 * lm_id:2 * lm_id + 2] = Gz @ Q_cov @ Gz.T
+    dx = r * c
+    dy = r * s
+    d2 = dx**2 + dy**2
+    d = math.sqrt(d2)
+    Gz = np.array([[dx / d, dy / d],
+                   [-dy / d2, dx / d2]])
+    particle.lmP[2 * lm_id:2 * lm_id + 2] = np.linalg.inv(
+        Gz) @ Q_cov @ np.linalg.inv(Gz.T)
 
     return particle
 
@@ -206,7 +210,7 @@ def update_with_observation(particles, z):
         for ip in range(N_PARTICLE):
             # new landmark
             if abs(particles[ip].lm[landmark_id, 0]) <= 0.01:
-                particles[ip] = add_new_lm(particles[ip], z[:, iz], Q)
+                particles[ip] = add_new_landmark(particles[ip], z[:, iz], Q)
             # known landmark
             else:
                 w = compute_weight(particles[ip], z[:, iz], Q)
