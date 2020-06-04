@@ -113,10 +113,14 @@ def add_new_lm(particle, z, Q_cov):
     particle.lm[lm_id, 1] = particle.y + r * s
 
     # covariance
-    Gz = np.array([[c, -r * s],
-                   [s, r * c]])
-
-    particle.lmP[2 * lm_id:2 * lm_id + 2] = Gz @ Q_cov @ Gz.T
+    dx = r * c
+    dy = r * s
+    d2 = dx ** 2 + dy ** 2
+    d = math.sqrt(d2)
+    Gz = np.array([[dx / d, dy / d],
+                   [-dy / d2, dx / d2]])
+    particle.lmP[2 * lm_id:2 * lm_id + 2] = np.linalg.inv(
+        Gz) @ Q_cov @ np.linalg.inv(Gz.T)
 
     return particle
 
