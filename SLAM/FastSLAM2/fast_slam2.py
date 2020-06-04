@@ -268,7 +268,8 @@ def resampling(particles):
         inds = []
         ind = 0
         for ip in range(N_PARTICLE):
-            while (ind < w_cum.shape[0] - 1) and (resample_id[ip] > w_cum[ind]):
+            while (ind < w_cum.shape[0] - 1) \
+                    and (resample_id[ip] > w_cum[ind]):
                 ind += 1
             inds.append(ind)
 
@@ -312,13 +313,15 @@ def observation(xTrue, xd, u, RFID):
         angle = pi_2_pi(math.atan2(dy, dx) - xTrue[2, 0])
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Q_sim[0, 0] ** 0.5  # add noise
-            angle_with_noise = angle + np.random.randn() * Q_sim[1, 1] ** 0.5  # add noise
+            angle_noise = np.random.randn() * Q_sim[1, 1] ** 0.5
+            angle_with_noise = angle + angle_noise  # add noise
             zi = np.array([dn, pi_2_pi(angle_with_noise), i]).reshape(3, 1)
             z = np.hstack((z, zi))
 
     # add noise to input
     ud1 = u[0, 0] + np.random.randn() * R_sim[0, 0] ** 0.5
-    ud2 = u[1, 0] + np.random.randn() * R_sim[1, 1] ** 0.5 + OFFSET_YAW_RATE_NOISE
+    ud2 = u[1, 0] + np.random.randn() * R_sim[
+        1, 1] ** 0.5 + OFFSET_YAW_RATE_NOISE
     ud = np.array([ud1, ud2]).reshape(2, 1)
 
     xd = motion_model(xd, ud)

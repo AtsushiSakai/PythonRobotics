@@ -244,7 +244,8 @@ def resampling(particles):
         inds = []
         ind = 0
         for ip in range(N_PARTICLE):
-            while (ind < w_cum.shape[0] - 1) and (resample_id[ip] > w_cum[ind]):
+            while (ind < w_cum.shape[0] - 1) \
+                    and (resample_id[ip] > w_cum[ind]):
                 ind += 1
             inds.append(ind)
 
