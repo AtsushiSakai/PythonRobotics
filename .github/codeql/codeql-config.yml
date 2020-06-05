@@ -1,0 +1,6 @@
+name: "Extended CodeQL Config"
+
+# This file adds additional queries to the default configuration to make it equivalent to what LGTM checks.
+queries:
+  - name: Security and quality queries
+    uses: security-and-quality
