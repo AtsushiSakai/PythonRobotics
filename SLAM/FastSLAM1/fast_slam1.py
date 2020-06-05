@@ -339,7 +339,7 @@ def main():
                      [-5.0, 5.0],
                      [-10.0, 15.0]
                      ])
-    N_LM = RFID.shape[0]
+    n_landmark = RFID.shape[0]
 
     # State Vector [x y yaw v]'
     xEst = np.zeros((STATE_SIZE, 1))  # SLAM estimation
@@ -351,7 +351,7 @@ def main():
     hxTrue = xTrue
     hxDR = xTrue
 
-    particles = [Particle(N_LM) for _ in range(N_PARTICLE)]
+    particles = [Particle(n_landmark) for _ in range(N_PARTICLE)]
 
     while SIM_TIME >= time:
         time += DT
