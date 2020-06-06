@@ -186,7 +186,9 @@ def calc_next_node(current, steer, direction, config, ox, oy, kd_tree):
 
 
 def is_same_grid(n1, n2):
-    if n1.x_index == n2.x_index and n1.y_index == n2.y_index and n1.yaw_index == n2.yaw_index:
+    if n1.x_index == n2.x_index \
+            and n1.y_index == n2.y_index \
+            and n1.yaw_index == n2.yaw_index:
         return True
     return False
 
@@ -201,7 +203,8 @@ def analytic_expansion(current, goal, ox, oy, kd_tree):
     goal_yaw = goal.yaw_list[-1]
 
     max_curvature = math.tan(MAX_STEER) / WB
-    paths = rs.calc_paths(start_x, start_y, start_yaw, goal_x, goal_y, goal_yaw,
+    paths = rs.calc_paths(start_x, start_y, start_yaw,
+                          goal_x, goal_y, goal_yaw,
                           max_curvature, step_size=MOTION_RESOLUTION)
 
     if not paths:

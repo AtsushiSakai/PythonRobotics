@@ -156,7 +156,7 @@ def generate_ray_casting_grid_map(ox, oy, xyreso, breshen=True):
     The breshen boolean tells if it's computed with bresenham ray casting (True) or with flood fill (False)
     """
     minx, miny, maxx, maxy, xw, yw = calc_grid_map_config(ox, oy, xyreso)
-    pmap = np.ones((xw, yw))/2 # default 0.5 -- [[0.5 for i in range(yw)] for i in range(xw)] 
+    pmap = np.ones((xw, yw))/2 # default 0.5 -- [[0.5 for i in range(y_w)] for i in range(x_w)]
     centix = int(round(-minx / xyreso)) # center x coordinate of the grid map
     centiy = int(round(-miny / xyreso)) # center y coordinate of the grid map
     # occupancy grid computed with bresenham ray casting

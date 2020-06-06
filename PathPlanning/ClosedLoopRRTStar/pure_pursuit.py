@@ -40,7 +40,7 @@ def pure_pursuit_control(state, cx, cy, pind):
     if pind >= ind:
         ind = pind
 
-    #  print(pind, ind)
+    #  print(parent_index, ind)
     if ind < len(cx):
         tx = cx[ind]
         ty = cy[ind]

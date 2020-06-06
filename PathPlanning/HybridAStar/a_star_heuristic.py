@@ -105,13 +105,15 @@ def dp_planning(sx, sy, gx, gy, ox, oy, resolution, rr):
             if n_id not in open_set:
                 open_set[n_id] = node  # Discover a new node
                 heapq.heappush(
-                    priority_queue, (node.cost, calc_index(node, x_w, min_x, min_y)))
+                    priority_queue,
+                    (node.cost, calc_index(node, x_w, min_x, min_y)))
             else:
                 if open_set[n_id].cost >= node.cost:
                     # This path is the best until now. record it!
                     open_set[n_id] = node
                     heapq.heappush(
-                        priority_queue, (node.cost, calc_index(node, x_w, min_x, min_y)))
+                        priority_queue,
+                        (node.cost, calc_index(node, x_w, min_x, min_y)))
 
     rx, ry = calc_final_path(closed_set[calc_index(
         start_node, x_w, min_x, min_y)], closed_set, resolution)
