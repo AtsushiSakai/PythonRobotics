@@ -240,7 +240,7 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
         n = closedset[pind]
         rx.append(n.x)
         ry.append(n.y)
-        pind = n.pind
+        pind = n.parent_index
 
     return rx, ry
 

@@ -66,8 +66,8 @@ def histogram_filter_localization(grid_map, u, z, yaw):
 
 def calc_gaussian_observation_pdf(gmap, z, iz, ix, iy, std):
     # predicted range
-    x = ix * gmap.xy_reso + gmap.minx
-    y = iy * gmap.xy_reso + gmap.miny
+    x = ix * gmap.xy_reso + gmap.min_x
+    y = iy * gmap.xy_reso + gmap.min_y
     d = math.hypot(x - z[iz, 1], y - z[iz, 2])
 
     # likelihood
@@ -78,8 +78,8 @@ def calc_gaussian_observation_pdf(gmap, z, iz, ix, iy, std):
 
 def observation_update(gmap, z, std):
     for iz in range(z.shape[0]):
-        for ix in range(gmap.xw):
-            for iy in range(gmap.yw):
+        for ix in range(gmap.x_w):
+            for iy in range(gmap.y_w):
                 gmap.data[ix][iy] *= calc_gaussian_observation_pdf(
                     gmap, z, iz, ix, iy, std)
 
@@ -143,8 +143,8 @@ def observation(xTrue, u, RFID):
 def normalize_probability(gmap):
     sump = sum([sum(igmap) for igmap in gmap.data])
 
-    for ix in range(gmap.xw):
-        for iy in range(gmap.yw):
+    for ix in range(gmap.x_w):
+        for iy in range(gmap.y_w):
             gmap.data[ix][iy] /= sump
 
     return gmap
@@ -170,12 +170,12 @@ def init_gmap(xy_reso, minx, miny, maxx, maxy):
 def map_shift(grid_map, x_shift, y_shift):
     tgmap = copy.deepcopy(grid_map.data)
 
-    for ix in range(grid_map.xw):
-        for iy in range(grid_map.yw):
+    for ix in range(grid_map.x_w):
+        for iy in range(grid_map.y_w):
             nix = ix + x_shift
             niy = iy + y_shift
 
-            if 0 <= nix < grid_map.xw and 0 <= niy < grid_map.yw:
+            if 0 <= nix < grid_map.x_w and 0 <= niy < grid_map.y_w:
                 grid_map.data[ix + x_shift][iy + y_shift] = tgmap[ix][iy]
 
     return grid_map
@@ -199,8 +199,8 @@ def motion_update(grid_map, u, yaw):
 
 
 def calc_grid_index(gmap):
-    mx, my = np.mgrid[slice(gmap.minx - gmap.xy_reso / 2.0, gmap.maxx + gmap.xy_reso / 2.0, gmap.xy_reso),
-                      slice(gmap.miny - gmap.xy_reso / 2.0, gmap.maxy + gmap.xy_reso / 2.0, gmap.xy_reso)]
+    mx, my = np.mgrid[slice(gmap.min_x - gmap.xy_reso / 2.0, gmap.max_x + gmap.xy_reso / 2.0, gmap.xy_reso),
+                      slice(gmap.min_y - gmap.xy_reso / 2.0, gmap.max_y + gmap.xy_reso / 2.0, gmap.xy_reso)]
 
     return mx, my
 

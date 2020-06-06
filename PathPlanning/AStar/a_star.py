@@ -131,12 +131,12 @@ class AStarPlanner:
         # generate final course
         rx, ry = [self.calc_grid_position(ngoal.x, self.minx)], [
             self.calc_grid_position(ngoal.y, self.miny)]
-        pind = ngoal.pind
+        pind = ngoal.parent_index
         while pind != -1:
             n = closedset[pind]
             rx.append(self.calc_grid_position(n.x, self.minx))
             ry.append(self.calc_grid_position(n.y, self.miny))
-            pind = n.pind
+            pind = n.parent_index
 
         return rx, ry
 
