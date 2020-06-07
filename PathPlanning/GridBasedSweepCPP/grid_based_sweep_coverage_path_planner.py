@@ -11,6 +11,7 @@ from enum import IntEnum
 
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.spatial.transform import Rotation as Rot
 
 sys.path.append(os.path.relpath("../../Mapping/grid_map_lib/"))
 try:
@@ -36,52 +37,55 @@ class SweepSearcher:
         self.sweep_direction = sweep_direction
         self.turing_window = []
         self.update_turning_window()
-        self.xinds_goaly = x_inds_goal_y
-        self.goaly = goal_y
+        self.x_indexes_goal_y = x_inds_goal_y
+        self.goal_y = goal_y
 
-    def move_target_grid(self, cxind, cyind, gmap):
-        nxind = self.moving_direction + cxind
-        nyind = cyind
+    def move_target_grid(self, c_x_index, c_y_index, grid_map):
+        n_x_index = self.moving_direction + c_x_index
+        n_y_index = c_y_index
 
         # found safe grid
-        if not gmap.check_occupied_from_xy_index(nxind, nyind,
-                                                 occupied_val=0.5):
-            return nxind, nyind
+        if not grid_map.check_occupied_from_xy_index(n_x_index, n_y_index,
+                                                     occupied_val=0.5):
+            return n_x_index, n_y_index
         else:  # occupied
-            ncxind, ncyind = self.find_safe_turning_grid(cxind, cyind, gmap)
-            if (ncxind is None) and (ncyind is None):
+            next_c_x_index, next_c_y_index = self.find_safe_turning_grid(
+                c_x_index, c_y_index, grid_map)
+            if (next_c_x_index is None) and (next_c_y_index is None):
                 # moving backward
-                ncxind = -self.moving_direction + cxind
-                ncyind = cyind
-                if gmap.check_occupied_from_xy_index(ncxind, ncyind):
+                next_c_x_index = -self.moving_direction + c_x_index
+                next_c_y_index = c_y_index
+                if grid_map.check_occupied_from_xy_index(next_c_x_index,
+                                                         next_c_y_index):
                     # moved backward, but the grid is occupied by obstacle
                     return None, None
             else:
                 # keep moving until end
-                while not gmap.check_occupied_from_xy_index(
-                        ncxind + self.moving_direction, ncyind,
-                        occupied_val=0.5):
-                    ncxind += self.moving_direction
+                while not grid_map.check_occupied_from_xy_index(
+                        next_c_x_index + self.moving_direction,
+                        next_c_y_index, occupied_val=0.5):
+                    next_c_x_index += self.moving_direction
                 self.swap_moving_direction()
-            return ncxind, ncyind
+            return next_c_x_index, next_c_y_index
 
-    def find_safe_turning_grid(self, cxind, cyind, gmap):
+    def find_safe_turning_grid(self, c_x_index, c_y_index, grid_map):
 
         for (d_x_ind, d_y_ind) in self.turing_window:
 
-            next_x_ind = d_x_ind + cxind
-            next_y_ind = d_y_ind + cyind
+            next_x_ind = d_x_ind + c_x_index
+            next_y_ind = d_y_ind + c_y_index
 
             # found safe grid
-            if not gmap.check_occupied_from_xy_index(next_x_ind, next_y_ind,
-                                                     occupied_val=0.5):
+            if not grid_map.check_occupied_from_xy_index(next_x_ind,
+                                                         next_y_ind,
+                                                         occupied_val=0.5):
                 return next_x_ind, next_y_ind
 
         return None, None
 
     def is_search_done(self, grid_map):
-        for ix in self.xinds_goaly:
-            if not grid_map.check_occupied_from_xy_index(ix, self.goaly,
+        for ix in self.x_indexes_goal_y:
+            if not grid_map.check_occupied_from_xy_index(ix, self.goal_y,
                                                          occupied_val=0.5):
                 return False
 
@@ -138,64 +142,54 @@ def find_sweep_direction_and_start_position(ox, oy):
     return vec, sweep_start_pos
 
 
-def convert_grid_coordinate(ox, oy, sweep_vec, sweep_start_posi):
-    tx = [ix - sweep_start_posi[0] for ix in ox]
-    ty = [iy - sweep_start_posi[1] for iy in oy]
-
+def convert_grid_coordinate(ox, oy, sweep_vec, sweep_start_position):
+    tx = [ix - sweep_start_position[0] for ix in ox]
+    ty = [iy - sweep_start_position[1] for iy in oy]
     th = math.atan2(sweep_vec[1], sweep_vec[0])
+    rot = Rot.from_euler('z', th).as_matrix()[0:2, 0:2]
+    converted_xy = np.stack([tx, ty]).T @ rot
 
-    c = np.cos(-th)
-    s = np.sin(-th)
-
-    rx = [ix * c - iy * s for (ix, iy) in zip(tx, ty)]
-    ry = [ix * s + iy * c for (ix, iy) in zip(tx, ty)]
-
-    return rx, ry
+    return converted_xy[:, 0], converted_xy[:, 1]
 
 
-def convert_global_coordinate(x, y, sweep_vec, sweep_start_posi):
+def convert_global_coordinate(x, y, sweep_vec, sweep_start_position):
     th = math.atan2(sweep_vec[1], sweep_vec[0])
-    c = np.cos(th)
-    s = np.sin(th)
-
-    tx = [ix * c - iy * s for (ix, iy) in zip(x, y)]
-    ty = [ix * s + iy * c for (ix, iy) in zip(x, y)]
-
-    rx = [ix + sweep_start_posi[0] for ix in tx]
-    ry = [iy + sweep_start_posi[1] for iy in ty]
-
+    rot = Rot.from_euler('z', -th).as_matrix()[0:2, 0:2]
+    converted_xy = np.stack([x, y]).T @ rot
+    rx = [ix + sweep_start_position[0] for ix in converted_xy[:, 0]]
+    ry = [iy + sweep_start_position[1] for iy in converted_xy[:, 1]]
     return rx, ry
 
 
 def search_free_grid_index_at_edge_y(grid_map, from_upper=False):
-    yind = None
-    xinds = []
+    y_index = None
+    x_indexes = []
 
     if from_upper:
-        xrange = range(grid_map.height)[::-1]
-        yrange = range(grid_map.width)[::-1]
+        x_range = range(grid_map.height)[::-1]
+        y_range = range(grid_map.width)[::-1]
     else:
-        xrange = range(grid_map.height)
-        yrange = range(grid_map.width)
+        x_range = range(grid_map.height)
+        y_range = range(grid_map.width)
 
-    for iy in xrange:
-        for ix in yrange:
+    for iy in x_range:
+        for ix in y_range:
             if not grid_map.check_occupied_from_xy_index(ix, iy):
-                yind = iy
-                xinds.append(ix)
-        if yind:
+                y_index = iy
+                x_indexes.append(ix)
+        if y_index:
             break
 
-    return xinds, yind
+    return x_indexes, y_index
 
 
-def setup_grid_map(ox, oy, reso, sweep_direction, offset_grid=10):
-    width = math.ceil((max(ox) - min(ox)) / reso) + offset_grid
-    height = math.ceil((max(oy) - min(oy)) / reso) + offset_grid
-    center_x = (np.max(ox)+np.min(ox))/2.0
-    center_y = (np.max(oy)+np.min(oy))/2.0
+def setup_grid_map(ox, oy, resolution, sweep_direction, offset_grid=10):
+    width = math.ceil((max(ox) - min(ox)) / resolution) + offset_grid
+    height = math.ceil((max(oy) - min(oy)) / resolution) + offset_grid
+    center_x = (np.max(ox) + np.min(ox)) / 2.0
+    center_y = (np.max(oy) + np.min(oy)) / 2.0
 
-    grid_map = GridMap(width, height, reso, center_x, center_y)
+    grid_map = GridMap(width, height, resolution, center_x, center_y)
     grid_map.print_grid_map_info()
     grid_map.set_value_from_polygon(ox, oy, 1.0, inside=False)
     grid_map.expand_grid()
@@ -203,48 +197,51 @@ def setup_grid_map(ox, oy, reso, sweep_direction, offset_grid=10):
     x_inds_goal_y = []
     goal_y = 0
     if sweep_direction == SweepSearcher.SweepDirection.UP:
-        x_inds_goal_y, goal_y = search_free_grid_index_at_edge_y(grid_map,
-                                                              from_upper=True)
+        x_inds_goal_y, goal_y = search_free_grid_index_at_edge_y(
+            grid_map, from_upper=True)
     elif sweep_direction == SweepSearcher.SweepDirection.DOWN:
-        x_inds_goal_y, goal_y = search_free_grid_index_at_edge_y(grid_map,
-                                                              from_upper=False)
+        x_inds_goal_y, goal_y = search_free_grid_index_at_edge_y(
+            grid_map, from_upper=False)
 
     return grid_map, x_inds_goal_y, goal_y
 
 
 def sweep_path_search(sweep_searcher, grid_map, grid_search_animation=False):
     # search start grid
-    cxind, cyind = sweep_searcher.search_start_grid(grid_map)
-    if not grid_map.set_value_from_xy_index(cxind, cyind, 0.5):
+    c_x_index, c_y_index = sweep_searcher.search_start_grid(grid_map)
+    if not grid_map.set_value_from_xy_index(c_x_index, c_y_index, 0.5):
         print("Cannot find start grid")
         return [], []
 
-    x, y = grid_map.calc_grid_central_xy_position_from_xy_index(cxind, cyind)
+    x, y = grid_map.calc_grid_central_xy_position_from_xy_index(c_x_index,
+                                                                c_y_index)
     px, py = [x], [y]
 
     fig, ax = None, None
     if grid_search_animation:
         fig, ax = plt.subplots()
         # for stopping simulation with the esc key.
-        fig.canvas.mpl_connect('key_release_event',
-                               lambda event: [
-                                   exit(0) if event.key == 'escape' else None])
+        fig.canvas.mpl_connect(
+            'key_release_event',
+            lambda event: [exit(0) if event.key == 'escape' else None])
 
     while True:
-        cxind, cyind = sweep_searcher.move_target_grid(cxind, cyind, grid_map)
+        c_x_index, c_y_index = sweep_searcher.move_target_grid(c_x_index,
+                                                               c_y_index,
+                                                               grid_map)
 
         if sweep_searcher.is_search_done(grid_map) or (
-                cxind is None or cyind is None):
+                c_x_index is None or c_y_index is None):
             print("Done")
             break
 
         x, y = grid_map.calc_grid_central_xy_position_from_xy_index(
-            cxind, cyind)
+            c_x_index, c_y_index)
 
         px.append(x)
         py.append(y)
 
-        grid_map.set_value_from_xy_index(cxind, cyind, 0.5)
+        grid_map.set_value_from_xy_index(c_x_index, c_y_index, 0.5)
 
         if grid_search_animation:
             grid_map.plot_grid_map(ax=ax)
@@ -255,32 +252,34 @@ def sweep_path_search(sweep_searcher, grid_map, grid_search_animation=False):
     return px, py
 
 
-def planning(ox, oy, reso,
+def planning(ox, oy, resolution,
              moving_direction=SweepSearcher.MovingDirection.RIGHT,
              sweeping_direction=SweepSearcher.SweepDirection.UP,
              ):
-    sweep_vec, sweep_start_posi = find_sweep_direction_and_start_position(
+    sweep_vec, sweep_start_position = find_sweep_direction_and_start_position(
         ox, oy)
 
-    rox, roy = convert_grid_coordinate(ox, oy, sweep_vec, sweep_start_posi)
+    rox, roy = convert_grid_coordinate(ox, oy, sweep_vec,
+                                       sweep_start_position)
 
-    gmap, xinds_goaly, goaly = setup_grid_map(rox, roy, reso,
-                                              sweeping_direction)
+    grid_map, x_inds_goal_y, goal_y = setup_grid_map(rox, roy, resolution,
+                                                     sweeping_direction)
 
     sweep_searcher = SweepSearcher(moving_direction, sweeping_direction,
-                                   xinds_goaly, goaly)
+                                   x_inds_goal_y, goal_y)
 
-    px, py = sweep_path_search(sweep_searcher, gmap)
+    px, py = sweep_path_search(sweep_searcher, grid_map)
 
-    rx, ry = convert_global_coordinate(px, py, sweep_vec, sweep_start_posi)
+    rx, ry = convert_global_coordinate(px, py, sweep_vec,
+                                       sweep_start_position)
 
     print("Path length:", len(rx))
 
     return rx, ry
 
 
-def planning_animation(ox, oy, reso):  # pragma: no cover
-    px, py = planning(ox, oy, reso)
+def planning_animation(ox, oy, resolution):  # pragma: no cover
+    px, py = planning(ox, oy, resolution)
 
     # animation
     if do_animation:
@@ -311,18 +310,18 @@ def main():  # pragma: no cover
 
     ox = [0.0, 20.0, 50.0, 100.0, 130.0, 40.0, 0.0]
     oy = [0.0, -20.0, 0.0, 30.0, 60.0, 80.0, 0.0]
-    reso = 5.0
-    planning_animation(ox, oy, reso)
+    resolution = 5.0
+    planning_animation(ox, oy, resolution)
 
     ox = [0.0, 50.0, 50.0, 0.0, 0.0]
     oy = [0.0, 0.0, 30.0, 30.0, 0.0]
-    reso = 1.3
-    planning_animation(ox, oy, reso)
+    resolution = 1.3
+    planning_animation(ox, oy, resolution)
 
     ox = [0.0, 20.0, 50.0, 200.0, 130.0, 40.0, 0.0]
     oy = [0.0, -80.0, 0.0, 30.0, 60.0, 80.0, 0.0]
-    reso = 5.0
-    planning_animation(ox, oy, reso)
+    resolution = 5.0
+    planning_animation(ox, oy, resolution)
 
     plt.show()
     print("done!!")

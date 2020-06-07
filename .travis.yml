@@ -18,10 +18,9 @@ before_install:
     - conda update -q conda
     # Useful for debugging any issues with conda
     - conda info -a
-#    - conda install python==3.6.8
 
 install:
-  - conda install numpy==1.15
+  - conda install numpy
   - conda install scipy
   - conda install matplotlib
   - conda install pandas

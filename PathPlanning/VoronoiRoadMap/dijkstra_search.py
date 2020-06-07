@@ -35,8 +35,8 @@ class DijkstraSearch:
         """
         Search shortest path
 
-        sx: start x positions [m]
-        sy: start y positions [m]
+        s_x: start x positions [m]
+        s_y: start y positions [m]
         gx: goal x position [m]
         gx: goal x position [m]
         node_x: node x position

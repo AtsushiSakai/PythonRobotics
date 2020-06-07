@@ -8,8 +8,9 @@ See Wikipedia article (https://en.wikipedia.org/wiki/A*_search_algorithm)
 
 """
 
-import math
 import heapq
+import math
+
 import matplotlib.pyplot as plt
 
 show_animation = False
@@ -17,71 +18,73 @@ show_animation = False
 
 class Node:
 
-    def __init__(self, x, y, cost, pind):
+    def __init__(self, x, y, cost, parent_index):
         self.x = x
         self.y = y
         self.cost = cost
-        self.pind = pind
+        self.parent_index = parent_index
 
     def __str__(self):
-        return str(self.x) + "," + str(self.y) + "," + str(self.cost) + "," + str(self.pind)
+        return str(self.x) + "," + str(self.y) + "," + str(
+            self.cost) + "," + str(self.parent_index)
 
 
-def calc_final_path(ngoal, closedset, reso):
+def calc_final_path(goal_node, closed_node_set, resolution):
     # generate final course
-    rx, ry = [ngoal.x * reso], [ngoal.y * reso]
-    pind = ngoal.pind
-    while pind != -1:
-        n = closedset[pind]
-        rx.append(n.x * reso)
-        ry.append(n.y * reso)
-        pind = n.pind
+    rx, ry = [goal_node.x * resolution], [goal_node.y * resolution]
+    parent_index = goal_node.parent_index
+    while parent_index != -1:
+        n = closed_node_set[parent_index]
+        rx.append(n.x * resolution)
+        ry.append(n.y * resolution)
+        parent_index = n.parent_index
 
     return rx, ry
 
 
-def dp_planning(sx, sy, gx, gy, ox, oy, reso, rr):
+def dp_planning(sx, sy, gx, gy, ox, oy, resolution, rr):
     """
     gx: goal x position [m]
     gx: goal x position [m]
     ox: x position list of Obstacles [m]
     oy: y position list of Obstacles [m]
-    reso: grid resolution [m]
+    resolution: grid resolution [m]
     rr: robot radius[m]
     """
 
-    nstart = Node(round(sx / reso), round(sy / reso), 0.0, -1)
-    ngoal = Node(round(gx / reso), round(gy / reso), 0.0, -1)
-    ox = [iox / reso for iox in ox]
-    oy = [ioy / reso for ioy in oy]
+    start_node = Node(round(sx / resolution), round(sy / resolution), 0.0, -1)
+    goal_node = Node(round(gx / resolution), round(gy / resolution), 0.0, -1)
+    ox = [iox / resolution for iox in ox]
+    oy = [ioy / resolution for ioy in oy]
 
-    obmap, minx, miny, maxx, maxy, xw, yw = calc_obstacle_map(ox, oy, reso, rr)
+    obstacle_map, min_x, min_y, max_x, max_y, x_w, y_w = calc_obstacle_map(
+        ox, oy, resolution, rr)
 
     motion = get_motion_model()
 
-    openset, closedset = dict(), dict()
-    openset[calc_index(ngoal, xw, minx, miny)] = ngoal
-    pq = []
-    pq.append((0, calc_index(ngoal, xw, minx, miny)))
+    open_set, closed_set = dict(), dict()
+    open_set[calc_index(goal_node, x_w, min_x, min_y)] = goal_node
+    priority_queue = [(0, calc_index(goal_node, x_w, min_x, min_y))]
 
     while 1:
-        if not pq:
+        if not priority_queue:
             break
-        cost, c_id = heapq.heappop(pq)
-        if c_id in openset:
-            current = openset[c_id]
-            closedset[c_id] = current
-            openset.pop(c_id)
+        cost, c_id = heapq.heappop(priority_queue)
+        if c_id in open_set:
+            current = open_set[c_id]
+            closed_set[c_id] = current
+            open_set.pop(c_id)
         else:
             continue
 
         # show graph
         if show_animation:  # pragma: no cover
-            plt.plot(current.x * reso, current.y * reso, "xc")
+            plt.plot(current.x * resolution, current.y * resolution, "xc")
             # for stopping simulation with the esc key.
-            plt.gcf().canvas.mpl_connect('key_release_event',
-                    lambda event: [exit(0) if event.key == 'escape' else None])
-            if len(closedset.keys()) % 10 == 0:
+            plt.gcf().canvas.mpl_connect(
+                'key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
+            if len(closed_set.keys()) % 10 == 0:
                 plt.pause(0.001)
 
         # Remove the item from the open set
@@ -91,82 +94,82 @@ def dp_planning(sx, sy, gx, gy, ox, oy, reso, rr):
             node = Node(current.x + motion[i][0],
                         current.y + motion[i][1],
                         current.cost + motion[i][2], c_id)
-            n_id = calc_index(node, xw, minx, miny)
+            n_id = calc_index(node, x_w, min_x, min_y)
 
-            if n_id in closedset:
+            if n_id in closed_set:
                 continue
 
-            if not verify_node(node, obmap, minx, miny, maxx, maxy):
+            if not verify_node(node, obstacle_map, min_x, min_y, max_x, max_y):
                 continue
 
-            if n_id not in openset:
-                openset[n_id] = node  # Discover a new node
+            if n_id not in open_set:
+                open_set[n_id] = node  # Discover a new node
                 heapq.heappush(
-                    pq, (node.cost, calc_index(node, xw, minx, miny)))
+                    priority_queue,
+                    (node.cost, calc_index(node, x_w, min_x, min_y)))
             else:
-                if openset[n_id].cost >= node.cost:
+                if open_set[n_id].cost >= node.cost:
                     # This path is the best until now. record it!
-                    openset[n_id] = node
+                    open_set[n_id] = node
                     heapq.heappush(
-                        pq, (node.cost, calc_index(node, xw, minx, miny)))
+                        priority_queue,
+                        (node.cost, calc_index(node, x_w, min_x, min_y)))
 
-    rx, ry = calc_final_path(closedset[calc_index(
-        nstart, xw, minx, miny)], closedset, reso)
+    rx, ry = calc_final_path(closed_set[calc_index(
+        start_node, x_w, min_x, min_y)], closed_set, resolution)
 
-    return rx, ry, closedset
+    return rx, ry, closed_set
 
 
 def calc_heuristic(n1, n2):
     w = 1.0  # weight of heuristic
-    d = w * math.sqrt((n1.x - n2.x)**2 + (n1.y - n2.y)**2)
+    d = w * math.sqrt((n1.x - n2.x) ** 2 + (n1.y - n2.y) ** 2)
     return d
 
 
-def verify_node(node, obmap, minx, miny, maxx, maxy):
+def verify_node(node, obstacle_map, min_x, min_y, max_x, max_y):
+    if node.x < min_x:
+        return False
+    elif node.y < min_y:
+        return False
+    elif node.x >= max_x:
+        return False
+    elif node.y >= max_y:
+        return False
 
-    if node.x < minx:
-        return False
-    elif node.y < miny:
-        return False
-    elif node.x >= maxx:
-        return False
-    elif node.y >= maxy:
-        return False
-
-    if obmap[node.x][node.y]:
+    if obstacle_map[node.x][node.y]:
         return False
 
     return True
 
 
-def calc_obstacle_map(ox, oy, reso, vr):
+def calc_obstacle_map(ox, oy, resolution, vr):
+    min_x = round(min(ox))
+    min_y = round(min(oy))
+    max_x = round(max(ox))
+    max_y = round(max(oy))
 
-    minx = round(min(ox))
-    miny = round(min(oy))
-    maxx = round(max(ox))
-    maxy = round(max(oy))
-
-    xwidth = round(maxx - minx)
-    ywidth = round(maxy - miny)
+    x_width = round(max_x - min_x)
+    y_width = round(max_y - min_y)
 
     # obstacle map generation
-    obmap = [[False for i in range(ywidth)] for i in range(xwidth)]
-    for ix in range(xwidth):
-        x = ix + minx
-        for iy in range(ywidth):
-            y = iy + miny
+    obstacle_map = [[False for _ in range(y_width)] for _ in range(x_width)]
+    for ix in range(x_width):
+        x = ix + min_x
+        for iy in range(y_width):
+            y = iy + min_y
             #  print(x, y)
             for iox, ioy in zip(ox, oy):
-                d = math.sqrt((iox - x)**2 + (ioy - y)**2)
-                if d <= vr / reso:
-                    obmap[ix][iy] = True
+                d = math.sqrt((iox - x) ** 2 + (ioy - y) ** 2)
+                if d <= vr / resolution:
+                    obstacle_map[ix][iy] = True
                     break
 
-    return obmap, minx, miny, maxx, maxy, xwidth, ywidth
+    return obstacle_map, min_x, min_y, max_x, max_y, x_width, y_width
 
 
-def calc_index(node, xwidth, xmin, ymin):
-    return (node.y - ymin) * xwidth + (node.x - xmin)
+def calc_index(node, x_width, x_min, y_min):
+    return (node.y - y_min) * x_width + (node.x - x_min)
 
 
 def get_motion_model():

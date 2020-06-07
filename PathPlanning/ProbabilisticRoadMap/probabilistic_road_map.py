@@ -1,6 +1,6 @@
 """
 
-Probablistic Road Map (PRM) Planner
+Probabilistic Road Map (PRM) Planner
 
 author: Atsushi Sakai (@Atsushi_twi)
 
@@ -25,14 +25,15 @@ class Node:
     Node class for dijkstra search
     """
 
-    def __init__(self, x, y, cost, pind):
+    def __init__(self, x, y, cost, parent_index):
         self.x = x
         self.y = y
         self.cost = cost
-        self.pind = pind
+        self.parent_index = parent_index
 
     def __str__(self):
-        return str(self.x) + "," + str(self.y) + "," + str(self.cost) + "," + str(self.pind)
+        return str(self.x) + "," + str(self.y) + "," +\
+               str(self.cost) + "," + str(self.parent_index)
 
 
 class KDTree:
@@ -57,9 +58,9 @@ class KDTree:
             dist = []
 
             for i in inp.T:
-                idist, iindex = self.tree.query(i, k=k)
-                index.append(iindex)
-                dist.append(idist)
+                i_dist, i_index = self.tree.query(i, k=k)
+                index.append(i_index)
+                dist.append(i_dist)
 
             return index, dist
 
@@ -75,23 +76,24 @@ class KDTree:
         return index
 
 
-def PRM_planning(sx, sy, gx, gy, ox, oy, rr):
+def prm_planning(sx, sy, gx, gy, ox, oy, rr):
 
-    obkdtree = KDTree(np.vstack((ox, oy)).T)
+    obstacle_kd_tree = KDTree(np.vstack((ox, oy)).T)
 
-    sample_x, sample_y = sample_points(sx, sy, gx, gy, rr, ox, oy, obkdtree)
+    sample_x, sample_y = sample_points(sx, sy, gx, gy,
+                                       rr, ox, oy, obstacle_kd_tree)
     if show_animation:
         plt.plot(sample_x, sample_y, ".b")
 
-    road_map = generate_roadmap(sample_x, sample_y, rr, obkdtree)
+    road_map = generate_road_map(sample_x, sample_y, rr, obstacle_kd_tree)
 
     rx, ry = dijkstra_planning(
-        sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y)
+        sx, sy, gx, gy, road_map, sample_x, sample_y)
 
     return rx, ry
 
 
-def is_collision(sx, sy, gx, gy, rr, okdtree):
+def is_collision(sx, sy, gx, gy, rr, obstacle_kd_tree):
     x = sx
     y = sy
     dx = gx - sx
@@ -103,41 +105,41 @@ def is_collision(sx, sy, gx, gy, rr, okdtree):
         return True
 
     D = rr
-    nstep = round(d / D)
+    n_step = round(d / D)
 
-    for i in range(nstep):
-        idxs, dist = okdtree.search(np.array([x, y]).reshape(2, 1))
+    for i in range(n_step):
+        _, dist = obstacle_kd_tree.search(np.array([x, y]).reshape(2, 1))
         if dist[0] <= rr:
             return True  # collision
         x += D * math.cos(yaw)
         y += D * math.sin(yaw)
 
     # goal point check
-    idxs, dist = okdtree.search(np.array([gx, gy]).reshape(2, 1))
+    _, dist = obstacle_kd_tree.search(np.array([gx, gy]).reshape(2, 1))
     if dist[0] <= rr:
         return True  # collision
 
     return False  # OK
 
 
-def generate_roadmap(sample_x, sample_y, rr, obkdtree):
+def generate_road_map(sample_x, sample_y, rr, obstacle_kd_tree):
     """
     Road map generation
 
     sample_x: [m] x positions of sampled points
     sample_y: [m] y positions of sampled points
     rr: Robot Radius[m]
-    obkdtree: KDTree object of obstacles
+    obstacle_kd_tree: KDTree object of obstacles
     """
 
     road_map = []
-    nsample = len(sample_x)
-    skdtree = KDTree(np.vstack((sample_x, sample_y)).T)
+    n_sample = len(sample_x)
+    sample_kd_tree = KDTree(np.vstack((sample_x, sample_y)).T)
 
-    for (i, ix, iy) in zip(range(nsample), sample_x, sample_y):
+    for (i, ix, iy) in zip(range(n_sample), sample_x, sample_y):
 
-        index, dists = skdtree.search(
-            np.array([ix, iy]).reshape(2, 1), k=nsample)
+        index, dists = sample_kd_tree.search(
+            np.array([ix, iy]).reshape(2, 1), k=n_sample)
         inds = index[0]
         edge_id = []
         #  print(index)
@@ -146,7 +148,7 @@ def generate_roadmap(sample_x, sample_y, rr, obkdtree):
             nx = sample_x[inds[ii]]
             ny = sample_y[inds[ii]]
 
-            if not is_collision(ix, iy, nx, ny, rr, obkdtree):
+            if not is_collision(ix, iy, nx, ny, rr, obstacle_kd_tree):
                 edge_id.append(inds[ii])
 
             if len(edge_id) >= N_KNN:
@@ -159,10 +161,10 @@ def generate_roadmap(sample_x, sample_y, rr, obkdtree):
     return road_map
 
 
-def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
+def dijkstra_planning(sx, sy, gx, gy, road_map, sample_x, sample_y):
     """
-    sx: start x position [m]
-    sy: start y position [m]
+    s_x: start x position [m]
+    s_y: start y position [m]
     gx: goal x position [m]
     gy: goal y position [m]
     ox: x position list of Obstacles [m]
@@ -175,41 +177,42 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
     @return: Two lists of path coordinates ([x1, x2, ...], [y1, y2, ...]), empty list when no path was found
     """
 
-    nstart = Node(sx, sy, 0.0, -1)
-    ngoal = Node(gx, gy, 0.0, -1)
+    start_node = Node(sx, sy, 0.0, -1)
+    goal_node = Node(gx, gy, 0.0, -1)
 
-    openset, closedset = dict(), dict()
-    openset[len(road_map) - 2] = nstart
+    open_set, closed_set = dict(), dict()
+    open_set[len(road_map) - 2] = start_node
 
     path_found = True
 
     while True:
-        if not openset:
+        if not open_set:
             print("Cannot find path")
             path_found = False
             break
 
-        c_id = min(openset, key=lambda o: openset[o].cost)
-        current = openset[c_id]
+        c_id = min(open_set, key=lambda o: open_set[o].cost)
+        current = open_set[c_id]
 
         # show graph
-        if show_animation and len(closedset.keys()) % 2 == 0:
+        if show_animation and len(closed_set.keys()) % 2 == 0:
             # for stopping simulation with the esc key.
-            plt.gcf().canvas.mpl_connect('key_release_event',
-                    lambda event: [exit(0) if event.key == 'escape' else None])
+            plt.gcf().canvas.mpl_connect(
+                'key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(current.x, current.y, "xg")
             plt.pause(0.001)
 
         if c_id == (len(road_map) - 1):
             print("goal is found!")
-            ngoal.pind = current.pind
-            ngoal.cost = current.cost
+            goal_node.parent_index = current.parent_index
+            goal_node.cost = current.cost
             break
 
         # Remove the item from the open set
-        del openset[c_id]
+        del open_set[c_id]
         # Add it to the closed set
-        closedset[c_id] = current
+        closed_set[c_id] = current
 
         # expand search grid based on motion model
         for i in range(len(road_map[c_id])):
@@ -220,27 +223,27 @@ def dijkstra_planning(sx, sy, gx, gy, ox, oy, rr, road_map, sample_x, sample_y):
             node = Node(sample_x[n_id], sample_y[n_id],
                         current.cost + d, c_id)
 
-            if n_id in closedset:
+            if n_id in closed_set:
                 continue
             # Otherwise if it is already in the open set
-            if n_id in openset:
-                if openset[n_id].cost > node.cost:
-                    openset[n_id].cost = node.cost
-                    openset[n_id].pind = c_id
+            if n_id in open_set:
+                if open_set[n_id].cost > node.cost:
+                    open_set[n_id].cost = node.cost
+                    open_set[n_id].parent_index = c_id
             else:
-                openset[n_id] = node
+                open_set[n_id] = node
 
     if path_found is False:
         return [], []
 
     # generate final course
-    rx, ry = [ngoal.x], [ngoal.y]
-    pind = ngoal.pind
-    while pind != -1:
-        n = closedset[pind]
+    rx, ry = [goal_node.x], [goal_node.y]
+    parent_index = goal_node.parent_index
+    while parent_index != -1:
+        n = closed_set[parent_index]
         rx.append(n.x)
         ry.append(n.y)
-        pind = n.pind
+        parent_index = n.parent_index
 
     return rx, ry
 
@@ -255,19 +258,19 @@ def plot_road_map(road_map, sample_x, sample_y):  # pragma: no cover
                      [sample_y[i], sample_y[ind]], "-k")
 
 
-def sample_points(sx, sy, gx, gy, rr, ox, oy, obkdtree):
-    maxx = max(ox)
-    maxy = max(oy)
-    minx = min(ox)
-    miny = min(oy)
+def sample_points(sx, sy, gx, gy, rr, ox, oy, obstacle_kd_tree):
+    max_x = max(ox)
+    max_y = max(oy)
+    min_x = min(ox)
+    min_y = min(oy)
 
     sample_x, sample_y = [], []
 
     while len(sample_x) <= N_SAMPLE:
-        tx = (random.random() * (maxx - minx)) + minx
-        ty = (random.random() * (maxy - miny)) + miny
+        tx = (random.random() * (max_x - min_x)) + min_x
+        ty = (random.random() * (max_y - min_y)) + min_y
 
-        index, dist = obkdtree.search(np.array([tx, ty]).reshape(2, 1))
+        index, dist = obstacle_kd_tree.search(np.array([tx, ty]).reshape(2, 1))
 
         if dist[0] >= rr:
             sample_x.append(tx)
@@ -320,12 +323,13 @@ def main():
         plt.grid(True)
         plt.axis("equal")
 
-    rx, ry = PRM_planning(sx, sy, gx, gy, ox, oy, robot_size)
+    rx, ry = prm_planning(sx, sy, gx, gy, ox, oy, robot_size)
 
     assert rx, 'Cannot found path'
 
     if show_animation:
         plt.plot(rx, ry, "-r")
+        plt.pause(0.001)
         plt.show()
 
 

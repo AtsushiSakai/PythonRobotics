@@ -7,28 +7,27 @@ author: Zheng Zh (@Zhengzh)
 """
 
 import heapq
-import scipy.spatial
-import numpy as np
 import math
-import matplotlib.pyplot as plt
-import sys
 import os
+import sys
+
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.spatial
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__))
                 + "/../ReedsSheppPath")
 try:
-    from a_star_heuristic import dp_planning  # , calc_obstacle_map
+    from a_star_heuristic import dp_planning
     import reeds_shepp_path_planning as rs
     from car import move, check_car_collision, MAX_STEER, WB, plot_car
 except Exception:
     raise
 
-
 XY_GRID_RESOLUTION = 2.0  # [m]
 YAW_GRID_RESOLUTION = np.deg2rad(15.0)  # [rad]
-MOTION_RESOLUTION = 0.1  # [m] path interporate resolution
+MOTION_RESOLUTION = 0.1  # [m] path interpolate resolution
 N_STEER = 20  # number of steer command
-H_COST = 1.0
 VR = 1.0  # robot radius
 
 SB_COST = 100.0  # switch back penalty cost
@@ -42,29 +41,29 @@ show_animation = True
 
 class Node:
 
-    def __init__(self, xind, yind, yawind, direction,
-                 xlist, ylist, yawlist, directions,
-                 steer=0.0, pind=None, cost=None):
-        self.xind = xind
-        self.yind = yind
-        self.yawind = yawind
+    def __init__(self, x_ind, y_ind, yaw_ind, direction,
+                 x_list, y_list, yaw_list, directions,
+                 steer=0.0, parent_index=None, cost=None):
+        self.x_index = x_ind
+        self.y_index = y_ind
+        self.yaw_index = yaw_ind
         self.direction = direction
-        self.xlist = xlist
-        self.ylist = ylist
-        self.yawlist = yawlist
+        self.x_list = x_list
+        self.y_list = y_list
+        self.yaw_list = yaw_list
         self.directions = directions
         self.steer = steer
-        self.pind = pind
+        self.parent_index = parent_index
         self.cost = cost
 
 
 class Path:
 
-    def __init__(self, xlist, ylist, yawlist, directionlist, cost):
-        self.xlist = xlist
-        self.ylist = ylist
-        self.yawlist = yawlist
-        self.directionlist = directionlist
+    def __init__(self, x_list, y_list, yaw_list, direction_list, cost):
+        self.x_list = x_list
+        self.y_list = y_list
+        self.yaw_list = yaw_list
+        self.direction_list = direction_list
         self.cost = cost
 
 
@@ -88,9 +87,9 @@ class KDTree:
             dist = []
 
             for i in inp.T:
-                idist, iindex = self.tree.query(i, k=k)
-                index.append(iindex)
-                dist.append(idist)
+                i_dist, i_index = self.tree.query(i, k=k)
+                index.append(i_index)
+                dist.append(i_dist)
 
             return index, dist
 
@@ -108,7 +107,7 @@ class KDTree:
 
 class Config:
 
-    def __init__(self, ox, oy, xyreso, yawreso):
+    def __init__(self, ox, oy, xy_resolution, yaw_resolution):
         min_x_m = min(ox)
         min_y_m = min(oy)
         max_x_m = max(ox)
@@ -119,94 +118,93 @@ class Config:
         ox.append(max_x_m)
         oy.append(max_y_m)
 
-        self.minx = round(min_x_m / xyreso)
-        self.miny = round(min_y_m / xyreso)
-        self.maxx = round(max_x_m / xyreso)
-        self.maxy = round(max_y_m / xyreso)
+        self.min_x = round(min_x_m / xy_resolution)
+        self.min_y = round(min_y_m / xy_resolution)
+        self.max_x = round(max_x_m / xy_resolution)
+        self.max_y = round(max_y_m / xy_resolution)
 
-        self.xw = round(self.maxx - self.minx)
-        self.yw = round(self.maxy - self.miny)
+        self.x_w = round(self.max_x - self.min_x)
+        self.y_w = round(self.max_y - self.min_y)
 
-        self.minyaw = round(- math.pi / yawreso) - 1
-        self.maxyaw = round(math.pi / yawreso)
-        self.yaww = round(self.maxyaw - self.minyaw)
+        self.min_yaw = round(- math.pi / yaw_resolution) - 1
+        self.max_yaw = round(math.pi / yaw_resolution)
+        self.yaw_w = round(self.max_yaw - self.min_yaw)
 
 
 def calc_motion_inputs():
-
     for steer in np.concatenate((np.linspace(-MAX_STEER, MAX_STEER,
                                              N_STEER), [0.0])):
         for d in [1, -1]:
             yield [steer, d]
 
 
-def get_neighbors(current, config, ox, oy, kdtree):
-
+def get_neighbors(current, config, ox, oy, kd_tree):
     for steer, d in calc_motion_inputs():
-        node = calc_next_node(current, steer, d, config, ox, oy, kdtree)
+        node = calc_next_node(current, steer, d, config, ox, oy, kd_tree)
         if node and verify_index(node, config):
             yield node
 
 
-def calc_next_node(current, steer, direction, config, ox, oy, kdtree):
-
-    x, y, yaw = current.xlist[-1], current.ylist[-1], current.yawlist[-1]
+def calc_next_node(current, steer, direction, config, ox, oy, kd_tree):
+    x, y, yaw = current.x_list[-1], current.y_list[-1], current.yaw_list[-1]
 
     arc_l = XY_GRID_RESOLUTION * 1.5
-    xlist, ylist, yawlist = [], [], []
+    x_list, y_list, yaw_list = [], [], []
     for _ in np.arange(0, arc_l, MOTION_RESOLUTION):
         x, y, yaw = move(x, y, yaw, MOTION_RESOLUTION * direction, steer)
-        xlist.append(x)
-        ylist.append(y)
-        yawlist.append(yaw)
+        x_list.append(x)
+        y_list.append(y)
+        yaw_list.append(yaw)
 
-    if not check_car_collision(xlist, ylist, yawlist, ox, oy, kdtree):
+    if not check_car_collision(x_list, y_list, yaw_list, ox, oy, kd_tree):
         return None
 
     d = direction == 1
-    xind = round(x / XY_GRID_RESOLUTION)
-    yind = round(y / XY_GRID_RESOLUTION)
-    yawind = round(yaw / YAW_GRID_RESOLUTION)
+    x_ind = round(x / XY_GRID_RESOLUTION)
+    y_ind = round(y / XY_GRID_RESOLUTION)
+    yaw_ind = round(yaw / YAW_GRID_RESOLUTION)
 
-    addedcost = 0.0
+    added_cost = 0.0
 
     if d != current.direction:
-        addedcost += SB_COST
+        added_cost += SB_COST
 
     # steer penalty
-    addedcost += STEER_COST * abs(steer)
+    added_cost += STEER_COST * abs(steer)
 
     # steer change penalty
-    addedcost += STEER_CHANGE_COST * abs(current.steer - steer)
+    added_cost += STEER_CHANGE_COST * abs(current.steer - steer)
 
-    cost = current.cost + addedcost + arc_l
+    cost = current.cost + added_cost + arc_l
 
-    node = Node(xind, yind, yawind, d, xlist,
-                ylist, yawlist, [d],
-                pind=calc_index(current, config),
+    node = Node(x_ind, y_ind, yaw_ind, d, x_list,
+                y_list, yaw_list, [d],
+                parent_index=calc_index(current, config),
                 cost=cost, steer=steer)
 
     return node
 
 
 def is_same_grid(n1, n2):
-    if n1.xind == n2.xind and n1.yind == n2.yind and n1.yawind == n2.yawind:
+    if n1.x_index == n2.x_index \
+            and n1.y_index == n2.y_index \
+            and n1.yaw_index == n2.yaw_index:
         return True
     return False
 
 
-def analytic_expantion(current, goal, c, ox, oy, kdtree):
+def analytic_expansion(current, goal, ox, oy, kd_tree):
+    start_x = current.x_list[-1]
+    start_y = current.y_list[-1]
+    start_yaw = current.yaw_list[-1]
 
-    sx = current.xlist[-1]
-    sy = current.ylist[-1]
-    syaw = current.yawlist[-1]
-
-    gx = goal.xlist[-1]
-    gy = goal.ylist[-1]
-    gyaw = goal.yawlist[-1]
+    goal_x = goal.x_list[-1]
+    goal_y = goal.y_list[-1]
+    goal_yaw = goal.yaw_list[-1]
 
     max_curvature = math.tan(MAX_STEER) / WB
-    paths = rs.calc_paths(sx, sy, syaw, gx, gy, gyaw,
+    paths = rs.calc_paths(start_x, start_y, start_yaw,
+                          goal_x, goal_y, goal_yaw,
                           max_curvature, step_size=MOTION_RESOLUTION)
 
     if not paths:
@@ -215,7 +213,7 @@ def analytic_expantion(current, goal, c, ox, oy, kdtree):
     best_path, best = None, None
 
     for path in paths:
-        if check_car_collision(path.x, path.y, path.yaw, ox, oy, kdtree):
+        if check_car_collision(path.x, path.y, path.yaw, ox, oy, kd_tree):
             cost = calc_rs_path_cost(path)
             if not best or best > cost:
                 best = cost
@@ -224,99 +222,105 @@ def analytic_expantion(current, goal, c, ox, oy, kdtree):
     return best_path
 
 
-def update_node_with_analystic_expantion(current, goal,
-                                         c, ox, oy, kdtree):
-    apath = analytic_expantion(current, goal, c, ox, oy, kdtree)
+def update_node_with_analytic_expansion(current, goal,
+                                        c, ox, oy, kd_tree):
+    path = analytic_expansion(current, goal, ox, oy, kd_tree)
 
-    if apath:
+    if path:
         if show_animation:
-            plt.plot(apath.x, apath.y)
-        fx = apath.x[1:]
-        fy = apath.y[1:]
-        fyaw = apath.yaw[1:]
+            plt.plot(path.x, path.y)
+        f_x = path.x[1:]
+        f_y = path.y[1:]
+        f_yaw = path.yaw[1:]
 
-        fcost = current.cost + calc_rs_path_cost(apath)
-        fpind = calc_index(current, c)
+        f_cost = current.cost + calc_rs_path_cost(path)
+        f_parent_index = calc_index(current, c)
 
         fd = []
-        for d in apath.directions[1:]:
+        for d in path.directions[1:]:
             fd.append(d >= 0)
 
-        fsteer = 0.0
-        fpath = Node(current.xind, current.yind, current.yawind,
-                     current.direction, fx, fy, fyaw, fd,
-                     cost=fcost, pind=fpind, steer=fsteer)
-        return True, fpath
+        f_steer = 0.0
+        f_path = Node(current.x_index, current.y_index, current.yaw_index,
+                      current.direction, f_x, f_y, f_yaw, fd,
+                      cost=f_cost, parent_index=f_parent_index, steer=f_steer)
+        return True, f_path
 
     return False, None
 
 
-def calc_rs_path_cost(rspath):
-
+def calc_rs_path_cost(reed_shepp_path):
     cost = 0.0
-    for l in rspath.lengths:
-        if l >= 0:  # forward
-            cost += l
+    for length in reed_shepp_path.lengths:
+        if length >= 0:  # forward
+            cost += length
         else:  # back
-            cost += abs(l) * BACK_COST
+            cost += abs(length) * BACK_COST
 
-    # swich back penalty
-    for i in range(len(rspath.lengths) - 1):
-        if rspath.lengths[i] * rspath.lengths[i + 1] < 0.0:  # switch back
+    # switch back penalty
+    for i in range(len(reed_shepp_path.lengths) - 1):
+        # switch back
+        if reed_shepp_path.lengths[i] * reed_shepp_path.lengths[i + 1] < 0.0:
             cost += SB_COST
 
-    # steer penalyty
-    for ctype in rspath.ctypes:
-        if ctype != "S":  # curve
+    # steer penalty
+    for course_type in reed_shepp_path.ctypes:
+        if course_type != "S":  # curve
             cost += STEER_COST * abs(MAX_STEER)
 
     # ==steer change penalty
     # calc steer profile
-    nctypes = len(rspath.ctypes)
-    ulist = [0.0] * nctypes
-    for i in range(nctypes):
-        if rspath.ctypes[i] == "R":
-            ulist[i] = - MAX_STEER
-        elif rspath.ctypes[i] == "L":
-            ulist[i] = MAX_STEER
+    n_ctypes = len(reed_shepp_path.ctypes)
+    u_list = [0.0] * n_ctypes
+    for i in range(n_ctypes):
+        if reed_shepp_path.ctypes[i] == "R":
+            u_list[i] = - MAX_STEER
+        elif reed_shepp_path.ctypes[i] == "L":
+            u_list[i] = MAX_STEER
 
-    for i in range(len(rspath.ctypes) - 1):
-        cost += STEER_CHANGE_COST * abs(ulist[i + 1] - ulist[i])
+    for i in range(len(reed_shepp_path.ctypes) - 1):
+        cost += STEER_CHANGE_COST * abs(u_list[i + 1] - u_list[i])
 
     return cost
 
 
-def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
+def hybrid_a_star_planning(start, goal, ox, oy, xy_resolution, yaw_resolution):
     """
-    start
-    goal
+    start: start node
+    goal: goal node
     ox: x position list of Obstacles [m]
     oy: y position list of Obstacles [m]
-    xyreso: grid resolution [m]
-    yawreso: yaw angle resolution [rad]
+    xy_resolution: grid resolution [m]
+    yaw_resolution: yaw angle resolution [rad]
     """
 
     start[2], goal[2] = rs.pi_2_pi(start[2]), rs.pi_2_pi(goal[2])
     tox, toy = ox[:], oy[:]
 
-    obkdtree = KDTree(np.vstack((tox, toy)).T)
+    obstacle_kd_tree = KDTree(np.vstack((tox, toy)).T)
 
-    config = Config(tox, toy, xyreso, yawreso)
+    config = Config(tox, toy, xy_resolution, yaw_resolution)
 
-    nstart = Node(round(start[0] / xyreso), round(start[1] / xyreso), round(start[2] / yawreso),
-                  True, [start[0]], [start[1]], [start[2]], [True], cost=0)
-    ngoal = Node(round(goal[0] / xyreso), round(goal[1] / xyreso), round(goal[2] / yawreso),
-                 True, [goal[0]], [goal[1]], [goal[2]], [True])
+    start_node = Node(round(start[0] / xy_resolution),
+                      round(start[1] / xy_resolution),
+                      round(start[2] / yaw_resolution), True,
+                      [start[0]], [start[1]], [start[2]], [True], cost=0)
+    goal_node = Node(round(goal[0] / xy_resolution),
+                     round(goal[1] / xy_resolution),
+                     round(goal[2] / yaw_resolution), True,
+                     [goal[0]], [goal[1]], [goal[2]], [True])
 
     openList, closedList = {}, {}
 
-    _, _, h_dp = dp_planning(nstart.xlist[-1], nstart.ylist[-1],
-                             ngoal.xlist[-1], ngoal.ylist[-1], ox, oy, xyreso, VR)
+    _, _, h_dp = dp_planning(start_node.x_list[-1], start_node.y_list[-1],
+                             goal_node.x_list[-1], goal_node.y_list[-1],
+                             ox, oy, xy_resolution, VR)
 
     pq = []
-    openList[calc_index(nstart, config)] = nstart
-    heapq.heappush(pq, (calc_cost(nstart, h_dp, ngoal, config),
-                        calc_index(nstart, config)))
+    openList[calc_index(start_node, config)] = start_node
+    heapq.heappush(pq, (calc_cost(start_node, h_dp, config),
+                        calc_index(start_node, config)))
+    final_path = None
 
     while True:
         if not openList:
@@ -331,83 +335,85 @@ def hybrid_a_star_planning(start, goal, ox, oy, xyreso, yawreso):
             continue
 
         if show_animation:  # pragma: no cover
-            plt.plot(current.xlist[-1], current.ylist[-1], "xc")
+            plt.plot(current.x_list[-1], current.y_list[-1], "xc")
             # for stopping simulation with the esc key.
-            plt.gcf().canvas.mpl_connect('key_release_event',
-                    lambda event: [exit(0) if event.key == 'escape' else None])
+            plt.gcf().canvas.mpl_connect(
+                'key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
             if len(closedList.keys()) % 10 == 0:
                 plt.pause(0.001)
 
-        isupdated, fpath = update_node_with_analystic_expantion(
-            current, ngoal, config, ox, oy, obkdtree)
+        is_updated, final_path = update_node_with_analytic_expansion(
+            current, goal_node, config, ox, oy, obstacle_kd_tree)
 
-        if isupdated:
+        if is_updated:
             print("path found")
             break
 
-        for neighbor in get_neighbors(current, config, ox, oy, obkdtree):
+        for neighbor in get_neighbors(current, config, ox, oy,
+                                      obstacle_kd_tree):
             neighbor_index = calc_index(neighbor, config)
             if neighbor_index in closedList:
                 continue
             if neighbor not in openList \
                     or openList[neighbor_index].cost > neighbor.cost:
                 heapq.heappush(
-                    pq, (calc_cost(neighbor, h_dp, ngoal, config),
+                    pq, (calc_cost(neighbor, h_dp, config),
                          neighbor_index))
                 openList[neighbor_index] = neighbor
 
-    path = get_final_path(closedList, fpath, nstart, config)
+    path = get_final_path(closedList, final_path)
     return path
 
 
-def calc_cost(n, h_dp, goal, c):
-    ind = (n.yind - c.miny) * c.xw + (n.xind - c.minx)
+def calc_cost(n, h_dp, c):
+    ind = (n.y_index - c.min_y) * c.x_w + (n.x_index - c.min_x)
     if ind not in h_dp:
         return n.cost + 999999999  # collision cost
     return n.cost + H_COST * h_dp[ind].cost
 
 
-def get_final_path(closed, ngoal, nstart, config):
-    rx, ry, ryaw = list(reversed(ngoal.xlist)), list(
-        reversed(ngoal.ylist)), list(reversed(ngoal.yawlist))
-    direction = list(reversed(ngoal.directions))
-    nid = ngoal.pind
-    finalcost = ngoal.cost
+def get_final_path(closed, goal_node):
+    reversed_x, reversed_y, reversed_yaw = \
+        list(reversed(goal_node.x_list)), list(reversed(goal_node.y_list)), \
+        list(reversed(goal_node.yaw_list))
+    direction = list(reversed(goal_node.directions))
+    nid = goal_node.parent_index
+    final_cost = goal_node.cost
 
     while nid:
         n = closed[nid]
-        rx.extend(list(reversed(n.xlist)))
-        ry.extend(list(reversed(n.ylist)))
-        ryaw.extend(list(reversed(n.yawlist)))
+        reversed_x.extend(list(reversed(n.x_list)))
+        reversed_y.extend(list(reversed(n.y_list)))
+        reversed_yaw.extend(list(reversed(n.yaw_list)))
         direction.extend(list(reversed(n.directions)))
 
-        nid = n.pind
+        nid = n.parent_index
 
-    rx = list(reversed(rx))
-    ry = list(reversed(ry))
-    ryaw = list(reversed(ryaw))
+    reversed_x = list(reversed(reversed_x))
+    reversed_y = list(reversed(reversed_y))
+    reversed_yaw = list(reversed(reversed_yaw))
     direction = list(reversed(direction))
 
     # adjust first direction
     direction[0] = direction[1]
 
-    path = Path(rx, ry, ryaw, direction, finalcost)
+    path = Path(reversed_x, reversed_y, reversed_yaw, direction, final_cost)
 
     return path
 
 
 def verify_index(node, c):
-    xind, yind = node.xind, node.yind
-    if xind >= c.minx and xind <= c.maxx and yind >= c.miny \
-            and yind <= c.maxy:
+    x_ind, y_ind = node.x_index, node.y_index
+    if c.min_x <= x_ind <= c.max_x and c.min_y <= y_ind <= c.max_y:
         return True
 
     return False
 
 
 def calc_index(node, c):
-    ind = (node.yawind - c.minyaw) * c.xw * c.yw + \
-        (node.yind - c.miny) * c.xw + (node.xind - c.minx)
+    ind = (node.yaw_index - c.min_yaw) * c.x_w * c.y_w + \
+          (node.y_index - c.min_y) * c.x_w + (node.x_index - c.min_x)
 
     if ind <= 0:
         print("Error(calc_index):", ind)
@@ -457,18 +463,18 @@ def main():
     path = hybrid_a_star_planning(
         start, goal, ox, oy, XY_GRID_RESOLUTION, YAW_GRID_RESOLUTION)
 
-    x = path.xlist
-    y = path.ylist
-    yaw = path.yawlist
+    x = path.x_list
+    y = path.y_list
+    yaw = path.yaw_list
 
     if show_animation:
-        for ix, iy, iyaw in zip(x, y, yaw):
+        for i_x, i_y, i_yaw in zip(x, y, yaw):
             plt.cla()
             plt.plot(ox, oy, ".k")
             plt.plot(x, y, "-r", label="Hybrid A* path")
             plt.grid(True)
             plt.axis("equal")
-            plot_car(ix, iy, iyaw)
+            plot_car(i_x, i_y, i_yaw)
             plt.pause(0.0001)
 
     print(__file__ + " done!!")

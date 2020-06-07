@@ -23,7 +23,7 @@ class BidirectionalAStarPlanner:
 
         ox: x position list of Obstacles [m]
         oy: y position list of Obstacles [m]
-        reso: grid resolution [m]
+        resolution: grid resolution [m]
         rr: robot radius[m]
         """
 
@@ -48,8 +48,8 @@ class BidirectionalAStarPlanner:
         Bidirectional A star path search
 
         input:
-            sx: start x position [m]
-            sy: start y position [m]
+            s_x: start x position [m]
+            s_y: start y position [m]
             gx: goal x position [m]
             gy: goal y position [m]
 
@@ -179,12 +179,12 @@ class BidirectionalAStarPlanner:
         # generate final course
         rx, ry = [self.calc_grid_position(ngoal.x, self.minx)], [
             self.calc_grid_position(ngoal.y, self.miny)]
-        pind = ngoal.pind
+        pind = ngoal.parent_index
         while pind != -1:
             n = closedset[pind]
             rx.append(self.calc_grid_position(n.x, self.minx))
             ry.append(self.calc_grid_position(n.y, self.miny))
-            pind = n.pind
+            pind = n.parent_index
 
         return rx, ry
 
@@ -252,15 +252,15 @@ class BidirectionalAStarPlanner:
         self.miny = round(min(oy))
         self.maxx = round(max(ox))
         self.maxy = round(max(oy))
-        print("minx:", self.minx)
-        print("miny:", self.miny)
-        print("maxx:", self.maxx)
-        print("maxy:", self.maxy)
+        print("min_x:", self.minx)
+        print("min_y:", self.miny)
+        print("max_x:", self.maxx)
+        print("max_y:", self.maxy)
 
         self.xwidth = round((self.maxx - self.minx) / self.reso)
         self.ywidth = round((self.maxy - self.miny) / self.reso)
-        print("xwidth:", self.xwidth)
-        print("ywidth:", self.ywidth)
+        print("x_width:", self.xwidth)
+        print("y_width:", self.ywidth)
 
         # obstacle map generation
         self.obmap = [[False for _ in range(self.ywidth)]

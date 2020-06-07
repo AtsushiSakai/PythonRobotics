@@ -5,7 +5,8 @@ Ensemble Kalman Filter(EnKF) localization sample
 author: Ryohei Sasaki(rsasaki0109)
 
 Ref:
-- [Ensemble Kalman filtering](https://rmets.onlinelibrary.wiley.com/doi/10.1256/qj.05.135)
+Ensemble Kalman filtering
+(https://rmets.onlinelibrary.wiley.com/doi/10.1256/qj.05.135)
 
 """
 
@@ -13,6 +14,7 @@ import math
 
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.spatial.transform import Rotation as Rot
 
 #  Simulation parameter
 Q_sim = np.diag([0.2, np.deg2rad(1.0)]) ** 2
@@ -48,8 +50,8 @@ def observation(xTrue, xd, u, RFID):
         angle = pi_2_pi(math.atan2(dy, dx) - xTrue[2, 0])
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Q_sim[0, 0] ** 0.5  # add noise
-            anglen = angle + np.random.randn() * Q_sim[1, 1] ** 0.5  # add noise
-            zi = np.array([dn, anglen, RFID[i, 0], RFID[i, 1]])
+            angle_with_noise = angle + np.random.randn() * Q_sim[1, 1] ** 0.5
+            zi = np.array([dn, angle_with_noise, RFID[i, 0], RFID[i, 1]])
             z = np.vstack((z, zi))
 
     # add noise to input
@@ -79,10 +81,12 @@ def motion_model(x, u):
 def observe_landmark_position(x, landmarks):
     landmarks_pos = np.zeros((2 * landmarks.shape[0], 1))
     for (i, lm) in enumerate(landmarks):
-        landmarks_pos[2 * i] = x[0, 0] + lm[0] * math.cos(x[2, 0] + lm[1]) + np.random.randn() * Q_sim[
-            0, 0] ** 0.5 / np.sqrt(2)
-        landmarks_pos[2 * i + 1] = x[1, 0] + lm[0] * math.sin(x[2, 0] + lm[1]) + np.random.randn() * Q_sim[
-            0, 0] ** 0.5 / np.sqrt(2)
+        index = 2 * i
+        q = Q_sim[0, 0] ** 0.5
+        landmarks_pos[index] = x[0, 0] + lm[0] * math.cos(
+            x[2, 0] + lm[1]) + np.random.randn() * q / np.sqrt(2)
+        landmarks_pos[index + 1] = x[1, 0] + lm[0] * math.sin(
+            x[2, 0] + lm[1]) + np.random.randn() * q / np.sqrt(2)
     return landmarks_pos
 
 
@@ -148,8 +152,9 @@ def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
 
     t = np.arange(0, 2 * math.pi + 0.1, 0.1)
 
-    # eig_val[big_ind] or eiq_val[small_ind] were occasionally negative numbers extremely
-    # close to 0 (~10^-20), catch these cases and set the respective variable to 0
+    # eig_val[big_ind] or eiq_val[small_ind] were occasionally negative
+    # numbers extremely close to 0 (~10^-20), catch these cases and set
+    # the respective variable to 0
     try:
         a = math.sqrt(eig_val[big_ind])
     except ValueError:
@@ -163,11 +168,11 @@ def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
     x = [a * math.cos(it) for it in t]
     y = [b * math.sin(it) for it in t]
     angle = math.atan2(eig_vec[big_ind, 1], eig_vec[big_ind, 0])
-    R = np.array([[math.cos(angle), math.sin(angle)],
-                  [-math.sin(angle), math.cos(angle)]])
-    fx = R.dot(np.array([[x, y]]))
-    px = np.array(fx[0, :] + xEst[0, 0]).flatten()
-    py = np.array(fx[1, :] + xEst[1, 0]).flatten()
+    rot = Rot.from_euler('z', angle).as_matrix()[0:2, 0:2]
+    fx = np.stack([x, y]).T @ rot
+
+    px = np.array(fx[:, 0] + xEst[0, 0]).flatten()
+    py = np.array(fx[:, 1] + xEst[1, 0]).flatten()
     plt.plot(px, py, "--r")
 
 
@@ -214,8 +219,9 @@ def main():
         if show_animation:
             plt.cla()
             # for stopping simulation with the esc key.
-            plt.gcf().canvas.mpl_connect('key_release_event',
-                    lambda event: [exit(0) if event.key == 'escape' else None])
+            plt.gcf().canvas.mpl_connect(
+                'key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
 
             for i in range(len(z[:, 0])):
                 plt.plot([xTrue[0, 0], z[i, 2]], [xTrue[1, 0], z[i, 3]], "-k")
@@ -227,7 +233,7 @@ def main():
                      np.array(hxDR[1, :]).flatten(), "-k")
             plt.plot(np.array(hxEst[0, :]).flatten(),
                      np.array(hxEst[1, :]).flatten(), "-r")
-            # plot_covariance_ellipse(xEst, PEst)
+            plot_covariance_ellipse(xEst, PEst)
             plt.axis("equal")
             plt.grid(True)
             plt.pause(0.001)

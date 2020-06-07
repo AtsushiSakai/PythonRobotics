@@ -40,7 +40,7 @@ def pure_pursuit_control(state, cx, cy, pind):
     if pind >= ind:
         ind = pind
 
-    #  print(pind, ind)
+    #  print(parent_index, ind)
     if ind < len(cx):
         tx = cx[ind]
         ty = cy[ind]
@@ -181,12 +181,12 @@ def set_stop_point(target_speed, cx, cy, cyaw):
             speed_profile[i] = 0.0
             forward = False
             #  plt.plot(cx[i], cy[i], "xb")
-            #  print(iyaw, move_direction, dx, dy)
+            #  print(i_yaw, move_direction, dx, dy)
         elif not is_back and not forward:
             speed_profile[i] = 0.0
             forward = True
             #  plt.plot(cx[i], cy[i], "xb")
-            #  print(iyaw, move_direction, dx, dy)
+            #  print(i_yaw, move_direction, dx, dy)
     speed_profile[0] = 0.0
     if is_back:
         speed_profile[-1] = -stop_speed
