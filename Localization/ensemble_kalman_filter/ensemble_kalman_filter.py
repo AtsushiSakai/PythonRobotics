@@ -14,6 +14,7 @@ import math
 
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.spatial.transform import Rotation as Rot
 
 #  Simulation parameter
 Q_sim = np.diag([0.2, np.deg2rad(1.0)]) ** 2
@@ -167,11 +168,11 @@ def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
     x = [a * math.cos(it) for it in t]
     y = [b * math.sin(it) for it in t]
     angle = math.atan2(eig_vec[big_ind, 1], eig_vec[big_ind, 0])
-    R = np.array([[math.cos(angle), math.sin(angle)],
-                  [-math.sin(angle), math.cos(angle)]])
-    fx = R.dot(np.array([[x, y]]))
-    px = np.array(fx[0, :] + xEst[0, 0]).flatten()
-    py = np.array(fx[1, :] + xEst[1, 0]).flatten()
+    rot = Rot.from_euler('z', angle).as_matrix()[0:2, 0:2]
+    fx = np.stack([x, y]).T @ rot
+
+    px = np.array(fx[:, 0] + xEst[0, 0]).flatten()
+    py = np.array(fx[:, 1] + xEst[1, 0]).flatten()
     plt.plot(px, py, "--r")
 
 
@@ -232,7 +233,7 @@ def main():
                      np.array(hxDR[1, :]).flatten(), "-k")
             plt.plot(np.array(hxEst[0, :]).flatten(),
                      np.array(hxEst[1, :]).flatten(), "-r")
-            # plot_covariance_ellipse(xEst, PEst)
+            plot_covariance_ellipse(xEst, PEst)
             plt.axis("equal")
             plt.grid(True)
             plt.pause(0.001)

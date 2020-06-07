@@ -71,9 +71,9 @@ def quintic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_
     quintic polynomial planner
 
     input
-        sx: start x position [m]
-        sy: start y position [m]
-        syaw: start yaw angle [rad]
+        s_x: start x position [m]
+        s_y: start y position [m]
+        s_yaw: start yaw angle [rad]
         sa: start accel [m/ss]
         gx: goal x position [m]
         gy: goal y position [m]

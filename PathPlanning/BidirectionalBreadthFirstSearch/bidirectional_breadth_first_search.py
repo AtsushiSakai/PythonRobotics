@@ -49,8 +49,8 @@ class BidirectionalBreadthFirstSearchPlanner:
         Bidirectional Breadth First search based planning
 
         input:
-            sx: start x position [m]
-            sy: start y position [m]
+            s_x: start x position [m]
+            s_y: start y position [m]
             gx: goal x position [m]
             gy: goal y position [m]
 

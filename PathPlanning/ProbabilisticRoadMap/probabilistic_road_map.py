@@ -163,8 +163,8 @@ def generate_road_map(sample_x, sample_y, rr, obstacle_kd_tree):
 
 def dijkstra_planning(sx, sy, gx, gy, road_map, sample_x, sample_y):
     """
-    sx: start x position [m]
-    sy: start y position [m]
+    s_x: start x position [m]
+    s_y: start y position [m]
     gx: goal x position [m]
     gy: goal y position [m]
     ox: x position list of Obstacles [m]

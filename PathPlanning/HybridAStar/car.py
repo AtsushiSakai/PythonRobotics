@@ -71,13 +71,12 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
 def plot_car(x, y, yaw):
     car_color = '-k'
     c, s = cos(yaw), sin(yaw)
-
+    rot = Rot.from_euler('z', yaw).as_matrix()[0:2, 0:2]
     car_outline_x, car_outline_y = [], []
     for rx, ry in zip(VRX, VRY):
-        tx = c * rx - s * ry + x
-        ty = s * rx + c * ry + y
-        car_outline_x.append(tx)
-        car_outline_y.append(ty)
+        converted_xy = np.stack([rx, ry]).T @ rot
+        car_outline_x.append(converted_xy[0]+x)
+        car_outline_y.append(converted_xy[1]+y)
 
     arrow_x, arrow_y, arrow_yaw = c * 1.5 + x, s * 1.5 + y, yaw
     plot_arrow(arrow_x, arrow_y, arrow_yaw)
