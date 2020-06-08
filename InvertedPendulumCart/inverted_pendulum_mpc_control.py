@@ -40,11 +40,11 @@ def main():
     for i in range(50):
 
         # calc control input
-        optimized_x, optimized_delta_x, optimized_theta, optimized_delta_theta, optimized_input = mpc_control(
-            x)
+        opt_x, opt_delta_x, opt_theta, opt_delta_theta, opt_input = \
+            mpc_control(x)
 
         # get input
-        u = optimized_input[0]
+        u = opt_input[0]
 
         # simulate inverted pendulum cart
         x = simulation(x, u)
