@@ -46,9 +46,8 @@ class BipedalPlanner(object):
             print("No footsteps")
             return
 
-        com_trajectory_for_plot, ax = None, None
-
         # set up plotter
+        com_trajectory_for_plot, ax = None, None
         if plot:
             fig = plt.figure()
             ax = Axes3D(fig)

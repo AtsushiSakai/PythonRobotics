@@ -27,7 +27,8 @@ class RTree(object):
     # Class to represent the explicit tree created
     # while sampling through the state space
 
-    def __init__(self, start=None, lowerLimit=None, upperLimit=None, resolution=1.0):
+    def __init__(self, start=None, lowerLimit=None, upperLimit=None,
+                 resolution=1.0):
 
         if upperLimit is None:
             upperLimit = [10, 10]
@@ -96,10 +97,11 @@ class RTree(object):
     def real_world_to_node_id(self, real_coord):
         # first convert the given coordinates to grid space and then
         # convert the grid space coordinates to a unique node id
-        return self.grid_coordinate_to_node_id(self.real_coords_to_grid_coord(real_coord))
+        return self.grid_coordinate_to_node_id(
+            self.real_coords_to_grid_coord(real_coord))
 
     def grid_coord_to_real_world_coord(self, coord):
-        # This function smaps a grid coordinate in discrete space
+        # This function maps a grid coordinate in discrete space
         # to a configuration in the full configuration space
         config = [0] * self.dimension
         for i in range(0, len(coord)):
@@ -126,7 +128,8 @@ class RTree(object):
     def node_id_to_real_world_coord(self, nid):
         # This function maps a node in discrete space to a configuration
         # in the full configuration space
-        return self.grid_coord_to_real_world_coord(self.node_id_to_grid_coord(nid))
+        return self.grid_coord_to_real_world_coord(
+            self.node_id_to_grid_coord(nid))
 
 
 class BITStar(object):
@@ -137,9 +140,9 @@ class BITStar(object):
         self.start = start
         self.goal = goal
 
-        self.minrand = randArea[0]
-        self.maxrand = randArea[1]
-        self.maxIter = maxIter
+        self.min_rand = randArea[0]
+        self.max_rand = randArea[1]
+        self.max_iIter = maxIter
         self.obstacleList = obstacleList
         self.startId = None
         self.goalId = None
@@ -186,18 +189,19 @@ class BITStar(object):
                             [(self.start[1] + self.goal[1]) / 2.0], [0]])
         a1 = np.array([[(self.goal[0] - self.start[0]) / cMin],
                        [(self.goal[1] - self.start[1]) / cMin], [0]])
-        etheta = math.atan2(a1[1], a1[0])
-        # first column of idenity matrix transposed
+        eTheta = math.atan2(a1[1], a1[0])
+        # first column of identity matrix transposed
         id1_t = np.array([1.0, 0.0, 0.0]).reshape(1, 3)
         M = np.dot(a1, id1_t)
         U, S, Vh = np.linalg.svd(M, True, True)
         C = np.dot(np.dot(U, np.diag(
-            [1.0, 1.0, np.linalg.det(U) * np.linalg.det(np.transpose(Vh))])), Vh)
+            [1.0, 1.0, np.linalg.det(U) * np.linalg.det(np.transpose(Vh))])),
+                   Vh)
 
         self.samples.update(self.informed_sample(
             200, cBest, cMin, xCenter, C))
 
-        return etheta, cMin, xCenter, C, cBest
+        return eTheta, cMin, xCenter, C, cBest
 
     def setup_sample(self, iterations, foundGoal, cMin, xCenter, C, cBest):
 
@@ -228,18 +232,19 @@ class BITStar(object):
 
     def plan(self, animation=True):
 
-        etheta, cMin, xCenter, C, cBest = self.setup_planning()
+        eTheta, cMin, xCenter, C, cBest = self.setup_planning()
         iterations = 0
 
         foundGoal = False
         # run until done
-        while iterations < self.maxIter:
+        while iterations < self.max_iIter:
             cBest = self.setup_sample(iterations,
                                       foundGoal, cMin, xCenter, C, cBest)
             # expand the best vertices until an edge is better than the vertex
             # this is done because the vertex cost represents the lower bound
             # on the edge cost
-            while self.best_vertex_queue_value() <= self.best_edge_queue_value():
+            while self.best_vertex_queue_value() <= \
+                    self.best_edge_queue_value():
                 self.expand_vertex(self.best_in_vertex_queue())
 
             # add the best edge to the tree
@@ -247,11 +252,17 @@ class BITStar(object):
             self.edge_queue.remove(bestEdge)
 
             # Check if this can improve the current solution
-            estimatedCostOfVertex = self.g_scores[bestEdge[0]] + self.compute_distance_cost(
-                bestEdge[0], bestEdge[1]) + self.compute_heuristic_cost(bestEdge[1], self.goalId)
-            estimatedCostOfEdge = self.compute_distance_cost(self.startId, bestEdge[0]) + self.compute_heuristic_cost(
-                bestEdge[0], bestEdge[1]) + self.compute_heuristic_cost(bestEdge[1], self.goalId)
-            actualCostOfEdge = self.g_scores[bestEdge[0]] + self.compute_distance_cost(bestEdge[0], bestEdge[1])
+            estimatedCostOfVertex = self.g_scores[bestEdge[
+                0]] + self.compute_distance_cost(
+                bestEdge[0], bestEdge[1]) + self.compute_heuristic_cost(
+                bestEdge[1], self.goalId)
+            estimatedCostOfEdge = self.compute_distance_cost(
+                self.startId, bestEdge[0]) + self.compute_heuristic_cost(
+                bestEdge[0], bestEdge[1]) + self.compute_heuristic_cost(
+                bestEdge[1], self.goalId)
+            actualCostOfEdge = self.g_scores[
+                                   bestEdge[0]] + self.compute_distance_cost(
+                bestEdge[0], bestEdge[1])
 
             f1 = estimatedCostOfVertex < self.g_scores[self.goalId]
             f2 = estimatedCostOfEdge < self.g_scores[self.goalId]
@@ -277,10 +288,12 @@ class BITStar(object):
                     try:
                         del self.samples[bestEdge[1]]
                     except KeyError:
+                        # invalid sample key
                         pass
                     eid = self.tree.add_vertex(nextCoord)
                     self.vertex_queue.append(eid)
-                if eid == self.goalId or bestEdge[0] == self.goalId or bestEdge[1] == self.goalId:
+                if eid == self.goalId or bestEdge[0] == self.goalId or \
+                        bestEdge[1] == self.goalId:
                     print("Goal found")
                     foundGoal = True
 
@@ -288,14 +301,18 @@ class BITStar(object):
 
                 g_score = self.compute_distance_cost(
                     bestEdge[0], bestEdge[1])
-                self.g_scores[bestEdge[1]] = g_score + self.g_scores[bestEdge[0]]
-                self.f_scores[bestEdge[1]] = g_score + self.compute_heuristic_cost(bestEdge[1], self.goalId)
+                self.g_scores[bestEdge[1]] = g_score + self.g_scores[
+                    bestEdge[0]]
+                self.f_scores[
+                    bestEdge[1]] = g_score + self.compute_heuristic_cost(
+                    bestEdge[1], self.goalId)
                 self.update_graph()
 
                 # visualize new edge
                 if animation:
                     self.draw_graph(xCenter=xCenter, cBest=cBest,
-                                    cMin=cMin, etheta=etheta, samples=self.samples.values(),
+                                    cMin=cMin, eTheta=eTheta,
+                                    samples=self.samples.values(),
                                     start=firstCoord, end=secondCoord)
 
                 self.remove_queue(lastEdge, bestEdge)
@@ -330,7 +347,8 @@ class BITStar(object):
         for edge in self.edge_queue:
             if edge[1] == bestEdge[1]:
                 dist_cost = self.compute_distance_cost(edge[1], bestEdge[1])
-                if self.g_scores[edge[1]] + dist_cost >= self.g_scores[self.goalId]:
+                if self.g_scores[edge[1]] + dist_cost >= \
+                        self.g_scores[self.goalId]:
                     if (lastEdge, bestEdge[1]) in self.edge_queue:
                         self.edge_queue.remove(
                             (lastEdge, bestEdge[1]))
@@ -338,8 +356,9 @@ class BITStar(object):
     def connect(self, start, end):
         # A function which attempts to extend from a start coordinates
         # to goal coordinates
-        steps = int(self.compute_distance_cost(self.tree.real_world_to_node_id(
-            start), self.tree.real_world_to_node_id(end)) * 10)
+        steps = int(self.compute_distance_cost(
+            self.tree.real_world_to_node_id(start),
+            self.tree.real_world_to_node_id(end)) * 10)
         x = np.linspace(start[0], end[0], num=steps)
         y = np.linspace(start[1], end[1], num=steps)
         for i in range(len(x)):
@@ -409,8 +428,8 @@ class BITStar(object):
         return np.array([[sample[0]], [sample[1]], [0]])
 
     def sample_free_space(self):
-        rnd = [random.uniform(self.minrand, self.maxrand),
-               random.uniform(self.minrand, self.maxrand)]
+        rnd = [random.uniform(self.min_rand, self.max_rand),
+               random.uniform(self.min_rand, self.max_rand)]
 
         return rnd
 
@@ -418,7 +437,8 @@ class BITStar(object):
         if len(self.vertex_queue) == 0:
             return float('inf')
         values = [self.g_scores[v]
-                  + self.compute_heuristic_cost(v, self.goalId) for v in self.vertex_queue]
+                  + self.compute_heuristic_cost(v, self.goalId) for v in
+                  self.vertex_queue]
         values.sort()
         return values[0]
 
@@ -427,21 +447,25 @@ class BITStar(object):
             return float('inf')
         # return the best value in the queue by score g_tau[v] + c(v,x) + h(x)
         values = [self.g_scores[e[0]] + self.compute_distance_cost(e[0], e[1])
-                  + self.compute_heuristic_cost(e[1], self.goalId) for e in self.edge_queue]
+                  + self.compute_heuristic_cost(e[1], self.goalId) for e in
+                  self.edge_queue]
         values.sort(reverse=True)
         return values[0]
 
     def best_in_vertex_queue(self):
         # return the best value in the vertex queue
-        v_plus_vals = [(v, self.g_scores[v] + self.compute_heuristic_cost(v, self.goalId))
-                       for v in self.vertex_queue]
-        v_plus_vals = sorted(v_plus_vals, key=lambda x: x[1])
-        # print(v_plus_vals)
-        return v_plus_vals[0][0]
+        v_plus_values = [(v, self.g_scores[v] +
+                          self.compute_heuristic_cost(v, self.goalId))
+                         for v in self.vertex_queue]
+        v_plus_values = sorted(v_plus_values, key=lambda x: x[1])
+        # print(v_plus_values)
+        return v_plus_values[0][0]
 
     def best_in_edge_queue(self):
-        e_and_values = [(e[0], e[1], self.g_scores[e[0]] + self.compute_distance_cost(
-            e[0], e[1]) + self.compute_heuristic_cost(e[1], self.goalId)) for e in self.edge_queue]
+        e_and_values = [
+            (e[0], e[1], self.g_scores[e[0]] + self.compute_distance_cost(
+                e[0], e[1]) + self.compute_heuristic_cost(e[1], self.goalId))
+            for e in self.edge_queue]
         e_and_values = sorted(e_and_values, key=lambda x: x[2])
 
         return e_and_values[0][0], e_and_values[0][1]
@@ -454,18 +478,19 @@ class BITStar(object):
 
         # get the nearest value in vertex for every one in samples where difference is
         # less than the radius
-        neigbors = []
-        for sid, scoord in self.samples.items():
-            scoord = np.array(scoord)
-            if np.linalg.norm(scoord - currCoord, 2) <= self.r and sid != vid:
-                neigbors.append((sid, scoord))
+        neighbors = []
+        for sid, s_coord in self.samples.items():
+            s_coord = np.array(s_coord)
+            if np.linalg.norm(s_coord - currCoord, 2) <= self.r and sid != vid:
+                neighbors.append((sid, s_coord))
 
         # add an edge to the edge queue is the path might improve the solution
-        for neighbor in neigbors:
+        for neighbor in neighbors:
             sid = neighbor[0]
             h_cost = self.compute_heuristic_cost(sid, self.goalId)
             estimated_f_score = self.compute_distance_cost(
-                self.startId, vid) + h_cost + self.compute_distance_cost(vid, sid)
+                self.startId, vid) + h_cost + self.compute_distance_cost(vid,
+                                                                         sid)
             if estimated_f_score < self.g_scores[self.goalId]:
                 self.edge_queue.append((vid, sid))
 
@@ -476,17 +501,21 @@ class BITStar(object):
         if vid not in self.old_vertices:
             neighbors = []
             for v, edges in self.tree.vertices.items():
-                if v != vid and (v, vid) not in self.edge_queue and (vid, v) not in self.edge_queue:
+                if v != vid and (v, vid) not in self.edge_queue and \
+                        (vid, v) not in self.edge_queue:
                     v_coord = self.tree.node_id_to_real_world_coord(v)
                     if np.linalg.norm(currCoord - v_coord, 2) <= self.r:
                         neighbors.append((vid, v_coord))
 
             for neighbor in neighbors:
                 sid = neighbor[0]
-                estimated_f_score = self.compute_distance_cost(self.startId, vid) + self.compute_distance_cost(
+                estimated_f_score = self.compute_distance_cost(
+                    self.startId, vid) + self.compute_distance_cost(
                     vid, sid) + self.compute_heuristic_cost(sid, self.goalId)
                 if estimated_f_score < self.g_scores[self.goalId] and (
-                        self.g_scores[vid] + self.compute_distance_cost(vid, sid)) < self.g_scores[sid]:
+                        self.g_scores[vid] +
+                        self.compute_distance_cost(vid, sid)) < \
+                        self.g_scores[sid]:
                     self.edge_queue.append((vid, sid))
 
     def update_graph(self):
@@ -511,37 +540,40 @@ class BITStar(object):
 
             # find a non visited successor to the current node
             successors = self.tree.vertices[currId]
-            for succesor in successors:
-                if succesor in closedSet:
+            for successor in successors:
+                if successor in closedSet:
                     continue
                 else:
-                    # claculate tentative g score
+                    # calculate tentative g score
                     g_score = self.g_scores[currId] + \
-                              self.compute_distance_cost(currId, succesor)
-                    if succesor not in openSet:
+                              self.compute_distance_cost(currId, successor)
+                    if successor not in openSet:
                         # add the successor to open set
-                        openSet.append(succesor)
-                    elif g_score >= self.g_scores[succesor]:
+                        openSet.append(successor)
+                    elif g_score >= self.g_scores[successor]:
                         continue
 
                     # update g and f scores
-                    self.g_scores[succesor] = g_score
-                    self.f_scores[succesor] = g_score + self.compute_heuristic_cost(succesor, self.goalId)
+                    self.g_scores[successor] = g_score
+                    self.f_scores[
+                        successor] = g_score + self.compute_heuristic_cost(
+                        successor, self.goalId)
 
                     # store the parent and child
-                    self.nodes[succesor] = currId
+                    self.nodes[successor] = currId
 
-    def draw_graph(self, xCenter=None, cBest=None, cMin=None, etheta=None,
+    def draw_graph(self, xCenter=None, cBest=None, cMin=None, eTheta=None,
                    samples=None, start=None, end=None):
         plt.clf()
         # for stopping simulation with the esc key.
-        plt.gcf().canvas.mpl_connect('key_release_event',
-                lambda event: [exit(0) if event.key == 'escape' else None])
+        plt.gcf().canvas.mpl_connect(
+            'key_release_event',
+            lambda event: [exit(0) if event.key == 'escape' else None])
         for rnd in samples:
             if rnd is not None:
                 plt.plot(rnd[0], rnd[1], "^k")
                 if cBest != float('inf'):
-                    self.plot_ellipse(xCenter, cBest, cMin, etheta)
+                    self.plot_ellipse(xCenter, cBest, cMin, eTheta)
 
         if start is not None and end is not None:
             plt.plot([start[0], start[1]], [end[0], end[1]], "-g")
@@ -556,11 +588,11 @@ class BITStar(object):
         plt.pause(0.01)
 
     @staticmethod
-    def plot_ellipse(xCenter, cBest, cMin, etheta):  # pragma: no cover
+    def plot_ellipse(xCenter, cBest, cMin, eTheta):  # pragma: no cover
 
         a = math.sqrt(cBest ** 2 - cMin ** 2) / 2.0
         b = cBest / 2.0
-        angle = math.pi / 2.0 - etheta
+        angle = math.pi / 2.0 - eTheta
         cx = xCenter[0]
         cy = xCenter[1]
 

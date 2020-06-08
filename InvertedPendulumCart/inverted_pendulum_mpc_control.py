@@ -3,11 +3,12 @@ Inverted Pendulum MPC control
 author: Atsushi Sakai
 """
 
-import matplotlib.pyplot as plt
-import numpy as np
 import math
 import time
+
 import cvxpy
+import matplotlib.pyplot as plt
+import numpy as np
 
 # Model parameters
 
@@ -39,10 +40,11 @@ def main():
     for i in range(50):
 
         # calc control input
-        optimized_x, optimized_delta_x, optimized_theta, optimized_delta_theta, optimized_input = mpc_control(x)
+        opt_x, opt_delta_x, opt_theta, opt_delta_theta, opt_input = \
+            mpc_control(x)
 
         # get input
-        u = optimized_input[0]
+        u = opt_input[0]
 
         # simulate inverted pendulum cart
         x = simulation(x, u)
@@ -86,17 +88,19 @@ def mpc_control(x0):
     print("calc time:{0} [sec]".format(elapsed_time))
 
     if prob.status == cvxpy.OPTIMAL:
-        ox = get_nparray_from_matrix(x.value[0, :])
-        dx = get_nparray_from_matrix(x.value[1, :])
-        theta = get_nparray_from_matrix(x.value[2, :])
-        dtheta = get_nparray_from_matrix(x.value[3, :])
+        ox = get_numpy_array_from_matrix(x.value[0, :])
+        dx = get_numpy_array_from_matrix(x.value[1, :])
+        theta = get_numpy_array_from_matrix(x.value[2, :])
+        d_theta = get_numpy_array_from_matrix(x.value[3, :])
 
-        ou = get_nparray_from_matrix(u.value[0, :])
+        ou = get_numpy_array_from_matrix(u.value[0, :])
+    else:
+        ox, dx, theta, d_theta, ou = None, None, None, None, None
 
-    return ox, dx, theta, dtheta, ou
+    return ox, dx, theta, d_theta, ou
 
 
-def get_nparray_from_matrix(x):
+def get_numpy_array_from_matrix(x):
     """
     get build-in list from matrix
     """
@@ -133,7 +137,7 @@ def plot_cart(xt, theta):
     radius = 0.1
 
     cx = np.array([-cart_w / 2.0, cart_w / 2.0, cart_w /
-                    2.0, -cart_w / 2.0, -cart_w / 2.0])
+                   2.0, -cart_w / 2.0, -cart_w / 2.0])
     cy = np.array([0.0, 0.0, cart_h, cart_h, 0.0])
     cy += radius * 2.0
 
