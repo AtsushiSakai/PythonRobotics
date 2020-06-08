@@ -145,15 +145,13 @@ class BidirectionalBreadthFirstSearchPlanner:
                 if not self.verify_node(node_B):
                     breakB = True
 
-                if (n_id_A not in closed_set_A) and (n_id_A not in
-                                                     open_set_A) and (not
-                breakA):
+                if (n_id_A not in closed_set_A) and \
+                        (n_id_A not in open_set_A) and (not breakA):
                     node_A.parent = current_A
                     open_set_A[n_id_A] = node_A
 
-                if (n_id_B not in closed_set_B) and (n_id_B not in
-                                                     open_set_B) and (not
-                breakB):
+                if (n_id_B not in closed_set_B) and \
+                        (n_id_B not in open_set_B) and (not breakB):
                     node_B.parent = current_B
                     open_set_B[n_id_B] = node_B
 
