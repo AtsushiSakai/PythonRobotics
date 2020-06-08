@@ -243,7 +243,8 @@ class BITStar(object):
             # expand the best vertices until an edge is better than the vertex
             # this is done because the vertex cost represents the lower bound
             # on the edge cost
-            while self.best_vertex_queue_value() <= self.best_edge_queue_value():
+            while self.best_vertex_queue_value() <= \
+                    self.best_edge_queue_value():
                 self.expand_vertex(self.best_in_vertex_queue())
 
             # add the best edge to the tree
@@ -255,9 +256,8 @@ class BITStar(object):
                 0]] + self.compute_distance_cost(
                 bestEdge[0], bestEdge[1]) + self.compute_heuristic_cost(
                 bestEdge[1], self.goalId)
-            estimatedCostOfEdge = self.compute_distance_cost(self.startId,
-                                                             bestEdge[
-                                                                 0]) + self.compute_heuristic_cost(
+            estimatedCostOfEdge = self.compute_distance_cost(
+                self.startId, bestEdge[0]) + self.compute_heuristic_cost(
                 bestEdge[0], bestEdge[1]) + self.compute_heuristic_cost(
                 bestEdge[1], self.goalId)
             actualCostOfEdge = self.g_scores[
@@ -352,8 +352,9 @@ class BITStar(object):
     def connect(self, start, end):
         # A function which attempts to extend from a start coordinates
         # to goal coordinates
-        steps = int(self.compute_distance_cost(self.tree.real_world_to_node_id(
-            start), self.tree.real_world_to_node_id(end)) * 10)
+        steps = int(self.compute_distance_cost(
+            self.tree.real_world_to_node_id(start),
+            self.tree.real_world_to_node_id(end)) * 10)
         x = np.linspace(start[0], end[0], num=steps)
         y = np.linspace(start[1], end[1], num=steps)
         for i in range(len(x)):
@@ -449,8 +450,8 @@ class BITStar(object):
 
     def best_in_vertex_queue(self):
         # return the best value in the vertex queue
-        v_plus_values = [
-            (v, self.g_scores[v] + self.compute_heuristic_cost(v, self.goalId))
+        v_plus_values = [(v, self.g_scores[v] +
+                          self.compute_heuristic_cost(v, self.goalId))
             for v in self.vertex_queue]
         v_plus_values = sorted(v_plus_values, key=lambda x: x[1])
         # print(v_plus_values)
@@ -504,12 +505,12 @@ class BITStar(object):
 
             for neighbor in neighbors:
                 sid = neighbor[0]
-                estimated_f_score = self.compute_distance_cost(self.startId,
-                                                               vid) + self.compute_distance_cost(
+                estimated_f_score = self.compute_distance_cost(
+                    self.startId, vid) + self.compute_distance_cost(
                     vid, sid) + self.compute_heuristic_cost(sid, self.goalId)
                 if estimated_f_score < self.g_scores[self.goalId] and (
-                        self.g_scores[vid] + self.compute_distance_cost(vid,
-                                                                        sid)) < \
+                        self.g_scores[vid] +
+                        self.compute_distance_cost(vid, sid)) < \
                         self.g_scores[sid]:
                     self.edge_queue.append((vid, sid))
 
