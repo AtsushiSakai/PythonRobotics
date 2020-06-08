@@ -47,12 +47,11 @@ class BipedalPlanner(object):
             return
 
         # set up plotter
+        com_trajectory_for_plot, ax = None, None
         if plot:
             fig = plt.figure()
             ax = Axes3D(fig)
             com_trajectory_for_plot = []
-        else:
-            com_trajectory_for_plot, ax = None, None
 
         px, py = 0.0, 0.0  # reference footstep position
         px_star, py_star = px, py  # modified footstep position
