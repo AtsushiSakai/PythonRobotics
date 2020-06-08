@@ -285,7 +285,10 @@ class BITStar(object):
                 if bestEdge[1] in self.tree.vertices.keys():
                     continue
                 else:
-                    del self.samples[bestEdge[1]]
+                    try:
+                        del self.samples[bestEdge[1]]
+                    except KeyError:
+                        pass
                     eid = self.tree.add_vertex(nextCoord)
                     self.vertex_queue.append(eid)
                 if eid == self.goalId or bestEdge[0] == self.goalId or \
