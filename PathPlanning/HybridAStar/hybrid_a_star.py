@@ -13,7 +13,7 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy.spatial
+from scipy.spatial import cKDTree
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__))
                 + "/../ReedsSheppPath")
@@ -65,44 +65,6 @@ class Path:
         self.yaw_list = yaw_list
         self.direction_list = direction_list
         self.cost = cost
-
-
-class KDTree:
-    """
-    Nearest neighbor search class with KDTree
-    """
-
-    def __init__(self, data):
-        # store kd-tree
-        self.tree = scipy.spatial.cKDTree(data)
-
-    def search(self, inp, k=1):
-        """
-        Search NN
-        inp: input data, single frame or multi frame
-        """
-
-        if len(inp.shape) >= 2:  # multi input
-            index = []
-            dist = []
-
-            for i in inp.T:
-                i_dist, i_index = self.tree.query(i, k=k)
-                index.append(i_index)
-                dist.append(i_dist)
-
-            return index, dist
-
-        dist, index = self.tree.query(inp, k=k)
-        return index, dist
-
-    def search_in_distance(self, inp, r):
-        """
-        find points with in a distance r
-        """
-
-        index = self.tree.query_ball_point(inp, r)
-        return index
 
 
 class Config:
@@ -297,7 +259,7 @@ def hybrid_a_star_planning(start, goal, ox, oy, xy_resolution, yaw_resolution):
     start[2], goal[2] = rs.pi_2_pi(start[2]), rs.pi_2_pi(goal[2])
     tox, toy = ox[:], oy[:]
 
-    obstacle_kd_tree = KDTree(np.vstack((tox, toy)).T)
+    obstacle_kd_tree = cKDTree(np.vstack((tox, toy)).T)
 
     config = Config(tox, toy, xy_resolution, yaw_resolution)
 

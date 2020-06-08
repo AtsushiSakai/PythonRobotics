@@ -9,8 +9,8 @@ author: Atsushi Sakai (@Atsushi_twi)
 import random
 import math
 import numpy as np
-import scipy.spatial
 import matplotlib.pyplot as plt
+from scipy.spatial import cKDTree
 
 # parameter
 N_SAMPLE = 500  # number of sample_points
@@ -36,49 +36,9 @@ class Node:
                str(self.cost) + "," + str(self.parent_index)
 
 
-class KDTree:
-    """
-    Nearest neighbor search class with KDTree
-    """
-
-    def __init__(self, data):
-        # store kd-tree
-        self.tree = scipy.spatial.cKDTree(data)
-
-    def search(self, inp, k=1):
-        """
-        Search NN
-
-        inp: input data, single frame or multi frame
-
-        """
-
-        if len(inp.shape) >= 2:  # multi input
-            index = []
-            dist = []
-
-            for i in inp.T:
-                i_dist, i_index = self.tree.query(i, k=k)
-                index.append(i_index)
-                dist.append(i_dist)
-
-            return index, dist
-
-        dist, index = self.tree.query(inp, k=k)
-        return index, dist
-
-    def search_in_distance(self, inp, r):
-        """
-        find points with in a distance r
-        """
-
-        index = self.tree.query_ball_point(inp, r)
-        return index
-
-
 def prm_planning(sx, sy, gx, gy, ox, oy, rr):
 
-    obstacle_kd_tree = KDTree(np.vstack((ox, oy)).T)
+    obstacle_kd_tree = cKDTree(np.vstack((ox, oy)).T)
 
     sample_x, sample_y = sample_points(sx, sy, gx, gy,
                                        rr, ox, oy, obstacle_kd_tree)
@@ -108,15 +68,15 @@ def is_collision(sx, sy, gx, gy, rr, obstacle_kd_tree):
     n_step = round(d / D)
 
     for i in range(n_step):
-        _, dist = obstacle_kd_tree.search(np.array([x, y]).reshape(2, 1))
-        if dist[0] <= rr:
+        dist, _ = obstacle_kd_tree.query([x, y])
+        if dist <= rr:
             return True  # collision
         x += D * math.cos(yaw)
         y += D * math.sin(yaw)
 
     # goal point check
-    _, dist = obstacle_kd_tree.search(np.array([gx, gy]).reshape(2, 1))
-    if dist[0] <= rr:
+    dist, _ = obstacle_kd_tree.query([gx, gy])
+    if dist <= rr:
         return True  # collision
 
     return False  # OK
@@ -134,22 +94,19 @@ def generate_road_map(sample_x, sample_y, rr, obstacle_kd_tree):
 
     road_map = []
     n_sample = len(sample_x)
-    sample_kd_tree = KDTree(np.vstack((sample_x, sample_y)).T)
+    sample_kd_tree = cKDTree(np.vstack((sample_x, sample_y)).T)
 
     for (i, ix, iy) in zip(range(n_sample), sample_x, sample_y):
 
-        index, dists = sample_kd_tree.search(
-            np.array([ix, iy]).reshape(2, 1), k=n_sample)
-        inds = index[0]
+        dists, indexes = sample_kd_tree.query([ix, iy], k=n_sample)
         edge_id = []
-        #  print(index)
 
-        for ii in range(1, len(inds)):
-            nx = sample_x[inds[ii]]
-            ny = sample_y[inds[ii]]
+        for ii in range(1, len(indexes)):
+            nx = sample_x[indexes[ii]]
+            ny = sample_y[indexes[ii]]
 
             if not is_collision(ix, iy, nx, ny, rr, obstacle_kd_tree):
-                edge_id.append(inds[ii])
+                edge_id.append(indexes[ii])
 
             if len(edge_id) >= N_KNN:
                 break
@@ -270,9 +227,9 @@ def sample_points(sx, sy, gx, gy, rr, ox, oy, obstacle_kd_tree):
         tx = (random.random() * (max_x - min_x)) + min_x
         ty = (random.random() * (max_y - min_y)) + min_y
 
-        index, dist = obstacle_kd_tree.search(np.array([tx, ty]).reshape(2, 1))
+        dist, index = obstacle_kd_tree.query([tx, ty])
 
-        if dist[0] >= rr:
+        if dist >= rr:
             sample_x.append(tx)
             sample_y.append(ty)
 
