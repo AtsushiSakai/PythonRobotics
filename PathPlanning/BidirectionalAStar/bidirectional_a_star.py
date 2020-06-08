@@ -17,7 +17,7 @@ show_animation = True
 
 class BidirectionalAStarPlanner:
 
-    def __init__(self, ox, oy, reso, rr):
+    def __init__(self, ox, oy, resolution, rr):
         """
         Initialize grid map for a star planning
 
@@ -27,21 +27,24 @@ class BidirectionalAStarPlanner:
         rr: robot radius[m]
         """
 
-        self.reso = reso
+        self.min_x, self.min_y = None, None
+        self.max_x, self.max_y = None, None
+        self.x_width, self.y_width, self.obstacle_map = None, None, None
+        self.resolution = resolution
         self.rr = rr
         self.calc_obstacle_map(ox, oy)
         self.motion = self.get_motion_model()
 
     class Node:
-        def __init__(self, x, y, cost, pind):
+        def __init__(self, x, y, cost, parent_index):
             self.x = x  # index of grid
             self.y = y  # index of grid
             self.cost = cost
-            self.pind = pind
+            self.parent_index = parent_index
 
         def __str__(self):
             return str(self.x) + "," + str(self.y) + "," + str(
-                self.cost) + "," + str(self.pind)
+                self.cost) + "," + str(self.parent_index)
 
     def planning(self, sx, sy, gx, gy):
         """
@@ -58,18 +61,19 @@ class BidirectionalAStarPlanner:
             ry: y position list of the final path
         """
 
-        nstart = self.Node(self.calc_xyindex(sx, self.minx),
-                           self.calc_xyindex(sy, self.miny), 0.0, -1)
-        ngoal = self.Node(self.calc_xyindex(gx, self.minx),
-                          self.calc_xyindex(gy, self.miny), 0.0, -1)
+        start_node = self.Node(self.calc_xy_index(sx, self.min_x),
+                               self.calc_xy_index(sy, self.min_y), 0.0, -1)
+        goal_node = self.Node(self.calc_xy_index(gx, self.min_x),
+                              self.calc_xy_index(gy, self.min_y), 0.0, -1)
 
         open_set_A, closed_set_A = dict(), dict()
         open_set_B, closed_set_B = dict(), dict()
-        open_set_A[self.calc_grid_index(nstart)] = nstart
-        open_set_B[self.calc_grid_index(ngoal)] = ngoal
+        open_set_A[self.calc_grid_index(start_node)] = start_node
+        open_set_B[self.calc_grid_index(goal_node)] = goal_node
 
-        current_A = nstart
-        current_B = ngoal
+        current_A = start_node
+        current_B = goal_node
+        meet_point_A, meet_point_B = None, None
 
         while 1:
             if len(open_set_A) == 0:
@@ -94,22 +98,23 @@ class BidirectionalAStarPlanner:
 
             # show graph
             if show_animation:  # pragma: no cover
-                plt.plot(self.calc_grid_position(current_A.x, self.minx),
-                         self.calc_grid_position(current_A.y, self.miny), "xc")
-                plt.plot(self.calc_grid_position(current_B.x, self.minx),
-                         self.calc_grid_position(current_B.y, self.miny), "xc")
+                plt.plot(self.calc_grid_position(current_A.x, self.min_x),
+                         self.calc_grid_position(current_A.y, self.min_y),
+                         "xc")
+                plt.plot(self.calc_grid_position(current_B.x, self.min_x),
+                         self.calc_grid_position(current_B.y, self.min_y),
+                         "xc")
                 # for stopping simulation with the esc key.
-                plt.gcf().canvas.mpl_connect('key_release_event',
-                                             lambda event:
-                                             [exit(0) if event.key == 'escape'
-                                              else None])
+                plt.gcf().canvas.mpl_connect(
+                    'key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
                 if len(closed_set_A.keys()) % 10 == 0:
                     plt.pause(0.001)
 
             if current_A.x == current_B.x and current_A.y == current_B.y:
                 print("Found goal")
-                meetpointA = current_A
-                meetpointB = current_B
+                meet_point_A = current_A
+                meet_point_B = current_B
                 break
 
             # Remove the item from the open set
@@ -158,7 +163,7 @@ class BidirectionalAStarPlanner:
                             open_set_B[n_ids[1]] = c_nodes[1]
 
         rx, ry = self.calc_final_bidirectional_path(
-            meetpointA, meetpointB, closed_set_A, closed_set_B)
+            meet_point_A, meet_point_B, closed_set_A, closed_set_B)
 
         return rx, ry
 
@@ -175,16 +180,16 @@ class BidirectionalAStarPlanner:
 
         return rx, ry
 
-    def calc_final_path(self, ngoal, closedset):
+    def calc_final_path(self, goal_node, closed_set):
         # generate final course
-        rx, ry = [self.calc_grid_position(ngoal.x, self.minx)], [
-            self.calc_grid_position(ngoal.y, self.miny)]
-        pind = ngoal.parent_index
-        while pind != -1:
-            n = closedset[pind]
-            rx.append(self.calc_grid_position(n.x, self.minx))
-            ry.append(self.calc_grid_position(n.y, self.miny))
-            pind = n.parent_index
+        rx, ry = [self.calc_grid_position(goal_node.x, self.min_x)], \
+                 [self.calc_grid_position(goal_node.y, self.min_y)]
+        parent_index = goal_node.parent_index
+        while parent_index != -1:
+            n = closed_set[parent_index]
+            rx.append(self.calc_grid_position(n.x, self.min_x))
+            ry.append(self.calc_grid_position(n.y, self.min_y))
+            parent_index = n.parent_index
 
         return rx, ry
 
@@ -210,69 +215,69 @@ class BidirectionalAStarPlanner:
         f_cost = g_cost + h_cost
         return f_cost
 
-    def calc_grid_position(self, index, minp):
+    def calc_grid_position(self, index, min_position):
         """
         calc grid position
 
         :param index:
-        :param minp:
+        :param min_position:
         :return:
         """
-        pos = index * self.reso + minp
+        pos = index * self.resolution + min_position
         return pos
 
-    def calc_xyindex(self, position, min_pos):
-        return round((position - min_pos) / self.reso)
+    def calc_xy_index(self, position, min_pos):
+        return round((position - min_pos) / self.resolution)
 
     def calc_grid_index(self, node):
-        return (node.y - self.miny) * self.xwidth + (node.x - self.minx)
+        return (node.y - self.min_y) * self.x_width + (node.x - self.min_x)
 
     def verify_node(self, node):
-        px = self.calc_grid_position(node.x, self.minx)
-        py = self.calc_grid_position(node.y, self.miny)
+        px = self.calc_grid_position(node.x, self.min_x)
+        py = self.calc_grid_position(node.y, self.min_y)
 
-        if px < self.minx:
+        if px < self.min_x:
             return False
-        elif py < self.miny:
+        elif py < self.min_y:
             return False
-        elif px >= self.maxx:
+        elif px >= self.max_x:
             return False
-        elif py >= self.maxy:
+        elif py >= self.max_y:
             return False
 
         # collision check
-        if self.obmap[node.x][node.y]:
+        if self.obstacle_map[node.x][node.y]:
             return False
 
         return True
 
     def calc_obstacle_map(self, ox, oy):
 
-        self.minx = round(min(ox))
-        self.miny = round(min(oy))
-        self.maxx = round(max(ox))
-        self.maxy = round(max(oy))
-        print("min_x:", self.minx)
-        print("min_y:", self.miny)
-        print("max_x:", self.maxx)
-        print("max_y:", self.maxy)
+        self.min_x = round(min(ox))
+        self.min_y = round(min(oy))
+        self.max_x = round(max(ox))
+        self.max_y = round(max(oy))
+        print("min_x:", self.min_x)
+        print("min_y:", self.min_y)
+        print("max_x:", self.max_x)
+        print("max_y:", self.max_y)
 
-        self.xwidth = round((self.maxx - self.minx) / self.reso)
-        self.ywidth = round((self.maxy - self.miny) / self.reso)
-        print("x_width:", self.xwidth)
-        print("y_width:", self.ywidth)
+        self.x_width = round((self.max_x - self.min_x) / self.resolution)
+        self.y_width = round((self.max_y - self.min_y) / self.resolution)
+        print("x_width:", self.x_width)
+        print("y_width:", self.y_width)
 
         # obstacle map generation
-        self.obmap = [[False for _ in range(self.ywidth)]
-                      for _ in range(self.xwidth)]
-        for ix in range(self.xwidth):
-            x = self.calc_grid_position(ix, self.minx)
-            for iy in range(self.ywidth):
-                y = self.calc_grid_position(iy, self.miny)
+        self.obstacle_map = [[False for _ in range(self.y_width)]
+                             for _ in range(self.x_width)]
+        for ix in range(self.x_width):
+            x = self.calc_grid_position(ix, self.min_x)
+            for iy in range(self.y_width):
+                y = self.calc_grid_position(iy, self.min_y)
                 for iox, ioy in zip(ox, oy):
                     d = math.hypot(iox - x, ioy - y)
                     if d <= self.rr:
-                        self.obmap[ix][iy] = True
+                        self.obstacle_map[ix][iy] = True
                         break
 
     @staticmethod
