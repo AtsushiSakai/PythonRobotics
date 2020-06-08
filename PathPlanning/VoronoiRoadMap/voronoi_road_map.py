@@ -10,7 +10,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from dijkstra_search import DijkstraSearch
-from scipy.spatial import cKDTree
+from scipy.spatial import cKDTree, Voronoi
 
 show_animation = True
 
@@ -116,7 +116,7 @@ class VoronoiRoadMapPlanner:
         oxy = np.vstack((ox, oy)).T
 
         # generate voronoi point
-        vor = scipy.spatial.Voronoi(oxy)
+        vor = Voronoi(oxy)
         sample_x = [ix for [ix, _] in vor.vertices]
         sample_y = [iy for [_, iy] in vor.vertices]
 
