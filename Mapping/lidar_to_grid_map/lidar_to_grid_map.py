@@ -19,7 +19,8 @@ def file_read(f):
     """
     Reading LIDAR laser beams (angles and corresponding distance data)
     """
-    measures = [line.split(",") for line in open(f)]
+    with open(f) as data:
+        measures = [line.split(",") for line in data]
     angles = []
     distances = []
     for measure in measures:
