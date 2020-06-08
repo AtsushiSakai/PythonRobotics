@@ -8,7 +8,6 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 import math
 import numpy as np
-import scipy.spatial
 import matplotlib.pyplot as plt
 from dijkstra_search import DijkstraSearch
 from scipy.spatial import cKDTree
