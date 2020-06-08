@@ -16,6 +16,15 @@ grid_based_sweep_coverage_path_planner.do_animation = False
 
 class TestPlanning(TestCase):
 
+    RIGHT = grid_based_sweep_coverage_path_planner.\
+        SweepSearcher.MovingDirection.RIGHT
+    LEFT = grid_based_sweep_coverage_path_planner. \
+        SweepSearcher.MovingDirection.LEFT
+    UP = grid_based_sweep_coverage_path_planner. \
+        SweepSearcher.SweepDirection.UP
+    DOWN = grid_based_sweep_coverage_path_planner. \
+        SweepSearcher.SweepDirection.DOWN
+
     def test_planning1(self):
         ox = [0.0, 20.0, 50.0, 100.0, 130.0, 40.0, 0.0]
         oy = [0.0, -20.0, 0.0, 30.0, 60.0, 80.0, 0.0]
@@ -23,29 +32,29 @@ class TestPlanning(TestCase):
 
         px, py = grid_based_sweep_coverage_path_planner.planning(
             ox, oy, resolution,
-            moving_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.MovingDirection.RIGHT,
-            sweeping_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.SweepDirection.DOWN,
+            moving_direction=self.RIGHT,
+            sweeping_direction=self.DOWN,
         )
         self.assertGreater(len(px), 5)
 
         px, py = grid_based_sweep_coverage_path_planner.planning(
             ox, oy, resolution,
-            moving_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.MovingDirection.LEFT,
-            sweeping_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.SweepDirection.DOWN,
+            moving_direction=self.LEFT,
+            sweeping_direction=self.DOWN,
         )
         self.assertGreater(len(px), 5)
 
         px, py = grid_based_sweep_coverage_path_planner.planning(
             ox, oy, resolution,
-            moving_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.MovingDirection.RIGHT,
-            sweeping_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.SweepDirection.UP,
+            moving_direction=self.RIGHT,
+            sweeping_direction=self.UP,
         )
         self.assertGreater(len(px), 5)
 
         px, py = grid_based_sweep_coverage_path_planner.planning(
             ox, oy, resolution,
-            moving_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.MovingDirection.RIGHT,
-            sweeping_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.SweepDirection.DOWN,
+            moving_direction=self.RIGHT,
+            sweeping_direction=self.UP,
         )
         self.assertGreater(len(px), 5)
 
@@ -56,29 +65,29 @@ class TestPlanning(TestCase):
 
         px, py = grid_based_sweep_coverage_path_planner.planning(
             ox, oy, resolution,
-            moving_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.MovingDirection.RIGHT,
-            sweeping_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.SweepDirection.DOWN,
+            moving_direction=self.RIGHT,
+            sweeping_direction=self.DOWN,
         )
         self.assertGreater(len(px), 5)
 
         px, py = grid_based_sweep_coverage_path_planner.planning(
             ox, oy, resolution,
-            moving_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.MovingDirection.LEFT,
-            sweeping_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.SweepDirection.DOWN,
+            moving_direction=self.LEFT,
+            sweeping_direction=self.DOWN,
         )
         self.assertGreater(len(px), 5)
 
         px, py = grid_based_sweep_coverage_path_planner.planning(
             ox, oy, resolution,
-            moving_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.MovingDirection.RIGHT,
-            sweeping_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.SweepDirection.UP,
+            moving_direction=self.RIGHT,
+            sweeping_direction=self.UP,
         )
         self.assertGreater(len(px), 5)
 
         px, py = grid_based_sweep_coverage_path_planner.planning(
             ox, oy, resolution,
-            moving_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.MovingDirection.RIGHT,
-            sweeping_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.SweepDirection.DOWN,
+            moving_direction=self.RIGHT,
+            sweeping_direction=self.DOWN,
         )
         self.assertGreater(len(px), 5)
 
@@ -88,28 +97,28 @@ class TestPlanning(TestCase):
         resolution = 5.1
         px, py = grid_based_sweep_coverage_path_planner.planning(
             ox, oy, resolution,
-            moving_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.MovingDirection.RIGHT,
-            sweeping_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.SweepDirection.DOWN,
+            moving_direction=self.RIGHT,
+            sweeping_direction=self.DOWN,
         )
         self.assertGreater(len(px), 5)
 
         px, py = grid_based_sweep_coverage_path_planner.planning(
             ox, oy, resolution,
-            moving_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.MovingDirection.LEFT,
-            sweeping_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.SweepDirection.DOWN,
+            moving_direction=self.LEFT,
+            sweeping_direction=self.DOWN,
         )
         self.assertGreater(len(px), 5)
 
         px, py = grid_based_sweep_coverage_path_planner.planning(
             ox, oy, resolution,
-            moving_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.MovingDirection.RIGHT,
-            sweeping_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.SweepDirection.UP,
+            moving_direction=self.RIGHT,
+            sweeping_direction=self.UP,
         )
         self.assertGreater(len(px), 5)
 
         px, py = grid_based_sweep_coverage_path_planner.planning(
             ox, oy, resolution,
-            moving_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.MovingDirection.RIGHT,
-            sweeping_direction=grid_based_sweep_coverage_path_planner.SweepSearcher.SweepDirection.DOWN,
+            moving_direction=self.RIGHT,
+            sweeping_direction=self.DOWN,
         )
         self.assertGreater(len(px), 5)
