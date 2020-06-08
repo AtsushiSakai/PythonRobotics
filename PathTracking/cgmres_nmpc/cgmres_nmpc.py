@@ -10,13 +10,13 @@ control, sliding mode control https://github.com/Shunichi09/nonlinear_control
 
 """
 
-import math
+from math import cos, sin, radians, atan2
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 U_A_MAX = 1.0
-U_OMEGA_MAX = math.radians(45.0)
+U_OMEGA_MAX = radians(45.0)
 PHI_V = 0.01
 PHI_OMEGA = 0.01
 WB = 0.25  # [m] wheel base
@@ -25,11 +25,11 @@ show_animation = True
 
 
 def differential_model(v, yaw, u_1, u_2):
-    dx = math.cos(yaw) * v
-    dy = math.sin(yaw) * v
+    dx = cos(yaw) * v
+    dy = sin(yaw) * v
     dv = u_1
     # tangent is not good for nonlinear optimization
-    d_yaw = v / WB * math.sin(u_2)
+    d_yaw = v / WB * sin(u_2)
 
     return dx, dy, d_yaw, dv
 
@@ -126,10 +126,9 @@ class NMPCSimulatorSystem:
         # ∂H/∂x
         pre_lam_1 = lam_1 + dt * 0.0
         pre_lam_2 = lam_2 + dt * 0.0
-        tmp1 = - lam_1 * math.sin(yaw) * v + lam_2 * math.cos(yaw) * v
+        tmp1 = - lam_1 * sin(yaw) * v + lam_2 * cos(yaw) * v
         pre_lam_3 = lam_3 + dt * tmp1
-        tmp2 = lam_1 * math.cos(yaw) + lam_2 * math.sin(yaw) + \
-               lam_3 * math.sin(u_2) / WB
+        tmp2 = lam_1 * cos(yaw) + lam_2 * sin(yaw) + lam_3 * sin(u_2) / WB
         pre_lam_4 = lam_4 + dt * tmp2
 
         return pre_lam_1, pre_lam_2, pre_lam_3, pre_lam_4
@@ -325,15 +324,17 @@ class NMPCControllerCGMRES:
 
             judge_value = r0_norm * e[:i + 1] - np.dot(hs[:i + 1, :i], ys[:i])
 
-            if np.linalg.norm(
-                    judge_value) < self.threshold or i == self.max_iteration - 1:
-                update_value = np.dot(vs[:, :i - 1], ys_pre[:i - 1]).flatten()
-                du_1_new = du_1 + update_value[::self.input_num]
-                du_2_new = du_2 + update_value[1::self.input_num]
-                ddummy_u_1_new = ddummy_u_1 + update_value[2::self.input_num]
-                ddummy_u_2_new = ddummy_u_2 + update_value[3::self.input_num]
-                draw_1_new = draw_1 + update_value[4::self.input_num]
-                draw_2_new = draw_2 + update_value[5::self.input_num]
+            flag1 = np.linalg.norm(judge_value) < self.threshold
+
+            flag2 = i == self.max_iteration - 1
+            if flag1 or flag2:
+                update_val = np.dot(vs[:, :i - 1], ys_pre[:i - 1]).flatten()
+                du_1_new = du_1 + update_val[::self.input_num]
+                du_2_new = du_2 + update_val[1::self.input_num]
+                ddummy_u_1_new = ddummy_u_1 + update_val[2::self.input_num]
+                ddummy_u_2_new = ddummy_u_2 + update_val[3::self.input_num]
+                draw_1_new = draw_1 + update_val[4::self.input_num]
+                draw_2_new = draw_2 + update_val[5::self.input_num]
                 break
 
             ys_pre = ys
@@ -375,7 +376,7 @@ class NMPCControllerCGMRES:
             # ∂H/∂u(xi, ui, λi)
             F.append(u_1s[i] + lam_4s[i] + 2.0 * raw_1s[i] * u_1s[i])
             F.append(u_2s[i] + lam_3s[i] * v_s[i] /
-                     WB * math.cos(u_2s[i]) ** 2 + 2.0 * raw_2s[i] * u_2s[i])
+                     WB * cos(u_2s[i]) ** 2 + 2.0 * raw_2s[i] * u_2s[i])
             F.append(-PHI_V + 2.0 * raw_1s[i] * dummy_u_1s[i])
             F.append(-PHI_OMEGA + 2.0 * raw_2s[i] * dummy_u_2s[i])
 
@@ -505,10 +506,10 @@ def plot_car(x, y, yaw, steer=0.0, truck_color="-k"):  # pragma: no cover
     rl_wheel = np.copy(rr_wheel)
     rl_wheel[1, :] *= -1
 
-    Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
-                     [-math.sin(yaw), math.cos(yaw)]])
-    Rot2 = np.array([[math.cos(steer), math.sin(steer)],
-                     [-math.sin(steer), math.cos(steer)]])
+    Rot1 = np.array([[cos(yaw), sin(yaw)],
+                     [-sin(yaw), cos(yaw)]])
+    Rot2 = np.array([[cos(steer), sin(steer)],
+                     [-sin(steer), cos(steer)]])
 
     fr_wheel = (fr_wheel.T.dot(Rot2)).T
     fl_wheel = (fl_wheel.T.dot(Rot2)).T
@@ -560,7 +561,7 @@ def animation(plant, controller, dt):
         if abs(v) <= 0.01:
             steer = 0.0
         else:
-            steer = math.atan2(controller.history_u_2[t] * WB / v, 1.0)
+            steer = atan2(controller.history_u_2[t] * WB / v, 1.0)
 
         plt.cla()
         # for stopping simulation with the esc key.
@@ -586,7 +587,7 @@ def main():
 
     init_x = -4.5
     init_y = -2.5
-    init_yaw = math.radians(45.0)
+    init_yaw = radians(45.0)
     init_v = -1.0
 
     # plant
