@@ -288,6 +288,7 @@ class BITStar(object):
                     try:
                         del self.samples[bestEdge[1]]
                     except KeyError:
+                        # invalid sample key
                         pass
                     eid = self.tree.add_vertex(nextCoord)
                     self.vertex_queue.append(eid)
