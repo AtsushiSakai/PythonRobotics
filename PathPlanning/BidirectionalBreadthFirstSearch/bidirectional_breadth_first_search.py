@@ -27,7 +27,8 @@ class BidirectionalBreadthFirstSearchPlanner:
         rr: robot radius[m]
         """
 
-        self.min_x, self.min_y, self.max_x, self.max_y = None, None, None, None
+        self.min_x, self.min_y = None, None
+        self.max_x, self.max_y = None, None
         self.x_width, self.y_width, self.obstacle_map = None, None, None
         self.resolution = resolution
         self.rr = rr
@@ -62,9 +63,11 @@ class BidirectionalBreadthFirstSearchPlanner:
         """
 
         start_node = self.Node(self.calc_xy_index(sx, self.min_x),
-                               self.calc_xy_index(sy, self.min_y), 0.0, -1, None)
+                               self.calc_xy_index(sy, self.min_y), 0.0, -1,
+                               None)
         goal_node = self.Node(self.calc_xy_index(gx, self.min_x),
-                              self.calc_xy_index(gy, self.min_y), 0.0, -1, None)
+                              self.calc_xy_index(gy, self.min_y), 0.0, -1,
+                              None)
 
         open_set_A, closed_set_A = dict(), dict()
         open_set_B, closed_set_B = dict(), dict()
@@ -94,14 +97,15 @@ class BidirectionalBreadthFirstSearchPlanner:
             # show graph
             if show_animation:  # pragma: no cover
                 plt.plot(self.calc_grid_position(current_A.x, self.min_x),
-                         self.calc_grid_position(current_A.y, self.min_y), "xc")
+                         self.calc_grid_position(current_A.y, self.min_y),
+                         "xc")
                 plt.plot(self.calc_grid_position(current_B.x, self.min_x),
-                         self.calc_grid_position(current_B.y, self.min_y), "xc")
+                         self.calc_grid_position(current_B.y, self.min_y),
+                         "xc")
                 # for stopping simulation with the esc key.
-                plt.gcf().canvas.mpl_connect('key_release_event',
-                                             lambda event:
-                                             [exit(0) if
-                                              event.key == 'escape' else None])
+                plt.gcf().canvas.mpl_connect(
+                    'key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
                 if len(closed_set_A.keys()) % 10 == 0:
                     plt.pause(0.001)
 
@@ -143,13 +147,13 @@ class BidirectionalBreadthFirstSearchPlanner:
 
                 if (n_id_A not in closed_set_A) and (n_id_A not in
                                                      open_set_A) and (not
-                                                                      breakA):
+                breakA):
                     node_A.parent = current_A
                     open_set_A[n_id_A] = node_A
 
                 if (n_id_B not in closed_set_B) and (n_id_B not in
                                                      open_set_B) and (not
-                                                                      breakB):
+                breakB):
                     node_B.parent = current_B
                     open_set_B[n_id_B] = node_B
 
