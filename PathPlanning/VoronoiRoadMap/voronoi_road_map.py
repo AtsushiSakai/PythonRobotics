@@ -8,10 +8,9 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 import math
 import numpy as np
-import scipy.spatial
 import matplotlib.pyplot as plt
 from dijkstra_search import DijkstraSearch
-from kdtree import KDTree
+from scipy.spatial import cKDTree, Voronoi
 
 show_animation = True
 
@@ -24,7 +23,7 @@ class VoronoiRoadMapPlanner:
         self.MAX_EDGE_LEN = 30.0  # [m] Maximum edge length
 
     def planning(self, sx, sy, gx, gy, ox, oy, robot_radius):
-        obstacle_tree = KDTree(np.vstack((ox, oy)).T)
+        obstacle_tree = cKDTree(np.vstack((ox, oy)).T)
 
         sample_x, sample_y = self.voronoi_sampling(sx, sy, gx, gy, ox, oy)
         if show_animation:  # pragma: no cover
@@ -53,15 +52,15 @@ class VoronoiRoadMapPlanner:
         n_step = round(d / D)
 
         for i in range(n_step):
-            ids, dist = obstacle_kd_tree.search(np.array([x, y]).reshape(2, 1))
-            if dist[0] <= rr:
+            dist, _ = obstacle_kd_tree.query([x, y])
+            if dist <= rr:
                 return True  # collision
             x += D * math.cos(yaw)
             y += D * math.sin(yaw)
 
         # goal point check
-        ids, dist = obstacle_kd_tree.search(np.array([gx, gy]).reshape(2, 1))
-        if dist[0] <= rr:
+        dist, _ = obstacle_kd_tree.query([gx, gy])
+        if dist <= rr:
             return True  # collision
 
         return False  # OK
@@ -78,22 +77,20 @@ class VoronoiRoadMapPlanner:
 
         road_map = []
         n_sample = len(node_x)
-        node_tree = KDTree(np.vstack((node_x, node_y)).T)
+        node_tree = cKDTree(np.vstack((node_x, node_y)).T)
 
         for (i, ix, iy) in zip(range(n_sample), node_x, node_y):
 
-            index, dists = node_tree.search(
-                np.array([ix, iy]).reshape(2, 1), k=n_sample)
+            dists, indexes = node_tree.query([ix, iy], k=n_sample)
 
-            inds = index[0]
             edge_id = []
 
-            for ii in range(1, len(inds)):
-                nx = node_x[inds[ii]]
-                ny = node_y[inds[ii]]
+            for ii in range(1, len(indexes)):
+                nx = node_x[indexes[ii]]
+                ny = node_y[indexes[ii]]
 
                 if not self.is_collision(ix, iy, nx, ny, rr, obstacle_tree):
-                    edge_id.append(inds[ii])
+                    edge_id.append(indexes[ii])
 
                 if len(edge_id) >= self.N_KNN:
                     break
@@ -119,7 +116,7 @@ class VoronoiRoadMapPlanner:
         oxy = np.vstack((ox, oy)).T
 
         # generate voronoi point
-        vor = scipy.spatial.Voronoi(oxy)
+        vor = Voronoi(oxy)
         sample_x = [ix for [ix, _] in vor.vertices]
         sample_y = [iy for [_, iy] in vor.vertices]
 

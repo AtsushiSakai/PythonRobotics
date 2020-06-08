@@ -31,7 +31,7 @@ def check_car_collision(x_list, y_list, yaw_list, ox, oy, kd_tree):
         cx = i_x + W_BUBBLE_DIST * cos(i_yaw)
         cy = i_y + W_BUBBLE_DIST * sin(i_yaw)
 
-        ids = kd_tree.search_in_distance([cx, cy], W_BUBBLE_R)
+        ids = kd_tree.query_ball_point([cx, cy], W_BUBBLE_R)
 
         if not ids:
             continue
@@ -71,7 +71,7 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
 def plot_car(x, y, yaw):
     car_color = '-k'
     c, s = cos(yaw), sin(yaw)
-    rot = Rot.from_euler('z', yaw).as_matrix()[0:2, 0:2]
+    rot = Rot.from_euler('z', -yaw).as_matrix()[0:2, 0:2]
     car_outline_x, car_outline_y = [], []
     for rx, ry in zip(VRX, VRY):
         converted_xy = np.stack([rx, ry]).T @ rot
