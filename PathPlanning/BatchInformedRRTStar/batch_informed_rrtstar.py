@@ -452,7 +452,7 @@ class BITStar(object):
         # return the best value in the vertex queue
         v_plus_values = [(v, self.g_scores[v] +
                           self.compute_heuristic_cost(v, self.goalId))
-            for v in self.vertex_queue]
+                         for v in self.vertex_queue]
         v_plus_values = sorted(v_plus_values, key=lambda x: x[1])
         # print(v_plus_values)
         return v_plus_values[0][0]
