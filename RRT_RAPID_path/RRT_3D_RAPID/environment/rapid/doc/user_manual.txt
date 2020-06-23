@@ -1,0 +1,498 @@
+
+1.0 INTRODUCTION
+
+RAPID is a "Robust and Accurate Polygon Interference Detection"
+package.  It is a programmer's tool, as opposed to a product for
+end-users.  RAPID's API is intentionally narrow and easy to use.  This
+User's Manual describes the RAPID API.
+
+The persons who use RAPID will be collectively referred to as "the
+client".  The term "user" will be reserved for the end-users of the
+client's software.
+
+This manual will assume that the client is familiar with 3D graphics
+programming, and the following concepts in particular: use of matrix
+and vector arithmetic to effect rotations and translations, nested
+coordinated systems, and the use of polygon models.
+
+2.0 WHAT IS COLLISION DETECTION, AND HOW DOES RAPID FIT IN?
+
+Also known as interference detection or intersection detection,
+collision detection (CD) is the task of determining whether two shapes
+with a given relative placement have points in common.  Collision
+detection is needed by systems which perform physically based
+modeling, virtual prototyping of mechanical assemblies, and CAD, for
+instance.
+
+The collision detection task is required in many diverse contexts.
+The types of models being used and the kinds of motion they undergo
+(if they are in motion, at all) affect what techniques are suitable
+for performing CD.  Most collision detection systems are tailored for
+use with a particular kind of model.
+
+We will now survey the scope of the collision detection task, and
+describe what part of the task is addressed by RAPID.
+
+2.1 SHAPE TYPES: POLYGONAL, CURVED, AND CSG
+
+In general, computer models can be composed of polygons, implicit
+surfaces, parametric surfaces (such as trimmed NURBS), or CSG objects.
+Some of these forms are suitable for modeling (such as CSG and NURBS),
+and some are especially suited for hardware-accelerated rendering
+(polygons).  Furthermore, in the case of polygonal models, some CD
+systems require the shapes to be well-formed solids -- the surfaces
+must "close" so that there is a well-defined inside and outside.
+
+RAPID accepts only polygonal models composed entirely of triangles,
+but does not require the models to have any particular structure.
+Polygonal models containing quadrilaterals or higher order polygons
+can be converted into triangle-only form by the client before loading
+them into RAPID.
+
+2.2 DETECTION VERSUS DETERMINATION
+
+Systems which "detect" contact simply report whether or not two
+objects are touching each other -- the response is a true/false
+indication.  Systems which "determine" contact actually report, in
+some form, the actual intersection between the models.  In the case of
+curved surfaces, this might be some representation of the space curve
+which lies on both surfaces.  In the case of CSG models, the system
+might return a new CSG object representing the intersection.  In the
+case of polygonal models, this might be a list of the pairs of
+touching polygons.  Often the term "collision detection" is used
+loosely, and is meant to include either "detection" or
+"determination".  In this manual, the term "detection" is used
+loosely, unless specifically stated otherwise.
+
+RAPID performs either the "detection" or "determination" task, as the
+client directs.
+
+2.3 NBODY SYSTEMS VERSUS TWO_BODY SYSTEMS
+
+"Nbody" systems manage many objects and report collisions when one or
+many are moved.  The client typically loads all objects into the
+system with initial positions, and then updates object positions
+during subsequent time steps.  Sometimes an Nbody system will actually
+model the motion of the objects, either using a closed-form formula
+for the placement of the objects as a function of time, or using
+bounds on the acceleration and/or velocity to assist in its task.
+"Two body" systems typically require the client to explicitly request
+a collision check between a pair of objects with a given placement
+every time contact status is needed.  Some two-body systems will also
+model the motion of the objects.
+
+RAPID is a two body system which does not model the object motions at
+all, and bounds on object motion are not expected.
+
+2.4 DEFORMABLE VERSUS RIGID MODELS
+
+Models which change shape over time are called "deformable models."  A
+model deforms either by reassigning coordinates to the vertices
+individually or by applying a nonrigid transformation to all the
+vertices (in a sense, warping the model's coordinate system).
+Algorithms for performing CD on deformable models have been presented
+in the literature.
+
+RAPID does not accept deformations, except for uniform scaling
+(uniform scaling is not a rigid transformation, since it does not
+preserve distances).  On every collision query, the client supplies to
+RAPID the position, orientation, and scale factor for the two objects.
+
+3 DESIGN CHOICES
+
+The following section describes the design choices made in producing
+RAPID.
+
+3.1 ACCURACY AND ROBUSTNESS
+
+RAPID's first priority is accuracy and robustness.  It is designed to
+give correct output for a wide range of inputs -- including nongeneric
+input.  The triangles may have unusual alignments, such as being
+coplanar or even exactly overlapping.  This design requirement burdens
+the system with more complex computation than otherwise necessary.
+
+3.2 SIMPLE API
+
+RAPID's second priority is a simple interface.  The client requires
+only seven routines to create, destroy, and preprocess models, as well
+as to perform collision queries.  Only three very simple data
+structures need be understood: the familiar 3 x 1 translation
+vector, the familiar 3 x 3 rotation matrix, and a structure
+called a contact_pair, which contains the id numbers of a pair
+of overlapping triangles.  RAPID exposes little of its internal
+structure in the API so as not to burden the client with unnecessary
+conceptual overhead.  Some additional speed might be gained by
+widening the interface, but we deem simplicity more important.  The
+entire API, including all necessary structures and procedures, is
+defined in the file "RAPID.H".
+
+3.3 EFFICIENT EXECUTION
+
+In spite of RAPID's name, speed is only its third priority.  The
+preprocessing code and the collision query have been highly optimized.
+These optimizations reduce modularity, code compactness, and
+maintainability.  We consider these tradeoffs worthwhile since we do
+not expect RAPID to undergo frequent or extensive revision.
+
+3.4 EFFICIENT MEMORY USE
+
+RAPID's fourth priority is efficient memory usage.  The current
+version has eliminated almost all unnecessary memory usage without
+sacrificing speed -- but future versions may permit speed and memory
+to be traded off according to the client's needs.
+
+4 BASIC USAGE OF RAPID
+
+A model is a collection of triangles; each triangle has three
+vertices; each vertex has three coordinates.  These coordinates are
+given with respect to the "model coordinate system", or within
+"model space".
+
+4.1 PERFORMING A COLLISION QUERY
+
+A model thus specified can have a placement in its environment, or in
+"world space".  The model's placement in world space is defined as the
+placement of the model's coordinate axes within world space, which are
+specified as a rotation, R, followed by a translation, T.  Given the
+placement of a model with R and T, we can determine the location in
+world space of a vertex of the model, given the vertex's coordinates
+in model space:
+
+	x_w = R x_m + T
+
+where x_m is a point in the model coordinate system, and x_w are the
+coordinates of the same point, but with respect to the world
+coordinate system.
+
+The basic function of RAPID is to indicate whether two objects are in
+contact in world space.  Suppose model m_1 has orientation R_1 and
+position T_1 in world space, while model m_2 has orientation R_2
+and position T_1.  Then the function call to rapid which asks
+whether the two models are touching is,
+
+
+int 
+RAPID_Collide(double R1[3][3], double T1[3], RAPID_model *m1,
+              double R2[3][3], double T2[3], RAPID_model *m2,
+              int flag);
+
+
+This function returns RAPID_OK, which is 0, on success.  A nonzero
+value indicates that the call failed, and the value is itself the
+error code.  At present, the only error RAPID_Collide() can return is
+RAPID_ERR_COLLIDE_OUT_OF_MEMORY.
+
+Note: The rotation matrices must be orthonormal, which means R R^T = I
+to within machine precision (R^T is the transpose of R).  If RAPID is
+fed rotation matrices which are not orthonormal, then it may give
+unexpected results.  At present, RAPID does not validate the input to
+ensure that the matrices are orthonormal.
+
+After calling this function, the number of pairwise intersecting
+triangles can be found in the global variable RAPID_num_contacts}.  So
+if this variable is 0, the models were not touching.  If it nonzero,
+they were touching.
+
+To find out which triangles were among the contact pairs, the
+client must look int the global array RAPID_contacts[], and the
+first RAPID_num_contacts elements are valid data.  This is
+an array of contact_pair structures:
+
+struct collision_pair
+{
+  int id1;
+  int id2;
+};
+
+Each contact pair structure corresponds to a unique pair of
+overlapping triangles, indicated by the id number fields id1 and id2.
+So, for example, after calling RAPID_Collide() as shown above, if find
+that RAPID_num_contacts has been set to 43, then we could look at,
+say, RAPID_contact[20].id2 to retrieve from the 21'st contact pair the
+triangle from model m2.
+
+The global variables remain valid until RAPID_Collide() is called
+again.
+
+Note that a given triangle id may appear multiple times in the contact
+pair list -- once for each triangle it touches in the opposing model.
+But a given contact pair will appear only once in the list.
+
+Theoretically it is possible for each of n triangles in one model to
+touch each of m triangles in another model, result in a list
+containing m n contact pairs.  If m and n are in the hundred thousands
+or millions, then the list could be quite long.  If RAPID is unable to
+allocate space for the contact list (or any other required structure),
+then RAPID_Collide() will return RAPID_ERR_COLLIDE_OUT_OF_MEMORY,
+instead of RAPID_OK.
+
+4.2 CONSTRUCTING A MODEL
+
+So, how did RAPID acquire the models in the first place, and how do
+the triangles get their id numbers?
+
+The client tells RAPID the shape of an object by allocating a
+RAPID_model object, and adding the model's triangles to it.  The
+following sequence of calls creates a pyramid model, consisting of six
+triangles.  Notice that the sqaure base of the pyramid must be built
+as two triangles.
+
+
+static double p0[3] = {0.0, 0.0, 1.0};   // top of pyramid
+static double p1[3] = {-.5, -.5, 0.0);   // SW corner
+static double p2[3] = {+.5, -.5, 0.0);   // SE corner
+static double p3[3] = {+.5, +.5, 0.0);   // NE corner
+static double p4[3] = {-.5, +.5, 0.0);   // NW corner
+
+RAPID_model *m = new RAPID_model;
+m->BeginModel();
+m->AddTri(p1, p2, p0, 0);         // south face
+m->AddTri(p2, p3, p0, 1);         // east face
+m->AddTri(p3, p4, p0, 2);         // north face
+m->AddTri(p4, p1, p0, 3);         // west face
+m->AddTri(p1, p4, p2, 4);         // bottom face
+m->AddTri(p2, p4, p3, 5);         // bottom face
+m->EndModel();
+
+
+Notice that each triangle is given an id number, as we add it to
+RAPID's object.  When RAPID reports contacts, these are the id numbers
+that get put into the contact_pair structures.
+
+The m->BeginModel() tells RAPID to prepare the object m for the
+addition of triangles.  Each subsequent m->AddTri(...) adds a triangle
+to the object m.  RAPID stores a copy of the triangle in m.  When
+m->EndModel() is called, RAPID knows you won't be adding any more
+triangles, and it then performs any necessary preprocessing.
+
+Any of these three procedures may attempt to allocate additional space
+for the model.  If the allocation fails, then the procedure will
+return RAPID_ERR_MODEL_OUT_OF_MEMORY.  Otherwise, a successful
+procedure call will return RAPID_OK.
+
+Note: the preprocessing step invoked by EndModel() may take a long
+time, depending on how large the model is, and what type of
+preprocessing is done.  Models containing hundreds of thousands of
+triangles may take many minutes on modern (1997) high performance
+workstations.
+
+Note: it is acceptable to overlap the BeginModel() and EndModel()
+pairs for different objects, as in the example below.
+
+
+RAPID_model *m1 = new RAPID_model;
+RAPID_model *m2 = new RAPID_model;
+m1->BeginModel();
+m1->AddTri(...);
+m2->BeginModel();
+m2->AddTri(...);
+m1->AddTri(...);
+m1->EndModel();
+m2->AddTri(...);
+m2->EndModel();
+
+
+The RAPID_model object can be destroyed with the usual C++ syntax,
+
+
+delete m1;
+delete m2;
+
+
+This frees the storage allocated for the model, of course.  
+
+To reload a model into a RAPID_model object, the BeginModel() call can
+be invoked again, which frees all associated storage.
+
+Once EndModel() completes, the model is said to have been processed.
+RAPID_Collide(), returns RAPID_ERR_UNPROCESSED_MODEL when passed
+unprocessed models.
+
+The usual build sequence for RAPID_model objects is BeginModel(),
+repeated AddTri(), followed by one EndModel(), and this entire
+sequence can be repeated.  However, any sequence of calls is safe --
+the system will not be corrupted.  For example, calling EndModel()
+when no triangles have been added yet will return an error message and
+leave the model in an unprocessed state.
+
+5 A DETAILED EXAMPLE
+
+Below is the complete source code for a sample client application
+using RAPID.  The client code builds two tori, and then determines 
+contact between them for various placements.
+
+
+
+#include "RAPID.H"
+#include <math.h>
+#include <stdio.h>
+
+#define LISTS 1
+
+main()
+{
+  // First, get a couple of RAPID_models in which to put our models
+
+  RAPID_model *b1 = new RAPID_model;
+  RAPID_model *b2 = new RAPID_model;
+  
+  // Then, load the models with triangles.  The following loads each 
+  // with a torus of 2*n1*n2 triangles.
+
+  fprintf(stderr, "loading tris into RAPID_model objects...");  fflush(stderr);
+  
+  double a = 1.0;  // major radius of the tori
+  double b = 0.2;  // minor radius of the tori
+
+  int n1 = 50;     // tori will have n1*n2*2 triangles each
+  int n2 = 50;
+
+  int uc, vc;
+  int count = 0;
+  
+  for(uc=0; uc<n1; uc++)
+    for(vc=0; vc<n2; vc++)
+      {
+        double u1 = (2.0*M_PI*uc) / n1; 
+        double u2 = (2.0*M_PI*(uc+1)) / n1; 
+        double v1 = (2.0*M_PI*vc) / n2; 
+        double v2 = (2.0*M_PI*(vc+1)) / n2; 
+
+        double p1[3], p2[3], p3[3], p4[3];
+
+        p1[0] = (a - b * cos(v1)) * cos(u1);
+        p2[0] = (a - b * cos(v1)) * cos(u2);
+        p3[0] = (a - b * cos(v2)) * cos(u1);
+        p4[0] = (a - b * cos(v2)) * cos(u2);
+        p1[1] = (a - b * cos(v1)) * sin(u1);
+        p2[1] = (a - b * cos(v1)) * sin(u2);
+        p3[1] = (a - b * cos(v2)) * sin(u1);
+        p4[1] = (a - b * cos(v2)) * sin(u2);
+        p1[2] = b * sin(v1);
+        p2[2] = b * sin(v1);
+        p3[2] = b * sin(v2);
+        p4[2] = b * sin(v2);
+
+        b1->AddTri(p1, p2, p3, count);
+        b1->AddTri(p4, p2, p3, count+1);
+        b2->AddTri(p1, p2, p3, count);
+        b2->AddTri(p4, p2, p3, count+1);
+
+        count += 2;
+      }
+  fprintf(stderr, "done\n");  fflush(stderr);
+  fprintf(stderr, "Tori have %d triangles each.\n", count);
+  fprintf(stderr, "building hierarchies...");  fflush(stderr);
+  b1->EndModel();
+  b2->EndModel();
+  fprintf(stderr, "done.\n"); fflush(stderr); 
+  
+  // Now we are free to call the interference detection routine.
+  // But first, construct the transformations which define the placement
+  // of our two hierarchies in world space:
+
+  // This placement causes them to overlap a large amount.
+
+  double R1[3][3], R2[3][3], T1[3], T2[3];
+  
+  R1[0][0] = R1[1][1] = R1[2][2] = 1.0;
+  R1[0][1] = R1[1][0] = R1[2][0] = 0.0;
+  R1[0][2] = R1[1][2] = R1[2][1] = 0.0;
+
+  R2[0][0] = R2[1][1] = R2[2][2] = 1.0;
+  R2[0][1] = R2[1][0] = R2[2][0] = 0.0;
+  R2[0][2] = R2[1][2] = R2[2][1] = 0.0;
+  
+  T1[0] = 1.0;  T1[1] = 0.0; T1[2] = 0.0;
+  T2[0] = 0.0;  T2[1] = 0.0; T2[2] = 0.0;
+
+  // Now we can perform a collision query:
+
+  RAPID_Collide(R1, T1, b1, R2, T2, b2, RAPID_ALL_CONTACTS);
+
+  // Looking at the report, we can see where all the contacts were, and
+  // also how many tests were necessary:
+
+  printf("All contacts between overlapping tori:\n");
+  
+  printf("Num box tests: %d\n", RAPID_num_box_tests);
+  printf("Num contact pairs: %d\n", RAPID_num_contacts);
+#if LISTS
+  int i;
+  for(i=0; i<RAPID_num_contacts; i++)
+    {
+      printf("\t contact %4d: tri %4d and tri %4d\n", 
+             i, RAPID_contact[i].id1, RAPID_contact[i].id2);
+    }
+#endif
+
+  // Notice the RAPID_ALL_CONTACTS flag we used in the call to collide().
+  // The alternative is to use the RAPID_FIRST_CONTACT flag, instead,
+  // so that the collide routine searches for contacts until it locates
+  // the first one.  It takes many many fewer tests to locate a single
+  // contact this way.
+
+  RAPID_Collide(R1, T1, b1, R2, T2, b2, RAPID_FIRST_CONTACT);
+
+  printf("First contact between overlapping tori:\n");
+  
+  printf("Num box tests: %d\n", RAPID_num_box_tests);
+  printf("Num contact pairs: %d\n", RAPID_num_contacts);
+#if LISTS
+  for(i=0; i<RAPID_num_contacts; i++)
+    {
+      printf("\t contact %4d: tri %4d and tri %4d\n", 
+             i, RAPID_contact[i].id1, RAPID_contact[i].id2);
+    }
+#endif
+
+  // By rotating one of them around the x-axis 90 degrees, they 
+  // are now interlocked, but not quite touching.
+
+  R1[0][0] = 1.0;  R1[0][1] = 0.0;  R1[0][2] = 0.0;
+  R1[1][0] = 0.0;  R1[1][1] = 0.0;  R1[1][2] =-1.0;
+  R1[2][0] = 0.0;  R1[2][1] = 1.0;  R1[2][2] = 0.0;
+  
+  RAPID_Collide(R1, T1, b1, R2, T2, b2, RAPID_FIRST_CONTACT);
+
+  printf("No contact between interlocked but nontouching tori:\n");
+  
+  printf("Num box tests: %d\n", RAPID_num_box_tests);
+  printf("Num contact pairs: %d\n", RAPID_num_contacts);
+#if LISTS
+  for(i=0; i<RAPID_num_contacts; i++)
+    {
+      printf("\t contact %4d: tri %4d and tri %4d\n", 
+             i, RAPID_contact[i].id1, RAPID_contact[i].id2);
+    }
+#endif
+
+  // By moving one of the tori closer to the other, they
+  // almost touch.  This is the case that requires a lot
+  // of work wiht methods which use bounding boxes of limited
+  // aspect ratio.  Oriented bounding boxes are more efficient
+  // at determining noncontact than spheres, octree, or axis-aligned
+  // bounding boxes for scenarios like this.  In this case, the interlocked
+  // tori are separated by 0.0001 at their closest point.
+
+
+  T1[0] = 1.5999;
+  
+  RAPID_Collide(R1, T1, b1, R2, T2, b2, RAPID_FIRST_CONTACT);
+
+  printf("Many tests required for interlocked but almost touching tori:\n");
+  
+  printf("Num box tests: %d\n", RAPID_num_box_tests);
+  printf("Num contact pairs: %d\n", RAPID_num_contacts);
+#if LISTS
+  for(i=0; i<RAPID_num_contacts; i++)
+    {
+      printf("\t contact %4d: tri %4d and tri %4d\n", 
+             i, RAPID_contact[i].id1, RAPID_contact[i].id2);
+    }
+#endif
+
+  return 0;  
+}
+
+
