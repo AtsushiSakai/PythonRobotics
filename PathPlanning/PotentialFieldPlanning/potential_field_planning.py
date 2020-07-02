@@ -9,6 +9,7 @@ https://www.cs.cmu.edu/~motionplanning/lecture/Chap4-Potential-Field_howie.pdf
 
 """
 
+from collections import deque
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -16,6 +17,8 @@ import matplotlib.pyplot as plt
 KP = 5.0  # attractive potential gain
 ETA = 100.0  # repulsive potential gain
 AREA_WIDTH = 30.0  # potential area width [m]
+# the number of previous positions used to check oscillations
+OSCILLATIONS_DETECTION_LENGTH = 3
 
 show_animation = True
 
@@ -84,6 +87,22 @@ def get_motion_model():
     return motion
 
 
+def oscillations_detection(previous_ids, ix, iy):
+    previous_ids.append((ix, iy))
+
+    if (len(previous_ids) > OSCILLATIONS_DETECTION_LENGTH):
+        previous_ids.popleft()
+
+    # check if contains any duplicates by copying into a set
+    previous_ids_set = set()
+    for index in previous_ids:
+        if index in previous_ids_set:
+            return True
+        else:
+            previous_ids_set.add(index)
+    return False
+
+
 def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
 
     # calc potential field
@@ -106,7 +125,7 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
 
     rx, ry = [sx], [sy]
     motion = get_motion_model()
-    previous_id = [(None, None)] * 3
+    previous_ids = deque()
 
     while d >= reso:
         minp = float("inf")
@@ -131,18 +150,9 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
         rx.append(xp)
         ry.append(yp)
 
-        if ((None, None) not in previous_id and
-                (previous_id[0] == previous_id[1]
-                 or previous_id[1] == previous_id[2]
-                 or previous_id[0] == previous_id[2])):
-            print("Oscillation detected!!!")
-            print(previous_id)
+        if (oscillations_detection(previous_ids, ix, iy)):
+            print("Oscillation detected at ({},{})!".format(ix, iy))
             break
-
-        # roll previous
-        previous_id[0] = previous_id[1]
-        previous_id[1] = previous_id[2]
-        previous_id[2] = (ix, iy)
 
         if show_animation:
             plt.plot(ix, iy, ".r")
