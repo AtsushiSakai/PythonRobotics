@@ -8,6 +8,3 @@ dependencies:
 - cvxpy
 - matplotlib
 - coverage
-# cvxpy cannot install by conda
-#- pip:
-#    - cvxpy
