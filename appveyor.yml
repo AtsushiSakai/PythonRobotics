@@ -36,7 +36,8 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - conda env create -f C:\\projects\pythonrobotics\environment.yml
+  # - conda env create -f C:\\projects\pythonrobotics\environment.yml
+  - conda create --name python_robotics --file C:\\projects\pythonrobotics\requirements.txt
   - activate python_robotics
 
   # Check that we have the expected version and architecture for Python
