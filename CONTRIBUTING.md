@@ -18,6 +18,6 @@ Please check this paper to understand the philosophy of this project.
 
 ## Check your Python version.
 
-We only accept a PR for Python 3.6.x or higher.
+We only accept a PR for Python 3.8.x or higher.
 
 We will not accept a PR for Python 2.x.
