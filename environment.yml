@@ -5,8 +5,9 @@ dependencies:
 - scipy
 - numpy
 - pandas
-- matplotlib
 - cvxpy
+- matplotlib
 - coverage
+# cvxpy cannot install by conda
 #- pip:
 #    - cvxpy

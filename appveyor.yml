@@ -34,6 +34,7 @@ install:
   - SET PATH=%PYTHON%;%PYTHON%\Scripts;%PYTHON%\Library\bin;%PATH%
   - SET PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin
   - conda config --set always_yes yes --set changeps1 no
+  - conda config --append channels conda-forge
   - conda update -q conda
   - conda info -a
   - conda env create -f C:\\projects\pythonrobotics\environment.yml
