@@ -16,7 +16,7 @@ import numpy as np
 from scipy import ndimage
 
 
-def transform(gridmap:np.ndarray, src:tuple, distance_type='chessboard', transform_type='path', alpha=0.01):
+def transform(gridmap, src, distance_type='chessboard', transform_type='path', alpha=0.01):
     """transform
     
     calculating transform of transform_type from source in the given distance_type 
@@ -82,7 +82,7 @@ def transform(gridmap:np.ndarray, src:tuple, distance_type='chessboard', transfo
     return T
 
 
-def wavefront(T:np.ndarray, start:tuple, goal:tuple):
+def wavefront(T, start, goal):
     """wavefront
 
     performing wavefront coverage path planning
@@ -138,7 +138,7 @@ def wavefront(T:np.ndarray, start:tuple, goal:tuple):
             if ilast != 0:
                 print('backtracing to [%d, %d]'%(cur[0], cur[1]))
     
-    path.append((goal[0],goal[1]))
+    path.append(goal)
 
     return path
 
