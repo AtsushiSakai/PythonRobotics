@@ -2,7 +2,8 @@
 Distance/Path Transform Wavefront Coverage Path Planner
 
 author: Todd Tang
-paper: Planning paths of complete coverage of an unstructured environment by a mobile robot - Zelinsky et.al. 
+paper: Planning paths of complete coverage of an unstructured environment
+         by a mobile robot - Zelinsky et.al.
 link: http://pinkwink.kr/attachment/cfile3.uf@1354654A4E8945BD13FE77.pdf
 """
 
@@ -16,16 +17,20 @@ import numpy as np
 from scipy import ndimage
 
 
-def transform(gridmap, src, distance_type='chessboard', transform_type='path', alpha=0.01):
+def transform(
+    gridmap, src, distance_type='chessboard',
+    transform_type='path', alpha=0.01
+):
     """transform
-    
-    calculating transform of transform_type from source in the given distance_type 
+
+    calculating transform of transform_type from src
+    in given distance_type
 
     :param gridmap: 2d binary map
     :param src: distance transform source
     :param distance_type: type of distance used
     :param transform_type: type of transform used
-    :param alpha: weight for Obstacle Transform used in path_transform calculating 
+    :param alpha: weight of Obstacle Transform usedwhen using path_transform
     """
 
     nrows, ncols = gridmap.shape
@@ -34,8 +39,8 @@ def transform(gridmap, src, distance_type='chessboard', transform_type='path', a
         print('Empty gridmap')
         return
 
-    order = [[0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1]]
-    
+    order = [[0, 1], [1, 1], [1, 0], [1, -1],
+             [0, -1], [-1, -1], [-1, 0], [-1, 1]]
     if distance_type == 'chessboard':
         cost = [1, 1, 1, 1, 1, 1, 1, 1]
     elif distance_type == 'eculidean':
@@ -46,7 +51,6 @@ def transform(gridmap, src, distance_type='chessboard', transform_type='path', a
 
     T = float('inf') * np.ones_like(gridmap, dtype=np.float)
     T[src[0], src[1]] = 0
-    
     if transform_type == 'distance':
         eT = np.zeros_like(gridmap)
     elif transform_type == 'path':
@@ -60,10 +64,8 @@ def transform(gridmap, src, distance_type='chessboard', transform_type='path', a
         for j in range(ncols):
             if gridmap[i][j] == 1.0:
                 T[i][j] = float('inf')
-    
     is_visited = np.zeros_like(T, dtype=bool)
     is_visited[src[0], src[1]] = True
-    
     queue = [src]
     calculated = [(src[0]-1)*ncols + src[1]]
 
@@ -72,10 +74,12 @@ def transform(gridmap, src, distance_type='chessboard', transform_type='path', a
         for k, inc in enumerate(order):
             ni = i + inc[0]
             nj = j + inc[1]
-            if ni >= 0 and ni < nrows and nj >= 0 and nj < ncols and not gridmap[ni][nj]:
+            if ni >= 0 and ni < nrows and nj >= 0 and nj < ncols \
+                    and not gridmap[ni][nj]:
                 is_visited[i][j] = True
-                T[i][j] = min(T[i][j], T[ni][nj] + cost[k] + alpha * eT[ni][nj])
-                if not is_visited[ni][nj] and ((ni-1)*ncols + nj) not in calculated:
+                T[i][j] = min(T[i][j], T[ni][nj] + cost[k] + alpha*eT[ni][nj])
+                if not is_visited[ni][nj] and ((ni-1)*ncols + nj) \
+                        not in calculated:
                     queue.append((ni, nj))
                     calculated.append((ni-1)*ncols + nj)
 
@@ -97,16 +101,19 @@ def wavefront(T, start, goal):
     nrows, ncols = T.shape
 
     if start[0] >= goal[0] and start[1] >= goal[1]:
-        order = [[1, 0], [0, 1], [-1, 0], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]
+        order = [[1, 0], [0, 1], [-1, 0], [0, -1],
+                 [1, 1], [1, -1], [-1, 1], [-1, -1]]
     elif start[0] <= goal[0] and start[1] >= goal[1]:
-        order = [[-1, 0], [0, 1], [1, 0], [0, -1], [-1, 1], [-1, -1], [1, 1], [1, -1]]
+        order = [[-1, 0], [0, 1], [1, 0], [0, -1],
+                 [-1, 1], [-1, -1], [1, 1], [1, -1]]
     elif start[0] >= goal[0] and start[1] <= goal[1]:
-        order = [[1, 0], [0, -1], [-1, 0], [0, 1], [1, -1], [-1, -1], [1, 1], [-1, 1]]
+        order = [[1, 0], [0, -1], [-1, 0], [0, 1],
+                 [1, -1], [-1, -1], [1, 1], [-1, 1]]
     elif start[0] <= goal[0] and start[1] <= goal[1]:
-        order = [[-1, 0], [0, -1], [0, 1], [1, 0], [-1, -1], [-1, 1], [1, -1], [1, 1]]
+        order = [[-1, 0], [0, -1], [0, 1], [1, 0],
+                 [-1, -1], [-1, 1], [1, -1], [1, 1]]
     else:
         return
-    
     cur = start
     is_visited = np.zeros_like(T, dtype=bool)
 
@@ -123,10 +130,11 @@ def wavefront(T, start, goal):
             for ci, cj in order:
                 ni, nj = cur[0] + ci, cur[1] + cj
                 if ni >= 0 and ni < nrows and nj >= 0 and nj < ncols \
-                    and not is_visited[ni][nj] and T[ni][nj] != float('inf'):
-                    if T[ni][nj] > max_T:
-                        imax = (ni, nj)
-                        max_T = T[ni][nj]
+                        and not is_visited[ni][nj] \
+                        and T[ni][nj] != float('inf') \
+                        and T[ni][nj] > max_T:
+                    imax = (ni, nj)
+                    max_T = T[ni][nj]
 
             if imax != (-1, -1):
                 break
@@ -136,8 +144,7 @@ def wavefront(T, start, goal):
         else:
             cur = imax
             if ilast != 0:
-                print('backtracing to [%d, %d]'%(cur[0], cur[1]))
-    
+                print('backtracing to [%d, %d]' % (cur[0], cur[1]))
     path.append(goal)
 
     return path
@@ -173,14 +180,15 @@ def viz_plan(grid_map, start, goal, path, resolution):
 
 if __name__ == "__main__":
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    img = cv2.imread(os.path.join(dir_path, 'map', 'test.png'), cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread(
+            os.path.join(dir_path, 'map', 'test.png'),
+            cv2.IMREAD_GRAYSCALE)
     img = 1 - img / 255
 
     start = (43, 0)
     goal = (0, 0)
 
     do_animation = True
-    
     # distance transform wavefront
     DT = transform(img, goal, transform_type='distance')
     DT_path = wavefront(DT, start, goal)
