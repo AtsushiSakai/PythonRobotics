@@ -24,7 +24,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install coveralls
     - name: install coverage
       run: pip install coverage
     - name: install mypy
@@ -44,10 +43,6 @@ jobs:
         find SLAM -name "*.py" | xargs mypy
     - name: do diff style check
       run: bash rundiffstylecheck.sh
-    - name: Coveralls
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: coveralls
     - name: do all unit tests
       run: bash runtests.sh
 
