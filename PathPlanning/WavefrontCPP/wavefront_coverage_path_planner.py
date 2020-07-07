@@ -16,6 +16,9 @@ import numpy as np
 from scipy import ndimage
 
 
+do_animation = True
+
+
 def transform(
     gridmap, src, distance_type='chessboard',
     transform_type='path', alpha=0.01
@@ -191,7 +194,6 @@ if __name__ == "__main__":
     start = (43, 0)
     goal = (0, 0)
 
-    do_animation = True
     # distance transform wavefront
     DT = transform(img, goal, transform_type='distance')
     DT_path = wavefront(DT, start, goal)
