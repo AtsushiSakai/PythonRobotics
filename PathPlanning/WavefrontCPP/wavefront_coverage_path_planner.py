@@ -148,7 +148,7 @@ def viz_plan(map, start, goal, path, resolution):
     px, py = np.transpose(np.flipud(np.fliplr((path))))
 
     if not do_animation:
-        plt.matshow(T, cmap='Greys')
+        plt.matshow(map, cmap='Greys')
         plt.plot(ox, oy, "-xy")
         plt.plot(px, py, "-r")
         plt.plot(gx, gy, "-pg")
