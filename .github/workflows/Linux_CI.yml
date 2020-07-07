@@ -44,12 +44,12 @@ jobs:
         find SLAM -name "*.py" | xargs mypy
     - name: do diff style check
       run: bash rundiffstylecheck.sh
+    - name: Coveralls
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: coveralls
     - name: do all unit tests
       run: bash runtests.sh
-    - name: Coveralls GitHub Action
-      uses: coverallsapp/github-action@v1.1.1
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
 
 
 
