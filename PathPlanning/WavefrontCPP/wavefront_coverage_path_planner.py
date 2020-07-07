@@ -138,7 +138,7 @@ def wavefront(T:np.ndarray, start:tuple, goal:tuple):
             if ilast != 0:
                 print('backtracing to [%d, %d]'%(cur[0], cur[1]))
     
-    path.append(goal)
+    path.append((goal[0],goal[1]))
 
     return path
 
