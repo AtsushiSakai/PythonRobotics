@@ -8,8 +8,7 @@ link: http://pinkwink.kr/attachment/cfile3.uf@1354654A4E8945BD13FE77.pdf
 """
 
 import os
-
-import cv2
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -36,18 +35,16 @@ def transform(
     nrows, ncols = gridmap.shape
 
     if nrows == 0 or ncols == 0:
-        print('Empty gridmap')
-        return
+        sys.exit('Empty gridmap.')
 
-    order = [[0, 1], [1, 1], [1, 0], [1, -1],
-             [0, -1], [-1, -1], [-1, 0], [-1, 1]]
+    inc_order = [[0, 1], [1, 1], [1, 0], [1, -1],
+                 [0, -1], [-1, -1], [-1, 0], [-1, 1]]
     if distance_type == 'chessboard':
         cost = [1, 1, 1, 1, 1, 1, 1, 1]
     elif distance_type == 'eculidean':
         cost = [1, np.sqrt(2), 1, np.sqrt(2), 1, np.sqrt(2), 1, np.sqrt(2)]
     else:
-        print('Unsupported distance type.')
-        return
+        sys.exit('Unsupported distance type.')
 
     T = float('inf') * np.ones_like(gridmap, dtype=np.float)
     T[src[0], src[1]] = 0
@@ -56,8 +53,7 @@ def transform(
     elif transform_type == 'path':
         eT = ndimage.distance_transform_cdt(1-gridmap, distance_type)
     else:
-        print('Unsupported transform type.')
-        return
+        sys.exit('Unsupported transform type.')
 
     # set obstacle T value to infinity
     for i in range(nrows):
@@ -71,7 +67,7 @@ def transform(
 
     while queue != []:
         i, j = queue.pop(0)
-        for k, inc in enumerate(order):
+        for k, inc in enumerate(inc_order):
             ni = i + inc[0]
             nj = j + inc[1]
             if ni >= 0 and ni < nrows and nj >= 0 and nj < ncols \
@@ -97,23 +93,35 @@ def wavefront(T, start, goal):
     """
 
     path = []
-
     nrows, ncols = T.shape
 
-    if start[0] >= goal[0] and start[1] >= goal[1]:
-        order = [[1, 0], [0, 1], [-1, 0], [0, -1],
-                 [1, 1], [1, -1], [-1, 1], [-1, -1]]
-    elif start[0] <= goal[0] and start[1] >= goal[1]:
-        order = [[-1, 0], [0, 1], [1, 0], [0, -1],
-                 [-1, 1], [-1, -1], [1, 1], [1, -1]]
-    elif start[0] >= goal[0] and start[1] <= goal[1]:
-        order = [[1, 0], [0, -1], [-1, 0], [0, 1],
-                 [1, -1], [-1, -1], [1, 1], [-1, 1]]
-    elif start[0] <= goal[0] and start[1] <= goal[1]:
-        order = [[-1, 0], [0, -1], [0, 1], [1, 0],
-                 [-1, -1], [-1, 1], [1, -1], [1, 1]]
-    else:
-        return
+    def get_search_order_increment(start, goal):
+        if start[0] >= goal[0] and start[1] >= goal[1]:
+            order = [[1, 0], [0, 1], [-1, 0], [0, -1],
+                     [1, 1], [1, -1], [-1, 1], [-1, -1]]
+        elif start[0] <= goal[0] and start[1] >= goal[1]:
+            order = [[-1, 0], [0, 1], [1, 0], [0, -1],
+                     [-1, 1], [-1, -1], [1, 1], [1, -1]]
+        elif start[0] >= goal[0] and start[1] <= goal[1]:
+            order = [[1, 0], [0, -1], [-1, 0], [0, 1],
+                     [1, -1], [-1, -1], [1, 1], [-1, 1]]
+        elif start[0] <= goal[0] and start[1] <= goal[1]:
+            order = [[-1, 0], [0, -1], [0, 1], [1, 0],
+                     [-1, -1], [-1, 1], [1, -1], [1, 1]]
+        else:
+            sys.exit('get_search_order_increment: cannot determine \
+                start=>goal increment order')
+        return order
+
+    def is_valid_neighbor(i, j):
+        is_i_valid_bounded = i >= 0 and i < nrows
+        is_j_valid_bounded = j >= 0 and j < ncols
+        if is_i_valid_bounded and is_j_valid_bounded:
+            return not is_visited[i][j] and T[i][j] != float('inf')
+        return False
+
+    inc_order = get_search_order_increment(start, goal)
+
     cur = start
     is_visited = np.zeros_like(T, dtype=bool)
 
@@ -126,13 +134,10 @@ def wavefront(T, start, goal):
         imax = (-1, -1)
         ilast = 0
         for ilast in range(len(path)):
-            cur = path[-1-ilast]
-            for ci, cj in order:
+            cur = path[-1-ilast]  # get lastest point in path
+            for ci, cj in inc_order:
                 ni, nj = cur[0] + ci, cur[1] + cj
-                if ni >= 0 and ni < nrows and nj >= 0 and nj < ncols \
-                        and not is_visited[ni][nj] \
-                        and T[ni][nj] != float('inf') \
-                        and T[ni][nj] > max_T:
+                if is_valid_neighbor(ni, nj) and T[ni][nj] > max_T:
                     imax = (ni, nj)
                     max_T = T[ni][nj]
 
@@ -180,10 +185,8 @@ def viz_plan(grid_map, start, goal, path, resolution):
 
 if __name__ == "__main__":
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    img = cv2.imread(
-            os.path.join(dir_path, 'map', 'test.png'),
-            cv2.IMREAD_GRAYSCALE)
-    img = 1 - img / 255
+    img = plt.imread(os.path.join(dir_path, 'map', 'test.png'))
+    img = 1 - img  # revert pixel values
 
     start = (43, 0)
     goal = (0, 0)
