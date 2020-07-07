@@ -110,82 +110,87 @@ class BipedalPlanner(object):
 
             # plot
             if plot:
-                # for plot trajectory, plot in for loop
-                for c in range(len(self.com_trajectory)):
-                    if c > len(com_trajectory_for_plot):
-                        # set up plotter
-                        plt.cla()
-                        # for stopping simulation with the esc key.
-                        plt.gcf().canvas.mpl_connect(
-                            'key_release_event',
-                            lambda event:
-                            [exit(0) if event.key == 'escape' else None])
-                        ax.set_zlim(0, z_c * 2)
-                        ax.set_xlim(0, 1)
-                        ax.set_ylim(-0.5, 0.5)
-
-                        # update com_trajectory_for_plot
-                        com_trajectory_for_plot.append(self.com_trajectory[c])
-
-                        # plot com
-                        ax.plot([p[0] for p in com_trajectory_for_plot],
-                                [p[1] for p in com_trajectory_for_plot], [
-                                    0 for _ in com_trajectory_for_plot],
-                                color="red")
-
-                        # plot inverted pendulum
-                        ax.plot([px_star, com_trajectory_for_plot[-1][0]],
-                                [py_star, com_trajectory_for_plot[-1][1]],
-                                [0, z_c], color="green", linewidth=3)
-                        ax.scatter([com_trajectory_for_plot[-1][0]],
-                                   [com_trajectory_for_plot[-1][1]],
-                                   [z_c], color="green", s=300)
-
-                        # foot rectangle for self.ref_p
-                        foot_width = 0.06
-                        foot_height = 0.04
-                        for j in range(len(self.ref_p)):
-                            angle = self.ref_p[j][2] + \
-                                    math.atan2(foot_height,
-                                               foot_width) - math.pi
-                            r = math.sqrt(
-                                math.pow(foot_width / 3., 2) + math.pow(
-                                    foot_height / 2., 2))
-                            rec = pat.Rectangle(xy=(
-                                self.ref_p[j][0] + r * math.cos(angle),
-                                self.ref_p[j][1] + r * math.sin(angle)),
-                                width=foot_width,
-                                height=foot_height,
-                                angle=self.ref_p[j][
-                                          2] * 180 / math.pi,
-                                color="blue", fill=False,
-                                ls=":")
-                            ax.add_patch(rec)
-                            art3d.pathpatch_2d_to_3d(rec, z=0, zdir="z")
-
-                        # foot rectangle for self.act_p
-                        for j in range(len(self.act_p)):
-                            angle = self.act_p[j][2] + \
-                                    math.atan2(foot_height,
-                                               foot_width) - math.pi
-                            r = math.sqrt(
-                                math.pow(foot_width / 3., 2) + math.pow(
-                                    foot_height / 2., 2))
-                            rec = pat.Rectangle(xy=(
-                                self.act_p[j][0] + r * math.cos(angle),
-                                self.act_p[j][1] + r * math.sin(angle)),
-                                width=foot_width,
-                                height=foot_height,
-                                angle=self.act_p[j][
-                                          2] * 180 / math.pi,
-                                color="blue", fill=False)
-                            ax.add_patch(rec)
-                            art3d.pathpatch_2d_to_3d(rec, z=0, zdir="z")
-
-                        plt.draw()
-                        plt.pause(0.001)
+                self.plot_animation(ax, com_trajectory_for_plot, px_star,
+                                    py_star, z_c)
         if plot:
             plt.show()
+
+    def plot_animation(self, ax, com_trajectory_for_plot, px_star, py_star,
+                       z_c):  # pragma: no cover
+        # for plot trajectory, plot in for loop
+        for c in range(len(self.com_trajectory)):
+            if c > len(com_trajectory_for_plot):
+                # set up plotter
+                plt.cla()
+                # for stopping simulation with the esc key.
+                plt.gcf().canvas.mpl_connect(
+                    'key_release_event',
+                    lambda event:
+                    [exit(0) if event.key == 'escape' else None])
+                ax.set_zlim(0, z_c * 2)
+                ax.set_xlim(0, 1)
+                ax.set_ylim(-0.5, 0.5)
+
+                # update com_trajectory_for_plot
+                com_trajectory_for_plot.append(self.com_trajectory[c])
+
+                # plot com
+                ax.plot([p[0] for p in com_trajectory_for_plot],
+                        [p[1] for p in com_trajectory_for_plot], [
+                            0 for _ in com_trajectory_for_plot],
+                        color="red")
+
+                # plot inverted pendulum
+                ax.plot([px_star, com_trajectory_for_plot[-1][0]],
+                        [py_star, com_trajectory_for_plot[-1][1]],
+                        [0, z_c], color="green", linewidth=3)
+                ax.scatter([com_trajectory_for_plot[-1][0]],
+                           [com_trajectory_for_plot[-1][1]],
+                           [z_c], color="green", s=300)
+
+                # foot rectangle for self.ref_p
+                foot_width = 0.06
+                foot_height = 0.04
+                for j in range(len(self.ref_p)):
+                    angle = self.ref_p[j][2] + \
+                            math.atan2(foot_height,
+                                       foot_width) - math.pi
+                    r = math.sqrt(
+                        math.pow(foot_width / 3., 2) + math.pow(
+                            foot_height / 2., 2))
+                    rec = pat.Rectangle(xy=(
+                        self.ref_p[j][0] + r * math.cos(angle),
+                        self.ref_p[j][1] + r * math.sin(angle)),
+                        width=foot_width,
+                        height=foot_height,
+                        angle=self.ref_p[j][
+                                  2] * 180 / math.pi,
+                        color="blue", fill=False,
+                        ls=":")
+                    ax.add_patch(rec)
+                    art3d.pathpatch_2d_to_3d(rec, z=0, zdir="z")
+
+                # foot rectangle for self.act_p
+                for j in range(len(self.act_p)):
+                    angle = self.act_p[j][2] + \
+                            math.atan2(foot_height,
+                                       foot_width) - math.pi
+                    r = math.sqrt(
+                        math.pow(foot_width / 3., 2) + math.pow(
+                            foot_height / 2., 2))
+                    rec = pat.Rectangle(xy=(
+                        self.act_p[j][0] + r * math.cos(angle),
+                        self.act_p[j][1] + r * math.sin(angle)),
+                        width=foot_width,
+                        height=foot_height,
+                        angle=self.act_p[j][
+                                  2] * 180 / math.pi,
+                        color="blue", fill=False)
+                    ax.add_patch(rec)
+                    art3d.pathpatch_2d_to_3d(rec, z=0, zdir="z")
+
+                plt.draw()
+                plt.pause(0.001)
 
 
 if __name__ == "__main__":
