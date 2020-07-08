@@ -40,7 +40,7 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
 
     x_traj, y_traj = [], []
 
-    rho = np.sqrt(x_diff**2 + y_diff**2)
+    rho = np.hypot(x_diff, y_diff)
     while rho > 0.001:
         x_traj.append(x)
         y_traj.append(y)
@@ -52,7 +52,7 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
         # [-pi, pi] to prevent unstable behavior e.g. difference going
         # from 0 rad to 2*pi rad with slight turn
 
-        rho = np.sqrt(x_diff**2 + y_diff**2)
+        rho = np.hypot(x_diff, y_diff)
         alpha = (np.arctan2(y_diff, x_diff)
                  - theta + np.pi) % (2 * np.pi) - np.pi
         beta = (theta_goal - theta - alpha + np.pi) % (2 * np.pi) - np.pi
@@ -92,6 +92,10 @@ def plot_vehicle(x, y, theta, x_traj, y_traj):  # pragma: no cover
     plt.plot([p3[0], p1[0]], [p3[1], p1[1]], 'k-')
 
     plt.plot(x_traj, y_traj, 'b--')
+
+    # for stopping simulation with the esc key.
+    plt.gcf().canvas.mpl_connect('key_release_event',
+            lambda event: [exit(0) if event.key == 'escape' else None])
 
     plt.xlim(0, 20)
     plt.ylim(0, 20)

@@ -3,6 +3,25 @@
 Getting Started
 ===============
 
+What is this?
+-------------
+
+This is an Open Source Software (OSS) project: PythonRobotics, which is a Python code collection of robotics algorithms.
+
+The focus of the project is on autonomous navigation, and the goal is for beginners in robotics to understand the basic ideas behind each algorithm.
+
+In this project, the algorithms which are practical and widely used in both academia and industry are selected.
+
+Each sample code is written in Python3 and only depends on some standard modules for readability and ease of use. 
+
+It includes intuitive animations to understand the behavior of the simulation.
+
+
+See this paper for more details:
+
+- PythonRobotics: a Python code collection of robotics algorithms: https://arxiv.org/abs/1808.10703
+
+
 Requirements
 -------------
 

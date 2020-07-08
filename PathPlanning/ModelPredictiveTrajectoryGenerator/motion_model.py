@@ -36,6 +36,11 @@ def generate_trajectory(s, km, kf, k0):
 
     n = s / ds
     time = s / v  # [s]
+    
+    if isinstance(time, type(np.array([]))): time = time[0]
+    if isinstance(km, type(np.array([]))): km = km[0]
+    if isinstance(kf, type(np.array([]))): kf = kf[0]
+    
     tk = np.array([0.0, time / 2.0, time])
     kk = np.array([k0, km, kf])
     t = np.arange(0.0, time, time / n)
@@ -62,6 +67,11 @@ def generate_last_state(s, km, kf, k0):
 
     n = s / ds
     time = s / v  # [s]
+    
+    if isinstance(time,  type(np.array([]))): time = time[0]
+    if isinstance(km, type(np.array([]))): km = km[0]
+    if isinstance(kf, type(np.array([]))): kf = kf[0]
+    
     tk = np.array([0.0, time / 2.0, time])
     kk = np.array([k0, km, kf])
     t = np.arange(0.0, time, time / n)

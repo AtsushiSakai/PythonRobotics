@@ -55,7 +55,7 @@ def two_joint_arm(GOAL_TH=0.0, theta1=0.0, theta2=0.0):
         wrist = plot_arm(theta1, theta2, x, y)
 
         # check goal
-        d2goal = np.math.sqrt((wrist[0] - x)**2 + (wrist[1] - y)**2)
+        d2goal = np.hypot(wrist[0] - x, wrist[1] - y)
 
         if abs(d2goal) < GOAL_TH and x is not None:
             return theta1, theta2
@@ -114,6 +114,9 @@ def animation():
 def main():  # pragma: no cover
     fig = plt.figure()
     fig.canvas.mpl_connect("button_press_event", click)
+    # for stopping simulation with the esc key.
+    fig.canvas.mpl_connect('key_release_event',
+            lambda event: [exit(0) if event.key == 'escape' else None])
     two_joint_arm()
 
 

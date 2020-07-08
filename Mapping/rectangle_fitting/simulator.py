@@ -10,15 +10,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 import random
+from scipy.spatial.transform import Rotation as Rot
 
 
-class VehicleSimulator():
+class VehicleSimulator:
 
-    def __init__(self, ix, iy, iyaw, iv, max_v, w, L):
-        self.x = ix
-        self.y = iy
-        self.yaw = iyaw
-        self.v = iv
+    def __init__(self, i_x, i_y, i_yaw, i_v, max_v, w, L):
+        self.x = i_x
+        self.y = i_y
+        self.yaw = i_yaw
+        self.v = i_v
         self.max_v = max_v
         self.W = w
         self.L = L
@@ -40,10 +41,10 @@ class VehicleSimulator():
         plt.plot(gx, gy, "--b")
 
     def calc_global_contour(self):
-        gx = [(ix * np.cos(self.yaw) + iy * np.sin(self.yaw)) +
-              self.x for (ix, iy) in zip(self.vc_x, self.vc_y)]
-        gy = [(ix * np.sin(self.yaw) - iy * np.cos(self.yaw)) +
-              self.y for (ix, iy) in zip(self.vc_x, self.vc_y)]
+        rot = Rot.from_euler('z', self.yaw).as_matrix()[0:2, 0:2]
+        gxy = np.stack([self.vc_x, self.vc_y]).T @ rot
+        gx = gxy[:, 0] + self.x
+        gy = gxy[:, 1] + self.y
 
         return gx, gy
 
@@ -67,69 +68,71 @@ class VehicleSimulator():
         self.vc_x.append(self.L / 2.0)
         self.vc_y.append(self.W / 2.0)
 
-        self.vc_x, self.vc_y = self._interporate(self.vc_x, self.vc_y)
+        self.vc_x, self.vc_y = self._interpolate(self.vc_x, self.vc_y)
 
-    def _interporate(self, x, y):
+    @staticmethod
+    def _interpolate(x, y):
         rx, ry = [], []
-        dtheta = 0.05
+        d_theta = 0.05
         for i in range(len(x) - 1):
-            rx.extend([(1.0 - θ) * x[i] + θ * x[i + 1]
-                       for θ in np.arange(0.0, 1.0, dtheta)])
-            ry.extend([(1.0 - θ) * y[i] + θ * y[i + 1]
-                       for θ in np.arange(0.0, 1.0, dtheta)])
+            rx.extend([(1.0 - theta) * x[i] + theta * x[i + 1]
+                       for theta in np.arange(0.0, 1.0, d_theta)])
+            ry.extend([(1.0 - theta) * y[i] + theta * y[i + 1]
+                       for theta in np.arange(0.0, 1.0, d_theta)])
 
-        rx.extend([(1.0 - θ) * x[len(x) - 1] + θ * x[1]
-                   for θ in np.arange(0.0, 1.0, dtheta)])
-        ry.extend([(1.0 - θ) * y[len(y) - 1] + θ * y[1]
-                   for θ in np.arange(0.0, 1.0, dtheta)])
+        rx.extend([(1.0 - theta) * x[len(x) - 1] + theta * x[1]
+                   for theta in np.arange(0.0, 1.0, d_theta)])
+        ry.extend([(1.0 - theta) * y[len(y) - 1] + theta * y[1]
+                   for theta in np.arange(0.0, 1.0, d_theta)])
 
         return rx, ry
 
 
-class LidarSimulator():
+class LidarSimulator:
 
     def __init__(self):
         self.range_noise = 0.01
 
-    def get_observation_points(self, vlist, angle_reso):
+    def get_observation_points(self, v_list, angle_resolution):
         x, y, angle, r = [], [], [], []
 
         # store all points
-        for v in vlist:
+        for v in v_list:
 
             gx, gy = v.calc_global_contour()
 
             for vx, vy in zip(gx, gy):
-                vangle = math.atan2(vy, vx)
+                v_angle = math.atan2(vy, vx)
                 vr = np.hypot(vx, vy) * random.uniform(1.0 - self.range_noise,
                                                        1.0 + self.range_noise)
 
                 x.append(vx)
                 y.append(vy)
-                angle.append(vangle)
+                angle.append(v_angle)
                 r.append(vr)
 
         # ray casting filter
-        rx, ry = self.ray_casting_filter(x, y, angle, r, angle_reso)
+        rx, ry = self.ray_casting_filter(angle, r, angle_resolution)
 
         return rx, ry
 
-    def ray_casting_filter(self, xl, yl, thetal, rangel, angle_reso):
+    @staticmethod
+    def ray_casting_filter(theta_l, range_l, angle_resolution):
         rx, ry = [], []
-        rangedb = [float("inf") for _ in range(
-            int(np.floor((np.pi * 2.0) / angle_reso)) + 1)]
+        range_db = [float("inf") for _ in range(
+            int(np.floor((np.pi * 2.0) / angle_resolution)) + 1)]
 
-        for i in range(len(thetal)):
-            angleid = int(round(thetal[i] / angle_reso))
+        for i in range(len(theta_l)):
+            angle_id = int(round(theta_l[i] / angle_resolution))
 
-            if rangedb[angleid] > rangel[i]:
-                rangedb[angleid] = rangel[i]
+            if range_db[angle_id] > range_l[i]:
+                range_db[angle_id] = range_l[i]
 
-        for i in range(len(rangedb)):
-            t = i * angle_reso
-            if rangedb[i] != float("inf"):
-                rx.append(rangedb[i] * np.cos(t))
-                ry.append(rangedb[i] * np.sin(t))
+        for i in range(len(range_db)):
+            t = i * angle_resolution
+            if range_db[i] != float("inf"):
+                rx.append(range_db[i] * np.cos(t))
+                ry.append(range_db[i] * np.sin(t))
 
         return rx, ry
 

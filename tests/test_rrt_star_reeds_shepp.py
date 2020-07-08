@@ -1,7 +1,7 @@
+import os
+import sys
 from unittest import TestCase
 
-import sys
-import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__))
                 + "/../PathPlanning/RRTStarReedsShepp/")
 sys.path.append(os.path.dirname(os.path.abspath(__file__))
@@ -20,7 +20,7 @@ class Test(TestCase):
 
     def test1(self):
         m.show_animation = False
-        m.main(maxIter=5)
+        m.main(max_iter=5)
 
 
 if __name__ == '__main__':  # pragma: no cover

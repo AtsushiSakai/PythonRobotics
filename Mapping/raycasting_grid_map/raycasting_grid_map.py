@@ -57,7 +57,7 @@ def precasting(minx, miny, xw, yw, xyreso, yawreso):
             px = ix * xyreso + minx
             py = iy * xyreso + miny
 
-            d = math.sqrt(px**2 + py**2)
+            d = math.hypot(px, py)
             angle = atan_zero_to_twopi(py, px)
             angleid = int(math.floor(angle / yawreso))
 
@@ -85,7 +85,7 @@ def generate_ray_casting_grid_map(ox, oy, xyreso, yawreso):
 
     for (x, y) in zip(ox, oy):
 
-        d = math.sqrt(x**2 + y**2)
+        d = math.hypot(x, y)
         angle = atan_zero_to_twopi(y, x)
         angleid = int(math.floor(angle / yawreso))
 
@@ -124,6 +124,9 @@ def main():
 
         if show_animation:  # pragma: no cover
             plt.cla()
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             draw_heatmap(pmap, minx, maxx, miny, maxy, xyreso)
             plt.plot(ox, oy, "xr")
             plt.plot(0.0, 0.0, "ob")

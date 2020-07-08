@@ -5,10 +5,10 @@ Reeds Shepp path planner sample code
 author Atsushi Sakai(@Atsushi_twi)
 
 """
-import numpy as np
 import math
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+import numpy as np
 
 show_animation = True
 
@@ -49,15 +49,15 @@ def mod2pi(x):
     return v
 
 
-def SLS(x, y, phi):
+def straight_left_straight(x, y, phi):
     phi = mod2pi(phi)
-    if y > 0.0 and phi > 0.0 and phi < math.pi * 0.99:
+    if y > 0.0 and 0.0 < phi < math.pi * 0.99:
         xd = - y / math.tan(phi) + x
         t = xd - math.tan(phi / 2.0)
         u = phi
         v = math.sqrt((x - xd) ** 2 + y ** 2) - math.tan(phi / 2.0)
         return True, t, u, v
-    elif y < 0.0 and phi > 0.0 and phi < math.pi * 0.99:
+    elif y < 0.0 < phi < math.pi * 0.99:
         xd = - y / math.tan(phi) + x
         t = xd - math.tan(phi / 2.0)
         u = phi
@@ -68,7 +68,6 @@ def SLS(x, y, phi):
 
 
 def set_path(paths, lengths, ctypes):
-
     path = Path()
     path.ctypes = ctypes
     path.lengths = lengths
@@ -89,12 +88,12 @@ def set_path(paths, lengths, ctypes):
     return paths
 
 
-def SCS(x, y, phi, paths):
-    flag, t, u, v = SLS(x, y, phi)
+def straight_curve_straight(x, y, phi, paths):
+    flag, t, u, v = straight_left_straight(x, y, phi)
     if flag:
         paths = set_path(paths, [t, u, v], ["S", "L", "S"])
 
-    flag, t, u, v = SLS(x, -y, -phi)
+    flag, t, u, v = straight_left_straight(x, -y, -phi)
     if flag:
         paths = set_path(paths, [t, u, v], ["S", "R", "S"])
 
@@ -107,7 +106,7 @@ def polar(x, y):
     return r, theta
 
 
-def LSL(x, y, phi):
+def left_straight_left(x, y, phi):
     u, t = polar(x - math.sin(phi), y - 1.0 + math.cos(phi))
     if t >= 0.0:
         v = mod2pi(phi - t)
@@ -117,7 +116,7 @@ def LSL(x, y, phi):
     return False, 0.0, 0.0, 0.0
 
 
-def LRL(x, y, phi):
+def left_right_left(x, y, phi):
     u1, t1 = polar(x - math.sin(phi), y - 1.0 + math.cos(phi))
 
     if u1 <= 4.0:
@@ -125,91 +124,89 @@ def LRL(x, y, phi):
         t = mod2pi(t1 + 0.5 * u + math.pi)
         v = mod2pi(phi - t + u)
 
-        if t >= 0.0 and u <= 0.0:
+        if t >= 0.0 >= u:
             return True, t, u, v
 
     return False, 0.0, 0.0, 0.0
 
 
-def CCC(x, y, phi, paths):
-
-    flag, t, u, v = LRL(x, y, phi)
+def curve_curve_curve(x, y, phi, paths):
+    flag, t, u, v = left_right_left(x, y, phi)
     if flag:
         paths = set_path(paths, [t, u, v], ["L", "R", "L"])
 
-    flag, t, u, v = LRL(-x, y, -phi)
+    flag, t, u, v = left_right_left(-x, y, -phi)
     if flag:
         paths = set_path(paths, [-t, -u, -v], ["L", "R", "L"])
 
-    flag, t, u, v = LRL(x, -y, -phi)
+    flag, t, u, v = left_right_left(x, -y, -phi)
     if flag:
         paths = set_path(paths, [t, u, v], ["R", "L", "R"])
 
-    flag, t, u, v = LRL(-x, -y, phi)
+    flag, t, u, v = left_right_left(-x, -y, phi)
     if flag:
         paths = set_path(paths, [-t, -u, -v], ["R", "L", "R"])
 
     # backwards
     xb = x * math.cos(phi) + y * math.sin(phi)
     yb = x * math.sin(phi) - y * math.cos(phi)
-    # println(xb, ",", yb,",",x,",",y)
 
-    flag, t, u, v = LRL(xb, yb, phi)
+    flag, t, u, v = left_right_left(xb, yb, phi)
     if flag:
         paths = set_path(paths, [v, u, t], ["L", "R", "L"])
 
-    flag, t, u, v = LRL(-xb, yb, -phi)
+    flag, t, u, v = left_right_left(-xb, yb, -phi)
     if flag:
         paths = set_path(paths, [-v, -u, -t], ["L", "R", "L"])
 
-    flag, t, u, v = LRL(xb, -yb, -phi)
+    flag, t, u, v = left_right_left(xb, -yb, -phi)
     if flag:
         paths = set_path(paths, [v, u, t], ["R", "L", "R"])
 
-    flag, t, u, v = LRL(-xb, -yb, phi)
+    flag, t, u, v = left_right_left(-xb, -yb, phi)
     if flag:
         paths = set_path(paths, [-v, -u, -t], ["R", "L", "R"])
 
     return paths
 
 
-def CSC(x, y, phi, paths):
-    flag, t, u, v = LSL(x, y, phi)
+def curve_straight_curve(x, y, phi, paths):
+    flag, t, u, v = left_straight_left(x, y, phi)
     if flag:
         paths = set_path(paths, [t, u, v], ["L", "S", "L"])
 
-    flag, t, u, v = LSL(-x, y, -phi)
+    flag, t, u, v = left_straight_left(-x, y, -phi)
     if flag:
         paths = set_path(paths, [-t, -u, -v], ["L", "S", "L"])
 
-    flag, t, u, v = LSL(x, -y, -phi)
+    flag, t, u, v = left_straight_left(x, -y, -phi)
     if flag:
         paths = set_path(paths, [t, u, v], ["R", "S", "R"])
 
-    flag, t, u, v = LSL(-x, -y, phi)
+    flag, t, u, v = left_straight_left(-x, -y, phi)
     if flag:
         paths = set_path(paths, [-t, -u, -v], ["R", "S", "R"])
 
-    flag, t, u, v = LSR(x, y, phi)
+    flag, t, u, v = left_straight_right(x, y, phi)
     if flag:
         paths = set_path(paths, [t, u, v], ["L", "S", "R"])
 
-    flag, t, u, v = LSR(-x, y, -phi)
+    flag, t, u, v = left_straight_right(-x, y, -phi)
     if flag:
         paths = set_path(paths, [-t, -u, -v], ["L", "S", "R"])
 
-    flag, t, u, v = LSR(x, -y, -phi)
+    flag, t, u, v = left_straight_right(x, -y, -phi)
     if flag:
         paths = set_path(paths, [t, u, v], ["R", "S", "L"])
 
-    flag, t, u, v = LSR(-x, -y, phi)
+    flag, t, u, v = left_straight_right(-x, -y, phi)
     if flag:
         paths = set_path(paths, [-t, -u, -v], ["R", "S", "L"])
 
     return paths
 
 
-def LSR(x, y, phi):
+def left_straight_right(x, y, phi):
     u1, t1 = polar(x + math.sin(phi), y - 1.0 - math.cos(phi))
     u1 = u1 ** 2
     if u1 >= 4.0:
@@ -224,60 +221,60 @@ def LSR(x, y, phi):
     return False, 0.0, 0.0, 0.0
 
 
-def generate_path(q0, q1, maxc):
+def generate_path(q0, q1, max_curvature):
     dx = q1[0] - q0[0]
     dy = q1[1] - q0[1]
     dth = q1[2] - q0[2]
     c = math.cos(q0[2])
     s = math.sin(q0[2])
-    x = (c * dx + s * dy) * maxc
-    y = (-s * dx + c * dy) * maxc
+    x = (c * dx + s * dy) * max_curvature
+    y = (-s * dx + c * dy) * max_curvature
 
     paths = []
-    paths = SCS(x, y, dth, paths)
-    paths = CSC(x, y, dth, paths)
-    paths = CCC(x, y, dth, paths)
+    paths = straight_curve_straight(x, y, dth, paths)
+    paths = curve_straight_curve(x, y, dth, paths)
+    paths = curve_curve_curve(x, y, dth, paths)
 
     return paths
 
 
-def interpolate(ind, l, m, maxc, ox, oy, oyaw, px, py, pyaw, directions):
-
-    if m == "S":
-        px[ind] = ox + l / maxc * math.cos(oyaw)
-        py[ind] = oy + l / maxc * math.sin(oyaw)
-        pyaw[ind] = oyaw
+def interpolate(ind, length, mode, max_curvature, origin_x, origin_y, origin_yaw, path_x, path_y, path_yaw, directions):
+    if mode == "S":
+        path_x[ind] = origin_x + length / max_curvature * math.cos(origin_yaw)
+        path_y[ind] = origin_y + length / max_curvature * math.sin(origin_yaw)
+        path_yaw[ind] = origin_yaw
     else:  # curve
-        ldx = math.sin(l) / maxc
-        if m == "L":  # left turn
-            ldy = (1.0 - math.cos(l)) / maxc
-        elif m == "R":  # right turn
-            ldy = (1.0 - math.cos(l)) / -maxc
-        gdx = math.cos(-oyaw) * ldx + math.sin(-oyaw) * ldy
-        gdy = -math.sin(-oyaw) * ldx + math.cos(-oyaw) * ldy
-        px[ind] = ox + gdx
-        py[ind] = oy + gdy
+        ldx = math.sin(length) / max_curvature
+        ldy = 0.0
+        if mode == "L":  # left turn
+            ldy = (1.0 - math.cos(length)) / max_curvature
+        elif mode == "R":  # right turn
+            ldy = (1.0 - math.cos(length)) / -max_curvature
+        gdx = math.cos(-origin_yaw) * ldx + math.sin(-origin_yaw) * ldy
+        gdy = -math.sin(-origin_yaw) * ldx + math.cos(-origin_yaw) * ldy
+        path_x[ind] = origin_x + gdx
+        path_y[ind] = origin_y + gdy
 
-    if m == "L":  # left turn
-        pyaw[ind] = oyaw + l
-    elif m == "R":  # right turn
-        pyaw[ind] = oyaw - l
+    if mode == "L":  # left turn
+        path_yaw[ind] = origin_yaw + length
+    elif mode == "R":  # right turn
+        path_yaw[ind] = origin_yaw - length
 
-    if l > 0.0:
+    if length > 0.0:
         directions[ind] = 1
     else:
         directions[ind] = -1
 
-    return px, py, pyaw, directions
+    return path_x, path_y, path_yaw, directions
 
 
-def generate_local_course(L, lengths, mode, maxc, step_size):
-    npoint = math.trunc(L / step_size) + len(lengths) + 4
+def generate_local_course(total_length, lengths, mode, max_curvature, step_size):
+    n_point = math.trunc(total_length / step_size) + len(lengths) + 4
 
-    px = [0.0 for i in range(npoint)]
-    py = [0.0 for i in range(npoint)]
-    pyaw = [0.0 for i in range(npoint)]
-    directions = [0.0 for i in range(npoint)]
+    px = [0.0 for _ in range(n_point)]
+    py = [0.0 for _ in range(n_point)]
+    pyaw = [0.0 for _ in range(n_point)]
+    directions = [0.0 for _ in range(n_point)]
     ind = 1
 
     if lengths[0] > 0.0:
@@ -305,14 +302,14 @@ def generate_local_course(L, lengths, mode, maxc, step_size):
         while abs(pd) <= abs(l):
             ind += 1
             px, py, pyaw, directions = interpolate(
-                ind, pd, m, maxc, ox, oy, oyaw, px, py, pyaw, directions)
+                ind, pd, m, max_curvature, ox, oy, oyaw, px, py, pyaw, directions)
             pd += d
 
         ll = l - pd - d  # calc remain length
 
         ind += 1
         px, py, pyaw, directions = interpolate(
-            ind, l, m, maxc, ox, oy, oyaw, px, py, pyaw, directions)
+            ind, l, m, max_curvature, ox, oy, oyaw, px, py, pyaw, directions)
 
     # remove unused data
     while px[-1] == 0.0:
@@ -344,22 +341,17 @@ def calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size):
                   * iy + q0[1] for (ix, iy) in zip(x, y)]
         path.yaw = [pi_2_pi(iyaw + q0[2]) for iyaw in yaw]
         path.directions = directions
-        path.lengths = [l / maxc for l in path.lengths]
+        path.lengths = [length / maxc for length in path.lengths]
         path.L = path.L / maxc
-
-    #  print(paths)
 
     return paths
 
 
 def reeds_shepp_path_planning(sx, sy, syaw,
-                              gx, gy, gyaw, maxc, step_size):
-
+                              gx, gy, gyaw, maxc, step_size=0.2):
     paths = calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size)
 
     if not paths:
-        #  print("No path")
-        #  print(sx, sy, syaw, gx, gy, gyaw)
         return None, None, None, None, None
 
     minL = float("Inf")
@@ -374,55 +366,24 @@ def reeds_shepp_path_planning(sx, sy, syaw,
     return bpath.x, bpath.y, bpath.yaw, bpath.ctypes, bpath.lengths
 
 
-def test():
-
-    NTEST = 5
-
-    for i in range(NTEST):
-        start_x = (np.random.rand() - 0.5) * 10.0  # [m]
-        start_y = (np.random.rand() - 0.5) * 10.0  # [m]
-        start_yaw = np.deg2rad((np.random.rand() - 0.5) * 180.0)  # [rad]
-
-        end_x = (np.random.rand() - 0.5) * 10.0  # [m]
-        end_y = (np.random.rand() - 0.5) * 10.0  # [m]
-        end_yaw = np.deg2rad((np.random.rand() - 0.5) * 180.0)  # [rad]
-
-        curvature = 1.0 / (np.random.rand() * 20.0)
-        step_size = 0.1
-
-        px, py, pyaw, mode, clen = reeds_shepp_path_planning(
-            start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature, step_size)
-
-        if show_animation:  # pragma: no cover
-            plt.cla()
-            plt.plot(px, py, label="final course " + str(mode))
-
-            #  plotting
-            plot_arrow(start_x, start_y, start_yaw)
-            plot_arrow(end_x, end_y, end_yaw)
-
-            plt.legend()
-            plt.grid(True)
-            plt.axis("equal")
-            plt.xlim(-10, 10)
-            plt.ylim(-10, 10)
-            plt.pause(1.0)
-
-            #  plt.show()
-
-    print("Test done")
-
-
 def main():
     print("Reeds Shepp path planner sample start!!")
 
-    start_x = -1.0  # [m]
-    start_y = -4.0  # [m]
-    start_yaw = np.deg2rad(-20.0)  # [rad]
+    # start_x = -1.0  # [m]
+    # start_y = -4.0  # [m]
+    # start_yaw = np.deg2rad(-20.0)  # [rad]
+    #
+    # end_x = 5.0  # [m]
+    # end_y = 5.0  # [m]
+    # end_yaw = np.deg2rad(25.0)  # [rad]
 
-    end_x = 5.0  # [m]
-    end_y = 5.0  # [m]
-    end_yaw = np.deg2rad(25.0)  # [rad]
+    start_x = 0.0  # [m]
+    start_y = 0.0  # [m]
+    start_yaw = np.deg2rad(0.0)  # [rad]
+
+    end_x = 0.0  # [m]
+    end_y = 0.0  # [m]
+    end_yaw = np.deg2rad(0.0)  # [rad]
 
     curvature = 1.0
     step_size = 0.1
@@ -448,5 +409,4 @@ def main():
 
 
 if __name__ == '__main__':
-    test()
     main()

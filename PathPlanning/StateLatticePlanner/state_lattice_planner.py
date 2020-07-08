@@ -4,6 +4,12 @@ State lattice planner with model predictive trajectory generator
 
 author: Atsushi Sakai (@Atsushi_twi)
 
+- lookuptable.csv is generated with this script: https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ModelPredictiveTrajectoryGenerator/lookuptable_generator.py
+
+Ref:
+
+- State Space Sampling of Feasible Motions for High-Performance Mobile Robot Navigation in Complex Environments http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.187.8210&rep=rep1&type=pdf
+
 """
 import sys
 import os

@@ -1,23 +1,27 @@
+import os
+import sys
 from unittest import TestCase
 
-import sys
-import os
 sys.path.append(os.path.dirname(__file__) + "/../")
 try:
     from PathPlanning.DynamicWindowApproach import dynamic_window_approach as m
-except:
+except ImportError:
     raise
 
 print(__file__)
 
 
-class Test(TestCase):
-
-    def test1(self):
+class TestDynamicWindowApproach(TestCase):
+    def test_main1(self):
         m.show_animation = False
         m.main(gx=1.0, gy=1.0)
 
+    def test_main2(self):
+        m.show_animation = False
+        m.main(gx=1.0, gy=1.0, robot_type=m.RobotType.rectangle)
+
 
 if __name__ == '__main__':  # pragma: no cover
-    test = Test()
-    test.test1()
+    test = TestDynamicWindowApproach()
+    test.test_main1()
+    test.test_main2()

@@ -21,7 +21,7 @@ except:
 
 
 k = 0.5  # control gain
-Kp = 1.0  # speed propotional gain
+Kp = 1.0  # speed proportional gain
 dt = 0.1  # [s] time difference
 L = 2.9  # [m] Wheel base of vehicle
 max_steer = np.radians(30.0)  # [rad] max steering angle
@@ -127,20 +127,19 @@ def calc_target_index(state, cx, cy):
     :param cy: [float]
     :return: (int, float)
     """
-   # Calc front axle position
+    # Calc front axle position
     fx = state.x + L * np.cos(state.yaw)
     fy = state.y + L * np.sin(state.yaw)
 
     # Search nearest point index
     dx = [fx - icx for icx in cx]
     dy = [fy - icy for icy in cy]
-    d = [np.sqrt(idx ** 2 + idy ** 2) for (idx, idy) in zip(dx, dy)]
-    closest_error = min(d)
-    target_idx = d.index(closest_error)
+    d = np.hypot(dx, dy)
+    target_idx = np.argmin(d)
 
     # Project RMS error onto front axle vector
     front_axle_vec = [-np.cos(state.yaw + np.pi / 2),
-                      - np.sin(state.yaw + np.pi / 2)]
+                      -np.sin(state.yaw + np.pi / 2)]
     error_front_axle = np.dot([dx[target_idx], dy[target_idx]], front_axle_vec)
 
     return target_idx, error_front_axle
@@ -186,6 +185,9 @@ def main():
 
         if show_animation:  # pragma: no cover
             plt.cla()
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(cx, cy, ".r", label="course")
             plt.plot(x, y, "-b", label="trajectory")
             plt.plot(cx[target_idx], cy[target_idx], "xg", label="target")

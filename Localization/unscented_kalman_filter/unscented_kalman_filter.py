@@ -6,23 +6,24 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
+import math
+
+import matplotlib.pyplot as plt
 import numpy as np
 import scipy.linalg
-import math
-import matplotlib.pyplot as plt
 
 # Covariance for UKF simulation
 Q = np.diag([
-    0.1, # variance of location on x-axis
-    0.1, # variance of location on y-axis
-    np.deg2rad(1.0), # variance of yaw angle
-    1.0 # variance of velocity
-    ])**2  # predict state covariance
-R = np.diag([1.0, 1.0])**2  # Observation x,y position covariance
+    0.1,  # variance of location on x-axis
+    0.1,  # variance of location on y-axis
+    np.deg2rad(1.0),  # variance of yaw angle
+    1.0  # variance of velocity
+]) ** 2  # predict state covariance
+R = np.diag([1.0, 1.0]) ** 2  # Observation x,y position covariance
 
 #  Simulation parameter
-INPUT_NOISE = np.diag([1.0, np.deg2rad(30.0)])**2
-GPS_NOISE = np.diag([0.5, 0.5])**2
+INPUT_NOISE = np.diag([1.0, np.deg2rad(30.0)]) ** 2
+GPS_NOISE = np.diag([0.5, 0.5]) ** 2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
@@ -43,7 +44,6 @@ def calc_input():
 
 
 def observation(xTrue, xd, u):
-
     xTrue = motion_model(xTrue, u)
 
     # add noise to gps x-y
@@ -58,7 +58,6 @@ def observation(xTrue, xd, u):
 
 
 def motion_model(x, u):
-
     F = np.array([[1.0, 0, 0, 0],
                   [0, 1.0, 0, 0],
                   [0, 0, 1.0, 0],
@@ -144,7 +143,6 @@ def calc_pxz(sigma, x, z_sigma, zb, wc):
 
 
 def ukf_estimation(xEst, PEst, z, u, wm, wc, gamma):
-
     #  Predict
     sigma = generate_sigma_points(xEst, PEst, gamma)
     sigma = predict_sigma_motion(sigma, u)
@@ -183,9 +181,9 @@ def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
     x = [a * math.cos(it) for it in t]
     y = [b * math.sin(it) for it in t]
     angle = math.atan2(eigvec[bigind, 1], eigvec[bigind, 0])
-    R = np.array([[math.cos(angle), math.sin(angle)],
-                  [-math.sin(angle), math.cos(angle)]])
-    fx = R @ np.array([x, y])
+    rot = np.array([[math.cos(angle), math.sin(angle)],
+                    [-math.sin(angle), math.cos(angle)]])
+    fx = rot @ np.array([x, y])
     px = np.array(fx[0, :] + xEst[0, 0]).flatten()
     py = np.array(fx[1, :] + xEst[1, 0]).flatten()
     plt.plot(px, py, "--r")
@@ -242,6 +240,9 @@ def main():
 
         if show_animation:
             plt.cla()
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(hz[0, :], hz[1, :], ".g")
             plt.plot(np.array(hxTrue[0, :]).flatten(),
                      np.array(hxTrue[1, :]).flatten(), "-b")

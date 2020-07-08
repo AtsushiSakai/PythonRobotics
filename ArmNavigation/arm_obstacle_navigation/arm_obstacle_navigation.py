@@ -162,6 +162,9 @@ def astar_torus(grid, start_node, goal_node):
         for i in range(1, len(route)):
             grid[route[i]] = 6
             plt.cla()
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             plt.imshow(grid, cmap=cmap, norm=norm, interpolation=None)
             plt.show()
             plt.pause(1e-2)

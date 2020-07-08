@@ -1,6 +1,8 @@
-<img src="https://github.com/AtsushiSakai/PythonRobotics/raw/master/icon.png?raw=true" align="right" width="300"/>
+<img src="https://github.com/AtsushiSakai/PythonRobotics/raw/master/icon.png?raw=true" align="right" width="300" alt="header pic"/>
 
 # PythonRobotics
+![GitHub_Action_Linux_CI](https://github.com/AtsushiSakai/PythonRobotics/workflows/Linux_CI/badge.svg)
+![GitHub_Action_MacOS_CI](https://github.com/AtsushiSakai/PythonRobotics/workflows/MacOS_CI/badge.svg)
 [![Build Status](https://travis-ci.org/AtsushiSakai/PythonRobotics.svg?branch=master)](https://travis-ci.org/AtsushiSakai/PythonRobotics)
 [![Documentation Status](https://readthedocs.org/projects/pythonrobotics/badge/?version=latest)](https://pythonrobotics.readthedocs.io/en/latest/?badge=latest)
 [![Build status](https://ci.appveyor.com/api/projects/status/sb279kxuv1be391g?svg=true)](https://ci.appveyor.com/project/AtsushiSakai/pythonrobotics)
@@ -8,7 +10,6 @@
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/AtsushiSakai/PythonRobotics.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/AtsushiSakai/PythonRobotics/context:python)
 [![CodeFactor](https://www.codefactor.io/repository/github/atsushisakai/pythonrobotics/badge/master)](https://www.codefactor.io/repository/github/atsushisakai/pythonrobotics/overview/master)
 [![tokei](https://tokei.rs/b1/github/AtsushiSakai/PythonRobotics)](https://github.com/AtsushiSakai/PythonRobotics)
-[![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/AtsushiSakai)
 
 Python codes for robotics algorithm.
 
@@ -31,7 +32,6 @@ Python codes for robotics algorithm.
    * [SLAM](#slam)
       * [Iterative Closest Point (ICP) Matching](#iterative-closest-point-icp-matching)
       * [FastSLAM 1.0](#fastslam-10)
-      * [Pose Optimization SLAM](#pose-optimization-slam)
    * [Path Planning](#path-planning)
       * [Dynamic Window Approach](#dynamic-window-approach)
       * [Grid based search](#grid-based-search)
@@ -45,7 +45,7 @@ Python codes for robotics algorithm.
       * [Probabilistic Road-Map (PRM) planning](#probabilistic-road-map-prm-planning)
       * [Rapidly-Exploring Random Trees (RRT)](#rapidly-exploring-random-trees-rrt)
          * [RRT*](#rrt)
-         * [RRT* with reeds-sheep path](#rrt-with-reeds-sheep-path)
+         * [RRT* with reeds-shepp path](#rrt-with-reeds-shepp-path)
          * [LQR-RRT*](#lqr-rrt)
       * [Quintic polynomials planning](#quintic-polynomials-planning)
       * [Reeds Shepp planning](#reeds-shepp-planning)
@@ -69,6 +69,7 @@ Python codes for robotics algorithm.
    * [License](#license)
    * [Use-case](#use-case)
    * [Contribution](#contribution)
+   * [Citing](#citing)
    * [Support](#support)
    * [Authors](#authors)
 
@@ -91,7 +92,7 @@ See this paper for more details:
 
 # Requirements
 
-- Python 3.6.x (2.7 is not supported)
+- Python 3.8.x
 
 - numpy
 
@@ -101,7 +102,7 @@ See this paper for more details:
 
 - pandas
 
-- [cvxpy](http://www.cvxpy.org/en/latest/) 
+- [cvxpy](https://www.cvxpy.org/index.html) 
 
 # Documentation
 
@@ -119,8 +120,6 @@ All animation gifs are stored here: [AtsushiSakai/PythonRoboticsGifs: Animation 
 
 > git clone https://github.com/AtsushiSakai/PythonRobotics.git
 
-> cd PythonRobotics/
-
 
 2. Install the required libraries. You can use environment.yml with conda command.
 
@@ -135,7 +134,7 @@ All animation gifs are stored here: [AtsushiSakai/PythonRoboticsGifs: Animation 
 
 ## Extended Kalman Filter localization
 
-<img src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/extended_kalman_filter/animation.gif" width="640">
+<img src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/extended_kalman_filter/animation.gif" width="640" alt="EKF pic">
 
 Documentation: [Notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/Localization/extended_kalman_filter/extended_kalman_filter_localization.ipynb)
 
@@ -249,12 +248,6 @@ Ref:
 - [SLAM simulations by Tim Bailey](http://www-personal.acfr.usyd.edu.au/tbailey/software/slam_simulations.htm)
 
 
-## Pose Optimization SLAM
-
-This is a graph based pose optimization SLAM example.
-
-![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/PoseOptimizationSLAM/animation.gif)
-
 # Path Planning
 
 ## Dynamic Window Approach
@@ -360,11 +353,11 @@ Ref:
 
 - [Sampling-based Algorithms for Optimal Motion Planning](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.419.5503&rep=rep1&type=pdf)
 
-### RRT\* with reeds-sheep path
+### RRT\* with reeds-shepp path
 
 ![Robotics/animation.gif at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTStarReedsShepp/animation.gif))
 
-Path planning for a car robot with RRT\* and reeds sheep path planner.
+Path planning for a car robot with RRT\* and reeds shepp path planner.
 
 ### LQR-RRT\*
 
@@ -485,11 +478,13 @@ Ref:
 
 Path tracking simulation with iterative linear model predictive speed and steering control.
 
-<img src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif" width="640">
+<img src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif" width="640" alt="MPC pic">
 
 Ref:
 
 - [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/Model_predictive_speed_and_steering_control.ipynb)
+
+- [Real\-time Model Predictive Control \(MPC\), ACADO, Python \| Work\-is\-Playing](http://grauonline.de/wordpress/?page_id=3244)
 
 ## Nonlinear Model predictive control with C-GMRES
 
@@ -557,7 +552,7 @@ MIT
 
 # Use-case
 
-If this project helps your robotics project, please let me know with [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/AtsushiSakai).
+If this project helps your robotics project, please let me know with creating an issue.
 
 Your robot's video, which is using PythonRobotics, is very welcome!!
 
@@ -565,7 +560,7 @@ This is a list of other user's comment and references:[users\_comments](https://
 
 # Contribution
 
-A small PR like bug fix is welcome.
+Any contribution is welcome!!
 
 If your PR is merged multiple times, I will add your account to the author list.
 
@@ -579,23 +574,15 @@ If you use this project's code in industry, we'd love to hear from you as well; 
 
 If you or your company would like to support this project, please consider:
 
+- [Sponsor @AtsushiSakai on GitHub Sponsors](https://github.com/sponsors/AtsushiSakai)
+
 - [Become a backer or sponsor on Patreon](https://www.patreon.com/myenigma)
 
 - [One-time donation via PayPal](https://www.paypal.me/myenigmapay/)
 
-You can add your name or your company logo in README if you are a patron.
-
-E-mail consultant is also available.
-
- 　
-
-Your comment using [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/AtsushiSakai) is also welcome. 
-
-This is a list: [Users comments](https://github.com/AtsushiSakai/PythonRobotics/blob/master/users_comments.md)
-
 # Authors
 
-- [Atsushi Sakai](https://github.com/AtsushiSakai/) ([@Atsushi_twi](https://twitter.com/Atsushi_twi))
+- [Atsushi Sakai](https://github.com/AtsushiSakai/)
 
 - [Daniel Ingram](https://github.com/daniel-s-ingram)
 
@@ -607,18 +594,12 @@ This is a list: [Users comments](https://github.com/AtsushiSakai/PythonRobotics/
 
 - [Alexis Paques](https://github.com/AlexisTM)
 
+- [Ryohei Sasaki](https://github.com/rsasaki0109)
 
+- [Göktuğ Karakaşlı](https://github.com/goktug97)
 
+- [Guillaume Jacquenot](https://github.com/Gjacquenot)
 
-
-
-
-
-
-
-
-
-
-
+- [Erwin Lejeune](https://github.com/guilyx)
 
 

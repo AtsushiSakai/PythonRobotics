@@ -40,7 +40,7 @@ def pure_pursuit_control(state, cx, cy, pind):
     if pind >= ind:
         ind = pind
 
-    #  print(pind, ind)
+    #  print(parent_index, ind)
     if ind < len(cx):
         tx = cx[ind]
         ty = cy[ind]
@@ -68,17 +68,17 @@ def calc_target_index(state, cx, cy):
     dx = [state.x - icx for icx in cx]
     dy = [state.y - icy for icy in cy]
 
-    d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
+    d = np.hypot(dx, dy)
     mindis = min(d)
 
-    ind = d.index(mindis)
+    ind = np.argmin(d)
 
     L = 0.0
 
     while Lf > L and (ind + 1) < len(cx):
         dx = cx[ind + 1] - cx[ind]
         dy = cy[ind + 1] - cy[ind]
-        L += math.sqrt(dx ** 2 + dy ** 2)
+        L += math.hypot(dx, dy)
         ind += 1
 
     #  print(mindis)
@@ -121,7 +121,7 @@ def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
         # check goal
         dx = state.x - goal[0]
         dy = state.y - goal[1]
-        if math.sqrt(dx ** 2 + dy ** 2) <= goal_dis:
+        if math.hypot(dx, dy) <= goal_dis:
             find_goal = True
             break
 
@@ -135,6 +135,9 @@ def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
 
         if target_ind % 1 == 0 and animation:  # pragma: no cover
             plt.cla()
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(cx, cy, "-r", label="course")
             plt.plot(x, y, "ob", label="trajectory")
             plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")
@@ -161,7 +164,7 @@ def set_stop_point(target_speed, cx, cy, cyaw):
     for i in range(len(cx) - 1):
         dx = cx[i + 1] - cx[i]
         dy = cy[i + 1] - cy[i]
-        d.append(math.sqrt(dx ** 2.0 + dy ** 2.0))
+        d.append(math.hypot(dx, dy))
         iyaw = cyaw[i]
         move_direction = math.atan2(dy, dx)
         is_back = abs(move_direction - iyaw) >= math.pi / 2.0
@@ -178,12 +181,12 @@ def set_stop_point(target_speed, cx, cy, cyaw):
             speed_profile[i] = 0.0
             forward = False
             #  plt.plot(cx[i], cy[i], "xb")
-            #  print(iyaw, move_direction, dx, dy)
+            #  print(i_yaw, move_direction, dx, dy)
         elif not is_back and not forward:
             speed_profile[i] = 0.0
             forward = True
             #  plt.plot(cx[i], cy[i], "xb")
-            #  print(iyaw, move_direction, dx, dy)
+            #  print(i_yaw, move_direction, dx, dy)
     speed_profile[0] = 0.0
     if is_back:
         speed_profile[-1] = -stop_speed

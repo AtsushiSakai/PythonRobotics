@@ -140,8 +140,7 @@ class Spline2D:
     def __calc_s(self, x, y):
         dx = np.diff(x)
         dy = np.diff(y)
-        self.ds = [math.sqrt(idx ** 2 + idy ** 2)
-                   for (idx, idy) in zip(dx, dy)]
+        self.ds = np.hypot(dx, dy)
         s = [0]
         s.extend(np.cumsum(self.ds))
         return s
@@ -191,7 +190,7 @@ def calc_spline_course(x, y, ds=0.1):
     return rx, ry, ryaw, rk, s
 
 
-def main():
+def main():  # pragma: no cover
     print("Spline 2D test")
     import matplotlib.pyplot as plt
     x = [-2.5, 0.0, 2.5, 5.0, 7.5, 3.0, -1.0]

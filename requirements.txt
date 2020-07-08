@@ -1,5 +1,5 @@
-numpy
-pandas
-scipy
-matplotlib
-cvxpy
+numpy == 1.19.0
+scipy == 1.5.1
+pandas == 1.0.5
+matplotlib == 3.2.2
+cvxpy == 1.1.1

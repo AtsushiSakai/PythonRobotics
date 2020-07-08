@@ -6,17 +6,19 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import numpy as np
 import math
+
 import matplotlib.pyplot as plt
+import numpy as np
+from scipy.spatial.transform import Rotation as Rot
 
 # Estimation parameter of PF
-Q = np.diag([0.1])**2  # range error
-R = np.diag([1.0, np.deg2rad(40.0)])**2  # input error
+Q = np.diag([0.2]) ** 2  # range error
+R = np.diag([2.0, np.deg2rad(40.0)]) ** 2  # input error
 
 #  Simulation parameter
-Qsim = np.diag([0.2])**2
-Rsim = np.diag([1.0, np.deg2rad(30.0)])**2
+Q_sim = np.diag([0.2]) ** 2
+R_sim = np.diag([1.0, np.deg2rad(30.0)]) ** 2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
@@ -31,40 +33,38 @@ show_animation = True
 
 def calc_input():
     v = 1.0  # [m/s]
-    yawrate = 0.1  # [rad/s]
-    u = np.array([[v, yawrate]]).T
+    yaw_rate = 0.1  # [rad/s]
+    u = np.array([[v, yaw_rate]]).T
     return u
 
 
-def observation(xTrue, xd, u, RFID):
-
-    xTrue = motion_model(xTrue, u)
+def observation(x_true, xd, u, rf_id):
+    x_true = motion_model(x_true, u)
 
     # add noise to gps x-y
     z = np.zeros((0, 3))
 
-    for i in range(len(RFID[:, 0])):
+    for i in range(len(rf_id[:, 0])):
 
-        dx = xTrue[0, 0] - RFID[i, 0]
-        dy = xTrue[1, 0] - RFID[i, 1]
-        d = math.sqrt(dx**2 + dy**2)
+        dx = x_true[0, 0] - rf_id[i, 0]
+        dy = x_true[1, 0] - rf_id[i, 1]
+        d = math.hypot(dx, dy)
         if d <= MAX_RANGE:
-            dn = d + np.random.randn() * Qsim[0, 0]  # add noise
-            zi = np.array([[dn, RFID[i, 0], RFID[i, 1]]])
+            dn = d + np.random.randn() * Q_sim[0, 0] ** 0.5  # add noise
+            zi = np.array([[dn, rf_id[i, 0], rf_id[i, 1]]])
             z = np.vstack((z, zi))
 
     # add noise to input
-    ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
-    ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1]
+    ud1 = u[0, 0] + np.random.randn() * R_sim[0, 0] ** 0.5
+    ud2 = u[1, 0] + np.random.randn() * R_sim[1, 1] ** 0.5
     ud = np.array([[ud1, ud2]]).T
 
     xd = motion_model(xd, ud)
 
-    return xTrue, z, xd, ud
+    return x_true, z, xd, ud
 
 
 def motion_model(x, u):
-
     F = np.array([[1.0, 0, 0, 0],
                   [0, 1.0, 0, 0],
                   [0, 0, 1.0, 0],
@@ -87,17 +87,22 @@ def gauss_likelihood(x, sigma):
     return p
 
 
-def calc_covariance(xEst, px, pw):
+def calc_covariance(x_est, px, pw):
+    """
+    calculate covariance matrix
+    see ipynb doc
+    """
     cov = np.zeros((3, 3))
-
-    for i in range(px.shape[1]):
-        dx = (px[:, i] - xEst)[0:3]
-        cov += pw[0, i] * dx.dot(dx.T)
+    n_particle = px.shape[1]
+    for i in range(n_particle):
+        dx = (px[:, i:i + 1] - x_est)[0:3]
+        cov += pw[0, i] * dx @ dx.T
+    cov *= 1.0 / (1.0 - pw @ pw.T)
 
     return cov
 
 
-def pf_localization(px, pw, xEst, PEst, z, u):
+def pf_localization(px, pw, z, u):
     """
     Localization with Particle filter
     """
@@ -105,9 +110,10 @@ def pf_localization(px, pw, xEst, PEst, z, u):
     for ip in range(NP):
         x = np.array([px[:, ip]]).T
         w = pw[0, ip]
+
         #  Predict with random input sampling
-        ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
-        ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1]
+        ud1 = u[0, 0] + np.random.randn() * R[0, 0] ** 0.5
+        ud2 = u[1, 0] + np.random.randn() * R[1, 1] ** 0.5
         ud = np.array([[ud1, ud2]]).T
         x = motion_model(x, ud)
 
@@ -115,8 +121,8 @@ def pf_localization(px, pw, xEst, PEst, z, u):
         for i in range(len(z[:, 0])):
             dx = x[0, 0] - z[i, 1]
             dy = x[1, 0] - z[i, 2]
-            prez = math.sqrt(dx**2 + dy**2)
-            dz = prez - z[i, 0]
+            pre_z = math.hypot(dx, dy)
+            dz = pre_z - z[i, 0]
             w = w * gauss_likelihood(dz, math.sqrt(Q[0, 0]))
 
         px[:, ip] = x[:, 0]
@@ -124,71 +130,69 @@ def pf_localization(px, pw, xEst, PEst, z, u):
 
     pw = pw / pw.sum()  # normalize
 
-    xEst = px.dot(pw.T)
-    PEst = calc_covariance(xEst, px, pw)
+    x_est = px.dot(pw.T)
+    p_est = calc_covariance(x_est, px, pw)
 
-    px, pw = resampling(px, pw)
+    N_eff = 1.0 / (pw.dot(pw.T))[0, 0]  # Effective particle number
+    if N_eff < NTh:
+        px, pw = re_sampling(px, pw)
+    return x_est, p_est, px, pw
 
-    return xEst, PEst, px, pw
 
-
-def resampling(px, pw):
+def re_sampling(px, pw):
     """
     low variance re-sampling
     """
 
-    Neff = 1.0 / (pw.dot(pw.T))[0, 0]  # Effective particle number
-    if Neff < NTh:
-        wcum = np.cumsum(pw)
-        base = np.cumsum(pw * 0.0 + 1 / NP) - 1 / NP
-        resampleid = base + np.random.rand(base.shape[0]) / NP
+    w_cum = np.cumsum(pw)
+    base = np.arange(0.0, 1.0, 1 / NP)
+    re_sample_id = base + np.random.uniform(0, 1 / NP)
+    indexes = []
+    ind = 0
+    for ip in range(NP):
+        while re_sample_id[ip] > w_cum[ind]:
+            ind += 1
+        indexes.append(ind)
 
-        inds = []
-        ind = 0
-        for ip in range(NP):
-            while resampleid[ip] > wcum[ind]:
-                ind += 1
-            inds.append(ind)
-
-        px = px[:, inds]
-        pw = np.zeros((1, NP)) + 1.0 / NP  # init weight
+    px = px[:, indexes]
+    pw = np.zeros((1, NP)) + 1.0 / NP  # init weight
 
     return px, pw
 
 
-def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
-    Pxy = PEst[0:2, 0:2]
-    eigval, eigvec = np.linalg.eig(Pxy)
+def plot_covariance_ellipse(x_est, p_est):  # pragma: no cover
+    p_xy = p_est[0:2, 0:2]
+    eig_val, eig_vec = np.linalg.eig(p_xy)
 
-    if eigval[0] >= eigval[1]:
-        bigind = 0
-        smallind = 1
+    if eig_val[0] >= eig_val[1]:
+        big_ind = 0
+        small_ind = 1
     else:
-        bigind = 1
-        smallind = 0
+        big_ind = 1
+        small_ind = 0
 
     t = np.arange(0, 2 * math.pi + 0.1, 0.1)
 
-    # eigval[bigind] or eiqval[smallind] were occassionally negative numbers extremely
-    # close to 0 (~10^-20), catch these cases and set the respective variable to 0
+    # eig_val[big_ind] or eiq_val[small_ind] were occasionally negative
+    # numbers extremely close to 0 (~10^-20), catch these cases and set the
+    # respective variable to 0
     try:
-        a = math.sqrt(eigval[bigind])
+        a = math.sqrt(eig_val[big_ind])
     except ValueError:
         a = 0
 
     try:
-        b = math.sqrt(eigval[smallind])
+        b = math.sqrt(eig_val[small_ind])
     except ValueError:
         b = 0
 
     x = [a * math.cos(it) for it in t]
     y = [b * math.sin(it) for it in t]
-    angle = math.atan2(eigvec[bigind, 1], eigvec[bigind, 0])
-    R = np.array([[math.cos(angle), math.sin(angle)],
-                  [-math.sin(angle), math.cos(angle)]])
-    fx = R.dot(np.array([[x, y]]))
-    px = np.array(fx[0, :] + xEst[0, 0]).flatten()
-    py = np.array(fx[1, :] + xEst[1, 0]).flatten()
+    angle = math.atan2(eig_vec[big_ind, 1], eig_vec[big_ind, 0])
+    rot = Rot.from_euler('z', angle).as_matrix()[0:2, 0:2]
+    fx = rot.dot(np.array([[x, y]]))
+    px = np.array(fx[0, :] + x_est[0, 0]).flatten()
+    py = np.array(fx[1, :] + x_est[1, 0]).flatten()
     plt.plot(px, py, "--r")
 
 
@@ -197,53 +201,56 @@ def main():
 
     time = 0.0
 
-    # RFID positions [x, y]
-    RFID = np.array([[10.0, 0.0],
-                     [10.0, 10.0],
-                     [0.0, 15.0],
-                     [-5.0, 20.0]])
+    # RF_ID positions [x, y]
+    rf_id = np.array([[10.0, 0.0],
+                      [10.0, 10.0],
+                      [0.0, 15.0],
+                      [-5.0, 20.0]])
 
     # State Vector [x y yaw v]'
-    xEst = np.zeros((4, 1))
-    xTrue = np.zeros((4, 1))
-    PEst = np.eye(4)
+    x_est = np.zeros((4, 1))
+    x_true = np.zeros((4, 1))
 
     px = np.zeros((4, NP))  # Particle store
     pw = np.zeros((1, NP)) + 1.0 / NP  # Particle weight
-    xDR = np.zeros((4, 1))  # Dead reckoning
+    x_dr = np.zeros((4, 1))  # Dead reckoning
 
     # history
-    hxEst = xEst
-    hxTrue = xTrue
-    hxDR = xTrue
+    h_x_est = x_est
+    h_x_true = x_true
+    h_x_dr = x_true
 
     while SIM_TIME >= time:
         time += DT
         u = calc_input()
 
-        xTrue, z, xDR, ud = observation(xTrue, xDR, u, RFID)
+        x_true, z, x_dr, ud = observation(x_true, x_dr, u, rf_id)
 
-        xEst, PEst, px, pw = pf_localization(px, pw, xEst, PEst, z, ud)
+        x_est, PEst, px, pw = pf_localization(px, pw, z, ud)
 
         # store data history
-        hxEst = np.hstack((hxEst, xEst))
-        hxDR = np.hstack((hxDR, xDR))
-        hxTrue = np.hstack((hxTrue, xTrue))
+        h_x_est = np.hstack((h_x_est, x_est))
+        h_x_dr = np.hstack((h_x_dr, x_dr))
+        h_x_true = np.hstack((h_x_true, x_true))
 
         if show_animation:
             plt.cla()
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect(
+                'key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
 
             for i in range(len(z[:, 0])):
-                plt.plot([xTrue[0, 0], z[i, 1]], [xTrue[1, 0], z[i, 2]], "-k")
-            plt.plot(RFID[:, 0], RFID[:, 1], "*k")
+                plt.plot([x_true[0, 0], z[i, 1]], [x_true[1, 0], z[i, 2]], "-k")
+            plt.plot(rf_id[:, 0], rf_id[:, 1], "*k")
             plt.plot(px[0, :], px[1, :], ".r")
-            plt.plot(np.array(hxTrue[0, :]).flatten(),
-                     np.array(hxTrue[1, :]).flatten(), "-b")
-            plt.plot(np.array(hxDR[0, :]).flatten(),
-                     np.array(hxDR[1, :]).flatten(), "-k")
-            plt.plot(np.array(hxEst[0, :]).flatten(),
-                     np.array(hxEst[1, :]).flatten(), "-r")
-            plot_covariance_ellipse(xEst, PEst)
+            plt.plot(np.array(h_x_true[0, :]).flatten(),
+                     np.array(h_x_true[1, :]).flatten(), "-b")
+            plt.plot(np.array(h_x_dr[0, :]).flatten(),
+                     np.array(h_x_dr[1, :]).flatten(), "-k")
+            plt.plot(np.array(h_x_est[0, :]).flatten(),
+                     np.array(h_x_est[1, :]).flatten(), "-r")
+            plot_covariance_ellipse(x_est, PEst)
             plt.axis("equal")
             plt.grid(True)
             plt.pause(0.001)

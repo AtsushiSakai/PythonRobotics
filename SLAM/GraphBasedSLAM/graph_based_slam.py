@@ -6,20 +6,22 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 Ref
 
-[A Tutorial on Graph-Based SLAM](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)
+[A Tutorial on Graph-Based SLAM]
+(http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)
 
 """
 
-import numpy as np
-import math
 import copy
 import itertools
-import matplotlib.pyplot as plt
+import math
 
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.spatial.transform import Rotation as Rot
 
 #  Simulation parameter
-Qsim = np.diag([0.2, np.deg2rad(1.0)])**2
-Rsim = np.diag([0.1, np.deg2rad(10.0)])**2
+Q_sim = np.diag([0.2, np.deg2rad(1.0)]) ** 2
+R_sim = np.diag([0.1, np.deg2rad(10.0)]) ** 2
 
 DT = 2.0  # time tick [s]
 SIM_TIME = 100.0  # simulation time [s]
@@ -33,11 +35,11 @@ C_SIGMA3 = np.deg2rad(1.0)
 
 MAX_ITR = 20  # Maximum iteration
 
-show_graph_dtime = 20.0  # [s]
+show_graph_d_time = 20.0  # [s]
 show_animation = True
 
 
-class Edge():
+class Edge:
 
     def __init__(self):
         self.e = np.zeros((3, 1))
@@ -52,26 +54,21 @@ class Edge():
         self.id2 = 0
 
 
-def cal_observation_sigma(d):
-
+def cal_observation_sigma():
     sigma = np.zeros((3, 3))
-    sigma[0, 0] = C_SIGMA1**2
-    sigma[1, 1] = C_SIGMA2**2
-    sigma[2, 2] = C_SIGMA3**2
+    sigma[0, 0] = C_SIGMA1 ** 2
+    sigma[1, 1] = C_SIGMA2 ** 2
+    sigma[2, 2] = C_SIGMA3 ** 2
 
     return sigma
 
 
 def calc_rotational_matrix(angle):
-
-    Rt = np.array([[math.cos(angle), -math.sin(angle), 0],
-                   [math.sin(angle), math.cos(angle), 0],
-                   [0, 0, 1.0]])
-    return Rt
+    return Rot.from_euler('z', angle).as_matrix()
 
 
 def calc_edge(x1, y1, yaw1, x2, y2, yaw2, d1,
-              angle1, phi1, d2, angle2, phi2, t1, t2):
+              angle1, d2, angle2, t1, t2):
     edge = Edge()
 
     tangle1 = pi_2_pi(yaw1 + angle1)
@@ -88,8 +85,8 @@ def calc_edge(x1, y1, yaw1, x2, y2, yaw2, d1,
     Rt1 = calc_rotational_matrix(tangle1)
     Rt2 = calc_rotational_matrix(tangle2)
 
-    sig1 = cal_observation_sigma(d1)
-    sig2 = cal_observation_sigma(d2)
+    sig1 = cal_observation_sigma()
+    sig2 = cal_observation_sigma()
 
     edge.omega = np.linalg.inv(Rt1 @ sig1 @ Rt1.T + Rt2 @ sig2 @ Rt2.T)
 
@@ -101,34 +98,33 @@ def calc_edge(x1, y1, yaw1, x2, y2, yaw2, d1,
     return edge
 
 
-def calc_edges(xlist, zlist):
-
+def calc_edges(x_list, z_list):
     edges = []
     cost = 0.0
-    zids = list(itertools.combinations(range(len(zlist)), 2))
+    z_ids = list(itertools.combinations(range(len(z_list)), 2))
 
-    for (t1, t2) in zids:
-        x1, y1, yaw1 = xlist[0, t1], xlist[1, t1], xlist[2, t1]
-        x2, y2, yaw2 = xlist[0, t2], xlist[1, t2], xlist[2, t2]
+    for (t1, t2) in z_ids:
+        x1, y1, yaw1 = x_list[0, t1], x_list[1, t1], x_list[2, t1]
+        x2, y2, yaw2 = x_list[0, t2], x_list[1, t2], x_list[2, t2]
 
-        if zlist[t1] is None or zlist[t2] is None:
+        if z_list[t1] is None or z_list[t2] is None:
             continue  # No observation
 
-        for iz1 in range(len(zlist[t1][:, 0])):
-            for iz2 in range(len(zlist[t2][:, 0])):
-                if zlist[t1][iz1, 3] == zlist[t2][iz2, 3]:
-                    d1 = zlist[t1][iz1, 0]
-                    angle1, phi1 = zlist[t1][iz1, 1], zlist[t1][iz1, 2]
-                    d2 = zlist[t2][iz2, 0]
-                    angle2, phi2 = zlist[t2][iz2, 1], zlist[t2][iz2, 2]
+        for iz1 in range(len(z_list[t1][:, 0])):
+            for iz2 in range(len(z_list[t2][:, 0])):
+                if z_list[t1][iz1, 3] == z_list[t2][iz2, 3]:
+                    d1 = z_list[t1][iz1, 0]
+                    angle1, phi1 = z_list[t1][iz1, 1], z_list[t1][iz1, 2]
+                    d2 = z_list[t2][iz2, 0]
+                    angle2, phi2 = z_list[t2][iz2, 1], z_list[t2][iz2, 2]
 
                     edge = calc_edge(x1, y1, yaw1, x2, y2, yaw2, d1,
-                                     angle1, phi1, d2, angle2, phi2, t1, t2)
+                                     angle1, d2, angle2, t1, t2)
 
                     edges.append(edge)
-                    cost += (edge.e.T @ (edge.omega) @ edge.e)[0, 0]
+                    cost += (edge.e.T @ edge.omega @ edge.e)[0, 0]
 
-    print("cost:", cost, ",nedge:", len(edges))
+    print("cost:", cost, ",n_edge:", len(edges))
     return edges
 
 
@@ -147,7 +143,6 @@ def calc_jacobian(edge):
 
 
 def fill_H_and_b(H, b, edge):
-
     A, B = calc_jacobian(edge)
 
     id1 = edge.id1 * STATE_SIZE
@@ -167,14 +162,14 @@ def fill_H_and_b(H, b, edge):
 def graph_based_slam(x_init, hz):
     print("start graph based slam")
 
-    zlist = copy.deepcopy(hz)
+    z_list = copy.deepcopy(hz)
 
     x_opt = copy.deepcopy(x_init)
     nt = x_opt.shape[1]
     n = nt * STATE_SIZE
 
     for itr in range(MAX_ITR):
-        edges = calc_edges(x_opt, zlist)
+        edges = calc_edges(x_opt, z_list)
 
         H = np.zeros((n, n))
         b = np.zeros((n, 1))
@@ -200,13 +195,12 @@ def graph_based_slam(x_init, hz):
 
 def calc_input():
     v = 1.0  # [m/s]
-    yawrate = 0.1  # [rad/s]
-    u = np.array([[v, yawrate]]).T
+    yaw_rate = 0.1  # [rad/s]
+    u = np.array([[v, yaw_rate]]).T
     return u
 
 
 def observation(xTrue, xd, u, RFID):
-
     xTrue = motion_model(xTrue, u)
 
     # add noise to gps x-y
@@ -216,20 +210,20 @@ def observation(xTrue, xd, u, RFID):
 
         dx = RFID[i, 0] - xTrue[0, 0]
         dy = RFID[i, 1] - xTrue[1, 0]
-        d = math.sqrt(dx**2 + dy**2)
+        d = math.hypot(dx, dy)
         angle = pi_2_pi(math.atan2(dy, dx)) - xTrue[2, 0]
         phi = pi_2_pi(math.atan2(dy, dx))
         if d <= MAX_RANGE:
-            dn = d + np.random.randn() * Qsim[0, 0]  # add noise
-            angle_noise = np.random.randn() * Qsim[1, 1]
+            dn = d + np.random.randn() * Q_sim[0, 0]  # add noise
+            angle_noise = np.random.randn() * Q_sim[1, 1]
             angle += angle_noise
             phi += angle_noise
             zi = np.array([dn, angle, phi, i])
             z = np.vstack((z, zi))
 
     # add noise to input
-    ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
-    ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1]
+    ud1 = u[0, 0] + np.random.randn() * R_sim[0, 0]
+    ud2 = u[1, 0] + np.random.randn() * R_sim[1, 1]
     ud = np.array([[ud1, ud2]]).T
 
     xd = motion_model(xd, ud)
@@ -238,7 +232,6 @@ def observation(xTrue, xd, u, RFID):
 
 
 def motion_model(x, u):
-
     F = np.array([[1.0, 0, 0],
                   [0, 1.0, 0],
                   [0, 0, 1.0]])
@@ -277,7 +270,7 @@ def main():
     hxTrue = []
     hxDR = []
     hz = []
-    dtime = 0.0
+    d_time = 0.0
     init = False
     while SIM_TIME >= time:
 
@@ -290,20 +283,23 @@ def main():
             hxTrue = np.hstack((hxTrue, xTrue))
 
         time += DT
-        dtime += DT
+        d_time += DT
         u = calc_input()
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u, RFID)
 
         hz.append(z)
 
-        if dtime >= show_graph_dtime:
+        if d_time >= show_graph_d_time:
             x_opt = graph_based_slam(hxDR, hz)
-            dtime = 0.0
+            d_time = 0.0
 
             if show_animation:  # pragma: no cover
                 plt.cla()
-
+                # for stopping simulation with the esc key.
+                plt.gcf().canvas.mpl_connect(
+                    'key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
                 plt.plot(RFID[:, 0], RFID[:, 1], "*k")
 
                 plt.plot(hxTrue[0, :].flatten(),

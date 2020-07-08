@@ -32,10 +32,8 @@ class GridMap:
         self.center_x = center_x
         self.center_y = center_y
 
-        self.left_lower_x = self.center_x - \
-                            (self.width / 2.0) * self.resolution
-        self.left_lower_y = self.center_y - \
-                            (self.height / 2.0) * self.resolution
+        self.left_lower_x = self.center_x - self.width / 2.0 * self.resolution
+        self.left_lower_y = self.center_y - self.height / 2.0 * self.resolution
 
         self.ndata = self.width * self.height
         self.data = [init_val] * self.ndata
@@ -51,7 +49,7 @@ class GridMap:
 
         grid_ind = self.calc_grid_index_from_xy_index(x_ind, y_ind)
 
-        if 0 <= grid_ind <= self.ndata:
+        if 0 <= grid_ind < self.ndata:
             return self.data[grid_ind]
         else:
             return None
@@ -99,7 +97,6 @@ class GridMap:
         """
 
         if (x_ind is None) or (y_ind is None):
-            print(x_ind, y_ind)
             return False, False
 
         grid_ind = int(y_ind * self.width + x_ind)
@@ -163,7 +160,7 @@ class GridMap:
 
         val = self.get_value_from_xy_index(xind, yind)
 
-        if val >= occupied_val:
+        if val is None or val >= occupied_val:
             return True
         else:
             return False
@@ -200,11 +197,21 @@ class GridMap:
             if not min_x < iox < max_x:
                 continue
 
-            if (y[i1] + (y[i2] - y[i1]) / (x[i2] - x[i1])
-                * (iox - x[i1]) - ioy) > 0.0:
+            tmp1 = (y[i2] - y[i1]) / (x[i2] - x[i1])
+            if (y[i1] + tmp1 * (iox - x[i1]) - ioy) > 0.0:
                 inside = not inside
 
         return inside
+
+    def print_grid_map_info(self):
+        print("width:", self.width)
+        print("height:", self.height)
+        print("resolution:", self.resolution)
+        print("center_x:", self.center_x)
+        print("center_y:", self.center_y)
+        print("left_lower_x:", self.left_lower_x)
+        print("left_lower_y:", self.left_lower_y)
+        print("ndata:", self.ndata)
 
     def plot_grid_map(self, ax=None):
 

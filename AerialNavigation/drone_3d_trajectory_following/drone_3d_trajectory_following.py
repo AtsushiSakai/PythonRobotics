@@ -99,7 +99,7 @@ def quad_sim(x_c, y_c, z_c):
 
             R = rotation_matrix(roll, pitch, yaw)
             acc = (np.matmul(R, np.array(
-                [0, 0, thrust]).T) - np.array([0, 0, m * g]).T) / m
+                [0, 0, thrust.item()]).T) - np.array([0, 0, m * g]).T) / m
             x_acc = acc[0]
             y_acc = acc[1]
             z_acc = acc[2]

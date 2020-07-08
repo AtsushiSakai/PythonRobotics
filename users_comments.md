@@ -1,3 +1,19 @@
+# User's demos
+
+## WHILL MODEL CR with move to a pose control
+
+This is an electric wheelchair control demo by [Katsushun89](https://github.com/Katsushun89).
+
+[WHILL Model CR](https://whill.jp/model-cr) is the control target, [M5Stack](https://m5stack.com/) is used for the controller, and [toio](https://toio.io/) is used for the control input device.
+
+[move-to-a-pose-control](https://pythonrobotics.readthedocs.io/en/latest/modules/path_tracking.html#move-to-a-pose-control) is used for its control algorithm ([code link](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/move_to_pose/move_to_pose.py)).
+
+![1](https://github.com/AtsushiSakai/PythonRoboticsGifs/blob/master/Users/WHILL_Model_CR_with_move_to_a_pose/WHLL_Model_CR_with_move_to_a_pose.gif)
+
+Ref:
+
+- [toioと同じように動くWHILL Model CR (in Japanese)](https://qiita.com/KatsuShun89/items/68fde7544ecfe36096d2)
+
 
 # Educational users
 
@@ -6,6 +22,8 @@ This is a list of users who are using PythonRobotics for education.
 If you found other users, please make an issue to let me know.
 
 - [CSCI/ARTI 4530/6530: Introduction to Robotics (Fall 2018),  University of Georgia ](http://cobweb.cs.uga.edu/~ramviyas/csci_x530.html)
+
+- [CIT Modules & Programmes \- COMP9073 \- Automation with Python](https://courses.cit.ie/index.cfm/page/module/moduleId/14416)
 
 # Stargazers location map
 
@@ -21,8 +39,6 @@ This is a list of related projects.
 - [onlytailei/CppRobotics: cpp implementation of robotics algorithms including localization, mapping, SLAM, path planning and control](https://github.com/onlytailei/CppRobotics)
 
 # Individual users comments
-
-These are comments from user's using [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/AtsushiSakai)
 
 ---
 
@@ -287,6 +303,84 @@ Dear Atsushi Sakai <br>Thank you for the Python Robotics
 
 ---
 
+Thanks for your robotics repo!
+
+--Mithi
+
+---
+
+You made such a nice work. Congratulations :)
+
+--ATroya
+
+---
+
+thank you for python path finding repo
+
+--fengzongbao
+
+---
+
+Dear AtsushiSakai, <br> <br>Thank you so much for making the concept of robotics approachable for the general mass. Keep up the good work :)
+
+--Harsh Munshi
+
+---
+
+Benefit a lot for your GitHub repository of PythonRobotics. Thanks so much.
+
+--Haoran
+
+---
+
+Thanks!
+
+--Reinzor
+
+---
+
+Thanks for writing these algorithms. They are very helpful for learning robotics.
+
+--Arihant Lunawat
+
+---
+
+Dear AtsushiSakai, <br>Thank you for providing us this great repository for playing and look around:)!
+
+--Hsin-Wen
+
+---
+
+Thanks for PythonRobotics!
+
+--Nick V
+
+---
+
+Dear AtsushiSakai, thank you so much for this material, it's so useful to me, i'm really glad with it =D
+
+--Juanda
+
+---
+
+Dear Atsushi Thanks for compiling such a vast resource for robotics motion planning.
+
+--Kartik Prakash
+
+---
+
+Thanks for your job! <br>I have learned a lot from it!
+
+--ZhongyiShen
+
+---
+
+Dear Atsushi Sakai, <br>Thank you so much for creating PythonRobotics and documenting it so well. I am a senior in high school trying to learn and better myself in these concepts.
+
+--Rohan Mathur
+
+
+
 # Citations
 
 1. B. Blaga, M. Deac, R. W. Y. Al-doori, M. Negru and R. Dǎnescu, "Miniature Autonomous Vehicle Development on Raspberry Pi," 2018 IEEE 14th International Conference on Intelligent Computer Communication and Processing (ICCP), Cluj-Napoca, Romania, 2018, pp. 229-236.
@@ -298,6 +392,23 @@ URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8516589&isnumber=85
 
 3. Welburn, E, Hakim Khalili, H, Gupta, A, Watson, S & Carrasco, J 2019, A Navigational System for Quadcopter Remote Inspection of Offshore Substations. in The Fifteenth International Conference on Autonomic and Autonomous Systems 2019. URL:https://www.research.manchester.ac.uk/portal/files/107169964/ICAS19_A_Navigational_System_for_Quadcopter_Remote_Inspection_of_Offshore_Substations.pdf
 
+4. E. Horváth, C. Hajdu, C. Radu and Á. Ballagi, "Range Sensor-based Occupancy Grid Mapping with Signatures," 2019 20th International Carpathian Control Conference (ICCC), Krakow-Wieliczka, Poland, 2019, pp. 1-5.
+URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8765684&isnumber=8765679
+
+5. Josie Hughes, Masaru Shimizu, and Arnoud Visser, "A Review of Robot Rescue Simulation Platforms for Robotics Education"
+URL: https://2019.robocup.org/downloads/program/HughesEtAl2019.pdf
+
+6. Hughes, Josie, Masaru Shimizu, and Arnoud Visser. "A review of robot rescue simulation platforms for robotics education." (2019).
+URL: https://www.semanticscholar.org/paper/A-Review-of-Robot-Rescue-Simulation-Platforms-for-Hughes-Shimizu/318a4bcb97a44661422ae1430d950efc408097da
+
+7. Ghosh, Ritwika, et al. "CyPhyHouse: A Programming, Simulation, and Deployment Toolchain for Heterogeneous Distributed Coordination." arXiv preprint arXiv:1910.01557 (2019).
+URL: https://arxiv.org/abs/1910.01557
+
+8. Hahn, Carsten, et al. "Dynamic Path Planning with Stable Growing Neural Gas." (2019).
+URL: https://pdfs.semanticscholar.org/5c06/f3cb9542a51e1bf1a32523c1bc7fea6cecc5.pdf
+
+9. Brijen Thananjeyan, et al. "ABC-LMPC: Safe Sample-Based Learning MPC for Stochastic Nonlinear Dynamical Systems with Adjustable Boundary Conditions"
+URL: https://arxiv.org/pdf/2003.01410.pdf
 
 # Others
 
@@ -305,3 +416,6 @@ URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8516589&isnumber=85
 
 - 36 Amazing Python Open Source Projects (v.2019) – Mybridge for Professionals https://medium.mybridge.co/36-amazing-python-open-source-projects-v-2019-2fe058d79450
 
+- Real-time Model Predictive Control (MPC), ACADO, Python | Work-is-Playing http://grauonline.de/wordpress/?page_id=3244
+
+- 💡 Greatest of GitHub - Python Robotics (Amazing!) - YouTube https://www.youtube.com/watch?v=f_pPaYx6Gu0&feature=emb_logo

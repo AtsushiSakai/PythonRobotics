@@ -5,7 +5,10 @@ Object shape recognition with L-shape fitting
 author: Atsushi Sakai (@Atsushi_twi)
 
 Ref:
-- [Efficient L\-Shape Fitting for Vehicle Detection Using Laser Scanners \- The Robotics Institute Carnegie Mellon University](https://www.ri.cmu.edu/publications/efficient-l-shape-fitting-for-vehicle-detection-using-laser-scanners/)
+- Efficient L-Shape Fitting for Vehicle Detection Using Laser Scanners -
+The Robotics Institute Carnegie Mellon University
+https://www.ri.cmu.edu/publications/
+efficient-l-shape-fitting-for-vehicle-detection-using-laser-scanners/
 
 """
 
@@ -13,13 +16,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import itertools
 from enum import Enum
+from scipy.spatial.transform import Rotation as Rot
 
 from simulator import VehicleSimulator, LidarSimulator
 
 show_animation = True
 
 
-class LShapeFitting():
+class LShapeFitting:
 
     class Criteria(Enum):
         AREA = 1
@@ -29,26 +33,27 @@ class LShapeFitting():
     def __init__(self):
         # Parameters
         self.criteria = self.Criteria.VARIANCE
-        self.min_dist_of_closeness_crit = 0.01  # [m]
-        self.dtheta_deg_for_serarch = 1.0  # [deg]
+        self.min_dist_of_closeness_criteria = 0.01  # [m]
+        self.d_theta_deg_for_search = 1.0  # [deg]
         self.R0 = 3.0  # [m] range segmentation param
         self.Rd = 0.001  # [m] range segmentation param
 
     def fitting(self, ox, oy):
 
         # step1: Adaptive Range Segmentation
-        idsets = self._adoptive_range_segmentation(ox, oy)
+        id_sets = self._adoptive_range_segmentation(ox, oy)
 
         # step2 Rectangle search
         rects = []
-        for ids in idsets:  # for each cluster
+        for ids in id_sets:  # for each cluster
             cx = [ox[i] for i in range(len(ox)) if i in ids]
             cy = [oy[i] for i in range(len(oy)) if i in ids]
             rects.append(self._rectangle_search(cx, cy))
 
-        return rects, idsets
+        return rects, id_sets
 
-    def _calc_area_criterion(self, c1, c2):
+    @staticmethod
+    def _calc_area_criterion(c1, c2):
         c1_max = max(c1)
         c2_max = max(c2)
         c1_min = min(c1)
@@ -71,12 +76,13 @@ class LShapeFitting():
 
         beta = 0
         for i, _ in enumerate(D1):
-            d = max(min([D1[i], D2[i]]), self.min_dist_of_closeness_crit)
+            d = max(min([D1[i], D2[i]]), self.min_dist_of_closeness_criteria)
             beta += (1.0 / d)
 
         return beta
 
-    def _calc_variance_criterion(self, c1, c2):
+    @staticmethod
+    def _calc_variance_criterion(c1, c2):
         c1_max = max(c1)
         c2_max = max(c2)
         c1_min = min(c1)
@@ -110,17 +116,17 @@ class LShapeFitting():
 
         X = np.array([x, y]).T
 
-        dtheta = np.deg2rad(self.dtheta_deg_for_serarch)
-        minp = (-float('inf'), None)
-        for theta in np.arange(0.0, np.pi / 2.0 - dtheta, dtheta):
+        d_theta = np.deg2rad(self.d_theta_deg_for_search)
+        min_cost = (-float('inf'), None)
+        for theta in np.arange(0.0, np.pi / 2.0 - d_theta, d_theta):
 
-            e1 = np.array([np.cos(theta), np.sin(theta)])
-            e2 = np.array([-np.sin(theta), np.cos(theta)])
-
-            c1 = X @ e1.T
-            c2 = X @ e2.T
+            rot = Rot.from_euler('z', theta).as_matrix()[0:2, 0:2]
+            c = X @ rot
+            c1 = c[:, 0]
+            c2 = c[:, 1]
 
             # Select criteria
+            cost = 0.0
             if self.criteria == self.Criteria.AREA:
                 cost = self._calc_area_criterion(c1, c2)
             elif self.criteria == self.Criteria.CLOSENESS:
@@ -128,12 +134,12 @@ class LShapeFitting():
             elif self.criteria == self.Criteria.VARIANCE:
                 cost = self._calc_variance_criterion(c1, c2)
 
-            if minp[0] < cost:
-                minp = (cost, theta)
+            if min_cost[0] < cost:
+                min_cost = (cost, theta)
 
         # calc best rectangle
-        sin_s = np.sin(minp[1])
-        cos_s = np.cos(minp[1])
+        sin_s = np.sin(min_cost[1])
+        cos_s = np.cos(min_cost[1])
 
         c1_s = X @ np.array([cos_s, sin_s]).T
         c2_s = X @ np.array([-sin_s, cos_s]).T
@@ -162,7 +168,7 @@ class LShapeFitting():
             C = set()
             R = self.R0 + self.Rd * np.linalg.norm([ox[i], oy[i]])
             for j, _ in enumerate(ox):
-                d = np.sqrt((ox[i] - ox[j])**2 + (oy[i] - oy[j])**2)
+                d = np.hypot(ox[i] - ox[j], oy[i] - oy[j])
                 if d <= R:
                     C.add(j)
             S.append(C)
@@ -181,7 +187,7 @@ class LShapeFitting():
         return S
 
 
-class RectangleData():
+class RectangleData:
 
     def __init__(self):
         self.a = [None] * 4
@@ -207,7 +213,8 @@ class RectangleData():
             [self.a[3], self.a[0]], [self.b[3], self.b[0]], [self.c[3], self.c[0]])
         self.rect_c_x[4], self.rect_c_y[4] = self.rect_c_x[0], self.rect_c_y[0]
 
-    def calc_cross_point(self, a, b, c):
+    @staticmethod
+    def calc_cross_point(a, b, c):
         x = (b[0] * -c[1] - b[1] * -c[0]) / (a[0] * b[1] - a[1] * b[0])
         y = (a[1] * -c[0] - a[0] * -c[1]) / (a[0] * b[1] - a[1] * b[0])
         return x, y
@@ -216,39 +223,43 @@ class RectangleData():
 def main():
 
     # simulation parameters
-    simtime = 30.0  # simulation time
+    sim_time = 30.0  # simulation time
     dt = 0.2  # time tick
 
-    angle_reso = np.deg2rad(3.0)  # sensor angle resolution
+    angle_resolution = np.deg2rad(3.0)  # sensor angle resolution
 
     v1 = VehicleSimulator(-10.0, 0.0, np.deg2rad(90.0),
                           0.0, 50.0 / 3.6, 3.0, 5.0)
     v2 = VehicleSimulator(20.0, 10.0, np.deg2rad(180.0),
                           0.0, 50.0 / 3.6, 4.0, 10.0)
 
-    lshapefitting = LShapeFitting()
+    l_shape_fitting = LShapeFitting()
     lidar_sim = LidarSimulator()
 
     time = 0.0
-    while time <= simtime:
+    while time <= sim_time:
         time += dt
 
         v1.update(dt, 0.1, 0.0)
         v2.update(dt, 0.1, -0.05)
 
-        ox, oy = lidar_sim.get_observation_points([v1, v2], angle_reso)
+        ox, oy = lidar_sim.get_observation_points([v1, v2], angle_resolution)
 
-        rects, idsets = lshapefitting.fitting(ox, oy)
+        rects, id_sets = l_shape_fitting.fitting(ox, oy)
 
         if show_animation:  # pragma: no cover
             plt.cla()
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect(
+                'key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
             plt.axis("equal")
             plt.plot(0.0, 0.0, "*r")
             v1.plot()
             v2.plot()
 
             # Plot range observation
-            for ids in idsets:
+            for ids in id_sets:
                 x = [ox[i] for i in range(len(ox)) if i in ids]
                 y = [oy[i] for i in range(len(ox)) if i in ids]
 

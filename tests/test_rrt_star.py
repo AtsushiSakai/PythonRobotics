@@ -3,11 +3,11 @@ import sys
 from unittest import TestCase
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                "/../PathPlanning/RRTstar/")
+                "/../PathPlanning/RRTStar/")
 
 try:
     import rrt_star as m
-except:
+except ImportError:
     raise
 
 
