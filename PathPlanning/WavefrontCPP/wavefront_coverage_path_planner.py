@@ -49,8 +49,8 @@ def transform(
     else:
         sys.exit('Unsupported distance type.')
 
-    T = float('inf') * np.ones_like(gridmap, dtype=np.float)
-    T[src[0], src[1]] = 0
+    transform_matrix = float('inf') * np.ones_like(gridmap, dtype=np.float)
+    transform_matrix[src[0], src[1]] = 0
     if transform_type == 'distance':
         eT = np.zeros_like(gridmap)
     elif transform_type == 'path':
@@ -58,45 +58,53 @@ def transform(
     else:
         sys.exit('Unsupported transform type.')
 
-    # set obstacle T value to infinity
+    # set obstacle transform_matrix value to infinity
     for i in range(nrows):
         for j in range(ncols):
             if gridmap[i][j] == 1.0:
-                T[i][j] = float('inf')
-    is_visited = np.zeros_like(T, dtype=bool)
+                transform_matrix[i][j] = float('inf')
+    is_visited = np.zeros_like(transform_matrix, dtype=bool)
     is_visited[src[0], src[1]] = True
-    queue = [src]
+    traversal_queue = [src]
     calculated = [(src[0]-1)*ncols + src[1]]
 
-    while queue != []:
-        i, j = queue.pop(0)
+    def is_valid_neighbor(i, j):
+        return ni >= 0 and ni < nrows and nj >= 0 and nj < ncols \
+            and not gridmap[ni][nj]
+
+    while traversal_queue != []:
+        i, j = traversal_queue.pop(0)
         for k, inc in enumerate(inc_order):
             ni = i + inc[0]
             nj = j + inc[1]
-            if ni >= 0 and ni < nrows and nj >= 0 and nj < ncols \
-                    and not gridmap[ni][nj]:
+            if is_valid_neighbor(ni, nj):
                 is_visited[i][j] = True
-                T[i][j] = min(T[i][j], T[ni][nj] + cost[k] + alpha*eT[ni][nj])
-                if not is_visited[ni][nj] and ((ni-1)*ncols + nj) \
-                        not in calculated:
-                    queue.append((ni, nj))
+
+                # update transform_matrix
+                transform_matrix[i][j] = min(
+                    transform_matrix[i][j],
+                    transform_matrix[ni][nj] + cost[k] + alpha*eT[ni][nj])
+
+                if not is_visited[ni][nj] \
+                        and ((ni-1)*ncols + nj) not in calculated:
+                    traversal_queue.append((ni, nj))
                     calculated.append((ni-1)*ncols + nj)
 
-    return T
+    return transform_matrix
 
 
-def wavefront(T, start, goal):
+def wavefront(transform_matrix, start, goal):
     """wavefront
 
     performing wavefront coverage path planning
 
-    :param T: the transform matrix
+    :param transform_matrix: the transform matrix
     :param start: start point of planning
     :param goal: goal point of planning
     """
 
     path = []
-    nrows, ncols = T.shape
+    nrows, ncols = transform_matrix.shape
 
     def get_search_order_increment(start, goal):
         if start[0] >= goal[0] and start[1] >= goal[1]:
@@ -120,45 +128,47 @@ def wavefront(T, start, goal):
         is_i_valid_bounded = i >= 0 and i < nrows
         is_j_valid_bounded = j >= 0 and j < ncols
         if is_i_valid_bounded and is_j_valid_bounded:
-            return not is_visited[i][j] and T[i][j] != float('inf')
+            return not is_visited[i][j] and \
+                transform_matrix[i][j] != float('inf')
         return False
 
     inc_order = get_search_order_increment(start, goal)
 
-    cur = start
-    is_visited = np.zeros_like(T, dtype=bool)
+    current_node = start
+    is_visited = np.zeros_like(transform_matrix, dtype=bool)
 
-    while cur != goal:
-        i, j = cur
+    while current_node != goal:
+        i, j = current_node
         path.append((i, j))
         is_visited[i][j] = True
 
         max_T = float('-inf')
-        imax = (-1, -1)
-        ilast = 0
-        for ilast in range(len(path)):
-            cur = path[-1-ilast]  # get lastest point in path
+        i_max = (-1, -1)
+        i_last = 0
+        for i_last in range(len(path)):
+            current_node = path[-1 - i_last]  # get lastest node in path
             for ci, cj in inc_order:
-                ni, nj = cur[0] + ci, cur[1] + cj
-                if is_valid_neighbor(ni, nj) and T[ni][nj] > max_T:
-                    imax = (ni, nj)
-                    max_T = T[ni][nj]
+                ni, nj = current_node[0] + ci, current_node[1] + cj
+                if is_valid_neighbor(ni, nj) and \
+                        transform_matrix[ni][nj] > max_T:
+                    i_max = (ni, nj)
+                    max_T = transform_matrix[ni][nj]
 
-            if imax != (-1, -1):
+            if i_max != (-1, -1):
                 break
 
-        if imax == (-1, -1):
+        if i_max == (-1, -1):
             break
         else:
-            cur = imax
-            if ilast != 0:
-                print('backtracing to [%d, %d]' % (cur[0], cur[1]))
+            current_node = i_max
+            if i_last != 0:
+                print('backtracing to', current_node)
     path.append(goal)
 
     return path
 
 
-def viz_plan(grid_map, start, goal, path, resolution):
+def visualize_path(grid_map, start, goal, path, resolution):
     oy, ox = start
     gy, gx = goal
     px, py = np.transpose(np.flipud(np.fliplr((path))))
@@ -186,7 +196,7 @@ def viz_plan(grid_map, start, goal, path, resolution):
             plt.pause(0.1)
 
 
-if __name__ == "__main__":
+def main():
     dir_path = os.path.dirname(os.path.realpath(__file__))
     img = plt.imread(os.path.join(dir_path, 'map', 'test.png'))
     img = 1 - img  # revert pixel values
@@ -197,9 +207,13 @@ if __name__ == "__main__":
     # distance transform wavefront
     DT = transform(img, goal, transform_type='distance')
     DT_path = wavefront(DT, start, goal)
-    viz_plan(img, start, goal, DT_path, 1)
+    visualize_path(img, start, goal, DT_path, 1)
 
     # path transform wavefront
     PT = transform(img, goal, transform_type='path', alpha=0.01)
     PT_path = wavefront(PT, start, goal)
-    viz_plan(img, start, goal, PT_path, 1)
+    visualize_path(img, start, goal, PT_path, 1)
+
+
+if __name__ == "__main__":
+    main()
