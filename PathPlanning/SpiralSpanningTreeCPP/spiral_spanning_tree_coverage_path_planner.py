@@ -1,5 +1,5 @@
 """
-Terrain-Adaptive Spiral-STC Coverage Path Planner
+Spiral Spanning Tree Coverage Path Planner
 
 author: Todd Tang
 paper: Spiral-STC: An On-Line Coverage Algorithm of Grid Environments
@@ -17,18 +17,17 @@ import matplotlib.pyplot as plt
 do_animation = True
 
 
-class SpiralSTC():
-    def __init__(self, occmap):
-        self.origin_map_height = occmap.shape[0]
-        self.origin_map_width = occmap.shape[1]
+class SpiralSTC:
+    def __init__(self, occ_map):
+        self.origin_map_height = occ_map.shape[0]
+        self.origin_map_width = occ_map.shape[1]
 
-        # original map resolution must be 2^k
-        if math.log2(self.origin_map_height) % 1 == 0 and \
-                math.log2(self.origin_map_width) % 1 == 0:
-            sys.exit('original map width/height must be 2^k \
+        # original map resolution must be even
+        if self.origin_map_height % 2 == 1 or self.origin_map_width % 2 == 1:
+            sys.exit('original map width/height must be even \
                 in grayscale .png format')
 
-        self.occmap = occmap
+        self.occ_map = occ_map
         self.merged_map_height = self.origin_map_height // 2
         self.merged_map_width = self.origin_map_width // 2
 
@@ -51,34 +50,33 @@ class SpiralSTC():
         order = [[1, 0], [0, 1], [-1, 0], [0, -1]]
 
         def is_valid_node(i, j):
-            is_i_valid_bounded = i >= 0 and i < self.merged_map_height
-            is_j_valid_bounded = j >= 0 and j < self.merged_map_width
+            is_i_valid_bounded = 0 <= i < self.merged_map_height
+            is_j_valid_bounded = 0 <= j < self.merged_map_width
             if is_i_valid_bounded and is_j_valid_bounded:
                 # free only when the 4 sub-cells are all free
                 return bool(
-                    self.occmap[2*i][2*j] and self.occmap[2*i+1][2*j]
-                    and self.occmap[2*i][2*j+1] and self.occmap[2*i+1][2*j+1])
+                    self.occ_map[2*i][2*j] and self.occ_map[2*i+1][2*j]
+                    and self.occ_map[2*i][2*j+1] and self.occ_map[2*i+1][2*j+1])
             return False
 
-        def STC(w, x):
+        def STC(current_node):
             """STC
 
             recursive function for function <plan>
 
-            :param w: parent node
-            :param x: current node
+            :param current_node: current node
             """
 
             found = False
-            route.append(x)
+            route.append(current_node)
             for inc in order:
-                ni, nj = x[0] + inc[0], x[1] + inc[1]
+                ni, nj = current_node[0] + inc[0], current_node[1] + inc[1]
                 if is_valid_node(ni, nj) and visit_times[ni][nj] == 0:
-                    y = (ni, nj)
-                    self.edge.append((x, y))
+                    neighbor_node = (ni, nj)
+                    self.edge.append((current_node, neighbor_node))
                     found = True
                     visit_times[ni][nj] += 1
-                    STC(x, y)
+                    STC(neighbor_node)
 
             # backtrace route from node with neighbors all visited
             # to first node with unvisited neighbor
@@ -101,8 +99,8 @@ class SpiralSTC():
                     if has_node_with_unvisited_ngb:
                         break
 
-        # generate route by recursing form start node
-        STC(None, start)
+        # generate route by recusively call STC() from start node
+        STC(start)
 
         # generate path from route
         for idx in range(len(route)-1):
@@ -114,12 +112,12 @@ class SpiralSTC():
             elif dp == 1:
                 path.append(self.move(route[idx], route[idx+1]))
             elif dp == 2:
-                # special handle for non-adjecent route nodes
+                # special handle for non-adjacent route nodes
                 mid_node = self.get_intermediate_node(route[idx], route[idx+1])
                 path.append(self.move(route[idx], mid_node))
                 path.append(self.move(mid_node, route[idx+1]))
             else:
-                sys.exit('adjecent path node distance larger than 2')
+                sys.exit('adjacent path node distance larger than 2')
 
         return self.edge, route, path
 
@@ -254,7 +252,7 @@ class SpiralSTC():
                     lambda event: [exit(0) if event.key == 'escape' else None])
 
                 # draw spanning tree
-                plt.imshow(self.occmap, 'gray')
+                plt.imshow(self.occ_map, 'gray')
                 for p, q in edge:
                     p = coord_transform(p)
                     q = coord_transform(q)
@@ -271,7 +269,7 @@ class SpiralSTC():
 
         else:
             # draw spanning tree
-            plt.imshow(self.occmap, 'gray')
+            plt.imshow(self.occ_map, 'gray')
             for p, q in edge:
                 p = coord_transform(p)
                 q = coord_transform(q)
@@ -294,10 +292,14 @@ class SpiralSTC():
             plt.show()
 
 
-if __name__ == "__main__":
+def main():
     dir_path = os.path.dirname(os.path.realpath(__file__))
     img = plt.imread(os.path.join(dir_path, 'map', 'test_2.png'))
     STC_planner = SpiralSTC(img)
     start = (10, 0)
     edge, route, path = STC_planner.plan(start)
     STC_planner.viz_plan(edge, path, start)
+
+
+if __name__ == "__main__":
+    main()
