@@ -55,8 +55,11 @@ class SpiralSTC:
             if is_i_valid_bounded and is_j_valid_bounded:
                 # free only when the 4 sub-cells are all free
                 return bool(
-                    self.occ_map[2*i][2*j] and self.occ_map[2*i+1][2*j]
-                    and self.occ_map[2*i][2*j+1] and self.occ_map[2*i+1][2*j+1])
+                    self.occ_map[2*i][2*j]
+                    and self.occ_map[2*i+1][2*j]
+                    and self.occ_map[2*i][2*j+1]
+                    and self.occ_map[2*i+1][2*j+1])
+
             return False
 
         def STC(current_node):
