@@ -26,8 +26,6 @@ jobs:
         pip install -r requirements.txt
     - name: install coverage
       run: pip install coverage
-    - name: install coveralls
-      run: pip install coveralls
     - name: install mypy
       run: pip install mypy
     - name: install pycodestyle
@@ -43,15 +41,12 @@ jobs:
         find PathPlanning -name "*.py" | xargs mypy
         find PathTracking -name "*.py" | xargs mypy
         find SLAM -name "*.py" | xargs mypy
-
     - name: do diff style check
       run: bash rundiffstylecheck.sh
     - name: do all unit tests
       run: bash runtests.sh
     - name: Codecov
       uses: codecov/codecov-action@v1.0.10
-    - name: Coveralls
-      run: coveralls
 
 
 
