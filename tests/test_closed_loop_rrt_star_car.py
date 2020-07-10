@@ -1,5 +1,6 @@
 import os
 import sys
+import random
 from unittest import TestCase
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../")
@@ -7,9 +8,10 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
                 "/../PathPlanning/ClosedLoopRRTStar/")
 try:
     from PathPlanning.ClosedLoopRRTStar import closed_loop_rrt_star_car as m
-except:
+except ImportError:
     raise
 
+random.seed(12345)
 
 print(__file__)
 
