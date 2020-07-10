@@ -12,33 +12,31 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-
 from scipy import ndimage
-
 
 do_animation = True
 
 
 def transform(
-    gridmap, src, distance_type='chessboard',
-    transform_type='path', alpha=0.01
+        grid_map, src, distance_type='chessboard',
+        transform_type='path', alpha=0.01
 ):
     """transform
 
     calculating transform of transform_type from src
     in given distance_type
 
-    :param gridmap: 2d binary map
+    :param grid_map: 2d binary map
     :param src: distance transform source
     :param distance_type: type of distance used
     :param transform_type: type of transform used
-    :param alpha: weight of Obstacle Transform usedwhen using path_transform
+    :param alpha: weight of Obstacle Transform used when using path_transform
     """
 
-    nrows, ncols = gridmap.shape
+    n_rows, n_cols = grid_map.shape
 
-    if nrows == 0 or ncols == 0:
-        sys.exit('Empty gridmap.')
+    if n_rows == 0 or n_cols == 0:
+        sys.exit('Empty grid_map.')
 
     inc_order = [[0, 1], [1, 1], [1, 0], [1, -1],
                  [0, -1], [-1, -1], [-1, 0], [-1, 1]]
@@ -49,30 +47,30 @@ def transform(
     else:
         sys.exit('Unsupported distance type.')
 
-    transform_matrix = float('inf') * np.ones_like(gridmap, dtype=np.float)
+    transform_matrix = float('inf') * np.ones_like(grid_map, dtype=np.float)
     transform_matrix[src[0], src[1]] = 0
     if transform_type == 'distance':
-        eT = np.zeros_like(gridmap)
+        eT = np.zeros_like(grid_map)
     elif transform_type == 'path':
-        eT = ndimage.distance_transform_cdt(1-gridmap, distance_type)
+        eT = ndimage.distance_transform_cdt(1 - grid_map, distance_type)
     else:
         sys.exit('Unsupported transform type.')
 
     # set obstacle transform_matrix value to infinity
-    for i in range(nrows):
-        for j in range(ncols):
-            if gridmap[i][j] == 1.0:
+    for i in range(n_rows):
+        for j in range(n_cols):
+            if grid_map[i][j] == 1.0:
                 transform_matrix[i][j] = float('inf')
     is_visited = np.zeros_like(transform_matrix, dtype=bool)
     is_visited[src[0], src[1]] = True
     traversal_queue = [src]
-    calculated = [(src[0]-1)*ncols + src[1]]
+    calculated = [(src[0] - 1) * n_cols + src[1]]
 
-    def is_valid_neighbor(i, j):
-        return ni >= 0 and ni < nrows and nj >= 0 and nj < ncols \
-            and not gridmap[ni][nj]
+    def is_valid_neighbor(g_i, g_j):
+        return 0 <= g_i < n_rows and 0 <= g_j < n_cols \
+               and not grid_map[g_i][g_j]
 
-    while traversal_queue != []:
+    while traversal_queue:
         i, j = traversal_queue.pop(0)
         for k, inc in enumerate(inc_order):
             ni = i + inc[0]
@@ -83,14 +81,33 @@ def transform(
                 # update transform_matrix
                 transform_matrix[i][j] = min(
                     transform_matrix[i][j],
-                    transform_matrix[ni][nj] + cost[k] + alpha*eT[ni][nj])
+                    transform_matrix[ni][nj] + cost[k] + alpha * eT[ni][nj])
 
                 if not is_visited[ni][nj] \
-                        and ((ni-1)*ncols + nj) not in calculated:
+                        and ((ni - 1) * n_cols + nj) not in calculated:
                     traversal_queue.append((ni, nj))
-                    calculated.append((ni-1)*ncols + nj)
+                    calculated.append((ni - 1) * n_cols + nj)
 
     return transform_matrix
+
+
+def get_search_order_increment(start, goal):
+    if start[0] >= goal[0] and start[1] >= goal[1]:
+        order = [[1, 0], [0, 1], [-1, 0], [0, -1],
+                 [1, 1], [1, -1], [-1, 1], [-1, -1]]
+    elif start[0] <= goal[0] and start[1] >= goal[1]:
+        order = [[-1, 0], [0, 1], [1, 0], [0, -1],
+                 [-1, 1], [-1, -1], [1, 1], [1, -1]]
+    elif start[0] >= goal[0] and start[1] <= goal[1]:
+        order = [[1, 0], [0, -1], [-1, 0], [0, 1],
+                 [1, -1], [-1, -1], [1, 1], [-1, 1]]
+    elif start[0] <= goal[0] and start[1] <= goal[1]:
+        order = [[-1, 0], [0, -1], [0, 1], [1, 0],
+                 [-1, -1], [-1, 1], [1, -1], [1, 1]]
+    else:
+        sys.exit('get_search_order_increment: cannot determine \
+            start=>goal increment order')
+    return order
 
 
 def wavefront(transform_matrix, start, goal):
@@ -104,32 +121,14 @@ def wavefront(transform_matrix, start, goal):
     """
 
     path = []
-    nrows, ncols = transform_matrix.shape
+    n_rows, n_cols = transform_matrix.shape
 
-    def get_search_order_increment(start, goal):
-        if start[0] >= goal[0] and start[1] >= goal[1]:
-            order = [[1, 0], [0, 1], [-1, 0], [0, -1],
-                     [1, 1], [1, -1], [-1, 1], [-1, -1]]
-        elif start[0] <= goal[0] and start[1] >= goal[1]:
-            order = [[-1, 0], [0, 1], [1, 0], [0, -1],
-                     [-1, 1], [-1, -1], [1, 1], [1, -1]]
-        elif start[0] >= goal[0] and start[1] <= goal[1]:
-            order = [[1, 0], [0, -1], [-1, 0], [0, 1],
-                     [1, -1], [-1, -1], [1, 1], [-1, 1]]
-        elif start[0] <= goal[0] and start[1] <= goal[1]:
-            order = [[-1, 0], [0, -1], [0, 1], [1, 0],
-                     [-1, -1], [-1, 1], [1, -1], [1, 1]]
-        else:
-            sys.exit('get_search_order_increment: cannot determine \
-                start=>goal increment order')
-        return order
-
-    def is_valid_neighbor(i, j):
-        is_i_valid_bounded = i >= 0 and i < nrows
-        is_j_valid_bounded = j >= 0 and j < ncols
+    def is_valid_neighbor(g_i, g_j):
+        is_i_valid_bounded = 0 <= g_i < n_rows
+        is_j_valid_bounded = 0 <= g_j < n_cols
         if is_i_valid_bounded and is_j_valid_bounded:
-            return not is_visited[i][j] and \
-                transform_matrix[i][j] != float('inf')
+            return not is_visited[g_i][g_j] and \
+                   transform_matrix[g_i][g_j] != float('inf')
         return False
 
     inc_order = get_search_order_increment(start, goal)
@@ -146,7 +145,7 @@ def wavefront(transform_matrix, start, goal):
         i_max = (-1, -1)
         i_last = 0
         for i_last in range(len(path)):
-            current_node = path[-1 - i_last]  # get lastest node in path
+            current_node = path[-1 - i_last]  # get latest node in path
             for ci, cj in inc_order:
                 ni, nj = current_node[0] + ci, current_node[1] + cj
                 if is_valid_neighbor(ni, nj) and \
@@ -168,10 +167,10 @@ def wavefront(transform_matrix, start, goal):
     return path
 
 
-def visualize_path(grid_map, start, goal, path, resolution):
+def visualize_path(grid_map, start, goal, path):  # pragma: no cover
     oy, ox = start
     gy, gx = goal
-    px, py = np.transpose(np.flipud(np.fliplr((path))))
+    px, py = np.transpose(np.flipud(np.fliplr(path)))
 
     if not do_animation:
         plt.imshow(grid_map, cmap='Greys')
@@ -207,12 +206,12 @@ def main():
     # distance transform wavefront
     DT = transform(img, goal, transform_type='distance')
     DT_path = wavefront(DT, start, goal)
-    visualize_path(img, start, goal, DT_path, 1)
+    visualize_path(img, start, goal, DT_path)
 
     # path transform wavefront
     PT = transform(img, goal, transform_type='path', alpha=0.01)
     PT_path = wavefront(PT, start, goal)
-    visualize_path(img, start, goal, PT_path, 1)
+    visualize_path(img, start, goal, PT_path)
 
 
 if __name__ == "__main__":

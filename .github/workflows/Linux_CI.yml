@@ -45,6 +45,8 @@ jobs:
       run: bash rundiffstylecheck.sh
     - name: do all unit tests
       run: bash runtests.sh
+    - name: Codecov
+      uses: codecov/codecov-action@v1.0.10
 
 
 
