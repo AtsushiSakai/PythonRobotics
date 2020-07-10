@@ -117,7 +117,7 @@ def jacob_motion(x, u):
 
     jF = np.array([[0.0, 0.0, -DT * u[0] * math.sin(x[2, 0])],
                    [0.0, 0.0, DT * u[0] * math.cos(x[2, 0])],
-                   [0.0, 0.0, 0.0]])
+                   [0.0, 0.0, 0.0]], dtype=np.float64)
 
     G = np.eye(STATE_SIZE) + Fx.T @ jF @ Fx
 
@@ -236,8 +236,9 @@ def main():
         if show_animation:  # pragma: no cover
             plt.cla()
             # for stopping simulation with the esc key.
-            plt.gcf().canvas.mpl_connect('key_release_event',
-                    lambda event: [exit(0) if event.key == 'escape' else None])
+            plt.gcf().canvas.mpl_connect(
+                'key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
 
             plt.plot(RFID[:, 0], RFID[:, 1], "*k")
             plt.plot(xEst[0], xEst[1], ".r")
