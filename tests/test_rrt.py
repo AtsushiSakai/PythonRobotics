@@ -1,5 +1,6 @@
 import os
 import sys
+import random
 from unittest import TestCase
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../")
@@ -11,6 +12,8 @@ except ImportError:
 
 
 print(__file__)
+
+random.seed(12345)
 
 
 class Test(TestCase):

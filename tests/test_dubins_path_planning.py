@@ -1,6 +1,7 @@
 from unittest import TestCase
 
 import numpy as np
+np.random.seed(12345)
 
 from PathPlanning.DubinsPath import dubins_path_planning
 
