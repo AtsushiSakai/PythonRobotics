@@ -1,0 +1,25 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@0.2.1
+
+jobs:
+  build_doc:
+    executor: python/default
+    steps:
+      - checkout
+      - python/load-cache
+      - python/install-deps
+      - python/save-cache
+      - run: pip install sphinx sphinx-autobuild sphinx-rtd-theme
+      - run:
+          command: cd docs;make html
+          name: doc_build
+      - store_artifacts:
+          path: docs/_build/html/
+          destination: html
+
+workflows:
+  main:
+    jobs:
+      - build_doc
