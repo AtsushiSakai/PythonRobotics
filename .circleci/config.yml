@@ -12,9 +12,8 @@ jobs:
       - python/install-deps
       - python/save-cache
       - run: pip install sphinx sphinx-autobuild sphinx-rtd-theme
-      - run: cd docs
       - run:
-          command: make html
+          command: cd docs;make html
           name: doc_build
 
 workflows:
