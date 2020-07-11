@@ -8,7 +8,7 @@ Welcome to PythonRobotics's documentation!
 
 Python codes for robotics algorithm. The project is on `GitHub`_.
 
-This is a Python code collection of robotics algorithms, especially for autonomous navigation.
+This is a Python code collection of robotics algorithms.
 
 Features:
 
