@@ -16,8 +16,8 @@ jobs:
           command: cd docs;make html
           name: doc_build
       - store_artifacts:
-        path: docs/_build/html/
-        destination: html
+          path: docs/_build/html/
+          destination: html
 
 workflows:
   main:
