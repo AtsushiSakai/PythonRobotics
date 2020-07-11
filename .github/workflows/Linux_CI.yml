@@ -43,12 +43,6 @@ jobs:
         find SLAM -name "*.py" | xargs mypy
     - name: do diff style check
       run: bash rundiffstylecheck.sh
-    - name: run-circleci-artifacts-redirector
-      uses: larsoner/circleci-artifacts-redirector-action@0.2.0
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        artifact-path: 0/html/index.html
-        circleci-jobs: build_doc
     - name: do all unit tests
       run: bash runtests.sh
     - name: Codecov
