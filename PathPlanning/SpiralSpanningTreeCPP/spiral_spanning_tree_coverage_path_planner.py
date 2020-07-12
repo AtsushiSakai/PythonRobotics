@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 do_animation = True
 
 
-class SpiralSTC:
+class SpiralSpanningTreeCoveragePlanner:
     def __init__(self, occ_map):
         self.origin_map_height = occ_map.shape[0]
         self.origin_map_width = occ_map.shape[1]
@@ -36,18 +36,47 @@ class SpiralSTC:
     def plan(self, start):
         """plan
 
-        performing Spiral Spanning Tree coverage path planning
+        performing Spiral Spanning Tree Coverage path planning
 
-        :param start: the start node of Spiral-STC
+        :param start: the start node of Spiral Spanning Tree Coverage
         """
 
         visit_times = np.zeros(
             (self.merged_map_height, self.merged_map_width), dtype=np.int)
         visit_times[start[0]][start[1]] = 1
 
-        route, path = [], []
-        # counter-clockwise neighbor finding order
-        order = [[1, 0], [0, 1], [-1, 0], [0, -1]]
+        # generate route by
+        # recusively call perform_spanning_tree_coverage() from start node
+        route = []
+        self.perform_spanning_tree_coverage(start, visit_times, route)
+
+        path = []
+        # generate path from route
+        for idx in range(len(route)-1):
+            dp = abs(route[idx][0] - route[idx+1][0]) + \
+                abs(route[idx][1] - route[idx+1][1])
+            if dp == 0:
+                # special handle for round-trip path
+                path.append(self.get_round_trip_path(route[idx-1], route[idx]))
+            elif dp == 1:
+                path.append(self.move(route[idx], route[idx+1]))
+            elif dp == 2:
+                # special handle for non-adjacent route nodes
+                mid_node = self.get_intermediate_node(route[idx], route[idx+1])
+                path.append(self.move(route[idx], mid_node))
+                path.append(self.move(mid_node, route[idx+1]))
+            else:
+                sys.exit('adjacent path node distance larger than 2')
+
+        return self.edge, route, path
+
+    def perform_spanning_tree_coverage(self, current_node, visit_times, route):
+        """perform_spanning_tree_coverage
+
+        recursive function for function <plan>
+
+        :param current_node: current node
+        """
 
         def is_valid_node(i, j):
             is_i_valid_bounded = 0 <= i < self.merged_map_height
@@ -62,67 +91,43 @@ class SpiralSTC:
 
             return False
 
-        def STC(current_node):
-            """STC
+        # counter-clockwise neighbor finding order
+        order = [[1, 0], [0, 1], [-1, 0], [0, -1]]
 
-            recursive function for function <plan>
+        found = False
+        route.append(current_node)
+        for inc in order:
+            ni, nj = current_node[0] + inc[0], current_node[1] + inc[1]
+            if is_valid_node(ni, nj) and visit_times[ni][nj] == 0:
+                neighbor_node = (ni, nj)
+                self.edge.append((current_node, neighbor_node))
+                found = True
+                visit_times[ni][nj] += 1
+                self.perform_spanning_tree_coverage(
+                    neighbor_node, visit_times, route)
 
-            :param current_node: current node
-            """
+        # backtrace route from node with neighbors all visited
+        # to first node with unvisited neighbor
+        if not found:
+            has_node_with_unvisited_ngb = False
+            for node in reversed(route):
+                # drop nodes that have been visited twice
+                if visit_times[node[0]][node[1]] == 2:
+                    continue
 
-            found = False
-            route.append(current_node)
-            for inc in order:
-                ni, nj = current_node[0] + inc[0], current_node[1] + inc[1]
-                if is_valid_node(ni, nj) and visit_times[ni][nj] == 0:
-                    neighbor_node = (ni, nj)
-                    self.edge.append((current_node, neighbor_node))
-                    found = True
-                    visit_times[ni][nj] += 1
-                    STC(neighbor_node)
+                visit_times[node[0]][node[1]] += 1
+                route.append(node)
 
-            # backtrace route from node with neighbors all visited
-            # to first node with unvisited neighbor
-            if not found:
-                has_node_with_unvisited_ngb = False
-                for node in reversed(route):
-                    # drop nodes that have been visited twice
-                    if visit_times[node[0]][node[1]] == 2:
-                        continue
-
-                    visit_times[node[0]][node[1]] += 1
-                    route.append(node)
-
-                    for inc in order:
-                        ni, nj = node[0] + inc[0], node[1] + inc[1]
-                        if is_valid_node(ni, nj) and visit_times[ni][nj] == 0:
-                            has_node_with_unvisited_ngb = True
-                            break
-
-                    if has_node_with_unvisited_ngb:
+                for inc in order:
+                    ni, nj = node[0] + inc[0], node[1] + inc[1]
+                    if is_valid_node(ni, nj) and visit_times[ni][nj] == 0:
+                        has_node_with_unvisited_ngb = True
                         break
 
-        # generate route by recusively call STC() from start node
-        STC(start)
+                if has_node_with_unvisited_ngb:
+                    break
 
-        # generate path from route
-        for idx in range(len(route)-1):
-            dp = abs(route[idx][0] - route[idx+1][0]) + \
-                abs(route[idx][1] - route[idx+1][1])
-            if dp == 0:
-                # special handle for round-trip path
-                path.append(self.round_trip(route[idx-1], route[idx]))
-            elif dp == 1:
-                path.append(self.move(route[idx], route[idx+1]))
-            elif dp == 2:
-                # special handle for non-adjacent route nodes
-                mid_node = self.get_intermediate_node(route[idx], route[idx+1])
-                path.append(self.move(route[idx], mid_node))
-                path.append(self.move(mid_node, route[idx+1]))
-            else:
-                sys.exit('adjacent path node distance larger than 2')
-
-        return self.edge, route, path
+        return route
 
     def move(self, p, q):
         direction = self.get_vector_direction(p, q)
@@ -146,7 +151,7 @@ class SpiralSTC:
             sys.exit('move direction error...')
         return [p, q]
 
-    def round_trip(self, last, pivot):
+    def get_round_trip_path(self, last, pivot):
         direction = self.get_vector_direction(last, pivot)
         if direction == 'E':
             return [self.get_sub_node(pivot, 'SE'),
@@ -161,7 +166,7 @@ class SpiralSTC:
             return [self.get_sub_node(pivot, 'NE'),
                     self.get_sub_node(pivot, 'NW')]
         else:
-            sys.exit('round_trip: last->pivot direction error.')
+            sys.exit('get_round_trip_path: last->pivot direction error.')
 
     def get_vector_direction(self, p, q):
         # east
@@ -225,7 +230,7 @@ class SpiralSTC:
             sys.exit('get_intermediate_node: \
                 more than 1 intermediate node between', p, q)
 
-    def viz_plan(self, edge, path, start):
+    def visualize_path(self, edge, path, start):
         def coord_transform(p):
             return [2*p[1] + 0.5, 2*p[0] + 0.5]
 
@@ -298,10 +303,10 @@ class SpiralSTC:
 def main():
     dir_path = os.path.dirname(os.path.realpath(__file__))
     img = plt.imread(os.path.join(dir_path, 'map', 'test_2.png'))
-    STC_planner = SpiralSTC(img)
+    STC_planner = SpiralSpanningTreeCoveragePlanner(img)
     start = (10, 0)
     edge, route, path = STC_planner.plan(start)
-    STC_planner.viz_plan(edge, path, start)
+    STC_planner.visualize_path(edge, path, start)
 
 
 if __name__ == "__main__":

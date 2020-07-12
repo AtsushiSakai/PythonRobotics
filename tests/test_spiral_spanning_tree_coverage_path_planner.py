@@ -10,7 +10,7 @@ try:
 except ImportError:
     raise
 
-spiral_spanning_tree_coverage_path_planner.do_animation = False
+spiral_spanning_tree_coverage_path_planner.do_animation = True
 
 
 class TestPlanning(TestCase):
@@ -20,7 +20,9 @@ class TestPlanning(TestCase):
             for j in range(img.shape[1]):
                 num_free += img[i][j]
 
-        STC_planner = spiral_spanning_tree_coverage_path_planner.SpiralSTC(img)
+        STC_planner = spiral_spanning_tree_coverage_path_planner.\
+            SpiralSpanningTreeCoveragePlanner(img)
+
         edge, route, path = STC_planner.plan(start)
 
         covered_nodes = set()
