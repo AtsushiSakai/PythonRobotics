@@ -18,7 +18,7 @@ from scipy.spatial import cKDTree
 sys.path.append(os.path.dirname(os.path.abspath(__file__))
                 + "/../ReedsSheppPath")
 try:
-    from a_star_heuristic import dp_planning
+    from dynamic_programming_heuristic import calc_distance_heuristic
     import reeds_shepp_path_planning as rs
     from car import move, check_car_collision, MAX_STEER, WB, plot_car
 except Exception:
@@ -274,9 +274,9 @@ def hybrid_a_star_planning(start, goal, ox, oy, xy_resolution, yaw_resolution):
 
     openList, closedList = {}, {}
 
-    _, _, h_dp = dp_planning(start_node.x_list[-1], start_node.y_list[-1],
-                             goal_node.x_list[-1], goal_node.y_list[-1],
-                             ox, oy, xy_resolution, VR)
+    h_dp = calc_distance_heuristic(
+        goal_node.x_list[-1], goal_node.y_list[-1],
+        ox, oy, xy_resolution, VR)
 
     pq = []
     openList[calc_index(start_node, config)] = start_node

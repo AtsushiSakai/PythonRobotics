@@ -42,7 +42,7 @@ def calc_final_path(goal_node, closed_node_set, resolution):
     return rx, ry
 
 
-def dp_planning(sx, sy, gx, gy, ox, oy, resolution, rr):
+def calc_distance_heuristic(gx, gy, ox, oy, resolution, rr):
     """
     gx: goal x position [m]
     gx: goal x position [m]
@@ -52,7 +52,6 @@ def dp_planning(sx, sy, gx, gy, ox, oy, resolution, rr):
     rr: robot radius[m]
     """
 
-    start_node = Node(round(sx / resolution), round(sy / resolution), 0.0, -1)
     goal_node = Node(round(gx / resolution), round(gy / resolution), 0.0, -1)
     ox = [iox / resolution for iox in ox]
     oy = [ioy / resolution for ioy in oy]
@@ -115,16 +114,7 @@ def dp_planning(sx, sy, gx, gy, ox, oy, resolution, rr):
                         priority_queue,
                         (node.cost, calc_index(node, x_w, min_x, min_y)))
 
-    rx, ry = calc_final_path(closed_set[calc_index(
-        start_node, x_w, min_x, min_y)], closed_set, resolution)
-
-    return rx, ry, closed_set
-
-
-def calc_heuristic(n1, n2):
-    w = 1.0  # weight of heuristic
-    d = w * math.sqrt((n1.x - n2.x) ** 2 + (n1.y - n2.y) ** 2)
-    return d
+    return closed_set
 
 
 def verify_node(node, obstacle_map, min_x, min_y, max_x, max_y):
@@ -184,54 +174,3 @@ def get_motion_model():
               [1, 1, math.sqrt(2)]]
 
     return motion
-
-
-def main():
-    print(__file__ + " start!!")
-
-    # start and goal position
-    sx = 10.0  # [m]
-    sy = 10.0  # [m]
-    gx = 50.0  # [m]
-    gy = 50.0  # [m]
-    grid_size = 2.0  # [m]
-    robot_size = 1.0  # [m]
-
-    ox, oy = [], []
-
-    for i in range(60):
-        ox.append(i)
-        oy.append(0.0)
-    for i in range(60):
-        ox.append(60.0)
-        oy.append(i)
-    for i in range(61):
-        ox.append(i)
-        oy.append(60.0)
-    for i in range(61):
-        ox.append(0.0)
-        oy.append(i)
-    for i in range(40):
-        ox.append(20.0)
-        oy.append(i)
-    for i in range(40):
-        ox.append(40.0)
-        oy.append(60.0 - i)
-
-    if show_animation:  # pragma: no cover
-        plt.plot(ox, oy, ".k")
-        plt.plot(sx, sy, "xr")
-        plt.plot(gx, gy, "xb")
-        plt.grid(True)
-        plt.axis("equal")
-
-    rx, ry, _ = dp_planning(sx, sy, gx, gy, ox, oy, grid_size, robot_size)
-
-    if show_animation:  # pragma: no cover
-        plt.plot(rx, ry, "-r")
-        plt.show()
-
-
-if __name__ == '__main__':
-    show_animation = True
-    main()
