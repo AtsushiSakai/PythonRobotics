@@ -174,4 +174,3 @@ def get_motion_model():
               [1, 1, math.sqrt(2)]]
 
     return motion
-
