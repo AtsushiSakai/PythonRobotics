@@ -33,16 +33,16 @@ class DepthFirstSearchPlanner:
         self.motion = self.get_motion_model()
 
     class Node:
-        def __init__(self, x, y, cost, pind, parent):
+        def __init__(self, x, y, cost, parent_index, parent):
             self.x = x  # index of grid
             self.y = y  # index of grid
             self.cost = cost
-            self.pind = pind
+            self.parent_index = parent_index
             self.parent = parent
 
         def __str__(self):
             return str(self.x) + "," + str(self.y) + "," + str(
-                self.cost) + "," + str(self.pind)
+                self.cost) + "," + str(self.parent_index)
 
     def planning(self, sx, sy, gx, gy):
         """
@@ -88,7 +88,7 @@ class DepthFirstSearchPlanner:
 
             if current.x == ngoal.x and current.y == ngoal.y:
                 print("Find goal")
-                ngoal.pind = current.pind
+                ngoal.parent_index = current.parent_index
                 ngoal.cost = current.cost
                 break
 
@@ -115,7 +115,7 @@ class DepthFirstSearchPlanner:
         # generate final course
         rx, ry = [self.calc_grid_position(ngoal.x, self.minx)], [
             self.calc_grid_position(ngoal.y, self.miny)]
-        n = closedset[ngoal.pind]
+        n = closedset[ngoal.parent_index]
         while n is not None:
             rx.append(self.calc_grid_position(n.x, self.minx))
             ry.append(self.calc_grid_position(n.y, self.miny))
