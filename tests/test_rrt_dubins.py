@@ -3,8 +3,8 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
                 "/../PathPlanning/RRTDubins/")
-#sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                #"/../PathPlanning/DubinsPath/")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/../PathPlanning/DubinsPath/")
 
 try:
     import rrt_dubins as m

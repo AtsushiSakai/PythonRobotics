@@ -7,8 +7,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
 
 try:
     import depth_first_search as m
-except:
-    raise
+except ImportError :
+	raise	
 
 
 print(__file__)
