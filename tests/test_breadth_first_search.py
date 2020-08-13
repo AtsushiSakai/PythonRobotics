@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
 
 try:
     import breadth_first_search as m
-except ImportError :
+except ImportError:
 	raise
     
 

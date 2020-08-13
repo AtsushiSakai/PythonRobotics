@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
 
 try:
     import dijkstra as m
-except ImportError :
+except ImportError:
 	raise
 
 print(__file__)
