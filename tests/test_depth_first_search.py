@@ -14,4 +14,5 @@ class Test(TestCase):
         m.main()
 if __name__ == '__main__':  # pragma: no cover
     test = Test()
-    test.test1()     
+    
+    test.test1()  
