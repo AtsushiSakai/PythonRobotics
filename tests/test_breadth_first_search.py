@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
 try:
     import breadth_first_search as m
 except ImportError:
-	 raise
+    raise
 
 
 print(__file__)
@@ -23,4 +23,4 @@ class Test(TestCase):
 
 if __name__ == '__main__':  # pragma: no cover
     test = Test()
-    test.test1() 
+    test.test1()
