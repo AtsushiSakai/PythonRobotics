@@ -38,15 +38,15 @@ class Dijkstra:
         self.motion = self.get_motion_model()
 
     class Node:
-        def __init__(self, x, y, cost, parent):
+        def __init__(self, x, y, cost, parent_index):
             self.x = x  # index of grid
             self.y = y  # index of grid
             self.cost = cost
-            self.parent = parent  # index of previous Node
+            self.parent_index = parent_index  # index of previous Node
 
         def __str__(self):
             return str(self.x) + "," + str(self.y) + "," + str(
-                self.cost) + "," + str(self.parent)
+                self.cost) + "," + str(self.parent_index)
 
     def planning(self, sx, sy, gx, gy):
         """
@@ -88,7 +88,7 @@ class Dijkstra:
 
             if current.x == goal_node.x and current.y == goal_node.y:
                 print("Find goal")
-                goal_node.parent = current.parent
+                goal_node.parent_index = current.parent_index
                 goal_node.cost = current.cost
                 break
 
@@ -126,12 +126,12 @@ class Dijkstra:
         # generate final course
         rx, ry = [self.calc_position(goal_node.x, self.min_x)], [
             self.calc_position(goal_node.y, self.min_y)]
-        parent = goal_node.parent
-        while parent != -1:
-            n = closed_set[parent]
+        parent_index = goal_node.parent_index
+        while parent_index != -1:
+            n = closed_set[parent_index]
             rx.append(self.calc_position(n.x, self.min_x))
             ry.append(self.calc_position(n.y, self.min_y))
-            parent = n.parent
+            parent_index = n.parent_index
 
         return rx, ry
 

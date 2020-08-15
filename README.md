@@ -124,6 +124,8 @@ All animation gifs are stored here: [AtsushiSakai/PythonRoboticsGifs: Animation 
 2. Install the required libraries. You can use environment.yml with conda command.
 
 > conda env create -f environment.yml
+> using pip :-
+         pip install -r requirements.txt
 
 
 3. Execute python script in each directory.
