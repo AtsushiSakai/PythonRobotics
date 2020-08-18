@@ -31,7 +31,7 @@ class Bug():
                     self.outx.append(candx), self.outy.append(candy)
 
     def mov_normal(self):
-        return self.rx[-1] + np.sign(self.goalx - self.rx[-1]), 
+        return self.rx[-1] + np.sign(self.goalx - self.rx[-1]), \
                self.ry[-1] + np.sign(self.goaly - self.ry[-1])
 
     def mov_to_next_obs(self, visitedx, visitedy):
@@ -67,7 +67,7 @@ class Bug():
 
         visitedx, visitedy = [], []
         while True:
-            if self.rx[-1] == self.goalx and 
+            if self.rx[-1] == self.goalx and \
                     self.ry[-1] == self.goaly:
                 break
             if mov_dir == 'normal':
@@ -89,7 +89,7 @@ class Bug():
             elif mov_dir == 'obs':
                 can_go_normal = True
                 for xob, yob in zip(self.obsx, self.obsy):
-                    if self.mov_normal()[0] == xob and 
+                    if self.mov_normal()[0] == xob and \
                             self.mov_normal()[1] == yob:
                         can_go_normal = False
                         break
@@ -123,13 +123,13 @@ class Bug():
 
         visitedx, visitedy = [], []
         while True:
-            if self.rx[-1] == self.goalx and 
+            if self.rx[-1] == self.goalx and \
                     self.ry[-1] == self.goaly:
                 break
             if mov_dir == 'normal':
                 candx, candy = self.mov_normal()
             if mov_dir == 'obs':
-                candx, candy, back_to_start = 
+                candx, candy, back_to_start = \
                     self.mov_to_next_obs(visitedx, visitedy)
             if mov_dir == 'normal':
                 found_boundary = False
@@ -160,8 +160,8 @@ class Bug():
                     visitedx[:], visitedy[:] = [], []
                 self.rx.append(candx), self.ry.append(candy)
                 visitedx.append(candx), visitedy.append(candy)
-                if candx == exitx and 
-                        candy == exity and 
+                if candx == exitx and \
+                        candy == exity and \
                         second_round:
                     mov_dir = 'normal'
             plt.plot(self.rx, self.ry, "-r")
@@ -179,7 +179,7 @@ class Bug():
         straightx, straighty = [self.rx[-1]], [self.ry[-1]]
         hitx, hity = [], []
         while True:
-            if straightx[-1] == self.goalx and 
+            if straightx[-1] == self.goalx and \
                     straighty[-1] == self.goaly:
                 break
             c_x = straightx[-1] + np.sign(self.goalx - straightx[-1])
@@ -202,7 +202,7 @@ class Bug():
 
         visitedx, visitedy = [], []
         while True:
-            if self.rx[-1] == self.goalx 
+            if self.rx[-1] == self.goalx \
                     and self.ry[-1] == self.goaly:
                 break
             if mov_dir == 'normal':
