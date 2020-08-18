@@ -1,3 +1,9 @@
+"""
+Bug Planning
+author: Sarim Mehdi(muhammadsarim.mehdi@studio.unibo.it)
+Source: https://sites.google.com/site/ece452bugalgorithms/
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 
