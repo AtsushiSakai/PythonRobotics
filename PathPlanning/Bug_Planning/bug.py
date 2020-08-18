@@ -7,6 +7,7 @@ Source: https://sites.google.com/site/ece452bugalgorithms/
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 class Bug():
     def __init__(self, startx, starty, goalx, goaly, obsx, obsy):
         self.goalx = goalx
@@ -18,19 +19,23 @@ class Bug():
         self.outx = []
         self.outy = []
         for o_x, o_y in zip(obsx, obsy):
-            for addx, addy in zip([1,0,-1,-1,-1,0,1,1], [1,1,1,0,-1,-1,-1,0]):
+            for addx, addy in zip([1, 0, -1, -1, -1, 0, 1, 1],
+                                  [1, 1, 1, 0, -1, -1, -1, 0]):
                 candx, candy = o_x+addx, o_y+addy
                 valid_point = True
                 for _x, _y in zip(obsx, obsy):
                     if candx == _x and candy == _y:
                         valid_point = False
                         break
-                if valid_point: self.outx.append(candx), self.outy.append(candy)
+                if valid_point:
+                    self.outx.append(candx), self.outy.append(candy)
 
     def mov_normal(self):
-        return self.rx[-1] + np.sign(self.goalx-self.rx[-1]), self.ry[-1] + np.sign(self.goaly-self.ry[-1])
+        return self.rx[-1] + np.sign(self.goalx - self.rx[-1]), 
+               self.ry[-1] + np.sign(self.goaly - self.ry[-1])
+
     def mov_to_next_obs(self, visitedx, visitedy):
-        for addx, addy in zip([1,0,-1,0], [0,1,0,-1]):
+        for addx, addy in zip([1, 0, -1, 0], [0, 1, 0, -1]):
             cx, cy = self.rx[-1] + addx, self.ry[-1] + addy
             for _x, _y in zip(self.outx, self.outy):
                 use_pt = True
@@ -39,8 +44,10 @@ class Bug():
                         if cx == v_x and cy == v_y:
                             use_pt = False
                             break
-                    if use_pt: return cx, cy, False
-                if not use_pt: break
+                    if use_pt:
+                        return cx, cy, False
+                if not use_pt:
+                    break
         return self.rx[-1], self.ry[-1], True
 
     def bug0(self):
@@ -60,9 +67,13 @@ class Bug():
 
         visitedx, visitedy = [], []
         while True:
-            if self.rx[-1] == self.goalx and self.ry[-1] == self.goaly: break
-            if mov_dir == 'normal': candx, candy = self.mov_normal()
-            if mov_dir == 'obs': candx, candy, _ = self.mov_to_next_obs(visitedx, visitedy)
+            if self.rx[-1] == self.goalx and 
+                    self.ry[-1] == self.goaly:
+                break
+            if mov_dir == 'normal':
+                candx, candy = self.mov_normal()
+            if mov_dir == 'obs':
+                candx, candy, _ = self.mov_to_next_obs(visitedx, visitedy)
             if mov_dir == 'normal':
                 found_boundary = False
                 for xob, yob in zip(self.outx, self.outy):
@@ -73,11 +84,13 @@ class Bug():
                         mov_dir = 'obs'
                         found_boundary = True
                         break
-                if not found_boundary: self.rx.append(candx), self.ry.append(candy)
+                if not found_boundary:
+                    self.rx.append(candx), self.ry.append(candy)
             elif mov_dir == 'obs':
                 can_go_normal = True
                 for xob, yob in zip(self.obsx, self.obsy):
-                    if self.mov_normal()[0] == xob and self.mov_normal()[1] == yob:
+                    if self.mov_normal()[0] == xob and 
+                            self.mov_normal()[1] == yob:
                         can_go_normal = False
                         break
                 if can_go_normal:
@@ -110,9 +123,14 @@ class Bug():
 
         visitedx, visitedy = [], []
         while True:
-            if self.rx[-1] == self.goalx and self.ry[-1] == self.goaly: break
-            if mov_dir == 'normal': candx, candy = self.mov_normal()
-            if mov_dir == 'obs': candx, candy, back_to_start = self.mov_to_next_obs(visitedx, visitedy)
+            if self.rx[-1] == self.goalx and 
+                    self.ry[-1] == self.goaly:
+                break
+            if mov_dir == 'normal':
+                candx, candy = self.mov_normal()
+            if mov_dir == 'obs':
+                candx, candy, back_to_start = 
+                    self.mov_to_next_obs(visitedx, visitedy)
             if mov_dir == 'normal':
                 found_boundary = False
                 for xob, yob in zip(self.outx, self.outy):
@@ -126,9 +144,12 @@ class Bug():
                         second_round = False
                         found_boundary = True
                         break
-                if not found_boundary: self.rx.append(candx), self.ry.append(candy)
+                if not found_boundary:
+                    self.rx.append(candx), self.ry.append(candy)
             elif mov_dir == 'obs':
-                d = np.linalg.norm(np.array([candx, candy]-np.array([self.goalx, self.goaly])))
+                d = np.linalg.norm(np.array([candx, candy] -
+                                            np.array([self.goalx,
+                                                      self.goaly])))
                 if d < dist and not second_round:
                     exitx, exity = candx, candy
                     dist = d
@@ -139,7 +160,10 @@ class Bug():
                     visitedx[:], visitedy[:] = [], []
                 self.rx.append(candx), self.ry.append(candy)
                 visitedx.append(candx), visitedy.append(candy)
-                if candx == exitx and candy == exity and second_round: mov_dir = 'normal'
+                if candx == exitx and 
+                        candy == exity and 
+                        second_round:
+                    mov_dir = 'normal'
             plt.plot(self.rx, self.ry, "-r")
             plt.pause(0.001)
         plt.show()
@@ -155,7 +179,9 @@ class Bug():
         straightx, straighty = [self.rx[-1]], [self.ry[-1]]
         hitx, hity = [], []
         while True:
-            if straightx[-1] == self.goalx and straighty[-1] == self.goaly: break
+            if straightx[-1] == self.goalx and 
+                    straighty[-1] == self.goaly:
+                break
             c_x = straightx[-1] + np.sign(self.goalx - straightx[-1])
             c_y = straighty[-1] + np.sign(self.goaly - straighty[-1])
             for xob, yob in zip(self.outx, self.outy):
@@ -176,9 +202,13 @@ class Bug():
 
         visitedx, visitedy = [], []
         while True:
-            if self.rx[-1] == self.goalx and self.ry[-1] == self.goaly: break
-            if mov_dir == 'normal': candx, candy = self.mov_normal()
-            if mov_dir == 'obs': candx, candy, _ = self.mov_to_next_obs(visitedx, visitedy)
+            if self.rx[-1] == self.goalx 
+                    and self.ry[-1] == self.goaly:
+                break
+            if mov_dir == 'normal':
+                candx, candy = self.mov_normal()
+            if mov_dir == 'obs':
+                candx, candy, _ = self.mov_to_next_obs(visitedx, visitedy)
             if mov_dir == 'normal':
                 found_boundary = False
                 for xob, yob in zip(self.outx, self.outy):
@@ -191,7 +221,8 @@ class Bug():
                         mov_dir = 'obs'
                         found_boundary = True
                         break
-                if not found_boundary: self.rx.append(candx), self.ry.append(candy)
+                if not found_boundary:
+                    self.rx.append(candx), self.ry.append(candy)
             elif mov_dir == 'obs':
                 self.rx.append(candx), self.ry.append(candy)
                 visitedx.append(candx), visitedy.append(candy)
@@ -205,35 +236,11 @@ class Bug():
             plt.pause(0.001)
         plt.show()
 
-# set obstacle positions
-ox, oy = [], []
-
-# sx = 5.0
-# sy = 5.0
-# gx = 50.0
-# gy = 90.0
-#
-# for i in range(100):
-#     for j in range(3):
-#         ox.append(i), oy.append(j)
-# for i in range(100):
-#     for j in range(3):
-#         ox.append(j), oy.append(i)
-# for i in range(100):
-#     for j in range(97,100):
-#         ox.append(i), oy.append(j)
-# for i in range(100):
-#     for j in range(97,100):
-#         ox.append(j), oy.append(i)
-# for i in range(70):
-#     for j in range(17,20):
-#         ox.append(j), oy.append(i)
-# for i in range(20,100):
-#     for j in range(27,30):
-#         ox.append(j), oy.append(i)
-
 
 def main():
+    # set obstacle positions
+    ox, oy = [], []
+
     sx = 0.0
     sy = 0.0
     gx = 167.0
@@ -286,6 +293,7 @@ def main():
     # plt.show()
 
     myBug.bug2()
+
 
 if __name__ == '__main__':
     main()
