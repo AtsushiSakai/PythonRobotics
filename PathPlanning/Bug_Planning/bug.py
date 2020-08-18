@@ -232,55 +232,60 @@ ox, oy = [], []
 #     for j in range(27,30):
 #         ox.append(j), oy.append(i)
 
-sx = 0.0
-sy = 0.0
-gx = 167.0
-gy = 50.0
 
-for i in range(20, 40):
-    for j in range(20, 40):
-        ox.append(i)
-        oy.append(j)
+def main():
+    sx = 0.0
+    sy = 0.0
+    gx = 167.0
+    gy = 50.0
 
-for i in range(60, 100):
-    for j in range(40, 80):
-        ox.append(i)
-        oy.append(j)
+    for i in range(20, 40):
+        for j in range(20, 40):
+            ox.append(i)
+            oy.append(j)
 
-for i in range(120, 140):
-    for j in range(80, 100):
-        ox.append(i)
-        oy.append(j)
+    for i in range(60, 100):
+        for j in range(40, 80):
+            ox.append(i)
+            oy.append(j)
 
-for i in range(80, 140):
-    for j in range(0, 20):
-        ox.append(i)
-        oy.append(j)
+    for i in range(120, 140):
+        for j in range(80, 100):
+            ox.append(i)
+            oy.append(j)
 
-for i in range(0, 20):
-    for j in range(60, 100):
-        ox.append(i)
-        oy.append(j)
+    for i in range(80, 140):
+        for j in range(0, 20):
+            ox.append(i)
+            oy.append(j)
 
-for i in range(20, 40):
-    for j in range(80, 100):
-        ox.append(i)
-        oy.append(j)
+    for i in range(0, 20):
+        for j in range(60, 100):
+            ox.append(i)
+            oy.append(j)
 
-for i in range(120, 160):
-    for j in range(40, 60):
-        ox.append(i)
-        oy.append(j)
+    for i in range(20, 40):
+        for j in range(80, 100):
+            ox.append(i)
+            oy.append(j)
 
-myBug = Bug(sx, sy, gx, gy, ox, oy)
-# myBug.bug0()
+    for i in range(120, 160):
+        for j in range(40, 60):
+            ox.append(i)
+            oy.append(j)
 
-# myBug.bug1()
-# showx, showy = [], []
-# for r_x, r_y in zip(myBug.rx, myBug.ry):
-#     showx.append(r_x), showy.append(r_y)
-#     plt.plot(showx, showy, "-r")
-#     plt.pause(0.001)
-# plt.show()
+    myBug = Bug(sx, sy, gx, gy, ox, oy)
+    # myBug.bug0()
 
-myBug.bug2()
+    # myBug.bug1()
+    # showx, showy = [], []
+    # for r_x, r_y in zip(myBug.rx, myBug.ry):
+    #     showx.append(r_x), showy.append(r_y)
+    #     plt.plot(showx, showy, "-r")
+    #     plt.pause(0.001)
+    # plt.show()
+
+    myBug.bug2()
+
+if __name__ == '__main__':
+    main()
