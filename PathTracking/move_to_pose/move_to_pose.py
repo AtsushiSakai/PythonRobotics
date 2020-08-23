@@ -15,7 +15,7 @@ from random import random
 
 # simulation parameters
 Kp_rho = 9
-Kp_alpha = -18
+Kp_alpha = 18
 Kp_beta = -3
 dt = 0.01
 
@@ -53,7 +53,7 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
         # from 0 rad to 2*pi rad with slight turn
 
         rho = np.hypot(x_diff, y_diff)
-        alpha = (theta - np.arctan2(y_diff, x_diff)
+        alpha = (np.arctan2(y_diff, x_diff) - theta
                  + np.pi) % (2 * np.pi) - np.pi
         beta = (theta_goal - theta + np.pi) % (2 * np.pi) - np.pi
 
