@@ -1,5 +1,5 @@
 numpy == 1.19.1
 scipy == 1.5.2
-pandas == 1.1.0
+pandas == 1.1.1
 matplotlib == 3.3.1
 cvxpy == 1.1.4
