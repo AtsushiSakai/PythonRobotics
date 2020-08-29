@@ -1,4 +1,4 @@
-from PathPlanning.Bug_Planning import bug as b
+from PathPlanning.BugPlanning import bug as b
 from unittest import TestCase
 import sys
 import os
