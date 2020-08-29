@@ -33,7 +33,7 @@ class BugPlanner:
                     self.out_x.append(cand_x), self.out_y.append(cand_y)
 
     def mov_normal(self):
-        return self.r_x[-1] + np.sign(self.goal_x - self.r_x[-1]), 
+        return self.r_x[-1] + np.sign(self.goal_x - self.r_x[-1]), \
                self.r_y[-1] + np.sign(self.goal_y - self.r_y[-1])
 
     def mov_to_next_obs(self, visited_x, visited_y):
@@ -74,7 +74,7 @@ class BugPlanner:
 
         visited_x, visited_y = [], []
         while True:
-            if self.r_x[-1] == self.goal_x and 
+            if self.r_x[-1] == self.goal_x and \
                     self.r_y[-1] == self.goal_y:
                 break
             if mov_dir == 'normal':
@@ -96,7 +96,7 @@ class BugPlanner:
             elif mov_dir == 'obs':
                 can_go_normal = True
                 for x_ob, y_ob in zip(self.obs_x, self.obs_y):
-                    if self.mov_normal()[0] == x_ob and 
+                    if self.mov_normal()[0] == x_ob and \
                             self.mov_normal()[1] == y_ob:
                         can_go_normal = False
                         break
@@ -139,13 +139,13 @@ class BugPlanner:
 
         visited_x, visited_y = [], []
         while True:
-            if self.r_x[-1] == self.goal_x and 
+            if self.r_x[-1] == self.goal_x and \
                     self.r_y[-1] == self.goal_y:
                 break
             if mov_dir == 'normal':
                 cand_x, cand_y = self.mov_normal()
             if mov_dir == 'obs':
-                cand_x, cand_y, back_to_start = 
+                cand_x, cand_y, back_to_start = \
                     self.mov_to_next_obs(visited_x, visited_y)
             if mov_dir == 'normal':
                 found_boundary = False
@@ -176,8 +176,8 @@ class BugPlanner:
                     visited_x[:], visited_y[:] = [], []
                 self.r_x.append(cand_x), self.r_y.append(cand_y)
                 visited_x.append(cand_x), visited_y.append(cand_y)
-                if cand_x == exit_x and 
-                        cand_y == exit_y and 
+                if cand_x == exit_x and \
+                        cand_y == exit_y and \
                         second_round:
                     mov_dir = 'normal'
             if show_animation:
@@ -208,7 +208,7 @@ class BugPlanner:
         straight_x, straight_y = [self.r_x[-1]], [self.r_y[-1]]
         hit_x, hit_y = [], []
         while True:
-            if straight_x[-1] == self.goal_x and 
+            if straight_x[-1] == self.goal_x and \
                     straight_y[-1] == self.goal_y:
                 break
             c_x = straight_x[-1] + np.sign(self.goal_x - straight_x[-1])
@@ -231,7 +231,7 @@ class BugPlanner:
 
         visited_x, visited_y = [], []
         while True:
-            if self.r_x[-1] == self.goal_x 
+            if self.r_x[-1] == self.goal_x \
                     and self.r_y[-1] == self.goal_y:
                 break
             if mov_dir == 'normal':
