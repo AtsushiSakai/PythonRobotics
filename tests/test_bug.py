@@ -1,11 +1,8 @@
+from PathPlanning.Bug_Planning import bug as b
 from unittest import TestCase
 import sys
 import os
 sys.path.append(os.path.dirname(__file__) + "/../")
-try:
-    from PathPlanning.Bug_Planning import bug as b
-except:
-    raise
 
 
 class Test(TestCase):
