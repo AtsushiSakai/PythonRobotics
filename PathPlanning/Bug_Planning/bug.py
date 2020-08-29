@@ -237,7 +237,7 @@ class Bug():
         plt.show()
 
 
-def main():
+def main(bug0, bug1, bug2):
     # set obstacle positions
     ox, oy = [], []
 
@@ -281,19 +281,16 @@ def main():
             ox.append(i)
             oy.append(j)
 
-    myBug = Bug(sx, sy, gx, gy, ox, oy)
-    # myBug.bug0()
-
-    # myBug.bug1()
-    # showx, showy = [], []
-    # for r_x, r_y in zip(myBug.rx, myBug.ry):
-    #     showx.append(r_x), showy.append(r_y)
-    #     plt.plot(showx, showy, "-r")
-    #     plt.pause(0.001)
-    # plt.show()
-
-    myBug.bug2()
+    if bug0:
+        myBug = Bug(sx, sy, gx, gy, ox, oy)
+        myBug.bug0()
+    if bug1:
+        myBug = Bug(sx, sy, gx, gy, ox, oy)
+        myBug.bug1()
+    if bug2:
+        myBug = Bug(sx, sy, gx, gy, ox, oy)
+        myBug.bug2()
 
 
 if __name__ == '__main__':
-    main()
+    main(bug0=True, bug1=False, bug2=False)
