@@ -52,11 +52,11 @@ class BugPlanner:
                     break
         return self.r_x[-1], self.r_y[-1], True
 
-    '''Bug0: Greedy algorithm where you move towards goal
-    until you hit an obstacle. Then you go around it
-    (pick an arbitrary direction), until it is possible
-    for you to start moving towards goal in a greedy manner again'''
     def bug0(self):
+        '''Greedy algorithm where you move towards goal
+        until you hit an obstacle. Then you go around it
+        (pick an arbitrary direction), until it is possible
+        for you to start moving towards goal in a greedy manner again'''
         mov_dir = 'normal'
         cand_x, cand_y = -9999, -9999
         if show_animation:
@@ -111,13 +111,13 @@ class BugPlanner:
         if show_animation:
             plt.show()
 
-    '''Bug1: Move towards goal in a greedy manner.
-    When you hit an obstacle, you go around it and
-    back to where you hit the obstacle initially.
-    Then, you go to the point on the obstacle that is
-    closest to your goal and you start moving towards
-    goal in a greedy manner from that new point.'''
     def bug1(self):
+        '''Move towards goal in a greedy manner.
+        When you hit an obstacle, you go around it and
+        back to where you hit the obstacle initially.
+        Then, you go to the point on the obstacle that is
+        closest to your goal and you start moving towards
+        goal in a greedy manner from that new point.'''
         mov_dir = 'normal'
         cand_x, cand_y = -9999, -9999
         exit_x, exit_y = -9999, -9999
@@ -186,17 +186,17 @@ class BugPlanner:
         if show_animation:
             plt.show()
 
-    '''Bug2: Move towards goal in a greedy manner.
-    When you hit an obstacle, you go around it and
-    keep track of your distance from the goal.
-    If the distance from your goal was decreasing before
-    and now it starts increasing, that means the current
-    point is probably the closest point to the
-    goal (this may or may not be true because the algorithm
-    doesn't explore the entire boundary around the obstacle).
-    So, you depart from this point and continue towards the
-    goal in a greedy manner'''
     def bug2(self):
+        '''Move towards goal in a greedy manner.
+        When you hit an obstacle, you go around it and
+        keep track of your distance from the goal.
+        If the distance from your goal was decreasing before
+        and now it starts increasing, that means the current
+        point is probably the closest point to the
+        goal (this may or may not be true because the algorithm
+        doesn't explore the entire boundary around the obstacle).
+        So, you depart from this point and continue towards the
+        goal in a greedy manner'''
         mov_dir = 'normal'
         cand_x, cand_y = -9999, -9999
         if show_animation:
