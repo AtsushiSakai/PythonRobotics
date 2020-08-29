@@ -1,9 +1,6 @@
 """
-
 Mobile robot motion planning sample with Dynamic Window Approach
-
 author: Atsushi Sakai (@Atsushi_twi), Göktuğ Karakaşlı
-
 """
 
 import math
@@ -15,12 +12,12 @@ import numpy as np
 show_animation = True
 
 
-def dwa_control(x, config, goal, ob):
+def dwa_control(x, config, goal, ob, trajectory):
     """
     Dynamic Window Approach control
     """
-
-    dw = calc_dynamic_window(x, config)
+    dist = calc_obstacle_cost(trajectory, ob, config)
+    dw = calc_dynamic_window(x, config, dist)
 
     u, trajectory = calc_control_and_trajectory(x, dw, config, goal, ob)
 
@@ -48,14 +45,15 @@ class Config:
         self.yaw_rate_resolution = 0.1 * math.pi / 180.0  # [rad/s]
         self.dt = 0.1  # [s] Time tick for motion prediction
         self.predict_time = 3.0  # [s]
-        self.to_goal_cost_gain = 0.15
-        self.speed_cost_gain = 1.0
-        self.obstacle_cost_gain = 1.0
+        self.to_goal_cost_gain = 0.07
+        self.speed_cost_gain = 1.2
+        self.obstacle_cost_gain = 2.0
         self.robot_type = RobotType.circle
 
         # if robot_type == RobotType.circle
         # Also used to check if goal is reached in both types
         self.robot_radius = 1.0  # [m] for collision check
+        self.buffer_clearance = 1.0  # [m] buffer zone with obstacle, for safety secure
 
         # if robot_type == RobotType.rectangle
         self.robot_width = 0.5  # [m] for collision check
@@ -86,7 +84,7 @@ def motion(x, u, dt):
     return x
 
 
-def calc_dynamic_window(x, config):
+def calc_dynamic_window(x, config, dist):
     """
     calculation dynamic window based on current state x
     """
@@ -101,8 +99,11 @@ def calc_dynamic_window(x, config):
           x[4] - config.max_delta_yaw_rate * config.dt,
           x[4] + config.max_delta_yaw_rate * config.dt]
 
+    # # max brake velocity = sqrt(2*distance*acceleraction)
+    brake_v = math.sqrt(2 * abs(dist - config.buffer_clearance) * config.max_accel)
+
     #  [v_min, v_max, yaw_rate_min, yaw_rate_max]
-    dw = [max(Vs[0], Vd[0]), min(Vs[1], Vd[1]),
+    dw = [max(Vs[0], Vd[0], -brake_v), min(Vs[1], Vd[1], brake_v),
           max(Vs[2], Vd[2]), min(Vs[3], Vd[3])]
 
     return dw
@@ -139,7 +140,6 @@ def calc_control_and_trajectory(x, dw, config, goal, ob):
         for y in np.arange(dw[2], dw[3], config.yaw_rate_resolution):
 
             trajectory = predict_trajectory(x_init, v, y, config)
-
             # calc cost
             to_goal_cost = config.to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
             speed_cost = config.speed_cost_gain * (config.max_speed - trajectory[-1, 3])
@@ -152,7 +152,13 @@ def calc_control_and_trajectory(x, dw, config, goal, ob):
                 min_cost = final_cost
                 best_u = [v, y]
                 best_trajectory = trajectory
-
+                if abs(best_u[0]) < 0.05:
+                    if abs(x[3]) < 0.05:
+                        '''to ensure the robot do not stucked in 
+                        best_v=0 m/s (in front of an obstacle) and 
+                        best_w=0 rad/s (heading to the goal with 
+                        angle difference of 0)'''
+                        best_u[1] = -config.max_delta_yaw_rate
     return best_u, best_trajectory
 
 
@@ -232,37 +238,43 @@ def plot_robot(x, y, yaw, config):  # pragma: no cover
         plt.plot([x, out_x], [y, out_y], "-k")
 
 
-def main(gx=10.0, gy=10.0, robot_type=RobotType.circle):
+def main(gx=-5.0, gy=-7.0, robot_type=RobotType.circle):
     print(__file__ + " start!!")
     # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
     x = np.array([0.0, 0.0, math.pi / 8.0, 0.0, 0.0])
     # goal position [x(m), y(m)]
     goal = np.array([gx, gy])
     # obstacles [x(m) y(m), ....]
-    ob = np.array([[-1, -1],
-                   [0, 2],
-                   [4.0, 2.0],
-                   [5.0, 4.0],
-                   [5.0, 5.0],
-                   [5.0, 6.0],
-                   [5.0, 9.0],
-                   [8.0, 9.0],
-                   [7.0, 9.0],
-                   [8.0, 10.0],
-                   [9.0, 11.0],
-                   [12.0, 13.0],
-                   [12.0, 12.0],
-                   [15.0, 15.0],
-                   [13.0, 13.0]
-                   ])
+    ob = -1 * np.array([[-1, -1],
+                        [0, 2],
+                        [2, 6],
+                        [2, 8],
+                        [3, 9.27],
+                        [3.79, 9.39],
+                        [7.25, 8.97],
+                        [7.0, 2.0],
+                        [3.0, 4.0],
+                        [6.0, 5.0],
+                        [3.5, 5.8],
+                        [6.0, 9.0],
+                        [8.8, 9.0],
+                        [5.0, 9.0],
+                        [7.5, 3.0],
+                        [9.0, 8.0],
+                        [5.8, 4.4],
+                        [12.0, 12.0],
+                        [3.0, 2.0],
+                        [13.0, 13.0]
+                        ])
 
     # input [forward speed, yaw_rate]
     config = Config()
     config.robot_type = robot_type
     trajectory = np.array(x)
+    predicted_trajectory = np.vstack((x, x))
 
     while True:
-        u, predicted_trajectory = dwa_control(x, config, goal, ob)
+        u, predicted_trajectory = dwa_control(x, config, goal, ob, predicted_trajectory)
         x = motion(x, u, config.dt)  # simulate robot
         trajectory = np.vstack((trajectory, x))  # store state history
 
@@ -297,5 +309,5 @@ def main(gx=10.0, gy=10.0, robot_type=RobotType.circle):
 
 
 if __name__ == '__main__':
-    main(robot_type=RobotType.rectangle)
-    # main(robot_type=RobotType.circle)
+    # main(robot_type=RobotType.rectangle)
+    main(robot_type=RobotType.circle)
