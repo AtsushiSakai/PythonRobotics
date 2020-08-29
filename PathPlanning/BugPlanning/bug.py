@@ -58,7 +58,7 @@ class BugPlanner:
         (pick an arbitrary direction), until it is possible
         for you to start moving towards goal in a greedy manner again'''
         mov_dir = 'normal'
-        cand_x, cand_y = -9999, -9999
+        cand_x, cand_y = -np.inf, -np.inf
         if show_animation:
             plt.plot(self.obs_x, self.obs_y, ".k")
             plt.plot(self.r_x[-1], self.r_y[-1], "og")
@@ -119,9 +119,9 @@ class BugPlanner:
         closest to your goal and you start moving towards
         goal in a greedy manner from that new point.'''
         mov_dir = 'normal'
-        cand_x, cand_y = -9999, -9999
-        exit_x, exit_y = -9999, -9999
-        dist = 9999
+        cand_x, cand_y = -np.inf, -np.inf
+        exit_x, exit_y = -np.inf, -np.inf
+        dist = np.inf
         back_to_start = False
         second_round = False
         if show_animation:
@@ -155,7 +155,7 @@ class BugPlanner:
                         visited_x[:], visited_y[:] = [], []
                         visited_x.append(cand_x), visited_y.append(cand_y)
                         mov_dir = 'obs'
-                        dist = 9999
+                        dist = np.inf
                         back_to_start = False
                         second_round = False
                         found_boundary = True
@@ -198,7 +198,7 @@ class BugPlanner:
         So, you depart from this point and continue towards the
         goal in a greedy manner'''
         mov_dir = 'normal'
-        cand_x, cand_y = -9999, -9999
+        cand_x, cand_y = -np.inf, -np.inf
         if show_animation:
             plt.plot(self.obs_x, self.obs_y, ".k")
             plt.plot(self.r_x[-1], self.r_y[-1], "og")
