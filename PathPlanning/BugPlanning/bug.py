@@ -53,10 +53,12 @@ class BugPlanner:
         return self.r_x[-1], self.r_y[-1], True
 
     def bug0(self):
-        '''Greedy algorithm where you move towards goal
+        """
+        Greedy algorithm where you move towards goal
         until you hit an obstacle. Then you go around it
         (pick an arbitrary direction), until it is possible
-        for you to start moving towards goal in a greedy manner again'''
+        for you to start moving towards goal in a greedy manner again
+        """
         mov_dir = 'normal'
         cand_x, cand_y = -np.inf, -np.inf
         if show_animation:
@@ -112,12 +114,14 @@ class BugPlanner:
             plt.show()
 
     def bug1(self):
-        '''Move towards goal in a greedy manner.
+        """
+        Move towards goal in a greedy manner.
         When you hit an obstacle, you go around it and
         back to where you hit the obstacle initially.
         Then, you go to the point on the obstacle that is
         closest to your goal and you start moving towards
-        goal in a greedy manner from that new point.'''
+        goal in a greedy manner from that new point.
+        """
         mov_dir = 'normal'
         cand_x, cand_y = -np.inf, -np.inf
         exit_x, exit_y = -np.inf, -np.inf
@@ -187,7 +191,8 @@ class BugPlanner:
             plt.show()
 
     def bug2(self):
-        '''Move towards goal in a greedy manner.
+        """
+        Move towards goal in a greedy manner.
         When you hit an obstacle, you go around it and
         keep track of your distance from the goal.
         If the distance from your goal was decreasing before
@@ -196,7 +201,8 @@ class BugPlanner:
         goal (this may or may not be true because the algorithm
         doesn't explore the entire boundary around the obstacle).
         So, you depart from this point and continue towards the
-        goal in a greedy manner'''
+        goal in a greedy manner
+        """
         mov_dir = 'normal'
         cand_x, cand_y = -np.inf, -np.inf
         if show_animation:
