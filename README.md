@@ -252,14 +252,6 @@ Ref:
 
 # Path Planning
 
-## Bug Planning
-
-This is sample code for bug0, bug1, and bug2
-
-- [ECE452: Bug Algorithms](https://sites.google.com/site/ece452bugalgorithms/)
-
-![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/BugPlanner/animation.gif)
-
 ## Dynamic Window Approach
 
 This is a 2D navigation sample code with Dynamic Window Approach.
