@@ -53,7 +53,7 @@ class Config:
         # if robot_type == RobotType.circle
         # Also used to check if goal is reached in both types
         self.robot_radius = 1.0  # [m] for collision check
-        self.buffer_clearance = 1.0  # [m] buffer zone with obstacle, for safety secure
+        self.buffer_clearance = 0.2  # [m] buffer zone with obstacle
 
         # if robot_type == RobotType.rectangle
         self.robot_width = 0.5  # [m] for collision check
@@ -99,8 +99,9 @@ def calc_dynamic_window(x, config, dist):
           x[4] - config.max_delta_yaw_rate * config.dt,
           x[4] + config.max_delta_yaw_rate * config.dt]
 
-    # # max brake velocity = sqrt(2*distance*acceleraction)
-    brake_v = math.sqrt(2 * abs(dist - config.buffer_clearance) * config.max_accel)
+    # max brake velocity = sqrt(2*distance*acceleraction)
+    brake_v = \
+        math.sqrt(2 * abs(dist - config.buffer_clearance) * config.max_accel)
 
     #  [v_min, v_max, yaw_rate_min, yaw_rate_max]
     dw = [max(Vs[0], Vd[0], -brake_v), min(Vs[1], Vd[1], brake_v),
@@ -154,9 +155,9 @@ def calc_control_and_trajectory(x, dw, config, goal, ob):
                 best_trajectory = trajectory
                 if abs(best_u[0]) < 0.05:
                     if abs(x[3]) < 0.05:
-                        '''to ensure the robot do not stucked in 
-                        best_v=0 m/s (in front of an obstacle) and 
-                        best_w=0 rad/s (heading to the goal with 
+                        '''to ensure the robot do not stucked in
+                        best_v=0 m/s (in front of an obstacle) and
+                        best_w=0 rad/s (heading to the goal with
                         angle difference of 0)'''
                         best_u[1] = -config.max_delta_yaw_rate
     return best_u, best_trajectory
@@ -274,7 +275,8 @@ def main(gx=-5.0, gy=-7.0, robot_type=RobotType.circle):
     predicted_trajectory = np.vstack((x, x))
 
     while True:
-        u, predicted_trajectory = dwa_control(x, config, goal, ob, predicted_trajectory)
+        u, predicted_trajectory = \
+            dwa_control(x, config, goal, ob, predicted_trajectory)
         x = motion(x, u, config.dt)  # simulate robot
         trajectory = np.vstack((trajectory, x))  # store state history
 
