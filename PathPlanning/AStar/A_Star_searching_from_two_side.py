@@ -281,7 +281,7 @@ if __name__ == '__main__':
                     raise NoPath()
 
                 # update target for searching from end to start
-                target_origin = min(origin_open,key=lambda x: x.H).coordinate
+                target_origin = min(origin_open, key=lambda x: x.H).coordinate
 
                 # searching from end to start
                 goal_open, goal_close = \
