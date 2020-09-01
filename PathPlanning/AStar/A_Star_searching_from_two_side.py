@@ -271,7 +271,8 @@ if __name__ == '__main__':
             target_goal = end
             while True:
                 # searching from start to end
-                origin_open, origin_close = find_path(origin_open, origin_close, target_goal, bound)
+                origin_open, origin_close = \
+                    find_path(origin_open, origin_close, target_goal, bound)
 
                 # convert node list into coordinate list and array
                 org_cor_list, org_cor_array = node_to_coor(origin_close)
@@ -283,7 +284,8 @@ if __name__ == '__main__':
                 target_origin = min(origin_open,key=lambda x: x.H).coordinate
 
                 # searching from end to start
-                goal_open, goal_close = find_path(goal_open, goal_close, target_origin, bound)
+                goal_open, goal_close = \
+                    find_path(goal_open, goal_close, target_origin, bound)
 
                 # convert node list into coordinate list and array
                 goa_cor_list, goa_cor_array = node_to_coor(goal_close)
