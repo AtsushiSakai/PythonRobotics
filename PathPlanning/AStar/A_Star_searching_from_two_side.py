@@ -13,7 +13,9 @@ import math
 class Node:
     '''Node with properties of G, H, Coordinate, Parent node'''
 
-    def __init__(self, G=0, H=0, coordinate=[0, 0], parent=None):
+    def __init__(self, G=0, H=0, coordinate=None, parent=None):
+        if coordinate is None:
+            coordinate = [0, 0]
         self.G = G
         self.H = H
         self.F = G + H
@@ -77,10 +79,8 @@ def boundary_and_obstacles(start, goal, topv, botv, obstacle_number):
     dy = [topv[1]] * len(dx)
 
     # generate random obstacles
-    ob_x = np.random.randint(botv[0] + 1, topv[0], \
-                             obstacle_number).tolist()
-    ob_y = np.random.randint(botv[1] + 1, topv[1], \
-                             obstacle_number).tolist()
+    ob_x = np.random.randint(botv[0] + 1, topv[0], obstacle_number).tolist()
+    ob_y = np.random.randint(botv[1] + 1, topv[1], obstacle_number).tolist()
     # x y coordinate in certain order for boundary
     x = ax + bx + cx + dx
     y = ay + by + cy + dy
@@ -271,13 +271,11 @@ if __name__ == '__main__':
             target_goal = end
             while True:
                 # searching from start to end
-                origin_open, origin_close = \
-                    find_path(open_list=origin_open, closed_list= \
-                        origin_close, goal=target_goal, obstacle=bound)
+                origin_open, origin_close = find_path(open_list=origin_open, closed_list=origin_close, goal=target_goal,
+                                                      obstacle=bound)
 
                 # convert node list into coordinate list and array
-                org_cor_list, org_cor_array = \
-                    convert_to_coordinate_in_array(origin_close)
+                org_cor_list, org_cor_array = convert_to_coordinate_in_array(origin_close)
 
                 if origin_open == []:  # no path condition
                     raise NoPath()
@@ -287,24 +285,20 @@ if __name__ == '__main__':
                                     key=lambda x: x.H).coordinate
 
                 # searching from end to start
-                goal_open, goal_close = \
-                    find_path(open_list=goal_open, closed_list= \
-                        goal_close, goal=target_origin, obstacle=bound)
+                goal_open, goal_close = find_path(open_list=goal_open, closed_list=goal_close, goal=target_origin,
+                                                  obstacle=bound)
 
                 # convert node list into coordinate list and array
-                goa_cor_list, goa_cor_array = \
-                    convert_to_coordinate_in_array(goal_close)
+                goa_cor_list, goa_cor_array = convert_to_coordinate_in_array(goal_close)
 
                 if goal_open == []:  # no path condition
                     raise NoPath()
 
                 # update target for searching from start to end
-                target_goal = min(goal_open,
-                                  key=lambda x: x.H).coordinate
+                target_goal = min(goal_open, key=lambda x: x.H).coordinate
 
                 # check if the searching meet each other
-                og_intersect = [coor for coor in org_cor_list
-                                if coor in goa_cor_list]
+                og_intersect = [coor for coor in org_cor_list if coor in goa_cor_list]
 
                 if og_intersect != []:  # a path is find
                     raise Break()
