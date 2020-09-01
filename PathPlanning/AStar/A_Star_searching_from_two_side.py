@@ -187,7 +187,7 @@ def draw_plot(close_origin, close_goal, start, end, bound):
     plt.pause(0.0001)
 
 
-def convert_to_coordinate_in_array(node_list):
+def node_to_coor(node_list):
     # convert node list into coordinate list and array
     coor_list = [node.coordinate for node in node_list]
     coor_array = np.array(coor_list)
@@ -271,34 +271,33 @@ if __name__ == '__main__':
             target_goal = end
             while True:
                 # searching from start to end
-                origin_open, origin_close = find_path(open_list=origin_open, closed_list=origin_close, goal=target_goal,
-                                                      obstacle=bound)
+                origin_open, origin_close = find_path(origin_open, origin_close, target_goal, bound)
 
                 # convert node list into coordinate list and array
-                org_cor_list, org_cor_array = convert_to_coordinate_in_array(origin_close)
+                org_cor_list, org_cor_array = node_to_coor(origin_close)
 
                 if origin_open == []:  # no path condition
                     raise NoPath()
 
                 # update target for searching from end to start
-                target_origin = min(origin_open,
-                                    key=lambda x: x.H).coordinate
+                target_origin = min(origin_open,key=lambda x: x.H).coordinate
 
                 # searching from end to start
-                goal_open, goal_close = find_path(open_list=goal_open, closed_list=goal_close, goal=target_origin,
-                                                  obstacle=bound)
+                goal_open, goal_close = find_path(goal_open, goal_close, target_origin, bound)
 
                 # convert node list into coordinate list and array
-                goa_cor_list, goa_cor_array = convert_to_coordinate_in_array(goal_close)
+                goa_cor_list, goa_cor_array = node_to_coor(goal_close)
 
                 if goal_open == []:  # no path condition
                     raise NoPath()
 
                 # update target for searching from start to end
-                target_goal = min(goal_open, key=lambda x: x.H).coordinate
+                target_goal = \
+                    min(goal_open, key=lambda x: x.H).coordinate
 
                 # check if the searching meet each other
-                og_intersect = [coor for coor in org_cor_list if coor in goa_cor_list]
+                og_intersect = \
+                    [coor for coor in org_cor_list if coor in goa_cor_list]
 
                 if og_intersect != []:  # a path is find
                     raise Break()
