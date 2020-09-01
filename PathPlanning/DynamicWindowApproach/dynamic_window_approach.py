@@ -1,6 +1,9 @@
 """
+
 Mobile robot motion planning sample with Dynamic Window Approach
+
 author: Atsushi Sakai (@Atsushi_twi), Göktuğ Karakaşlı
+
 """
 
 import math
@@ -148,10 +151,10 @@ def calc_control_and_trajectory(x, dw, config, goal, ob):
                 best_trajectory = trajectory
                 if abs(best_u[0]) < 0.05:
                     if abs(x[3]) < 0.05:
-                        '''to ensure the robot do not stucked in
-                        best_v=0 m/s (in front of an obstacle) and
-                        best_w=0 rad/s (heading to the goal with
-                        angle difference of 0)'''
+                        # to ensure the robot do not stucked in
+                        # best_v=0 m/s (in front of an obstacle) and
+                        # best_w=0 rad/s (heading to the goal with
+                        # angle difference of 0)
                         best_u[1] = -config.max_delta_yaw_rate
     return best_u, best_trajectory
 
