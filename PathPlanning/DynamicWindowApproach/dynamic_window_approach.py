@@ -161,7 +161,7 @@ def calc_control_and_trajectory(x, dw, config, goal, ob):
 
 def calc_obstacle_cost(trajectory, ob, config):
     """
-        calc obstacle cost inf: collision
+    calc obstacle cost inf: collision
     """
     ox = ob[:, 0]
     oy = ob[:, 1]
