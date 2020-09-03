@@ -47,7 +47,7 @@ class Config:
         self.yaw_rate_resolution = 0.1 * math.pi / 180.0  # [rad/s]
         self.dt = 0.1  # [s] Time tick for motion prediction
         self.predict_time = 3.0  # [s]
-        self.to_goal_cost_gain = 0.15
+        self.to_goal_cost_gain = 0.2
         self.speed_cost_gain = 1.0
         self.obstacle_cost_gain = 2.0
         self.robot_type = RobotType.circle
@@ -149,13 +149,12 @@ def calc_control_and_trajectory(x, dw, config, goal, ob):
                 min_cost = final_cost
                 best_u = [v, y]
                 best_trajectory = trajectory
-                if abs(best_u[0]) < 0.05:
-                    if abs(x[3]) < 0.05:
-                        # to ensure the robot do not stucked in
-                        # best_v=0 m/s (in front of an obstacle) and
-                        # best_w=0 rad/s (heading to the goal with
-                        # angle difference of 0)
-                        best_u[1] = -config.max_delta_yaw_rate
+                if abs(best_u[0]) < 0.001 and abs(x[3]) < 0.001:
+                    # to ensure the robot do not stucked in
+                    # best_v=0 m/s (in front of an obstacle) and
+                    # best_w=0 rad/s (heading to the goal with
+                    # angle difference of 0)
+                    best_u[1] = -config.max_delta_yaw_rate
     return best_u, best_trajectory
 
 
@@ -235,7 +234,71 @@ def plot_robot(x, y, yaw, config):  # pragma: no cover
         plt.plot([x, out_x], [y, out_y], "-k")
 
 
-def main(gx=-5.0, gy=-7.0, robot_type=RobotType.circle):
+def main(gx=10.0, gy=10.0, robot_type=RobotType.circle):
+    print(__file__ + " start!!")
+    # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
+    x = np.array([0.0, 0.0, math.pi / 8.0, 0.0, 0.0])
+    # goal position [x(m), y(m)]
+    goal = np.array([gx, gy])
+    # obstacles [x(m) y(m), ....]
+    ob = np.array([[-1, -1],
+                   [0, 2],
+                   [4.0, 2.0],
+                   [5.0, 4.0],
+                   [5.0, 5.0],
+                   [5.0, 6.0],
+                   [5.0, 9.0],
+                   [8.0, 9.0],
+                   [7.0, 9.0],
+                   [8.0, 10.0],
+                   [9.0, 11.0],
+                   [12.0, 13.0],
+                   [12.0, 12.0],
+                   [15.0, 15.0],
+                   [13.0, 13.0]
+                   ])
+
+    # input [forward speed, yaw_rate]
+    config = Config()
+    config.robot_type = robot_type
+    trajectory = np.array(x)
+
+    while True:
+        u, predicted_trajectory = dwa_control(x, config, goal, ob)
+        x = motion(x, u, config.dt)  # simulate robot
+        trajectory = np.vstack((trajectory, x))  # store state history
+
+        if show_animation:
+            plt.cla()
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect(
+                'key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
+            plt.plot(predicted_trajectory[:, 0], predicted_trajectory[:, 1], "-g")
+            plt.plot(x[0], x[1], "xr")
+            plt.plot(goal[0], goal[1], "xb")
+            plt.plot(ob[:, 0], ob[:, 1], "ok")
+            plot_robot(x[0], x[1], x[2], config)
+            plot_arrow(x[0], x[1], x[2])
+            plt.axis("equal")
+            plt.grid(True)
+            plt.pause(0.0001)
+
+        # check reaching goal
+        dist_to_goal = math.hypot(x[0] - goal[0], x[1] - goal[1])
+        if dist_to_goal <= config.robot_radius:
+            print("Goal!!")
+            break
+
+    print("Done")
+    if show_animation:
+        plt.plot(trajectory[:, 0], trajectory[:, 1], "-r")
+        plt.pause(0.0001)
+
+    plt.show()
+
+
+def test_pr(gx=-5.0, gy=-7.0, robot_type=RobotType.circle):
     print(__file__ + " start!!")
     # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
     x = np.array([0.0, 0.0, math.pi / 8.0, 0.0, 0.0])
@@ -307,3 +370,4 @@ def main(gx=-5.0, gy=-7.0, robot_type=RobotType.circle):
 if __name__ == '__main__':
     # main(robot_type=RobotType.rectangle)
     main(robot_type=RobotType.circle)
+    # test_pr(robot_type=RobotType.circle)
