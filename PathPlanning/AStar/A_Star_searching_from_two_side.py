@@ -2,16 +2,18 @@
 A* algorithm
 Author: Weicent
 randomly generate obstacles, start and goal point
-searching path from start and end simultanously
+searching path from start and end simultaneously
 '''
 
 import numpy as np
 import matplotlib.pyplot as plt
 import math
 
+show_animation = True
+
 
 class Node:
-    '''Node with properties of G, H, Coordinate, Parent node'''
+    '''node with properties of g, h, coordinate and parent node'''
 
     def __init__(self, G=0, H=0, coordinate=None, parent=None):
         if coordinate is None:
@@ -68,7 +70,7 @@ def boundary_and_obstacles(start, goal, topv, botv, obstacle_number):
     botv = bottom vertex coordinate of boundary
     obstacle_number = number of obstacles generated in the map
     '''
-    # above can be merged into a rectangle boundary
+    # below can be merged into a rectangle boundary
     ay = list(range(botv[1], topv[1]))
     ax = [botv[0]] * len(ay)
     cy = ay
@@ -210,8 +212,8 @@ def border_line(closed, obs):
     for node in closed:
         temp = find_surrounding(node, obs)
         border = border + temp
-    border = np.array(border)
-    return border
+    border_ary = np.array(border)
+    return border_ary
 
 
 def get_path(org_list, goal_list, coor):
@@ -236,20 +238,16 @@ def get_path(org_list, goal_list, coor):
     return path
 
 
-if __name__ == '__main__':
+def main(topv=[60, 60], botv=[0, 0], obstacle_number=1500):
+    print(__file__ + ' start!')
     try:
         try:
-            topv = [60, 60]  # top vertex of boundary
-            botv = [0, 0]  # bottoom vertex of boundary
-
             # generate start point randomly
             start = [np.random.randint(botv[0] + 1, topv[0]),
                      np.random.randint(botv[1] + 1, topv[1])]
             # generate goal randomly
             end = [np.random.randint(botv[0] + 1, topv[0]),
                    np.random.randint(botv[1] + 1, topv[1])]
-
-            obstacle_number = 1500  # obstacle numbers
 
             # generate boundary and obstacles
             bound, obs = boundary_and_obstacles(start, end, topv,
@@ -258,7 +256,7 @@ if __name__ == '__main__':
             origin = Node(coordinate=start, H=hcost(start, end))
             goal = Node(coordinate=end, H=hcost(end, start))
             # open and closed list for search from origin to goal
-            origin_open = [origin]
+            origin_open: list = [origin]
             origin_close: list = []
             # open and closed list for search from goal to origin
             goal_open = [goal]
@@ -277,7 +275,7 @@ if __name__ == '__main__':
                 # convert node list into coordinate list and array
                 org_cor_list, org_cor_array = node_to_coor(origin_close)
 
-                if origin_open == []:  # no path condition
+                if not origin_open:  # no path condition
                     raise NoPath()
 
                 # update target for searching from end to start
@@ -290,7 +288,7 @@ if __name__ == '__main__':
                 # convert node list into coordinate list and array
                 goa_cor_list, goa_cor_array = node_to_coor(goal_close)
 
-                if goal_open == []:  # no path condition
+                if not goal_open:  # no path condition
                     raise NoPath()
 
                 # update target for searching from start to end
@@ -301,40 +299,44 @@ if __name__ == '__main__':
                 og_intersect = \
                     [coor for coor in org_cor_list if coor in goa_cor_list]
 
-                if og_intersect != []:  # a path is find
+                if og_intersect:  # a path is find, og_intersect!=[]
                     raise Break()
-
-                draw_plot(org_cor_array, goa_cor_array, start, end, bound)
+                if show_animation:
+                    draw_plot(org_cor_array, goa_cor_array, start, end, bound)
 
         except Break as success:
             # get path
             path = get_path(origin_close, goal_close, og_intersect[0])
-            # plot map
-            draw_plot(org_cor_array, goa_cor_array, start, end, bound)
-            plt.plot(path[:, 0], path[:, 1], '-r')
-            plt.title('Robot Arrived', size=20, loc='center')
+            if show_animation:
+                # plot map
+                draw_plot(org_cor_array, goa_cor_array, start, end, bound)
+                plt.plot(path[:, 0], path[:, 1], '-r')
+                plt.title('Robot Arrived', size=20, loc='center')
     except NoPath as fail:
-        if origin_open == []:
+        if not origin_open:
             # if origin confined, find border for origin
             border = border_line(org_cor_list, obs)
-        elif goal_open == []:
+        elif not goal_open:
             # if goal confined, find border for goal
             border = border_line(goa_cor_list, obs)
-        if org_cor_list == []:
+        if not org_cor_list:
             # in case start point totally confined by obstacles
             # in this condition, no neighbor node generated at all,
             # and search ended with close_list=[]
             org_cor_list.append(start)
             org_cor_array = np.array(org_cor_list)
-        if goa_cor_list == []:
+        if not goa_cor_list:
             goa_cor_list.append(end)
             goa_cor_array = np.array(goa_cor_list)
+        if show_animation:
+            info = 'There is no path to  the goal!' \
+                   ' Robot&Goal are split by border' \
+                   ' shown in red \'x\'!'
+            draw_plot(org_cor_array, goa_cor_array, start, end, bound)
+            plt.plot(border[:, 0], border[:, 1], 'xr')
+            plt.title(info, size=14, loc='center')
+    plt.show()
 
-        info = 'There is no path to  the goal!' \
-               ' Robot&Goal are split by border' \
-               ' shown in red \'x\'!'
-        draw_plot(org_cor_array, goa_cor_array, start, end, bound)
-        plt.plot(border[:, 0], border[:, 1], 'xr')
-        plt.title(info, size=14, loc='center')
 
-plt.show()
+if __name__ == '__main__':
+    main(topv=[60, 60], botv=[0, 0], obstacle_number=1500)
