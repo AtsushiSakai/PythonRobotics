@@ -14,17 +14,17 @@ use_iterative_deepening = False
 use_dynamic_weighting = True
 
 
-def draw_horizontal_line(start_x, start_y, len, o_x, o_y, o_dict):
-    for i in range(start_x, start_x + len):
+def draw_horizontal_line(start_x, start_y, length, o_x, o_y, o_dict):
+    for i in range(start_x, start_x + length):
         for j in range(start_y, start_y + 1):
             o_x.append(i)
             o_y.append(j)
             o_dict[(i, j)] = True
 
 
-def draw_vertical_line(start_x, start_y, len, o_x, o_y, o_dict):
+def draw_vertical_line(start_x, start_y, length, o_x, o_y, o_dict):
     for i in range(start_x, start_x + 1):
-        for j in range(start_y, start_y + len):
+        for j in range(start_y, start_y + length):
             o_x.append(i)
             o_y.append(j)
             o_dict[(i, j)] = True
