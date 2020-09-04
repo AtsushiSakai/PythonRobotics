@@ -173,7 +173,7 @@ def find_path(open_list, closed_list, goal, obstacle):
     return open_list, closed_list
 
 
-def draw_plot(close_origin, close_goal, start, end, bound):
+def draw(close_origin, close_goal, start, end, bound):
     # plot the map
     plt.cla()
     plt.gcf().set_size_inches(12, 8, forward=True)
@@ -302,12 +302,12 @@ def main(obstacle_number=1500):
                     path = get_path(origin_close, goal_close, og_intersect[0])
                     if show_animation:
                         # plot map
-                        draw_plot(org_cor_array, goa_cor_array, start, end, bound)
+                        draw(org_cor_array, goa_cor_array, start, end, bound)
                         plt.plot(path[:, 0], path[:, 1], '-r')
                         plt.title('Robot Arrived', size=20, loc='center')
                     raise Break()
                 if show_animation:
-                    draw_plot(org_cor_array, goa_cor_array, start, end, bound)
+                    draw(org_cor_array, goa_cor_array, start, end, bound)
 
         except Break as success:
             print('Robot Arrived!')
@@ -331,9 +331,10 @@ def main(obstacle_number=1500):
             info = 'There is no path to  the goal!' \
                    ' Robot&Goal are split by border' \
                    ' shown in red \'x\'!'
-            draw_plot(org_cor_array, goa_cor_array, start, end, bound)
+            draw(org_cor_array, goa_cor_array, start, end, bound)
             plt.plot(border[:, 0], border[:, 1], 'xr')
             plt.title(info, size=14, loc='center')
+        print('No Path to the goal!')
     plt.show()
 
 
