@@ -16,8 +16,6 @@ class Node:
     '''node with properties of g, h, coordinate and parent node'''
 
     def __init__(self, G=0, H=0, coordinate=None, parent=None):
-        if coordinate is None:
-            coordinate = [0, 0]
         self.G = G
         self.H = H
         self.F = G + H
