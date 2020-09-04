@@ -248,8 +248,8 @@ def main(topv=[60, 60], botv=[0, 0], obstacle_number=1500):
                    np.random.randint(botv[1] + 1, topv[1])]
 
             # generate boundary and obstacles
-            bound, obs = boundary_and_obstacles(start, end, topv,
-                                                botv, obstacle_number)
+            bound, obst = boundary_and_obstacles(start, end, topv,
+                                                 botv, obstacle_number)
             # initial origin node and end node
             origin = Node(coordinate=start, H=hcost(start, end))
             goal = Node(coordinate=end, H=hcost(end, start))
@@ -297,13 +297,13 @@ def main(topv=[60, 60], botv=[0, 0], obstacle_number=1500):
                     [coor for coor in org_cor_list if coor in goa_cor_list]
 
                 if og_intersect != []:  # a path is find, og_intersect!=[]
+                    # get path
+                    path = get_path(origin_close, goal_close, og_intersect[0])
                     raise Break()
                 if show_animation:
                     draw_plot(org_cor_array, goa_cor_array, start, end, bound)
 
         except Break as success:
-            # get path
-            path = get_path(origin_close, goal_close, og_intersect[0])
             if show_animation:
                 # plot map
                 draw_plot(org_cor_array, goa_cor_array, start, end, bound)
@@ -312,10 +312,10 @@ def main(topv=[60, 60], botv=[0, 0], obstacle_number=1500):
     except NoPath as fail:
         if origin_open == []:
             # if origin confined, find border for origin
-            border = border_line(org_cor_list, obs)
-        elif goal_open == []:
-            # if goal confined, find border for goal
-            border = border_line(goa_cor_list, obs)
+            border = border_line(org_cor_list, obst)
+        else:
+            # else goal confined, find border for goal
+            border = border_line(goa_cor_list, obst)
         if org_cor_list == []:
             # in case start point totally confined by obstacles
             # in this condition, no neighbor node generated at all,
@@ -336,4 +336,4 @@ def main(topv=[60, 60], botv=[0, 0], obstacle_number=1500):
 
 
 if __name__ == '__main__':
-    main(topv=[60, 60], botv=[0, 0], obstacle_number=1500)
+    main(topv=[60, 60], botv=[0, 0], obstacle_number=2500)
