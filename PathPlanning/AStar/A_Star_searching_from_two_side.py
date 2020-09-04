@@ -263,7 +263,6 @@ def main(topv=[60, 60], botv=[0, 0], obstacle_number=1500):
             org_cor_list: list = []
             goa_cor_list: list = []
             # initialize searching target for origin and goal
-            target_origin = start
             target_goal = end
             while True:
                 # searching from start to end
@@ -273,7 +272,7 @@ def main(topv=[60, 60], botv=[0, 0], obstacle_number=1500):
                 # convert node list into coordinate list and array
                 org_cor_list, org_cor_array = node_to_coor(origin_close)
 
-                if not origin_open:  # no path condition
+                if origin_open == []:  # no path condition
                     raise NoPath()
 
                 # update target for searching from end to start
@@ -286,7 +285,7 @@ def main(topv=[60, 60], botv=[0, 0], obstacle_number=1500):
                 # convert node list into coordinate list and array
                 goa_cor_list, goa_cor_array = node_to_coor(goal_close)
 
-                if not goal_open:  # no path condition
+                if goal_open == []:  # no path condition
                     raise NoPath()
 
                 # update target for searching from start to end
@@ -297,7 +296,7 @@ def main(topv=[60, 60], botv=[0, 0], obstacle_number=1500):
                 og_intersect = \
                     [coor for coor in org_cor_list if coor in goa_cor_list]
 
-                if og_intersect:  # a path is find, og_intersect!=[]
+                if og_intersect != []:  # a path is find, og_intersect!=[]
                     raise Break()
                 if show_animation:
                     draw_plot(org_cor_array, goa_cor_array, start, end, bound)
@@ -311,19 +310,19 @@ def main(topv=[60, 60], botv=[0, 0], obstacle_number=1500):
                 plt.plot(path[:, 0], path[:, 1], '-r')
                 plt.title('Robot Arrived', size=20, loc='center')
     except NoPath as fail:
-        if not origin_open:
+        if origin_open == []:
             # if origin confined, find border for origin
             border = border_line(org_cor_list, obs)
-        elif not goal_open:
+        elif goal_open == []:
             # if goal confined, find border for goal
             border = border_line(goa_cor_list, obs)
-        if not org_cor_list:
+        if org_cor_list == []:
             # in case start point totally confined by obstacles
             # in this condition, no neighbor node generated at all,
             # and search ended with close_list=[]
             org_cor_list.append(start)
             org_cor_array = np.array(org_cor_list)
-        if not goa_cor_list:
+        if goa_cor_list == []:
             goa_cor_list.append(end)
             goa_cor_array = np.array(goa_cor_list)
         if show_animation:
