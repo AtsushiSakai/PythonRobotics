@@ -30,7 +30,8 @@ class BugPlanner:
                         valid_point = False
                         break
                 if valid_point:
-                    self.out_x.append(cand_x), self.out_y.append(cand_y)
+                    self.out_x.append(cand_x)
+                    self.out_y.append(cand_y)
 
     def mov_normal(self):
         return self.r_x[-1] + np.sign(self.goal_x - self.r_x[-1]), \
@@ -85,14 +86,17 @@ class BugPlanner:
                 found_boundary = False
                 for x_ob, y_ob in zip(self.out_x, self.out_y):
                     if cand_x == x_ob and cand_y == y_ob:
-                        self.r_x.append(cand_x), self.r_y.append(cand_y)
+                        self.r_x.append(cand_x)
+                        self.r_y.append(cand_y)
                         visited_x[:], visited_y[:] = [], []
-                        visited_x.append(cand_x), visited_y.append(cand_y)
+                        visited_x.append(cand_x)
+                        visited_y.append(cand_y)
                         mov_dir = 'obs'
                         found_boundary = True
                         break
                 if not found_boundary:
-                    self.r_x.append(cand_x), self.r_y.append(cand_y)
+                    self.r_x.append(cand_x)
+                    self.r_y.append(cand_y)
             elif mov_dir == 'obs':
                 can_go_normal = True
                 for x_ob, y_ob in zip(self.obs_x, self.obs_y):
@@ -103,8 +107,10 @@ class BugPlanner:
                 if can_go_normal:
                     mov_dir = 'normal'
                 else:
-                    self.r_x.append(cand_x), self.r_y.append(cand_y)
-                    visited_x.append(cand_x), visited_y.append(cand_y)
+                    self.r_x.append(cand_x)
+                    self.r_y.append(cand_y)
+                    visited_x.append(cand_x)
+                    visited_y.append(cand_y)
             if show_animation:
                 plt.plot(self.r_x, self.r_y, "-r")
                 plt.pause(0.001)
@@ -151,9 +157,11 @@ class BugPlanner:
                 found_boundary = False
                 for x_ob, y_ob in zip(self.out_x, self.out_y):
                     if cand_x == x_ob and cand_y == y_ob:
-                        self.r_x.append(cand_x), self.r_y.append(cand_y)
+                        self.r_x.append(cand_x)
+                        self.r_y.append(cand_y)
                         visited_x[:], visited_y[:] = [], []
-                        visited_x.append(cand_x), visited_y.append(cand_y)
+                        visited_x.append(cand_x)
+                        visited_y.append(cand_y)
                         mov_dir = 'obs'
                         dist = np.inf
                         back_to_start = False
@@ -161,7 +169,8 @@ class BugPlanner:
                         found_boundary = True
                         break
                 if not found_boundary:
-                    self.r_x.append(cand_x), self.r_y.append(cand_y)
+                    self.r_x.append(cand_x)
+                    self.r_y.append(cand_y)
             elif mov_dir == 'obs':
                 d = np.linalg.norm(np.array([cand_x, cand_y] -
                                             np.array([self.goal_x,
@@ -174,8 +183,10 @@ class BugPlanner:
                     del self.r_x[-len(visited_x):]
                     del self.r_y[-len(visited_y):]
                     visited_x[:], visited_y[:] = [], []
-                self.r_x.append(cand_x), self.r_y.append(cand_y)
-                visited_x.append(cand_x), visited_y.append(cand_y)
+                self.r_x.append(cand_x)
+                self.r_y.append(cand_y)
+                visited_x.append(cand_x)
+                visited_y.append(cand_y)
                 if cand_x == exit_x and \
                         cand_y == exit_y and \
                         second_round:
@@ -215,9 +226,11 @@ class BugPlanner:
             c_y = straight_y[-1] + np.sign(self.goal_y - straight_y[-1])
             for x_ob, y_ob in zip(self.out_x, self.out_y):
                 if c_x == x_ob and c_y == y_ob:
-                    hit_x.append(c_x), hit_y.append(c_y)
+                    hit_x.append(c_x)
+                    hit_y.append(c_y)
                     break
-            straight_x.append(c_x), straight_y.append(c_y)
+            straight_x.append(c_x)
+            straight_y.append(c_y)
         if show_animation:
             plt.plot(straight_x, straight_y, ",")
             plt.plot(hit_x, hit_y, "d")
@@ -242,19 +255,24 @@ class BugPlanner:
                 found_boundary = False
                 for x_ob, y_ob in zip(self.out_x, self.out_y):
                     if cand_x == x_ob and cand_y == y_ob:
-                        self.r_x.append(cand_x), self.r_y.append(cand_y)
+                        self.r_x.append(cand_x)
+                        self.r_y.append(cand_y)
                         visited_x[:], visited_y[:] = [], []
-                        visited_x.append(cand_x), visited_y.append(cand_y)
+                        visited_x.append(cand_x)
+                        visited_y.append(cand_y)
                         del hit_x[0]
                         del hit_y[0]
                         mov_dir = 'obs'
                         found_boundary = True
                         break
                 if not found_boundary:
-                    self.r_x.append(cand_x), self.r_y.append(cand_y)
+                    self.r_x.append(cand_x)
+                    self.r_y.append(cand_y)
             elif mov_dir == 'obs':
-                self.r_x.append(cand_x), self.r_y.append(cand_y)
-                visited_x.append(cand_x), visited_y.append(cand_y)
+                self.r_x.append(cand_x)
+                self.r_y.append(cand_y)
+                visited_x.append(cand_x)
+                visited_y.append(cand_y)
                 for i_x, i_y in zip(range(len(hit_x)), range(len(hit_y))):
                     if cand_x == hit_x[i_x] and cand_y == hit_y[i_y]:
                         del hit_x[i_x]
