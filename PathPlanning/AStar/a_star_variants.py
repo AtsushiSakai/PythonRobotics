@@ -15,7 +15,7 @@ use_dynamic_weighting = True
 
 
 def draw_horizontal_line(start_x, start_y, length, o_x, o_y, o_dict):
-    for i in range(start_x, start_x + len):
+    for i in range(start_x, start_x + length):
         for j in range(start_y, start_y + 1):
             o_x.append(i)
             o_y.append(j)
@@ -24,7 +24,7 @@ def draw_horizontal_line(start_x, start_y, length, o_x, o_y, o_dict):
 
 def draw_vertical_line(start_x, start_y, length, o_x, o_y, o_dict):
     for i in range(start_x, start_x + 1):
-        for j in range(start_y, start_y + len):
+        for j in range(start_y, start_y + length):
             o_x.append(i)
             o_y.append(j)
             o_dict[(i, j)] = True
@@ -64,6 +64,18 @@ class Search_Algo:
         return val
 
     def astar(self):
+        '''Beam search: Maintain an open list of just 30 nodes.
+        If more than 30 nodes, then get rid of ndoes with high
+        f values.
+        Iterative deepening: At every iteration, get a cut-off
+        value for the f cost. This cut-off is minimum of the f
+        value of all nodes whose f value is higher than the
+        current cut-off value. Nodes with f value higher than
+        the current cut off value are not put in the open set.
+        Dynamic weighting: Multiply heuristic with the following:
+        (1 + epsilon - (epsilon*d)/N) where d is the current
+        iteration of loop and N is upper bound on number of
+        iterations'''
         plt.title('A*')
 
         goal_found = False
