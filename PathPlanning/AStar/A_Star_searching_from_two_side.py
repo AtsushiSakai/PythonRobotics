@@ -336,4 +336,4 @@ def main(topv=[60, 60], botv=[0, 0], obstacle_number=1500):
 
 
 if __name__ == '__main__':
-    main(topv=[60, 60], botv=[0, 0], obstacle_number=2500)
+    main(topv=[60, 60], botv=[0, 0], obstacle_number=1500)
