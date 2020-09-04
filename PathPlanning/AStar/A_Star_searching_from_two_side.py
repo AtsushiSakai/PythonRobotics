@@ -236,20 +236,21 @@ def get_path(org_list, goal_list, coor):
     return path
 
 
-def main(topv=[60, 60], botv=[0, 0], obstacle_number=1500):
+def main(obstacle_number=1500):
     print(__file__ + ' start!')
+    topv = [60, 60]  # top right vertex of boundary
+    botv = [0, 0]  # bottom left vertex of boundary
+    # generate start point randomly
+    start = [np.random.randint(botv[0] + 1, topv[0]),
+             np.random.randint(botv[1] + 1, topv[1])]
+    # generate goal randomly
+    end = [np.random.randint(botv[0] + 1, topv[0]),
+           np.random.randint(botv[1] + 1, topv[1])]
+    # generate boundary and obstacles
+    bound, obst = boundary_and_obstacles(start, end, topv,
+                                         botv, obstacle_number)
     try:
         try:
-            # generate start point randomly
-            start = [np.random.randint(botv[0] + 1, topv[0]),
-                     np.random.randint(botv[1] + 1, topv[1])]
-            # generate goal randomly
-            end = [np.random.randint(botv[0] + 1, topv[0]),
-                   np.random.randint(botv[1] + 1, topv[1])]
-
-            # generate boundary and obstacles
-            bound, obst = boundary_and_obstacles(start, end, topv,
-                                                 botv, obstacle_number)
             # initial origin node and end node
             origin = Node(coordinate=start, H=hcost(start, end))
             goal = Node(coordinate=end, H=hcost(end, start))
@@ -299,16 +300,17 @@ def main(topv=[60, 60], botv=[0, 0], obstacle_number=1500):
                 if og_intersect != []:  # a path is find, og_intersect!=[]
                     # get path
                     path = get_path(origin_close, goal_close, og_intersect[0])
+                    if show_animation:
+                        # plot map
+                        draw_plot(org_cor_array, goa_cor_array, start, end, bound)
+                        plt.plot(path[:, 0], path[:, 1], '-r')
+                        plt.title('Robot Arrived', size=20, loc='center')
                     raise Break()
                 if show_animation:
                     draw_plot(org_cor_array, goa_cor_array, start, end, bound)
 
         except Break as success:
-            if show_animation:
-                # plot map
-                draw_plot(org_cor_array, goa_cor_array, start, end, bound)
-                plt.plot(path[:, 0], path[:, 1], '-r')
-                plt.title('Robot Arrived', size=20, loc='center')
+            print('Robot Arrived!')
     except NoPath as fail:
         if origin_open == []:
             # if origin confined, find border for origin
@@ -336,4 +338,4 @@ def main(topv=[60, 60], botv=[0, 0], obstacle_number=1500):
 
 
 if __name__ == '__main__':
-    main(topv=[60, 60], botv=[0, 0], obstacle_number=1500)
+    main(obstacle_number=1500)

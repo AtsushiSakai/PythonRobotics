@@ -14,7 +14,7 @@ class Test(TestCase):
 
     def test1(self):
         m.show_animation = False
-        m.main([60, 60], [0, 0], 1500)
+        m.main(1500)
 
 
 if __name__ == '__main__':
