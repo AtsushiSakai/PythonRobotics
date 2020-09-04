@@ -101,6 +101,7 @@ def calc_dynamic_window(x, config):
           x[4] - config.max_delta_yaw_rate * config.dt,
           x[4] + config.max_delta_yaw_rate * config.dt]
 
+    #  [v_min, v_max, yaw_rate_min, yaw_rate_max]
     dw = [max(Vs[0], Vd[0]), min(Vs[1], Vd[1]),
           max(Vs[2], Vd[2]), min(Vs[3], Vd[3])]
 
