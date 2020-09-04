@@ -50,6 +50,7 @@ class Config:
         self.to_goal_cost_gain = 0.2
         self.speed_cost_gain = 1.0
         self.obstacle_cost_gain = 2.0
+        self.robot_stuck_flag_cons = 0.001  # constant to prevent robot stucked
         self.robot_type = RobotType.circle
 
         # if robot_type == RobotType.circle
@@ -149,10 +150,11 @@ def calc_control_and_trajectory(x, dw, config, goal, ob):
                 min_cost = final_cost
                 best_u = [v, y]
                 best_trajectory = trajectory
-                if abs(best_u[0]) < 0.001 and abs(x[3]) < 0.001:
-                    # to ensure the robot do not stucked in
-                    # best_v=0 m/s (in front of an obstacle) and
-                    # best_w=0 rad/s (heading to the goal with
+                if abs(best_u[0]) < config.robot_stuck_flag_cons \
+                        and abs(x[3]) < config.robot_stuck_flag_cons:
+                    # to ensure the robot do not get stuck in
+                    # best v=0 m/s (in front of an obstacle) and
+                    # best omega=0 rad/s (heading to the goal with
                     # angle difference of 0)
                     best_u[1] = -config.max_delta_yaw_rate
     return best_u, best_trajectory
