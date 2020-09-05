@@ -148,7 +148,7 @@ class Search_Algo:
                     if use_theta_star and goal_found:
                         current_node['open'] = False
                         cand_pt = self.goal_pt
-                        self.all_nodes[tuple(cand_pt)]['pred'] = 
+                        self.all_nodes[tuple(cand_pt)]['pred'] = \
                             current_node['pos']
                         break
 
