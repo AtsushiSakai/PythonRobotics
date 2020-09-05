@@ -4,7 +4,6 @@ author: Sarim Mehdi(muhammadsarim.mehdi@studio.unibo.it)
 Source: http://theory.stanford.edu/~amitp/GameProgramming/Variations.html
 """
 
-import time
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -12,7 +11,8 @@ show_animation = True
 use_beam_search = False
 use_iterative_deepening = False
 use_dynamic_weighting = False
-use_theta_star = True
+use_theta_star = False
+use_jump_point = True
 
 
 def draw_horizontal_line(start_x, start_y, length, o_x, o_y, o_dict):
@@ -31,22 +31,78 @@ def draw_vertical_line(start_x, start_y, length, o_x, o_y, o_dict):
             o_dict[(i, j)] = True
 
 
+def find_corners(o_dict):
+    offsets1 = [(1, 0), (0, 1), (-1, 0), (1, 0)]
+    offsets2 = [(1, 1), (-1, 1), (-1, -1), (1, -1)]
+    offsets3 = [(0, 1), (-1, 0), (0, -1), (0, -1)]
+    c_list = []
+    for grid_point, obs_status in o_dict.items():
+        if obs_status:
+            continue
+        empty_space = True
+        x, y = grid_point
+        for i in [-1, 0, 1]:
+            for j in [-1, 0, 1]:
+                if (x + i, y + j) not in o_dict.keys():
+                    continue
+                if o_dict[(x + i, y + j)]:
+                    empty_space = False
+                    break
+        if empty_space:
+            continue
+        for offset1, offset2, offset3 in zip(offsets1, offsets2, offsets3):
+            i1, j1 = offset1
+            i2, j2 = offset2
+            i3, j3 = offset3
+            if ((x + i1, y + j1) not in o_dict.keys()) or \
+                    ((x + i2, y + j2) not in o_dict.keys()) or \
+                    ((x + i3, y + j3) not in o_dict.keys()):
+                continue
+            obs_count = 0
+            if o_dict[(x + i1, y + j1)]:
+                obs_count += 1
+            if o_dict[(x + i2, y + j2)]:
+                obs_count += 1
+            if o_dict[(x + i3, y + j3)]:
+                obs_count += 1
+            if obs_count == 3 or obs_count == 1:
+                c_list.append((x, y))
+                plt.plot(x, y, ".y")
+                break
+    return c_list
+
+
 class Search_Algo:
     def __init__(self, obs_grid, goal_x, goal_y, start_x, start_y,
-                 limit_x, limit_y):
+                 limit_x, limit_y, corner_list=None):
         self.start_pt = [start_x, start_y]
         self.goal_pt = [goal_x, goal_y]
         self.obs_grid = obs_grid
         g_cost, h_cost = 0, self.get_hval(start_x, start_y, goal_x, goal_y)
         f_cost = g_cost + h_cost
         self.all_nodes, self.open_set = {}, []
-        for i in range(limit_x):
-            for j in range(limit_y):
+
+        if use_jump_point:
+            for corner in corner_list:
+                i, j = corner
                 h_c = self.get_hval(i, j, goal_x, goal_y)
                 self.all_nodes[(i, j)] = {'pos': [i, j], 'pred': None,
                                           'gcost': np.inf, 'hcost': h_c,
                                           'fcost': np.inf,
                                           'open': True, 'in_open_list': False}
+            self.all_nodes[tuple(self.goal_pt)] = \
+                {'pos': self.goal_pt, 'pred': None,
+                 'gcost': np.inf, 'hcost': 0, 'fcost': np.inf,
+                 'open': True, 'in_open_list': True}
+        else:
+            for i in range(limit_x):
+                for j in range(limit_y):
+                    h_c = self.get_hval(i, j, goal_x, goal_y)
+                    self.all_nodes[(i, j)] = {'pos': [i, j], 'pred': None,
+                                              'gcost': np.inf, 'hcost': h_c,
+                                              'fcost': np.inf,
+                                              'open': True,
+                                              'in_open_list': False}
         self.all_nodes[tuple(self.start_pt)] = \
             {'pos': self.start_pt, 'pred': None,
              'gcost': g_cost, 'hcost': h_cost, 'fcost': f_cost,
@@ -77,6 +133,95 @@ class Search_Algo:
             if (x + i_temp, y + j_temp) not in self.obs_grid.keys():
                 break
         return i_temp - 2*i, j_temp - 2*j, counter, got_goal
+
+    def in_line_of_sight(self, x1, y1, x2, y2):
+        for x in range(min(int(x1), int(x2) + 1),
+                       max(int(x1), int(x2) + 1)):
+            if self.obs_grid[(x, int(y1))]:
+                return False, None
+        for y in range(min(int(y1), int(y2) + 1),
+                       max(int(y1), int(y2) + 1)):
+            print((int(x2), y))
+            if self.obs_grid[(int(x2), y)]:
+                return False, None
+        return True, abs(x2 - x1) + abs(y2 - y1)
+
+    def jump_point(self):
+        '''Jump point: Instead of exploring all empty spaces of the
+        map, just explore the corners.'''
+        plt.title('Theta*')
+
+        goal_found = False
+        while len(self.open_set) > 0:
+            self.open_set = sorted(self.open_set, key=lambda x: x['fcost'])
+            lowest_f = self.open_set[0]['fcost']
+            lowest_h = self.open_set[0]['hcost']
+            lowest_g = self.open_set[0]['gcost']
+            p = 0
+            for p_n in self.open_set[1:]:
+                if p_n['fcost'] == lowest_f and \
+                        p_n['hcost'] < lowest_h:
+                    lowest_h = p_n['hcost']
+                    p += 1
+                elif p_n['fcost'] == lowest_f and \
+                        p_n['hcost'] == lowest_h and \
+                        p_n['gcost'] < lowest_g:
+                    lowest_g = p_n['gcost']
+                    p += 1
+                else:
+                    break
+            current_node = self.all_nodes[tuple(self.open_set[p]['pos'])]
+            x1, y1 = current_node['pos']
+
+            for cand_pt, cand_node in self.all_nodes.items():
+                x2, y2 = cand_pt
+                reachable, offset = self.in_line_of_sight(x1, y1, x2, y2)
+                if not reachable:
+                    continue
+
+                if list(cand_pt) == self.goal_pt:
+                    current_node['open'] = False
+                    self.all_nodes[tuple(cand_pt)]['pred'] = \
+                        current_node['pos']
+                    goal_found = True
+                    break
+
+                g_cost = offset + current_node['gcost']
+                h_cost = self.all_nodes[cand_pt]['hcost']
+                f_cost = g_cost + h_cost
+                cand_pt = tuple(cand_pt)
+                if f_cost < self.all_nodes[cand_pt]['fcost']:
+                    self.all_nodes[cand_pt]['pred'] = current_node['pos']
+                    self.all_nodes[cand_pt]['gcost'] = g_cost
+                    self.all_nodes[cand_pt]['fcost'] = f_cost
+                    if not self.all_nodes[cand_pt]['in_open_list']:
+                        self.open_set.append(self.all_nodes[cand_pt])
+                        self.all_nodes[cand_pt]['in_open_list'] = True
+                    plt.plot(cand_pt[0], cand_pt[1], "r*")
+
+                if goal_found:
+                    break
+            plt.pause(0.001)
+            if goal_found:
+                current_node = self.all_nodes[tuple(self.goal_pt)]
+            while goal_found:
+                if current_node['pred'] is None:
+                    break
+                x = [current_node['pos'][0], current_node['pred'][0]]
+                y = [current_node['pos'][1], current_node['pred'][1]]
+                plt.plot(x, y, "b")
+                current_node = self.all_nodes[tuple(current_node['pred'])]
+                plt.pause(0.001)
+            if goal_found:
+                break
+
+            current_node['open'] = False
+            current_node['in_open_list'] = False
+            plt.plot(current_node['pos'][0], current_node['pos'][1], "g*")
+            del self.open_set[p]
+            current_node['fcost'], current_node['hcost'] = np.inf, np.inf
+        if show_animation:
+            plt.show()
 
     def astar(self):
         '''Beam search: Maintain an open list of just 30 nodes.
@@ -152,6 +297,13 @@ class Search_Algo:
                             current_node['pos']
                         break
 
+                    if cand_pt == self.goal_pt:
+                        current_node['open'] = False
+                        self.all_nodes[tuple(cand_pt)]['pred'] = \
+                            current_node['pos']
+                        goal_found = True
+                        break
+
                     cand_pt = tuple(cand_pt)
                     if not self.obs_grid[tuple(cand_pt)] and \
                             self.all_nodes[cand_pt]['open']:
@@ -183,7 +335,7 @@ class Search_Algo:
             while goal_found:
                 if current_node['pred'] is None:
                     break
-                if use_theta_star:
+                if use_theta_star or use_jump_point:
                     x, y = [current_node['pos'][0], current_node['pred'][0]], \
                              [current_node['pos'][1], current_node['pred'][1]]
                     plt.plot(x, y, "b")
@@ -225,8 +377,8 @@ def main():
 
     s_x = 10.0
     s_y = 10.0
-    g_x = 90.0
-    g_y = 90.0
+    g_x = 65.0
+    g_y = 60.0
 
     # draw outer border of maze
     draw_vertical_line(0, 0, 100, o_x, o_y, obs_dict)
@@ -248,13 +400,19 @@ def main():
     for x, y, l in zip(all_x, all_y, all_len):
         draw_horizontal_line(x, y, l, o_x, o_y, obs_dict)
 
+    corner_list = find_corners(obs_dict)
+
     plt.plot(o_x, o_y, ".k")
     plt.plot(s_x, s_y, "og")
     plt.plot(g_x, g_y, "xb")
     plt.grid(True)
 
-    search_obj = Search_Algo(obs_dict, g_x, g_y, s_x, s_y, 101, 101)
-    search_obj.astar()
+    search_obj = Search_Algo(obs_dict, g_x, g_y, s_x, s_y, 101, 101,
+                             corner_list)
+    if use_jump_point:
+        search_obj.jump_point()
+    else:
+        search_obj.astar()
 
 
 if __name__ == '__main__':
