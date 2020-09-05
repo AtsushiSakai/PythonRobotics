@@ -63,7 +63,7 @@ class Search_Algo:
                 val += 10
             x, y = x + np.sign(x2 - x), y + np.sign(y2 - y)
         return val
-    
+
     def get_farthest_point(self, x, y, i, j):
         i_temp, j_temp = i, j
         counter = 1
