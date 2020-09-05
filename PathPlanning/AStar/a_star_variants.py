@@ -11,19 +11,20 @@ import matplotlib.pyplot as plt
 show_animation = True
 use_beam_search = False
 use_iterative_deepening = False
-use_dynamic_weighting = True
+use_dynamic_weighting = False
+use_theta_star = True
 
 
 def draw_horizontal_line(start_x, start_y, length, o_x, o_y, o_dict):
     for i in range(start_x, start_x + length):
-        for j in range(start_y, start_y + 1):
+        for j in range(start_y, start_y + 2):
             o_x.append(i)
             o_y.append(j)
             o_dict[(i, j)] = True
 
 
 def draw_vertical_line(start_x, start_y, length, o_x, o_y, o_dict):
-    for i in range(start_x, start_x + 1):
+    for i in range(start_x, start_x + 2):
         for j in range(start_y, start_y + length):
             o_x.append(i)
             o_y.append(j)
@@ -62,6 +63,20 @@ class Search_Algo:
                 val += 10
             x, y = x + np.sign(x2 - x), y + np.sign(y2 - y)
         return val
+    
+    def get_farthest_point(self, x, y, i, j):
+        i_temp, j_temp = i, j
+        counter = 1
+        got_goal = False
+        while not self.obs_grid[(x + i_temp, y + j_temp)]:
+            i_temp += i
+            j_temp += j
+            counter += 1
+            if [x + i_temp, y + j_temp] == self.goal_pt:
+                got_goal = True
+            if (x + i_temp, y + j_temp) not in self.obs_grid.keys():
+                break
+        return i_temp - 2*i, j_temp - 2*j, counter, got_goal
 
     def astar(self):
         '''Beam search: Maintain an open list of just 30 nodes.
@@ -75,7 +90,11 @@ class Search_Algo:
         Dynamic weighting: Multiply heuristic with the following:
         (1 + epsilon - (epsilon*d)/N) where d is the current
         iteration of loop and N is upper bound on number of
-        iterations'''
+        iterations.
+        Theta star: Same as A star but you don't need to move
+        one neighbor at a time. In fact, you can look for the
+        next node as far out as you can as long as there is a
+        clear line of sight from your current node to that node.'''
         plt.title('A*')
 
         goal_found = False
@@ -111,17 +130,26 @@ class Search_Algo:
                 w = (1 + epsilon - epsilon*depth/upper_bound_depth)
             for i in [-1, 0, 1]:
                 for j in [-1, 0, 1]:
-                    if i == 0 and j == 0:
+                    x, y = current_node['pos']
+                    if (i == 0 and j == 0) or \
+                            ((x + i, y + j) not in self.obs_grid.keys()):
                         continue
                     offset = 10 if min(i, j) == 0 else 14
-                    cand_pt = [current_node['pos'][0] + i,
-                               current_node['pos'][1] + j]
+                    if use_theta_star:
+                        new_i, new_j, counter, goal_found = \
+                            self.get_farthest_point(x, y, i, j)
+                        offset = offset * counter
+                        cand_pt = [current_node['pos'][0] + new_i,
+                                   current_node['pos'][1] + new_j]
+                    else:
+                        cand_pt = [current_node['pos'][0] + i,
+                                   current_node['pos'][1] + j]
 
-                    if cand_pt == self.goal_pt:
+                    if use_theta_star and goal_found:
                         current_node['open'] = False
-                        self.all_nodes[tuple(cand_pt)]['pred'] = \
+                        cand_pt = self.goal_pt
+                        self.all_nodes[tuple(cand_pt)]['pred'] = 
                             current_node['pos']
-                        goal_found = True
                         break
 
                     cand_pt = tuple(cand_pt)
@@ -155,8 +183,13 @@ class Search_Algo:
             while goal_found:
                 if current_node['pred'] is None:
                     break
-                plt.plot(current_node['pred'][0],
-                         current_node['pred'][1], "b*")
+                if use_theta_star:
+                    x, y = [current_node['pos'][0], current_node['pred'][0]], \
+                             [current_node['pos'][1], current_node['pred'][1]]
+                    plt.plot(x, y, "b")
+                else:
+                    plt.plot(current_node['pred'][0],
+                             current_node['pred'][1], "b*")
                 current_node = self.all_nodes[tuple(current_node['pred'])]
                 plt.pause(0.001)
             if goal_found:
