@@ -135,15 +135,13 @@ class Search_Algo:
         return i_temp - 2*i, j_temp - 2*j, counter, got_goal
 
     def in_line_of_sight(self, x1, y1, x2, y2):
-        for x in range(min(int(x1), int(x2) + 1),
-                       max(int(x1), int(x2) + 1)):
-            if self.obs_grid[(x, int(y1))]:
+        t = 0
+        while t <= 1:
+            xt = (1 - t) * x1 + t * x2
+            yt = (1 - t) * y1 + t * y2
+            if self.obs_grid[(int(xt), int(yt))]:
                 return False, None
-        for y in range(min(int(y1), int(y2) + 1),
-                       max(int(y1), int(y2) + 1)):
-            print((int(x2), y))
-            if self.obs_grid[(int(x2), y)]:
-                return False, None
+            t += 0.01
         return True, abs(x2 - x1) + abs(y2 - y1)
 
     def jump_point(self):
