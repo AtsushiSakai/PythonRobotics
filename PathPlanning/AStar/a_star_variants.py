@@ -14,6 +14,10 @@ use_dynamic_weighting = False
 use_theta_star = False
 use_jump_point = True
 
+beam_capacity = 30
+only_corners = False
+w, epsilon, upper_bound_depth = 1, 4, 500
+
 
 def draw_horizontal_line(start_x, start_y, length, o_x, o_y, o_dict):
     for i in range(start_x, start_x + length):
@@ -31,7 +35,23 @@ def draw_vertical_line(start_x, start_y, length, o_x, o_y, o_dict):
             o_dict[(i, j)] = True
 
 
-def find_corners(o_dict):
+def in_line_of_sight(obs_grid, x1, y1, x2, y2):
+    t = 0
+    while t <= 0.5:
+        xt = (1 - t) * x1 + t * x2
+        yt = (1 - t) * y1 + t * y2
+        if obs_grid[(int(xt), int(yt))]:
+            return False, None
+        xt = (1 - t) * x2 + t * x1
+        yt = (1 - t) * y2 + t * y1
+        if obs_grid[(int(xt), int(yt))]:
+            return False, None
+        t += 0.001
+    dist = np.linalg.norm(np.array([x1, y1] - np.array([x2, y2])))
+    return True, dist
+
+
+def find_keypoints(o_dict):
     offsets1 = [(1, 0), (0, 1), (-1, 0), (1, 0)]
     offsets2 = [(1, 1), (-1, 1), (-1, -1), (1, -1)]
     offsets3 = [(0, 1), (-1, 0), (0, -1), (0, -1)]
@@ -69,7 +89,23 @@ def find_corners(o_dict):
                 c_list.append((x, y))
                 plt.plot(x, y, ".y")
                 break
-    return c_list
+    if only_corners:
+        return c_list
+
+    e_list = []
+    for corner in c_list:
+        x1, y1 = corner
+        for other_corner in c_list:
+            x2, y2 = other_corner
+            if x1 == x2 and y1 == y2:
+                continue
+            reachable, _ = in_line_of_sight(o_dict, x1, y1, x2, y2)
+            if not reachable:
+                continue
+            x_m, y_m = int((x1 + x2) / 2), int((y1 + y2) / 2)
+            e_list.append((x_m, y_m))
+            plt.plot(x_m, y_m, ".y")
+    return c_list + e_list
 
 
 class Search_Algo:
@@ -134,20 +170,10 @@ class Search_Algo:
                 break
         return i_temp - 2*i, j_temp - 2*j, counter, got_goal
 
-    def in_line_of_sight(self, x1, y1, x2, y2):
-        t = 0
-        while t <= 1:
-            xt = (1 - t) * x1 + t * x2
-            yt = (1 - t) * y1 + t * y2
-            if self.obs_grid[(int(xt), int(yt))]:
-                return False, None
-            t += 0.01
-        return True, abs(x2 - x1) + abs(y2 - y1)
-
     def jump_point(self):
         '''Jump point: Instead of exploring all empty spaces of the
         map, just explore the corners.'''
-        plt.title('Theta*')
+        plt.title('Jump Point')
 
         goal_found = False
         while len(self.open_set) > 0:
@@ -173,7 +199,13 @@ class Search_Algo:
 
             for cand_pt, cand_node in self.all_nodes.items():
                 x2, y2 = cand_pt
-                reachable, offset = self.in_line_of_sight(x1, y1, x2, y2)
+                if x1 == x2 and y1 == y2:
+                    continue
+                if np.linalg.norm(np.array([x1, y1] -
+                                           np.array([x2, y2]))) > 100:
+                    continue
+                reachable, offset = in_line_of_sight(self.obs_grid, x1,
+                                                     y1, x2, y2)
                 if not reachable:
                     continue
 
@@ -238,11 +270,20 @@ class Search_Algo:
         one neighbor at a time. In fact, you can look for the
         next node as far out as you can as long as there is a
         clear line of sight from your current node to that node.'''
-        plt.title('A*')
+        if use_beam_search:
+            plt.title('A* with beam search')
+        elif use_iterative_deepening:
+            plt.title('A* with iterative deepening')
+        elif use_dynamic_weighting:
+            plt.title('A* with dynamic weighting')
+        elif use_theta_star:
+            plt.title('Theta *')
+        else:
+            plt.title('A*')
 
         goal_found = False
         curr_f_thresh = np.inf
-        depth, upper_bound_depth = 0, 500
+        depth = 0
         while len(self.open_set) > 0:
             self.open_set = sorted(self.open_set, key=lambda x: x['fcost'])
             lowest_f = self.open_set[0]['fcost']
@@ -263,12 +304,10 @@ class Search_Algo:
                     break
             current_node = self.all_nodes[tuple(self.open_set[p]['pos'])]
 
-            while len(self.open_set) > 10 and use_beam_search:
+            while len(self.open_set) > beam_capacity and use_beam_search:
                 del self.open_set[-1]
 
             f_cost_list = []
-            alternate_f_cost_list = []
-            w, epsilon = 1, 4
             if use_dynamic_weighting:
                 w = (1 + epsilon - epsilon*depth/upper_bound_depth)
             for i in [-1, 0, 1]:
@@ -310,7 +349,7 @@ class Search_Algo:
                         if use_dynamic_weighting:
                             h_cost = h_cost * w
                         f_cost = g_cost + h_cost
-                        if f_cost < self.all_nodes[cand_pt]['fcost'] and \
+                        if f_cost < self.all_nodes[cand_pt]['fcost'] and 
                                 f_cost <= curr_f_thresh:
                             f_cost_list.append(f_cost)
                             self.all_nodes[cand_pt]['pred'] = \
@@ -321,10 +360,6 @@ class Search_Algo:
                                 self.open_set.append(self.all_nodes[cand_pt])
                                 self.all_nodes[cand_pt]['in_open_list'] = True
                             plt.plot(cand_pt[0], cand_pt[1], "r*")
-                        alternate_f = min(f_cost,
-                                          self.all_nodes[cand_pt]['fcost'])
-                        if alternate_f > curr_f_thresh:
-                            alternate_f_cost_list.append(alternate_f)
                 if goal_found:
                     break
             plt.pause(0.001)
@@ -345,14 +380,9 @@ class Search_Algo:
             if goal_found:
                 break
 
-            if use_iterative_deepening and f_cost_list and \
-                    not alternate_f_cost_list:
+            if use_iterative_deepening and f_cost_list:
                 curr_f_thresh = min(f_cost_list)
-            if use_iterative_deepening and not f_cost_list and \
-                    alternate_f_cost_list:
-                curr_f_thresh = min(alternate_f_cost_list)
-            if use_iterative_deepening and not f_cost_list and \
-                    not alternate_f_cost_list:
+            if use_iterative_deepening and not f_cost_list:
                 curr_f_thresh = np.inf
 
             current_node['open'] = False
@@ -375,8 +405,8 @@ def main():
 
     s_x = 10.0
     s_y = 10.0
-    g_x = 65.0
-    g_y = 60.0
+    g_x = 90.0
+    g_y = 90.0
 
     # draw outer border of maze
     draw_vertical_line(0, 0, 100, o_x, o_y, obs_dict)
@@ -398,18 +428,18 @@ def main():
     for x, y, l in zip(all_x, all_y, all_len):
         draw_horizontal_line(x, y, l, o_x, o_y, obs_dict)
 
-    corner_list = find_corners(obs_dict)
-
     plt.plot(o_x, o_y, ".k")
     plt.plot(s_x, s_y, "og")
     plt.plot(g_x, g_y, "xb")
     plt.grid(True)
 
-    search_obj = Search_Algo(obs_dict, g_x, g_y, s_x, s_y, 101, 101,
-                             corner_list)
     if use_jump_point:
+        keypoint_list = find_keypoints(obs_dict)
+        search_obj = Search_Algo(obs_dict, g_x, g_y, s_x, s_y, 101, 101,
+                                 keypoint_list)
         search_obj.jump_point()
     else:
+        search_obj = Search_Algo(obs_dict, g_x, g_y, s_x, s_y, 101, 101)
         search_obj.astar()
 
 
