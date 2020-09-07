@@ -349,7 +349,7 @@ class Search_Algo:
                         if use_dynamic_weighting:
                             h_cost = h_cost * w
                         f_cost = g_cost + h_cost
-                        if f_cost < self.all_nodes[cand_pt]['fcost'] and 
+                        if f_cost < self.all_nodes[cand_pt]['fcost'] and \
                                 f_cost <= curr_f_thresh:
                             f_cost_list.append(f_cost)
                             self.all_nodes[cand_pt]['pred'] = \
