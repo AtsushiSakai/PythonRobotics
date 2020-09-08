@@ -187,13 +187,13 @@ class Search_Algo:
             p = 0
             for p_n in self.open_set[1:]:
                 if p_n['fcost'] == lowest_f and \
-                        p_n['hcost'] < lowest_h:
-                    lowest_h = p_n['hcost']
-                    p += 1
-                elif p_n['fcost'] == lowest_f and \
-                        p_n['hcost'] == lowest_h and \
                         p_n['gcost'] < lowest_g:
                     lowest_g = p_n['gcost']
+                    p += 1
+                elif p_n['fcost'] == lowest_f and \
+                        p_n['gcost'] == lowest_g and \
+                        p_n['hcost'] < lowest_h:
+                    lowest_h = p_n['hcost']
                     p += 1
                 else:
                     break
@@ -296,13 +296,13 @@ class Search_Algo:
             p = 0
             for p_n in self.open_set[1:]:
                 if p_n['fcost'] == lowest_f and \
-                        p_n['hcost'] < lowest_h:
-                    lowest_h = p_n['hcost']
-                    p += 1
-                elif p_n['fcost'] == lowest_f and \
-                        p_n['hcost'] == lowest_h and \
                         p_n['gcost'] < lowest_g:
                     lowest_g = p_n['gcost']
+                    p += 1
+                elif p_n['fcost'] == lowest_f and \
+                        p_n['gcost'] == lowest_g and \
+                        p_n['hcost'] < lowest_h:
+                    lowest_h = p_n['hcost']
                     p += 1
                 else:
                     break
