@@ -15,6 +15,7 @@ use_theta_star = False
 use_jump_point = True
 
 beam_capacity = 30
+max_theta = 25
 only_corners = False
 w, epsilon, upper_bound_depth = 1, 4, 500
 
@@ -160,12 +161,14 @@ class Search_Algo:
         i_temp, j_temp = i, j
         counter = 1
         got_goal = False
-        while not self.obs_grid[(x + i_temp, y + j_temp)]:
+        while not self.obs_grid[(x + i_temp, y + j_temp)] and \
+                counter < max_theta:
             i_temp += i
             j_temp += j
             counter += 1
             if [x + i_temp, y + j_temp] == self.goal_pt:
                 got_goal = True
+                break
             if (x + i_temp, y + j_temp) not in self.obs_grid.keys():
                 break
         return i_temp - 2*i, j_temp - 2*j, counter, got_goal
@@ -277,13 +280,14 @@ class Search_Algo:
         elif use_dynamic_weighting:
             plt.title('A* with dynamic weighting')
         elif use_theta_star:
-            plt.title('Theta *')
+            plt.title('Theta*')
         else:
             plt.title('A*')
 
         goal_found = False
         curr_f_thresh = np.inf
         depth = 0
+        no_valid_f = False
         while len(self.open_set) > 0:
             self.open_set = sorted(self.open_set, key=lambda x: x['fcost'])
             lowest_f = self.open_set[0]['fcost']
@@ -310,13 +314,16 @@ class Search_Algo:
             f_cost_list = []
             if use_dynamic_weighting:
                 w = (1 + epsilon - epsilon*depth/upper_bound_depth)
-            for i in [-1, 0, 1]:
-                for j in [-1, 0, 1]:
+            for i in range(-1, 2):
+                for j in range(-1, 2):
                     x, y = current_node['pos']
                     if (i == 0 and j == 0) or \
                             ((x + i, y + j) not in self.obs_grid.keys()):
                         continue
-                    offset = 10 if min(i, j) == 0 else 14
+                    if (i, j) in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
+                        offset = 10
+                    else:
+                        offset = 14
                     if use_theta_star:
                         new_i, new_j, counter, goal_found = \
                             self.get_farthest_point(x, y, i, j)
@@ -360,6 +367,9 @@ class Search_Algo:
                                 self.open_set.append(self.all_nodes[cand_pt])
                                 self.all_nodes[cand_pt]['in_open_list'] = True
                             plt.plot(cand_pt[0], cand_pt[1], "r*")
+                        if curr_f_thresh < f_cost < \
+                                self.all_nodes[cand_pt]['fcost']:
+                            no_valid_f = True
                 if goal_found:
                     break
             plt.pause(0.001)
@@ -384,6 +394,9 @@ class Search_Algo:
                 curr_f_thresh = min(f_cost_list)
             if use_iterative_deepening and not f_cost_list:
                 curr_f_thresh = np.inf
+            if use_iterative_deepening and not f_cost_list and no_valid_f:
+                current_node['fcost'], current_node['hcost'] = np.inf, np.inf
+                continue
 
             current_node['open'] = False
             current_node['in_open_list'] = False
