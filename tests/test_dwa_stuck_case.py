@@ -16,11 +16,11 @@ class TestStuckCaseDWA(TestCase):
     def test_main1(self):
         m.show_animation = False
         # obstacles and goals for stuck condition
-        m.config.ob = -1 * np.array([[-1, -1],
-                                     [0, 2],
-                                     [2, 6],
-                                     [2, 8],
-                                     [3, 9.27],
+        m.config.ob = -1 * np.array([[-1.0, -1.0],
+                                     [0.0, 2.0],
+                                     [2.0, 6.0],
+                                     [2.0, 8.0],
+                                     [3.0, 9.27],
                                      [3.79, 9.39],
                                      [7.25, 8.97],
                                      [7.0, 2.0],
