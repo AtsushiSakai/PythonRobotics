@@ -60,6 +60,23 @@ class Config:
         # if robot_type == RobotType.rectangle
         self.robot_width = 0.5  # [m] for collision check
         self.robot_length = 1.2  # [m] for collision check
+        # obstacles [x(m) y(m), ....]
+        self.ob = np.array([[-1, -1],
+                            [0, 2],
+                            [4.0, 2.0],
+                            [5.0, 4.0],
+                            [5.0, 5.0],
+                            [5.0, 6.0],
+                            [5.0, 9.0],
+                            [8.0, 9.0],
+                            [7.0, 9.0],
+                            [8.0, 10.0],
+                            [9.0, 11.0],
+                            [12.0, 13.0],
+                            [12.0, 12.0],
+                            [15.0, 15.0],
+                            [13.0, 13.0]
+                            ])
 
     @property
     def robot_type(self):
@@ -71,7 +88,7 @@ class Config:
             raise TypeError("robot_type must be an instance of RobotType")
         self._robot_type = value
 
-
+config = Config()
 def motion(x, u, dt):
     """
     motion model
@@ -243,29 +260,13 @@ def main(gx=10.0, gy=10.0, robot_type=RobotType.circle):
     x = np.array([0.0, 0.0, math.pi / 8.0, 0.0, 0.0])
     # goal position [x(m), y(m)]
     goal = np.array([gx, gy])
-    # obstacles [x(m) y(m), ....]
-    ob = np.array([[-1, -1],
-                   [0, 2],
-                   [4.0, 2.0],
-                   [5.0, 4.0],
-                   [5.0, 5.0],
-                   [5.0, 6.0],
-                   [5.0, 9.0],
-                   [8.0, 9.0],
-                   [7.0, 9.0],
-                   [8.0, 10.0],
-                   [9.0, 11.0],
-                   [12.0, 13.0],
-                   [12.0, 12.0],
-                   [15.0, 15.0],
-                   [13.0, 13.0]
-                   ])
+
 
     # input [forward speed, yaw_rate]
-    config = Config()
+
     config.robot_type = robot_type
     trajectory = np.array(x)
-
+    ob = config.ob
     while True:
         u, predicted_trajectory = dwa_control(x, config, goal, ob)
         x = motion(x, u, config.dt)  # simulate robot
