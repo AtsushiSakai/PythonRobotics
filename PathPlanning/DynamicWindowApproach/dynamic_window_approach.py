@@ -88,7 +88,10 @@ class Config:
             raise TypeError("robot_type must be an instance of RobotType")
         self._robot_type = value
 
+
 config = Config()
+
+
 def motion(x, u, dt):
     """
     motion model
@@ -260,7 +263,6 @@ def main(gx=10.0, gy=10.0, robot_type=RobotType.circle):
     x = np.array([0.0, 0.0, math.pi / 8.0, 0.0, 0.0])
     # goal position [x(m), y(m)]
     goal = np.array([gx, gy])
-
 
     # input [forward speed, yaw_rate]
 
