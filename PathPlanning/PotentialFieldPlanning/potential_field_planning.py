@@ -19,6 +19,8 @@ ETA = 100.0  # repulsive potential gain
 AREA_WIDTH = 30.0  # potential area width [m]
 # the number of previous positions used to check oscillations
 OSCILLATIONS_DETECTION_LENGTH = 3
+#choose the reso
+
 
 show_animation = True
 
