@@ -37,12 +37,18 @@ class Node:
 
 class NoPath(Exception):
     '''No path to the goal'''
-    pass
+
+    def print_info(self):
+        info = 'No path to the goal! ' \
+               'Border are shown in red \'x\''
+        print(info)
 
 
 class Break(Exception):
     '''Path is find, jump out of loop'''
-    pass
+
+    def print_info(self):
+        print('Path is find!')
 
 
 def hcost(node_coordinate, goal):
@@ -310,7 +316,7 @@ def main(obstacle_number=1500):
                     draw(org_cor_array, goa_cor_array, start, end, bound)
 
         except Break as success:
-            print('Robot Arrived!')
+            success.print_info()
     except NoPath as fail:
         if origin_open == []:
             # if origin confined, find border for origin
@@ -334,7 +340,7 @@ def main(obstacle_number=1500):
             draw(org_cor_array, goa_cor_array, start, end, bound)
             plt.plot(border[:, 0], border[:, 1], 'xr')
             plt.title(info, size=14, loc='center')
-        print('No Path to the goal!')
+        fail.print_info()
     plt.show()
 
 
