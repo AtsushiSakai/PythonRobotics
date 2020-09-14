@@ -12,7 +12,7 @@ use_beam_search = False
 use_iterative_deepening = False
 use_dynamic_weighting = False
 use_theta_star = False
-use_jump_point = True
+use_jump_point = False
 
 beam_capacity = 30
 max_theta = 25
@@ -52,7 +52,7 @@ def in_line_of_sight(obs_grid, x1, y1, x2, y2):
     return True, dist
 
 
-def find_keypoints(o_dict):
+def key_points(o_dict):
     offsets1 = [(1, 0), (0, 1), (-1, 0), (1, 0)]
     offsets2 = [(1, 1), (-1, 1), (-1, -1), (1, -1)]
     offsets3 = [(0, 1), (-1, 0), (0, -1), (0, -1)]
@@ -109,7 +109,7 @@ def find_keypoints(o_dict):
     return c_list + e_list
 
 
-class Search_Algo:
+class SearchAlgo:
     def __init__(self, obs_grid, goal_x, goal_y, start_x, start_y,
                  limit_x, limit_y, corner_list=None):
         self.start_pt = [start_x, start_y]
@@ -447,12 +447,12 @@ def main():
     plt.grid(True)
 
     if use_jump_point:
-        keypoint_list = find_keypoints(obs_dict)
-        search_obj = Search_Algo(obs_dict, g_x, g_y, s_x, s_y, 101, 101,
-                                 keypoint_list)
+        keypoint_list = key_points(obs_dict)
+        search_obj = SearchAlgo(obs_dict, g_x, g_y, s_x, s_y, 101, 101,
+                                keypoint_list)
         search_obj.jump_point()
     else:
-        search_obj = Search_Algo(obs_dict, g_x, g_y, s_x, s_y, 101, 101)
+        search_obj = SearchAlgo(obs_dict, g_x, g_y, s_x, s_y, 101, 101)
         search_obj.astar()
 
 
