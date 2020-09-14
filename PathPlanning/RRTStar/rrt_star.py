@@ -82,7 +82,7 @@ class RRTStar(RRT):
                     self.node_list.append(new_node)
 
             if animation:
-                self.draw_graph(rnd, new_node=new_node)
+                self.draw_graph(rnd)
 
             if (not search_until_max_iter) and new_node:  # check reaching the goal
                 last_index = self.search_best_goal_node()
@@ -129,7 +129,6 @@ class RRTStar(RRT):
 
         if min_cost == float("inf"):
             print("There is no good path.(min_cost is inf)")
-            assert 0
             return None
 
         min_ind = near_inds[costs.index(min_cost)]
