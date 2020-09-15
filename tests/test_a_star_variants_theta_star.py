@@ -9,6 +9,7 @@ class Test(TestCase):
 
     def test(self):
         # Theta*
+        astar.show_animation = False
         astar.use_theta_star = True
         astar.main()
 
