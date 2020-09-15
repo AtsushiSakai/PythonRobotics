@@ -1,4 +1,4 @@
-from PathPlanning.a_star import a_star_variants as astar
+from PathPlanning.AStar import a_star_variants as astar
 from unittest import TestCase
 import sys
 import os
