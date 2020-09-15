@@ -9,6 +9,7 @@ class Test(TestCase):
 
     def test(self):
         # A* with jump point
+        astar.show_animation = False
         astar.use_jump_point = True
         astar.main()
 
