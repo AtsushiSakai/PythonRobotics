@@ -259,7 +259,7 @@ def draw_control(org_closed, goal_closed, flag, start, end, bound, obstacle):
     org_array = np.array(org_closed_ls)
     goal_closed_ls = node_to_coordinate(goal_closed)
     goal_array = np.array(goal_closed_ls)
-    if show_animation:
+    if show_animation:  # draw the searching process
         draw(org_array, goal_array, start, end, bound)
     if flag == 0:
         node_intersect = check_node_coincide(org_closed, goal_closed)
@@ -267,27 +267,30 @@ def draw_control(org_closed, goal_closed, flag, start, end, bound, obstacle):
             path = get_path(org_closed, goal_closed, node_intersect[0])
             stop_loop = 1
             print('Path is find!')
-            if show_animation:
-                draw(org_array, goal_array, start, end, bound)
+            if show_animation:  # draw the path
                 plt.plot(path[:, 0], path[:, 1], '-r')
                 plt.title('Robot Arrived', size=20, loc='center')
                 plt.show()
     elif flag == 1:  # start point blocked first
         stop_loop = 1
-        border = get_border_line(org_closed, obstacle)
         print('There is no path to the goal! Start point is blocked!')
     elif flag == 2:  # end point blocked first
         stop_loop = 1
-        border = get_border_line(goal_closed, obstacle)
         print('There is no path to the goal! End point is blocked!')
-    if show_animation and flag == 1 or flag == 2:
+    if show_animation:  # blocked case, draw the border line
         info = 'There is no path to the goal!' \
                ' Robot&Goal are split by border' \
                ' shown in red \'x\'!'
-        draw(org_array, goal_array, start, end, bound)
-        plt.plot(border[:, 0], border[:, 1], 'xr')
-        plt.title(info, size=14, loc='center')
-        plt.show()
+        if flag == 1:
+            border = get_border_line(org_closed, obstacle)
+            plt.plot(border[:, 0], border[:, 1], 'xr')
+            plt.title(info, size=14, loc='center')
+            plt.show()
+        elif flag == 2:
+            border = get_border_line(goal_closed, obstacle)
+            plt.plot(border[:, 0], border[:, 1], 'xr')
+            plt.title(info, size=14, loc='center')
+            plt.show()
     return stop_loop
 
 
