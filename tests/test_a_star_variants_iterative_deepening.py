@@ -9,7 +9,8 @@ class Test(TestCase):
 
     def test(self):
         # A* with dynamic weighting
-        astar.use_dynamic_weighting = True
+        astar.show_animation = False
+        astar.use_iterative_deepening = True
         astar.main()
 
 
