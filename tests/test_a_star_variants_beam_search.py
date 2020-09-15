@@ -9,6 +9,7 @@ class Test(TestCase):
 
     def test(self):
         # A* with beam search
+        astar.show_animation = False
         astar.use_beam_search = True
         astar.main()
 
