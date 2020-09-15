@@ -9,6 +9,7 @@ class Test(TestCase):
 
     def test(self):
         # A* with dynamic weighting
+        astar.show_animation = False
         astar.use_dynamic_weighting = True
         astar.main()
 
