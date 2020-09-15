@@ -1,9 +1,9 @@
-'''
+"""
 A* algorithm
 Author: Weicent
 randomly generate obstacles, start and goal point
 searching path from start and end simultaneously
-'''
+"""
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,7 +13,7 @@ show_animation = True
 
 
 class Node:
-    '''node with properties of g, h, coordinate and parent node'''
+    """node with properties of g, h, coordinate and parent node"""
 
     def __init__(self, G=0, H=0, coordinate=None, parent=None):
         self.G = G
@@ -22,33 +22,8 @@ class Node:
         self.parent = parent
         self.coordinate = coordinate
 
-    def setg(self, value):
-        self.G = value
-
-    def seth(self, value):
-        self.H = value
-
-    def setf(self):
+    def reset_f(self):
         self.F = self.G + self.H
-
-    def set_parent(self, new_parent):
-        self.parent = new_parent
-
-
-class NoPath(Exception):
-    '''No path to the goal'''
-
-    def print_info(self):
-        info = 'No path to the goal! ' \
-               'Border are shown in red \'x\''
-        print(info)
-
-
-class Break(Exception):
-    '''Path is find, jump out of loop'''
-
-    def print_info(self):
-        print('Path is find!')
 
 
 def hcost(node_coordinate, goal):
@@ -66,27 +41,30 @@ def gcost(fixed_node, update_node_coordinate):
     return gcost
 
 
-def boundary_and_obstacles(start, goal, topv, botv, obstacle_number):
-    '''
-    start = start coordinate
-    goal = goal coordinate
-    topv = top vertex coordinate of boundary
-    botv = bottom vertex coordinate of boundary
-    obstacle_number = number of obstacles generated in the map
-    '''
+def boundary_and_obstacles(start, goal, top_vertex, bottom_vertex, obs_number):
+    """
+    :param start: start coordinate
+    :param goal: goal coordinate
+    :param top_vertex: top right vertex coordinate of boundary
+    :param bottom_vertex: bottom left vertex coordinate of boundary
+    :param obs_number: number of obstacles generated in the map
+    :return: boundary_obstacle array, obstacle list
+    """
     # below can be merged into a rectangle boundary
-    ay = list(range(botv[1], topv[1]))
-    ax = [botv[0]] * len(ay)
+    ay = list(range(bottom_vertex[1], top_vertex[1]))
+    ax = [bottom_vertex[0]] * len(ay)
     cy = ay
-    cx = [topv[0]] * len(cy)
-    bx = list(range(botv[0] + 1, topv[0]))
-    by = [botv[1]] * len(bx)
-    dx = [botv[0]] + bx + [topv[0]]
-    dy = [topv[1]] * len(dx)
+    cx = [top_vertex[0]] * len(cy)
+    bx = list(range(bottom_vertex[0] + 1, top_vertex[0]))
+    by = [bottom_vertex[1]] * len(bx)
+    dx = [bottom_vertex[0]] + bx + [top_vertex[0]]
+    dy = [top_vertex[1]] * len(dx)
 
     # generate random obstacles
-    ob_x = np.random.randint(botv[0] + 1, topv[0], obstacle_number).tolist()
-    ob_y = np.random.randint(botv[1] + 1, topv[1], obstacle_number).tolist()
+    ob_x = np.random.randint(bottom_vertex[0] + 1,
+                             top_vertex[0], obs_number).tolist()
+    ob_y = np.random.randint(bottom_vertex[1] + 1,
+                             top_vertex[1], obs_number).tolist()
     # x y coordinate in certain order for boundary
     x = ax + bx + cx + dx
     y = ay + by + cy + dy
@@ -152,85 +130,85 @@ def find_node_index(coordinate, node_list):
 
 def find_path(open_list, closed_list, goal, obstacle):
     # searching for the path, update open and closed list
+    # obstacle = obstacle and boundary
     flag = len(open_list)
     for i in range(flag):
         node = open_list[0]
-        open_coor = [node.coordinate for node in open_list]
-        closed_coor = [node.coordinate for node in closed_list]
-        temp = find_neighbor(node, obstacle, closed_coor)
+        open_coordinate_list = [node.coordinate for node in open_list]
+        closed_coordinate_list = [node.coordinate for node in closed_list]
+        temp = find_neighbor(node, obstacle, closed_coordinate_list)
         for element in temp:
             if element in closed_list:
                 continue
-            elif element in open_coor:
+            elif element in open_coordinate_list:
                 # if node in open list, update g value
-                ind = open_coor.index(element)
+                ind = open_coordinate_list.index(element)
                 new_g = gcost(node, element)
                 if new_g <= open_list[ind].G:
-                    open_list[ind].setg(new_g)
-                    open_list[ind].setf()
-                    open_list[ind].set_parent = node
+                    open_list[ind].G = new_g
+                    open_list[ind].reset_f()
+                    open_list[ind].parent = node
             else:  # new coordinate, create corresponding node
                 ele_node = Node(coordinate=element, parent=node,
                                 G=gcost(node, element), H=hcost(element, goal))
                 open_list.append(ele_node)
         open_list.remove(node)
         closed_list.append(node)
-        open_list.sort(key=lambda x: x.H)
+        open_list.sort(key=lambda x: x.F)
     return open_list, closed_list
 
 
-def draw(close_origin, close_goal, start, end, bound):
-    # plot the map
-    plt.cla()
-    plt.gcf().set_size_inches(12, 8, forward=True)
-    plt.axis('equal')
-    plt.plot(close_origin[:, 0], close_origin[:, 1], 'oy')
-    plt.plot(close_goal[:, 0], close_goal[:, 1], 'og')
-    plt.plot(bound[:, 0], bound[:, 1], 'sk')
-    plt.plot(end[0], end[1], '*b', label='Goal')
-    plt.plot(start[0], start[1], '^b', label='Origin')
-    plt.legend()
-    plt.pause(0.0001)
-
-
-def node_to_coor(node_list):
+def node_to_coordinate(node_list):
     # convert node list into coordinate list and array
-    coor_list = [node.coordinate for node in node_list]
-    coor_array = np.array(coor_list)
-    return coor_list, coor_array
+    coordinate_list = [node.coordinate for node in node_list]
+    return coordinate_list
 
 
-def find_surrounding(coor, obs):
+def check_node_coincide(close_ls1, closed_ls2):
+    """
+    :param close_ls1: node closed list for searching from start
+    :param closed_ls2: node closed list for searching from end
+    :return: intersect node list for above two
+    """
+    # check if node in close_ls1 intersect with node in closed_ls2
+    cl1 = node_to_coordinate(close_ls1)
+    cl2 = node_to_coordinate(closed_ls2)
+    intersect_ls = [node for node in cl1 if node in cl2]
+    return intersect_ls
+
+
+def find_surrounding(coordinate, obstacle):
     # find obstacles around node, help to draw the borderline
     boundary: list = []
-    for x in range(coor[0] - 1, coor[0] + 2):
-        for y in range(coor[1] - 1, coor[1] + 2):
-            if [x, y] in obs:
+    for x in range(coordinate[0] - 1, coordinate[0] + 2):
+        for y in range(coordinate[1] - 1, coordinate[1] + 2):
+            if [x, y] in obstacle:
                 boundary.append([x, y])
     return boundary
 
 
-def border_line(closed, obs):
+def get_border_line(node_closed_ls, obstacle):
     # if no path, find border line which confine goal or robot
     border: list = []
-    for node in closed:
-        temp = find_surrounding(node, obs)
+    coordinate_closed_ls = node_to_coordinate(node_closed_ls)
+    for coordinate in coordinate_closed_ls:
+        temp = find_surrounding(coordinate, obstacle)
         border = border + temp
     border_ary = np.array(border)
     return border_ary
 
 
-def get_path(org_list, goal_list, coor):
+def get_path(org_list, goal_list, coordinate):
     # get path from start to end
     path_org: list = []
     path_goal: list = []
-    ind = find_node_index(coor, org_list)
+    ind = find_node_index(coordinate, org_list)
     node = org_list[ind]
     while node != org_list[0]:
         path_org.append(node.coordinate)
         node = node.parent
     path_org.append(org_list[0].coordinate)
-    ind = find_node_index(coor, goal_list)
+    ind = find_node_index(coordinate, goal_list)
     node = goal_list[ind]
     while node != goal_list[0]:
         path_goal.append(node.coordinate)
@@ -242,106 +220,140 @@ def get_path(org_list, goal_list, coor):
     return path
 
 
+def random_coordinate(bottom_vertex, top_vertex):
+    # generate random coordinates inside maze
+    coordinate = [np.random.randint(bottom_vertex[0] + 1, top_vertex[0]),
+                  np.random.randint(bottom_vertex[1] + 1, top_vertex[1])]
+    return coordinate
+
+
+def draw(close_origin, close_goal, start, end, bound):
+    # plot the map
+    if not close_goal.tolist():  # ensure the close_goal not empty
+        # in case of the obstacle number is really large (>4500), the
+        # origin is very likely blocked at the first search, and then
+        # the program is over and the searching from goal to origin
+        # will not start, which remain the closed_list for goal == []
+        # in order to plot the map, add the end coordinate to array
+        close_goal = np.array([end])
+    plt.cla()
+    plt.gcf().set_size_inches(11, 9, forward=True)
+    plt.axis('equal')
+    plt.plot(close_origin[:, 0], close_origin[:, 1], 'oy')
+    plt.plot(close_goal[:, 0], close_goal[:, 1], 'og')
+    plt.plot(bound[:, 0], bound[:, 1], 'sk')
+    plt.plot(end[0], end[1], '*b', label='Goal')
+    plt.plot(start[0], start[1], '^b', label='Origin')
+    plt.legend()
+    plt.pause(0.0001)
+
+
+def draw_control(org_closed, goal_closed, flag, start, end, bound, obstacle):
+    """
+    control the plot process
+    flag == 0 : draw the searching process and plot path
+    flag == 1 or 2 : start or end is blocked, draw the border line
+    """
+    stop_loop = 0  # stop sign for the searching
+    org_closed_ls = node_to_coordinate(org_closed)
+    org_array = np.array(org_closed_ls)
+    goal_closed_ls = node_to_coordinate(goal_closed)
+    goal_array = np.array(goal_closed_ls)
+    if show_animation:
+        draw(org_array, goal_array, start, end, bound)
+    if flag == 0:
+        node_intersect = check_node_coincide(org_closed, goal_closed)
+        if node_intersect:  # a path is find
+            path = get_path(org_closed, goal_closed, node_intersect[0])
+            stop_loop = 1
+            print('Path is find!')
+            if show_animation:
+                draw(org_array, goal_array, start, end, bound)
+                plt.plot(path[:, 0], path[:, 1], '-r')
+                plt.title('Robot Arrived', size=20, loc='center')
+                plt.show()
+    elif flag == 1:  # start point blocked first
+        stop_loop = 1
+        border = get_border_line(org_closed, obstacle)
+        print('There is no path to the goal! Start point is blocked!')
+    elif flag == 2:  # end point blocked first
+        stop_loop = 1
+        border = get_border_line(goal_closed, obstacle)
+        print('There is no path to the goal! End point is blocked!')
+    if show_animation and flag == 1 or flag == 2:
+        info = 'There is no path to the goal!' \
+               ' Robot&Goal are split by border' \
+               ' shown in red \'x\'!'
+        draw(org_array, goal_array, start, end, bound)
+        plt.plot(border[:, 0], border[:, 1], 'xr')
+        plt.title(info, size=14, loc='center')
+        plt.show()
+    return stop_loop
+
+
+def searching_control(start, end, bound, obstacle):
+    """manage the searching process, start searching from two side"""
+    # initial origin node and end node
+    origin = Node(coordinate=start, H=hcost(start, end))
+    goal = Node(coordinate=end, H=hcost(end, start))
+    # list for searching from origin to goal
+    origin_open: list = [origin]
+    origin_close: list = []
+    # list for searching from goal to origin
+    goal_open = [goal]
+    goal_close: list = []
+    # initial target
+    target_goal = end
+    # flag = 0 (not blocked) 1 (start point blocked) 2 (end point blocked)
+    flag = 0  # init flag
+
+    while True:
+        # searching from start to end
+        origin_open, origin_close = \
+            find_path(origin_open, origin_close, target_goal, bound)
+        if not origin_open:  # no path condition
+            flag = 1  # origin node is blocked
+            draw_control(origin_close, goal_close, flag, start, end, bound,
+                         obstacle)
+            break
+        # update target for searching from end to start
+        target_origin = min(origin_open, key=lambda x: x.F).coordinate
+
+        # searching from end to start
+        goal_open, goal_close = \
+            find_path(goal_open, goal_close, target_origin, bound)
+        if not goal_open:  # no path condition
+            flag = 2  # goal is blocked
+            draw_control(origin_close, goal_close, flag, start, end, bound,
+                         obstacle)
+            break
+        # update target for searching from start to end
+        target_goal = min(goal_open, key=lambda x: x.F).coordinate
+
+        # continue searching, draw the process
+        stop_sign = draw_control(origin_close, goal_close, flag, start, end,
+                                 bound, obstacle)
+        if stop_sign:
+            break
+    return flag
+
+
 def main(obstacle_number=1500):
     print(__file__ + ' start!')
-    topv = [60, 60]  # top right vertex of boundary
-    botv = [0, 0]  # bottom left vertex of boundary
-    # generate start point randomly
-    start = [np.random.randint(botv[0] + 1, topv[0]),
-             np.random.randint(botv[1] + 1, topv[1])]
-    # generate goal randomly
-    end = [np.random.randint(botv[0] + 1, topv[0]),
-           np.random.randint(botv[1] + 1, topv[1])]
+
+    top_vertex = [60, 60]  # top right vertex of boundary
+    bottom_vertex = [0, 0]  # bottom left vertex of boundary
+
+    # generate start and goal point randomly
+    start = random_coordinate(bottom_vertex, top_vertex)
+    end = random_coordinate(bottom_vertex, top_vertex)
+
     # generate boundary and obstacles
-    bound, obst = boundary_and_obstacles(start, end, topv,
-                                         botv, obstacle_number)
-    try:
-        try:
-            # initial origin node and end node
-            origin = Node(coordinate=start, H=hcost(start, end))
-            goal = Node(coordinate=end, H=hcost(end, start))
-            # open and closed list for search from origin to goal
-            origin_open: list = [origin]
-            origin_close: list = []
-            # open and closed list for search from goal to origin
-            goal_open = [goal]
-            goal_close: list = []
-            # initialize coordinate closed list for origin and goal
-            org_cor_list: list = []
-            goa_cor_list: list = []
-            # initialize searching target for origin and goal
-            target_goal = end
-            while True:
-                # searching from start to end
-                origin_open, origin_close = \
-                    find_path(origin_open, origin_close, target_goal, bound)
+    bound, obstacle = boundary_and_obstacles(start, end, top_vertex,
+                                             bottom_vertex,
+                                             obstacle_number)
 
-                # convert node list into coordinate list and array
-                org_cor_list, org_cor_array = node_to_coor(origin_close)
-
-                if origin_open == []:  # no path condition
-                    raise NoPath()
-
-                # update target for searching from end to start
-                target_origin = min(origin_open, key=lambda x: x.H).coordinate
-
-                # searching from end to start
-                goal_open, goal_close = \
-                    find_path(goal_open, goal_close, target_origin, bound)
-
-                # convert node list into coordinate list and array
-                goa_cor_list, goa_cor_array = node_to_coor(goal_close)
-
-                if goal_open == []:  # no path condition
-                    raise NoPath()
-
-                # update target for searching from start to end
-                target_goal = \
-                    min(goal_open, key=lambda x: x.H).coordinate
-
-                # check if the searching meet each other
-                og_intersect = \
-                    [coor for coor in org_cor_list if coor in goa_cor_list]
-
-                if og_intersect != []:  # a path is find, og_intersect!=[]
-                    # get path
-                    path = get_path(origin_close, goal_close, og_intersect[0])
-                    if show_animation:
-                        # plot map
-                        draw(org_cor_array, goa_cor_array, start, end, bound)
-                        plt.plot(path[:, 0], path[:, 1], '-r')
-                        plt.title('Robot Arrived', size=20, loc='center')
-                    raise Break()
-                if show_animation:
-                    draw(org_cor_array, goa_cor_array, start, end, bound)
-
-        except Break as success:
-            success.print_info()
-    except NoPath as fail:
-        if origin_open == []:
-            # if origin confined, find border for origin
-            border = border_line(org_cor_list, obst)
-        else:
-            # else goal confined, find border for goal
-            border = border_line(goa_cor_list, obst)
-        if org_cor_list == []:
-            # in case start point totally confined by obstacles
-            # in this condition, no neighbor node generated at all,
-            # and search ended with close_list=[]
-            org_cor_list.append(start)
-            org_cor_array = np.array(org_cor_list)
-        if goa_cor_list == []:
-            goa_cor_list.append(end)
-            goa_cor_array = np.array(goa_cor_list)
-        if show_animation:
-            info = 'There is no path to  the goal!' \
-                   ' Robot&Goal are split by border' \
-                   ' shown in red \'x\'!'
-            draw(org_cor_array, goa_cor_array, start, end, bound)
-            plt.plot(border[:, 0], border[:, 1], 'xr')
-            plt.title(info, size=14, loc='center')
-        fail.print_info()
-    plt.show()
+    searching_control(start, end, bound, obstacle)
 
 
 if __name__ == '__main__':

@@ -18,7 +18,7 @@ class Test(TestCase):
 
     def test2(self):
         m.show_animation = False
-        m.main(4000)  # increase obstacle number, block path
+        m.main(5000)  # increase obstacle number, block path
 
 
 if __name__ == '__main__':
