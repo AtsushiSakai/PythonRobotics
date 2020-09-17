@@ -42,7 +42,8 @@ class RRTStar(RRT):
                  connect_circle_dist=50.0
                  ):
         super().__init__(start, goal, obstacle_list,
-                         rand_area, expand_dis, path_resolution, goal_sample_rate, max_iter)
+                         rand_area, expand_dis, path_resolution,
+                         goal_sample_rate, max_iter)
         """
         Setting Parameter
 
@@ -59,8 +60,8 @@ class RRTStar(RRT):
         """
         rrt star path planning
 
-        animation: flag for animation on or off
-        search_until_max_iter: search until max iteration for path improving or not
+        animation: flag for animation on or off search_until_max_iter: search
+        until max iteration for path improving or not
         """
 
         self.node_list = [self.start]
@@ -68,9 +69,12 @@ class RRTStar(RRT):
             print("Iter:", i, ", number of nodes:", len(self.node_list))
             rnd = self.get_random_node()
             nearest_ind = self.get_nearest_node_index(self.node_list, rnd)
-            new_node = self.steer(self.node_list[nearest_ind], rnd, self.expand_dis)
+            new_node = self.steer(
+                self.node_list[nearest_ind], rnd, self.expand_dis)
             near_node = self.node_list[nearest_ind]
-            new_node.cost = near_node.cost + math.sqrt((new_node.x-near_node.x)**2+(new_node.y-near_node.y)**2)
+            new_node.cost = near_node.cost + \
+                math.sqrt((new_node.x-near_node.x)**2 +
+                          (new_node.y-near_node.y)**2)
 
             if self.check_collision(new_node, self.obstacle_list):
                 near_inds = self.find_near_nodes(new_node)
@@ -84,7 +88,7 @@ class RRTStar(RRT):
             if animation:
                 self.draw_graph(rnd)
 
-            if (not search_until_max_iter) and new_node:  # check reaching the goal
+            if (not search_until_max_iter) and new_node:  # if reaches goal
                 last_index = self.search_best_goal_node()
                 if last_index is not None:
                     return self.generate_final_course(last_index)
@@ -108,7 +112,7 @@ class RRTStar(RRT):
                     There are not coalitions between this node and th tree.
                 near_inds: list
                     Indices of indices of the nodes what are near to new_node
-                    
+
             Returns.
             ------
                 Node, a copy of new_node
@@ -139,8 +143,10 @@ class RRTStar(RRT):
         return new_node
 
     def search_best_goal_node(self):
-        dist_to_goal_list = [self.calc_dist_to_goal(n.x, n.y) for n in self.node_list]
-        goal_inds = [dist_to_goal_list.index(i) for i in dist_to_goal_list if i <= self.expand_dis]
+        dist_to_goal_list = [self.calc_dist_to_goal(
+            n.x, n.y) for n in self.node_list]
+        goal_inds = [dist_to_goal_list.index(
+            i) for i in dist_to_goal_list if i <= self.expand_dis]
 
         safe_goal_inds = []
         for goal_ind in goal_inds:
@@ -160,9 +166,9 @@ class RRTStar(RRT):
 
     def find_near_nodes(self, new_node):
         '''
-        1) defines a ball centered on new_node 
+        1) defines a ball centered on new_node
         2) Returns all nodes of the three that are inside this ball
-            Arguments: 
+            Arguments:
             ---------
                 new_node: Node
                     new randomly generated node, without collisions between
@@ -170,12 +176,14 @@ class RRTStar(RRT):
             Returns:
             -------
                 list
-                    List with the indices of the nodes inside the ball of radius r
+                    List with the indices of the nodes inside the ball of
+                    radius r
         '''
         nnode = len(self.node_list) + 1
         r = self.connect_circle_dist * math.sqrt((math.log(nnode) / nnode))
-        # if expand_dist exists, search vertices in a range no more than expand_dist
-        if hasattr(self, 'expand_dis'): 
+        # if expand_dist exists, search vertices in a range no more than
+        # expand_dist
+        if hasattr(self, 'expand_dis'):
             r = min(r, self.expand_dis)
         dist_list = [(node.x - new_node.x) ** 2 +
                      (node.y - new_node.y) ** 2 for node in self.node_list]
@@ -183,9 +191,11 @@ class RRTStar(RRT):
         return near_inds
 
     def rewire(self, new_node, near_inds):
-        ''' 
-            For each node in near_inds, this will check if it is cheaper to arrive to them from new_node. 
-            In such a case, this will re-assign the parent of the nodes in near_inds to new_node.
+        '''
+            For each node in near_inds, this will check if it is cheaper to
+            arrive to them from new_node.
+            In such a case, this will re-assign the parent of the nodes in
+            near_inds to new_node.
             Parameters:
             ----------
                 new_node, Node
@@ -194,8 +204,8 @@ class RRTStar(RRT):
                 near_inds, list of uints
                     A list of indices of the self.new_node which contains
                     nodes within a circle of a given radius.
-            Remark: parent is designated in choose_parent. 
-                    
+            Remark: parent is designated in choose_parent.
+
         '''
         for i in near_inds:
             near_node = self.node_list[i]
@@ -247,7 +257,8 @@ def main():
                        goal=[6, 10],
                        rand_area=[-2, 15],
                        obstacle_list=obstacle_list)
-    path = rrt_star.planning(animation=show_animation, search_until_max_iter=search_until_max_iter)
+    path = rrt_star.planning(animation=show_animation,
+                             search_until_max_iter=search_until_max_iter)
 
     if path is None:
         print("Cannot find path")
