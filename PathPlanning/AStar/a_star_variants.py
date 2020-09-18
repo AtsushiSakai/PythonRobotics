@@ -15,7 +15,7 @@ use_theta_star = False
 use_jump_point = False
 
 beam_capacity = 30
-max_theta = 25
+max_theta = 5
 only_corners = False
 w, epsilon, upper_bound_depth = 1, 4, 500
 
@@ -411,33 +411,33 @@ class SearchAlgo:
 def main():
     # set obstacle positions
     obs_dict = {}
-    for i in range(101):
-        for j in range(101):
+    for i in range(51):
+        for j in range(51):
             obs_dict[(i, j)] = False
     o_x, o_y = [], []
 
-    s_x = 10.0
-    s_y = 10.0
-    g_x = 90.0
-    g_y = 90.0
+    s_x = 5.0
+    s_y = 5.0
+    g_x = 35.0
+    g_y = 45.0
 
     # draw outer border of maze
-    draw_vertical_line(0, 0, 100, o_x, o_y, obs_dict)
-    draw_vertical_line(98, 0, 100, o_x, o_y, obs_dict)
-    draw_horizontal_line(0, 0, 100, o_x, o_y, obs_dict)
-    draw_horizontal_line(0, 98, 100, o_x, o_y, obs_dict)
+    draw_vertical_line(0, 0, 50, o_x, o_y, obs_dict)
+    draw_vertical_line(48, 0, 50, o_x, o_y, obs_dict)
+    draw_horizontal_line(0, 0, 50, o_x, o_y, obs_dict)
+    draw_horizontal_line(0, 48, 50, o_x, o_y, obs_dict)
 
     # draw inner walls
-    all_x = [25, 25, 50, 50, 70, 85, 12, 35, 35]
-    all_y = [25, 30, 0, 75, 50, 0, 35, 70, 0]
-    all_len = [50, 40, 25, 25, 25, 40, 30, 20, 30]
+    all_x = [10, 10, 10, 15, 20, 20, 30, 30, 35, 30, 40, 45]
+    all_y = [10, 30, 45, 20, 5, 40, 10, 40, 5, 40, 10, 25]
+    all_len = [10, 10, 5, 10, 10, 5, 20, 10, 25, 10, 35, 15]
     for x, y, l in zip(all_x, all_y, all_len):
         draw_vertical_line(x, y, l, o_x, o_y, obs_dict)
 
     all_x[:], all_y[:], all_len[:] = [], [], []
-    all_x = [50, 25, 0, 25, 40, 80, 65, 90]
-    all_y = [25, 50, 80, 50, 60, 60, 10, 70]
-    all_len = [25, 50, 10, 10, 20, 20, 10, 10]
+    all_x = [35, 40, 15, 10, 45, 20, 10, 15, 25, 45, 10, 30, 10, 40]
+    all_y = [5, 10, 15, 20, 20, 25, 30, 35, 35, 35, 40, 40, 45, 45]
+    all_len = [10, 5, 10, 10, 5, 5, 10, 5, 10, 5, 10, 5, 5, 5]
     for x, y, l in zip(all_x, all_y, all_len):
         draw_horizontal_line(x, y, l, o_x, o_y, obs_dict)
 
