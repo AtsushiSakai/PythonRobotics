@@ -250,7 +250,7 @@ def draw(close_origin, close_goal, start, end, bound):
 
 def draw_control(org_closed, goal_closed, flag, start, end, bound, obstacle):
     """
-    control the plot process
+    control the plot process, evaluate if the searching finished
     flag == 0 : draw the searching process and plot path
     flag == 1 or 2 : start or end is blocked, draw the border line
     """
@@ -259,6 +259,7 @@ def draw_control(org_closed, goal_closed, flag, start, end, bound, obstacle):
     org_array = np.array(org_closed_ls)
     goal_closed_ls = node_to_coordinate(goal_closed)
     goal_array = np.array(goal_closed_ls)
+    path = None
     if show_animation:  # draw the searching process
         draw(org_array, goal_array, start, end, bound)
     if flag == 0:
@@ -270,6 +271,7 @@ def draw_control(org_closed, goal_closed, flag, start, end, bound, obstacle):
             if show_animation:  # draw the path
                 plt.plot(path[:, 0], path[:, 1], '-r')
                 plt.title('Robot Arrived', size=20, loc='center')
+                plt.pause(0.01)
                 plt.show()
     elif flag == 1:  # start point blocked first
         stop_loop = 1
@@ -285,13 +287,15 @@ def draw_control(org_closed, goal_closed, flag, start, end, bound, obstacle):
             border = get_border_line(org_closed, obstacle)
             plt.plot(border[:, 0], border[:, 1], 'xr')
             plt.title(info, size=14, loc='center')
+            plt.pause(0.01)
             plt.show()
         elif flag == 2:
             border = get_border_line(goal_closed, obstacle)
             plt.plot(border[:, 0], border[:, 1], 'xr')
             plt.title(info, size=14, loc='center')
+            plt.pause(0.01)
             plt.show()
-    return stop_loop
+    return stop_loop, path
 
 
 def searching_control(start, end, bound, obstacle):
@@ -309,7 +313,7 @@ def searching_control(start, end, bound, obstacle):
     target_goal = end
     # flag = 0 (not blocked) 1 (start point blocked) 2 (end point blocked)
     flag = 0  # init flag
-
+    path = None
     while True:
         # searching from start to end
         origin_open, origin_close = \
@@ -334,11 +338,11 @@ def searching_control(start, end, bound, obstacle):
         target_goal = min(goal_open, key=lambda x: x.F).coordinate
 
         # continue searching, draw the process
-        stop_sign = draw_control(origin_close, goal_close, flag, start, end,
-                                 bound, obstacle)
+        stop_sign, path = draw_control(origin_close, goal_close, flag, start,
+                                       end, bound, obstacle)
         if stop_sign:
             break
-    return flag
+    return path
 
 
 def main(obstacle_number=1500):
@@ -356,7 +360,9 @@ def main(obstacle_number=1500):
                                              bottom_vertex,
                                              obstacle_number)
 
-    searching_control(start, end, bound, obstacle)
+    path = searching_control(start, end, bound, obstacle)
+    if not show_animation:
+        print(path)
 
 
 if __name__ == '__main__':
