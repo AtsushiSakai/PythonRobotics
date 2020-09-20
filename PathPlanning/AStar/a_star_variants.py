@@ -7,7 +7,7 @@ Source: http://theory.stanford.edu/~amitp/GameProgramming/Variations.html
 import numpy as np
 import matplotlib.pyplot as plt
 
-show_animation = True
+show_animation = False
 use_beam_search = False
 use_iterative_deepening = False
 use_dynamic_weighting = False
@@ -17,6 +17,7 @@ use_jump_point = False
 beam_capacity = 30
 max_theta = 5
 only_corners = False
+max_corner = 5
 w, epsilon, upper_bound_depth = 1, 4, 500
 
 
@@ -88,7 +89,8 @@ def key_points(o_dict):
                 obs_count += 1
             if obs_count == 3 or obs_count == 1:
                 c_list.append((x, y))
-                plt.plot(x, y, ".y")
+                if show_animation:
+                    plt.plot(x, y, ".y")
                 break
     if only_corners:
         return c_list
@@ -105,7 +107,8 @@ def key_points(o_dict):
                 continue
             x_m, y_m = int((x1 + x2) / 2), int((y1 + y2) / 2)
             e_list.append((x_m, y_m))
-            plt.plot(x_m, y_m, ".y")
+            if show_animation:
+                plt.plot(x_m, y_m, ".y")
     return c_list + e_list
 
 
@@ -174,9 +177,10 @@ class SearchAlgo:
         return i_temp - 2*i, j_temp - 2*j, counter, got_goal
 
     def jump_point(self):
-        '''Jump point: Instead of exploring all empty spaces of the
-        map, just explore the corners.'''
-        plt.title('Jump Point')
+        """Jump point: Instead of exploring all empty spaces of the
+        map, just explore the corners."""
+        if show_animation:
+            plt.title('Jump Point')
 
         goal_found = False
         while len(self.open_set) > 0:
@@ -205,7 +209,7 @@ class SearchAlgo:
                 if x1 == x2 and y1 == y2:
                     continue
                 if np.linalg.norm(np.array([x1, y1] -
-                                           np.array([x2, y2]))) > 100:
+                                           np.array([x2, y2]))) > max_corner:
                     continue
                 reachable, offset = in_line_of_sight(self.obs_grid, x1,
                                                      y1, x2, y2)
@@ -230,11 +234,13 @@ class SearchAlgo:
                     if not self.all_nodes[cand_pt]['in_open_list']:
                         self.open_set.append(self.all_nodes[cand_pt])
                         self.all_nodes[cand_pt]['in_open_list'] = True
-                    plt.plot(cand_pt[0], cand_pt[1], "r*")
+                    if show_animation:
+                        plt.plot(cand_pt[0], cand_pt[1], "r*")
 
                 if goal_found:
                     break
-            plt.pause(0.001)
+            if show_animation:
+                plt.pause(0.001)
             if goal_found:
                 current_node = self.all_nodes[tuple(self.goal_pt)]
             while goal_found:
@@ -242,22 +248,25 @@ class SearchAlgo:
                     break
                 x = [current_node['pos'][0], current_node['pred'][0]]
                 y = [current_node['pos'][1], current_node['pred'][1]]
-                plt.plot(x, y, "b")
+                if show_animation:
+                    plt.plot(x, y, "b")
                 current_node = self.all_nodes[tuple(current_node['pred'])]
-                plt.pause(0.001)
+                if show_animation:
+                    plt.pause(0.001)
             if goal_found:
                 break
 
             current_node['open'] = False
             current_node['in_open_list'] = False
-            plt.plot(current_node['pos'][0], current_node['pos'][1], "g*")
+            if show_animation:
+                plt.plot(current_node['pos'][0], current_node['pos'][1], "g*")
             del self.open_set[p]
             current_node['fcost'], current_node['hcost'] = np.inf, np.inf
         if show_animation:
             plt.show()
 
     def astar(self):
-        '''Beam search: Maintain an open list of just 30 nodes.
+        """Beam search: Maintain an open list of just 30 nodes.
         If more than 30 nodes, then get rid of ndoes with high
         f values.
         Iterative deepening: At every iteration, get a cut-off
@@ -272,17 +281,18 @@ class SearchAlgo:
         Theta star: Same as A star but you don't need to move
         one neighbor at a time. In fact, you can look for the
         next node as far out as you can as long as there is a
-        clear line of sight from your current node to that node.'''
-        if use_beam_search:
-            plt.title('A* with beam search')
-        elif use_iterative_deepening:
-            plt.title('A* with iterative deepening')
-        elif use_dynamic_weighting:
-            plt.title('A* with dynamic weighting')
-        elif use_theta_star:
-            plt.title('Theta*')
-        else:
-            plt.title('A*')
+        clear line of sight from your current node to that node."""
+        if show_animation:
+            if use_beam_search:
+                plt.title('A* with beam search')
+            elif use_iterative_deepening:
+                plt.title('A* with iterative deepening')
+            elif use_dynamic_weighting:
+                plt.title('A* with dynamic weighting')
+            elif use_theta_star:
+                plt.title('Theta*')
+            else:
+                plt.title('A*')
 
         goal_found = False
         curr_f_thresh = np.inf
@@ -366,13 +376,15 @@ class SearchAlgo:
                             if not self.all_nodes[cand_pt]['in_open_list']:
                                 self.open_set.append(self.all_nodes[cand_pt])
                                 self.all_nodes[cand_pt]['in_open_list'] = True
-                            plt.plot(cand_pt[0], cand_pt[1], "r*")
+                            if show_animation:
+                                plt.plot(cand_pt[0], cand_pt[1], "r*")
                         if curr_f_thresh < f_cost < \
                                 self.all_nodes[cand_pt]['fcost']:
                             no_valid_f = True
                 if goal_found:
                     break
-            plt.pause(0.001)
+            if show_animation:
+                plt.pause(0.001)
             if goal_found:
                 current_node = self.all_nodes[tuple(self.goal_pt)]
             while goal_found:
@@ -381,12 +393,15 @@ class SearchAlgo:
                 if use_theta_star or use_jump_point:
                     x, y = [current_node['pos'][0], current_node['pred'][0]], \
                              [current_node['pos'][1], current_node['pred'][1]]
-                    plt.plot(x, y, "b")
+                    if show_animation:
+                        plt.plot(x, y, "b")
                 else:
-                    plt.plot(current_node['pred'][0],
-                             current_node['pred'][1], "b*")
+                    if show_animation:
+                        plt.plot(current_node['pred'][0],
+                                 current_node['pred'][1], "b*")
                 current_node = self.all_nodes[tuple(current_node['pred'])]
-                plt.pause(0.001)
+                if show_animation:
+                    plt.pause(0.001)
             if goal_found:
                 break
 
@@ -400,7 +415,8 @@ class SearchAlgo:
 
             current_node['open'] = False
             current_node['in_open_list'] = False
-            plt.plot(current_node['pos'][0], current_node['pos'][1], "g*")
+            if show_animation:
+                plt.plot(current_node['pos'][0], current_node['pos'][1], "g*")
             del self.open_set[p]
             current_node['fcost'], current_node['hcost'] = np.inf, np.inf
             depth += 1
@@ -441,10 +457,11 @@ def main():
     for x, y, l in zip(all_x, all_y, all_len):
         draw_horizontal_line(x, y, l, o_x, o_y, obs_dict)
 
-    plt.plot(o_x, o_y, ".k")
-    plt.plot(s_x, s_y, "og")
-    plt.plot(g_x, g_y, "xb")
-    plt.grid(True)
+    if show_animation:
+        plt.plot(o_x, o_y, ".k")
+        plt.plot(s_x, s_y, "og")
+        plt.plot(g_x, g_y, "xb")
+        plt.grid(True)
 
     if use_jump_point:
         keypoint_list = key_points(obs_dict)
