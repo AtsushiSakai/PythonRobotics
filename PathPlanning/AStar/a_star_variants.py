@@ -89,8 +89,7 @@ def key_points(o_dict):
                 obs_count += 1
             if obs_count == 3 or obs_count == 1:
                 c_list.append((x, y))
-                if show_animation:
-                    plt.plot(x, y, ".y")
+                plt.plot(x, y, ".y")
                 break
     if only_corners:
         return c_list
@@ -179,8 +178,7 @@ class SearchAlgo:
     def jump_point(self):
         """Jump point: Instead of exploring all empty spaces of the
         map, just explore the corners."""
-        if show_animation:
-            plt.title('Jump Point')
+        plt.title('Jump Point')
 
         goal_found = False
         while len(self.open_set) > 0:
@@ -234,13 +232,11 @@ class SearchAlgo:
                     if not self.all_nodes[cand_pt]['in_open_list']:
                         self.open_set.append(self.all_nodes[cand_pt])
                         self.all_nodes[cand_pt]['in_open_list'] = True
-                    if show_animation:
-                        plt.plot(cand_pt[0], cand_pt[1], "r*")
+                    plt.plot(cand_pt[0], cand_pt[1], "r*")
 
                 if goal_found:
                     break
-            if show_animation:
-                plt.pause(0.001)
+            plt.pause(0.001)
             if goal_found:
                 current_node = self.all_nodes[tuple(self.goal_pt)]
             while goal_found:
@@ -248,18 +244,15 @@ class SearchAlgo:
                     break
                 x = [current_node['pos'][0], current_node['pred'][0]]
                 y = [current_node['pos'][1], current_node['pred'][1]]
-                if show_animation:
-                    plt.plot(x, y, "b")
+                plt.plot(x, y, "b")
                 current_node = self.all_nodes[tuple(current_node['pred'])]
-                if show_animation:
-                    plt.pause(0.001)
+                plt.pause(0.001)
             if goal_found:
                 break
 
             current_node['open'] = False
             current_node['in_open_list'] = False
-            if show_animation:
-                plt.plot(current_node['pos'][0], current_node['pos'][1], "g*")
+            plt.plot(current_node['pos'][0], current_node['pos'][1], "g*")
             del self.open_set[p]
             current_node['fcost'], current_node['hcost'] = np.inf, np.inf
         if show_animation:
@@ -282,17 +275,16 @@ class SearchAlgo:
         one neighbor at a time. In fact, you can look for the
         next node as far out as you can as long as there is a
         clear line of sight from your current node to that node."""
-        if show_animation:
-            if use_beam_search:
-                plt.title('A* with beam search')
-            elif use_iterative_deepening:
-                plt.title('A* with iterative deepening')
-            elif use_dynamic_weighting:
-                plt.title('A* with dynamic weighting')
-            elif use_theta_star:
-                plt.title('Theta*')
-            else:
-                plt.title('A*')
+        if use_beam_search:
+            plt.title('A* with beam search')
+        elif use_iterative_deepening:
+            plt.title('A* with iterative deepening')
+        elif use_dynamic_weighting:
+            plt.title('A* with dynamic weighting')
+        elif use_theta_star:
+            plt.title('Theta*')
+        else:
+            plt.title('A*')
 
         goal_found = False
         curr_f_thresh = np.inf
@@ -376,15 +368,13 @@ class SearchAlgo:
                             if not self.all_nodes[cand_pt]['in_open_list']:
                                 self.open_set.append(self.all_nodes[cand_pt])
                                 self.all_nodes[cand_pt]['in_open_list'] = True
-                            if show_animation:
-                                plt.plot(cand_pt[0], cand_pt[1], "r*")
+                            plt.plot(cand_pt[0], cand_pt[1], "r*")
                         if curr_f_thresh < f_cost < \
                                 self.all_nodes[cand_pt]['fcost']:
                             no_valid_f = True
                 if goal_found:
                     break
-            if show_animation:
-                plt.pause(0.001)
+            plt.pause(0.001)
             if goal_found:
                 current_node = self.all_nodes[tuple(self.goal_pt)]
             while goal_found:
@@ -393,15 +383,12 @@ class SearchAlgo:
                 if use_theta_star or use_jump_point:
                     x, y = [current_node['pos'][0], current_node['pred'][0]], \
                              [current_node['pos'][1], current_node['pred'][1]]
-                    if show_animation:
-                        plt.plot(x, y, "b")
+                    plt.plot(x, y, "b")
                 else:
-                    if show_animation:
-                        plt.plot(current_node['pred'][0],
-                                 current_node['pred'][1], "b*")
+                    plt.plot(current_node['pred'][0],
+                             current_node['pred'][1], "b*")
                 current_node = self.all_nodes[tuple(current_node['pred'])]
-                if show_animation:
-                    plt.pause(0.001)
+                plt.pause(0.001)
             if goal_found:
                 break
 
@@ -415,8 +402,7 @@ class SearchAlgo:
 
             current_node['open'] = False
             current_node['in_open_list'] = False
-            if show_animation:
-                plt.plot(current_node['pos'][0], current_node['pos'][1], "g*")
+            plt.plot(current_node['pos'][0], current_node['pos'][1], "g*")
             del self.open_set[p]
             current_node['fcost'], current_node['hcost'] = np.inf, np.inf
             depth += 1
@@ -457,11 +443,10 @@ def main():
     for x, y, l in zip(all_x, all_y, all_len):
         draw_horizontal_line(x, y, l, o_x, o_y, obs_dict)
 
-    if show_animation:
-        plt.plot(o_x, o_y, ".k")
-        plt.plot(s_x, s_y, "og")
-        plt.plot(g_x, g_y, "xb")
-        plt.grid(True)
+    plt.plot(o_x, o_y, ".k")
+    plt.plot(s_x, s_y, "og")
+    plt.plot(g_x, g_y, "xb")
+    plt.grid(True)
 
     if use_jump_point:
         keypoint_list = key_points(obs_dict)
