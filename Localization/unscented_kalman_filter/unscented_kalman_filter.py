@@ -180,9 +180,9 @@ def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
     b = math.sqrt(eigval[smallind])
     x = [a * math.cos(it) for it in t]
     y = [b * math.sin(it) for it in t]
-    angle = math.atan2(eigvec[bigind, 1], eigvec[bigind, 0])
-    rot = np.array([[math.cos(angle), math.sin(angle)],
-                    [-math.sin(angle), math.cos(angle)]])
+    angle = math.atan2(eigvec[1, bigind], eigvec[0, bigind])
+    rot = np.array([[math.cos(angle), -math.sin(angle)],
+                    [math.sin(angle), math.cos(angle)]])
     fx = rot @ np.array([x, y])
     px = np.array(fx[0, :] + xEst[0, 0]).flatten()
     py = np.array(fx[1, :] + xEst[1, 0]).flatten()
