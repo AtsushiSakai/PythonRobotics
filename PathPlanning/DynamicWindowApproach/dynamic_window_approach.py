@@ -19,7 +19,6 @@ def dwa_control(x, config, goal, ob):
     """
     Dynamic Window Approach control
     """
-
     dw = calc_dynamic_window(x, config)
 
     u, trajectory = calc_control_and_trajectory(x, dw, config, goal, ob)
@@ -51,6 +50,7 @@ class Config:
         self.to_goal_cost_gain = 0.15
         self.speed_cost_gain = 1.0
         self.obstacle_cost_gain = 1.0
+        self.robot_stuck_flag_cons = 0.001  # constant to prevent robot stucked
         self.robot_type = RobotType.circle
 
         # if robot_type == RobotType.circle
@@ -60,6 +60,23 @@ class Config:
         # if robot_type == RobotType.rectangle
         self.robot_width = 0.5  # [m] for collision check
         self.robot_length = 1.2  # [m] for collision check
+        # obstacles [x(m) y(m), ....]
+        self.ob = np.array([[-1, -1],
+                            [0, 2],
+                            [4.0, 2.0],
+                            [5.0, 4.0],
+                            [5.0, 5.0],
+                            [5.0, 6.0],
+                            [5.0, 9.0],
+                            [8.0, 9.0],
+                            [7.0, 9.0],
+                            [8.0, 10.0],
+                            [9.0, 11.0],
+                            [12.0, 13.0],
+                            [12.0, 12.0],
+                            [15.0, 15.0],
+                            [13.0, 13.0]
+                            ])
 
     @property
     def robot_type(self):
@@ -70,6 +87,9 @@ class Config:
         if not isinstance(value, RobotType):
             raise TypeError("robot_type must be an instance of RobotType")
         self._robot_type = value
+
+
+config = Config()
 
 
 def motion(x, u, dt):
@@ -139,7 +159,6 @@ def calc_control_and_trajectory(x, dw, config, goal, ob):
         for y in np.arange(dw[2], dw[3], config.yaw_rate_resolution):
 
             trajectory = predict_trajectory(x_init, v, y, config)
-
             # calc cost
             to_goal_cost = config.to_goal_cost_gain * calc_to_goal_cost(trajectory, goal)
             speed_cost = config.speed_cost_gain * (config.max_speed - trajectory[-1, 3])
@@ -152,13 +171,19 @@ def calc_control_and_trajectory(x, dw, config, goal, ob):
                 min_cost = final_cost
                 best_u = [v, y]
                 best_trajectory = trajectory
-
+                if abs(best_u[0]) < config.robot_stuck_flag_cons \
+                        and abs(x[3]) < config.robot_stuck_flag_cons:
+                    # to ensure the robot do not get stuck in
+                    # best v=0 m/s (in front of an obstacle) and
+                    # best omega=0 rad/s (heading to the goal with
+                    # angle difference of 0)
+                    best_u[1] = -config.max_delta_yaw_rate
     return best_u, best_trajectory
 
 
 def calc_obstacle_cost(trajectory, ob, config):
     """
-        calc obstacle cost inf: collision
+    calc obstacle cost inf: collision
     """
     ox = ob[:, 0]
     oy = ob[:, 1]
@@ -238,29 +263,12 @@ def main(gx=10.0, gy=10.0, robot_type=RobotType.circle):
     x = np.array([0.0, 0.0, math.pi / 8.0, 0.0, 0.0])
     # goal position [x(m), y(m)]
     goal = np.array([gx, gy])
-    # obstacles [x(m) y(m), ....]
-    ob = np.array([[-1, -1],
-                   [0, 2],
-                   [4.0, 2.0],
-                   [5.0, 4.0],
-                   [5.0, 5.0],
-                   [5.0, 6.0],
-                   [5.0, 9.0],
-                   [8.0, 9.0],
-                   [7.0, 9.0],
-                   [8.0, 10.0],
-                   [9.0, 11.0],
-                   [12.0, 13.0],
-                   [12.0, 12.0],
-                   [15.0, 15.0],
-                   [13.0, 13.0]
-                   ])
 
     # input [forward speed, yaw_rate]
-    config = Config()
+
     config.robot_type = robot_type
     trajectory = np.array(x)
-
+    ob = config.ob
     while True:
         u, predicted_trajectory = dwa_control(x, config, goal, ob)
         x = motion(x, u, config.dt)  # simulate robot
