@@ -33,6 +33,9 @@ class FlowField:
         self.goal_pt = [goal_x, goal_y]
         self.obs_grid = obs_grid
         self.limit_x, self.limit_y = limit_x, limit_y
+        self.cost_field = {}
+        self.integration_field = {}
+        self.vector_field = {}
 
     def find_path(self):
         self.create_cost_field()
@@ -43,7 +46,6 @@ class FlowField:
     def create_cost_field(self):
         """Assign cost to each grid which defines the energy
         it would take to get there."""
-        self.cost_field = {}
         for i in range(self.limit_x):
             for j in range(self.limit_y):
                 if self.obs_grid[(i, j)] == 'free':
@@ -73,7 +75,6 @@ class FlowField:
         assigned cost of the node in the integration field and,
         when that happens, the neighbor is put on the open list.
         This process continues until the open list is empty."""
-        self.integration_field = {}
         for i in range(self.limit_x):
             for j in range(self.limit_y):
                 if self.obs_grid[(i, j)] == 'obs':
@@ -107,7 +108,6 @@ class FlowField:
         """For each node, assign a vector from itself to the node with
         the lowest cost in the integration field. An agent will simply
         follow this vector field to the goal"""
-        self.vector_field = {}
         for i in range(self.limit_x):
             for j in range(self.limit_y):
                 if self.obs_grid[(i, j)] == 'obs':
@@ -168,6 +168,15 @@ def main():
     all_len = [10, 5, 10, 10, 5, 5, 10, 5, 10, 5, 10, 5, 5, 5]
     for x, y, l in zip(all_x, all_y, all_len):
         draw_horizontal_line(x, y, l, o_x, o_y, obs_dict, 'obs')
+
+    # Some points are asigned a slightly higher energy value in the cost
+    # field. For example, if an agent wishes to go to a point, it might
+    # encounter different kind of terrain like grass and dirt. Grass is
+    # assigned medium difficulty of passage (color coded as green on the
+    # map here). Dirt is assigned hard difficulty of passage (color coded
+    # as brown here). Hence, this algorithm will take into account how
+    # difficult it is to go through certain areas of a map when deciding
+    # the shortest path.
 
     # draw paths that have medium difficulty (in terms of going through them)
     all_x[:], all_y[:], all_len[:] = [], [], []
