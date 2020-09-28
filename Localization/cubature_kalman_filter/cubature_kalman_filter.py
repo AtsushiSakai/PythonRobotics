@@ -1,4 +1,5 @@
-# implementation of cubature kalman filter using CTRV motion model
+"""
+implementation of cubature kalman filter using CTRV motion model
 
 # author: Raghuram Shankar
 # based on PythonRobotics by Atsushi Sakai
@@ -6,6 +7,8 @@
 # state matrix:                     2D x-y position, velocity, yaw and yaw rate (5 x 1)
 # input matrix:                     --None--
 # measurement matrix:               2D noisy x-y position measured directly, noisy velocity and yaw rate (4 x 1)
+
+"""
 
 import math
 import matplotlib.pyplot as plt
@@ -68,14 +71,6 @@ r = np.array([[0.015, 0.0, 0.0, 0.0],
 # main program
 def main():
     print(__file__ + " start!!")
-    # show_final = int(input('Display final result? (No/Yes = 0/1) : '))
-    # show_animation = int(
-        # input('Show animation of filter working? (No/Yes = 0/1) : '))
-    # if show_animation == 1:
-        # show_ellipse = int(
-            # input('Display covariance ellipses in animation? (No/Yes = 0/1) : '))
-    # else:
-        # show_ellipse = 0
     x_est = x_0
     p_est = p_0
     x_true = x_0
@@ -103,7 +98,6 @@ def main():
 # cubature kalman filter
 def cubature_kalman_filter(x_est, p_est, z):
     x_pred, p_pred = cubature_prediction(x_est, p_est)
-    # return x_pred.astype(float), p_pred.astype(float)
     x_upd, p_upd = cubature_update(x_pred, p_pred, z)
     return x_upd.astype(float), p_upd.astype(float)
 
