@@ -8,5 +8,7 @@ print(__file__)
 class Test(TestCase):
 
     def test1(self):
+        m.show_final = False
         m.show_animation = False
+        m.show_ellipse = False
         m.main()

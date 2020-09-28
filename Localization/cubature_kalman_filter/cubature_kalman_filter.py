@@ -64,14 +64,14 @@ r = np.array([[0.015, 0.0, 0.0, 0.0],
 # main program
 def main():
     print(__file__ + " start!!")
-    show_final = int(input('Display final result? (No/Yes = 0/1) : '))
-    show_animation = int(
-        input('Show animation of filter working? (No/Yes = 0/1) : '))
-    if show_animation == 1:
-        show_ellipse = int(
-            input('Display covariance ellipses in animation? (No/Yes = 0/1) : '))
-    else:
-        show_ellipse = 0
+    # show_final = int(input('Display final result? (No/Yes = 0/1) : '))
+    # show_animation = int(
+        # input('Show animation of filter working? (No/Yes = 0/1) : '))
+    # if show_animation == 1:
+        # show_ellipse = int(
+            # input('Display covariance ellipses in animation? (No/Yes = 0/1) : '))
+    # else:
+        # show_ellipse = 0
     x_est = x_0
     p_est = p_0
     x_true = x_0
