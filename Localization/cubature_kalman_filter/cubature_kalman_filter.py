@@ -4,10 +4,6 @@ implementation of cubature kalman filter using CTRV motion model
 # author: Raghuram Shankar
 # based on PythonRobotics by Atsushi Sakai
 
-# state matrix:                     2D x-y position, velocity, yaw and yaw rate (5 x 1)
-# input matrix:                     --None--
-# measurement matrix:               2D noisy x-y position measured directly, noisy velocity and yaw rate (4 x 1)
-
 """
 
 import math
@@ -28,7 +24,7 @@ show_ellipse = 0
 z_noise = np.array([[0.1, 0.0, 0.0, 0.0],
                     [0.0, 0.1, 0.0, 0.0],
                     [0.0, 0.0, 0.1, 0.0],
-                    [0.0, 0.0, 0.0, 0.1]])              
+                    [0.0, 0.0, 0.0, 0.1]])
 
 
 # prior mean
@@ -185,7 +181,7 @@ def gen_measurement(x_true):
     gz = hx @ x_true
     z = gz + z_noise @ np.random.randn(4, 1)
     return z.astype(float)
-    
+
 
 # postprocessing
 def plot_animation(i, x_true_cat, x_est_cat, z):
