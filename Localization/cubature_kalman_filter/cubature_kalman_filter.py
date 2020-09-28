@@ -17,6 +17,10 @@ dt = 0.1                                                # seconds
 # N = int(input('Enter number of samples : '))          # number of samples
 N = 100
 
+show_final = 1
+show_animation = 0
+show_ellipse = 0
+
 # measurement noise
 z_noise = np.array([[0.1, 0.0, 0.0, 0.0],
                     [0.0, 0.1, 0.0, 0.0],
@@ -72,16 +76,12 @@ def main():
             # input('Display covariance ellipses in animation? (No/Yes = 0/1) : '))
     # else:
         # show_ellipse = 0
-    show_final = 1
-    show_animation = 0
-    show_ellipse = 0
     x_est = x_0
     p_est = p_0
     x_true = x_0
     x_true_cat = np.array([x_0[0, 0], x_0[1, 0]])
     x_est_cat = np.array([x_0[0, 0], x_0[1, 0]])
     z_cat = np.array([x_0[0, 0], x_0[1, 0]])
-    x_dead_cat = np.array([x_0[0, 0], x_0[1, 0]])
     for i in range(N):
         # generate ground truth
         x_true = f(x_true)
