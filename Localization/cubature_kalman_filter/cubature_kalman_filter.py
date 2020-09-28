@@ -82,8 +82,12 @@ def main():
             show_final_flag = 1
         else:
             show_final_flag = 0
-        postpross(i, x_true, x_true_cat, x_est, p_est, x_est_cat, z,
-                  z_cat, show_animation, show_ellipse, show_final_flag)
+        if show_animation == 1:
+            plot_animation(i, x_true_cat, x_est_cat, z)
+        if show_ellipse == 1:
+            plot_ellipse(x_est[0:2], p_est)
+        if show_final_flag == 1:
+            plot_final(x_true_cat, x_est_cat, z_cat)
         x_est, p_est = cubature_kalman_filter(x_est, p_est, z)
         x_true_cat = np.vstack((x_true_cat, np.transpose(x_true[0:2])))
         x_est_cat = np.vstack((x_est_cat, np.transpose(x_est[0:2])))
@@ -224,15 +228,6 @@ def plot_final(x_true_cat, x_est_cat, z_cat):
     f.legend(loc='upper left', shadow=True, fontsize='large')
     plt.grid(True)
     plt.show()
-
-
-def postpross(i, x_true, x_true_cat, x_est, p_est, x_est_cat, z, z_cat, show_animation, show_ellipse, show_final_flag):
-    if show_animation == 1:
-        plot_animation(i, x_true_cat, x_est_cat, z)
-        if show_ellipse == 1:
-            plot_ellipse(x_est[0:2], p_est)
-    if show_final_flag == 1:
-        plot_final(x_true_cat, x_est_cat, z_cat)
 
 
 if __name__ == '__main__':
