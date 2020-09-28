@@ -72,11 +72,12 @@ def main():
             # input('Display covariance ellipses in animation? (No/Yes = 0/1) : '))
     # else:
         # show_ellipse = 0
+    show_final = 1
+    show_animation = 0
+    show_ellipse = 0
     x_est = x_0
     p_est = p_0
     x_true = x_0
-    p_true = p_0
-    x_dead = x_0
     x_true_cat = np.array([x_0[0, 0], x_0[1, 0]])
     x_est_cat = np.array([x_0[0, 0], x_0[1, 0]])
     z_cat = np.array([x_0[0, 0], x_0[1, 0]])
@@ -94,7 +95,6 @@ def main():
                   z_cat, show_animation, show_ellipse, show_final_flag)
         x_est, p_est = cubature_kalman_filter(x_est, p_est, z)
         x_true_cat = np.vstack((x_true_cat, np.transpose(x_true[0:2])))
-        x_dead_cat = np.vstack((x_dead_cat, np.transpose(x_dead[0:2])))
         x_est_cat = np.vstack((x_est_cat, np.transpose(x_est[0:2])))
         z_cat = np.vstack((z_cat, np.transpose(z[0:2])))
     print('CKF Over')
