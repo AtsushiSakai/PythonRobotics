@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.linalg import sqrtm
 
-'''initalize global variables'''
+
 dt = 0.1
 N = 100
 
@@ -11,21 +11,20 @@ show_final = 1
 show_animation = 0
 show_ellipse = 0
 
-'''measurement noise'''
+
 z_noise = np.array([[0.1, 0.0, 0.0, 0.0],
                     [0.0, 0.1, 0.0, 0.0],
                     [0.0, 0.0, 0.1, 0.0],
                     [0.0, 0.0, 0.0, 0.1]])
 
 
-'''prior mean'''
 x_0 = np.array([[0.0],                                  # x position    [m]
                 [0.0],                                  # y position    [m]
                 [0.0],                                  # yaw           [rad]
                 [1.0],                                  # velocity      [m/s]
                 [0.1]])                                 # yaw rate      [rad/s]
 
-'''prior covariance'''
+
 p_0 = np.array([[1e-3, 0.0, 0.0, 0.0, 0.0],
                 [0.0, 1e-3, 0.0, 0.0, 0.0],
                 [0.0, 0.0, 1.0, 0.0, 0.0],
@@ -33,7 +32,6 @@ p_0 = np.array([[1e-3, 0.0, 0.0, 0.0, 0.0],
                 [0.0, 0.0, 0.0, 0.0, 1.0]])
 
 
-'''q matrix - process noise'''
 q = np.array([[1e-11, 0.0,    0.0,               0.0, 0.0],
               [0.0, 1e-11,    0.0,               0.0, 0.0],
               [0.0, 0.0,    np.deg2rad(1e-4),   0.0, 0.0],
@@ -41,21 +39,16 @@ q = np.array([[1e-11, 0.0,    0.0,               0.0, 0.0],
               [0.0, 0.0,    0.0,                0.0, np.deg2rad(1e-4)]])
 
 
-'''h matrix - measurement matrix'''
 hx = np.array([[1.0, 0.0, 0.0, 0.0, 0.0],
                [0.0, 1.0, 0.0, 0.0, 0.0],
                [0.0, 0.0, 0.0, 1.0, 0.0],
                [0.0, 0.0, 0.0, 0.0, 1.0]])
 
 
-'''r matrix - measurement noise covariance'''
 r = np.array([[0.015, 0.0, 0.0, 0.0],
               [0.0, 0.010, 0.0, 0.0],
               [0.0, 0.0, 0.1, 0.0],
               [0.0, 0.0, 0.0, 0.01]])**2
-
-
-'''main program'''
 
 
 def main():
@@ -88,16 +81,10 @@ def main():
     print('CKF Over')
 
 
-'''cubature kalman filter'''
-
-
 def cubature_kalman_filter(x_est, p_est, z):
     x_pred, p_pred = cubature_prediction(x_est, p_est)
     x_upd, p_upd = cubature_update(x_pred, p_pred, z)
     return x_upd.astype(float), p_upd.astype(float)
-
-
-'''CTRV motion model f matrix'''
 
 
 def f(x):
@@ -110,16 +97,10 @@ def f(x):
     return x.astype(float)
 
 
-'''CTRV measurement model h matrix'''
-
-
 def h(x):
     x = hx @ x
     x.reshape((4, 1))
     return x
-
-
-'''generate sigma points'''
 
 
 def sigma(x, p):
@@ -135,9 +116,6 @@ def sigma(x, p):
     return SP.astype(float), W.astype(float)
 
 
-'''cubature kalman filter nonlinear prediction step'''
-
-
 def cubature_prediction(x_pred, p_pred):
     n = np.shape(x_pred)[0]
     [SP, W] = sigma(x_pred, p_pred)
@@ -149,9 +127,6 @@ def cubature_prediction(x_pred, p_pred):
         p_step = (f(SP[:, i]).reshape((n, 1)) - x_pred)
         p_pred = p_pred + (p_step @ p_step.T * W[0, i])
     return x_pred.astype(float), p_pred.astype(float)
-
-
-'''cubature kalman filter nonlinear update step'''
 
 
 def cubature_update(x_pred, p_pred, z):
@@ -173,9 +148,6 @@ def cubature_update(x_pred, p_pred, z):
     return x_pred, p_pred
 
 
-'''cubature kalman filter linear update step'''
-
-
 def linear_update(x_pred, p_pred, z):
     s = h @ p_pred @ h.T + r
     k = p_pred @ h.T @ np.linalg.pinv(s)
@@ -186,18 +158,11 @@ def linear_update(x_pred, p_pred, z):
     return x_upd.astype(float), p_upd.astype(float)
 
 
-'''generate ground truth measurement vector gz, noisy measurement vector z'''
-
-
 def gen_measurement(x_true):
     # x position [m], y position [m]
     gz = hx @ x_true
     z = gz + z_noise @ np.random.randn(4, 1)
     return z.astype(float)
-
-
-'''postprocessing'''
-'''plot animation frames'''
 
 
 def plot_animation(i, x_true_cat, x_est_cat, z):
@@ -210,9 +175,6 @@ def plot_animation(i, x_true_cat, x_est_cat, z):
     plt.plot(z[0], z[1], '+g')
     plt.grid(True)
     plt.pause(0.001)
-
-
-'''plot ellipse at each animation frame'''
 
 
 def plot_ellipse(x_est, p_est):
@@ -229,9 +191,6 @@ def plot_ellipse(x_est, p_est):
         xy_2 = np.hstack([xy_2, arr[1]])
     plt.plot(xy_1 + x_est[0], xy_2 + x_est[1], 'r')
     plt.pause(0.00001)
-
-
-'''plot final animation frame and hold'''
 
 
 def plot_final(x_true_cat, x_est_cat, z_cat):
