@@ -167,7 +167,7 @@ def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
 
     x = [a * math.cos(it) for it in t]
     y = [b * math.sin(it) for it in t]
-    angle = math.atan2(eig_vec[big_ind, 1], eig_vec[big_ind, 0])
+    angle = math.atan2(eigvec[1, bigind], eigvec[0, bigind])
     rot = Rot.from_euler('z', angle).as_matrix()[0:2, 0:2]
     fx = np.stack([x, y]).T @ rot
 
