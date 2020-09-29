@@ -1,40 +1,31 @@
-"""
-implementation of cubature kalman filter using CTRV motion model
-
-# author: Raghuram Shankar
-# based on PythonRobotics by Atsushi Sakai
-
-"""
-
 import math
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.linalg import sqrtm
 
-# initalize global variables
-dt = 0.1                                                # seconds
-# N = int(input('Enter number of samples : '))          # number of samples
+'''initalize global variables'''
+dt = 0.1
 N = 100
 
 show_final = 1
 show_animation = 0
 show_ellipse = 0
 
-# measurement noise
+'''measurement noise'''
 z_noise = np.array([[0.1, 0.0, 0.0, 0.0],
                     [0.0, 0.1, 0.0, 0.0],
                     [0.0, 0.0, 0.1, 0.0],
                     [0.0, 0.0, 0.0, 0.1]])
 
 
-# prior mean
+'''prior mean'''
 x_0 = np.array([[0.0],                                  # x position    [m]
                 [0.0],                                  # y position    [m]
                 [0.0],                                  # yaw           [rad]
                 [1.0],                                  # velocity      [m/s]
                 [0.1]])                                 # yaw rate      [rad/s]
 
-# prior covariance
+'''prior covariance'''
 p_0 = np.array([[1e-3, 0.0, 0.0, 0.0, 0.0],
                 [0.0, 1e-3, 0.0, 0.0, 0.0],
                 [0.0, 0.0, 1.0, 0.0, 0.0],
@@ -42,7 +33,7 @@ p_0 = np.array([[1e-3, 0.0, 0.0, 0.0, 0.0],
                 [0.0, 0.0, 0.0, 0.0, 1.0]])
 
 
-# q matrix - process noise
+'''q matrix - process noise'''
 q = np.array([[1e-11, 0.0,    0.0,               0.0, 0.0],
               [0.0, 1e-11,    0.0,               0.0, 0.0],
               [0.0, 0.0,    np.deg2rad(1e-4),   0.0, 0.0],
@@ -50,21 +41,23 @@ q = np.array([[1e-11, 0.0,    0.0,               0.0, 0.0],
               [0.0, 0.0,    0.0,                0.0, np.deg2rad(1e-4)]])
 
 
-# h matrix - measurement matrix
+'''h matrix - measurement matrix'''
 hx = np.array([[1.0, 0.0, 0.0, 0.0, 0.0],
                [0.0, 1.0, 0.0, 0.0, 0.0],
                [0.0, 0.0, 0.0, 1.0, 0.0],
                [0.0, 0.0, 0.0, 0.0, 1.0]])
 
 
-# r matrix - measurement noise covariance
+'''r matrix - measurement noise covariance'''
 r = np.array([[0.015, 0.0, 0.0, 0.0],
               [0.0, 0.010, 0.0, 0.0],
               [0.0, 0.0, 0.1, 0.0],
               [0.0, 0.0, 0.0, 0.01]])**2
 
 
-# main program
+'''main program'''
+
+
 def main():
     print(__file__ + " start!!")
     x_est = x_0
@@ -89,20 +82,24 @@ def main():
         if show_final_flag == 1:
             plot_final(x_true_cat, x_est_cat, z_cat)
         x_est, p_est = cubature_kalman_filter(x_est, p_est, z)
-        x_true_cat = np.vstack((x_true_cat, np.transpose(x_true[0:2])))
-        x_est_cat = np.vstack((x_est_cat, np.transpose(x_est[0:2])))
-        z_cat = np.vstack((z_cat, np.transpose(z[0:2])))
+        x_true_cat = np.vstack((x_true_cat, x_true[0:2].T))
+        x_est_cat = np.vstack((x_est_cat, (x_est[0:2].T)))
+        z_cat = np.vstack((z_cat, z[0:2].T))
     print('CKF Over')
 
 
-# cubature kalman filter
+'''cubature kalman filter'''
+
+
 def cubature_kalman_filter(x_est, p_est, z):
     x_pred, p_pred = cubature_prediction(x_est, p_est)
     x_upd, p_upd = cubature_update(x_pred, p_pred, z)
     return x_upd.astype(float), p_upd.astype(float)
 
 
-# CTRV motion model f matrix
+'''CTRV motion model f matrix'''
+
+
 def f(x):
     x[0] = x[0] + (x[3]/x[4]) * (np.sin(x[4] * dt + x[2]) - np.sin(x[2]))
     x[1] = x[1] + (x[3]/x[4]) * (- np.cos(x[4] * dt + x[2]) + np.cos(x[2]))
@@ -113,14 +110,18 @@ def f(x):
     return x.astype(float)
 
 
-# CTRV measurement model h matrix
+'''CTRV measurement model h matrix'''
+
+
 def h(x):
     x = hx @ x
     x.reshape((4, 1))
     return x
 
 
-# generate sigma points
+'''generate sigma points'''
+
+
 def sigma(x, p):
     n = np.shape(x)[0]
     SP = np.zeros((n, 2*n))
@@ -134,7 +135,9 @@ def sigma(x, p):
     return SP.astype(float), W.astype(float)
 
 
-# cubature kalman filter nonlinear prediction step
+'''cubature kalman filter nonlinear prediction step'''
+
+
 def cubature_prediction(x_pred, p_pred):
     n = np.shape(x_pred)[0]
     [SP, W] = sigma(x_pred, p_pred)
@@ -144,11 +147,13 @@ def cubature_prediction(x_pred, p_pred):
         x_pred = x_pred + (f(SP[:, i]).reshape((n, 1)) * W[0, i])
     for i in range(2*n):
         p_step = (f(SP[:, i]).reshape((n, 1)) - x_pred)
-        p_pred = p_pred + (p_step @ np.transpose(p_step) * W[0, i])
+        p_pred = p_pred + (p_step @ p_step.T * W[0, i])
     return x_pred.astype(float), p_pred.astype(float)
 
 
-# cubature kalman filter nonlinear update step
+'''cubature kalman filter nonlinear update step'''
+
+
 def cubature_update(x_pred, p_pred, z):
     n = np.shape(x_pred)[0]
     m = np.shape(z)[0]
@@ -161,25 +166,29 @@ def cubature_update(x_pred, p_pred, z):
     for i in range(2*n):
         p_step = (h(SP[:, i]).reshape((m, 1)) - y_k)
         P_xy = P_xy + ((SP[:, i]).reshape((n, 1)) -
-                       x_pred) @ np.transpose(p_step) * W[0, i]
-        s = s + p_step @ np.transpose(p_step) * W[0, i]
+                       x_pred) @ p_step.T * W[0, i]
+        s = s + p_step @ p_step.T * W[0, i]
     x_pred = x_pred + P_xy @ np.linalg.pinv(s) @ (z - y_k)
-    p_pred = p_pred - P_xy @ np.linalg.pinv(s) @ np.transpose(P_xy)
+    p_pred = p_pred - P_xy @ np.linalg.pinv(s) @ P_xy.T
     return x_pred, p_pred
 
 
-# cubature kalman filter linear update step
+'''cubature kalman filter linear update step'''
+
+
 def linear_update(x_pred, p_pred, z):
-    s = h @ p_pred @ np.transpose(h) + r
-    k = p_pred @ np.transpose(h) @ np.linalg.pinv(s)
+    s = h @ p_pred @ h.T + r
+    k = p_pred @ h.T @ np.linalg.pinv(s)
     v = z - h @ x_pred
 
     x_upd = x_pred + k @ v
-    p_upd = p_pred - k @ s @ np.transpose(k)
+    p_upd = p_pred - k @ s @ k.T
     return x_upd.astype(float), p_upd.astype(float)
 
 
-# generate ground truth measurement vector gz, noisy measurement vector z
+'''generate ground truth measurement vector gz, noisy measurement vector z'''
+
+
 def gen_measurement(x_true):
     # x position [m], y position [m]
     gz = hx @ x_true
@@ -187,7 +196,10 @@ def gen_measurement(x_true):
     return z.astype(float)
 
 
-# postprocessing
+'''postprocessing'''
+'''plot animation frames'''
+
+
 def plot_animation(i, x_true_cat, x_est_cat, z):
     if i == 0:
         plt.plot(x_true_cat[0], x_true_cat[1], '.r')
@@ -198,6 +210,9 @@ def plot_animation(i, x_true_cat, x_est_cat, z):
     plt.plot(z[0], z[1], '+g')
     plt.grid(True)
     plt.pause(0.001)
+
+
+'''plot ellipse at each animation frame'''
 
 
 def plot_ellipse(x_est, p_est):
@@ -214,6 +229,9 @@ def plot_ellipse(x_est, p_est):
         xy_2 = np.hstack([xy_2, arr[1]])
     plt.plot(xy_1 + x_est[0], xy_2 + x_est[1], 'r')
     plt.pause(0.00001)
+
+
+'''plot final animation frame and hold'''
 
 
 def plot_final(x_true_cat, x_est_cat, z_cat):
