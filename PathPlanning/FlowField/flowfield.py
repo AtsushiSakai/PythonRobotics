@@ -169,7 +169,7 @@ def main():
     for x, y, l in zip(all_x, all_y, all_len):
         draw_horizontal_line(x, y, l, o_x, o_y, obs_dict, 'obs')
 
-    # Some points are asigned a slightly higher energy value in the cost
+    # Some points are assigned a slightly higher energy value in the cost
     # field. For example, if an agent wishes to go to a point, it might
     # encounter different kind of terrain like grass and dirt. Grass is
     # assigned medium difficulty of passage (color coded as green on the
