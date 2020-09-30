@@ -1,5 +1,5 @@
 """
-Implementation of Cubature Kalman filter using Constant Turn Rate and Velocity (CTRV) motion model
+Cubature Kalman filter using Constant Turn Rate and Velocity (CTRV) model
 Fuse sensor data from IMU and GPS to obtain accurate position
 
 Author: Raghuram Shankar
