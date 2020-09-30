@@ -263,10 +263,10 @@ class Rocket_Model_6DoF:
             U[:, k] = m_k * -self.g_I
 
         return X, U
-
+        #Get model specific constraints.
     def get_constraints(self, X_v, U_v, X_last_p, U_last_p):
         """
-        Get model specific constraints.
+        
 
         :param X_v: cvx variable for current states
         :param U_v: cvx variable for current inputs
@@ -312,7 +312,7 @@ class Rocket_Model_6DoF:
 
         return constraints
 
-
+#defining class Integrator
 class Integrator:
     def __init__(self, m, K):
         self.K = K
@@ -412,7 +412,7 @@ class Integrator:
 
         return dVdt
 
-
+#defining class SCProblem
 class SCProblem:
     """
     Defines a standard Successive Convexification problem and
@@ -667,3 +667,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+#Thankyou
