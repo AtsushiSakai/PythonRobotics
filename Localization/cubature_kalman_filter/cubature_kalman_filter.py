@@ -1,7 +1,18 @@
+"""
+Implementation of Cubature Kalman filter using Constant Turn Rate and Velocity (CTRV) motion model
+Fuse sensor data from IMU and GPS to obtain accurate position
+
+Author: Raghuram Shankar
+"""
+
 import math
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.linalg import sqrtm
+
+"""
+initialize global variables and flags
+"""
 
 
 dt = 0.1
@@ -51,6 +62,11 @@ r = np.array([[0.015, 0.0, 0.0, 0.0],
               [0.0, 0.0, 0.0, 0.01]])**2
 
 
+"""
+Main Program
+"""
+
+
 def main():
     print(__file__ + " start!!")
     x_est = x_0
@@ -60,9 +76,7 @@ def main():
     x_est_cat = np.array([x_0[0, 0], x_0[1, 0]])
     z_cat = np.array([x_0[0, 0], x_0[1, 0]])
     for i in range(N):
-        # generate ground truth
         x_true = f(x_true)
-        # generate measurement
         z = gen_measurement(x_true)
         if i == (N - 1) and show_final == 1:
             show_final_flag = 1
@@ -76,7 +90,7 @@ def main():
             plot_final(x_true_cat, x_est_cat, z_cat)
         x_est, p_est = cubature_kalman_filter(x_est, p_est, z)
         x_true_cat = np.vstack((x_true_cat, x_true[0:2].T))
-        x_est_cat = np.vstack((x_est_cat, (x_est[0:2].T)))
+        x_est_cat = np.vstack((x_est_cat, x_est[0:2].T))
         z_cat = np.vstack((z_cat, z[0:2].T))
     print('CKF Over')
 
@@ -84,7 +98,12 @@ def main():
 def cubature_kalman_filter(x_est, p_est, z):
     x_pred, p_pred = cubature_prediction(x_est, p_est)
     x_upd, p_upd = cubature_update(x_pred, p_pred, z)
-    return x_upd.astype(float), p_upd.astype(float)
+    return x_upd, p_upd
+
+
+""" 
+Motion model
+"""
 
 
 def f(x):
@@ -93,14 +112,22 @@ def f(x):
     x[2] = x[2] + x[4] * dt
     x[3] = x[3]
     x[4] = x[4]
-    x.reshape((5, 1))
-    return x.astype(float)
+    return x
+
+
+"""
+Measurement model
+"""
 
 
 def h(x):
     x = hx @ x
-    x.reshape((4, 1))
     return x
+
+
+"""
+Cubature Kalman Filter
+"""
 
 
 def sigma(x, p):
@@ -113,7 +140,7 @@ def sigma(x, p):
         SP[:, i+n] = (x - (math.sqrt(n) * SD[:, i]).reshape((n, 1))).flatten()
         W[:, i] = 1/(2*n)
         W[:, i+n] = W[:, i]
-    return SP.astype(float), W.astype(float)
+    return SP, W
 
 
 def cubature_prediction(x_pred, p_pred):
@@ -126,7 +153,7 @@ def cubature_prediction(x_pred, p_pred):
     for i in range(2*n):
         p_step = (f(SP[:, i]).reshape((n, 1)) - x_pred)
         p_pred = p_pred + (p_step @ p_step.T * W[0, i])
-    return x_pred.astype(float), p_pred.astype(float)
+    return x_pred, p_pred
 
 
 def cubature_update(x_pred, p_pred, z):
@@ -148,21 +175,21 @@ def cubature_update(x_pred, p_pred, z):
     return x_pred, p_pred
 
 
-def linear_update(x_pred, p_pred, z):
-    s = h @ p_pred @ h.T + r
-    k = p_pred @ h.T @ np.linalg.pinv(s)
-    v = z - h @ x_pred
-
-    x_upd = x_pred + k @ v
-    p_upd = p_pred - k @ s @ k.T
-    return x_upd.astype(float), p_upd.astype(float)
+"""
+Generate Measurements
+"""
 
 
 def gen_measurement(x_true):
-    # x position [m], y position [m]
+    """x position [m], y position [m]"""
     gz = hx @ x_true
     z = gz + z_noise @ np.random.randn(4, 1)
-    return z.astype(float)
+    return z
+
+
+"""
+Post Processing
+"""
 
 
 def plot_animation(i, x_true_cat, x_est_cat, z):
