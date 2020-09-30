@@ -10,8 +10,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.linalg import sqrtm
 
-"""initialize global variables and flags"""
-
 
 dt = 0.1
 N = 100
@@ -60,9 +58,6 @@ r = np.array([[0.015, 0.0, 0.0, 0.0],
               [0.0, 0.0, 0.0, 0.01]])**2
 
 
-"""Main Program"""
-
-
 def main():
     print(__file__ + " start!!")
     x_est = x_0
@@ -97,9 +92,6 @@ def cubature_kalman_filter(x_est, p_est, z):
     return x_upd, p_upd
 
 
-""" Motion model"""
-
-
 def f(x):
     x[0] = x[0] + (x[3]/x[4]) * (np.sin(x[4] * dt + x[2]) - np.sin(x[2]))
     x[1] = x[1] + (x[3]/x[4]) * (- np.cos(x[4] * dt + x[2]) + np.cos(x[2]))
@@ -109,15 +101,9 @@ def f(x):
     return x
 
 
-"""Measurement model"""
-
-
 def h(x):
     x = hx @ x
     return x
-
-
-"""Cubature Kalman Filter"""
 
 
 def sigma(x, p):
@@ -165,17 +151,11 @@ def cubature_update(x_pred, p_pred, z):
     return x_pred, p_pred
 
 
-"""Generate Measurements"""
-
-
 def gen_measurement(x_true):
     """x position [m], y position [m]"""
     gz = hx @ x_true
     z = gz + z_noise @ np.random.randn(4, 1)
     return z
-
-
-"""Post Processing"""
 
 
 def plot_animation(i, x_true_cat, x_est_cat, z):
