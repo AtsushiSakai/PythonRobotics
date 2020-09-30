@@ -90,8 +90,8 @@ class RRTStar(RRT):
             if animation:
                 self.draw_graph(rnd)
 
-            if (not self.search_until_max_iter
-                ) and new_node:  # if reaches goal
+            if ((not self.search_until_max_iter)
+                    and new_node):  # if reaches goal
                 last_index = self.search_best_goal_node()
                 if last_index is not None:
                     return self.generate_final_course(last_index)
