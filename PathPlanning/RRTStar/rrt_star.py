@@ -74,8 +74,8 @@ class RRTStar(RRT):
                                   self.expand_dis)
             near_node = self.node_list[nearest_ind]
             new_node.cost = near_node.cost + \
-                math.sqrt((new_node.x-near_node.x)**2 +
-                          (new_node.y-near_node.y)**2)
+                math.hypot(new_node.x-near_node.x,
+                           new_node.y-near_node.y)
 
             if self.check_collision(new_node, self.obstacle_list):
                 near_inds = self.find_near_nodes(new_node)
