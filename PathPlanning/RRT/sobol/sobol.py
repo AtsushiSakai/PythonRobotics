@@ -382,7 +382,8 @@ def i4_sobol(dim_num, seed):
         #
         for i in range(2, dim_num + 1):
             #
-            #    The bits of the integer POLY(I) gives the form of polynomial I.
+            #    The bits of the integer POLY(I) gives the form of polynomial
+            #    I.
             #
             #    Find the degree of polynomial I from binary encoding.
             #
