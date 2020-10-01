@@ -16,9 +16,10 @@
 """
 import math
 import datetime
-from numpy import *
+import sys
+import numpy as np
 
-#from numpy import bitwise_xor
+# from numpy import np.bitwise_xor
 
 
 def i4_bit_hi1(n):
@@ -193,7 +194,7 @@ def i4_sobol_generate(m, n, skip):
     #    Output, real R(M,N), the points.
     #
     """
-    r = zeros((m, n))
+    r = np.zeros((m, n))
     for j in range(1, n + 1):
         seed = skip + j - 2
         [r[0:m, j - 1], seed] = i4_sobol(m, seed)
@@ -268,17 +269,6 @@ def i4_sobol(dim_num, seed):
     #    Output, real QUASI(DIM_NUM), the next quasirandom vector.
     #
     """
-    global atmost
-    global dim_max
-    global dim_num_save
-    global initialized
-    global lastq
-    global log_max
-    global maxcol
-    global poly
-    global recipd
-    global seed_save
-    global v
 
     if not 'initialized' in globals().keys():
         initialized = 0
@@ -293,43 +283,43 @@ def i4_sobol(dim_num, seed):
         #
         #	Initialize (part of) V.
         #
-        v = zeros((dim_max, log_max))
-        v[0:40, 0] = transpose([
+        v = np.zeros((dim_max, log_max))
+        v[0:40, 0] = np.transpose([
             1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
             1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
         ])
 
-        v[2:40, 1] = transpose([
+        v[2:40, 1] = np.transpose([
             1, 3, 1, 3, 1, 3, 3, 1, 3, 1, 3, 1, 3, 1, 1, 3, 1, 3, 1, 3, 1, 3,
             3, 1, 3, 1, 3, 1, 3, 1, 1, 3, 1, 3, 1, 3, 1, 3
         ])
 
-        v[3:40, 2] = transpose([
+        v[3:40, 2] = np.transpose([
             7, 5, 1, 3, 3, 7, 5, 5, 7, 7, 1, 3, 3, 7, 5, 1, 1, 5, 3, 3, 1, 7,
             5, 1, 3, 3, 7, 5, 1, 1, 5, 7, 7, 5, 1, 3, 3
         ])
 
-        v[5:40, 3] = transpose([
+        v[5:40, 3] = np.transpose([
             1, 7, 9, 13, 11, 1, 3, 7, 9, 5, 13, 13, 11, 3, 15, 5, 3, 15, 7, 9,
             13, 9, 1, 11, 7, 5, 15, 1, 15, 11, 5, 3, 1, 7, 9
         ])
 
-        v[7:40, 4] = transpose([
+        v[7:40, 4] = np.transpose([
             9, 3, 27, 15, 29, 21, 23, 19, 11, 25, 7, 13, 17, 1, 25, 29, 3, 31,
             11, 5, 23, 27, 19, 21, 5, 1, 17, 13, 7, 15, 9, 31, 9
         ])
 
-        v[13:40, 5] = transpose([
+        v[13:40, 5] = np.transpose([
             37, 33, 7, 5, 11, 39, 63, 27, 17, 15, 23, 29, 3, 21, 13, 31, 25, 9,
             49, 33, 19, 29, 11, 19, 27, 15, 25
         ])
 
-        v[19:40, 6] = transpose([
+        v[19:40, 6] = np.transpose([
             13, 33, 115, 41, 79, 17, 29, 119, 75, 73, 105, 7, 59, 65, 21, 3,
             113, 61, 89, 45, 107
         ])
 
-        v[37:40, 7] = transpose([7, 23, 39])
+        v[37:40, 7] = np.transpose([7, 23, 39])
         #
         #	Set POLY.
         #
@@ -384,7 +374,7 @@ def i4_sobol(dim_num, seed):
 #	Expand this bit pattern to separate components of the logical array INCLUD.
 #
             j = poly[i - 1]
-            includ = zeros(m)
+            includ = np.zeros(m)
             for k in range(m, 0, -1):
                 j2 = math.floor(j / 2.)
                 includ[k - 1] = (j != 2 * j2)
@@ -399,7 +389,7 @@ def i4_sobol(dim_num, seed):
                 for k in range(1, m + 1):
                     l = 2 * l
                     if (includ[k - 1]):
-                        newv = bitwise_xor(
+                        newv = np.bitwise_xor(
                             int(newv), int(l * v[i - 1, j - k - 1]))
                 v[i - 1, j - 1] = newv
 #
@@ -413,7 +403,7 @@ def i4_sobol(dim_num, seed):
 #	RECIPD is 1/(common denominator of the elements in V).
 #
         recipd = 1.0 / (2 * l)
-        lastq = zeros(dim_num)
+        lastq = np.zeros(dim_num)
 
     seed = int(math.floor(seed))
 
@@ -422,7 +412,7 @@ def i4_sobol(dim_num, seed):
 
     if (seed == 0):
         l = 1
-        lastq = zeros(dim_num)
+        lastq = np.zeros(dim_num)
 
     elif (seed == seed_save + 1):
         #
@@ -434,12 +424,12 @@ def i4_sobol(dim_num, seed):
 
         seed_save = 0
         l = 1
-        lastq = zeros(dim_num)
+        lastq = np.zeros(dim_num)
 
         for seed_temp in range(int(seed_save), int(seed)):
             l = i4_bit_lo0(seed_temp)
             for i in range(1, dim_num + 1):
-                lastq[i - 1] = bitwise_xor(
+                lastq[i - 1] = np.bitwise_xor(
                     int(lastq[i - 1]), int(v[i - 1, l - 1]))
 
         l = i4_bit_lo0(seed)
@@ -449,7 +439,7 @@ def i4_sobol(dim_num, seed):
         for seed_temp in range(int(seed_save + 1), int(seed)):
             l = i4_bit_lo0(seed_temp)
             for i in range(1, dim_num + 1):
-                lastq[i - 1] = bitwise_xor(
+                lastq[i - 1] = np.bitwise_xor(
                     int(lastq[i - 1]), int(v[i - 1, l - 1]))
 
         l = i4_bit_lo0(seed)
@@ -467,10 +457,10 @@ def i4_sobol(dim_num, seed):
 #
 #	Calculate the new components of QUASI.
 #
-    quasi = zeros(dim_num)
+    quasi = np.zeros(dim_num)
     for i in range(1, dim_num + 1):
         quasi[i - 1] = lastq[i - 1] * recipd
-        lastq[i - 1] = bitwise_xor(int(lastq[i - 1]), int(v[i - 1, l - 1]))
+        lastq[i - 1] = np.bitwise_xor(int(lastq[i - 1]), int(v[i - 1, l - 1]))
 
     seed_save = seed
     seed = seed + 1
@@ -541,7 +531,6 @@ def i4_uniform_ab(a, b, seed):
     #    Output, integer SEED, the updated seed.
     #
     """
-    from sys import exit
 
     i4_huge = 2147483647
 
@@ -556,7 +545,7 @@ def i4_uniform_ab(a, b, seed):
         print('')
         print('I4_UNIFORM_AB - Fatal error!')
         print('  Input SEED = 0!')
-        exit('I4_UNIFORM_AB - Fatal error!')
+        sys.exit('I4_UNIFORM_AB - Fatal error!')
 
     k = (seed // 127773)
 
@@ -749,7 +738,6 @@ def r4_uniform_01(seed):
     #    normally be used as the input seed on the next call.
     #
     """
-    from sys import exit
 
     i4_huge = 2147483647
 
@@ -757,7 +745,7 @@ def r4_uniform_01(seed):
         print('')
         print('R4_UNIFORM_01 - Fatal error!')
         print('  Input SEED = 0!')
-        exit('R4_UNIFORM_01 - Fatal error!')
+        sys.exit('R4_UNIFORM_01 - Fatal error!')
 
     seed = (seed % i4_huge)
 
