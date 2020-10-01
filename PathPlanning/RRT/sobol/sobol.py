@@ -21,6 +21,18 @@ import numpy as np
 
 # from numpy import np.bitwise_xor
 
+atmost = None
+dim_max = None
+dim_num_save = None
+initialized = None
+lastq = None
+log_max = None
+maxcol = None
+poly = None
+recipd = None
+seed_save = None
+v = None
+
 
 def i4_bit_hi1(n):
     """
@@ -270,11 +282,23 @@ def i4_sobol(dim_num, seed):
 
     """
 
-    if not 'initialized' in globals().keys():
+    global atmost
+    global dim_max
+    global dim_num_save
+    global initialized
+    global lastq
+    global log_max
+    global maxcol
+    global poly
+    global recipd
+    global seed_save
+    global v
+
+    if 'initialized' is None:
         initialized = 0
         dim_num_save = -1
 
-    if (not initialized or dim_num != dim_num_save):
+    if not initialized or dim_num != dim_num_save:
         initialized = 1
         dim_max = 40
         dim_num_save = -1
