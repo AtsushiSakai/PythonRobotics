@@ -12,12 +12,12 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 
-show_animation = True
-
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from sobol import sobol_quasirand
+
+show_animation = True
 
 
 class RRT:
@@ -147,9 +147,6 @@ class RRT:
 
     def get_random_node(self):
         if random.randint(0, 100) > self.goal_sample_rate:
-            rnd = self.Node(
-                random.uniform(self.min_rand, self.max_rand),
-                random.uniform(self.min_rand, self.max_rand))
             rand_coordinates, n = sobol_quasirand(2, self.sobol_inter_)
             rand_coordinates = self.min_rand + \
                 rand_coordinates*(self.max_rand - self.min_rand)
