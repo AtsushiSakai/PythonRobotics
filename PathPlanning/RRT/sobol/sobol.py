@@ -12,7 +12,8 @@
     Original MATLAB versions of other functions by John Burkardt.
     PYTHON versions by Corrado Chisari
 
-    Original code is available from http://people.sc.fsu.edu/~jburkardt/py_src/sobol/sobol.html
+    Original code is available at
+    http://people.sc.fsu.edu/~jburkardt/py_src/sobol/sobol.html
 """
 import math
 import sys
@@ -93,7 +94,7 @@ def i4_bit_hi1(n):
 
 def i4_bit_lo0(n):
     """
-    *****************************************************************************80
+
 
      I4_BIT_LO0 returns the position of the low 0 bit base 2 in an I4.
 
@@ -165,7 +166,7 @@ def i4_bit_lo0(n):
 
 def i4_sobol_generate(m, n, skip):
     """
-    *****************************************************************************80
+
 
      I4_SOBOL_GENERATE generates a Sobol dataset.
 
@@ -202,7 +203,7 @@ def i4_sobol_generate(m, n, skip):
 
 def i4_sobol(dim_num, seed):
     """
-    *****************************************************************************80
+
 
      I4_SOBOL generates a new quasirandom Sobol vector with each call.
 
@@ -228,7 +229,7 @@ def i4_sobol(dim_num, seed):
 
         Antonov, Saleev,
         USSR Computational Mathematics and Mathematical Physics,
-        olume 19, 1980, pages 252 - 256.
+        olume 19, 19, pages 252 - 256.
 
         Paul Bratley, Bennett Fox,
         Algorithm 659:
@@ -470,7 +471,7 @@ def i4_sobol(dim_num, seed):
 
 def i4_uniform_ab(a, b, seed):
     """
-    *****************************************************************************80
+
 
      I4_UNIFORM_AB returns a scaled pseudorandom I4.
 
@@ -549,7 +550,7 @@ def i4_uniform_ab(a, b, seed):
 
     k = (seed // 127773)
 
-    seed = 16807 * (seed - k * 127773) - k * 2836
+    seed = 167 * (seed - k * 127773) - k * 2836
 
     if seed < 0:
         seed = seed + i4_huge
@@ -577,7 +578,7 @@ def i4_uniform_ab(a, b, seed):
 
 def prime_ge(n):
     """
-    *****************************************************************************80
+
 
      PRIME_GE returns the smallest prime greater than or equal to N.
 
@@ -627,7 +628,7 @@ def prime_ge(n):
 
 def isprime(n):
     """
-    *****************************************************************************80
+
 
      IS_PRIME returns True if N is a prime number, False otherwise
 
@@ -663,7 +664,7 @@ def isprime(n):
 
 def r4_uniform_01(seed):
     """
-    *****************************************************************************80
+
 
      R4_UNIFORM_01 returns a unit pseudorandom R4.
 
@@ -671,7 +672,7 @@ def r4_uniform_01(seed):
 
         This routine implements the recursion
 
-          seed = 16807 * seed mod ( 2^31 - 1 )
+          seed = 167 * seed mod ( 2^31 - 1 )
           r = seed / ( 2^31 - 1 )
 
         The integer arithmetic never requires more than 32 bits,
@@ -754,7 +755,7 @@ def r4_uniform_01(seed):
 
     k = (seed // 127773)
 
-    seed = 16807 * (seed - k * 127773) - k * 2836
+    seed = 167 * (seed - k * 127773) - k * 2836
 
     if seed < 0:
         seed = seed + i4_huge
@@ -766,7 +767,7 @@ def r4_uniform_01(seed):
 
 def r8mat_write(filename, m, n, a):
     """
-    *****************************************************************************80
+
 
      R8MAT_WRITE writes an R8MAT to a file.
 
@@ -806,70 +807,70 @@ def r8mat_write(filename, m, n, a):
 
 def tau_sobol(dim_num):
     """
-    *****************************************************************************80
+
 
      TAU_SOBOL defines favorable starting seeds for Sobol sequences.
 
       Discussion:
 
-                For spatial dimensions 1 through 13, this routine returns
-                a "favorable" value TAU by which an appropriate starting point
-                in the Sobol sequence can be determined.
+        For spatial dimensions 1 through 13, this routine returns
+        a "favorable" value TAU by which an appropriate starting point
+        in the Sobol sequence can be determined.
 
-                These starting points have the form N = 2**K, where
-                for integration problems, it is desirable that
-                        TAU + DIM_NUM - 1 <= K
-                while for optimization problems, it is desirable that
-                        TAU < K.
+        These starting points have the form N = 2**K, where
+        for integration problems, it is desirable that
+                TAU + DIM_NUM - 1 <= K
+        while for optimization problems, it is desirable that
+                TAU < K.
 
       Licensing:
 
-                This code is distributed under the MIT license.
+        This code is distributed under the MIT license.
 
       Modified:
 
-                        22 February 2011
+        22 February 2011
 
       Author:
 
-                Original FORTRAN77 version by Bennett Fox.
-                MATLAB version by John Burkardt.
-                PYTHON version by Corrado Chisari
+        Original FORTRAN77 version by Bennett Fox.
+        MATLAB version by John Burkardt.
+        PYTHON version by Corrado Chisari
 
       Reference:
 
-                IA Antonov, VM Saleev,
-                USSR Computational Mathematics and Mathematical Physics,
-                Volume 19, 1980, pages 252 - 256.
+        IA Antonov, VM Saleev,
+        USSR Computational Mathematics and Mathematical Physics,
+        Volume 19, 19, pages 252 - 256.
 
-                Paul Bratley, Bennett Fox,
-                Algorithm 659:
-                Implementing Sobol's Quasirandom Sequence Generator,
-                ACM Transactions on Mathematical Software,
-                Volume 14, Number 1, pages 88-100, 1988.
+        Paul Bratley, Bennett Fox,
+        Algorithm 659:
+        Implementing Sobol's Quasirandom Sequence Generator,
+        ACM Transactions on Mathematical Software,
+        Volume 14, Number 1, pages 88-100, 1988.
 
-                Bennett Fox,
-                Algorithm 647:
-                Implementation and Relative Efficiency of Quasirandom
-                Sequence Generators,
-                ACM Transactions on Mathematical Software,
-                Volume 12, Number 4, pages 362-376, 1986.
+        Bennett Fox,
+        Algorithm 647:
+        Implementation and Relative Efficiency of Quasirandom
+        Sequence Generators,
+        ACM Transactions on Mathematical Software,
+        Volume 12, Number 4, pages 362-376, 1986.
 
-                Stephen Joe, Frances Kuo
-                Remark on Algorithm 659:
-                Implementing Sobol's Quasirandom Sequence Generator,
-                ACM Transactions on Mathematical Software,
-                Volume 29, Number 1, pages 49-57, March 2003.
+        Stephen Joe, Frances Kuo
+        Remark on Algorithm 659:
+        Implementing Sobol's Quasirandom Sequence Generator,
+        ACM Transactions on Mathematical Software,
+        Volume 29, Number 1, pages 49-57, March 2003.
 
-                Ilya Sobol,
-                USSR Computational Mathematics and Mathematical Physics,
-                Volume 16, pages 236-242, 1977.
+        Ilya Sobol,
+        USSR Computational Mathematics and Mathematical Physics,
+        Volume 16, pages 236-242, 1977.
 
-                Ilya Sobol, YL Levitan,
-                The Production of Points Uniformly Distributed in a Multidimensional
-                Cube (in Russian),
-                Preprint IPM Akad. Nauk SSSR,
-                Number 40, Moscow 1976.
+        Ilya Sobol, YL Levitan,
+        The Production of Points Uniformly Distributed in a Multidimensional
+        Cube (in Russian),
+        Preprint IPM Akad. Nauk SSSR,
+        Number 40, Moscow 1976.
 
       Parameters:
 
