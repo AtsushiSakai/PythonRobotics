@@ -351,7 +351,7 @@ def i4_sobol(dim_num, seed):
             print('	The spatial dimension DIM_NUM should satisfy:')
             print('		1 <= DIM_NUM <= %d' % dim_max)
             print('	But this input value is DIM_NUM = %d' % dim_num)
-            return
+            return None
 
         dim_num_save = dim_num
         #
@@ -451,7 +451,7 @@ def i4_sobol(dim_num, seed):
         print('	Too many calls!')
         print('	MAXCOL = %d\n' % maxcol)
         print('	L =			%d\n' % l)
-        return
+        return None
 
 
 #
@@ -802,8 +802,6 @@ def r8mat_write(filename, m, n, a):
         output.write('\n')
 
     output.close()
-
-    return
 
 
 def tau_sobol(dim_num):
