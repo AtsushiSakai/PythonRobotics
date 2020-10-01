@@ -273,7 +273,7 @@ def i4_sobol(dim_num, seed):
 
         Input/output, integer SEED, the "seed" for the sequence.
         This is essentially the index in the sequence of the quasirandom
-        value to be generated.	On output, SEED has been set to the
+        value to be generated.    On output, SEED has been set to the
         appropriate next value, usually simply SEED+1.
         If SEED is less than 0 on input, it is treated as though it were 0.
         An input value of 0 requests the first (0-th) element of the sequence.
@@ -305,7 +305,7 @@ def i4_sobol(dim_num, seed):
         log_max = 30
         seed_save = -1
         #
-        #	Initialize (part of) V.
+        #    Initialize (part of) V.
         #
         v = np.zeros((dim_max, log_max))
         v[0:40, 0] = np.transpose([
@@ -345,7 +345,7 @@ def i4_sobol(dim_num, seed):
 
         v[37:40, 7] = np.transpose([7, 23, 39])
         #
-        #	Set POLY.
+        #    Set POLY.
         #
         poly = [
             1, 3, 7, 11, 13, 19, 25, 37, 59, 47, 61, 55, 41, 67, 97, 91, 109,
@@ -355,37 +355,36 @@ def i4_sobol(dim_num, seed):
 
         atmost = 2**log_max - 1
         #
-        #	Find the number of bits in ATMOST.
+        #    Find the number of bits in ATMOST.
         #
         maxcol = i4_bit_hi1(atmost)
         #
-        #	Initialize row 1 of V.
+        #    Initialize row 1 of V.
         #
         v[0, 0:maxcol] = 1
 
-#
-#	Things to do only if the dimension changed.
-#
+        # Things to do only if the dimension changed.
+
     if dim_num != dim_num_save:
         #
-        #	Check parameters.
+        #    Check parameters.
         #
         if (dim_num < 1 or dim_max < dim_num):
             print('I4_SOBOL - Fatal error!')
-            print('	The spatial dimension DIM_NUM should satisfy:')
-            print('		1 <= DIM_NUM <= %d' % dim_max)
-            print('	But this input value is DIM_NUM = %d' % dim_num)
+            print('    The spatial dimension DIM_NUM should satisfy:')
+            print('        1 <= DIM_NUM <= %d' % dim_max)
+            print('    But this input value is DIM_NUM = %d' % dim_num)
             return None
 
         dim_num_save = dim_num
         #
-        #	Initialize the remaining rows of V.
+        #    Initialize the remaining rows of V.
         #
         for i in range(2, dim_num + 1):
             #
-            #	The bits of the integer POLY(I) gives the form of polynomial I.
+            #    The bits of the integer POLY(I) gives the form of polynomial I.
             #
-            #	Find the degree of polynomial I from binary encoding.
+            #    Find the degree of polynomial I from binary encoding.
             #
             j = poly[i - 1]
             m = 0
@@ -394,19 +393,20 @@ def i4_sobol(dim_num, seed):
                 if (j <= 0):
                     break
                 m = m + 1
-#
-#	Expand this bit pattern to separate components of the logical array INCLUD.
-#
+            #
+            #    Expand this bit pattern to separate components of the logical
+            #    array INCLUD.
+            #
             j = poly[i - 1]
             includ = np.zeros(m)
             for k in range(m, 0, -1):
                 j2 = math.floor(j / 2.)
                 includ[k - 1] = (j != 2 * j2)
                 j = j2
-#
-#	Calculate the remaining elements of row I as explained
-#	in Bratley and Fox, section 2.
-#
+            #
+            #    Calculate the remaining elements of row I as explained
+            #    in Bratley and Fox, section 2.
+            #
             for j in range(m + 1, maxcol + 1):
                 newv = v[i - 1, j - m - 1]
                 l_var = 1
@@ -417,14 +417,14 @@ def i4_sobol(dim_num, seed):
                             int(newv), int(l_var * v[i - 1, j - k - 1]))
                 v[i - 1, j - 1] = newv
 #
-#	Multiply columns of V by appropriate power of 2.
+#    Multiply columns of V by appropriate power of 2.
 #
         l_var = 1
         for j in range(maxcol - 1, 0, -1):
             l_var = 2 * l_var
             v[0:dim_num, j - 1] = v[0:dim_num, j - 1] * l_var
 #
-#	RECIPD is 1/(common denominator of the elements in V).
+#    RECIPD is 1/(common denominator of the elements in V).
 #
         recipd = 1.0 / (2 * l_var)
         lastq = np.zeros(dim_num)
@@ -440,7 +440,7 @@ def i4_sobol(dim_num, seed):
 
     elif (seed == seed_save + 1):
         #
-        #	Find the position of the right-hand zero in SEED.
+        #    Find the position of the right-hand zero in SEED.
         #
         l_var = i4_bit_lo0(seed)
 
@@ -468,18 +468,18 @@ def i4_sobol(dim_num, seed):
 
         l_var = i4_bit_lo0(seed)
 #
-#	Check that the user is not calling too many times!
+#    Check that the user is not calling too many times!
 #
     if maxcol < l_var:
         print('I4_SOBOL - Fatal error!')
-        print('	Too many calls!')
-        print('	MAXCOL = %d\n' % maxcol)
-        print('	L =			%d\n' % l_var)
+        print('    Too many calls!')
+        print('    MAXCOL = %d\n' % maxcol)
+        print('    L =            %d\n' % l_var)
         return None
 
 
 #
-#	Calculate the new components of QUASI.
+#    Calculate the new components of QUASI.
 #
     quasi = np.zeros(dim_num)
     for i in range(1, dim_num + 1):
@@ -898,7 +898,7 @@ def tau_sobol(dim_num):
 
       Parameters:
 
-                Input, integer DIM_NUM, the spatial dimension.	Only values
+                Input, integer DIM_NUM, the spatial dimension.    Only values
                 of 1 through 13 will result in useful responses.
 
                 Output, integer TAU, the value TAU.
