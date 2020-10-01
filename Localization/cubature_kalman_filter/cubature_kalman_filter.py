@@ -2,7 +2,7 @@
 Cubature Kalman filter using Constant Turn Rate and Velocity (CTRV) model
 Fuse sensor data from IMU and GPS to obtain accurate position
 
-Reference:                          
+Reference:                       
 https://ieeexplore.ieee.org/document/4982682
 
 Author: Raghuram Shankar
@@ -93,10 +93,12 @@ def cubature_kalman_filter(x_est, p_est, z):
 
 
 def f(x):
-    '''Motion Model'''
-    '''References:'''
-    '''http://fusion.isif.org/proceedings/fusion08CD/papers/1569107835.pdf'''
-    '''https://github.com/balzer82/Kalman'''
+    """
+    Motion Model
+    References:
+    http://fusion.isif.org/proceedings/fusion08CD/papers/1569107835.pdf
+    https://github.com/balzer82/Kalman
+    """"
     x[0] = x[0] + (x[3]/x[4]) * (np.sin(x[4] * dt + x[2]) - np.sin(x[2]))
     x[1] = x[1] + (x[3]/x[4]) * (- np.cos(x[4] * dt + x[2]) + np.cos(x[2]))
     x[2] = x[2] + x[4] * dt
@@ -112,11 +114,13 @@ def h(x):
 
 
 def sigma(x, p):
-    '''Unscented Transform with Cubature Rule'''
-    '''Generate 2n Sigma Points to represent the nonlinear motion '''
-    '''Assign Weights to each Sigma Point, Wi = 1/2n'''
-    '''Cubature Rule - Special Case of Unscented Transform'''
-    '''W0 = 0, no extra tuning parameters, no negative weights'''
+    """
+    Unscented Transform with Cubature Rule
+    Generate 2n Sigma Points to represent the nonlinear motion
+    Assign Weights to each Sigma Point, Wi = 1/2n
+    Cubature Rule - Special Case of Unscented Transform
+    W0 = 0, no extra tuning parameters, no negative weights
+    """
     n = np.shape(x)[0]
     SP = np.zeros((n, 2*n))
     W = np.zeros((1, 2*n))
