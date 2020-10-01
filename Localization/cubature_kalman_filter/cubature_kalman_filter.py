@@ -2,7 +2,35 @@
 Cubature Kalman filter using Constant Turn Rate and Velocity (CTRV) model
 Fuse sensor data from IMU and GPS to obtain accurate position
 
+Reference:                          
+https://ieeexplore.ieee.org/document/4982682
+
 Author: Raghuram Shankar
+
+state matrix:                       2D x-y position, yaw, velocity and yaw rate
+measurement matrix:                 2D x-y position, velocity and yaw rate
+
+dt:                                 Duration of time step
+N:                                  Number of time steps
+show_final:                         Flag for showing final result
+show_animation:                     Flag for showing each animation frame
+show_ellipse:                       Flag for showing covariance ellipse
+z_noise:                            Measurement noise
+x_0:                                Prior state estimate matrix
+P_0:                                Prior state estimate covariance matrix
+q:                                  Process noise covariance
+hx:                                 Measurement model matrix
+r:                                  Sensor noise covariance
+SP:                                 Sigma Points
+W:                                  Weights
+
+x_est:                              State estimate
+P_est:                              State estimate covariance
+x_true:                             Ground truth value of state
+x_true_cat:                         Concatenate all ground truth states
+x_est_cat:                          Concatenate all state estimates
+z_cat:                              Concatenate all measurements
+
 """
 
 import math
@@ -19,10 +47,10 @@ show_animation = 0
 show_ellipse = 0
 
 
-z_noise = np.array([[0.1, 0.0, 0.0, 0.0],
-                    [0.0, 0.1, 0.0, 0.0],
-                    [0.0, 0.0, 0.1, 0.0],
-                    [0.0, 0.0, 0.0, 0.1]])
+z_noise = np.array([[0.1, 0.0, 0.0, 0.0],               # x position    [m]
+                    [0.0, 0.1, 0.0, 0.0],               # y position    [m]
+                    [0.0, 0.0, 0.1, 0.0],               # velocity      [m/s]
+                    [0.0, 0.0, 0.0, 0.1]])              # yaw rate      [rad/s]
 
 
 x_0 = np.array([[0.0],                                  # x position    [m]
@@ -58,34 +86,6 @@ r = np.array([[0.015, 0.0, 0.0, 0.0],
               [0.0, 0.0, 0.0, 0.01]])**2
 
 
-def main():
-    print(__file__ + " start!!")
-    x_est = x_0
-    p_est = p_0
-    x_true = x_0
-    x_true_cat = np.array([x_0[0, 0], x_0[1, 0]])
-    x_est_cat = np.array([x_0[0, 0], x_0[1, 0]])
-    z_cat = np.array([x_0[0, 0], x_0[1, 0]])
-    for i in range(N):
-        x_true = f(x_true)
-        z = gen_measurement(x_true)
-        if i == (N - 1) and show_final == 1:
-            show_final_flag = 1
-        else:
-            show_final_flag = 0
-        if show_animation == 1:
-            plot_animation(i, x_true_cat, x_est_cat, z)
-        if show_ellipse == 1:
-            plot_ellipse(x_est[0:2], p_est)
-        if show_final_flag == 1:
-            plot_final(x_true_cat, x_est_cat, z_cat)
-        x_est, p_est = cubature_kalman_filter(x_est, p_est, z)
-        x_true_cat = np.vstack((x_true_cat, x_true[0:2].T))
-        x_est_cat = np.vstack((x_est_cat, x_est[0:2].T))
-        z_cat = np.vstack((z_cat, z[0:2].T))
-    print('CKF Over')
-
-
 def cubature_kalman_filter(x_est, p_est, z):
     x_pred, p_pred = cubature_prediction(x_est, p_est)
     x_upd, p_upd = cubature_update(x_pred, p_pred, z)
@@ -93,6 +93,10 @@ def cubature_kalman_filter(x_est, p_est, z):
 
 
 def f(x):
+    '''Motion Model'''
+    '''References:'''
+    '''http://fusion.isif.org/proceedings/fusion08CD/papers/1569107835.pdf'''
+    '''https://github.com/balzer82/Kalman'''
     x[0] = x[0] + (x[3]/x[4]) * (np.sin(x[4] * dt + x[2]) - np.sin(x[2]))
     x[1] = x[1] + (x[3]/x[4]) * (- np.cos(x[4] * dt + x[2]) + np.cos(x[2]))
     x[2] = x[2] + x[4] * dt
@@ -102,11 +106,17 @@ def f(x):
 
 
 def h(x):
+    '''Measurement Model'''
     x = hx @ x
     return x
 
 
 def sigma(x, p):
+    '''Unscented Transform with Cubature Rule'''
+    '''Generate 2n Sigma Points to represent the nonlinear motion '''
+    '''Assign Weights to each Sigma Point, Wi = 1/2n'''
+    '''Cubature Rule - Special Case of Unscented Transform'''
+    '''W0 = 0, no extra tuning parameters, no negative weights'''
     n = np.shape(x)[0]
     SP = np.zeros((n, 2*n))
     W = np.zeros((1, 2*n))
@@ -151,8 +161,7 @@ def cubature_update(x_pred, p_pred, z):
     return x_pred, p_pred
 
 
-def gen_measurement(x_true):
-    """x position [m], y position [m]"""
+def generate_measurement(x_true):
     gz = hx @ x_true
     z = gz + z_noise @ np.random.randn(4, 1)
     return z
@@ -188,16 +197,46 @@ def plot_ellipse(x_est, p_est):
 
 def plot_final(x_true_cat, x_est_cat, z_cat):
     fig = plt.figure()
-    f = fig.add_subplot(111)
-    f.plot(x_true_cat[0:, 0], x_true_cat[0:, 1], 'r', label='True Position')
-    f.plot(x_est_cat[0:, 0], x_est_cat[0:, 1], 'b', label='Estimated Position')
-    f.plot(z_cat[0:, 0], z_cat[0:, 1], '+g', label='Noisy Measurements')
-    f.set_xlabel('x [m]')
-    f.set_ylabel('y [m]')
-    f.set_title('Cubature Kalman Filter - CTRV Model')
-    f.legend(loc='upper left', shadow=True, fontsize='large')
+    subplot = fig.add_subplot(111)
+    subplot.plot(x_true_cat[0:, 0], x_true_cat[0:, 1],
+                 'r', label='True Position')
+    subplot.plot(x_est_cat[0:, 0], x_est_cat[0:, 1],
+                 'b', label='Estimated Position')
+    subplot.plot(z_cat[0:, 0], z_cat[0:, 1], '+g', label='Noisy Measurements')
+    subplot.set_xlabel('x [m]')
+    subplot.set_ylabel('y [m]')
+    subplot.set_title('Cubature Kalman Filter - CTRV Model')
+    subplot.legend(loc='upper left', shadow=True, fontsize='large')
     plt.grid(True)
     plt.show()
+
+
+def main():
+    print(__file__ + " start!!")
+    x_est = x_0
+    p_est = p_0
+    x_true = x_0
+    x_true_cat = np.array([x_0[0, 0], x_0[1, 0]])
+    x_est_cat = np.array([x_0[0, 0], x_0[1, 0]])
+    z_cat = np.array([x_0[0, 0], x_0[1, 0]])
+    for i in range(N):
+        x_true = f(x_true)
+        z = generate_measurement(x_true)
+        if i == (N - 1) and show_final == 1:
+            show_final_flag = 1
+        else:
+            show_final_flag = 0
+        if show_animation == 1:
+            plot_animation(i, x_true_cat, x_est_cat, z)
+        if show_ellipse == 1:
+            plot_ellipse(x_est[0:2], p_est)
+        if show_final_flag == 1:
+            plot_final(x_true_cat, x_est_cat, z_cat)
+        x_est, p_est = cubature_kalman_filter(x_est, p_est, z)
+        x_true_cat = np.vstack((x_true_cat, x_true[0:2].T))
+        x_est_cat = np.vstack((x_est_cat, x_est[0:2].T))
+        z_cat = np.vstack((z_cat, z[0:2].T))
+    print('CKF Over')
 
 
 if __name__ == '__main__':
