@@ -2,7 +2,6 @@
 Cubature Kalman filter using Constant Turn Rate and Velocity (CTRV) model
 Fuse sensor data from IMU and GPS to obtain accurate position
 
-Reference:                       
 https://ieeexplore.ieee.org/document/4982682
 
 Author: Raghuram Shankar
