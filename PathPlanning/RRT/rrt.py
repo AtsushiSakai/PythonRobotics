@@ -14,6 +14,11 @@ import numpy as np
 
 show_animation = True
 
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from sobol import sobol_quasirand
+
 
 class RRT:
     """
@@ -60,6 +65,7 @@ class RRT:
         self.max_iter = max_iter
         self.obstacle_list = obstacle_list
         self.node_list = []
+        self.sobol_inter_ = 0
 
     def planning(self, animation=True):
         """
@@ -144,6 +150,11 @@ class RRT:
             rnd = self.Node(
                 random.uniform(self.min_rand, self.max_rand),
                 random.uniform(self.min_rand, self.max_rand))
+            rand_coordinates, n = sobol_quasirand(2, self.sobol_inter_)
+            rand_coordinates = self.min_rand + \
+                rand_coordinates*(self.max_rand - self.min_rand)
+            self.sobol_inter_ = n
+            rnd = self.Node(*rand_coordinates)
         else:  # goal point sampling
             rnd = self.Node(self.end.x, self.end.y)
         return rnd
