@@ -22,11 +22,8 @@ dt = 0.01
 l1 = l2 = 1
 
 # Set initial goal position to the initial end-effector position
-global x, y, x_prev, y_prev
 x = 2
 y = 0
-x_prev = x
-y_prev = y
 
 show_animation = True
 
@@ -39,7 +36,7 @@ def two_joint_arm(GOAL_TH=0.0, theta1=0.0, theta2=0.0):
     Computes the inverse kinematics for a planar 2DOF arm
     When out of bounds, rewrite x and y with last correct values
     """
-    global x, y, x_prev, y_prev
+    global x, y
     while True:
         try:
             if x is not None and y is not None:
@@ -79,7 +76,6 @@ def two_joint_arm(GOAL_TH=0.0, theta1=0.0, theta2=0.0):
 
 
 def plot_arm(theta1, theta2, x, y):  # pragma: no cover
-    global x_prev, y_prev
     shoulder = np.array([0, 0])
     elbow = shoulder + np.array([l1 * np.cos(theta1), l1 * np.sin(theta1)])
     wrist = elbow + \
