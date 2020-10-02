@@ -22,8 +22,11 @@ dt = 0.01
 l1 = l2 = 1
 
 # Set initial goal position to the initial end-effector position
+global x, y, x_prev, y_prev
 x = 2
 y = 0
+x_prev = x
+y_prev = y
 
 show_animation = True
 
