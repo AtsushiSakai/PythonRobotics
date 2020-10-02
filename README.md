@@ -431,7 +431,7 @@ Ref:
 
 ## move to a pose control
 
-This is a simulation of moving to a pose control
+This is a simulation of moving to a pose control using a proportional controller
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/move_to_pose/animation.gif)
 
@@ -503,7 +503,7 @@ Ref:
 
 ## N joint arm to point control
 
-N joint arm to a point control simulation.
+N joint arm to a point control simulation using a proportional controller.
 
 This is a interactive simulation.
 
@@ -515,7 +515,7 @@ In this simulation N = 10, however, you can change it.
 
 ## Arm navigation with obstacle avoidance 
 
-Arm navigation with obstacle avoidance simulation.
+Arm navigation with obstacle avoidance simulation using A* on a toroidal grid.
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/ArmNavigation/arm_obstacle_navigation/animation.gif)
 
@@ -524,13 +524,13 @@ Arm navigation with obstacle avoidance simulation.
 
 ## drone 3d trajectory following 
 
-This is a 3d trajectory following simulation for a quadrotor.
+This is a 3d trajectory following simulation for a quadrotor using PD control.
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/AerialNavigation/drone_3d_trajectory_following/animation.gif)
 
 ## rocket powered landing
 
-This is a 3d trajectory generation simulation for a rocket powered landing.
+This is a 3d trajectory generation simulation for a rocket powered landing by solving a Successive Convexification problem.
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/AerialNavigation/rocket_powered_landing/animation.gif)
 
