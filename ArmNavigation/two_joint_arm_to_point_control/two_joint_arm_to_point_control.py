@@ -34,9 +34,14 @@ if show_animation:
 def two_joint_arm(GOAL_TH=0.0, theta1=0.0, theta2=0.0):
     """
     Computes the inverse kinematics for a planar 2DOF arm
+    When out of bounds, rewrite x and y with last correct values
     """
+    global x, y, x_prev, y_prev
     while True:
         try:
+            if x is not None and y is not None:
+                x_prev = x
+                y_prev = y
             if np.sqrt(x**2 + y**2) > (l1 + l2):
                 theta2_goal = 0
             else:
@@ -54,17 +59,24 @@ def two_joint_arm(GOAL_TH=0.0, theta1=0.0, theta2=0.0):
             theta2 = theta2 + Kp * ang_diff(theta2_goal, theta2) * dt
         except ValueError as e:
             print("Unreachable goal")
+        except TypeError:
+            x = x_prev
+            y = y_prev
 
         wrist = plot_arm(theta1, theta2, x, y)
 
         # check goal
-        d2goal = np.hypot(wrist[0] - x, wrist[1] - y)
+        try:
+            d2goal = np.hypot(wrist[0] - x, wrist[1] - y)
+        except TypeError:
+            pass
 
         if abs(d2goal) < GOAL_TH and x is not None:
             return theta1, theta2
 
 
 def plot_arm(theta1, theta2, x, y):  # pragma: no cover
+    global x_prev, y_prev
     shoulder = np.array([0, 0])
     elbow = shoulder + np.array([l1 * np.cos(theta1), l1 * np.sin(theta1)])
     wrist = elbow + \
@@ -119,7 +131,7 @@ def main():  # pragma: no cover
     fig.canvas.mpl_connect("button_press_event", click)
     # for stopping simulation with the esc key.
     fig.canvas.mpl_connect('key_release_event',
-            lambda event: [exit(0) if event.key == 'escape' else None])
+                           lambda event: [exit(0) if event.key == 'escape' else None])
     two_joint_arm()
 
 
