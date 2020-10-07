@@ -107,7 +107,7 @@ def f(x):
 
 
 def h(x):
-    '''Measurement Model'''
+    """Measurement Model"""
     x = hx @ x
     return x
 
