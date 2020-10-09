@@ -66,10 +66,8 @@ def two_joint_arm(GOAL_TH=0.0, theta1=0.0, theta2=0.0):
         wrist = plot_arm(theta1, theta2, x, y)
 
         # check goal
-        try:
+        if x is not None and y is not None:
             d2goal = np.hypot(wrist[0] - x, wrist[1] - y)
-        except TypeError:
-            pass
 
         if abs(d2goal) < GOAL_TH and x is not None:
             return theta1, theta2
