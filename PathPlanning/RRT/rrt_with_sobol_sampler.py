@@ -1,6 +1,6 @@
 """
 
-Path planning Sample Code with Randomized Rapidly-Exploring Random Trees (RRT)
+Path planning Sample Code with Randomized Rapidly-Exploring Random Trees (RRTSobol)
 
 author: AtsushiSakai(@Atsushi_twi)
 
@@ -8,6 +8,7 @@ author: AtsushiSakai(@Atsushi_twi)
 
 import math
 import random
+from sobol import sobol_quasirand
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,14 +16,14 @@ import numpy as np
 show_animation = True
 
 
-class RRT:
+class RRTSobol:
     """
-    Class for RRT planning
+    Class for RRTSobol planning
     """
 
     class Node:
         """
-        RRT Node
+        RRTSobol Node
         """
 
         def __init__(self, x, y):
@@ -60,6 +61,7 @@ class RRT:
         self.max_iter = max_iter
         self.obstacle_list = obstacle_list
         self.node_list = []
+        self.sobol_inter_ = 0
 
     def planning(self, animation=True):
         """
@@ -141,9 +143,13 @@ class RRT:
 
     def get_random_node(self):
         if random.randint(0, 100) > self.goal_sample_rate:
-            rnd = self.Node(
-                random.uniform(self.min_rand, self.max_rand),
-                random.uniform(self.min_rand, self.max_rand))
+            rand_coordinates, n = sobol_quasirand(2, self.sobol_inter_)
+
+            rand_coordinates = self.min_rand + \
+                rand_coordinates*(self.max_rand - self.min_rand)
+            self.sobol_inter_ = n
+            rnd = self.Node(*rand_coordinates)
+
         else:  # goal point sampling
             rnd = self.Node(self.end.x, self.end.y)
         return rnd
@@ -214,11 +220,11 @@ class RRT:
 def main(gx=6.0, gy=10.0):
     print("start " + __file__)
 
-    # ====Search Path with RRT====
+    # ====Search Path with RRTSobol====
     obstacleList = [(5, 5, 1), (3, 6, 2), (3, 8, 2), (3, 10, 2), (7, 5, 2),
                     (9, 5, 2), (8, 10, 1)]  # [x, y, radius]
     # Set Initial parameters
-    rrt = RRT(
+    rrt = RRTSobol(
         start=[0, 0],
         goal=[gx, gy],
         rand_area=[-2, 15],
