@@ -1,6 +1,7 @@
 """
 
-Path planning Sample Code with Randomized Rapidly-Exploring Random Trees (RRTSobol)
+Path planning Sample Code with Randomized Rapidly-Exploring Random
+Trees with sobol sampler(RRTSobol)
 
 author: AtsushiSakai(@Atsushi_twi)
 
