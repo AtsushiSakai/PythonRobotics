@@ -5,7 +5,7 @@ import sys
 sys.path.append(os.path.dirname(__file__) + '/../')
 
 try:
-    from PathPlanning.AStar import A_Star_searching_from_two_side as m
+    from PathPlanning.AStar import a_star_searching_from_two_side as m
 except ImportError:
     raise
 

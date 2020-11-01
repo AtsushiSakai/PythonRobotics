@@ -1,5 +1,5 @@
 """
-astar variants
+a star variants
 author: Sarim Mehdi(muhammadsarim.mehdi@studio.unibo.it)
 Source: http://theory.stanford.edu/~amitp/GameProgramming/Variations.html
 """
@@ -7,7 +7,7 @@ Source: http://theory.stanford.edu/~amitp/GameProgramming/Variations.html
 import numpy as np
 import matplotlib.pyplot as plt
 
-show_animation = False
+show_animation = True
 use_beam_search = False
 use_iterative_deepening = False
 use_dynamic_weighting = False
@@ -89,7 +89,8 @@ def key_points(o_dict):
                 obs_count += 1
             if obs_count == 3 or obs_count == 1:
                 c_list.append((x, y))
-                plt.plot(x, y, ".y")
+                if show_animation:
+                    plt.plot(x, y, ".y")
                 break
     if only_corners:
         return c_list
@@ -148,7 +149,8 @@ class SearchAlgo:
              'open': True, 'in_open_list': True}
         self.open_set.append(self.all_nodes[tuple(self.start_pt)])
 
-    def get_hval(self, x1, y1, x2, y2):
+    @staticmethod
+    def get_hval(x1, y1, x2, y2):
         x, y = x1, y1
         val = 0
         while x != x2 or y != y2:
@@ -178,7 +180,6 @@ class SearchAlgo:
     def jump_point(self):
         """Jump point: Instead of exploring all empty spaces of the
         map, just explore the corners."""
-        plt.title('Jump Point')
 
         goal_found = False
         while len(self.open_set) > 0:
@@ -232,11 +233,13 @@ class SearchAlgo:
                     if not self.all_nodes[cand_pt]['in_open_list']:
                         self.open_set.append(self.all_nodes[cand_pt])
                         self.all_nodes[cand_pt]['in_open_list'] = True
-                    plt.plot(cand_pt[0], cand_pt[1], "r*")
+                    if show_animation:
+                        plt.plot(cand_pt[0], cand_pt[1], "r*")
 
                 if goal_found:
                     break
-            plt.pause(0.001)
+            if show_animation:
+                plt.pause(0.001)
             if goal_found:
                 current_node = self.all_nodes[tuple(self.goal_pt)]
             while goal_found:
@@ -244,23 +247,26 @@ class SearchAlgo:
                     break
                 x = [current_node['pos'][0], current_node['pred'][0]]
                 y = [current_node['pos'][1], current_node['pred'][1]]
-                plt.plot(x, y, "b")
                 current_node = self.all_nodes[tuple(current_node['pred'])]
-                plt.pause(0.001)
+                if show_animation:
+                    plt.plot(x, y, "b")
+                    plt.pause(0.001)
             if goal_found:
                 break
 
             current_node['open'] = False
             current_node['in_open_list'] = False
-            plt.plot(current_node['pos'][0], current_node['pos'][1], "g*")
+            if show_animation:
+                plt.plot(current_node['pos'][0], current_node['pos'][1], "g*")
             del self.open_set[p]
             current_node['fcost'], current_node['hcost'] = np.inf, np.inf
         if show_animation:
+            plt.title('Jump Point')
             plt.show()
 
-    def astar(self):
+    def a_star(self):
         """Beam search: Maintain an open list of just 30 nodes.
-        If more than 30 nodes, then get rid of ndoes with high
+        If more than 30 nodes, then get rid of nodes with high
         f values.
         Iterative deepening: At every iteration, get a cut-off
         value for the f cost. This cut-off is minimum of the f
@@ -275,16 +281,17 @@ class SearchAlgo:
         one neighbor at a time. In fact, you can look for the
         next node as far out as you can as long as there is a
         clear line of sight from your current node to that node."""
-        if use_beam_search:
-            plt.title('A* with beam search')
-        elif use_iterative_deepening:
-            plt.title('A* with iterative deepening')
-        elif use_dynamic_weighting:
-            plt.title('A* with dynamic weighting')
-        elif use_theta_star:
-            plt.title('Theta*')
-        else:
-            plt.title('A*')
+        if show_animation:
+            if use_beam_search:
+                plt.title('A* with beam search')
+            elif use_iterative_deepening:
+                plt.title('A* with iterative deepening')
+            elif use_dynamic_weighting:
+                plt.title('A* with dynamic weighting')
+            elif use_theta_star:
+                plt.title('Theta*')
+            else:
+                plt.title('A*')
 
         goal_found = False
         curr_f_thresh = np.inf
@@ -368,13 +375,15 @@ class SearchAlgo:
                             if not self.all_nodes[cand_pt]['in_open_list']:
                                 self.open_set.append(self.all_nodes[cand_pt])
                                 self.all_nodes[cand_pt]['in_open_list'] = True
-                            plt.plot(cand_pt[0], cand_pt[1], "r*")
+                            if show_animation:
+                                plt.plot(cand_pt[0], cand_pt[1], "r*")
                         if curr_f_thresh < f_cost < \
                                 self.all_nodes[cand_pt]['fcost']:
                             no_valid_f = True
                 if goal_found:
                     break
-            plt.pause(0.001)
+            if show_animation:
+                plt.pause(0.001)
             if goal_found:
                 current_node = self.all_nodes[tuple(self.goal_pt)]
             while goal_found:
@@ -383,12 +392,13 @@ class SearchAlgo:
                 if use_theta_star or use_jump_point:
                     x, y = [current_node['pos'][0], current_node['pred'][0]], \
                              [current_node['pos'][1], current_node['pred'][1]]
-                    plt.plot(x, y, "b")
+                    if show_animation:
+                        plt.plot(x, y, "b")
                 else:
-                    plt.plot(current_node['pred'][0],
-                             current_node['pred'][1], "b*")
+                    if show_animation:
+                        plt.plot(current_node['pred'][0],
+                                 current_node['pred'][1], "b*")
                 current_node = self.all_nodes[tuple(current_node['pred'])]
-                plt.pause(0.001)
             if goal_found:
                 break
 
@@ -402,7 +412,8 @@ class SearchAlgo:
 
             current_node['open'] = False
             current_node['in_open_list'] = False
-            plt.plot(current_node['pos'][0], current_node['pos'][1], "g*")
+            if show_animation:
+                plt.plot(current_node['pos'][0], current_node['pos'][1], "g*")
             del self.open_set[p]
             current_node['fcost'], current_node['hcost'] = np.inf, np.inf
             depth += 1
@@ -443,10 +454,11 @@ def main():
     for x, y, l in zip(all_x, all_y, all_len):
         draw_horizontal_line(x, y, l, o_x, o_y, obs_dict)
 
-    plt.plot(o_x, o_y, ".k")
-    plt.plot(s_x, s_y, "og")
-    plt.plot(g_x, g_y, "xb")
-    plt.grid(True)
+    if show_animation:
+        plt.plot(o_x, o_y, ".k")
+        plt.plot(s_x, s_y, "og")
+        plt.plot(g_x, g_y, "xb")
+        plt.grid(True)
 
     if use_jump_point:
         keypoint_list = key_points(obs_dict)
@@ -455,7 +467,7 @@ def main():
         search_obj.jump_point()
     else:
         search_obj = SearchAlgo(obs_dict, g_x, g_y, s_x, s_y, 101, 101)
-        search_obj.astar()
+        search_obj.a_star()
 
 
 if __name__ == '__main__':

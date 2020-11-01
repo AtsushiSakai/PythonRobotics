@@ -10,6 +10,7 @@ class Test(TestCase):
     def test(self):
         # A* with beam search
         astar.show_animation = False
+
         astar.use_beam_search = True
         astar.main()
         self.reset_all()
@@ -34,7 +35,9 @@ class Test(TestCase):
         astar.main()
         self.reset_all()
 
-    def reset_all(self):
+    @staticmethod
+    def reset_all():
+        astar.show_animation = False
         astar.use_beam_search = False
         astar.use_iterative_deepening = False
         astar.use_dynamic_weighting = False

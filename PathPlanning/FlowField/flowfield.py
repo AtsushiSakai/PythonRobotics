@@ -129,9 +129,12 @@ class FlowField:
     def follow_vectors(self):
         curr_x, curr_y = self.start_pt
         while curr_x is not None and curr_y is not None:
-            plt.plot(curr_x, curr_y, "b*")
             curr_x, curr_y = self.vector_field[(curr_x, curr_y)]
-            plt.pause(0.001)
+
+            if show_animation:
+                plt.plot(curr_x, curr_y, "b*")
+                plt.pause(0.001)
+
         if show_animation:
             plt.show()
 
@@ -208,12 +211,13 @@ def main():
     for x, y, l in zip(all_x, all_y, all_len):
         draw_horizontal_line(x, y, l, h_x, h_y, obs_dict, 'hard')
 
-    plt.plot(o_x, o_y, "sr")
-    plt.plot(m_x, m_y, "sg")
-    plt.plot(h_x, h_y, "sy")
-    plt.plot(s_x, s_y, "og")
-    plt.plot(g_x, g_y, "o")
-    plt.grid(True)
+    if show_animation:
+        plt.plot(o_x, o_y, "sr")
+        plt.plot(m_x, m_y, "sg")
+        plt.plot(h_x, h_y, "sy")
+        plt.plot(s_x, s_y, "og")
+        plt.plot(g_x, g_y, "o")
+        plt.grid(True)
 
     flow_obj = FlowField(obs_dict, g_x, g_y, s_x, s_y, 50, 50)
     flow_obj.find_path()
