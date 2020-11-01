@@ -297,6 +297,7 @@ class SearchAlgo:
         curr_f_thresh = np.inf
         depth = 0
         no_valid_f = False
+        w = None
         while len(self.open_set) > 0:
             self.open_set = sorted(self.open_set, key=lambda x: x['fcost'])
             lowest_f = self.open_set[0]['fcost']
@@ -358,28 +359,10 @@ class SearchAlgo:
                         break
 
                     cand_pt = tuple(cand_pt)
-                    if not self.obs_grid[tuple(cand_pt)] and \
-                            self.all_nodes[cand_pt]['open']:
-                        g_cost = offset + current_node['gcost']
-                        h_cost = self.all_nodes[cand_pt]['hcost']
-                        if use_dynamic_weighting:
-                            h_cost = h_cost * w
-                        f_cost = g_cost + h_cost
-                        if f_cost < self.all_nodes[cand_pt]['fcost'] and \
-                                f_cost <= curr_f_thresh:
-                            f_cost_list.append(f_cost)
-                            self.all_nodes[cand_pt]['pred'] = \
-                                current_node['pos']
-                            self.all_nodes[cand_pt]['gcost'] = g_cost
-                            self.all_nodes[cand_pt]['fcost'] = f_cost
-                            if not self.all_nodes[cand_pt]['in_open_list']:
-                                self.open_set.append(self.all_nodes[cand_pt])
-                                self.all_nodes[cand_pt]['in_open_list'] = True
-                            if show_animation:
-                                plt.plot(cand_pt[0], cand_pt[1], "r*")
-                        if curr_f_thresh < f_cost < \
-                                self.all_nodes[cand_pt]['fcost']:
-                            no_valid_f = True
+                    no_valid_f = self.update_node_cost(cand_pt, curr_f_thresh,
+                                                       current_node,
+                                                       f_cost_list, no_valid_f,
+                                                       offset, w)
                 if goal_found:
                     break
             if show_animation:
@@ -419,6 +402,32 @@ class SearchAlgo:
             depth += 1
         if show_animation:
             plt.show()
+
+    def update_node_cost(self, cand_pt, curr_f_thresh, current_node,
+                         f_cost_list, no_valid_f, offset, w):
+        if not self.obs_grid[tuple(cand_pt)] and \
+                self.all_nodes[cand_pt]['open']:
+            g_cost = offset + current_node['gcost']
+            h_cost = self.all_nodes[cand_pt]['hcost']
+            if use_dynamic_weighting:
+                h_cost = h_cost * w
+            f_cost = g_cost + h_cost
+            if f_cost < self.all_nodes[cand_pt]['fcost'] and \
+                    f_cost <= curr_f_thresh:
+                f_cost_list.append(f_cost)
+                self.all_nodes[cand_pt]['pred'] = \
+                    current_node['pos']
+                self.all_nodes[cand_pt]['gcost'] = g_cost
+                self.all_nodes[cand_pt]['fcost'] = f_cost
+                if not self.all_nodes[cand_pt]['in_open_list']:
+                    self.open_set.append(self.all_nodes[cand_pt])
+                    self.all_nodes[cand_pt]['in_open_list'] = True
+                if show_animation:
+                    plt.plot(cand_pt[0], cand_pt[1], "r*")
+            if curr_f_thresh < f_cost < \
+                    self.all_nodes[cand_pt]['fcost']:
+                no_valid_f = True
+        return no_valid_f
 
 
 def main():
