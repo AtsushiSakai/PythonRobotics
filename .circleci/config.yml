@@ -6,7 +6,7 @@ orbs:
 jobs:
   build_doc:
     docker:
-      - image: circleci/python:3.8
+      - image: circleci/python:3.9
     steps:
       - checkout
       - python/load-cache
