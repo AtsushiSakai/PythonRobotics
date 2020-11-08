@@ -309,6 +309,9 @@ def lane_state_sampling_test1():
     states = calc_lane_states(l_center, l_heading, l_width, v_width, d, nxy)
     result = generate_path(states, k0)
 
+    if show_animation:
+        plt.close("all")
+
     for table in result:
         xc, yc, yawc = motion_model.generate_trajectory(
             table[3], table[4], table[5], k0)
