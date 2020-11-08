@@ -69,15 +69,11 @@ class LShapeFitting:
         c1_min = min(c1)
         c2_min = min(c2)
 
-        D1 = [min([np.linalg.norm(c1_max - ic1),
-                   np.linalg.norm(ic1 - c1_min)]) for ic1 in c1]
-        D2 = [min([np.linalg.norm(c2_max - ic2),
-                   np.linalg.norm(ic2 - c2_min)]) for ic2 in c2]
-
-        beta = 0
-        for i, _ in enumerate(D1):
-            d = max(min([D1[i], D2[i]]), self.min_dist_of_closeness_criteria)
-            beta += (1.0 / d)
+        # Vectorization
+        D1 = np.minimum(c1_max - c1, c1 - c1_min)
+        D2 = np.minimum(c2_max - c2, c2 - c2_min)
+        d = np.maximum(np.minimum(D1, D2), self.min_dist_of_closeness_criteria)
+        beta = (1.0 / d).sum()
 
         return beta
 
@@ -88,26 +84,13 @@ class LShapeFitting:
         c1_min = min(c1)
         c2_min = min(c2)
 
-        D1 = [min([np.linalg.norm(c1_max - ic1),
-                   np.linalg.norm(ic1 - c1_min)]) for ic1 in c1]
-        D2 = [min([np.linalg.norm(c2_max - ic2),
-                   np.linalg.norm(ic2 - c2_min)]) for ic2 in c2]
-
-        E1, E2 = [], []
-        for (d1, d2) in zip(D1, D2):
-            if d1 < d2:
-                E1.append(d1)
-            else:
-                E2.append(d2)
-
-        V1 = 0.0
-        if E1:
-            V1 = - np.var(E1)
-
-        V2 = 0.0
-        if E2:
-            V2 = - np.var(E2)
-
+        # Vectorization
+        D1 = np.minimum(c1_max - c1, c1 - c1_min)
+        D2 = np.minimum(c2_max - c2, c2 - c2_min)
+        E1 = D1[D1 < D2]
+        E2 = D2[D1 >= D2]
+        V1 = - np.var(E1) if len(E1) > 0 else 0.
+        V2 = - np.var(E2) if len(E2) > 0 else 0.
         gamma = V1 + V2
 
         return gamma
