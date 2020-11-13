@@ -92,8 +92,8 @@ class RRTStar:
         rrt star path planning
 
         animation: flag for animation on or off
-        search_until_max_iter: search until max iteration for path 
-	improving or not
+        search_until_max_iter: search until max iteration for path
+        improving or not
         """
 
         self.node_list = [self.start]
@@ -102,7 +102,9 @@ class RRTStar:
                 print("Iter:", i, ", number of nodes:", len(self.node_list))
             rnd = self.get_random_node()
             nearest_ind = self.get_nearest_node_index(self.node_list, rnd)
-            new_node = self.steer(self.node_list[nearest_ind], rnd, self.expand_dis)
+            new_node = self.steer(self.node_list[nearest_ind],
+				rnd,
+				self.expand_dis)
 
             if self.check_collision(new_node, self.robot, self.obstacle_list):
                 near_inds = self.find_near_nodes(new_node)
@@ -111,7 +113,7 @@ class RRTStar:
                     self.node_list.append(new_node)
                     self.rewire(new_node, near_inds)
 
-            if animation and i % 5 == 0 and self.dimension<=3:
+            if animation and i % 5 == 0 and self.dimension <= 3:
                 self.draw_graph(rnd)
 
             if (not search_until_max_iter) and new_node:  # check reaching the goal
