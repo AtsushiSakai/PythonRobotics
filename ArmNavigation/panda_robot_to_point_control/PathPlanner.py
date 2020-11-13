@@ -158,8 +158,11 @@ class RRTStar:
         return new_node
 
     def search_best_goal_node(self):
-        dist_to_goal_list = [self.calc_dist_to_goal(n.x) for n in self.node_list]
-        goal_inds = [dist_to_goal_list.index(i) for i in dist_to_goal_list if i <= self.expand_dis]
+        dist_to_goal_list = [self.calc_dist_to_goal(n.x) \
+                             for n in self.node_list]
+        goal_inds = [dist_to_goal_list.index(i) \
+                     for i in dist_to_goal_list \
+                              if i <= self.expand_dis]
 
         safe_goal_inds = []
         for goal_ind in goal_inds:
@@ -180,7 +183,8 @@ class RRTStar:
     def find_near_nodes(self, new_node):
         nnode = len(self.node_list) + 1
         r = self.connect_circle_dist * math.sqrt((math.log(nnode) / nnode))
-        # if expand_dist exists, search vertices in a range no more than expand_dist
+        # if expand_dist exists, search vertices in 
+        # a range no more than expand_dist
         if hasattr(self, 'expand_dis'):
             r = min(r, self.expand_dis)
         dist_list = [np.sum((np.array(node.x) - np.array(new_node.x)) ** 2)
@@ -196,7 +200,9 @@ class RRTStar:
                 continue
             edge_node.cost = self.calc_new_cost(new_node, near_node)
 
-            no_collision = self.check_collision(edge_node, self.robot, self.obstacle_list)
+            no_collision = self.check_collision(edge_node,
+                                                self.robot,
+                                                self.obstacle_list)
             improved_cost = near_node.cost > edge_node.cost
 
             if no_collision and improved_cost:
@@ -230,7 +236,9 @@ class RRTStar:
 
     def get_random_node(self):
         if random.randint(0, 100) > self.goal_sample_rate:
-            rnd = self.Node(np.random.uniform(self.min_rand, self.max_rand,self.dimension))
+            rnd = self.Node(np.random.uniform(self.min_rand,
+                                              self.max_rand,
+                                              self.dimension))
         else:  # goal point sampling
             rnd = self.Node(self.end.x)
         return rnd
@@ -245,7 +253,6 @@ class RRTStar:
             extend_length = d
 
         n_expand = math.floor(extend_length / self.path_resolution)
-
 
         start, end = np.array(from_node.x), np.array(to_node.x)
         v = end - start
