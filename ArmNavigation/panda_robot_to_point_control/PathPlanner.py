@@ -158,11 +158,10 @@ class RRTStar:
         return new_node
 
     def search_best_goal_node(self):
-        dist_to_goal_list = [self.calc_dist_to_goal(n.x) \
+        dist_to_goal_list = [self.calc_dist_to_goal(n.x)
                              for n in self.node_list]
-        goal_inds = [dist_to_goal_list.index(i) \
-                     for i in dist_to_goal_list \
-                              if i <= self.expand_dis]
+        goal_inds = [dist_to_goal_list.index(i)
+                     for i in dist_to_goal_list if i <= self.expand_dis]
 
         safe_goal_inds = []
         for goal_ind in goal_inds:
@@ -183,7 +182,7 @@ class RRTStar:
     def find_near_nodes(self, new_node):
         nnode = len(self.node_list) + 1
         r = self.connect_circle_dist * math.sqrt((math.log(nnode) / nnode))
-        # if expand_dist exists, search vertices in 
+        # if expand_dist exists, search vertices in
         # a range no more than expand_dist
         if hasattr(self, 'expand_dis'):
             r = min(r, self.expand_dis)
@@ -272,26 +271,28 @@ class RRTStar:
     def draw_graph(self, rnd=None):
         plt.cla()
         self.ax.axis([-1, 1, -1, 1])
-        self.ax.set_zlim(0,1)
+        self.ax.set_zlim(0, 1)
         self.ax.grid(True)
         for (ox, oy, oz, size) in self.obstacle_list:
             self.plot_sphere(self.ax, ox, oy, oz, size=size)
-        if self.dimension>3:
+        if self.dimension > 3:
             return self.ax
         if rnd is not None:
             self.ax.plot([rnd.x[0]], [rnd.x[1]], [rnd.x[2]], "^k")
         for node in self.node_list:
             if node.parent:
                 path = np.array(node.path_x)
-                plt.plot(path[:,0], path[:,1], path[:,2], "-g")
-        self.ax.plot([self.start.x[0]], [self.start.x[1]], [self.start.x[2]], "xr")
+                plt.plot(path[:, 0], path[:, 1], path[:, 2], "-g")
+        self.ax.plot([self.start.x[0]], [self.start.x[1]],
+                     [self.start.x[2]], "xr")
         self.ax.plot([self.end.x[0]], [self.end.x[1]], [self.end.x[2]], "xr")
         plt.pause(0.01)
         return self.ax
 
     @staticmethod
     def get_nearest_node_index(node_list, rnd_node):
-        dlist = [np.sum((np.array(node.x) - np.array(rnd_node.x))**2) for node in node_list]
+        dlist = [np.sum((np.array(node.x) - np.array(rnd_node.x))**2)
+                 for node in node_list]
         minind = dlist.index(min(dlist))
 
         return minind
@@ -310,7 +311,7 @@ class RRTStar:
         dy = to_node.x[1] - from_node.x[1]
         dz = to_node.x[2] - from_node.x[2]
         d = math.sqrt(dx**2 + dy**2 + dz**2)
-        d = np.sqrt(np.sum((np.array(to_node.x)-np.array(from_node.x))**2))
+        d = np.sqrt(np.sum((np.array(to_node.x) - np.array(from_node.x))**2))
         phi = math.atan2(dy, dx)
         theta = math.atan2(math.hypot(dx,dy), dz)
         return d, phi, theta
@@ -322,7 +323,7 @@ class RRTStar:
         dz = to_node.x[2] - from_node.x[2]
         d = math.sqrt(dx**2 + dy**2 + dz**2)
         phi = math.atan2(dy, dx)
-        theta = math.atan2(math.hypot(dx,dy), dz)
+        theta = math.atan2(math.hypot(dx, dy), dz)
         return d, phi, theta
 
     @staticmethod
@@ -373,7 +374,8 @@ def main():
                        max_iter=200,
                        robot=panda,
                        obstacle_list=obstacle_list)
-    path = rrt_star.planning(animation=show_animation, search_until_max_iter=False)
+    path = rrt_star.planning(animation=show_animation,
+                             search_until_max_iter=False)
 
     if path is None:
         print("Cannot find path")
@@ -385,11 +387,13 @@ def main():
             ax = rrt_star.draw_graph()
             for i, q in enumerate(reversed(path)):
                 x_points, y_points, z_points = panda.get_points(q)
-                if i==0 or i==len(path)-1:
-                    color=None
+                if i == 0 or i == len(path) - 1:
+                    color = None
                 else:
-                    color="grey"
-                ax.plot([x for x in x_points], [y for y in y_points], [z for z in z_points], "o-",color=color,  ms=4, mew=0.5)
+                    color = "grey"
+                ax.plot([x for x in x_points],
+                        [y for y in y_points],
+                        [z for z in z_points], "o-", color=color,  ms=4, mew=0.5)
                 plt.pause(0.01)
             plt.show()
 
