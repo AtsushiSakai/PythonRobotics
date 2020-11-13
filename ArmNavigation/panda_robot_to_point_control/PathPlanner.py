@@ -7,12 +7,17 @@ from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
                 "/../n_joint_arm_3d/")
-from NLinkArm3d import NLinkArm
+try:
+    from NLinkArm3d import NLinkArm
+except ImportError:
+    raise
+
 show_animation = True
 verbose = False
 
+
 class RobotArm(NLinkArm):
-   def get_points(self, joint_angle_list):
+    def get_points(self, joint_angle_list):
         self.set_joint_angles(joint_angle_list)
 
         trans = self.transformation_matrix()
@@ -38,6 +43,7 @@ class RobotArm(NLinkArm):
             z_list.append(trans[2, 3])
 
         return x_list, y_list, z_list
+
 
 class RRTStar:
     """
@@ -86,7 +92,8 @@ class RRTStar:
         rrt star path planning
 
         animation: flag for animation on or off
-        search_until_max_iter: search until max iteration for path improving or not
+        search_until_max_iter: search until max iteration for path 
+	improving or not
         """
 
         self.node_list = [self.start]
@@ -223,8 +230,6 @@ class RRTStar:
         else:  # goal point sampling
             rnd = self.Node(self.end.x)
         return rnd
-
-
 
     def steer(self, from_node, to_node, extend_length=float("inf")):
         new_node = self.Node(list(from_node.x))
@@ -380,4 +385,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
