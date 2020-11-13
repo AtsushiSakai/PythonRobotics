@@ -20,6 +20,7 @@ class Test(TestCase):
         m.show_animation = False
         m.main()
 
+
 if __name__ == '__main__':  # pragma: no cover
     test = Test()
     test.test1()
