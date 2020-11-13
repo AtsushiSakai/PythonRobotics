@@ -2,11 +2,11 @@ from unittest import TestCase
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                "/../PathPlanning/Dijkstra/")
+                "/../PathPlanning/DepthFirstSearch/")
 
 
 try:
-    import dijkstra as m
+    import depth_first_search as m
 except ImportError:
     raise
 
