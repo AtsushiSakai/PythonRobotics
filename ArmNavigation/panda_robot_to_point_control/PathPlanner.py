@@ -103,8 +103,8 @@ class RRTStar:
             rnd = self.get_random_node()
             nearest_ind = self.get_nearest_node_index(self.node_list, rnd)
             new_node = self.steer(self.node_list[nearest_ind],
-				rnd,
-				self.expand_dis)
+                                  rnd,
+                                  self.expand_dis)
 
             if self.check_collision(new_node, self.robot, self.obstacle_list):
                 near_inds = self.find_near_nodes(new_node)
@@ -116,7 +116,7 @@ class RRTStar:
             if animation and i % 5 == 0 and self.dimension <= 3:
                 self.draw_graph(rnd)
 
-            if (not search_until_max_iter) and new_node:  # check reaching the goal
+            if (not search_until_max_iter) and new_node:
                 last_index = self.search_best_goal_node()
                 if last_index is not None:
                     return self.generate_final_course(last_index)
@@ -138,7 +138,9 @@ class RRTStar:
         for i in near_inds:
             near_node = self.node_list[i]
             t_node = self.steer(near_node, new_node)
-            if t_node and self.check_collision(t_node, self.robot, self.obstacle_list):
+            if t_node and self.check_collision(t_node,
+                                               self.robot,
+                                               self.obstacle_list):
                 costs.append(self.calc_new_cost(near_node, new_node))
             else:
                 costs.append(float("inf"))  # the cost of collision node
