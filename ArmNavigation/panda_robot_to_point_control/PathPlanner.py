@@ -3,13 +3,41 @@ import os
 import sys
 import random
 import numpy as np
-from NLinkArm3d import NLinkArm
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
-
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/../n_joint_arm_3d/")
+from NLinkArm3d import NLinkArm
 show_animation = True
 verbose = False
 
+class RobotArm(NLinkArm):
+   def get_points(self, joint_angle_list):
+        self.set_joint_angles(joint_angle_list)
+
+        trans = self.transformation_matrix()
+
+        x = trans[0, 3]
+        y = trans[1, 3]
+        z = trans[2, 3]
+        alpha, beta, gamma = self.euler_angle()
+
+        x_list = []
+        y_list = []
+        z_list = []
+
+        trans = np.identity(4)
+
+        x_list.append(trans[0, 3])
+        y_list.append(trans[1, 3])
+        z_list.append(trans[2, 3])
+        for i in range(len(self.link_list)):
+            trans = np.dot(trans, self.link_list[i].transformation_matrix())
+            x_list.append(trans[0, 3])
+            y_list.append(trans[1, 3])
+            z_list.append(trans[2, 3])
+
+        return x_list, y_list, z_list
 
 class RRTStar:
     """
@@ -307,7 +335,7 @@ def main():
     # init NLinkArm with Denavit-Hartenberg parameters of panda
     # https://frankaemika.github.io/docs/control_parameters.html
     # [theta, alpha, a, d]
-    panda = NLinkArm([[0., math.pi/2., 0., .333],
+    panda = RobotArm([[0., math.pi/2., 0., .333],
                       [0., -math.pi/2., 0., 0.],
                       [0., math.pi/2., 0.0825, 0.3160],
                       [0., -math.pi/2., -0.0825, 0.],
