@@ -313,7 +313,7 @@ class RRTStar:
         d = math.sqrt(dx**2 + dy**2 + dz**2)
         d = np.sqrt(np.sum((np.array(to_node.x) - np.array(from_node.x))**2))
         phi = math.atan2(dy, dx)
-        theta = math.atan2(math.hypot(dx,dy), dz)
+        theta = math.atan2(math.hypot(dx, dy), dz)
         return d, phi, theta
 
     @staticmethod
@@ -338,7 +338,10 @@ class RRTStar:
                 dx_list = [ox - x_point for x_point in x_list]
                 dy_list = [oy - y_point for y_point in y_list]
                 dz_list = [oz - z_point for z_point in z_list]
-                d_list = [dx * dx + dy * dy + dz * dz for (dx, dy, dz) in zip(dx_list, dy_list, dz_list)]
+                d_list = [dx * dx + dy * dy + dz * dz
+                          for (dx, dy, dz) in zip(dx_list,
+                                                  dy_list,
+                                                  dz_list)]
 
                 if min(d_list) <= size ** 2:
                     return False  # collision
@@ -365,8 +368,8 @@ def main():
         (.0, -.3, .7, .1),
         (.2, -.1, .3, .15),
     ]  # [x,y,size(radius)]
-    start=[0 for _ in range(len(panda.link_list))]
-    end=[1.5 for _ in range(len(panda.link_list))]
+    start = [0 for _ in range(len(panda.link_list))]
+    end = [1.5 for _ in range(len(panda.link_list))]
     # Set Initial parameters
     rrt_star = RRTStar(start=start,
                        goal=end,
@@ -393,7 +396,8 @@ def main():
                     color = "grey"
                 ax.plot([x for x in x_points],
                         [y for y in y_points],
-                        [z for z in z_points], "o-", color=color,  ms=4, mew=0.5)
+                        [z for z in z_points],
+                        "o-", color=color,  ms=4, mew=0.5)
                 plt.pause(0.01)
             plt.show()
 
