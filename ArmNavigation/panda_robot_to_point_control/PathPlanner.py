@@ -20,13 +20,6 @@ class RobotArm(NLinkArm):
     def get_points(self, joint_angle_list):
         self.set_joint_angles(joint_angle_list)
 
-        trans = self.transformation_matrix()
-
-        x = trans[0, 3]
-        y = trans[1, 3]
-        z = trans[2, 3]
-        alpha, beta, gamma = self.euler_angle()
-
         x_list = []
         y_list = []
         z_list = []
@@ -310,7 +303,6 @@ class RRTStar:
         dx = to_node.x[0] - from_node.x[0]
         dy = to_node.x[1] - from_node.x[1]
         dz = to_node.x[2] - from_node.x[2]
-        d = math.sqrt(dx**2 + dy**2 + dz**2)
         d = np.sqrt(np.sum((np.array(to_node.x) - np.array(from_node.x))**2))
         phi = math.atan2(dy, dx)
         theta = math.atan2(math.hypot(dx, dy), dz)
