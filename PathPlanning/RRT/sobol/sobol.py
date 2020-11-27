@@ -19,8 +19,6 @@ import math
 import sys
 import numpy as np
 
-# from numpy import np.bitwise_xor
-
 atmost = None
 dim_max = None
 dim_num_save = None
@@ -293,10 +291,6 @@ def i4_sobol(dim_num, seed):
     global recipd
     global seed_save
     global v
-
-    if 'initialized' is None:
-        initialized = 0
-        dim_num_save = -1
 
     if not initialized or dim_num != dim_num_save:
         initialized = 1
@@ -817,8 +811,8 @@ def r8mat_write(filename, m, n, a):
         Input, integer N, the number of columns in A.
 
         Input, real A(M,N), the matrix.
-
     """
+
     output = open(filename, 'w')
 
     for i in range(0, m):

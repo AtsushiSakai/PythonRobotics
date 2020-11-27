@@ -1,15 +1,35 @@
 """
 
 Path planning Sample Code with Randomized Rapidly-Exploring Random
-Trees with sobol sampler(RRTSobol)
+Trees with sobol low discrepancy sampler(RRTSobol).
+Sobol wiki https://en.wikipedia.org/wiki/Sobol_sequence
 
-author: AtsushiSakai(@Atsushi_twi)
+The goal of low discrepancy samplers is to generate a sequence of points that
+optimizes a criterion called dispersion.  Intuitively, the idea is to place
+samples to cover the exploration space in a way that makes the largest
+uncovered area be as small as possible.  This generalizes of the idea of grid
+resolution.  For a grid, the resolution may be selected by defining the step
+size for each axis.  As the step size is decreased, the resolution increases.
+If a grid-based motion planning algorithm can increase the resolution
+arbitrarily, it becomes resolution complete.  Dispersion can be considered as a
+powerful generalization of the notion of resolution.
+
+Taken from
+LaValle, Steven M. Planning algorithms. Cambridge university press, 2006.
+
+
+authors:
+    First implementation AtsushiSakai(@Atsushi_twi)
+    Sobol sampler Rafael A.
+Rojas (rafaelrojasmiliani@gmail.com)
+
 
 """
 
 import math
 import random
 from sobol import sobol_quasirand
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -48,7 +68,7 @@ class RRTSobol:
 
         start:Start Position [x,y]
         goal:Goal Position [x,y]
-        obstacleList:obstacle Positions [[x,y,size],...]
+        obstacle_list:obstacle Positions [[x,y,size],...]
         randArea:Random Sampling Area [min,max]
 
         """
@@ -160,7 +180,7 @@ class RRTSobol:
         # for stopping simulation with the esc key.
         plt.gcf().canvas.mpl_connect(
             'key_release_event',
-            lambda event: [exit(0) if event.key == 'escape' else None])
+            lambda event: [sys.exit(0) if event.key == 'escape' else None])
         if rnd is not None:
             plt.plot(rnd.x, rnd.y, "^k")
         for node in self.node_list:
@@ -194,12 +214,12 @@ class RRTSobol:
         return minind
 
     @staticmethod
-    def check_collision(node, obstacleList):
+    def check_collision(node, obstacle_list):
 
         if node is None:
             return False
 
-        for (ox, oy, size) in obstacleList:
+        for (ox, oy, size) in obstacle_list:
             dx_list = [ox - x for x in node.path_x]
             dy_list = [oy - y for y in node.path_y]
             d_list = [dx * dx + dy * dy for (dx, dy) in zip(dx_list, dy_list)]
@@ -222,14 +242,14 @@ def main(gx=6.0, gy=10.0):
     print("start " + __file__)
 
     # ====Search Path with RRTSobol====
-    obstacleList = [(5, 5, 1), (3, 6, 2), (3, 8, 2), (3, 10, 2), (7, 5, 2),
-                    (9, 5, 2), (8, 10, 1)]  # [x, y, radius]
+    obstacle_list = [(5, 5, 1), (3, 6, 2), (3, 8, 2), (3, 10, 2), (7, 5, 2),
+                     (9, 5, 2), (8, 10, 1)]  # [x, y, radius]
     # Set Initial parameters
     rrt = RRTSobol(
         start=[0, 0],
         goal=[gx, gy],
         rand_area=[-2, 15],
-        obstacle_list=obstacleList)
+        obstacle_list=obstacle_list)
     path = rrt.planning(animation=show_animation)
 
     if path is None:
