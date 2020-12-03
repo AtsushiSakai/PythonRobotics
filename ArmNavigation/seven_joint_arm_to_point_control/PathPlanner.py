@@ -348,12 +348,12 @@ def main():
     # https://frankaemika.github.io/docs/control_parameters.html
     # [theta, alpha, a, d]
     seven_joint_arm = RobotArm([[0., math.pi/2., 0., .333],
-                      [0., -math.pi/2., 0., 0.],
-                      [0., math.pi/2., 0.0825, 0.3160],
-                      [0., -math.pi/2., -0.0825, 0.],
-                      [0., math.pi/2., 0., 0.3840],
-                      [0., math.pi/2., 0.088, 0.],
-                      [0., 0., 0., 0.107]])
+                                [0., -math.pi/2., 0., 0.],
+                                [0., math.pi/2., 0.0825, 0.3160],
+                                [0., -math.pi/2., -0.0825, 0.],
+                                [0., math.pi/2., 0., 0.3840],
+                                [0., math.pi/2., 0.088, 0.],
+                                [0., 0., 0., 0.107]])
     # ====Search Path with RRT====
     obstacle_list = [
         (-.3, -.3, .7, .1),
