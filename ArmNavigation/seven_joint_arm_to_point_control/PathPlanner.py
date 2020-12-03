@@ -347,7 +347,7 @@ def main():
     # init NLinkArm with Denavit-Hartenberg parameters of panda
     # https://frankaemika.github.io/docs/control_parameters.html
     # [theta, alpha, a, d]
-    panda = RobotArm([[0., math.pi/2., 0., .333],
+    seven_joint_arm = RobotArm([[0., math.pi/2., 0., .333],
                       [0., -math.pi/2., 0., 0.],
                       [0., math.pi/2., 0.0825, 0.3160],
                       [0., -math.pi/2., -0.0825, 0.],
@@ -360,14 +360,14 @@ def main():
         (.0, -.3, .7, .1),
         (.2, -.1, .3, .15),
     ]  # [x,y,size(radius)]
-    start = [0 for _ in range(len(panda.link_list))]
-    end = [1.5 for _ in range(len(panda.link_list))]
+    start = [0 for _ in range(len(seven_joint_arm.link_list))]
+    end = [1.5 for _ in range(len(seven_joint_arm.link_list))]
     # Set Initial parameters
     rrt_star = RRTStar(start=start,
                        goal=end,
                        rand_area=[0, 2],
                        max_iter=200,
-                       robot=panda,
+                       robot=seven_joint_arm,
                        obstacle_list=obstacle_list)
     path = rrt_star.planning(animation=show_animation,
                              search_until_max_iter=False)
@@ -381,7 +381,7 @@ def main():
         if show_animation:
             ax = rrt_star.draw_graph()
             for i, q in enumerate(reversed(path)):
-                x_points, y_points, z_points = panda.get_points(q)
+                x_points, y_points, z_points = seven_joint_arm.get_points(q)
                 if i == 0 or i == len(path) - 1:
                     color = None
                 else:
