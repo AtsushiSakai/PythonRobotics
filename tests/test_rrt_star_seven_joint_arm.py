@@ -3,7 +3,7 @@ import sys
 from unittest import TestCase
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                "/../ArmNavigation/panda_robot_to_point_control/")
+                "/../ArmNavigation/seven_joint_arm_to_point_control/")
 
 try:
     import PathPlanner as m
