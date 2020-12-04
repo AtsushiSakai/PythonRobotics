@@ -1,3 +1,7 @@
+"""
+RRT* path planner for a seven joint arm
+Author: Mahyar Abdeetedal (mahyaret)
+"""
 import math
 import os
 import sys
@@ -79,6 +83,7 @@ class RRTStar:
         self.connect_circle_dist = connect_circle_dist
         self.goal_node = self.Node(goal)
         self.ax = plt.axes(projection='3d')
+        self.node_list = []
 
     def planning(self, animation=False, search_until_max_iter=False):
         """

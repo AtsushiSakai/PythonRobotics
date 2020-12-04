@@ -6,7 +6,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
                 "/../ArmNavigation/seven_joint_arm_to_point_control/")
 
 try:
-    import PathPlanner as m
+    import rrt_star_seven_joint_arm as m
 except ImportError:
     raise
 
