@@ -48,7 +48,7 @@ def icp_matching(previous_points, current_points):
         indexes, error = nearest_neighbor_association(previous_points, current_points)
         Rt, Tt = svd_motion_estimation(previous_points[:, indexes], current_points)
 
-        if dError < 0:  # if negative error prevent matrix H changing, exit loop
+        if dError < 0:  # prevent matrix H changing, exit loop
             print("Converge", preError, dError, count)
             break
 
