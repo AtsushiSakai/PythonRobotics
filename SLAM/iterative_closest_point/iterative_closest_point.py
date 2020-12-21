@@ -27,8 +27,8 @@ def icp_matching(previous_points, current_points):
     """
     H = None  # homogeneous transformation matrix
 
-    dError = 1000.0
-    preError = 1000.0
+    dError = np.inf
+    preError = np.inf
     count = 0
 
     while dError >= EPS:
@@ -48,6 +48,10 @@ def icp_matching(previous_points, current_points):
         indexes, error = nearest_neighbor_association(previous_points, current_points)
         Rt, Tt = svd_motion_estimation(previous_points[:, indexes], current_points)
 
+        if dError < 0: # if negative error prevent matrix H changing, exit loop
+            print("Converge", preError, dError, count)
+            break
+
         # update current points
         current_points = (Rt @ current_points) + Tt[:, np.newaxis]
 
@@ -57,7 +61,7 @@ def icp_matching(previous_points, current_points):
         preError = error
         print("Residual:", error)
 
-        if dError <= EPS:
+        if dError <= EPS and dError >= 0:
             print("Converge", error, dError, count)
             break
         elif MAX_ITER <= count:
