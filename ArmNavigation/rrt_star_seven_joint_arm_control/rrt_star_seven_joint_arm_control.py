@@ -224,7 +224,7 @@ class RRTStar:
             path.append(node.x)
             node = node.parent
         path.append(node.x)
-
+        reversed(path)
         return path
 
     def calc_dist_to_goal(self, x):
@@ -385,17 +385,22 @@ def main():
         # Draw final path
         if show_animation:
             ax = rrt_star.draw_graph()
-            for i, q in enumerate(reversed(path)):
+
+            # Plot final configuration
+            x_points, y_points, z_points = seven_joint_arm.get_points(path[-1])
+            ax.plot([x for x in x_points],
+                    [y for y in y_points],
+                    [z for z in z_points],
+                    "o-", color="red", ms=5, mew=0.5)
+
+            for i, q in enumerate(path):
                 x_points, y_points, z_points = seven_joint_arm.get_points(q)
-                if i == 0 or i == len(path) - 1:
-                    color = None
-                else:
-                    color = "grey"
                 ax.plot([x for x in x_points],
                         [y for y in y_points],
                         [z for z in z_points],
-                        "o-", color=color,  ms=4, mew=0.5)
+                        "o-", color="grey",  ms=4, mew=0.5)
                 plt.pause(0.01)
+
             plt.show()
 
 

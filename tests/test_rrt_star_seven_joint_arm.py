@@ -3,10 +3,10 @@ import sys
 from unittest import TestCase
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                "/../ArmNavigation/seven_joint_arm_to_point_control/")
+                "/../ArmNavigation/rrt_star_seven_joint_arm_control/")
 
 try:
-    import rrt_star_seven_joint_arm as m
+    import rrt_star_seven_joint_arm_control as m
 except ImportError:
     raise
 
