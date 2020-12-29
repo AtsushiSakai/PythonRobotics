@@ -40,9 +40,9 @@ install:
 #  - conda info -a
 #  - conda env create -f C:\\projects\pythonrobotics\environment.yml
 #  - activate python_robotics
-  - python -m pip install --upgrade pip
-  - pip install numpy
-  - python -m pip install -r requirements.txt
+  - "python -m pip install --upgrade pip"
+  - "pip install numpy"
+  - "python -m pip install -r requirements.txt"
 
   # Check that we have the expected version and architecture for Python
   - "python --version"

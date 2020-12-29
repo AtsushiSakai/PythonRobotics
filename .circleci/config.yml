@@ -10,6 +10,7 @@ jobs:
     steps:
       - checkout
       - python/load-cache
+      - run: pip install numpy
       - python/install-deps
       - python/save-cache
       - run: pip install sphinx sphinx-autobuild sphinx-rtd-theme
