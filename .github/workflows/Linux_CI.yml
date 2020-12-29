@@ -23,7 +23,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        cat requirements.txt | xargs pip install
+        pip install numpy
+        python -m pip install -r requirements.txt
     - name: install coverage
       run: pip install coverage
     - name: install mypy
