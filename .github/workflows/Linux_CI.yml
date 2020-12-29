@@ -23,7 +23,6 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-#        python -m pip install -r requirements.txt
         cat requirements.txt | xargs pip install
     - name: install coverage
       run: pip install coverage
