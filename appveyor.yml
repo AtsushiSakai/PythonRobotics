@@ -9,7 +9,7 @@ environment:
 
   matrix:
      - MINICONDA: C:\Python39-x64
-      PYTHON_VERSION: "3.9"
+     - PYTHON_VERSION: "3.9"
 
 init:
   - "ECHO %MINICONDA% %PYTHON_VERSION% %PYTHON_ARCH%"
