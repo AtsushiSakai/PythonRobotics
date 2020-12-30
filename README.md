@@ -92,7 +92,7 @@ See this paper for more details:
 
 # Requirements
 
-- Python 3.8.x
+- Python 3.9.x
 
 - numpy
 

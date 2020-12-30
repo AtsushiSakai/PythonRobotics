@@ -8,11 +8,10 @@ environment:
     CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
 
   matrix:
-    - MINICONDA: C:\Miniconda38-x64
-      PYTHON_VERSION: "3.8"
+     - PYTHON_DIR: C:\Python39-x64
 
 init:
-  - "ECHO %MINICONDA% %PYTHON_VERSION% %PYTHON_ARCH%"
+  - "ECHO %PYTHON_DIR%"
 
 install:
   # If there is a newer build queued for the same PR, cancel this one.
@@ -30,15 +29,12 @@ install:
   # Prepend newly installed Python to the PATH of this build (this cannot be
   # done from inside the powershell script as it would require to restart
   # the parent CMD process).
-  - SET PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%
+  - SET PATH=%PYTHON_DIR%;%PYTHON_DIR%\\Scripts;%PATH%
   - SET PATH=%PYTHON%;%PYTHON%\Scripts;%PYTHON%\Library\bin;%PATH%
   - SET PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin
-  - conda config --set always_yes yes --set changeps1 no
-  - conda config --append channels conda-forge
-  - conda update -q conda
-  - conda info -a
-  - conda env create -f C:\\projects\pythonrobotics\environment.yml
-  - activate python_robotics
+  - "python -m pip install --upgrade pip"
+  - "pip install numpy" # TODO: remove this line after osqp wheel released
+  - "python -m pip install -r requirements.txt"
 
   # Check that we have the expected version and architecture for Python
   - "python --version"

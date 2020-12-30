@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8']
+        python-version: ['3.9']
 
     name: Python ${{ matrix.python-version }} CI
 
@@ -21,9 +21,11 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
+      # TODO: remove numpy installation after fix cvxpy install issue
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install numpy
+        python -m pip install -r requirements.txt
     - name: install coverage
       run: pip install coverage
     - name: install mypy
