@@ -25,7 +25,7 @@ See this paper for more details:
 Requirements
 -------------
 
--  Python 3.6.x
+-  Python 3.9.x
 -  numpy
 -  scipy
 -  matplotlib

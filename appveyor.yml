@@ -11,7 +11,7 @@ environment:
      - PYTHON_DIR: C:\Python39-x64
 
 init:
-  - "ECHO %PYTHON_DIR% %PYTHON_VERSION% %PYTHON_ARCH%"
+  - "ECHO %PYTHON_DIR%"
 
 install:
   # If there is a newer build queued for the same PR, cancel this one.
