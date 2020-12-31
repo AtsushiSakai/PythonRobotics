@@ -64,6 +64,9 @@ class NLinkArm:
         alpha, beta, gamma = self.euler_angle()
 
         if plot:
+            self.fig = plt.figure()
+            self.ax = Axes3D(self.fig)
+
             x_list = []
             y_list = []
             z_list = []
