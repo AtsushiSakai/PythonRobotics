@@ -48,13 +48,15 @@ def two_joint_arm(GOAL_TH=0.0, theta1=0.0, theta2=0.0):
             else:
                 theta2_goal = np.arccos(
                     (x**2 + y**2 - l1**2 - l2**2) / (2 * l1 * l2))
-            theta1_goal = np.math.atan2(y, x) - np.math.atan2(l2 *
-                                                              np.sin(theta2_goal), (l1 + l2 * np.cos(theta2_goal)))
+            tmp = np.math.atan2(l2 * np.sin(theta2_goal),
+                                (l1 + l2 * np.cos(theta2_goal)))
+            theta1_goal = np.math.atan2(y, x) - tmp
 
             if theta1_goal < 0:
                 theta2_goal = -theta2_goal
-                theta1_goal = np.math.atan2(
-                    y, x) - np.math.atan2(l2 * np.sin(theta2_goal), (l1 + l2 * np.cos(theta2_goal)))
+                tmp = np.math.atan2(l2 * np.sin(theta2_goal),
+                                    (l1 + l2 * np.cos(theta2_goal)))
+                theta1_goal = np.math.atan2(y, x) - tmp
 
             theta1 = theta1 + Kp * ang_diff(theta1_goal, theta1) * dt
             theta2 = theta2 + Kp * ang_diff(theta2_goal, theta2) * dt

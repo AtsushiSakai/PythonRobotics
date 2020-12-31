@@ -1,13 +1,13 @@
 """
 
-\eta^3 polynomials trajectory planner
+eta^3 polynomials trajectory planner
 
 author: Joe Dinius, Ph.D (https://jwdinius.github.io)
         Atsushi Sakai (@Atsushi_twi)
 
 Refs:
 - https://jwdinius.github.io/blog/2018/eta3traj
-- [\eta^3-Splines for the Smooth Path Generation of Wheeled Mobile Robots](https://ieeexplore.ieee.org/document/4339545/)
+- [eta^3-Splines for the Smooth Path Generation of Wheeled Mobile Robots](https://ieeexplore.ieee.org/document/4339545/)
 
 """
 
@@ -20,7 +20,7 @@ sys.path.append(os.path.relpath("../Eta3SplinePath"))
 
 try:
     from eta3_spline_path import Eta3Path, Eta3PathSegment
-except:
+except ImportError:
     raise
 
 show_animation = True
@@ -41,7 +41,7 @@ class eta3_trajectory(Eta3Path):
     """
 
     def __init__(self, segments, max_vel, v0=0.0, a0=0.0, max_accel=2.0, max_jerk=5.0):
-       # ensure that all inputs obey the assumptions of the model
+        # ensure that all inputs obey the assumptions of the model
         assert max_vel > 0 and v0 >= 0 and a0 >= 0 and max_accel > 0 and max_jerk > 0 \
             and a0 <= max_accel and v0 <= max_vel
         super(eta3_trajectory, self).__init__(segments=segments)
@@ -61,7 +61,7 @@ class eta3_trajectory(Eta3Path):
         self.prev_seg_id = 0
 
     def velocity_profile(self):
-        '''                   /~~~~~----------------~~~~~\
+        """                   /~~~~~----------------~~~~~\
                              /                            \
                             /                              \
                            /                                \
@@ -73,7 +73,7 @@ class eta3_trajectory(Eta3Path):
                      max |max.|max.|     max.       |max.| max. |max.
                      jerk|acc.|jerk|    velocity    |jerk| acc. |jerk
             index     0    1    2      3 (optional)   4     5     6
-        '''
+        """
         # delta_a: accel change from initial position to end of maximal jerk section
         delta_a = self.max_accel - self.a0
         # t_s1: time of traversal of maximal jerk section
@@ -195,7 +195,7 @@ class eta3_trajectory(Eta3Path):
 
         def fprime(u):
             return self.segments[seg_id].s_dot(u)
-        while (ui >= 0 and ui <= 1) and abs(f(ui)) > tol:
+        while (0 <= ui <= 1) and abs(f(ui)) > tol:
             ui -= f(ui) / fprime(ui)
         ui = max(0, min(ui, 1))
         return ui

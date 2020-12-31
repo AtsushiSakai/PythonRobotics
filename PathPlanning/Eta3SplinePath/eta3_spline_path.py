@@ -15,7 +15,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import quad
 
-# NOTE: *_pose is a 3-array: 0 - x coord, 1 - y coord, 2 - orientation angle \theta
+# NOTE: *_pose is a 3-array:
+# 0 - x coord, 1 - y coord, 2 - orientation angle \theta
 
 show_animation = True
 
@@ -59,9 +60,9 @@ class Eta3Path(object):
 
 class Eta3PathSegment(object):
     """
-    Eta3PathSegment - constructs an eta^3 path segment based on desired shaping, eta, and curvature vector, kappa.
-                        If either, or both, of eta and kappa are not set during initialization, they will
-                        default to zeros.
+    Eta3PathSegment - constructs an eta^3 path segment based on desired shaping,
+     eta, and curvature vector, kappa. If either, or both, of eta and kappa are
+     not set during initialization, they will default to zeros.
 
     input
         start_pose - starting pose array  (x, y, \theta)
@@ -110,52 +111,78 @@ class Eta3PathSegment(object):
         self.coeffs[1, 3] = 1. / 6 * eta[4] * sa + 1. / 6 * \
             (eta[0]**3 * kappa[1] + 3. * eta[0] * eta[2] * kappa[0]) * ca
         # quartic (u^4)
-        self.coeffs[0, 4] = 35. * (end_pose[0] - start_pose[0]) - (20. * eta[0] + 5 * eta[2] + 2. / 3 * eta[4]) * ca \
-            + (5. * eta[0]**2 * kappa[0] + 2. / 3 * eta[0]**3 * kappa[1] + 2. * eta[0] * eta[2] * kappa[0]) * sa \
-            - (15. * eta[1] - 5. / 2 * eta[3] + 1. / 6 * eta[5]) * cb \
-            - (5. / 2 * eta[1]**2 * kappa[2] - 1. / 6 * eta[1] **
-               3 * kappa[3] - 1. / 2 * eta[1] * eta[3] * kappa[2]) * sb
-        self.coeffs[1, 4] = 35. * (end_pose[1] - start_pose[1]) - (20. * eta[0] + 5. * eta[2] + 2. / 3 * eta[4]) * sa \
-            - (5. * eta[0]**2 * kappa[0] + 2. / 3 * eta[0]**3 * kappa[1] + 2. * eta[0] * eta[2] * kappa[0]) * ca \
-            - (15. * eta[1] - 5. / 2 * eta[3] + 1. / 6 * eta[5]) * sb \
-            + (5. / 2 * eta[1]**2 * kappa[2] - 1. / 6 * eta[1] **
-               3 * kappa[3] - 1. / 2 * eta[1] * eta[3] * kappa[2]) * cb
+        tmp1 = 35. * (end_pose[0] - start_pose[0])
+        tmp2 = (20. * eta[0] + 5 * eta[2] + 2. / 3 * eta[4]) * ca
+        tmp3 = (5. * eta[0] ** 2 * kappa[0] + 2. / 3 * eta[0] ** 3 * kappa[1]
+                + 2. * eta[0] * eta[2] * kappa[0]) * sa
+        tmp4 = (15. * eta[1] - 5. / 2 * eta[3] + 1. / 6 * eta[5]) * cb
+        tmp5 = (5. / 2 * eta[1] ** 2 * kappa[2] - 1. / 6 * eta[1] ** 3 *
+                kappa[3] - 1. / 2 * eta[1] * eta[3] * kappa[2]) * sb
+        self.coeffs[0, 4] = tmp1 - tmp2 + tmp3 - tmp4 - tmp5
+        tmp1 = 35. * (end_pose[1] - start_pose[1])
+        tmp2 = (20. * eta[0] + 5. * eta[2] + 2. / 3 * eta[4]) * sa
+        tmp3 = (5. * eta[0] ** 2 * kappa[0] + 2. / 3 * eta[0] ** 3 * kappa[1]
+                + 2. * eta[0] * eta[2] * kappa[0]) * ca
+        tmp4 = (15. * eta[1] - 5. / 2 * eta[3] + 1. / 6 * eta[5]) * sb
+        tmp5 = (5. / 2 * eta[1] ** 2 * kappa[2] - 1. / 6 * eta[1] ** 3 *
+                kappa[3] - 1. / 2 * eta[1] * eta[3] * kappa[2]) * cb
+        self.coeffs[1, 4] = tmp1 - tmp2 - tmp3 - tmp4 + tmp5
         # quintic (u^5)
-        self.coeffs[0, 5] = -84. * (end_pose[0] - start_pose[0]) + (45. * eta[0] + 10. * eta[2] + eta[4]) * ca \
-            - (10. * eta[0]**2 * kappa[0] + eta[0]**3 * kappa[1] + 3. * eta[0] * eta[2] * kappa[0]) * sa \
-            + (39. * eta[1] - 7. * eta[3] + 1. / 2 * eta[5]) * cb \
-            + (7. * eta[1]**2 * kappa[2] - 1. / 2 * eta[1]**3 *
-               kappa[3] - 3. / 2 * eta[1] * eta[3] * kappa[2]) * sb
-        self.coeffs[1, 5] = -84. * (end_pose[1] - start_pose[1]) + (45. * eta[0] + 10. * eta[2] + eta[4]) * sa \
-            + (10. * eta[0]**2 * kappa[0] + eta[0]**3 * kappa[1] + 3. * eta[0] * eta[2] * kappa[0]) * ca \
-            + (39. * eta[1] - 7. * eta[3] + 1. / 2 * eta[5]) * sb \
-            - (7. * eta[1]**2 * kappa[2] - 1. / 2 * eta[1]**3 *
-               kappa[3] - 3. / 2 * eta[1] * eta[3] * kappa[2]) * cb
+        tmp1 = -84. * (end_pose[0] - start_pose[0])
+        tmp2 = (45. * eta[0] + 10. * eta[2] + eta[4]) * ca
+        tmp3 = (10. * eta[0] ** 2 * kappa[0] + eta[0] ** 3 * kappa[1] + 3. *
+                eta[0] * eta[2] * kappa[0]) * sa
+        tmp4 = (39. * eta[1] - 7. * eta[3] + 1. / 2 * eta[5]) * cb
+        tmp5 = + (7. * eta[1] ** 2 * kappa[2] - 1. / 2 * eta[1] ** 3 * kappa[3]
+                  - 3. / 2 * eta[1] * eta[3] * kappa[2]) * sb
+        self.coeffs[0, 5] = tmp1 + tmp2 - tmp3 + tmp4 + tmp5
+        tmp1 = -84. * (end_pose[1] - start_pose[1])
+        tmp2 = (45. * eta[0] + 10. * eta[2] + eta[4]) * sa
+        tmp3 = (10. * eta[0] ** 2 * kappa[0] + eta[0] ** 3 * kappa[1] + 3. *
+                eta[0] * eta[2] * kappa[0]) * ca
+        tmp4 = (39. * eta[1] - 7. * eta[3] + 1. / 2 * eta[5]) * sb
+        tmp5 = - (7. * eta[1] ** 2 * kappa[2] - 1. / 2 * eta[1] ** 3 * kappa[3]
+                  - 3. / 2 * eta[1] * eta[3] * kappa[2]) * cb
+        self.coeffs[1, 5] = tmp1 + tmp2 + tmp3 + tmp4 + tmp5
         # sextic (u^6)
-        self.coeffs[0, 6] = 70. * (end_pose[0] - start_pose[0]) - (36. * eta[0] + 15. / 2 * eta[2] + 2. / 3 * eta[4]) * ca \
-            + (15. / 2 * eta[0]**2 * kappa[0] + 2. / 3 * eta[0]**3 * kappa[1] + 2. * eta[0] * eta[2] * kappa[0]) * sa \
-            - (34. * eta[1] - 13. / 2 * eta[3] + 1. / 2 * eta[5]) * cb \
-            - (13. / 2 * eta[1]**2 * kappa[2] - 1. / 2 * eta[1] **
-               3 * kappa[3] - 3. / 2 * eta[1] * eta[3] * kappa[2]) * sb
-        self.coeffs[1, 6] = 70. * (end_pose[1] - start_pose[1]) - (36. * eta[0] + 15. / 2 * eta[2] + 2. / 3 * eta[4]) * sa \
-            - (15. / 2 * eta[0]**2 * kappa[0] + 2. / 3 * eta[0]**3 * kappa[1] + 2. * eta[0] * eta[2] * kappa[0]) * ca \
-            - (34. * eta[1] - 13. / 2 * eta[3] + 1. / 2 * eta[5]) * sb \
-            + (13. / 2 * eta[1]**2 * kappa[2] - 1. / 2 * eta[1] **
-               3 * kappa[3] - 3. / 2 * eta[1] * eta[3] * kappa[2]) * cb
+        tmp1 = 70. * (end_pose[0] - start_pose[0])
+        tmp2 = (36. * eta[0] + 15. / 2 * eta[2] + 2. / 3 * eta[4]) * ca
+        tmp3 = + (15. / 2 * eta[0] ** 2 * kappa[0] + 2. / 3 * eta[0] ** 3 *
+                  kappa[1] + 2. * eta[0] * eta[2] * kappa[0]) * sa
+        tmp4 = (34. * eta[1] - 13. / 2 * eta[3] + 1. / 2 * eta[5]) * cb
+        tmp5 = - (13. / 2 * eta[1] ** 2 * kappa[2] - 1. / 2 * eta[1] ** 3 *
+                  kappa[3] - 3. / 2 * eta[1] * eta[3] * kappa[2]) * sb
+        self.coeffs[0, 6] = tmp1 - tmp2 + tmp3 - tmp4 + tmp5
+        tmp1 = 70. * (end_pose[1] - start_pose[1])
+        tmp2 = - (36. * eta[0] + 15. / 2 * eta[2] + 2. / 3 * eta[4]) * sa
+        tmp3 = - (15. / 2 * eta[0] ** 2 * kappa[0] + 2. / 3 * eta[0] ** 3 *
+                  kappa[1] + 2. * eta[0] * eta[2] * kappa[0]) * ca
+        tmp4 = - (34. * eta[1] - 13. / 2 * eta[3] + 1. / 2 * eta[5]) * sb
+        tmp5 = + (13. / 2 * eta[1] ** 2 * kappa[2] - 1. / 2 * eta[1] ** 3 *
+                  kappa[3] - 3. / 2 * eta[1] * eta[3] * kappa[2]) * cb
+        self.coeffs[1, 6] = tmp1 + tmp2 + tmp3 + tmp4 + tmp5
         # septic (u^7)
-        self.coeffs[0, 7] = -20. * (end_pose[0] - start_pose[0]) + (10. * eta[0] + 2. * eta[2] + 1. / 6 * eta[4]) * ca \
-            - (2. * eta[0]**2 * kappa[0] + 1. / 6 * eta[0]**3 * kappa[1] + 1. / 2 * eta[0] * eta[2] * kappa[0]) * sa \
-            + (10. * eta[1] - 2. * eta[3] + 1. / 6 * eta[5]) * cb \
-            + (2. * eta[1]**2 * kappa[2] - 1. / 6 * eta[1]**3 *
-               kappa[3] - 1. / 2 * eta[1] * eta[3] * kappa[2]) * sb
-        self.coeffs[1, 7] = -20. * (end_pose[1] - start_pose[1]) + (10. * eta[0] + 2. * eta[2] + 1. / 6 * eta[4]) * sa \
-            + (2. * eta[0]**2 * kappa[0] + 1. / 6 * eta[0]**3 * kappa[1] + 1. / 2 * eta[0] * eta[2] * kappa[0]) * ca \
-            + (10. * eta[1] - 2. * eta[3] + 1. / 6 * eta[5]) * sb \
-            - (2. * eta[1]**2 * kappa[2] - 1. / 6 * eta[1]**3 *
-               kappa[3] - 1. / 2 * eta[1] * eta[3] * kappa[2]) * cb
+        tmp1 = -20. * (end_pose[0] - start_pose[0])
+        tmp2 = (10. * eta[0] + 2. * eta[2] + 1. / 6 * eta[4]) * ca
+        tmp3 = - (2. * eta[0] ** 2 * kappa[0] + 1. / 6 * eta[0] ** 3 * kappa[1]
+                  + 1. / 2 * eta[0] * eta[2] * kappa[0]) * sa
+        tmp4 = (10. * eta[1] - 2. * eta[3] + 1. / 6 * eta[5]) * cb
+        tmp5 = (2. * eta[1] ** 2 * kappa[2] - 1. / 6 * eta[1] ** 3 * kappa[3]
+                - 1. / 2 * eta[1] * eta[3] * kappa[2]) * sb
+        self.coeffs[0, 7] = tmp1 + tmp2 + tmp3 + tmp4 + tmp5
 
-        self.s_dot = lambda u: max(np.linalg.norm(self.coeffs[:, 1:].dot(np.array(
-            [1, 2. * u, 3. * u**2, 4. * u**3, 5. * u**4, 6. * u**5, 7. * u**6]))), 1e-6)
+        tmp1 = -20. * (end_pose[1] - start_pose[1])
+        tmp2 = (10. * eta[0] + 2. * eta[2] + 1. / 6 * eta[4]) * sa
+        tmp3 = (2. * eta[0] ** 2 * kappa[0] + 1. / 6 * eta[0] ** 3 * kappa[1]
+                + 1. / 2 * eta[0] * eta[2] * kappa[0]) * ca
+        tmp4 = (10. * eta[1] - 2. * eta[3] + 1. / 6 * eta[5]) * sb
+        tmp5 = - (2. * eta[1] ** 2 * kappa[2] - 1. / 6 * eta[1] ** 3 * kappa[3]
+                  - 1. / 2 * eta[1] * eta[3] * kappa[2]) * cb
+        self.coeffs[1, 7] = tmp1 + tmp2 + tmp3 + tmp4 + tmp5
+        self.s_dot = lambda u: max(np.linalg.norm(
+            self.coeffs[:, 1:].dot(np.array(
+                [1, 2. * u, 3. * u**2, 4. * u**3,
+                 5. * u**4, 6. * u**5, 7. * u**6]))), 1e-6)
         self.f_length = lambda ue: quad(lambda u: self.s_dot(u), 0, ue)
         self.segment_length = self.f_length(1)[0]
 
