@@ -103,6 +103,8 @@ See this paper for more details:
 - pandas
 
 - [cvxpy](https://www.cvxpy.org/index.html) 
+  
+- pytest (only for unit tests)
 
 # Documentation
 

@@ -1,7 +1,7 @@
 <!-- 
 Thanks for contributing a pull request! 
 Please ensure that your PR satisfies the checklist before submitting:
-- [] This project only accept codes for python 3.8 or higher.
+- [] This project only accept codes for python 3.9 or higher.
 - [] If you add a new algorithm sample code, please add a unit test file under `test` dir.
      This sample test code might help you : https://github.com/AtsushiSakai/PythonRobotics/blob/master/tests/test_a_star.py
 - [] If you fix a bug of existing code please add a test function in the test code to show the issue was solved.

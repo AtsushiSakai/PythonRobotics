@@ -1,13 +1,14 @@
 """
 
-\eta^3 polynomials trajectory planner
+eta^3 polynomials trajectory planner
 
 author: Joe Dinius, Ph.D (https://jwdinius.github.io)
         Atsushi Sakai (@Atsushi_twi)
 
 Refs:
 - https://jwdinius.github.io/blog/2018/eta3traj
-- [\eta^3-Splines for the Smooth Path Generation of Wheeled Mobile Robots](https://ieeexplore.ieee.org/document/4339545/)
+- [eta^3-Splines for the Smooth Path Generation of Wheeled Mobile Robots]
+(https://ieeexplore.ieee.org/document/4339545/)
 
 """
 
@@ -19,8 +20,8 @@ import os
 sys.path.append(os.path.relpath("../Eta3SplinePath"))
 
 try:
-    from eta3_spline_path import eta3_path, eta3_path_segment
-except:
+    from eta3_spline_path import Eta3Path, Eta3PathSegment
+except ImportError:
     raise
 
 show_animation = True
@@ -32,7 +33,7 @@ class MaxVelocityNotReached(Exception):
             actual_vel, max_vel)
 
 
-class eta3_trajectory(eta3_path):
+class eta3_trajectory(Eta3Path):
     """
     eta3_trajectory
 
@@ -41,7 +42,7 @@ class eta3_trajectory(eta3_path):
     """
 
     def __init__(self, segments, max_vel, v0=0.0, a0=0.0, max_accel=2.0, max_jerk=5.0):
-       # ensure that all inputs obey the assumptions of the model
+        # ensure that all inputs obey the assumptions of the model
         assert max_vel > 0 and v0 >= 0 and a0 >= 0 and max_accel > 0 and max_jerk > 0 \
             and a0 <= max_accel and v0 <= max_vel
         super(eta3_trajectory, self).__init__(segments=segments)
@@ -61,19 +62,19 @@ class eta3_trajectory(eta3_path):
         self.prev_seg_id = 0
 
     def velocity_profile(self):
-        '''                   /~~~~~----------------~~~~~\
-                             /                            \
-                            /                              \
-                           /                                \
-                          /                                  \
-        (v=v0, a=a0) ~~~~~                                    \
-                                                               \
-                                                                \~~~~~ (vf=0, af=0)
+        r"""                  /~~~~~----------------\
+                             /                       \
+                            /                         \
+                           /                           \
+                          /                             \
+        (v=v0, a=a0) ~~~~~                               \
+                                                          \
+                                                           \ ~~~~~ (vf=0, af=0)
                      pos.|pos.|neg.|   cruise at    |neg.| neg. |neg.
                      max |max.|max.|     max.       |max.| max. |max.
                      jerk|acc.|jerk|    velocity    |jerk| acc. |jerk
             index     0    1    2      3 (optional)   4     5     6
-        '''
+        """
         # delta_a: accel change from initial position to end of maximal jerk section
         delta_a = self.max_accel - self.a0
         # t_s1: time of traversal of maximal jerk section
@@ -112,7 +113,6 @@ class eta3_trajectory(eta3_path):
         self.seg_lengths = np.zeros((7,))
 
         # Section 0: max jerk up to max acceleration
-        index = 0
         self.times[0] = t_s1
         self.vels[0] = v_s1
         self.seg_lengths[0] = s_s1
@@ -195,7 +195,7 @@ class eta3_trajectory(eta3_path):
 
         def fprime(u):
             return self.segments[seg_id].s_dot(u)
-        while (ui >= 0 and ui <= 1) and abs(f(ui)) > tol:
+        while (0 <= ui <= 1) and abs(f(ui)) > tol:
             ui -= f(ui) / fprime(ui)
         ui = max(0, min(ui, 1))
         return ui
@@ -301,7 +301,7 @@ def test1(max_vel=0.5):
         # NOTE: The ordering on kappa is [kappa_A, kappad_A, kappa_B, kappad_B], with kappad_* being the curvature derivative
         kappa = [0, 0, 0, 0]
         eta = [i, i, 0, 0, 0, 0]
-        trajectory_segments.append(eta3_path_segment(
+        trajectory_segments.append(Eta3PathSegment(
             start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
 
         traj = eta3_trajectory(trajectory_segments,
@@ -335,7 +335,7 @@ def test2(max_vel=0.5):
         # NOTE: INTEGRATOR ERROR EXPLODES WHEN eta[:1] IS ZERO!
         # was: eta = [0, 0, (i - 5) * 20, (5 - i) * 20, 0, 0], now is:
         eta = [0.1, 0.1, (i - 5) * 20, (5 - i) * 20, 0, 0]
-        trajectory_segments.append(eta3_path_segment(
+        trajectory_segments.append(Eta3PathSegment(
             start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
 
         traj = eta3_trajectory(trajectory_segments,
@@ -366,7 +366,7 @@ def test3(max_vel=2.0):
     # NOTE: The ordering on kappa is [kappa_A, kappad_A, kappa_B, kappad_B], with kappad_* being the curvature derivative
     kappa = [0, 0, 0, 0]
     eta = [4.27, 4.27, 0, 0, 0, 0]
-    trajectory_segments.append(eta3_path_segment(
+    trajectory_segments.append(Eta3PathSegment(
         start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
 
     # segment 2: line segment
@@ -376,7 +376,7 @@ def test3(max_vel=2.0):
     # NOTE: INTEGRATOR ERROR EXPLODES WHEN eta[:1] IS ZERO!
     # was: eta = [0, 0, 0, 0, 0, 0], now is:
     eta = [0.5, 0.5, 0, 0, 0, 0]
-    trajectory_segments.append(eta3_path_segment(
+    trajectory_segments.append(Eta3PathSegment(
         start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
 
     # segment 3: cubic spiral
@@ -384,7 +384,7 @@ def test3(max_vel=2.0):
     end_pose = [7.4377, 1.8235, 0.6667]
     kappa = [0, 0, 1, 1]
     eta = [1.88, 1.88, 0, 0, 0, 0]
-    trajectory_segments.append(eta3_path_segment(
+    trajectory_segments.append(Eta3PathSegment(
         start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
 
     # segment 4: generic twirl arc
@@ -392,7 +392,7 @@ def test3(max_vel=2.0):
     end_pose = [7.8, 4.3, 1.8]
     kappa = [1, 1, 0.5, 0]
     eta = [7, 10, 10, -10, 4, 4]
-    trajectory_segments.append(eta3_path_segment(
+    trajectory_segments.append(Eta3PathSegment(
         start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
 
     # segment 5: circular arc
@@ -400,7 +400,7 @@ def test3(max_vel=2.0):
     end_pose = [5.4581, 5.8064, 3.3416]
     kappa = [0.5, 0, 0.5, 0]
     eta = [2.98, 2.98, 0, 0, 0, 0]
-    trajectory_segments.append(eta3_path_segment(
+    trajectory_segments.append(Eta3PathSegment(
         start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
 
     # construct the whole path
