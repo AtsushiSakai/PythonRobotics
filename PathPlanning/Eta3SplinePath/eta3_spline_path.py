@@ -7,7 +7,8 @@ author: Joe Dinius, Ph.D (https://jwdinius.github.io)
 
 Ref:
 
-- [eta^3-Splines for the Smooth Path Generation of Wheeled Mobile Robots](https://ieeexplore.ieee.org/document/4339545/)
+- [eta^3-Splines for the Smooth Path Generation of Wheeled Mobile Robots]
+(https://ieeexplore.ieee.org/document/4339545/)
 
 """
 
@@ -26,7 +27,8 @@ class Eta3Path(object):
     Eta3Path
 
     input
-        segments: list of `Eta3PathSegment` instances definining a continuous path
+        segments: a list of `Eta3PathSegment` instances
+        defining a continuous path
     """
 
     def __init__(self, segments):
@@ -60,9 +62,10 @@ class Eta3Path(object):
 
 class Eta3PathSegment(object):
     """
-    Eta3PathSegment - constructs an eta^3 path segment based on desired shaping,
-     eta, and curvature vector, kappa. If either, or both, of eta and kappa are
-     not set during initialization, they will default to zeros.
+    Eta3PathSegment - constructs an eta^3 path segment based on desired
+    shaping, eta, and curvature vector, kappa. If either, or both,
+    of eta and kappa are not set during initialization,
+    they will default to zeros.
 
     input
         start_pose - starting pose array  (x, y, \theta)
