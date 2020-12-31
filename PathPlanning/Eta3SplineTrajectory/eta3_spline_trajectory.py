@@ -60,20 +60,16 @@ class eta3_trajectory(Eta3Path):
         self.velocity_profile()
         self.ui_prev = 0
         self.prev_seg_id = 0
-        self.times = None
-        self.vels = None
-        self.seg_lengths = None
-        self.total_time = None
 
     def velocity_profile(self):
-        r"""                   /~~~~~----------------~\
-                             /                        \
-                            /                          \
-                           /                            \
-                          /                              \
-        (v=v0, a=a0) ~~~~~                                \
-                                                           \
-                                                            \ ~~~~~ (vf=0, af=0)
+        r"""                  /~~~~~----------------\
+                             /                       \
+                            /                         \
+                           /                           \
+                          /                             \
+        (v=v0, a=a0) ~~~~~                               \
+                                                          \
+                                                           \ ~~~~~ (vf=0, af=0)
                      pos.|pos.|neg.|   cruise at    |neg.| neg. |neg.
                      max |max.|max.|     max.       |max.| max. |max.
                      jerk|acc.|jerk|    velocity    |jerk| acc. |jerk
