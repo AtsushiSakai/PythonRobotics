@@ -7,7 +7,8 @@ author: Joe Dinius, Ph.D (https://jwdinius.github.io)
 
 Refs:
 - https://jwdinius.github.io/blog/2018/eta3traj
-- [eta^3-Splines for the Smooth Path Generation of Wheeled Mobile Robots](https://ieeexplore.ieee.org/document/4339545/)
+- [eta^3-Splines for the Smooth Path Generation of Wheeled Mobile Robots]
+(https://ieeexplore.ieee.org/document/4339545/)
 
 """
 
@@ -59,16 +60,20 @@ class eta3_trajectory(Eta3Path):
         self.velocity_profile()
         self.ui_prev = 0
         self.prev_seg_id = 0
+        self.times = None
+        self.vels = None
+        self.seg_lengths = None
+        self.total_time = None
 
     def velocity_profile(self):
-        """                   /~~~~~----------------~~~~~\
-                             /                            \
-                            /                              \
-                           /                                \
-                          /                                  \
-        (v=v0, a=a0) ~~~~~                                    \
-                                                               \
-                                                                \~~~~~ (vf=0, af=0)
+        r"""                   /~~~~~----------------~\
+                             /                        \
+                            /                          \
+                           /                            \
+                          /                              \
+        (v=v0, a=a0) ~~~~~                                \
+                                                           \
+                                                            \ ~~~~~ (vf=0, af=0)
                      pos.|pos.|neg.|   cruise at    |neg.| neg. |neg.
                      max |max.|max.|     max.       |max.| max. |max.
                      jerk|acc.|jerk|    velocity    |jerk| acc. |jerk
@@ -112,7 +117,6 @@ class eta3_trajectory(Eta3Path):
         self.seg_lengths = np.zeros((7,))
 
         # Section 0: max jerk up to max acceleration
-        index = 0
         self.times[0] = t_s1
         self.vels[0] = v_s1
         self.seg_lengths[0] = s_s1
