@@ -4,4 +4,4 @@ export PYTHONWARNINGS=default  # show warning
 #python -m unittest discover tests 
 #python -Wignore -m unittest discover tests #ignore warning
 #coverage run -m unittest discover tests # generate coverage file
-pytest tests -W DeprecationWarning
+pytest tests -Werror --durations=0
