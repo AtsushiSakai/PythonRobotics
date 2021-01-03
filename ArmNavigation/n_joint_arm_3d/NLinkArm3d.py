@@ -43,8 +43,6 @@ class Link:
 
 class NLinkArm:
     def __init__(self, dh_params_list):
-        self.fig = plt.figure()
-        self.ax = Axes3D(self.fig)
         self.link_list = []
         for i in range(len(dh_params_list)):
             self.link_list.append(Link(dh_params_list[i]))
@@ -64,6 +62,9 @@ class NLinkArm:
         alpha, beta, gamma = self.euler_angle()
 
         if plot:
+            self.fig = plt.figure()
+            self.ax = Axes3D(self.fig)
+
             x_list = []
             y_list = []
             z_list = []
