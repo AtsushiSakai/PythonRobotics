@@ -50,7 +50,7 @@ def icp_matching(previous_points, current_points):
         Rt, Tt = svd_motion_estimation(previous_points[:, indexes], current_points)
         # update current points
         current_points = (Rt @ current_points) + Tt[:, np.newaxis]
-        
+
         dError = preError - error
         print("Residual:", error)
 
@@ -59,7 +59,6 @@ def icp_matching(previous_points, current_points):
             break
 
         preError = error
-
         H = update_homogeneous_matrix(H, Rt, Tt)
 
         if dError <= EPS:
