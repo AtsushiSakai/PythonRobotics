@@ -14,6 +14,13 @@
 
     Original code is available at
     http://people.sc.fsu.edu/~jburkardt/py_src/sobol/sobol.html
+
+    Note: the i4 prefix means that the function takes a numeric argument or
+          returns a number which is interpreted inside the function as a 4
+          byte integer
+    Note: the r4 prefix means that the function takes a numeric argument or
+          returns a number which is interpreted inside the function as a 4
+          byte float
 """
 import math
 import sys
@@ -34,7 +41,6 @@ v = None
 
 def i4_bit_hi1(n):
     """
-
      I4_BIT_HI1 returns the position of the high 1 bit base 2 in an I4.
 
       Discussion:
@@ -104,8 +110,6 @@ def i4_bit_hi1(n):
 
 def i4_bit_lo0(n):
     """
-
-
      I4_BIT_LO0 returns the position of the low 0 bit base 2 in an I4.
 
       Discussion:
@@ -813,15 +817,12 @@ def r8mat_write(filename, m, n, a):
         Input, real A(M,N), the matrix.
     """
 
-    output = open(filename, 'w')
-
-    for i in range(0, m):
-        for j in range(0, n):
-            s = '  %g' % (a[i, j])
-            output.write(s)
-        output.write('\n')
-
-    output.close()
+    with open(filename, 'w') as output:
+        for i in range(0, m):
+            for j in range(0, n):
+                s = '  %g' % (a[i, j])
+                output.write(s)
+            output.write('\n')
 
 
 def tau_sobol(dim_num):
