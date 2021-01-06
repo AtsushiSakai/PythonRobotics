@@ -446,7 +446,6 @@ def i4_sobol(dim_num, seed):
     elif (seed <= seed_save):
 
         seed_save = 0
-        l_var = 1
         lastq = np.zeros(dim_num)
 
         for seed_temp in range(int(seed_save), int(seed)):
@@ -904,7 +903,7 @@ def tau_sobol(dim_num):
 
     tau_table = [0, 0, 1, 3, 5, 8, 11, 15, 19, 23, 27, 31, 35]
 
-    if 1 <= dim_num and dim_num <= dim_max:
+    if 1 <= dim_num <= dim_max:
         tau = tau_table[dim_num]
     else:
         tau = -1
