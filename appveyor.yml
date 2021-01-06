@@ -33,7 +33,6 @@ install:
   - SET PATH=%PYTHON%;%PYTHON%\Scripts;%PYTHON%\Library\bin;%PATH%
   - SET PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin
   - "python -m pip install --upgrade pip"
-  - "pip install numpy" # TODO: remove this line after osqp wheel released
   - "python -m pip install -r requirements.txt"
 
   # Check that we have the expected version and architecture for Python
@@ -43,4 +42,4 @@ install:
 build: off
 
 test_script:
-  - "python -Wignore -m unittest discover tests"
+  - "pytest tests -Werror --durations=0"
