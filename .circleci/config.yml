@@ -8,13 +8,11 @@ jobs:
     docker:
       - image: circleci/python:3.9
     steps:
-      - run: sudo apt-get update && sudo apt-get install -y cmake # TODO: remove after osqp wheels released
       - checkout
       - python/load-cache
-      - run: pip install numpy # TODO: remove after osqp wheels released
       - python/install-deps
       - python/save-cache
-      - run: pip install sphinx sphinx-autobuild sphinx-rtd-theme
+      - run: pip install sphinx sphinx-autobuild sphinx-rtd-theme pytest
       - run:
           command: cd docs;make html
           name: doc_build
