@@ -1,8 +1,6 @@
-import PathPlanning.AStar.a_star_variants as astar
+import conftest  # Add root path to sys.path
 from unittest import TestCase
-import sys
-import os
-sys.path.append(os.path.dirname(__file__) + "/../")
+import PathPlanning.AStar.a_star_variants as astar
 
 
 class Test(TestCase):

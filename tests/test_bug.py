@@ -1,8 +1,6 @@
-from PathPlanning.BugPlanning import bug as b
+import conftest  # Add root path to sys.path
 from unittest import TestCase
-import sys
-import os
-sys.path.append(os.path.dirname(__file__) + "/../")
+from PathPlanning.BugPlanning import bug as m
 
 
 class Test(TestCase):

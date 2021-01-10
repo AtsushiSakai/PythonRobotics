@@ -1,15 +1,10 @@
+import conftest  # Add root path to sys.path
 from unittest import TestCase
+from PathTracking.cgmres_nmpc import cgmres_nmpc as m
 
-import sys
-if 'cvxpy' in sys.modules:  # pragma: no cover
-    sys.path.append("./PathTracking/cgmres_nmpc/")
 
-    from PathTracking.cgmres_nmpc import cgmres_nmpc as m
+class Test(TestCase):
 
-    print(__file__)
-
-    class Test(TestCase):
-
-        def test1(self):
-            m.show_animation = False
-            m.main()
+    def test1(self):
+        m.show_animation = False
+        m.main()

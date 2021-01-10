@@ -1,17 +1,6 @@
+import conftest  # Add root path to sys.path
 from unittest import TestCase
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                "/../PathPlanning/BreadthFirstSearch/")
-
-
-try:
-    import breadth_first_search as m
-except ImportError:
-    raise
-
-
-print(__file__)
+from PathPlanning.BreadthFirstSearch import breadth_first_search as m
 
 
 class Test(TestCase):

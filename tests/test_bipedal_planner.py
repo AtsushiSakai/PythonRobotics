@@ -1,13 +1,6 @@
+import conftest  # Add root path to sys.path
 from unittest import TestCase
-
-import sys
-sys.path.append("./Bipedal/bipedal_planner/")
-try:
-    from Bipedal.bipedal_planner import bipedal_planner as m
-except Exception:
-    raise
-
-print(__file__)
+from Bipedal.bipedal_planner import bipedal_planner as m
 
 
 class Test(TestCase):
