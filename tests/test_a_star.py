@@ -1,10 +1,11 @@
 from unittest import TestCase
 import sys
 import os
-sys.path.append(os.path.dirname(__file__) + "/../")
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
 try:
     from PathPlanning.AStar import a_star as m
-except:
+except ImportError:
     raise
 
 

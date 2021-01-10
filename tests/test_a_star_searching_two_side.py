@@ -1,13 +1,10 @@
-from unittest import TestCase
-import os
+# Adding root path to sys.path
 import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-sys.path.append(os.path.dirname(__file__) + '/../')
-
-try:
-    from PathPlanning.AStar import a_star_searching_from_two_side as m
-except ImportError:
-    raise
+from unittest import TestCase
+from PathPlanning.AStar import a_star_searching_from_two_side as m
 
 
 class Test(TestCase):
