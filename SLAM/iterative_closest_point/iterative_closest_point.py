@@ -27,8 +27,8 @@ def icp_matching(previous_points, current_points):
     """
     H = None  # homogeneous transformation matrix
 
-    dError = 1000.0
-    preError = 1000.0
+    dError = np.inf
+    preError = np.inf
     count = 0
 
     while dError >= EPS:
@@ -37,8 +37,9 @@ def icp_matching(previous_points, current_points):
         if show_animation:  # pragma: no cover
             plt.cla()
             # for stopping simulation with the esc key.
-            plt.gcf().canvas.mpl_connect('key_release_event',
-                    lambda event: [exit(0) if event.key == 'escape' else None])
+            plt.gcf().canvas.mpl_connect(
+                'key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(previous_points[0, :], previous_points[1, :], ".r")
             plt.plot(current_points[0, :], current_points[1, :], ".b")
             plt.plot(0.0, 0.0, "xr")
@@ -47,15 +48,18 @@ def icp_matching(previous_points, current_points):
 
         indexes, error = nearest_neighbor_association(previous_points, current_points)
         Rt, Tt = svd_motion_estimation(previous_points[:, indexes], current_points)
-
         # update current points
         current_points = (Rt @ current_points) + Tt[:, np.newaxis]
 
-        H = update_homogeneous_matrix(H, Rt, Tt)
-
-        dError = abs(preError - error)
-        preError = error
+        dError = preError - error
         print("Residual:", error)
+
+        if dError < 0:  # prevent matrix H changing, exit loop
+            print("Not Converge...", preError, dError, count)
+            break
+
+        preError = error
+        H = update_homogeneous_matrix(H, Rt, Tt)
 
         if dError <= EPS:
             print("Converge", error, dError, count)
