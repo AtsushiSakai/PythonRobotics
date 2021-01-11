@@ -1,8 +1,8 @@
 import conftest  # Add root path to sys.path
-import rrt_dubins as m
+from PathPlanning.RRTDubins import rrt_dubins as m
 
 
-def test1(self):
+def test1():
     m.show_animation = False
     m.main()
 

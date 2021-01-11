@@ -1,5 +1,6 @@
 import conftest  # Add root path to sys.path
-import rrt_star_seven_joint_arm_control as m
+from ArmNavigation.rrt_star_seven_joint_arm_control \
+    import rrt_star_seven_joint_arm_control as m
 
 
 def test1():

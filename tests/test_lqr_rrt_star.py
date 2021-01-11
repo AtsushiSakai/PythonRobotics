@@ -1,5 +1,6 @@
 import conftest  # Add root path to sys.path
 from PathPlanning.LQRRRTStar import lqr_rrt_star as m
+import random
 
 random.seed(12345)
 
