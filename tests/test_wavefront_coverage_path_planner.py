@@ -1,5 +1,6 @@
 import conftest  # Add root path to sys.path
-from unittest import TestCase
+import os
+import matplotlib.pyplot as plt
 from PathPlanning.WavefrontCPP import wavefront_coverage_path_planner
 
 wavefront_coverage_path_planner.do_animation = False
@@ -19,7 +20,7 @@ def wavefront_cpp(img, start, goal):
     PT = wavefront_coverage_path_planner.transform(
         img, goal, transform_type='path', alpha=0.01)
     PT_path = wavefront_coverage_path_planner.wavefront(PT, start, goal)
-    self.assertEqual(len(PT_path), num_free)  # assert complete coverage
+    assert len(PT_path) == num_free  # assert complete coverage
 
 
 def test_wavefront_CPP_1():
@@ -34,7 +35,7 @@ def test_wavefront_CPP_1():
     wavefront_cpp(img, start, goal)
 
 
-def test_wavefront_CPP_2(self):
+def test_wavefront_CPP_2():
     img_dir = os.path.dirname(
         os.path.abspath(__file__)) + "/../PathPlanning/WavefrontCPP"
     img = plt.imread(os.path.join(img_dir, 'map', 'test_2.png'))
@@ -43,7 +44,7 @@ def test_wavefront_CPP_2(self):
     start = (10, 0)
     goal = (10, 40)
 
-    self.wavefront_cpp(img, start, goal)
+    wavefront_cpp(img, start, goal)
 
 
 def test_wavefront_CPP_3():
@@ -56,3 +57,7 @@ def test_wavefront_CPP_3():
     goal = (30, 30)
 
     wavefront_cpp(img, start, goal)
+
+
+if __name__ == '__main__':
+    conftest.run_this_test(__file__)
