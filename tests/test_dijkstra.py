@@ -1,26 +1,8 @@
+import conftest  # Add root path to sys.path
 from unittest import TestCase
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                "/../PathPlanning/Dijkstra/")
+from PathPlanning.Dijkstra import dijkstra as m
 
 
-try:
-    import dijkstra as m
-except ImportError:
-    raise
-
-
-print(__file__)
-
-
-class Test(TestCase):
-
-    def test1(self):
-        m.show_animation = False
-        m.main()
-
-
-if __name__ == '__main__':  # pragma: no cover
-    test = Test()
-    test.test1()
+def test_1():
+    m.show_animation = False
+    m.main()

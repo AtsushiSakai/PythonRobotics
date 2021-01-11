@@ -12,8 +12,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-import pure_pursuit
-
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.dirname(
     os.path.abspath(__file__)) + "/../ReedsSheppPath/")
 sys.path.append(os.path.dirname(

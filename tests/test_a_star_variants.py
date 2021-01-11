@@ -1,48 +1,39 @@
-import conftest  # Add root path to sys.path
-from unittest import TestCase
-import PathPlanning.AStar.a_star_variants as astar
+import PathPlanning.AStar.a_star_variants as a_star
 
 
-class Test(TestCase):
+def test_1():
+    # A* with beam search
+    a_star.show_animation = False
 
-    def test(self):
-        # A* with beam search
-        astar.show_animation = False
+    a_star.use_beam_search = True
+    a_star.main()
+    self.reset_all()
 
-        astar.use_beam_search = True
-        astar.main()
-        self.reset_all()
+    # A* with iterative deepening
+    a_star.use_iterative_deepening = True
+    a_star.main()
+    reset_all()
 
-        # A* with iterative deepening
-        astar.use_iterative_deepening = True
-        astar.main()
-        self.reset_all()
+    # A* with dynamic weighting
+    a_star.use_dynamic_weighting = True
+    a_star.main()
+    reset_all()
 
-        # A* with dynamic weighting
-        astar.use_dynamic_weighting = True
-        astar.main()
-        self.reset_all()
+    # theta*
+    a_star.use_theta_star = True
+    a_star.main()
+    reset_all()
 
-        # theta*
-        astar.use_theta_star = True
-        astar.main()
-        self.reset_all()
-
-        # A* with jump point
-        astar.use_jump_point = True
-        astar.main()
-        self.reset_all()
-
-    @staticmethod
-    def reset_all():
-        astar.show_animation = False
-        astar.use_beam_search = False
-        astar.use_iterative_deepening = False
-        astar.use_dynamic_weighting = False
-        astar.use_theta_star = False
-        astar.use_jump_point = False
+    # A* with jump point
+    a_star.use_jump_point = True
+    a_star.main()
+    reset_all()
 
 
-if __name__ == '__main__':  # pragma: no cover
-    test = Test()
-    test.test()
+def reset_all():
+    a_star.show_animation = False
+    a_star.use_beam_search = False
+    a_star.use_iterative_deepening = False
+    a_star.use_dynamic_weighting = False
+    a_star.use_theta_star = False
+    a_star.use_jump_point = False
