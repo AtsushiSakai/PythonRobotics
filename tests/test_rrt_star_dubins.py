@@ -1,5 +1,5 @@
 import conftest  # Add root path to sys.path
-import rrt_star_dubins as m
+from PathPlanning.RRTStarDubins import rrt_star_dubins as m
 
 
 def test1():

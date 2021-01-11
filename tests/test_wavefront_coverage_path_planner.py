@@ -1,6 +1,6 @@
 import conftest  # Add root path to sys.path
 from unittest import TestCase
-import wavefront_coverage_path_planner
+from PathPlanning.WavefrontCPP import wavefront_coverage_path_planner
 
 wavefront_coverage_path_planner.do_animation = False
 
