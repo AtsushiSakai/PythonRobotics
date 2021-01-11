@@ -1,12 +1,8 @@
-from unittest import TestCase
-
-from ArmNavigation.two_joint_arm_to_point_control import two_joint_arm_to_point_control as m
-
-print(__file__)
+import conftest  # Add root path to sys.path
+from ArmNavigation.two_joint_arm_to_point_control \
+    import two_joint_arm_to_point_control as m
 
 
-class Test(TestCase):
-
-    def test1(self):
-        m.show_animation = False
-        m.animation()
+def test1():
+    m.show_animation = False
+    m.animation()

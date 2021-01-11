@@ -24,6 +24,7 @@ def spiral_stc_cpp(self, img, start):
     # assert complete coverage
     self.assertEqual(len(covered_nodes), num_free / 4)
 
+
 def test_spiral_stc_cpp_1(self):
     img_dir = os.path.dirname(
         os.path.abspath(__file__)) + \
@@ -32,6 +33,7 @@ def test_spiral_stc_cpp_1(self):
     start = (0, 0)
     self.spiral_stc_cpp(img, start)
 
+
 def test_spiral_stc_cpp_2(self):
     img_dir = os.path.dirname(
         os.path.abspath(__file__)) + \
@@ -39,6 +41,7 @@ def test_spiral_stc_cpp_2(self):
     img = plt.imread(os.path.join(img_dir, 'map', 'test_2.png'))
     start = (10, 0)
     self.spiral_stc_cpp(img, start)
+
 
 def test_spiral_stc_cpp_3(self):
     img_dir = os.path.dirname(
