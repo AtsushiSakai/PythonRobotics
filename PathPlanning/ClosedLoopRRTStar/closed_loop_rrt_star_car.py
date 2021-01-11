@@ -12,18 +12,10 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.dirname(
-    os.path.abspath(__file__)) + "/../ReedsSheppPath/")
-sys.path.append(os.path.dirname(
-    os.path.abspath(__file__)) + "/../RRTStarReedsShepp/")
-
-try:
-    import reeds_shepp_path_planning
-    import unicycle_model
-    from rrt_star_reeds_shepp import RRTStarReedsShepp
-except ImportError:
-    raise
+import reeds_shepp_path_planning
+import unicycle_model
+import pure_pursuit
+from rrt_star_reeds_shepp import RRTStarReedsShepp
 
 show_animation = True
 

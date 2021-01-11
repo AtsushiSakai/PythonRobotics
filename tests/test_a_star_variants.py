@@ -7,7 +7,7 @@ def test_1():
 
     a_star.use_beam_search = True
     a_star.main()
-    self.reset_all()
+    reset_all()
 
     # A* with iterative deepening
     a_star.use_iterative_deepening = True
