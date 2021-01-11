@@ -8,4 +8,3 @@ def test_1():
     m.show_animation = False
     random.seed(12345)
     m.main(maxIter=10)
-
