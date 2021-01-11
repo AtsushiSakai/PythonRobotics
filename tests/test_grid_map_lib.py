@@ -1,4 +1,4 @@
-from Mapping.grid_map_lib import GridMap
+from Mapping.grid_map_lib.grid_map_lib import GridMap
 
 
 def test_position_set(self):
@@ -23,3 +23,7 @@ def test_polygon_set(self):
     grid_map.set_value_from_polygon(ox, oy, 1.0, inside=False)
 
     self.assertEqual(True, True)
+
+
+if __name__ == '__main__':
+    conftest.run_this_test(__file__)

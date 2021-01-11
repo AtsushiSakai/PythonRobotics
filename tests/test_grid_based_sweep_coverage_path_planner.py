@@ -1,3 +1,4 @@
+import conftest
 from PathPlanning.GridBasedSweepCPP \
     import grid_based_sweep_coverage_path_planner
 
@@ -111,3 +112,7 @@ def test_planning3(self):
         sweeping_direction=self.DOWN,
     )
     self.assertGreater(len(px), 5)
+
+
+if __name__ == '__main__':
+    conftest.run_this_test(__file__)

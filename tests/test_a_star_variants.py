@@ -1,4 +1,5 @@
 import PathPlanning.AStar.a_star_variants as a_star
+import conftest
 
 
 def test_1():
@@ -37,3 +38,7 @@ def reset_all():
     a_star.use_dynamic_weighting = False
     a_star.use_theta_star = False
     a_star.use_jump_point = False
+
+
+if __name__ == '__main__':
+    conftest.run_this_test(__file__)

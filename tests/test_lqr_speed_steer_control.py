@@ -1,15 +1,7 @@
-from unittest import TestCase
-
-import sys
-sys.path.append("./PathTracking/lqr_speed_steer_control/")
-
+import conftest  # Add root path to sys.path
 from PathTracking.lqr_speed_steer_control import lqr_speed_steer_control as m
 
-print(__file__)
 
-
-class Test(TestCase):
-
-    def test1(self):
-        m.show_animation = False
-        m.main()
+def test_1():
+    m.show_animation = False
+    m.main()

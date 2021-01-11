@@ -1,5 +1,5 @@
+import conftest
 import numpy as np
-
 from PathPlanning.DubinsPath import dubins_path_planning
 
 np.random.seed(12345)
@@ -59,3 +59,7 @@ def test_3():
         check_edge_condition(px, py, pyaw,
                              start_x, start_y, start_yaw,
                              end_x, end_y, end_yaw)
+
+
+if __name__ == '__main__':
+    conftest.run_this_test(__file__)

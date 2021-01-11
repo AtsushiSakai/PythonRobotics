@@ -6,16 +6,13 @@ author: AtsushiSakai(@Atsushi_twi)
 
 """
 
-import os
-import sys
-
 import matplotlib.pyplot as plt
 import numpy as np
-
 import reeds_shepp_path_planning
-import unicycle_model
-import pure_pursuit
 from rrt_star_reeds_shepp import RRTStarReedsShepp
+
+import pure_pursuit
+import unicycle_model
 
 show_animation = True
 
@@ -68,7 +65,8 @@ class ClosedLoopRRTStar(RRTStarReedsShepp):
         for ind in path_indexs:
             path = self.generate_final_course(ind)
 
-            flag, x, y, yaw, v, t, a, d = self.check_tracking_path_is_feasible(path)
+            flag, x, y, yaw, v, t, a, d = self.check_tracking_path_is_feasible(
+                path)
 
             if flag and best_time >= t[-1]:
                 print("feasible path is found")
@@ -177,7 +175,8 @@ def main(gx=6.0, gy=7.0, gyaw=np.deg2rad(90.0), max_iter=100):
                                              obstacle_list,
                                              [-2.0, 20.0],
                                              max_iter=max_iter)
-    flag, x, y, yaw, v, t, a, d = closed_loop_rrt_star.planning(animation=show_animation)
+    flag, x, y, yaw, v, t, a, d = closed_loop_rrt_star.planning(
+        animation=show_animation)
 
     if not flag:
         print("cannot find feasible path")

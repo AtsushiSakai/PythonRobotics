@@ -1,3 +1,4 @@
+import conftest
 import numpy as np
 
 from PathPlanning.DynamicWindowApproach import dynamic_window_approach as m
@@ -41,3 +42,7 @@ def test_stuck_main():
                                  [13.0, 13.0]
                                  ])
     m.main(gx=-5.0, gy=-7.0)
+
+
+if __name__ == '__main__':
+    conftest.run_this_test(__file__)

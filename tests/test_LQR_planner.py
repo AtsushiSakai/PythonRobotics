@@ -1,12 +1,13 @@
 import conftest  # Add root path to sys.path
-from unittest import TestCase
 from PathPlanning.LQRPlanner import LQRplanner as m
 
-print(__file__)
+
+def test_1():
+    m.SHOW_ANIMATION = False
+    m.main()
 
 
-class Test(TestCase):
+if __name__ == '__main__':
+    conftest.run_this_test(__file__)
 
-    def test1(self):
-        m.SHOW_ANIMATION = False
-        m.main()
+

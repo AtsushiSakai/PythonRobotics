@@ -1,12 +1,13 @@
-from unittest import TestCase
-
+import conftest
 from SLAM.iterative_closest_point import iterative_closest_point as m
 
-print(__file__)
+
+def test_1():
+    m.show_animation = False
+    m.main()
 
 
-class Test(TestCase):
+if __name__ == '__main__':
+    conftest.run_this_test(__file__)
 
-    def test1(self):
-        m.show_animation = False
-        m.main()
+
