@@ -1,5 +1,5 @@
 import conftest  # Add root path to sys.path
-import state_lattice_planner as m
+from PathPlanning.StateLatticePlanner import state_lattice_planner as m
 from PathPlanning.ModelPredictiveTrajectoryGenerator \
     import model_predictive_trajectory_generator as m2
 

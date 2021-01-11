@@ -6,7 +6,7 @@ Author: Daniel Ingram (daniel-s-ingram)
 """
 import numpy as np
 
-from NLinkArm import NLinkArm
+from ArmNavigation.n_joint_arm_to_point_control.NLinkArm import NLinkArm
 
 # Simulation parameters
 Kp = 2
