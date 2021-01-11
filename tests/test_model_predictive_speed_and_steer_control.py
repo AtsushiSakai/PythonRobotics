@@ -5,11 +5,9 @@ if 'cvxpy' in sys.modules:  # pragma: no cover
     from PathTracking.model_predictive_speed_and_steer_control \
         import model_predictive_speed_and_steer_control as m
 
-
     def test_1():
         m.show_animation = False
         m.main()
-
 
     def test_2():
         m.show_animation = False
