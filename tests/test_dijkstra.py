@@ -1,4 +1,3 @@
-import conftest  # Add root path to sys.path
 from PathPlanning.Dijkstra import dijkstra as m
 
 

@@ -1,4 +1,3 @@
-import conftest  # Add root path to sys.path
 from Localization.cubature_kalman_filter import cubature_kalman_filter as m
 
 
