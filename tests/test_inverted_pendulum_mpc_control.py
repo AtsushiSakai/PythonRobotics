@@ -12,4 +12,3 @@ if 'cvxpy' in sys.modules:  # pragma: no cover
 
 if __name__ == '__main__':
     conftest.run_this_test(__file__)
-

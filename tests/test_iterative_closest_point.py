@@ -9,5 +9,3 @@ def test_1():
 
 if __name__ == '__main__':
     conftest.run_this_test(__file__)
-
-
