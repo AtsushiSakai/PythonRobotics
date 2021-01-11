@@ -1,5 +1,4 @@
 import conftest  # Add root path to sys.path
-from unittest import TestCase
 from PathTracking.cgmres_nmpc import cgmres_nmpc as m
 
 

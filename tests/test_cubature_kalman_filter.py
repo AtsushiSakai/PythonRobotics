@@ -1,5 +1,4 @@
 import conftest  # Add root path to sys.path
-from unittest import TestCase
 from Localization.cubature_kalman_filter import cubature_kalman_filter as m
 
 

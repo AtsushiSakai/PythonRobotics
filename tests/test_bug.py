@@ -1,5 +1,4 @@
 import conftest  # Add root path to sys.path
-from unittest import TestCase
 from PathPlanning.BugPlanning import bug as m
 
 

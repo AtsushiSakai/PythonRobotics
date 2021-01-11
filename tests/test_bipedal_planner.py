@@ -1,5 +1,4 @@
 import conftest  # Add root path to sys.path
-from unittest import TestCase
 from Bipedal.bipedal_planner import bipedal_planner as m
 
 

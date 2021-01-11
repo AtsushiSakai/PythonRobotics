@@ -1,5 +1,4 @@
 import conftest  # Add root path to sys.path
-from unittest import TestCase
 from PathPlanning.ClosedLoopRRTStar import closed_loop_rrt_star_car as m
 import random
 

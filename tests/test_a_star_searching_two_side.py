@@ -1,5 +1,3 @@
-import conftest  # Add root path to sys.path
-from unittest import TestCase
 from PathPlanning.AStar import a_star_searching_from_two_side as m
 
 

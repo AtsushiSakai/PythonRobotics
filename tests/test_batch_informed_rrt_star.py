@@ -1,5 +1,3 @@
-import conftest  # Add root path to sys.path
-from unittest import TestCase
 from PathPlanning.BatchInformedRRTStar import batch_informed_rrtstar as m
 import random
 

@@ -1,12 +1,12 @@
-import conftest  # Add root path to sys.path
-from unittest import TestCase
-from PathPlanning.DubinsPath import dubins_path_planning
 import numpy as np
+
+from PathPlanning.DubinsPath import dubins_path_planning
+
 np.random.seed(12345)
 
 
-def test_check_edge_condition(px, py, pyaw, start_x, start_y, start_yaw,
-                              end_x, end_y, end_yaw):
+def check_edge_condition(px, py, pyaw, start_x, start_y, start_yaw,
+                         end_x, end_y, end_yaw):
     assert (abs(px[0] - start_x) <= 0.01)
     assert (abs(py[0] - start_y) <= 0.01)
     assert (abs(pyaw[0] - start_yaw) <= 0.01)
@@ -15,7 +15,7 @@ def test_check_edge_condition(px, py, pyaw, start_x, start_y, start_yaw,
     assert (abs(pyaw[-1] - end_yaw) <= 0.01)
 
 
-def test_1(self):
+def test_1():
     start_x = 1.0  # [m]
     start_y = 1.0  # [m]
     start_yaw = np.deg2rad(45.0)  # [rad]
@@ -29,9 +29,9 @@ def test_1(self):
     px, py, pyaw, mode, clen = dubins_path_planning.dubins_path_planning(
         start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature)
 
-    self.check_edge_condition(px, py, pyaw,
-                              start_x, start_y, start_yaw,
-                              end_x, end_y, end_yaw)
+    check_edge_condition(px, py, pyaw,
+                         start_x, start_y, start_yaw,
+                         end_x, end_y, end_yaw)
 
 
 def test_2():
@@ -56,6 +56,6 @@ def test_3():
         px, py, pyaw, mode, clen = dubins_path_planning.dubins_path_planning(
             start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature)
 
-        self.check_edge_condition(px, py, pyaw,
-                                  start_x, start_y, start_yaw,
-                                  end_x, end_y, end_yaw)
+        check_edge_condition(px, py, pyaw,
+                             start_x, start_y, start_yaw,
+                             end_x, end_y, end_yaw)
