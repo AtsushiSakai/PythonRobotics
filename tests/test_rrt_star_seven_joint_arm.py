@@ -1,26 +1,12 @@
-import os
-import sys
-from unittest import TestCase
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                "/../ArmNavigation/rrt_star_seven_joint_arm_control/")
-
-try:
+import conftest  # Add root path to sys.path
+from ArmNavigation.rrt_star_seven_joint_arm_control \
     import rrt_star_seven_joint_arm_control as m
-except ImportError:
-    raise
 
 
-print(__file__)
+def test1():
+    m.show_animation = False
+    m.main()
 
 
-class Test(TestCase):
-
-    def test1(self):
-        m.show_animation = False
-        m.main()
-
-
-if __name__ == '__main__':  # pragma: no cover
-    test = Test()
-    test.test1()
+if __name__ == '__main__':
+    conftest.run_this_test(__file__)

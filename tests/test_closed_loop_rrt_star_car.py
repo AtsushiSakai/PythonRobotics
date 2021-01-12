@@ -1,28 +1,13 @@
-import os
-import sys
+import conftest
+from PathPlanning.ClosedLoopRRTStar import closed_loop_rrt_star_car as m
 import random
-from unittest import TestCase
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                "/../PathPlanning/ClosedLoopRRTStar/")
-try:
-    from PathPlanning.ClosedLoopRRTStar import closed_loop_rrt_star_car as m
-except ImportError:
-    raise
-
-random.seed(12345)
-
-print(__file__)
 
 
-class Test(TestCase):
+def test_1():
+    random.seed(12345)
+    m.show_animation = False
+    m.main(gx=1.0, gy=0.0, gyaw=0.0, max_iter=5)
 
-    def test1(self):
-        m.show_animation = False
-        m.main(gx=1.0, gy=0.0, gyaw=0.0, max_iter=5)
 
-
-if __name__ == '__main__':  # pragma: no cover
-    test = Test()
-    test.test1()
+if __name__ == '__main__':
+    conftest.run_this_test(__file__)

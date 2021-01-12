@@ -1,17 +1,11 @@
-import PathPlanning.FlowField.flowfield as flowfield
-from unittest import TestCase
-import sys
-import os
-sys.path.append(os.path.dirname(__file__) + "/../")
+import conftest
+import PathPlanning.FlowField.flowfield as flow_field
 
 
-class Test(TestCase):
-
-    def test(self):
-        flowfield.show_animation = False
-        flowfield.main()
+def test():
+    flow_field.show_animation = False
+    flow_field.main()
 
 
-if __name__ == '__main__':  # pragma: no cover
-    test = Test()
-    test.test()
+if __name__ == '__main__':
+    conftest.run_this_test(__file__)

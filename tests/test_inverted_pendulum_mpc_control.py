@@ -1,15 +1,14 @@
-from unittest import TestCase
-
+import conftest
 import sys
 if 'cvxpy' in sys.modules:  # pragma: no cover
-    sys.path.append("./InvertedPendulumCart/inverted_pendulum_mpc_control/")
 
-    import inverted_pendulum_mpc_control as m
+    from InvertedPendulumCart.InvertedPendulumMPCControl \
+        import inverted_pendulum_mpc_control as m
 
-    print(__file__)
+    def test1():
+        m.show_animation = False
+        m.main()
 
-    class Test(TestCase):
 
-        def test1(self):
-            m.show_animation = False
-            m.main()
+if __name__ == '__main__':
+    conftest.run_this_test(__file__)

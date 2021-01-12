@@ -18,7 +18,8 @@ import itertools
 from enum import Enum
 from scipy.spatial.transform import Rotation as Rot
 
-from simulator import VehicleSimulator, LidarSimulator
+from Mapping.rectangle_fitting.simulator \
+    import VehicleSimulator, LidarSimulator
 
 show_animation = True
 

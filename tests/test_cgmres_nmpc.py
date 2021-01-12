@@ -1,15 +1,11 @@
-from unittest import TestCase
+import conftest
+from PathTracking.cgmres_nmpc import cgmres_nmpc as m
 
-import sys
-if 'cvxpy' in sys.modules:  # pragma: no cover
-    sys.path.append("./PathTracking/cgmres_nmpc/")
 
-    from PathTracking.cgmres_nmpc import cgmres_nmpc as m
+def test1():
+    m.show_animation = False
+    m.main()
 
-    print(__file__)
 
-    class Test(TestCase):
-
-        def test1(self):
-            m.show_animation = False
-            m.main()
+if __name__ == '__main__':
+    conftest.run_this_test(__file__)

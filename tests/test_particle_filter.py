@@ -1,12 +1,7 @@
-from unittest import TestCase
-
+import conftest  # Add root path to sys.path
 from Localization.particle_filter import particle_filter as m
 
-print(__file__)
 
-
-class Test(TestCase):
-
-    def test1(self):
-        m.show_animation = False
-        m.main()
+def test_1():
+    m.show_animation = False
+    m.main()

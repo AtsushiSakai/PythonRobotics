@@ -1,14 +1,13 @@
-from unittest import TestCase
-
+import conftest
 from Localization.cubature_kalman_filter import cubature_kalman_filter as m
 
-print(__file__)
+
+def test1():
+    m.show_final = False
+    m.show_animation = False
+    m.show_ellipse = False
+    m.main()
 
 
-class Test(TestCase):
-
-    def test1(self):
-        m.show_final = False
-        m.show_animation = False
-        m.show_ellipse = False
-        m.main()
+if __name__ == '__main__':
+    conftest.run_this_test(__file__)
