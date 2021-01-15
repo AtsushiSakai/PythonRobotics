@@ -28,13 +28,12 @@ jobs:
           pip install -r requirements.txt
       - name: install coverage
         run: pip install coverage
-
       - name: install mypy
         run: pip install mypy
-
       - name: install pycodestyle
         run: pip install pycodestyle
-
+      - name: install pytest-xdist
+        run: pip install pytest-xdist
       - name: mypy check
         run: |
           find AerialNavigation -name "*.py" | xargs mypy
