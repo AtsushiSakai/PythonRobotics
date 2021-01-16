@@ -40,3 +40,7 @@ def test2():
 
         check_edge_condition(px, py, pyaw, start_x, start_y, start_yaw,
                              end_x, end_y, end_yaw)
+
+
+if __name__ == '__main__':
+    conftest.run_this_test(__file__)
