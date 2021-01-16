@@ -7,10 +7,10 @@ author: Atsushi Sakai
 import math
 from enum import IntEnum
 
-import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.transform import Rotation as Rot
 from Mapping.grid_map_lib.grid_map_lib import GridMap
+import matplotlib.pyplot as plt
 
 do_animation = True
 
@@ -240,8 +240,6 @@ def sweep_path_search(sweep_searcher, grid_map, grid_search_animation=False):
             grid_map.plot_grid_map(ax=ax)
             plt.pause(1.0)
 
-    grid_map.plot_grid_map()
-
     return px, py
 
 
@@ -289,13 +287,13 @@ def planning_animation(ox, oy, resolution):  # pragma: no cover
             plt.grid(True)
             plt.pause(0.1)
 
-    plt.cla()
-    plt.plot(ox, oy, "-xb")
-    plt.plot(px, py, "-r")
-    plt.axis("equal")
-    plt.grid(True)
-    plt.pause(0.1)
-    plt.close()
+        plt.cla()
+        plt.plot(ox, oy, "-xb")
+        plt.plot(px, py, "-r")
+        plt.axis("equal")
+        plt.grid(True)
+        plt.pause(0.1)
+        plt.close()
 
 
 def main():  # pragma: no cover
@@ -316,7 +314,8 @@ def main():  # pragma: no cover
     resolution = 5.0
     planning_animation(ox, oy, resolution)
 
-    plt.show()
+    if do_animation:
+        plt.show()
     print("done!!")
 
 

@@ -30,6 +30,8 @@ jobs:
       run: pip install mypy
     - name: install pycodestyle
       run: pip install pycodestyle
+    - name: install pytest-xdist
+      run: pip install pytest-xdist
     - name: mypy check
       run: |
         find AerialNavigation -name "*.py" | xargs mypy

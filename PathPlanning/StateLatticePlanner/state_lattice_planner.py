@@ -25,7 +25,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__))
 try:
     import model_predictive_trajectory_generator as planner
     import motion_model
-except:
+except ImportError:
     raise
 
 
@@ -323,6 +323,7 @@ def lane_state_sampling_test1():
 
 
 def main():
+    planner.show_animation = show_animation
     uniform_terminal_state_sampling_test1()
     uniform_terminal_state_sampling_test2()
     biased_terminal_state_sampling_test1()

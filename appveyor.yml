@@ -34,6 +34,7 @@ install:
   - SET PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin
   - "python -m pip install --upgrade pip"
   - "python -m pip install -r requirements.txt"
+  - "python -m pip install pytest-xdist"
 
   # Check that we have the expected version and architecture for Python
   - "python --version"
@@ -42,4 +43,4 @@ install:
 build: off
 
 test_script:
-  - "pytest tests -Werror --durations=0"
+  - "pytest tests -n auto -Werror --durations=0"
