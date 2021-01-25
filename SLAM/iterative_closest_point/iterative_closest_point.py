@@ -148,6 +148,29 @@ def main():
         print("R:", R)
         print("T:", T)
 
+    # test for 3d point set
+    motion = [0.5, 2.0, -5, np.deg2rad(-10.0)]  # [x[m],y[m],z[m],roll[deg]]
+
+    for _ in range(nsim):
+
+        # previous points
+        px = (np.random.rand(nPoint) - 0.5) * fieldLength
+        py = (np.random.rand(nPoint) - 0.5) * fieldLength
+        pz = (np.random.rand(nPoint) - 0.5) * fieldLength
+        previous_points = np.vstack((px, py, pz))
+
+        # current points
+        cx = [math.cos(motion[3]) * x - math.sin(motion[3]) * z + motion[0]
+              for (x, z) in zip(px, pz)]
+        cy = [y + motion[1] for y in py]
+        cz = [math.sin(motion[3]) * x + math.cos(motion[3]) * z + motion[2]
+              for (x, z) in zip(px, pz)]
+        current_points = np.vstack((cx, cy, cz))
+
+        R, T = icp_matching(previous_points, current_points)
+        print("R:", R)
+        print("T:", T)
+
 
 if __name__ == '__main__':
     main()
