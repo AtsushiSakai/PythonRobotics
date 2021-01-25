@@ -68,24 +68,20 @@ def icp_matching(previous_points, current_points):
             print("Not Converge...", error, dError, count)
             break
 
-    R = np.array(H[0:2, 0:2])
-    T = np.array(H[0:2, 2])
+    R = np.array(H[0:-1, 0:-1])
+    T = np.array(H[0:-1, -1])
 
     return R, T
 
 
 def update_homogeneous_matrix(Hin, R, T):
 
-    H = np.zeros((3, 3))
+    r_size = R.shape[0]
+    H = np.zeros((r_size + 1, r_size + 1))
 
-    H[0, 0] = R[0, 0]
-    H[1, 0] = R[1, 0]
-    H[0, 1] = R[0, 1]
-    H[1, 1] = R[1, 1]
-    H[2, 2] = 1.0
-
-    H[0, 2] = T[0]
-    H[1, 2] = T[1]
+    H[0:r_size, 0:r_size] = R
+    H[0:r_size, r_size] = T
+    H[r_size, r_size] = 1.0
 
     if Hin is None:
         return H
