@@ -36,16 +36,15 @@ jobs:
         run: pip install pytest-xdist
       - name: mypy check
         run: |
-          find AerialNavigation -name "*.py" | xargs mypy
-          find ArmNavigation -name "*.py" | xargs mypy
-          find Bipedal -name "*.py" | xargs mypy
-          find InvertedPendulumCart -name "*.py" | xargs mypy
-          find Localization -name "*.py" | xargs mypy
-          find Mapping -name "*.py" | xargs mypy
-          find PathPlanning -name "*.py" | xargs mypy
-          find PathTracking -name "*.py" | xargs mypy
-          find SLAM -name "*.py" | xargs mypy
-
+          mypy -p AerialNavigation
+          mypy -p ArmNavigation
+          mypy -p Bipedal
+          mypy -p InvertedPendulumCart
+          mypy -p Localization
+          mypy -p Mapping
+          mypy -p PathPlanning
+          mypy -p PathTracking
+          mypy -p SLAM
       - name: do diff style check
         run: bash rundiffstylecheck.sh
 
