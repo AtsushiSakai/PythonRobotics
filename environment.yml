@@ -7,4 +7,3 @@ dependencies:
 - pandas
 - cvxpy
 - matplotlib
-- coverage
