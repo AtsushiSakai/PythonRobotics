@@ -148,8 +148,16 @@ def main():
         print("R:", R)
         print("T:", T)
 
-    # test for 3d point set
+
+def main_3d_points():
+    print(__file__ + " start!!")
+
+    # simulation parameters for 3d point set
+    nPoint = 1000
+    fieldLength = 50.0
     motion = [0.5, 2.0, -5, np.deg2rad(-10.0)]  # [x[m],y[m],z[m],roll[deg]]
+
+    nsim = 3  # number of simulation
 
     for _ in range(nsim):
 
@@ -174,3 +182,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    main_3d_points()
