@@ -42,7 +42,7 @@ class SpiralSpanningTreeCoveragePlanner:
         """
 
         visit_times = np.zeros(
-            (self.merged_map_height, self.merged_map_width), dtype=np.int)
+            (self.merged_map_height, self.merged_map_width), dtype=int)
         visit_times[start[0]][start[1]] = 1
 
         # generate route by

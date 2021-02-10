@@ -9,7 +9,6 @@ r"""Representation of a pose in :math:`SE(2)`.
 """
 
 import math
-
 import numpy as np
 
 from ..util import neg_pi_to_pi
@@ -26,8 +25,10 @@ class PoseSE2(np.ndarray):
         The angle of the pose (in radians)
 
     """
+
     def __new__(cls, position, orientation):
-        obj = np.array([position[0], position[1], neg_pi_to_pi(orientation)], dtype=np.float64).view(cls)
+        obj = np.array([position[0], position[1], neg_pi_to_pi(orientation)],
+                       dtype=float).view(cls)
         return obj
 
     # pylint: disable=arguments-differ
@@ -73,7 +74,9 @@ class PoseSE2(np.ndarray):
             The pose as an :math:`SE(2)` matrix
 
         """
-        return np.array([[np.cos(self[2]), -np.sin(self[2]), self[0]], [np.sin(self[2]), np.cos(self[2]), self[1]], [0., 0., 1.]], dtype=np.float64)
+        return np.array([[np.cos(self[2]), -np.sin(self[2]), self[0]],
+                         [np.sin(self[2]), np.cos(self[2]), self[1]],
+                         [0., 0., 1.]], dtype=float)
 
     @classmethod
     def from_matrix(cls, matrix):
@@ -90,7 +93,8 @@ class PoseSE2(np.ndarray):
             The matrix as a `PoseSE2` object
 
         """
-        return cls([matrix[0, 2], matrix[1, 2]], math.atan2(matrix[1, 0], matrix[0, 0]))
+        return cls([matrix[0, 2], matrix[1, 2]],
+                   math.atan2(matrix[1, 0], matrix[0, 0]))
 
     # ======================================================================= #
     #                                                                         #
@@ -131,7 +135,9 @@ class PoseSE2(np.ndarray):
             The pose's inverse
 
         """
-        return PoseSE2([-self[0] * np.cos(self[2]) - self[1] * np.sin(self[2]), self[0] * np.sin(self[2]) - self[1] * np.cos([self[2]])], -self[2])
+        return PoseSE2([-self[0] * np.cos(self[2]) - self[1] * np.sin(self[2]),
+                        self[0] * np.sin(self[2]) - self[1] * np.cos(
+                            [self[2]])], -self[2])
 
     # ======================================================================= #
     #                                                                         #
@@ -152,7 +158,10 @@ class PoseSE2(np.ndarray):
             The result of pose composition
 
         """
-        return PoseSE2([self[0] + other[0] * np.cos(self[2]) - other[1] * np.sin(self[2]), self[1] + other[0] * np.sin(self[2]) + other[1] * np.cos(self[2])], neg_pi_to_pi(self[2] + other[2]))
+        return PoseSE2(
+            [self[0] + other[0] * np.cos(self[2]) - other[1] * np.sin(self[2]),
+             self[1] + other[0] * np.sin(self[2]) + other[1] * np.cos(self[2])
+             ], neg_pi_to_pi(self[2] + other[2]))
 
     def __sub__(self, other):
         r"""Subtract poses (i.e., inverse pose composition): :math:`p_1 \ominus p_2`.
@@ -168,4 +177,8 @@ class PoseSE2(np.ndarray):
             The result of inverse pose composition
 
         """
-        return PoseSE2([(self[0] - other[0]) * np.cos(other[2]) + (self[1] - other[1]) * np.sin(other[2]), (other[0] - self[0]) * np.sin(other[2]) + (self[1] - other[1]) * np.cos(other[2])], neg_pi_to_pi(self[2] - other[2]))
+        return PoseSE2([(self[0] - other[0]) * np.cos(other[2]) + (
+                    self[1] - other[1]) * np.sin(other[2]),
+                        (other[0] - self[0]) * np.sin(other[2]) + (
+                                    self[1] - other[1]) * np.cos(other[2])],
+                       neg_pi_to_pi(self[2] - other[2]))

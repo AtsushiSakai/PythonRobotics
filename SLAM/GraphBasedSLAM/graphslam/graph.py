@@ -8,16 +8,14 @@ r"""A ``Graph`` class that stores the edges and vertices required for Graph SLAM
 
 """
 
-
+import warnings
 from collections import defaultdict
 from functools import reduce
-import warnings
 
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.sparse import SparseEfficiencyWarning, lil_matrix
 from scipy.sparse.linalg import spsolve
-import matplotlib.pyplot as plt
-
 
 warnings.simplefilter("ignore", SparseEfficiencyWarning)
 warnings.filterwarnings("ignore", category=SparseEfficiencyWarning)
@@ -44,6 +42,7 @@ class _Chi2GradientHessian:
         The contributions to the Hessian matrix
 
     """
+
     def __init__(self, dim):
         self.chi2 = 0.
         self.dim = dim
@@ -59,7 +58,6 @@ class _Chi2GradientHessian:
         chi2_grad_hess : _Chi2GradientHessian
             The ``_Chi2GradientHessian`` that will be updated
         incoming : tuple
-            TODO
 
         """
         chi2_grad_hess.chi2 += incoming[0]
@@ -100,6 +98,7 @@ class Graph(object):
         A list of the vertices in the graph
 
     """
+
     def __init__(self, edges, vertices):
         # The vertices and edges lists
         self._edges = edges
@@ -117,14 +116,16 @@ class Graph(object):
 
         """
         index_id_dict = {i: v.id for i, v in enumerate(self._vertices)}
-        id_index_dict = {v_id: v_index for v_index, v_id in index_id_dict.items()}
+        id_index_dict = {v_id: v_index for v_index, v_id in
+                         index_id_dict.items()}
 
         # Fill in the vertices' `index` attribute
         for v in self._vertices:
             v.index = id_index_dict[v.id]
 
         for e in self._edges:
-            e.vertices = [self._vertices[id_index_dict[v_id]] for v_id in e.vertex_ids]
+            e.vertices = [self._vertices[id_index_dict[v_id]] for v_id in
+                          e.vertex_ids]
 
     def calc_chi2(self):
         r"""Calculate the :math:`\chi^2` error for the ``Graph``.
@@ -144,22 +145,34 @@ class Graph(object):
         """
         n = len(self._vertices)
         dim = len(self._vertices[0].pose.to_compact())
-        chi2_gradient_hessian = reduce(_Chi2GradientHessian.update, (e.calc_chi2_gradient_hessian() for e in self._edges), _Chi2GradientHessian(dim))
+        chi2_gradient_hessian = reduce(_Chi2GradientHessian.update,
+                                       (e.calc_chi2_gradient_hessian()
+                                        for e in self._edges),
+                                       _Chi2GradientHessian(dim))
 
         self._chi2 = chi2_gradient_hessian.chi2
 
         # Fill in the gradient vector
-        self._gradient = np.zeros(n * dim, dtype=np.float64)
-        for idx, contrib in chi2_gradient_hessian.gradient.items():
-            self._gradient[idx * dim: (idx + 1) * dim] += contrib
+        self._gradient = np.zeros(n * dim, dtype=float)
+        for idx, cont in chi2_gradient_hessian.gradient.items():
+            self._gradient[idx * dim: (idx + 1) * dim] += cont
 
         # Fill in the Hessian matrix
-        self._hessian = lil_matrix((n * dim, n * dim), dtype=np.float64)
-        for (row_idx, col_idx), contrib in chi2_gradient_hessian.hessian.items():
-            self._hessian[row_idx * dim: (row_idx + 1) * dim, col_idx * dim: (col_idx + 1) * dim] = contrib
+        self._hessian = lil_matrix((n * dim, n * dim), dtype=float)
+        for (row_idx, col_idx), cont in chi2_gradient_hessian.hessian.items():
+            x_start = row_idx * dim
+            x_end = (row_idx + 1) * dim
+            y_start = col_idx * dim
+            y_end = (col_idx + 1) * dim
+            self._hessian[x_start:x_end, y_start:y_end] = cont
 
             if row_idx != col_idx:
-                self._hessian[col_idx * dim: (col_idx + 1) * dim, row_idx * dim: (row_idx + 1) * dim] = np.transpose(contrib)
+                x_start = col_idx * dim
+                x_end = (col_idx + 1) * dim
+                y_start = row_idx * dim
+                y_end = (row_idx + 1) * dim
+                self._hessian[x_start:x_end, y_start:y_end] = \
+                    np.transpose(cont)
 
     def optimize(self, tol=1e-4, max_iter=20, fix_first_pose=True):
         r"""Optimize the :math:`\chi^2` error for the ``Graph``.
@@ -189,8 +202,10 @@ class Graph(object):
 
             # Check for convergence (from the previous iteration); this avoids having to calculate chi^2 twice
             if i > 0:
-                rel_diff = (chi2_prev - self._chi2) / (chi2_prev + np.finfo(float).eps)
-                print("{:9d} {:20.4f} {:18.6f}".format(i, self._chi2, -rel_diff))
+                rel_diff = (chi2_prev - self._chi2) / (
+                            chi2_prev + np.finfo(float).eps)
+                print(
+                    "{:9d} {:20.4f} {:18.6f}".format(i, self._chi2, -rel_diff))
                 if self._chi2 < chi2_prev and rel_diff < tol:
                     return
             else:
@@ -207,7 +222,7 @@ class Graph(object):
                 self._gradient[:dim] = 0.
 
             # Solve for the updates
-            dx = spsolve(self._hessian, -self._gradient)  # pylint: disable=invalid-unary-operand-type
+            dx = spsolve(self._hessian, -self._gradient)
 
             # Apply the updates
             for v, dx_i in zip(self._vertices, np.split(dx, n)):
@@ -216,7 +231,8 @@ class Graph(object):
         # If we reached the maximum number of iterations, print out the final iteration's results
         self.calc_chi2()
         rel_diff = (chi2_prev - self._chi2) / (chi2_prev + np.finfo(float).eps)
-        print("{:9d} {:20.4f} {:18.6f}".format(max_iter, self._chi2, -rel_diff))
+        print("{:9d} {:20.4f} {:18.6f}".format(
+            max_iter, self._chi2, -rel_diff))
 
     def to_g2o(self, outfile):
         """Save the graph in .g2o format.
@@ -234,7 +250,8 @@ class Graph(object):
             for e in self._edges:
                 f.write(e.to_g2o())
 
-    def plot(self, vertex_color='r', vertex_marker='o', vertex_markersize=3, edge_color='b', title=None):
+    def plot(self, vertex_color='r', vertex_marker='o', vertex_markersize=3,
+             edge_color='b', title=None):
         """Plot the graph.
 
         Parameters
