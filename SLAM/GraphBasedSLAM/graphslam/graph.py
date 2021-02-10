@@ -146,8 +146,9 @@ class Graph(object):
         n = len(self._vertices)
         dim = len(self._vertices[0].pose.to_compact())
         chi2_gradient_hessian = reduce(_Chi2GradientHessian.update,
-                                       (e.calc_chi2_gradient_hessian() for e in
-                                        self._edges), _Chi2GradientHessian(dim))
+                                       (e.calc_chi2_gradient_hessian()
+                                        for e in self._edges),
+                                       _Chi2GradientHessian(dim))
 
         self._chi2 = chi2_gradient_hessian.chi2
 
@@ -163,14 +164,14 @@ class Graph(object):
             x_end = (row_idx + 1) * dim
             y_start = col_idx * dim
             y_end = (col_idx + 1) * dim
-            self._hessian[x_start:x_end,y_start:y_end] = cont
+            self._hessian[x_start:x_end, y_start:y_end] = cont
 
             if row_idx != col_idx:
                 x_start = col_idx * dim
                 x_end = (col_idx + 1) * dim
                 y_start = row_idx * dim
                 y_end = (row_idx + 1) * dim
-                self._hessian[x_start:x_end,y_start:y_end] = np.transpose(cont)
+                self._hessian[x_start:x_end, y_start:y_end] = np.transpose(cont)
 
     def optimize(self, tol=1e-4, max_iter=20, fix_first_pose=True):
         r"""Optimize the :math:`\chi^2` error for the ``Graph``.
@@ -230,7 +231,8 @@ class Graph(object):
         # If we reached the maximum number of iterations, print out the final iteration's results
         self.calc_chi2()
         rel_diff = (chi2_prev - self._chi2) / (chi2_prev + np.finfo(float).eps)
-        print("{:9d} {:20.4f} {:18.6f}".format(max_iter, self._chi2, -rel_diff))
+        print("{:9d} {:20.4f} {:18.6f}".format(
+            max_iter, self._chi2, -rel_diff))
 
     def to_g2o(self, outfile):
         """Save the graph in .g2o format.
