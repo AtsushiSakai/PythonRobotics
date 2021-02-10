@@ -171,7 +171,8 @@ class Graph(object):
                 x_end = (col_idx + 1) * dim
                 y_start = row_idx * dim
                 y_end = (row_idx + 1) * dim
-                self._hessian[x_start:x_end, y_start:y_end] = np.transpose(cont)
+                self._hessian[x_start:x_end, y_start:y_end] = \
+                    np.transpose(cont)
 
     def optimize(self, tol=1e-4, max_iter=20, fix_first_pose=True):
         r"""Optimize the :math:`\chi^2` error for the ``Graph``.
@@ -221,8 +222,7 @@ class Graph(object):
                 self._gradient[:dim] = 0.
 
             # Solve for the updates
-            dx = spsolve(self._hessian,
-                         -self._gradient)  # pylint: disable=invalid-unary-operand-type
+            dx = spsolve(self._hessian, -self._gradient)
 
             # Apply the updates
             for v, dx_i in zip(self._vertices, np.split(dx, n)):

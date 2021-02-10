@@ -160,8 +160,8 @@ class PoseSE2(np.ndarray):
         """
         return PoseSE2(
             [self[0] + other[0] * np.cos(self[2]) - other[1] * np.sin(self[2]),
-             self[1] + other[0] * np.sin(self[2]) + other[1] * np.cos(self[2])],
-            neg_pi_to_pi(self[2] + other[2]))
+             self[1] + other[0] * np.sin(self[2]) + other[1] * np.cos(self[2])
+             ], neg_pi_to_pi(self[2] + other[2]))
 
     def __sub__(self, other):
         r"""Subtract poses (i.e., inverse pose composition): :math:`p_1 \ominus p_2`.
