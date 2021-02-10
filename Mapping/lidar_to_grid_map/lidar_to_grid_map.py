@@ -193,7 +193,7 @@ def generate_ray_casting_grid_map(ox, oy, xy_resolution, breshen=True):
                                         (x_w, y_w),
                                         (min_x, min_y), xy_resolution)
         flood_fill((center_x, center_y), occupancy_map)
-        occupancy_map = np.array(occupancy_map, dtype=np.float)
+        occupancy_map = np.array(occupancy_map, dtype=float)
         for (x, y) in zip(ox, oy):
             ix = int(round((x - min_x) / xy_resolution))
             iy = int(round((y - min_y) / xy_resolution))

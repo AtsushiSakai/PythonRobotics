@@ -149,12 +149,12 @@ class Graph(object):
         self._chi2 = chi2_gradient_hessian.chi2
 
         # Fill in the gradient vector
-        self._gradient = np.zeros(n * dim, dtype=np.float64)
+        self._gradient = np.zeros(n * dim, dtype=float)
         for idx, contrib in chi2_gradient_hessian.gradient.items():
             self._gradient[idx * dim: (idx + 1) * dim] += contrib
 
         # Fill in the Hessian matrix
-        self._hessian = lil_matrix((n * dim, n * dim), dtype=np.float64)
+        self._hessian = lil_matrix((n * dim, n * dim), dtype=float)
         for (row_idx, col_idx), contrib in chi2_gradient_hessian.hessian.items():
             self._hessian[row_idx * dim: (row_idx + 1) * dim, col_idx * dim: (col_idx + 1) * dim] = contrib
 

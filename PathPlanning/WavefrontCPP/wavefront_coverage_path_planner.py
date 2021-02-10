@@ -47,7 +47,7 @@ def transform(
     else:
         sys.exit('Unsupported distance type.')
 
-    transform_matrix = float('inf') * np.ones_like(grid_map, dtype=np.float)
+    transform_matrix = float('inf') * np.ones_like(grid_map, dtype=float)
     transform_matrix[src[0], src[1]] = 0
     if transform_type == 'distance':
         eT = np.zeros_like(grid_map)

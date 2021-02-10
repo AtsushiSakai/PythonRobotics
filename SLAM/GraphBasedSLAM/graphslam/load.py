@@ -44,7 +44,7 @@ def load_g2o_se2(infile):
         for line in f.readlines():
             if line.startswith("VERTEX_SE2"):
                 numbers = line[10:].split()
-                arr = np.array([float(number) for number in numbers[1:]], dtype=np.float64)
+                arr = np.array([float(number) for number in numbers[1:]], dtype=float)
                 p = PoseSE2(arr[:2], arr[2])
                 v = Vertex(int(numbers[0]), p)
                 vertices.append(v)
@@ -52,7 +52,7 @@ def load_g2o_se2(infile):
 
             if line.startswith("EDGE_SE2"):
                 numbers = line[9:].split()
-                arr = np.array([float(number) for number in numbers[2:]], dtype=np.float64)
+                arr = np.array([float(number) for number in numbers[2:]], dtype=float)
                 vertex_ids = [int(numbers[0]), int(numbers[1])]
                 estimate = PoseSE2(arr[:2], arr[2])
                 information = upper_triangular_matrix_to_full_matrix(arr[3:], 3)

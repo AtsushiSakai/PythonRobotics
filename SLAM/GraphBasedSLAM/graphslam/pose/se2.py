@@ -27,7 +27,7 @@ class PoseSE2(np.ndarray):
 
     """
     def __new__(cls, position, orientation):
-        obj = np.array([position[0], position[1], neg_pi_to_pi(orientation)], dtype=np.float64).view(cls)
+        obj = np.array([position[0], position[1], neg_pi_to_pi(orientation)], dtype=float).view(cls)
         return obj
 
     # pylint: disable=arguments-differ
@@ -73,7 +73,7 @@ class PoseSE2(np.ndarray):
             The pose as an :math:`SE(2)` matrix
 
         """
-        return np.array([[np.cos(self[2]), -np.sin(self[2]), self[0]], [np.sin(self[2]), np.cos(self[2]), self[1]], [0., 0., 1.]], dtype=np.float64)
+        return np.array([[np.cos(self[2]), -np.sin(self[2]), self[0]], [np.sin(self[2]), np.cos(self[2]), self[1]], [0., 0., 1.]], dtype=float)
 
     @classmethod
     def from_matrix(cls, matrix):

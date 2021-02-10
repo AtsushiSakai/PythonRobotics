@@ -115,9 +115,9 @@ def jacob_motion(x, u):
     Fx = np.hstack((np.eye(STATE_SIZE), np.zeros(
         (STATE_SIZE, LM_SIZE * calc_n_lm(x)))))
 
-    jF = np.array([[0.0, 0.0, -DT * u[0] * math.sin(x[2, 0])],
-                   [0.0, 0.0, DT * u[0] * math.cos(x[2, 0])],
-                   [0.0, 0.0, 0.0]], dtype=np.float64)
+    jF = np.array([[0.0, 0.0, -DT * u[0, 0] * math.sin(x[2, 0])],
+                   [0.0, 0.0, DT * u[0, 0] * math.cos(x[2, 0])],
+                   [0.0, 0.0, 0.0]], dtype=float)
 
     G = np.eye(STATE_SIZE) + Fx.T @ jF @ Fx
 
