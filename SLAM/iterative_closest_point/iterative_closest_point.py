@@ -43,11 +43,11 @@ def icp_matching(previous_points, current_points):
             if previous_points.shape[0] == 3:
                 fig = plt.figure()
                 ax = fig.add_subplot(111, projection='3d')
-                ax.scatter(previous_points[0, :], previous_points[1, :], 
-                            previous_points[2, :], c = "r", marker = ".")
-                ax.scatter(current_points[0, :], current_points[1, :], 
-                           current_points[2, :], c = "b", marker = ".")
-                ax.scatter(0.0, 0.0, 0.0, c = "r", marker = "x")
+                ax.scatter(previous_points[0, :], previous_points[1, :],
+                            previous_points[2, :], c="r", marker=".")
+                ax.scatter(current_points[0, :], current_points[1, :],
+                           current_points[2, :], c="b", marker=".")
+                ax.scatter(0.0, 0.0, 0.0, c="r", marker="x")
             else:
                 plt.cla()
                 plt.plot(previous_points[0, :], previous_points[1, :], ".r")
