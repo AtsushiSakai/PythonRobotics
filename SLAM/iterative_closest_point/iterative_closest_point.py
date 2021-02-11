@@ -5,6 +5,7 @@ author: Atsushi Sakai (@Atsushi_twi), Göktuğ Karakaşlı
 
 import math
 
+from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -19,8 +20,8 @@ def icp_matching(previous_points, current_points):
     """
     Iterative Closest Point matching
     - input
-    previous_points: 2D points in the previous frame
-    current_points: 2D points in the current frame
+    previous_points: 2D or 3D points in the previous frame
+    current_points: 2D or 3D points in the current frame
     - output
     R: Rotation matrix
     T: Translation vector
@@ -35,15 +36,24 @@ def icp_matching(previous_points, current_points):
         count += 1
 
         if show_animation:  # pragma: no cover
-            plt.cla()
             # for stopping simulation with the esc key.
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
-            plt.plot(previous_points[0, :], previous_points[1, :], ".r")
-            plt.plot(current_points[0, :], current_points[1, :], ".b")
-            plt.plot(0.0, 0.0, "xr")
-            plt.axis("equal")
+            if previous_points.shape[0] == 3:
+                fig = plt.figure()
+                ax = fig.add_subplot(111, projection='3d')
+                ax.scatter(previous_points[0, :], previous_points[1, :], 
+                            previous_points[2, :], c = "r", marker = ".")
+                ax.scatter(current_points[0, :], current_points[1, :], 
+                           current_points[2, :], c = "b", marker = ".")
+                ax.scatter(0.0, 0.0, 0.0, c = "r", marker = "x")
+            else:
+                plt.cla()
+                plt.plot(previous_points[0, :], previous_points[1, :], ".r")
+                plt.plot(current_points[0, :], current_points[1, :], ".b")
+                plt.plot(0.0, 0.0, "xr")
+                plt.axis("equal")
             plt.pause(0.1)
 
         indexes, error = nearest_neighbor_association(previous_points, current_points)
