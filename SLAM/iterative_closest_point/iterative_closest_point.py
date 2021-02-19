@@ -1,6 +1,6 @@
 """
 Iterative Closest Point (ICP) SLAM example
-author: Atsushi Sakai (@Atsushi_twi), Göktuğ Karakaşlı
+author: Atsushi Sakai (@Atsushi_twi), Göktuğ Karakaşlı, Shamil Gemuev
 """
 
 import math
@@ -32,28 +32,16 @@ def icp_matching(previous_points, current_points):
     preError = np.inf
     count = 0
 
+    if show_animation:
+        fig = plt.figure()
+        if previous_points.shape[0] == 3:
+            fig.add_subplot(111, projection='3d')
+
     while dError >= EPS:
         count += 1
 
         if show_animation:  # pragma: no cover
-            # for stopping simulation with the esc key.
-            plt.gcf().canvas.mpl_connect(
-                'key_release_event',
-                lambda event: [exit(0) if event.key == 'escape' else None])
-            if previous_points.shape[0] == 3:
-                fig = plt.figure()
-                ax = fig.add_subplot(111, projection='3d')
-                ax.scatter(previous_points[0, :], previous_points[1, :],
-                           previous_points[2, :], c="r", marker=".")
-                ax.scatter(current_points[0, :], current_points[1, :],
-                           current_points[2, :], c="b", marker=".")
-                ax.scatter(0.0, 0.0, 0.0, c="r", marker="x")
-            else:
-                plt.cla()
-                plt.plot(previous_points[0, :], previous_points[1, :], ".r")
-                plt.plot(current_points[0, :], current_points[1, :], ".b")
-                plt.plot(0.0, 0.0, "xr")
-                plt.axis("equal")
+            plot_points(previous_points, current_points, fig)
             plt.pause(0.1)
 
         indexes, error = nearest_neighbor_association(previous_points, current_points)
@@ -128,6 +116,31 @@ def svd_motion_estimation(previous_points, current_points):
     t = pm - (R @ cm)
 
     return R, t
+
+
+def plot_points(previous_points, current_points, figure):
+    # for stopping simulation with the esc key.
+    plt.gcf().canvas.mpl_connect(
+        'key_release_event',
+        lambda event: [exit(0) if event.key == 'escape' else None])
+    if previous_points.shape[0] == 3:
+        # axes = figure.axes[0]
+        # axes.clear()
+        figure = plt.figure()
+        axes = figure.add_subplot(111, projection='3d')
+        axes.scatter(previous_points[0, :], previous_points[1, :],
+                   previous_points[2, :], c="r", marker=".")
+        axes.scatter(current_points[0, :], current_points[1, :],
+                   current_points[2, :], c="b", marker=".")
+        axes.scatter(0.0, 0.0, 0.0, c="r", marker="x")
+        # figure.canvas.draw()
+        # figure.canvas.flush_events()
+    else:
+        plt.cla()
+        plt.plot(previous_points[0, :], previous_points[1, :], ".r")
+        plt.plot(current_points[0, :], current_points[1, :], ".b")
+        plt.plot(0.0, 0.0, "xr")
+        plt.axis("equal")
 
 
 def main():
