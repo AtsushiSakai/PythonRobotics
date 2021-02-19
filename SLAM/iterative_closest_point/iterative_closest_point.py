@@ -129,9 +129,9 @@ def plot_points(previous_points, current_points, figure):
         figure = plt.figure()
         axes = figure.add_subplot(111, projection='3d')
         axes.scatter(previous_points[0, :], previous_points[1, :],
-                   previous_points[2, :], c="r", marker=".")
+                     previous_points[2, :], c="r", marker=".")
         axes.scatter(current_points[0, :], current_points[1, :],
-                   current_points[2, :], c="b", marker=".")
+                     current_points[2, :], c="b", marker=".")
         axes.scatter(0.0, 0.0, 0.0, c="r", marker="x")
         # figure.canvas.draw()
         # figure.canvas.flush_events()
