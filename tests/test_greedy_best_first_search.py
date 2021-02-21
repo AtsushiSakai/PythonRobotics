@@ -1,5 +1,5 @@
 import conftest
-from PathPlanning.BreadthFirstSearch import breadth_first_search as m
+from PathPlanning.GreedyBestFirstSearch import greedy_best_first_search as m
 
 
 def test_1():
