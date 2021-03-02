@@ -40,7 +40,8 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
 
 
 def mod2pi(x):
-    v = np.mod(x, 2.0 * math.pi)
+    # Be consistent with fmod in cplusplus here.
+    v = np.mod(x, np.copysign(2.0 * math.pi, x))
     if v < -math.pi:
         v += 2.0 * math.pi
     else:
@@ -76,7 +77,7 @@ def set_path(paths, lengths, ctypes):
     for tpath in paths:
         typeissame = (tpath.ctypes == path.ctypes)
         if typeissame:
-            if sum(tpath.lengths) - sum(path.lengths) <= 0.01:
+            if sum(np.abs(tpath.lengths)) - sum(np.abs(path.lengths)) <= 0.01:
                 return paths  # not insert path
 
     path.L = sum([abs(i) for i in lengths])
