@@ -16,7 +16,7 @@ class State(object):
         self.state = "."
         self.t = "new"  # tag for state
         self.h = 0
-        self.k = 0 
+        self.k = 0
 
     def cost(self, state):
         if self.state == "#" or state.state == "#":
@@ -189,12 +189,10 @@ class Dstar(object):
 
 
 def main():
-
-
     m = Map(20, 20)
-
-    obstacle_list = [(8, 3), (8, 4), (8, 5), (8, 6), (8, 7), (8, 8), (8, 9), (8, 10), 
-    (8, 11), (8, 12), (8, 13), (7, 13), (6, 13), (5, 13)]
+    obstacle_list = [(8, 3), (8, 4), (8, 5), (8, 6), (8, 7),
+                     (8, 8), (8, 9), (8, 10), (8, 11), (8, 12), 
+                     (8, 13), (7, 13), (6, 13), (5, 13)]
 
     m.set_obstacle(obstacle_list)
 
@@ -202,7 +200,8 @@ def main():
     goal = [17, 19]
 
     if show_animation:
-        plt.plot([x for (x, y) in obstacle_list], [y for (x, y) in obstacle_list], ".k")
+        plt.plot([x for (x, y) in obstacle_list], 
+            [y for (x, y) in obstacle_list], ".k")
         plt.plot(start[0], start[1], "og")
         plt.plot(goal[0], goal[1], "xb")
 
