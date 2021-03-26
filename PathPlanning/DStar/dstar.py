@@ -201,7 +201,7 @@ def main():
 
     if show_animation:
         plt.plot([x for (x, y) in obstacle_list], 
-            [y for (x, y) in obstacle_list], ".k")
+                 [y for (x, y) in obstacle_list], ".k")
         plt.plot(start[0], start[1], "og")
         plt.plot(goal[0], goal[1], "xb")
 
