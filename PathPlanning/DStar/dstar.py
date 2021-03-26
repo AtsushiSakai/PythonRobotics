@@ -1,8 +1,12 @@
 import math
+
 from sys import maxsize
+
 import matplotlib.pyplot as plt
 
 show_animation = True
+
+
 class State(object):
 
     def __init__(self, x, y):
@@ -10,17 +14,26 @@ class State(object):
         self.y = y
         self.parent = None
         self.state = "."
-        self.t = "new" #tag for state
+        self.t = "new"  # tag for state
         self.h = 0
-        self.k = 0
+        self.k = 0 
 
     def cost(self, state):
         if self.state == "#" or state.state == "#":
             return maxsize
+
         return math.sqrt(math.pow((self.x - state.x), 2) +
                          math.pow((self.y - state.y), 2))
 
     def set_state(self, state):
+        '''
+        : 
+        .: new
+        #: obstacle
+        e: oparent of current state
+        *: closed state
+        s: current state
+        '''
         if state not in ["s", ".", "#", "e", "*"]:
             return
         self.state = state
@@ -59,21 +72,24 @@ class Map(object):
         for x, y in point_list:
             if x < 0 or x >= self.row or y < 0 or y >= self.col:
                 continue
+
             self.map[x][y].set_state("#")
 
 
 class Dstar(object):
-
     def __init__(self, maps):
         self.map = maps
         self.open_list = set()
 
     def process_state(self):
         x = self.min_state()
+
         if x is None:
             return -1
+
         k_old = self.get_kmin()
         self.remove(x)
+
         if k_old < x.h:
             for y in self.map.get_neighbers(x):
                 if y.h <= k_old and x.h > y.h + x.cost(y):
@@ -132,18 +148,23 @@ class Dstar(object):
             self.insert(x, x.parent.h + x.cost(x.parent))
 
     def run(self, start, end):
+
         rx = []
         ry = []
+
         self.open_list.add(end)
+
         while True:
             self.process_state()
             if start.t == "close":
                 break
+
         start.set_state("s")
         s = start
         s = s.parent
         s.set_state("e")
         tmp = start
+
         while tmp != end:
             tmp.set_state("*")
             rx.append(tmp.x)
@@ -151,12 +172,12 @@ class Dstar(object):
             if show_animation:
                 plt.plot(rx, ry)
                 plt.pause(0.01)
-            print("")
             if tmp.parent.state == "#":
                 self.modify(tmp)
                 continue
             tmp = tmp.parent
         tmp.set_state("e")
+
         return rx, ry
 
     def modify(self, state):
@@ -165,23 +186,35 @@ class Dstar(object):
             k_min = self.process_state()
             if k_min >= state.h:
                 break
+
+
 def main():
+
+
     m = Map(20, 20)
-    obstacle_list = [(8, 3), (8, 4), (8, 5), (8, 6), (8, 7), (8, 8), (8, 9), (8, 10), (8, 11), (8, 12),(8, 13), (7, 13), (6, 13), (5, 13)]
+
+    obstacle_list = [(8, 3), (8, 4), (8, 5), (8, 6), (8, 7), (8, 8), (8, 9), (8, 10), 
+    (8, 11), (8, 12), (8, 13), (7, 13), (6, 13), (5, 13)]
+
     m.set_obstacle(obstacle_list)
-    start = [1,2]
+
+    start = [1, 2]
     goal = [17, 19]
+
     if show_animation:
         plt.plot([x for (x, y) in obstacle_list], [y for (x, y) in obstacle_list], ".k")
         plt.plot(start[0], start[1], "og")
         plt.plot(goal[0], goal[1], "xb")
+
     start = m.map[start[0]][start[1]]
     end = m.map[goal[0]][goal[1]]
     dstar = Dstar(m)
     rx, ry = dstar.run(start, end)
+
     if show_animation:
         plt.plot(rx, ry)
         plt.show()
+
 
 if __name__ == '__main__':
     main()
