@@ -128,7 +128,6 @@ class AStarPlanner:
                         open_set[n_id] = node
 
         rx, ry = self.calc_final_path(goal_node, closed_set)
-
         return rx, ry
 
     def calc_final_path(self, goal_node, closed_set):

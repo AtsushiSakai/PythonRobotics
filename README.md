@@ -301,6 +301,16 @@ In the animation, cyan points are searched nodes.
 
 Its heuristic is 2D Euclid distance.
 
+### D\* algorithm
+
+This is a 2D grid based the shortest path planning with D star algorithm.
+
+![figure at master · nirnayroy/intelligentrobotics](https://github.com/nirnayroy/intelligent-robotics/blob/main/dstar.gif)
+
+In the animation, cyan points are searched nodes.
+
+Its heuristic is 2D Euclid distance.
+
 ### Potential Field algorithm
 
 This is a 2D grid based path planning with Potential Field algorithm.
