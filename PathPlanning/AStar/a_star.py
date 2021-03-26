@@ -1,8 +1,12 @@
 """
+
 A* grid planning
+
 author: Atsushi Sakai(@Atsushi_twi)
         Nikos Kanargias (nkana@tee.gr)
+
 See Wikipedia article (https://en.wikipedia.org/wiki/A*_search_algorithm)
+
 """
 
 import math
@@ -17,6 +21,7 @@ class AStarPlanner:
     def __init__(self, ox, oy, resolution, rr):
         """
         Initialize grid map for a star planning
+
         ox: x position list of Obstacles [m]
         oy: y position list of Obstacles [m]
         resolution: grid resolution [m]
@@ -46,11 +51,13 @@ class AStarPlanner:
     def planning(self, sx, sy, gx, gy):
         """
         A star path search
+
         input:
             s_x: start x position [m]
             s_y: start y position [m]
             gx: goal x position [m]
             gy: goal y position [m]
+
         output:
             rx: x position list of the final path
             ry: y position list of the final path
@@ -146,6 +153,7 @@ class AStarPlanner:
     def calc_grid_position(self, index, min_position):
         """
         calc grid position
+
         :param index:
         :param min_position:
         :return:
