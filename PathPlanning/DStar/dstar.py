@@ -27,7 +27,6 @@ class State(object):
 
     def set_state(self, state):
         '''
-        : 
         .: new
         #: obstacle
         e: oparent of current state
@@ -198,7 +197,6 @@ def main():
 
     start = [1, 2]
     goal = [17, 19]
-
     if show_animation:
         plt.plot([x for (x, y) in obstacle_list], 
                  [y for (x, y) in obstacle_list], ".k")
@@ -213,7 +211,6 @@ def main():
     if show_animation:
         plt.plot(rx, ry)
         plt.show()
-
 
 if __name__ == '__main__':
     main()
