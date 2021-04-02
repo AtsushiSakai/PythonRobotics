@@ -5,7 +5,7 @@ author: Atsushi Sakai (@Atsushi_twi), Göktuğ Karakaşlı, Shamil Gemuev
 
 import math
 
-# from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
+from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -34,8 +34,8 @@ def icp_matching(previous_points, current_points):
 
     if show_animation:
         fig = plt.figure()
-        # if previous_points.shape[0] == 3:
-        #    fig.add_subplot(111, projection='3d')
+        if previous_points.shape[0] == 3:
+           fig.add_subplot(111, projection='3d')
 
     while dError >= EPS:
         count += 1
@@ -123,21 +123,21 @@ def plot_points(previous_points, current_points, figure):
     plt.gcf().canvas.mpl_connect(
         'key_release_event',
         lambda event: [exit(0) if event.key == 'escape' else None])
-    # if previous_points.shape[0] == 3:
-    # plt.clf()
-    # axes = figure.add_subplot(111, projection='3d')
-    # axes.scatter(previous_points[0, :], previous_points[1, :],
-    #             previous_points[2, :], c="r", marker=".")
-    # axes.scatter(current_points[0, :], current_points[1, :],
-    #             current_points[2, :], c="b", marker=".")
-    # axes.scatter(0.0, 0.0, 0.0, c="r", marker="x")
-    # figure.canvas.draw()
-    # else:
-    plt.cla()
-    plt.plot(previous_points[0, :], previous_points[1, :], ".r")
-    plt.plot(current_points[0, :], current_points[1, :], ".b")
-    plt.plot(0.0, 0.0, "xr")
-    plt.axis("equal")
+    if previous_points.shape[0] == 3:
+        plt.clf()
+        axes = figure.add_subplot(111, projection='3d')
+        axes.scatter(previous_points[0, :], previous_points[1, :],
+                    previous_points[2, :], c="r", marker=".")
+        axes.scatter(current_points[0, :], current_points[1, :],
+                    current_points[2, :], c="b", marker=".")
+        axes.scatter(0.0, 0.0, 0.0, c="r", marker="x")
+        figure.canvas.draw()
+    else:
+        plt.cla()
+        plt.plot(previous_points[0, :], previous_points[1, :], ".r")
+        plt.plot(current_points[0, :], current_points[1, :], ".b")
+        plt.plot(0.0, 0.0, "xr")
+        plt.axis("equal")
 
 
 def main():
