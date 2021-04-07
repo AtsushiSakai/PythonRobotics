@@ -74,3 +74,6 @@ matplotrecorder/*
 
 # scratchpad files
 scratch/
+
+# IDE files
+.vscode/

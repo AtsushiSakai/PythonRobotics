@@ -23,7 +23,7 @@ class Robot:
     Robot kinematics simulator 
     """
     # numbers for Robotis Turtlebot3
-    _v_max =  0.22 # [m/s]
+    _v_max = 0.22  # [m/s]
     _omega_max = 2.84  # [rad/s]
     _accel_angular = 0.1  # [rad/s2]
     _accel_linear = 0.1  # [m/s2]
@@ -61,13 +61,12 @@ class Robot:
             v_new = s.v + v_error
 
         # update angular speed
-        delta_omega = self._accel_angular * dt 
+        delta_omega = self._accel_angular * dt
         omega_error = self._omega_target - s.omega
         if abs(omega_error) > delta_omega:
             omega_new = s.omega + sign(omega_error) * delta_omega
         else:
             omega_new = s.omega + omega_error
-
 
         # create new state
         s_new = State(x=s.x + s.v*cos(s.phi)*dt,
