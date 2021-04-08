@@ -1,4 +1,4 @@
-name: robotics
+name: python_robotics
 channels:
   - conda-forge
 dependencies:
