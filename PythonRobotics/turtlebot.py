@@ -82,7 +82,7 @@ class Robot:
         self._states.append(s_new)
 
     @property
-    def states(self) -> pd.DataFrame:
+    def states(self):
         """ get history of all states as pandas DataFrame """
 
         cols = state_fields[:-1]
