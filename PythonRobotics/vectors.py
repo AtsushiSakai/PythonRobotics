@@ -18,10 +18,10 @@ Special thanks for these information sources and references:
 
 """
 import numpy as np
-from math import atan2, hypot, pi, acos
+from math import atan2, hypot, pi, acos, sin, cos
 
 
-class Vector2d:
+class Vector:
     """ 2d vector, compatible with numpy """
 
     def __init__(self, *args):
@@ -36,10 +36,10 @@ class Vector2d:
         return f"{self.__class__.__name__}(x={self.x}, y={self.y})"
 
     def __add__(self, other):
-        return Vector2d(self.x+other.x, self.y+other.y)
+        return Vector(self.x+other.x, self.y+other.y)
 
     def __sub__(self, other):
-        return Vector2d(self.x-other.x, self.y-other.y)
+        return Vector(self.x-other.x, self.y-other.y)
 
     def __eq__(self, other):
         return (self.x == other.x) & (self.y == other.y)
@@ -56,16 +56,20 @@ class Vector2d:
 
     def __mul__(self, scalar):
         """ scalar multiplification """
-        return Vector2d(self.x * scalar, self.y * scalar)
+        return Vector(self.x * scalar, self.y * scalar)
 
     def __truediv__(self, scalar):  # note __div__ was removed in Python3
-        return Vector2d(self.x / scalar, self.y / scalar)
+        return Vector(self.x / scalar, self.y / scalar)
 
     def __neg__(self):
-        return Vector2d(-self.x, -self.y)
+        return Vector(-self.x, -self.y)
 
     def __abs__(self):
         return hypot(self.x, self.y)
+
+    @classmethod
+    def from_polar(cls,r, theta):
+        return Vector(r * cos(theta), r * sin(theta))
 
     def __array__(self, dtype=None) -> np.array:
         """ make this class compatable with numpy operations """
