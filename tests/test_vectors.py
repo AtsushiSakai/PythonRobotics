@@ -50,17 +50,21 @@ def test_inner():
 def test_mul():
     assert a * 3 == Vector(3, 6)
 
+
 def test_div():
-    a = Vector(1,2)
-    assert a / 2 == Vector(0.5,1.)
+    a = Vector(1, 2)
+    assert a / 2 == Vector(0.5, 1.)
+
 
 def test_neg():
-    assert -a == Vector(-1,-2)
+    assert -a == Vector(-1, -2)
+
 
 def test_length():
     assert abs(c) == 1
     assert abs(d) == 1
     assert abs(e) == np.sqrt(2)
+
 
 def test_angle():
 
@@ -69,19 +73,29 @@ def test_angle():
     assert d.angle(e) == np.pi/4
     assert -d.angle(c) == -np.pi/2
 
+
 def test_from_polar():
 
-    assert Vector.from_polar(1,0) == Vector(1,0)
+    assert Vector.from_polar(1, 0) == Vector(1, 0)
+
 
 def test_subscriptable():
 
     assert a[0] == 1
     assert a[1] == 2
 
+
 def test_projection():
 
-    a = Vector(1,1)
-    b = Vector(3,3)
-    c = Vector(1,3)
+    a = Vector(1, 1)
+    b = Vector(3, 3)
+    c = Vector(1, 3)
 
-    assert point_on_line(a,b,c) == Vector(2,2)
+    assert point_on_line(a, b, c) == Vector(2, 2)
+
+
+def test_rotation():
+
+    a = Vector(1, 0)
+    assert a.rotate(np.pi/2).round() == Vector(0, 1)
+    assert a.rotate(-np.pi/4) == Vector.from_polar(1, -np.pi/4)

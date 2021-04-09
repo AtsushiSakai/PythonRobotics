@@ -21,6 +21,11 @@ import numpy as np
 from math import atan2, hypot, pi, acos, sin, cos
 
 
+def rotation_matrix(theta):
+    """ create 2-d rotation matrix """
+    return np.array([[cos(theta), sin(theta)], [-sin(theta), cos(theta)]])
+
+
 class Vector:
     """ 2d vector, compatible with numpy """
 
@@ -47,11 +52,19 @@ class Vector:
     def cross(self, other):
         return (self.x * other.y) - (self.y * other.x)
 
-    def dot(self,other):
+    def dot(self, other):
         return self.x * other.x + self.y * other.y
 
     def inner(self, other):
         return self.dot(other)
+
+    def rotate(self, angle):
+        a = np.dot(self, rotation_matrix(angle))
+        return Vector(a[0], a[1])
+
+    def round(self, precision=5):
+        r = np.round(self, precision)
+        return Vector(r)
 
     def angle(self, other):
         """ angle between vector, *relative* to other, range (-pi..pi)  """
@@ -89,7 +102,7 @@ class Vector:
             return np.array([self.x, self.y])
 
 
-def point_on_line(a: Vector,b: Vector,p: Vector):
+def point_on_line(a: Vector, b: Vector, p: Vector):
     """
     project point p to line defined by a and b
     """
