@@ -6,7 +6,7 @@ author - Jev Kuznetsov
 """
 
 
-from PythonRobotics.vectors import Vector
+from PythonRobotics.vectors import Vector, point_on_line
 import numpy as np
 import math
 
@@ -72,3 +72,16 @@ def test_angle():
 def test_from_polar():
 
     assert Vector.from_polar(1,0) == Vector(1,0)
+
+def test_subscriptable():
+
+    assert a[0] == 1
+    assert a[1] == 2
+
+def test_projection():
+
+    a = Vector(1,1)
+    b = Vector(3,3)
+    c = Vector(1,3)
+
+    assert point_on_line(a,b,c) == Vector(2,2)
