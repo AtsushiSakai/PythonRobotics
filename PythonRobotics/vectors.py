@@ -50,6 +50,10 @@ class Vector2d:
     def inner(self, other):
         return self.x * other.x + self.y * other.y
 
+    def angle(self, other):
+        """ angle between vector, *relative* to other, range (-pi..pi)  """
+        return -atan2(self.cross(other), self.inner(other))
+
     def __mul__(self, scalar):
         """ scalar multiplification """
         return Vector2d(self.x * scalar, self.y * scalar)

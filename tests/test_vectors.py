@@ -60,3 +60,10 @@ def test_length():
     assert abs(c) == 1
     assert abs(d) == 1
     assert abs(e) == np.sqrt(2)
+
+def test_angle():
+
+    assert c.angle(c) == 0
+    assert d.angle(c) == np.pi/2
+    assert d.angle(e) == np.pi/4
+    assert -d.angle(c) == -np.pi/2
