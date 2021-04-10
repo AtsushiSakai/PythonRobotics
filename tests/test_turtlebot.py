@@ -6,7 +6,7 @@ author - Jev Kuznetsov
 """
 
 import conftest
-from PythonRobotics.PythonRobotics import turtlebot as m
+from PythonRobotics import turtlebot as m
 
 
 def test_1():
