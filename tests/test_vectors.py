@@ -5,10 +5,9 @@ Test vector module
 author - Jev Kuznetsov
 """
 
-
-from PythonRobotics.vectors import Vector, point_on_line
 import numpy as np
-import math
+from PythonRobotics.vectors import Vector, point_on_line
+
 
 # test tuples
 ta = (1, 2)
@@ -52,8 +51,7 @@ def test_mul():
 
 
 def test_div():
-    a = Vector(1, 2)
-    assert a / 2 == Vector(0.5, 1.)
+    assert Vector(1, 2) / 2 == Vector(0.5, 1.)
 
 
 def test_neg():
@@ -67,7 +65,6 @@ def test_length():
 
 
 def test_angle():
-
     assert c.angle(c) == 0
     assert d.angle(c) == np.pi/2
     assert d.angle(e) == np.pi/4
@@ -75,7 +72,6 @@ def test_angle():
 
 
 def test_from_polar():
-
     assert Vector.from_polar(1, 0) == Vector(1, 0)
 
 
@@ -87,15 +83,15 @@ def test_subscriptable():
 
 def test_projection():
 
-    a = Vector(1, 1)
-    b = Vector(3, 3)
-    c = Vector(1, 3)
+    pa = Vector(1, 1)
+    pb = Vector(3, 3)
+    pc = Vector(1, 3)
 
-    assert point_on_line(a, b, c) == Vector(2, 2)
+    assert point_on_line(pa, pb, pc) == Vector(2, 2)
 
 
 def test_rotation():
 
-    a = Vector(1, 0)
-    assert a.rotate(np.pi/2).round() == Vector(0, 1)
-    assert a.rotate(-np.pi/4) == Vector.from_polar(1, -np.pi/4)
+    v = Vector(1, 0)
+    assert v.rotate(np.pi/2).round() == Vector(0, 1)
+    assert v.rotate(-np.pi/4) == Vector.from_polar(1, -np.pi/4)

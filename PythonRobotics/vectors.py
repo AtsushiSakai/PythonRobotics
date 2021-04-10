@@ -17,9 +17,9 @@ Special thanks for these information sources and references:
 * [vector.py](https://github.com/betados/vector_2d/blob/develop/vector_2d/vector.py)
 
 """
-import numpy as np
-from math import atan2, hypot, pi, acos, sin, cos
 
+from math import atan2, hypot, sin, cos
+import numpy as np
 
 def rotation_matrix(theta):
     """ create 2-d rotation matrix """
@@ -33,7 +33,7 @@ class Vector:
         """ create from x,y or xy """
         try:
             self.x, self.y = float(args[0]), float(args[1])
-        except:
+        except IndexError:
             self.x = float(args[0][0])
             self.y = float(args[0][1])
 
