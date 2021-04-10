@@ -21,6 +21,7 @@ Special thanks for these information sources and references:
 from math import atan2, hypot, sin, cos
 import numpy as np
 
+
 def rotation_matrix(theta):
     """ create 2-d rotation matrix """
     return np.array([[cos(theta), sin(theta)], [-sin(theta), cos(theta)]])
