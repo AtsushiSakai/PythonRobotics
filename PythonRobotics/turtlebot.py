@@ -8,7 +8,7 @@ Author  - Jev Kuznetsov
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
+
 from numpy import sin, cos, sign
 import pandas as pd
 
@@ -108,6 +108,7 @@ class Robot:
 
 def main():
     """ demonstrate functionality """
+    import matplotlib.pyplot as plt
 
     bot = Robot()
 
