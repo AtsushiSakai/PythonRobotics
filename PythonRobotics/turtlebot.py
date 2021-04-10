@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
- 
-Simulator of a differantial drive robot, Turtlebot3 - like 
+
+Simulator of a differantial drive robot, Turtlebot3 - like
 
 Author  - Jev Kuznetsov
 
@@ -22,8 +22,8 @@ State = namedtuple('State', state_fields, defaults=(0.,) * len(state_fields))
 
 
 class Robot:
-    """ 
-    Robot kinematics simulator 
+    """
+    Robot kinematics simulator
     """
     # numbers for Robotis Turtlebot3
     _v_max = 0.22  # [m/s]
