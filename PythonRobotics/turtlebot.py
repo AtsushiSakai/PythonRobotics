@@ -7,12 +7,10 @@ Author  - Jev Kuznetsov
 
 """
 
-import numpy as np
-
-from numpy import sin, cos, sign
-import pandas as pd
-
 from collections import namedtuple
+from math import sin, cos
+import numpy as np
+import pandas as pd
 
 show_animation = True
 
@@ -26,10 +24,10 @@ class Robot:
     Robot kinematics simulator
     """
     # numbers for Robotis Turtlebot3
-    _v_max = 0.22  # [m/s]
-    _omega_max = 2.84  # [rad/s]
-    _accel_angular = 0.1  # [rad/s2]
-    _accel_linear = 0.1  # [m/s2]
+    v_max = 0.22  # [m/s]
+    omega_max = 2.84  # [rad/s]
+    accel_angular = 0.1  # [rad/s2]
+    accel_linear = 0.1  # [m/s2]
     _wheel_diameter = 66e-3  # [m]
     _wheel_distance = 160e-3  # [m]
 
@@ -47,8 +45,8 @@ class Robot:
 
     def set_velocity(self, v, omega):
         """ set target velocities """
-        self._omega_target = np.clip(omega, -self._omega_max, self._omega_max)
-        self._v_target = np.clip(v, 0, self._v_max)
+        self._omega_target = np.clip(omega, -self.omega_max, self.omega_max)
+        self._v_target = np.clip(v, 0, self.v_max)
 
     def step(self, dt=0.1):
         """ perform simulation step with timestep dt """
@@ -56,18 +54,18 @@ class Robot:
         s = self.state  # start state
 
         # update linear speed
-        delta_v = self._accel_linear * dt  # dv is an absolute number
+        delta_v = self.accel_linear * dt  # dv is an absolute number
         v_error = self._v_target - s.v
         if abs(v_error) > delta_v:
-            v_new = s.v + sign(v_error) * delta_v
+            v_new = s.v + np.sign(v_error) * delta_v
         else:
             v_new = s.v + v_error
 
         # update angular speed
-        delta_omega = self._accel_angular * dt
+        delta_omega = self.accel_angular * dt
         omega_error = self._omega_target - s.omega
         if abs(omega_error) > delta_omega:
-            omega_new = s.omega + sign(omega_error) * delta_omega
+            omega_new = s.omega + np.sign(omega_error) * delta_omega
         else:
             omega_new = s.omega + omega_error
 
@@ -113,10 +111,10 @@ def main():
     bot = Robot()
 
     # high acceleration ~ instantaneous velocity
-    bot._accel_angular = 1000  # high angular acceleration
-    bot._accel_linear = 1  # constant linear acceleration
-    bot._v_max = 10  # max linear velocity
-    bot._omega_max = 2*np.pi  # max angular velocity
+    bot.accel_angular = 1000  # high angular acceleration
+    bot.accel_linear = 1  # constant linear acceleration
+    bot.v_max = 10  # max linear velocity
+    bot.omega_max = 2*np.pi  # max angular velocity
 
     omega = 2*np.pi  # rad/s
 
