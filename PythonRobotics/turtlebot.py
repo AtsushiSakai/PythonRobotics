@@ -8,10 +8,13 @@ Author  - Jev Kuznetsov
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
 from numpy import sin, cos, sign
 import pandas as pd
 
 from collections import namedtuple
+
+show_animation = True
 
 # define state object
 state_fields = ['x', 'y', 'phi', 'v', 'omega', 't']
@@ -101,3 +104,65 @@ class Robot:
 
     def __repr__(self):
         return f'{self.name} {self.state})'
+
+
+def main():
+    """ demonstrate functionality """
+
+    bot = Robot()
+
+    # high acceleration ~ instantaneous velocity
+    bot._accel_angular = 1000  # high angular acceleration
+    bot._accel_linear = 1  # constant linear acceleration
+    bot._v_max = 10  # max linear velocity
+    bot._omega_max = 2*np.pi  # max angular velocity
+
+    omega = 2*np.pi  # rad/s
+
+    # calculate path
+    t_sim = 1.0  # simulation time [sec]
+    dt = 0.01  # timestep
+    n_steps = int(t_sim / dt)
+
+    bot.set_velocity(1.0, omega)
+
+    for _ in range(n_steps):
+        bot.step(dt)
+
+    print('Simulation result:\n', bot.states)
+
+    # plot data
+    if show_animation:
+        plt.style.use('seaborn-whitegrid')
+
+        plt.cla()
+        plt.tight_layout()
+
+        plt.subplot(2, 2, 1)
+        bot.states.v.plot()
+        plt.title('v (linear velocity)')
+
+        plt.subplot(2, 2, 2)
+        plt.plot(bot.states.x, bot.states.y, 'x-',)
+        plt.xlabel('x')
+        plt.ylabel('y')
+        plt.title('position')
+
+        plt.subplot(2, 2, 3)
+        bot.states.omega.plot()
+        plt.title('omega (angular velocity)')
+        plt.ylabel('[rad/s]')
+
+        plt.subplot(2, 2, 4)
+        bot.states.phi.plot()
+        plt.title('phi')
+        plt.ylabel('phi [rad]')
+
+        plt.subplots_adjust(hspace=0.4)
+
+        plt.show()
+
+
+if __name__ == '__main__':
+    print('Turtlebot simulation demo starting...')
+    main()
