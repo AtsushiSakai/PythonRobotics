@@ -8,7 +8,7 @@ Author  - Jev Kuznetsov
 """
 
 from collections import namedtuple
-from numpy import sin, cos, sign
+from math import sin, cos
 import numpy as np
 import pandas as pd
 
@@ -57,7 +57,7 @@ class Robot:
         delta_v = self.accel_linear * dt  # dv is an absolute number
         v_error = self._v_target - s.v
         if abs(v_error) > delta_v:
-            v_new = s.v + sign(v_error) * delta_v
+            v_new = s.v + np.sign(v_error) * delta_v
         else:
             v_new = s.v + v_error
 
@@ -65,7 +65,7 @@ class Robot:
         delta_omega = self.accel_angular * dt
         omega_error = self._omega_target - s.omega
         if abs(omega_error) > delta_omega:
-            omega_new = s.omega + sign(omega_error) * delta_omega
+            omega_new = s.omega + np.sign(omega_error) * delta_omega
         else:
             omega_new = s.omega + omega_error
 
