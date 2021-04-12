@@ -8,7 +8,7 @@ Author  - Jev Kuznetsov
 """
 
 from collections import namedtuple
-from math import fabs, sin, cos
+from math import sin, cos
 import numpy as np
 import pandas as pd
 
@@ -27,7 +27,7 @@ class Robot:
     v_max = 0.22  # [m/s]
     omega_max = 2.84  # [rad/s]
     accel_angular = 0.1  # [rad/s2]
-    accel_linear = 0.1  # [m/s2]
+    accel_linear = 1  # [m/s2]
     _wheel_diameter = 66e-3  # [m]
     _wheel_distance = 160e-3  # [m]
 
@@ -38,7 +38,7 @@ class Robot:
                  name='Turtlebot3'):
         """ initiate robot at given location and orientation """
         self.name = name
-        self._states = [State(x, y, phi)]
+        self.states = [State(x, y, phi)]
 
         self._omega_target = 0.
         self._v_target = 0.
@@ -77,30 +77,27 @@ class Robot:
                       v=v_new,
                       omega=omega_new)
 
-        self._states.append(s_new)
+        self.states.append(s_new)
 
-    def states(self, raw=False):
-        """ get history of all states as pandas DataFrame 
-            or as a list if raw=True
-        """
-        if raw:
-            return self._states
-        else:
-            cols = state_fields[:-1]
-            data = {}
+          
 
-            for var_name in cols:
-                data[var_name] = [getattr(s, var_name) for s in self._states]
+    def states_df(self):
+        """ states as DataFrame """
+        cols = state_fields[:-1]
+        data = {}
 
-            t = pd.Index(name='time', data=[s.t for s in self._states])
-            df = pd.DataFrame(data, index=t)
+        for var_name in cols:
+            data[var_name] = [getattr(s, var_name) for s in self.states]
 
-            return df
+        t = pd.Index(name='time', data=[s.t for s in self.states])
+        df = pd.DataFrame(data, index=t)
+
+        return df
 
     @property
     def state(self):
         """ last known state """
-        return self._states[-1]
+        return self.states[-1]
 
     def __repr__(self):
         return f'{self.name} {self.state})'
@@ -130,7 +127,7 @@ def main():
     for _ in range(n_steps):
         bot.step(dt)
 
-    states = bot.states()
+    states = bot.states_df()
     print('Simulation result:\n', states)
 
     # plot data
