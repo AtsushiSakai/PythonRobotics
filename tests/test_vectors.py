@@ -4,11 +4,12 @@ Test vector module
 
 author - Jev Kuznetsov
 """
-
-
-from PythonRobotics.vectors import Vector, point_on_line
 import numpy as np
 import math
+
+import conftest
+from PythonRobotics.vectors import Vector, point_on_line
+
 
 # test tuples
 ta = (1, 2)
