@@ -10,6 +10,7 @@ Author  - Jev Kuznetsov
 from collections import namedtuple
 from math import sin, cos
 import numpy as np
+import matplotlib.pyplot as plt
 import pandas as pd
 
 show_animation = True
@@ -79,7 +80,7 @@ class Robot:
 
         self.states.append(s_new)
 
-          
+
 
     def states_df(self):
         """ states as DataFrame """
@@ -105,8 +106,7 @@ class Robot:
 
 def main():
     """ demonstrate functionality """
-    import matplotlib.pyplot as plt
-
+    
     bot = Robot()
 
     # high acceleration ~ instantaneous velocity
