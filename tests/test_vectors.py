@@ -4,8 +4,8 @@ Test vector module
 
 author - Jev Kuznetsov
 """
-
 import numpy as np
+import conftest
 from PythonRobotics.vectors import Vector, point_on_line
 
 

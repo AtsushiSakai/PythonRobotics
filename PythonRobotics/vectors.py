@@ -34,7 +34,7 @@ class Vector:
         """ create from x,y or xy """
         try:
             self.x, self.y = float(args[0]), float(args[1])
-        except IndexError:
+        except (IndexError, TypeError):
             self.x = float(args[0][0])
             self.y = float(args[0][1])
 
