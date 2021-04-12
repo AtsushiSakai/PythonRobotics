@@ -8,7 +8,7 @@ Author  - Jev Kuznetsov
 """
 
 from collections import namedtuple
-from math import sin, cos
+from math import fabs, sin, cos
 import numpy as np
 import pandas as pd
 
@@ -79,21 +79,23 @@ class Robot:
 
         self._states.append(s_new)
 
-    @property
-    def states(self):
-        """ get history of all states as pandas DataFrame """
+    def states(self, raw=False):
+        """ get history of all states as pandas DataFrame 
+            or as a list if raw=True
+        """
+        if raw:
+            return self._states
+        else:
+            cols = state_fields[:-1]
+            data = {}
 
-        cols = state_fields[:-1]
-        data = {}
+            for var_name in cols:
+                data[var_name] = [getattr(s, var_name) for s in self._states]
 
-        for var_name in cols:
-            data[var_name] = [getattr(s, var_name) for s in self._states]
+            t = pd.Index(name='time', data=[s.t for s in self._states])
+            df = pd.DataFrame(data, index=t)
 
-        t = pd.Index(name='time', data=[s.t for s in self._states])
-
-        df = pd.DataFrame(data, index=t)
-
-        return df
+            return df
 
     @property
     def state(self):
@@ -128,7 +130,8 @@ def main():
     for _ in range(n_steps):
         bot.step(dt)
 
-    print('Simulation result:\n', bot.states)
+    states = bot.states()
+    print('Simulation result:\n', states)
 
     # plot data
     if show_animation:
@@ -138,22 +141,22 @@ def main():
         plt.tight_layout()
 
         plt.subplot(2, 2, 1)
-        bot.states.v.plot()
+        states.v.plot()
         plt.title('v (linear velocity)')
 
         plt.subplot(2, 2, 2)
-        plt.plot(bot.states.x, bot.states.y, 'x-',)
+        plt.plot(states.x, states.y, 'x-',)
         plt.xlabel('x')
         plt.ylabel('y')
         plt.title('position')
 
         plt.subplot(2, 2, 3)
-        bot.states.omega.plot()
+        states.omega.plot()
         plt.title('omega (angular velocity)')
         plt.ylabel('[rad/s]')
 
         plt.subplot(2, 2, 4)
-        bot.states.phi.plot()
+        states.phi.plot()
         plt.title('phi')
         plt.ylabel('phi [rad]')
 
