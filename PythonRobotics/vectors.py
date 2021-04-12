@@ -86,6 +86,9 @@ class Vector:
 
     def __abs__(self):
         return hypot(self.x, self.y)
+    
+    def distance(self, other):
+        return hypot(self.x-other.x, self.y-other.y)
 
     @classmethod
     def from_polar(cls, r, theta):

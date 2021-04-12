@@ -95,3 +95,13 @@ def test_rotation():
     v = Vector(1, 0)
     assert v.rotate(np.pi/2).round() == Vector(0, 1)
     assert v.rotate(-np.pi/4) == Vector.from_polar(1, -np.pi/4)
+
+
+def test_distance():
+
+    assert Vector(1, 0).distance(Vector(0, 0)) == 1
+    assert Vector(2, 2).distance(Vector(1, 1)) == np.sqrt(2)
+
+
+if __name__ == '__main__':
+    conftest.run_this_test(__file__)
