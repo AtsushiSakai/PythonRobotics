@@ -27,7 +27,8 @@ class World:
 
         self._markers = {}  # marker objects
 
-    def add_marker(self, name,
+    def add_marker(self,
+                   name,
                    color='green',
                    shape="circle",
                    size=0.5,
@@ -36,7 +37,7 @@ class World:
         m = turtle.Turtle()
         m.color(color)
         m.shape(shape)
-        m.shapesize(size,size)
+        m.shapesize(size, size)
         if not trace:
             m.penup()
         self._markers[name] = m
