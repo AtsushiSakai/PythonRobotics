@@ -12,7 +12,7 @@ from math import sin, cos
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-
+from PythonRobotics.vectors import Vector
 
 show_animation = True
 
@@ -108,7 +108,7 @@ class Robot:
 
         self.states.append(s_new)
 
-    def states_df(self):
+    def states_df(self) -> 'pd.DataFrame':
         """ states as DataFrame """
         cols = state_fields[:-1]
         data = {}
@@ -120,6 +120,11 @@ class Robot:
         df = pd.DataFrame(data, index=t)
 
         return df
+
+    @property
+    def xy(self) -> 'Vector':
+        """ xy position as Vector """
+        return Vector(self.state.x,self.state.y)
 
     @property
     def state(self):
