@@ -39,7 +39,7 @@ class Vector:
             self.y = float(args[0][1])
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(x={self.x}, y={self.y})"
+        return f"(x={self.x:.3f}, y={self.y:.3f})"
 
     def __add__(self, other):
         return Vector(self.x + other.x, self.y + other.y)
