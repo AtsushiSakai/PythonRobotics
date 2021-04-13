@@ -24,24 +24,50 @@ state_fields = ['x', 'y', 'phi', 'v', 'omega', 't']
 State = namedtuple('State', state_fields, defaults=(0.,) * len(state_fields))
 
 
+# robot settings are defined with profiles
+profile_simple = {'v_max': 1.,
+                  'omega_max': 2.84,
+                  'accel_angular': 1.,
+                  'accel_linear': 1.,
+                  'wheel_diameter': 100e-3,
+                  'wheel_distance': 200e-3,
+                  'plot_scale': 100}
+
+
+profile_turtlebot3 = {'v_max': 0.22,
+                      'omega_max': 2.84,
+                      'accel_angular': 0.1,
+                      'accel_linear': 1.,
+                      'wheel_diameter': 66e-3,
+                      'wheel_distance': 160e-3,
+                      'plot_scale': 1000}
+
+profile_car = {'v_max': 200 / 3.6,  # m/s
+               'omega_max': 2.84,  # rad/s
+               'accel_angular': 0.5,  # rad/s2
+               'accel_linear': 3.,   # m/s2
+               'wheel_diameter': 0.63,  # m
+               'wheel_distance': 2.6,
+               'plot_scale': 1000}
+
+
 class Robot:
     """
     Robot kinematics simulator
     """
-    # numbers for Robotis Turtlebot3
-    v_max = 0.22  # [m/s]
-    omega_max = 2.84  # [rad/s]
-    accel_angular = 0.1  # [rad/s2]
-    accel_linear = 1  # [m/s2]
-    _wheel_diameter = 66e-3  # [m]
-    _wheel_distance = 160e-3  # [m]
 
     def __init__(self,
                  x=0.,  # x-position
                  y=0.,
                  phi=0.,
+                 profile=None,
                  animate=False):
         """ initiate robot at given location and orientation """
+        if profile is not None:
+            self.profile = profile
+        else:
+            self.profile = profile_simple
+
         self.states = [State(x, y, phi)]
         self._omega_target = 0.
         self._v_target = 0.
@@ -52,6 +78,13 @@ class Robot:
             self.turtle = turtle.Turtle()
         else:
             self.turtle = None
+
+    def __getattr__(self, attr):
+        """ get parameter from profile """
+        if attr in self.profile:
+            return self.profile[attr]
+        else:
+            raise AttributeError(f"no attribute '{attr}' in self.profile")
 
     def set_velocity(self, v, omega):
         """ set target velocities """
@@ -91,7 +124,8 @@ class Robot:
 
         # animate if required
         if self.turtle is not None:
-            self.turtle.setpos(s_new.x*plot_scale, s_new.y * plot_scale)
+            self.turtle.setpos(s_new.x*self.plot_scale,
+                               s_new.y * self.plot_scale)
             self.turtle.setheading(degrees(s_new.phi))
 
     def states_df(self):
@@ -121,19 +155,12 @@ def main():
 
     sim = Robot(animate=show_animation)
 
-    # high acceleration ~ instantaneous velocity
-    sim.accel_angular = 1000  # high angular acceleration
-    sim.accel_linear = 1  # constant linear acceleration
-    sim.v_max = 10  # max linear velocity
-    sim.omega_max = 2*np.pi  # max angular velocity
-
-    omega = 2*np.pi  # rad/s
-
     # calculate path
-    t_sim = 1.0  # simulation time [sec]
-    dt = 0.01  # timestep
+    t_sim = 10  # simulation time [sec]
+    dt = 0.1  # timestep
     n_steps = int(t_sim / dt)
 
+    omega = 2*np.pi  # rad/s
     sim.set_velocity(1.0, omega)
 
     for _ in range(n_steps):
