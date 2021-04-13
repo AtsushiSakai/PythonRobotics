@@ -18,7 +18,6 @@ import pandas as pd
 show_animation = True
 plot_result = False
 
-
 # define state object
 state_fields = ['x', 'y', 'phi', 'v', 'omega', 't']
 State = namedtuple('State', state_fields, defaults=(0.,) * len(state_fields))
