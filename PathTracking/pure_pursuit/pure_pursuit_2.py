@@ -4,13 +4,14 @@
 
  Copyright (c) 2021 AIGRO B.V. - Jev Kuznetsov
 """
+
+import time
 import math
 import turtle
 import numpy as np
-import matplotlib.pyplot as plt
 from PythonRobotics.vectors import Vector
 from PythonRobotics.turtlebot import Robot
-from PythonRobotics.plots import plot_arrow, plot_path
+from PythonRobotics.graphics import World
 
 show_animation = True
 
@@ -56,32 +57,36 @@ def point_on_line(a, b, p):
 
 def main():
 
+    world = World((-1, -1, 3, 3))
+
     # sim parameters
     t_sim = 10.0  # simulation time [sec]
     dt = 0.1  # timestep
     n_steps = int(t_sim / dt)
 
     # create waypoints
-    coord = [(0, 0), (0, 2), (2, 2), (2, 0), (2, -2)]
+    coord = [(0, 0), (0, 2), (2, 2), (2, 0), (2, -5)]
+    world.plot_path(coord)
     wp = Waypoints(coord)
     print('Waypoints: ', wp.points)
 
     # create robot
-    bot = Robot(phi=math.pi/4, animate= True)
+    bot = Robot(phi=math.pi/4)
     bot.plot_scale = 100
     bot.set_velocity(3., math.pi/2)
 
     # simulate
     for _ in range(n_steps):
         bot.step(dt)
+        world.robot_step(bot.state)
 
-
-
+        time.sleep(0.01)
 
     print('Simulation result:\n', bot.states_df())
 
     print('close simulation window to exit...')
     turtle.done()
+
 
 if __name__ == "__main__":
     main()

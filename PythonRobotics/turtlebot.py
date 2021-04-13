@@ -8,7 +8,7 @@ Author  - Jev Kuznetsov
 """
 
 from collections import namedtuple
-from math import sin, cos, degrees
+from math import sin, cos
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
