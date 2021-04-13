@@ -21,11 +21,16 @@ class World:
         self.screen.setup(width=window_size[0], height=window_size[1])
         self.screen.setworldcoordinates(*coord)
         self.screen.tracer(0, 0)
+        self.screen.onclick(self.click_callback)
 
         self.turtle = turtle.Turtle()
         self.turtle.color('blue')
 
         self._markers = {}  # marker objects
+        self.click_xy = None # last clicked position
+
+    def click_callback(self,x,y):
+        self.click_xy = (x,y)
 
     def add_marker(self,
                    name,
@@ -60,7 +65,7 @@ class World:
         self.turtle.setheading(degrees(state.phi))
         self.screen.update()
 
-    def plot_path(self, points, color='red', dotsize=10):
+    def plot_path(self, points, color='red', dotsize=3):
         """ plot conntected points """
 
         t = turtle.Turtle()

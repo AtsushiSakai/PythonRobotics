@@ -9,6 +9,7 @@ from collections import UserList
 import time
 import math
 import turtle
+from typing import Tuple
 import numpy as np
 from PythonRobotics.vectors import Vector
 from PythonRobotics.turtlebot import Robot
@@ -16,6 +17,15 @@ from PythonRobotics.graphics import World
 
 show_animation = True
 
+# sim parameters
+WAYPOINTS_TYPE = 'sine'
+TARGET_SPEED = .2 # [m/s]
+LOOK_AHEAD_1 = 0.1 # [m]  lenth of velocity vector
+LOOK_AHEAD_2 = 0.2 # [m]  step forward along the path segment
+Kp = 1.0 # controller gain
+t_sim = 50.0  # simulation time [sec]
+dt = 0.1  # timestep
+SIM_DELAY = 0.01
 
 class Waypoints(UserList):
     """ navigation waypoints, collection of xy Vectors """
@@ -23,6 +33,7 @@ class Waypoints(UserList):
     def __init__(self, *args, **kwargs):
         """ create waypoints. """
         super().__init__(*args, **kwargs)
+        self.data = [Vector(d) for d in self.data]
 
         self.next_idx = None
 
@@ -49,7 +60,7 @@ class Waypoints(UserList):
         return not self.next_idx < len(self.data)
 
 
-def point_on_line(a, b, p):
+def project_on_line(a: Vector, b: Vector, p: Vector) -> Vector:
     """ project point p to a line defined by points a and b """
     ap = p - a
     ab = b - a
@@ -57,49 +68,116 @@ def point_on_line(a, b, p):
     return result
 
 
-def target_position(state, wp_a, wp_b,  look_ahead=1) -> 'Vector':
-    """ calculate robot target position """
+def target_position(xy: Vector,
+                    phi: float,
+                    a: Vector, b: Vector,
+                    velocity_vector= LOOK_AHEAD_1,
+                    look_ahead=LOOK_AHEAD_2
+                    ) -> Tuple[Vector, Vector]:
+    """calculate look-ahead and target positions
 
+    Args:
+        xy (Vector): robot position
+        phi (float): robot pose [rad]
+        a (Vector): first waypoint
+        b (Vector): second waypoint
+        velocity_vector (float, optional): magnitude of velocity vector . Defaults to 1.0.
+        look_ahead (float, optional): forward distance from projecton point to path.
+                                      Defaults to 1.0.
+
+    Returns:
+        Tuple[Vector, Vector, float]: target & look-ahead positions, and angle error
+    """
+    # point names consistent with https://www.geogebra.org/calculator/vh5d7jvy
     # future position
-    d = Vector(state.x, state.y) + Vector.from_polar(look_ahead, state.phi)
+    v = Vector.from_polar(velocity_vector, phi)
+    d = xy + v
 
     # project to line
-    e = point_on_line(wp_a, wp_b, d)
+    e = project_on_line(a, b, d)
+    f = look_ahead*(b - a)/abs(b - a) + e
 
-    return e
+    # calculate angele error
+    alpha = v.angle(f-xy)
 
+    return f, d, alpha
+
+
+def proportional_control(target: float, current: float) -> float:
+    a = Kp * (target - current)
+
+    return a
+
+def generate_waypoints(key: str) -> Waypoints:
+    """generate different types of waypoints
+
+    Args:
+        key (str): name of waypoint generator
+
+    Returns:
+        Waypoints: waypoints to follow
+    """
+    if key == 'simple':
+        coord = [Vector(xy) for xy in [(0, 0), (0, 2), (2, 2), (2, 0), (2, -3)]]
+        waypoints = Waypoints(coord)
+    elif key == 'sine':
+        cx = np.arange(0, 5, 0.02)
+        cy = [np.sin(ix / 0.1) * ix / 2.0 for ix in cx]
+        waypoints = Waypoints(zip(cx,cy))
+    else:
+        raise KeyError(f"Don't know how to generate waypoints for {key}")
+
+    return waypoints
 
 def main():
 
-    world = World((-1, -1, 3, 3))
-    world.add_marker('target', trace=True)
+    # create visualisation
+    world = World((0, -3, 5, 3))
+    world.add_marker('target')
+    world.add_marker('future_xy', color="magenta")
 
-    # sim parameters
-    t_sim = 10.0  # simulation time [sec]
-    dt = 0.1  # timestep
-    n_steps = int(t_sim / dt)
     # create waypoints
-    coord = [Vector(xy) for xy in [(0, 0), (0, 2), (2, 2), (2, 0), (2, -5)]]
-    world.plot_path(coord)
-    waypoints = Waypoints(coord)
+    waypoints = generate_waypoints(WAYPOINTS_TYPE)
     print('Waypoints: ', waypoints)
+    world.plot_path(waypoints)
 
     # create robot
     bot = Robot(phi=math.pi/4)
-    bot.set_velocity(3., math.pi/2)
 
+    i_step = 0
     # simulate
-    for i_step in range(n_steps):
+    while True:
+
+        # advance simulation
         bot.step(dt)
 
+        # calculate target point
         idx = waypoints.find_next_idx(bot.xy)
-        target = target_position(bot.state, waypoints[idx-1], waypoints[idx])
+        if waypoints.target_reached:
+            print('Target reached')
+            break
 
+        target, future_xy, alpha = target_position(
+            bot.xy, bot.state.phi, waypoints[idx-1], waypoints[idx])
+
+        # control robot
+        omega = proportional_control(0, alpha)
+        bot.set_velocity(TARGET_SPEED, omega)
+
+        # visualise
         world.move_robot(bot.state)
-
+        world.move_marker('future_xy', future_xy)
         world.move_marker('target', target)
-        print(f"step[{i_step}] next_wp:{waypoints.next_idx}")
-        time.sleep(0.1)
+        print(f"step[{i_step}] next_wp:{waypoints.next_idx} target:{target} omega:{omega:.2f}")
+        time.sleep(SIM_DELAY)
+
+        i_step += 1
+
+        # check for exit
+        if world.click_xy:
+            print('Aborted by click')
+            break
+
 
     print('Simulation result:\n', bot.states_df())
 
