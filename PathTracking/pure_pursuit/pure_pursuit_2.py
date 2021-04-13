@@ -5,6 +5,7 @@
  Copyright (c) 2021 AIGRO B.V. - Jev Kuznetsov
 """
 import math
+import turtle
 import numpy as np
 import matplotlib.pyplot as plt
 from PythonRobotics.vectors import Vector
@@ -53,35 +54,6 @@ def point_on_line(a, b, p):
     return result
 
 
-def plot_state(states, waypoints):
-    """plot robot state, can be used in animaton
-
-    Args:
-        states (namedtuple): state history, containing ['x', 'y', 'phi', 'v', 'omega', 't'] fields
-    """
-
-    plt.cla()
-    # for stopping simulation with the esc key.
-    plt.gcf().canvas.mpl_connect(
-        'key_release_event',
-        lambda event: [exit(0) if event.key == 'escape' else None])
-
-    state = states[-1]
-    plot_arrow(state.x, state.y, state.phi, width=0.1, length=0.01)
-
-    # plot trajectory
-    x = [state.x for state in states]
-    y = [state.y for state in states]
-
-    plt.plot(x, y, "-b", label="trajectory")
-    plot_path(waypoints.points)
-
-    plt.axis("equal")
-    plt.grid(True)
-    plt.title("Speed[m/s]: %.3f" % state.v)
-    plt.pause(0.001)
-
-
 def main():
 
     # sim parameters
@@ -95,18 +67,21 @@ def main():
     print('Waypoints: ', wp.points)
 
     # create robot
-    bot = Robot(phi=math.pi/4)
+    bot = Robot(phi=math.pi/4, animate= True)
+    bot.plot_scale = 100
     bot.set_velocity(3., math.pi/2)
 
     # simulate
     for _ in range(n_steps):
         bot.step(dt)
 
-        if show_animation:  # pragma: no cover
-            plot_state(bot.states, wp)
+
+
 
     print('Simulation result:\n', bot.states_df())
 
+    print('close simulation window to exit...')
+    turtle.done()
 
 if __name__ == "__main__":
     main()
