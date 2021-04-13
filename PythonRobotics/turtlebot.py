@@ -40,13 +40,13 @@ class Robot:
                  x=0.,  # x-position
                  y=0.,
                  phi=0.,
-                 show_animation=False):
+                 animate=False):
         """ initiate robot at given location and orientation """
         self.states = [State(x, y, phi)]
         self._omega_target = 0.
         self._v_target = 0.
 
-        if show_animation:
+        if animate:
             self.screen = turtle.Screen()
             self.screen.setup(640, 480)
             self.turtle = turtle.Turtle()
@@ -119,7 +119,7 @@ class Robot:
 def main():
     """ demonstrate functionality """
 
-    sim = Robot(show_animation=show_animation)
+    sim = Robot(animate=show_animation)
 
     # high acceleration ~ instantaneous velocity
     sim.accel_angular = 1000  # high angular acceleration
