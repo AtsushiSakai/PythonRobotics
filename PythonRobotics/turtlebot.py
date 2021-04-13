@@ -9,14 +9,12 @@ Author  - Jev Kuznetsov
 
 from collections import namedtuple
 from math import sin, cos, degrees
-import turtle
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
 
 show_animation = True
-plot_result = False
 
 # define state object
 state_fields = ['x', 'y', 'phi', 'v', 'omega', 't']
@@ -29,8 +27,7 @@ profile_simple = {'v_max': 1.,
                   'accel_angular': 1.,
                   'accel_linear': 1.,
                   'wheel_diameter': 100e-3,
-                  'wheel_distance': 200e-3,
-                  'plot_scale': 100}
+                  'wheel_distance': 200e-3}
 
 
 profile_turtlebot3 = {'v_max': 0.22,
@@ -38,16 +35,14 @@ profile_turtlebot3 = {'v_max': 0.22,
                       'accel_angular': 0.1,
                       'accel_linear': 1.,
                       'wheel_diameter': 66e-3,
-                      'wheel_distance': 160e-3,
-                      'plot_scale': 1000}
+                      'wheel_distance': 160e-3}
 
 profile_car = {'v_max': 200 / 3.6,  # m/s
                'omega_max': 2.84,  # rad/s
                'accel_angular': 0.5,  # rad/s2
                'accel_linear': 3.,   # m/s2
                'wheel_diameter': 0.63,  # m
-               'wheel_distance': 2.6,
-               'plot_scale': 1000}
+               'wheel_distance': 2.6}
 
 
 class Robot:
@@ -59,8 +54,7 @@ class Robot:
                  x=0.,  # x-position
                  y=0.,
                  phi=0.,
-                 profile=None,
-                 animate=False):
+                 profile=None):
         """ initiate robot at given location and orientation """
         if profile is not None:
             self.profile = profile
@@ -70,13 +64,6 @@ class Robot:
         self.states = [State(x, y, phi)]
         self._omega_target = 0.
         self._v_target = 0.
-
-        if animate:
-            self.screen = turtle.Screen()
-            self.screen.setup(640, 480)
-            self.turtle = turtle.Turtle()
-        else:
-            self.turtle = None
 
     def __getattr__(self, attr):
         """ get parameter from profile """
@@ -121,12 +108,6 @@ class Robot:
 
         self.states.append(s_new)
 
-        # animate if required
-        if self.turtle is not None:
-            self.turtle.setpos(s_new.x*self.plot_scale,
-                               s_new.y * self.plot_scale)
-            self.turtle.setheading(degrees(s_new.phi))
-
     def states_df(self):
         """ states as DataFrame """
         cols = state_fields[:-1]
@@ -152,7 +133,7 @@ class Robot:
 def main():
     """ demonstrate functionality """
 
-    sim = Robot(animate=show_animation)
+    sim = Robot()
 
     # calculate path
     t_sim = 10  # simulation time [sec]
@@ -169,7 +150,7 @@ def main():
     print('Simulation result:\n', states)
 
     # plot data
-    if plot_result:
+    if show_animation:
         plt.style.use('seaborn-whitegrid')
 
         plt.cla()
@@ -198,10 +179,6 @@ def main():
         plt.subplots_adjust(hspace=0.4)
 
         plt.show()
-
-    if show_animation:
-        print('close plot window to continue....')
-        turtle.done()
 
 
 if __name__ == '__main__':
