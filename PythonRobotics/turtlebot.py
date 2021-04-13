@@ -40,13 +40,18 @@ class Robot:
                  x=0.,  # x-position
                  y=0.,
                  phi=0.,
-                 name='Turtlebot3'):
+                 show_animation=False):
         """ initiate robot at given location and orientation """
-        self.name = name
         self.states = [State(x, y, phi)]
-
         self._omega_target = 0.
         self._v_target = 0.
+
+        if show_animation:
+            self.screen = turtle.Screen()
+            self.screen.setup(640, 480)
+            self.turtle = turtle.Turtle()
+        else:
+            self.turtle = None
 
     def set_velocity(self, v, omega):
         """ set target velocities """
@@ -84,6 +89,11 @@ class Robot:
 
         self.states.append(s_new)
 
+        # animate if required
+        if self.turtle is not None:
+            self.turtle.setpos(s_new.x*plot_scale, s_new.y * plot_scale)
+            self.turtle.setheading(degrees(s_new.phi))
+
     def states_df(self):
         """ states as DataFrame """
         cols = state_fields[:-1]
@@ -103,13 +113,13 @@ class Robot:
         return self.states[-1]
 
     def __repr__(self):
-        return f'{self.name} {self.state})'
+        return f'Turtlebot {self.state})'
 
 
 def main():
     """ demonstrate functionality """
 
-    sim = Robot()
+    sim = Robot(show_animation=show_animation)
 
     # high acceleration ~ instantaneous velocity
     sim.accel_angular = 1000  # high angular acceleration
@@ -126,21 +136,8 @@ def main():
 
     sim.set_velocity(1.0, omega)
 
-    if show_animation:
-        screen = turtle.Screen()
-        screen.setup(640, 480)
-        bot = turtle.Turtle()
-
     for _ in range(n_steps):
-
         sim.step(dt)
-
-        if show_animation:
-            bot.setpos(sim.state.x*plot_scale, sim.state.y*plot_scale)
-            bot.setheading(degrees(sim.state.phi))
-
-    #print('close plot window to continue....')
-    # turtle.done()
 
     states = sim.states_df()
     print('Simulation result:\n', states)
@@ -175,6 +172,10 @@ def main():
         plt.subplots_adjust(hspace=0.4)
 
         plt.show()
+
+    if show_animation:
+        print('close plot window to continue....')
+        turtle.done()
 
 
 if __name__ == '__main__':
