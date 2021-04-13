@@ -17,7 +17,7 @@ import pandas as pd
 
 show_animation = True
 plot_result = False
-plot_scale = 1000
+
 
 # define state object
 state_fields = ['x', 'y', 'phi', 'v', 'omega', 't']
@@ -35,6 +35,9 @@ class Robot:
     accel_linear = 1  # [m/s2]
     _wheel_diameter = 66e-3  # [m]
     _wheel_distance = 160e-3  # [m]
+
+    # plot settings
+    plot_scale = 1000
 
     def __init__(self,
                  x=0.,  # x-position
@@ -91,7 +94,7 @@ class Robot:
 
         # animate if required
         if self.turtle is not None:
-            self.turtle.setpos(s_new.x*plot_scale, s_new.y * plot_scale)
+            self.turtle.setpos(s_new.x*self.plot_scale, s_new.y * self.plot_scale)
             self.turtle.setheading(degrees(s_new.phi))
 
     def states_df(self):
