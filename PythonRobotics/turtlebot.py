@@ -8,12 +8,16 @@ Author  - Jev Kuznetsov
 """
 
 from collections import namedtuple
-from math import sin, cos
+from math import sin, cos, degrees
+import turtle
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
+
 show_animation = True
+plot_result = False
+plot_scale = 1000
 
 # define state object
 state_fields = ['x', 'y', 'phi', 'v', 'omega', 't']
@@ -80,8 +84,6 @@ class Robot:
 
         self.states.append(s_new)
 
-
-
     def states_df(self):
         """ states as DataFrame """
         cols = state_fields[:-1]
@@ -106,14 +108,14 @@ class Robot:
 
 def main():
     """ demonstrate functionality """
-    
-    bot = Robot()
+
+    sim = Robot()
 
     # high acceleration ~ instantaneous velocity
-    bot.accel_angular = 1000  # high angular acceleration
-    bot.accel_linear = 1  # constant linear acceleration
-    bot.v_max = 10  # max linear velocity
-    bot.omega_max = 2*np.pi  # max angular velocity
+    sim.accel_angular = 1000  # high angular acceleration
+    sim.accel_linear = 1  # constant linear acceleration
+    sim.v_max = 10  # max linear velocity
+    sim.omega_max = 2*np.pi  # max angular velocity
 
     omega = 2*np.pi  # rad/s
 
@@ -122,16 +124,29 @@ def main():
     dt = 0.01  # timestep
     n_steps = int(t_sim / dt)
 
-    bot.set_velocity(1.0, omega)
+    sim.set_velocity(1.0, omega)
+
+    if show_animation:
+        screen = turtle.Screen()
+        screen.setup(640, 480)
+        bot = turtle.Turtle()
 
     for _ in range(n_steps):
-        bot.step(dt)
 
-    states = bot.states_df()
+        sim.step(dt)
+
+        if show_animation:
+            bot.setpos(sim.state.x*plot_scale, sim.state.y*plot_scale)
+            bot.setheading(degrees(sim.state.phi))
+
+    #print('close plot window to continue....')
+    # turtle.done()
+
+    states = sim.states_df()
     print('Simulation result:\n', states)
 
     # plot data
-    if show_animation:
+    if plot_result:
         plt.style.use('seaborn-whitegrid')
 
         plt.cla()
