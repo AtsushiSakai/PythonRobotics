@@ -12,6 +12,7 @@ import turtle
 
 TESTING = True
 
+
 class World:
     """ wrapper class for visualisations """
 
@@ -28,10 +29,10 @@ class World:
         self.turtle.color('blue')
 
         self._markers = {}  # marker objects
-        self.click_xy = None # last clicked position
+        self.click_xy = None  # last clicked position
 
-    def click_callback(self,x,y):
-        self.click_xy = (x,y)
+    def click_callback(self, x, y):
+        self.click_xy = (x, y)
 
     def add_marker(self,
                    name,
