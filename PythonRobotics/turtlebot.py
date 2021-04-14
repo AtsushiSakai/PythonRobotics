@@ -124,7 +124,7 @@ class Robot:
     @property
     def xy(self) -> Vector:
         """ xy position as Vector """
-        return Vector(self.state.x,self.state.y)
+        return Vector(self.state.x, self.state.y)
 
     @property
     def phi(self) -> float:
