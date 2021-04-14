@@ -6,10 +6,11 @@ Graphics for simulations, based on turtle graphics
 Author  - Jev Kuznetsov
 
 """
-from math import degrees
+import math
 from time import sleep
 import turtle
 
+TESTING = True
 
 class World:
     """ wrapper class for visualisations """
@@ -58,11 +59,11 @@ class World:
         self._markers[name].setpos(xy)
         self.screen.update()
 
-    def move_robot(self, state):
+    def move_robot(self, xy, phi):
         """ plot robot state """
 
-        self.turtle.setpos(state.x, state.y)
-        self.turtle.setheading(degrees(state.phi))
+        self.turtle.setpos(xy)
+        self.turtle.setheading(math.degrees(phi))
         self.screen.update()
 
     def plot_path(self, points, color='red', dotsize=3):
@@ -92,10 +93,13 @@ def main():
     w.add_marker('m')
     for x in range(10):
         w.move_marker('m', (x/10, 0))
-        sleep(0.1)
+        w.move_robot((0, x), math.pi/2)
+        if not TESTING:
+            sleep(0.1)
 
-    print('Please close graphics window...')
-    turtle.done()
+    if not TESTING:
+        print('Please close graphics window...')
+        turtle.done()
 
 
 if __name__ == "__main__":

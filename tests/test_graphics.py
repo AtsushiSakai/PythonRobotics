@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 """
-Test turtlebot simulator
+Test turtle graphics
 
 author - Jev Kuznetsov
 """
 
 import conftest
-from PythonRobotics import turtlebot as m
+from PythonRobotics import graphics as m
 
 
 def test_1():
-    m.PLOT_RESULT = False
+    m.TESTING = True
     m.main()
 
 if __name__ == '__main__':

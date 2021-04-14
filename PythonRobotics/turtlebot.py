@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from PythonRobotics.vectors import Vector
 
-show_animation = True
+PLOT_RESULT = True
 
 # define state object
 state_fields = ['x', 'y', 'phi', 'v', 'omega', 't']
@@ -108,7 +108,7 @@ class Robot:
 
         self.states.append(s_new)
 
-    def states_df(self) -> 'pd.DataFrame':
+    def states_df(self) -> pd.DataFrame:
         """ states as DataFrame """
         cols = state_fields[:-1]
         data = {}
@@ -122,12 +122,16 @@ class Robot:
         return df
 
     @property
-    def xy(self) -> 'Vector':
+    def xy(self) -> Vector:
         """ xy position as Vector """
         return Vector(self.state.x,self.state.y)
 
     @property
-    def state(self):
+    def phi(self) -> float:
+        return self.state.phi
+
+    @property
+    def state(self) -> State:
         """ last known state """
         return self.states[-1]
 
@@ -155,7 +159,7 @@ def main():
     print('Simulation result:\n', states)
 
     # plot data
-    if show_animation:
+    if PLOT_RESULT:
         plt.style.use('seaborn-whitegrid')
 
         plt.cla()

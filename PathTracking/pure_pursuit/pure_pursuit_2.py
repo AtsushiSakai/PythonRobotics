@@ -133,6 +133,7 @@ def main():
 
     # create visualisation
     world = World((0, -3, 5, 3))
+    world.screen.title('Pure pursuit 2')
     world.add_marker('target')
     world.add_marker('future_xy', color="magenta")
 
@@ -165,7 +166,7 @@ def main():
         bot.set_velocity(TARGET_SPEED, omega)
 
         # visualise
-        world.move_robot(bot.state)
+        world.move_robot(bot.xy, bot.phi)
         world.move_marker('future_xy', future_xy)
         world.move_marker('target', target)
         print(f"step[{i_step}] next_wp:{waypoints.next_idx} target:{target} omega:{omega:.2f}")
