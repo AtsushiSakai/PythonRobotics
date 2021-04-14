@@ -8,7 +8,7 @@ Author  - Jev Kuznetsov
 """
 
 from collections import namedtuple
-from math import sin, cos
+import math
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -23,7 +23,7 @@ State = namedtuple('State', state_fields, defaults=(0.,) * len(state_fields))
 
 # robot settings are defined with profiles
 profile_simple = {'v_max': 1.,
-                  'omega_max': 2.84,
+                  'omega_max': math.pi*2,
                   'accel_angular': 1.,
                   'accel_linear': 1.,
                   'wheel_diameter': 100e-3,
@@ -99,8 +99,8 @@ class Robot:
             omega_new = s.omega + omega_error
 
         # create new state
-        s_new = State(x=s.x + s.v*cos(s.phi)*dt,
-                      y=s.y + s.v*sin(s.phi)*dt,
+        s_new = State(x=s.x + s.v*math.cos(s.phi)*dt,
+                      y=s.y + s.v*math.sin(s.phi)*dt,
                       phi=s.phi + s.omega*dt,
                       t=s.t + dt,
                       v=v_new,

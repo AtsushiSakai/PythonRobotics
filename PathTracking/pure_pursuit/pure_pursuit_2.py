@@ -18,8 +18,8 @@ from PythonRobotics.graphics import World
 show_animation = True
 
 # sim parameters
-WAYPOINTS_TYPE = 'sine'
-TARGET_SPEED = .2 # [m/s]
+WAYPOINTS_TYPE = 'square'
+TARGET_SPEED = .1 # [m/s]
 LOOK_AHEAD_1 = 0.1 # [m]  lenth of velocity vector
 LOOK_AHEAD_2 = 0.2 # [m]  step forward along the path segment
 Kp = 1.0 # controller gain
@@ -124,6 +124,19 @@ def generate_waypoints(key: str) -> Waypoints:
         cx = np.arange(0, 5, 0.02)
         cy = [np.sin(ix / 0.1) * ix / 2.0 for ix in cx]
         waypoints = Waypoints(zip(cx,cy))
+    elif key == 'square':
+        w_tops = np.linspace(0.1, 1, 5) # turn widhts
+        waypoints = Waypoints([Vector(0,0)])
+
+        v_up = Vector(0,1)
+        waypoints.append(waypoints[-1] + 0.5*v_up)
+        for w in reversed(w_tops):
+            waypoints.append(waypoints[-1] + Vector(w,0))
+            waypoints.append(waypoints[-1] - v_up)
+            waypoints.append(waypoints[-1] + Vector(0.4,0))
+            waypoints.append(waypoints[-1] + v_up)
+
+
     else:
         raise KeyError(f"Don't know how to generate waypoints for {key}")
 
