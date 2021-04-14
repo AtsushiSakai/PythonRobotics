@@ -19,13 +19,14 @@ show_animation = True
 
 # sim parameters
 WAYPOINTS_TYPE = 'square'
-TARGET_SPEED = .1 # [m/s]
-LOOK_AHEAD_1 = 0.1 # [m]  lenth of velocity vector
-LOOK_AHEAD_2 = 0.2 # [m]  step forward along the path segment
-Kp = 1.0 # controller gain
+TARGET_SPEED = .1  # [m/s]
+LOOK_AHEAD_1 = 0.1  # [m]  lenth of velocity vector
+LOOK_AHEAD_2 = 0.2  # [m]  step forward along the path segment
+Kp = 1.0  # controller gain
 t_sim = 50.0  # simulation time [sec]
 dt = 0.1  # timestep
 SIM_DELAY = 0.01
+
 
 class Waypoints(UserList):
     """ navigation waypoints, collection of xy Vectors """
@@ -71,7 +72,7 @@ def project_on_line(a: Vector, b: Vector, p: Vector) -> Vector:
 def target_position(xy: Vector,
                     phi: float,
                     a: Vector, b: Vector,
-                    velocity_vector= LOOK_AHEAD_1,
+                    velocity_vector=LOOK_AHEAD_1,
                     look_ahead=LOOK_AHEAD_2
                     ) -> Tuple[Vector, Vector]:
     """calculate look-ahead and target positions
@@ -81,12 +82,14 @@ def target_position(xy: Vector,
         phi (float): robot pose [rad]
         a (Vector): first waypoint
         b (Vector): second waypoint
-        velocity_vector (float, optional): magnitude of velocity vector . Defaults to 1.0.
-        look_ahead (float, optional): forward distance from projecton point to path.
-                                      Defaults to 1.0.
+        velocity_vector (float, optional): magnitude of velocity vector .
+            Defaults to 1.0.
+        look_ahead (float, optional): forward distance from projecton
+            point to path.  Defaults to 1.0.
 
     Returns:
-        Tuple[Vector, Vector, float]: target & look-ahead positions, and angle error
+        Tuple[Vector, Vector, float]: target & look-ahead positions,
+            and angle error
     """
     # point names consistent with https://www.geogebra.org/calculator/vh5d7jvy
     # future position
@@ -108,6 +111,7 @@ def proportional_control(target: float, current: float) -> float:
 
     return a
 
+
 def generate_waypoints(key: str) -> Waypoints:
     """generate different types of waypoints
 
@@ -118,29 +122,30 @@ def generate_waypoints(key: str) -> Waypoints:
         Waypoints: waypoints to follow
     """
     if key == 'simple':
-        coord = [Vector(xy) for xy in [(0, 0), (0, 2), (2, 2), (2, 0), (2, -3)]]
+        coord = [Vector(xy)
+                 for xy in [(0, 0), (0, 2), (2, 2), (2, 0), (2, -3)]]
         waypoints = Waypoints(coord)
     elif key == 'sine':
         cx = np.arange(0, 5, 0.02)
         cy = [np.sin(ix / 0.1) * ix / 2.0 for ix in cx]
-        waypoints = Waypoints(zip(cx,cy))
+        waypoints = Waypoints(zip(cx, cy))
     elif key == 'square':
-        w_tops = np.linspace(0.1, 1, 5) # turn widhts
-        waypoints = Waypoints([Vector(0,0)])
+        w_tops = np.linspace(0.1, 1, 5)  # turn widhts
+        waypoints = Waypoints([Vector(0, 0)])
 
-        v_up = Vector(0,1)
+        v_up = Vector(0, 1)
         waypoints.append(waypoints[-1] + 0.5*v_up)
         for w in reversed(w_tops):
-            waypoints.append(waypoints[-1] + Vector(w,0))
+            waypoints.append(waypoints[-1] + Vector(w, 0))
             waypoints.append(waypoints[-1] - v_up)
-            waypoints.append(waypoints[-1] + Vector(0.4,0))
+            waypoints.append(waypoints[-1] + Vector(0.4, 0))
             waypoints.append(waypoints[-1] + v_up)
-
 
     else:
         raise KeyError(f"Don't know how to generate waypoints for {key}")
 
     return waypoints
+
 
 def main():
 
@@ -182,7 +187,9 @@ def main():
         world.move_robot(bot.xy, bot.phi)
         world.move_marker('future_xy', future_xy)
         world.move_marker('target', target)
-        print(f"step[{i_step}] next_wp:{waypoints.next_idx} target:{target} omega:{omega:.2f}")
+        print(
+            f"step[{i_step}] next_wp:{waypoints.next_idx} \
+            target:{target} omega:{omega:.2f}")
         time.sleep(SIM_DELAY)
 
         i_step += 1
@@ -191,7 +198,6 @@ def main():
         if world.click_xy:
             print('Aborted by click')
             break
-
 
     print('Simulation result:\n', bot.states_df())
 
