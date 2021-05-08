@@ -6,8 +6,8 @@ author: Atsushi Sakai (@Atsushi_twi)
         Guillaume Jacquenot (@Gjacquenot)
 
 """
-import numpy as np
 import math
+import numpy as np
 import matplotlib.pyplot as plt
 
 # Parameters

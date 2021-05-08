@@ -71,3 +71,10 @@ target/
 
 matplotrecorder/*
 .vscode/settings.json
+
+# scratchpad files
+scratch/
+
+# IDE files
+.vscode/
+workspace.code-workspace

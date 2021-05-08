@@ -147,10 +147,13 @@ using pip :
 
 > pip install -r requirements.txt
 
+3. Add this library to the environment (in development mode)
 
-3. Execute python script in each directory.
+> pip install -e .
 
-4. Add star to this repo if you like it :smiley:. 
+4. Execute python script in each directory.
+
+5. Add star to this repo if you like it :smiley:. 
 
 # Localization
 
