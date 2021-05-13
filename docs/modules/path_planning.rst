@@ -54,7 +54,6 @@ Ref:
 
 -  `D* search Wikipedia <https://en.wikipedia.org/wiki/D*>`__
 
-
 Potential Field algorithm
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
