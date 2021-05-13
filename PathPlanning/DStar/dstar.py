@@ -1,3 +1,12 @@
+"""
+
+D* grid planning
+
+author: Nirnay Roy
+
+See Wikipedia article (https://en.wikipedia.org/wiki/D*)
+
+"""
 import math
 
 from sys import maxsize
@@ -7,7 +16,7 @@ import matplotlib.pyplot as plt
 show_animation = True
 
 
-class State(object):
+class State:
 
     def __init__(self, x, y):
         self.x = x
@@ -26,19 +35,19 @@ class State(object):
                          math.pow((self.y - state.y), 2))
 
     def set_state(self, state):
-        '''
+        """
         .: new
         #: obstacle
         e: oparent of current state
         *: closed state
         s: current state
-        '''
+        """
         if state not in ["s", ".", "#", "e", "*"]:
             return
         self.state = state
 
 
-class Map(object):
+class Map:
 
     def __init__(self, row, col):
         self.row = row
@@ -75,7 +84,7 @@ class Map(object):
             self.map[x][y].set_state("#")
 
 
-class Dstar(object):
+class Dstar:
     def __init__(self, maps):
         self.map = maps
         self.open_list = set()
@@ -188,18 +197,32 @@ class Dstar(object):
 
 
 def main():
-    m = Map(20, 20)
-    obstacle_list = [(8, 3), (8, 4), (8, 5), (8, 6), (8, 7),
-                     (8, 8), (8, 9), (8, 10), (8, 11), (8, 12),
-                     (8, 13), (7, 13), (6, 13), (5, 13)]
+    m = Map(100, 100)
+    ox, oy = [], []
+    for i in range(-10, 60):
+        ox.append(i)
+        oy.append(-10.0)
+    for i in range(-10, 60):
+        ox.append(60.0)
+        oy.append(i)
+    for i in range(-10, 61):
+        ox.append(i)
+        oy.append(60.0)
+    for i in range(-10, 61):
+        ox.append(-10.0)
+        oy.append(i)
+    for i in range(-10, 40):
+        ox.append(20.0)
+        oy.append(i)
+    for i in range(0, 40):
+        ox.append(40.0)
+        oy.append(60.0 - i)
+    m.set_obstacle([(i, j) for (i, j) in zip(ox, oy)])
 
-    m.set_obstacle(obstacle_list)
-
-    start = [1, 2]
-    goal = [17, 19]
+    start = [10, 10]
+    goal = [50, 50]
     if show_animation:
-        plt.plot([x for (x, y) in obstacle_list],
-                 [y for (x, y) in obstacle_list], ".k")
+        plt.plot(ox, oy, ".k")
         plt.plot(start[0], start[1], "og")
         plt.plot(goal[0], goal[1], "xb")
 
