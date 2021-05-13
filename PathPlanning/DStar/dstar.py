@@ -197,7 +197,6 @@ class Dstar:
 
 
 def main():
-    
     m = Map(100, 100)
     ox, oy = [], []
     for i in range(-10, 60):
