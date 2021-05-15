@@ -37,6 +37,7 @@ Python codes for robotics algorithm.
       * [Grid based search](#grid-based-search)
          * [Dijkstra algorithm](#dijkstra-algorithm)
          * [A* algorithm](#a-algorithm)
+         * [D* algorithm](#d-algorithm)
          * [Potential Field algorithm](#potential-field-algorithm)
          * [Grid based coverage path planning](#grid-based-coverage-path-planning)
       * [State Lattice Planning](#state-lattice-planning)
@@ -300,6 +301,19 @@ This is a 2D grid based the shortest path planning with A star algorithm.
 In the animation, cyan points are searched nodes.
 
 Its heuristic is 2D Euclid distance.
+
+### D\* algorithm
+
+This is a 2D grid based the shortest path planning with D star algorithm.
+
+![figure at master · nirnayroy/intelligentrobotics](https://github.com/nirnayroy/intelligent-robotics/blob/main/dstar.gif)
+
+The animation shows a robot finding its path avoiding an obstacle using the D* search algorithm.
+
+Ref:
+
+- [D* Algorithm Wikipedia](https://en.wikipedia.org/wiki/D*)
+
 
 ### Potential Field algorithm
 

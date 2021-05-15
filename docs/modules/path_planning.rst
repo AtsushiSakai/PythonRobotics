@@ -39,6 +39,21 @@ In the animation, cyan points are searched nodes.
 
 Its heuristic is 2D Euclid distance.
 
+.. _a*-algorithm:
+
+D\* algorithm
+~~~~~~~~~~~~~
+
+This is a 2D grid based shortest path planning with D star algorithm.
+
+|dstar|
+
+The animation shows a robot finding its path avoiding an obstacle using the D* search algorithm.
+
+Ref:
+
+-  `D* search Wikipedia <https://en.wikipedia.org/wiki/D*>`__
+
 Potential Field algorithm
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -427,6 +442,7 @@ Ref:
 .. |DWA| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DynamicWindowApproach/animation.gif
 .. |Dijkstra| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/Dijkstra/animation.gif
 .. |astar| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/AStar/animation.gif
+.. |dstar| image:: https://github.com/nirnayroy/intelligent-robotics/blob/main/dstar.gif
 .. |PotentialField| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/PotentialFieldPlanning/animation.gif
 .. |4| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ModelPredictiveTrajectoryGenerator/kn05animation.gif
 .. |5| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/ModelPredictiveTrajectoryGenerator/lookuptable.png?raw=True
