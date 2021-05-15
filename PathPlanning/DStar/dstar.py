@@ -63,7 +63,7 @@ class Map:
             map_list.append(tmp)
         return map_list
 
-    def get_neighbers(self, state):
+    def get_neighbors(self, state):
         state_list = []
         for i in [-1, 0, 1]:
             for j in [-1, 0, 1]:
@@ -99,18 +99,18 @@ class Dstar:
         self.remove(x)
 
         if k_old < x.h:
-            for y in self.map.get_neighbers(x):
+            for y in self.map.get_neighbors(x):
                 if y.h <= k_old and x.h > y.h + x.cost(y):
                     x.parent = y
                     x.h = y.h + x.cost(y)
         elif k_old == x.h:
-            for y in self.map.get_neighbers(x):
+            for y in self.map.get_neighbors(x):
                 if y.t == "new" or y.parent == x and y.h != x.h + x.cost(y) \
                         or y.parent != x and y.h > x.h + x.cost(y):
                     y.parent = x
                     self.insert(y, x.h + x.cost(y))
         else:
-            for y in self.map.get_neighbers(x):
+            for y in self.map.get_neighbors(x):
                 if y.t == "new" or y.parent == x and y.h != x.h + x.cost(y):
                     y.parent = x
                     self.insert(y, x.h + x.cost(y))
@@ -178,7 +178,7 @@ class Dstar:
             rx.append(tmp.x)
             ry.append(tmp.y)
             if show_animation:
-                plt.plot(rx, ry)
+                plt.plot(rx, ry, "-r")
                 plt.pause(0.01)
             if tmp.parent.state == "#":
                 self.modify(tmp)
@@ -226,6 +226,7 @@ def main():
         plt.plot(ox, oy, ".k")
         plt.plot(start[0], start[1], "og")
         plt.plot(goal[0], goal[1], "xb")
+        plt.axis("equal")
 
     start = m.map[start[0]][start[1]]
     end = m.map[goal[0]][goal[1]]
@@ -233,7 +234,7 @@ def main():
     rx, ry = dstar.run(start, end)
 
     if show_animation:
-        plt.plot(rx, ry)
+        plt.plot(rx, ry, "-r")
         plt.show()
 
 

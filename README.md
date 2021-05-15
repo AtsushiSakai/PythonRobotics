@@ -306,7 +306,7 @@ Its heuristic is 2D Euclid distance.
 
 This is a 2D grid based the shortest path planning with D star algorithm.
 
-![figure at master · nirnayroy/intelligentrobotics](https://github.com/nirnayroy/intelligent-robotics/blob/main/dstar.gif)
+![figure at master · nirnayroy/intelligentrobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DStar/animation.gif)
 
 The animation shows a robot finding its path avoiding an obstacle using the D* search algorithm.
 

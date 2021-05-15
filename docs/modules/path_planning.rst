@@ -442,7 +442,7 @@ Ref:
 .. |DWA| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DynamicWindowApproach/animation.gif
 .. |Dijkstra| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/Dijkstra/animation.gif
 .. |astar| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/AStar/animation.gif
-.. |dstar| image:: https://github.com/nirnayroy/intelligent-robotics/blob/main/dstar.gif
+.. |dstar| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DStar/animation.gif
 .. |PotentialField| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/PotentialFieldPlanning/animation.gif
 .. |4| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ModelPredictiveTrajectoryGenerator/kn05animation.gif
 .. |5| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/ModelPredictiveTrajectoryGenerator/lookuptable.png?raw=True
