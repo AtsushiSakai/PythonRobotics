@@ -1,6 +1,7 @@
 import conftest
 from PathPlanning.DStarLite import DStarLite as m
 
+
 def test_1():
     m.show_animation = False
     m.main()
