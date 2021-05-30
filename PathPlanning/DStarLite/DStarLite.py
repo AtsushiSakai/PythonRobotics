@@ -9,7 +9,7 @@ Implemented maintaining similarity with the pseudocode for understanding
 from __future__ import annotations
 import math
 import matplotlib.pyplot as plt
-import random
+# import random
 
 show_animation = True
 pause_time = 0.1
