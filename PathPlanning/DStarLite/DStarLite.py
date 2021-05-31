@@ -10,10 +10,11 @@ Implemented maintaining similarity with the pseudocode for understanding
 from __future__ import annotations
 import math
 import matplotlib.pyplot as plt
-# import random
+import random
 
 show_animation = True
 pause_time = 0.1
+p_create_random_obstacle = 0
 
 
 class Node:
@@ -78,7 +79,8 @@ class DStarLite:
                     for obstacle in self.detected_obstacles])
 
     def c(self, node1: Node, node2: Node):
-        if self.is_obstacle(node2):  # Attempting to move to an obstacle
+        if self.is_obstacle(node1) or self.is_obstacle(node2):
+            # Attempting to move from or to an obstacle
             return math.inf
         new_node = Node(node1.x-node2.x, node1.y-node2.y)
         detected_motion = list(filter(lambda motion:
@@ -96,7 +98,7 @@ class DStarLite:
 
     def is_valid(self, node: Node):
         if node.x >= 0 and node.y >= 0 and node.x < self.x_max and \
-           node.y < self.x_max and not self.is_obstacle(node):
+           node.y < self.x_max:
             return True
         return False
 
@@ -126,8 +128,8 @@ class DStarLite:
     def update_vertex(self, u: Node):
         if not compare_coordinates(u, self.goal):
             self.rhs[u.x][u.y] = min([self.c(u, sprime) +
-                                     self.g[sprime.x][sprime.y]
-                                     for sprime in self.succ(u)])
+                                      self.g[sprime.x][sprime.y]
+                                      for sprime in self.succ(u)])
         if any([compare_coordinates(u, node) for node, key in self.U]):
             self.U = [(node, key) for node, key in self.U
                       if not compare_coordinates(node, u)]
@@ -181,21 +183,24 @@ class DStarLite:
                              self.detected_obstacles_for_plotting_y, ".k")
                     plt.pause(pause_time)
             self.spoofed_obstacles.pop(0)
+
         # Allows random generation of obstacles
-        # random.seed(1)
-        # p_generate_obs = 0.25;
-        # # probability of randomly generating an obstacle
-        # if random.random() > 1 - p_generate_obs:
-        #     x = random.randint(0, self.x_max)
-        #     y = random.randint(0, self.y_max)
-        #     changed_vertices.append(Node(x, y))
-        #     self.detected_obstacles.append(Node(x, y))
-        #     if show_animation:
-        #         self.detected_obstacles_for_plotting_x.append(x)
-        #         self.detected_obstacles_for_plotting_y.append(y)
-        #         plt.plot(self.detected_obstacles_for_plotting_x,
-        #                    self.detected_obstacles_for_plotting_y, ".k")
-        #         plt.pause(0.01)
+        random.seed()
+        if random.random() > 1 - p_create_random_obstacle:
+            x = random.randint(0, self.x_max - 1)
+            y = random.randint(0, self.y_max - 1)
+            new_obs = Node(x, y)
+            if compare_coordinates(new_obs, self.start) or \
+               compare_coordinates(new_obs, self.goal):
+                return changed_vertices
+            changed_vertices.append(Node(x, y))
+            self.detected_obstacles.append(Node(x, y))
+            if show_animation:
+                self.detected_obstacles_for_plotting_x.append(x)
+                self.detected_obstacles_for_plotting_y.append(y)
+                plt.plot(self.detected_obstacles_for_plotting_x,
+                         self.detected_obstacles_for_plotting_y, ".k")
+                plt.pause(pause_time)
         return changed_vertices
 
     def main(self, start: Node, goal: Node):
@@ -209,8 +214,8 @@ class DStarLite:
         while not compare_coordinates(self.goal, self.start):
             if self.g[start.x][start.y] == math.inf:
                 print("No path possible")
-                return
-            self.start = min([sprime for sprime in self.succ(self.start)],
+                return False, pathx, pathy
+            self.start = min(self.succ(self.start),
                              key=lambda sprime:
                              self.c(self.start, sprime) +
                              self.g[sprime.x][sprime.y])
@@ -227,13 +232,9 @@ class DStarLite:
                 for u in changed_vertices:
                     if compare_coordinates(u, self.start):
                         continue
-                    # Not required, can use for debug
-                    # self.rhs[u.x][u.y] = math.inf
-                    # self.g[u.x][u.y] = math.inf
-                    for neighbour in self.get_neighbours(u):
-                        self.update_vertex(neighbour)
+                    self.update_vertex(u)
                 self.compute_shortest_path()
-        return pathx, pathy
+        return True, pathx, pathy
 
 
 def main():
@@ -251,6 +252,7 @@ def main():
     spoofed_obstacles = list()
     spoofed_obstacles_x = [[0, 9, 4], [0, 7], [], [], [], [], [], [5]]
     spoofed_obstacles_y = [[2, 2, 0], [1, 6], [], [], [], [], [], [4]]
+
     for rowx, rowy in zip(spoofed_obstacles_x, spoofed_obstacles_y):
         spoofed_obstacles_row = [Node(x, y) for x, y in zip(rowx, rowy)]
         spoofed_obstacles.append(spoofed_obstacles_row)
@@ -269,12 +271,7 @@ def main():
                           obstacles=obstacles,
                           spoofed_obstacles=spoofed_obstacles
                           )
-    pathx, pathy = dstarlite.main(start_node, goal_node)
-
-    if show_animation:
-        plt.plot(pathx, pathy, "-r")
-        plt.axis("equal")
-        plt.show()
+    dstarlite.main(start_node, goal_node)
 
 
 if __name__ == "__main__":
