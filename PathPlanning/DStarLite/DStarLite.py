@@ -5,15 +5,17 @@ Link to papers:
 D* Lite (Link: http://idm-lab.org/bib/abstracts/papers/aaai02b.pd)
 Improved Fast Replanning for Robot Navigation in Unknown Terrain
 (Link: http://www.cs.cmu.edu/~maxim/files/dlite_icra02.pdf)
-Implemented maintaining similarity with the pseudocode for understanding
+Implemented maintaining similarity with the pseudocode for understanding.
+Code can be significantly optimized by using a priority queue for U, etc.
+Avoiding additional imports based on repository philosophy.
 """
-from __future__ import annotations
+
 import math
 import matplotlib.pyplot as plt
 import random
 
 show_animation = True
-pause_time = 0.1
+pause_time = 0.001
 p_create_random_obstacle = 0
 
 
@@ -38,24 +40,34 @@ def compare_coordinates(node1: Node, node2: Node):
 
 class DStarLite:
 
+    # Please adjust the heuristic function (h) if you change the list of
+    # possible motions
     motions = [
         Node(1, 0, 1),
         Node(0, 1, 1),
         Node(-1, 0, 1),
-        Node(0, -1, 1)
+        Node(0, -1, 1),
+        Node(1, 1, math.sqrt(2)),
+        Node(1, -1, math.sqrt(2)),
+        Node(-1, 1, math.sqrt(2)),
+        Node(-1, -1, math.sqrt(2))
     ]
 
-    def __init__(self, x_max: int, y_max: int, obstacles: list,
-                 spoofed_obstacles: list = list()):
-        self.x_max = x_max
-        self.y_max = y_max
-        self.obstacles = obstacles
-        self.spoofed_obstacles = spoofed_obstacles
+    def __init__(self, ox: list, oy: list):
+        # Ensure that within the algorithm implementation all node coordinates
+        # are indices in the grid and extend
+        # from 0 to abs(<axis>_max - <axis>_min)
+        self.x_min_world = int(min(ox))
+        self.y_min_world = int(min(oy))
+        self.x_max = int(abs(max(ox) - self.x_min_world))
+        self.y_max = int(abs(max(oy) - self.y_min_world))
+        self.obstacles = [Node(x - self.x_min_world, y - self.y_min_world)
+                          for x, y in zip(ox, oy)]
         self.start = Node(0, 0)
         self.goal = Node(0, 0)
         self.U = list()
-        self.km = 0
-        self.kold = 0
+        self.km = 0.0
+        self.kold = 0.0
         self.rhs = list()
         self.g = list()
         self.detected_obstacles = list()
@@ -79,7 +91,7 @@ class DStarLite:
                     for obstacle in self.detected_obstacles])
 
     def c(self, node1: Node, node2: Node):
-        if self.is_obstacle(node1) or self.is_obstacle(node2):
+        if self.is_obstacle(node2):
             # Attempting to move from or to an obstacle
             return math.inf
         new_node = Node(node1.x-node2.x, node1.y-node2.y)
@@ -89,16 +101,25 @@ class DStarLite:
         return detected_motion[0].cost
 
     def h(self, s: Node):
-        # Modify if allowing diagonal motion
-        return abs(self.start.x - s.x) + abs(self.start.y - s.y)
+        # Cannot use the 2nd euclidean norm as this might sometimes generate
+        # heuristics that overestimate the cost, making them inadmissible,
+        # due to rounding errors etc (when combined with calculate_key)
+        # To be admissible heuristic should
+        # never overestimate the cost of a move
+        # hence not using the line below
+        # return math.hypot(self.start.x - s.x, self.start.y - s.y)
+
+        # Below is the same as 1; modify if you modify the cost of each move in
+        # motion
+        # return max(abs(self.start.x - s.x), abs(self.start.y - s.y))
+        return 1
 
     def calculate_key(self, s: Node):
         return (min(self.g[s.x][s.y], self.rhs[s.x][s.y]) + self.h(s)
                 + self.km, min(self.g[s.x][s.y], self.rhs[s.x][s.y]))
 
     def is_valid(self, node: Node):
-        if node.x >= 0 and node.y >= 0 and node.x < self.x_max and \
-           node.y < self.x_max:
+        if 0 <= node.x < self.x_max and 0 <= node.y < self.y_max:
             return True
         return False
 
@@ -115,14 +136,16 @@ class DStarLite:
         return self.get_neighbours(u)
 
     def initialize(self, start: Node, goal: Node):
-        self.start = start
-        self.goal = goal
-        self.U = list()
-        self.km = 0
+        self.start.x = start.x - self.x_min_world
+        self.start.y = start.y - self.y_min_world
+        self.goal.x = goal.x - self.x_min_world
+        self.goal.y = goal.y - self.y_min_world
+        self.U = list()  # Would normally be a priority queue
+        self.km = 0.0
         self.rhs = self.create_grid(math.inf)
         self.g = self.create_grid(math.inf)
-        self.rhs[goal.x][goal.y] = 0
-        self.U.append((goal, self.calculate_key(goal)))
+        self.rhs[self.goal.x][self.goal.y] = 0
+        self.U.append((self.goal, self.calculate_key(self.goal)))
         self.detected_obstacles = list()
 
     def update_vertex(self, u: Node):
@@ -150,8 +173,8 @@ class DStarLite:
                                  self.calculate_key(self.start))) or \
                 self.rhs[self.start.x][self.start.y] != \
                 self.g[self.start.x][self.start.y]:
-            u = self.U[0][0]
             self.kold = self.U[0][1]
+            u = self.U[0][0]
             self.U.pop(0)
             if self.compare_keys(self.kold, self.calculate_key(u)):
                 self.U.append((u, self.calculate_key(u)))
@@ -164,6 +187,7 @@ class DStarLite:
                 self.g[u.x][u.y] = math.inf
                 for s in self.pred(u) + [u]:
                     self.update_vertex(s)
+            self.U.sort(key=lambda x: x[1])
 
     def detect_changes(self):
         changed_vertices = list()
@@ -176,9 +200,9 @@ class DStarLite:
                 self.detected_obstacles.append(spoofed_obstacle)
                 if show_animation:
                     self.detected_obstacles_for_plotting_x.append(
-                        spoofed_obstacle.x)
+                        spoofed_obstacle.x + self.x_min_world)
                     self.detected_obstacles_for_plotting_y.append(
-                        spoofed_obstacle.y)
+                        spoofed_obstacle.y + self.y_min_world)
                     plt.plot(self.detected_obstacles_for_plotting_x,
                              self.detected_obstacles_for_plotting_y, ".k")
                     plt.pause(pause_time)
@@ -187,8 +211,8 @@ class DStarLite:
         # Allows random generation of obstacles
         random.seed()
         if random.random() > 1 - p_create_random_obstacle:
-            x = random.randint(0, self.x_max - 1)
-            y = random.randint(0, self.y_max - 1)
+            x = random.randint(0, self.x_max)
+            y = random.randint(0, self.y_max)
             new_obs = Node(x, y)
             if compare_coordinates(new_obs, self.start) or \
                compare_coordinates(new_obs, self.goal):
@@ -196,82 +220,114 @@ class DStarLite:
             changed_vertices.append(Node(x, y))
             self.detected_obstacles.append(Node(x, y))
             if show_animation:
-                self.detected_obstacles_for_plotting_x.append(x)
-                self.detected_obstacles_for_plotting_y.append(y)
+                self.detected_obstacles_for_plotting_x.append(x +
+                                                              self.x_min_world)
+                self.detected_obstacles_for_plotting_y.append(y +
+                                                              self.y_min_world)
                 plt.plot(self.detected_obstacles_for_plotting_x,
                          self.detected_obstacles_for_plotting_y, ".k")
                 plt.pause(pause_time)
         return changed_vertices
 
-    def main(self, start: Node, goal: Node):
+    def main(self, start: Node, goal: Node,
+             spoofed_ox: list, spoofed_oy: list):
+        self.spoofed_obstacles = [[Node(x - self.x_min_world,
+                                        y - self.y_min_world)
+                                   for x, y in zip(rowx, rowy)]
+                                  for rowx, rowy in zip(spoofed_ox, spoofed_oy)
+                                  ]
         pathx = []
         pathy = []
-        last = start
         self.initialize(start, goal)
+        last = self.start
         self.compute_shortest_path()
-        pathx.append(start.x)
-        pathy.append(start.y)
+        pathx.append(self.start.x + self.x_min_world)
+        pathy.append(self.start.y + self.y_min_world)
         while not compare_coordinates(self.goal, self.start):
-            if self.g[start.x][start.y] == math.inf:
+            if self.g[self.start.x][self.start.y] == math.inf:
                 print("No path possible")
                 return False, pathx, pathy
             self.start = min(self.succ(self.start),
                              key=lambda sprime:
                              self.c(self.start, sprime) +
                              self.g[sprime.x][sprime.y])
-            pathx.append(self.start.x)
-            pathy.append(self.start.y)
+            pathx.append(self.start.x + self.x_min_world)
+            pathy.append(self.start.y + self.y_min_world)
             if show_animation:
                 plt.plot(pathx, pathy, "-r")
                 plt.axis("equal")
                 plt.pause(pause_time)
             changed_vertices = self.detect_changes()
-            if changed_vertices is not None:
+            if len(changed_vertices) != 0:
+                print("New obstacle detected")
                 self.km += self.h(last)
                 last = self.start
                 for u in changed_vertices:
                     if compare_coordinates(u, self.start):
                         continue
+                    self.rhs[u.x][u.y] = math.inf
+                    self.g[u.x][u.y] = math.inf
                     self.update_vertex(u)
                 self.compute_shortest_path()
+        print("Path found")
         return True, pathx, pathy
 
 
 def main():
-    start = [0, 0]
-    goal = [5, 5]
 
-    obsx = [1, 3]
-    obsy = [1, 2]
-    obstacles = [Node(x, y) for x, y in zip(obsx, obsy)]
+    # start and goal position
+    sx = 10  # [m]
+    sy = 10  # [m]
+    gx = 50  # [m]
+    gy = 50  # [m]
+
+    # set obstacle positions
+    ox, oy = [], []
+    for i in range(-10, 60):
+        ox.append(i)
+        oy.append(-10.0)
+    for i in range(-10, 60):
+        ox.append(60.0)
+        oy.append(i)
+    for i in range(-10, 61):
+        ox.append(i)
+        oy.append(60.0)
+    for i in range(-10, 61):
+        ox.append(-10.0)
+        oy.append(i)
+    for i in range(-10, 40):
+        ox.append(20.0)
+        oy.append(i)
+    for i in range(0, 40):
+        ox.append(40.0)
+        oy.append(60.0 - i)
+
+    if show_animation:
+        plt.plot(ox, oy, ".k")
+        plt.plot(sx, sy, "og")
+        plt.plot(gx, gy, "xb")
+        plt.axis("equal")
+        plt.pause(pause_time)
 
     # Obstacles discovered at time = row
     # time = 1, obstacles discovered at (0, 2), (9, 2), (4, 0)
-    # time = 2, obstacles discovered at (0, 1), (7, 6)
+    # time = 2, obstacles discovered at (0, 1), (7, 7)
     # ...
-    spoofed_obstacles = list()
-    spoofed_obstacles_x = [[0, 9, 4], [0, 7], [], [], [], [], [], [5]]
-    spoofed_obstacles_y = [[2, 2, 0], [1, 6], [], [], [], [], [], [4]]
+    # when the spoofed obstacles are:
+    # spoofed_ox = [[0, 9, 4], [0, 7], [], [], [], [], [], [5]]
+    # spoofed_oy = [[2, 2, 0], [1, 7], [], [], [], [], [], [4]]
 
-    for rowx, rowy in zip(spoofed_obstacles_x, spoofed_obstacles_y):
-        spoofed_obstacles_row = [Node(x, y) for x, y in zip(rowx, rowy)]
-        spoofed_obstacles.append(spoofed_obstacles_row)
+    # Reroute
+    # spoofed_ox = [[], [], [], [], [], [], [], [40 for _ in range(10, 21)]]
+    # spoofed_oy = [[], [], [], [], [], [], [], [i for i in range(10, 21)]]
 
-    start_node = Node(x=start[0], y=start[1])
-    goal_node = Node(x=goal[0], y=goal[1])
+    # Obstacles that demostrate large rerouting
+    spoofed_ox = [[], [i for i in range(0, 21)] + [0 for _ in range(0, 20)]]
+    spoofed_oy = [[], [20 for _ in range(0, 21)] + [i for i in range(0, 20)]]
 
-    if show_animation:
-        plt.plot(obsx, obsy, ".k")
-        plt.plot(start[0], start[1], "og")
-        plt.plot(goal[0], goal[1], "xb")
-        plt.axis("equal")
-
-    dstarlite = DStarLite(x_max=10,
-                          y_max=10,
-                          obstacles=obstacles,
-                          spoofed_obstacles=spoofed_obstacles
-                          )
-    dstarlite.main(start_node, goal_node)
+    dstarlite = DStarLite(ox, oy)
+    dstarlite.main(Node(x=sx, y=sy), Node(x=gx, y=gy),
+                   spoofed_ox=spoofed_ox, spoofed_oy=spoofed_oy)
 
 
 if __name__ == "__main__":
