@@ -9,7 +9,6 @@ Implemented maintaining similarity with the pseudocode for understanding.
 Code can be significantly optimized by using a priority queue for U, etc.
 Avoiding additional imports based on repository philosophy.
 """
-
 import math
 import matplotlib.pyplot as plt
 import random
@@ -229,6 +228,33 @@ class DStarLite:
                 plt.pause(pause_time)
         return changed_vertices
 
+    def compute_current_path(self):
+        path = list()
+        current_point = Node(self.start.x, self.start.y)
+        while not compare_coordinates(current_point, self.goal):
+            path.append(current_point)
+            current_point = min(self.succ(current_point),
+                                key=lambda sprime:
+                                self.c(current_point, sprime) +
+                                self.g[sprime.x][sprime.y])
+        path.append(self.goal)
+        return path
+
+    def compare_paths(self, path1: list, path2: list):
+        if len(path1) != len(path2):
+            return False
+        for node1, node2 in zip(path1, path2):
+            if not compare_coordinates(node1, node2):
+                return False
+        return True
+
+    def display_path(self, path: list, colour: str, alpha: int = 1):
+        px = [(node.x + self.x_min_world) for node in path]
+        py = [(node.y + self.y_min_world) for node in path]
+        drawing = plt.plot(px, py, colour, alpha=alpha)
+        plt.pause(pause_time)
+        return drawing
+
     def main(self, start: Node, goal: Node,
              spoofed_ox: list, spoofed_oy: list):
         self.spoofed_obstacles = [[Node(x - self.x_min_world,
@@ -243,6 +269,14 @@ class DStarLite:
         self.compute_shortest_path()
         pathx.append(self.start.x + self.x_min_world)
         pathy.append(self.start.y + self.y_min_world)
+
+        if show_animation:
+            current_path = self.compute_current_path()
+            previous_path = current_path.copy()
+            previous_path_image = self.display_path(previous_path, ".c",
+                                                    alpha=0.3)
+            current_path_image = self.display_path(current_path, ".c")
+
         while not compare_coordinates(self.goal, self.start):
             if self.g[self.start.x][self.start.y] == math.inf:
                 print("No path possible")
@@ -254,8 +288,8 @@ class DStarLite:
             pathx.append(self.start.x + self.x_min_world)
             pathy.append(self.start.y + self.y_min_world)
             if show_animation:
+                current_path.pop(0)
                 plt.plot(pathx, pathy, "-r")
-                plt.axis("equal")
                 plt.pause(pause_time)
             changed_vertices = self.detect_changes()
             if len(changed_vertices) != 0:
@@ -269,6 +303,20 @@ class DStarLite:
                     self.g[u.x][u.y] = math.inf
                     self.update_vertex(u)
                 self.compute_shortest_path()
+
+                if show_animation:
+                    new_path = self.compute_current_path()
+                    if not self.compare_paths(current_path, new_path):
+                        current_path_image[0].remove()
+                        previous_path_image[0].remove()
+                        previous_path = current_path.copy()
+                        current_path = new_path.copy()
+                        previous_path_image = self.display_path(previous_path,
+                                                                ".c",
+                                                                alpha=0.3)
+                        current_path_image = self.display_path(current_path,
+                                                               ".c")
+                        plt.pause(pause_time)
         print("Path found")
         return True, pathx, pathy
 
@@ -306,7 +354,21 @@ def main():
         plt.plot(ox, oy, ".k")
         plt.plot(sx, sy, "og")
         plt.plot(gx, gy, "xb")
+        plt.grid(True)
         plt.axis("equal")
+        label_column = ['Start', 'Goal', 'Path taken',
+                        'Current computed path', 'Previous computed path',
+                        'Obstacles']
+        columns = [plt.plot([], [], symbol, color=colour, alpha=alpha)[0]
+                   for symbol, colour, alpha in [['o', 'g', 1],
+                                                 ['x', 'b', 1],
+                                                 ['-', 'r', 1],
+                                                 ['.', 'c', 1],
+                                                 ['.', 'c', 0.3],
+                                                 ['.', 'k', 1]]]
+        plt.legend(columns, label_column, bbox_to_anchor=(1, 1), title="Key:",
+                   fontsize="xx-small")
+        plt.plot()
         plt.pause(pause_time)
 
     # Obstacles discovered at time = row
@@ -322,8 +384,10 @@ def main():
     # spoofed_oy = [[], [], [], [], [], [], [], [i for i in range(10, 21)]]
 
     # Obstacles that demostrate large rerouting
-    spoofed_ox = [[], [i for i in range(0, 21)] + [0 for _ in range(0, 20)]]
-    spoofed_oy = [[], [20 for _ in range(0, 21)] + [i for i in range(0, 20)]]
+    spoofed_ox = [[], [], [],
+                  [i for i in range(0, 21)] + [0 for _ in range(0, 20)]]
+    spoofed_oy = [[], [], [],
+                  [20 for _ in range(0, 21)] + [i for i in range(0, 20)]]
 
     dstarlite = DStarLite(ox, oy)
     dstarlite.main(Node(x=sx, y=sy), Node(x=gx, y=gy),

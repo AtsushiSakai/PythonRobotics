@@ -1,5 +1,5 @@
 import conftest
-from PathPlanning.DStarLite import DStarLite as m
+from PathPlanning.DStarLite import d_star_lite as m
 
 
 def test_1():
