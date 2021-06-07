@@ -38,6 +38,7 @@ Python codes for robotics algorithm.
          * [Dijkstra algorithm](#dijkstra-algorithm)
          * [A* algorithm](#a-algorithm)
          * [D* algorithm](#d-algorithm)
+         * [D* Lite algorithm](#dstarlite-algorithm)
          * [Potential Field algorithm](#potential-field-algorithm)
          * [Grid based coverage path planning](#grid-based-coverage-path-planning)
       * [State Lattice Planning](#state-lattice-planning)
@@ -314,6 +315,18 @@ Ref:
 
 - [D* Algorithm Wikipedia](https://en.wikipedia.org/wiki/D*)
 
+### D\* Lite algorithm
+
+This algorithm finds the shortest path between two points while rerouting when obstacles are discovered. It has been implemented here for a 2D grid.
+
+![D* Lite](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DStarLite/animation.gif)
+
+The animation shows a robot finding its path and rerouting to avoid obstacles as they are discovered using the D* Lite search algorithm.
+
+Refs:
+
+- [D* Lite](http://idm-lab.org/bib/abstracts/papers/aaai02b.pd)
+- [Improved Fast Replanning for Robot Navigation in Unknown Terrain](http://www.cs.cmu.edu/~maxim/files/dlite_icra02.pdf)
 
 ### Potential Field algorithm
 
