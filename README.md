@@ -38,7 +38,7 @@ Python codes for robotics algorithm.
          * [Dijkstra algorithm](#dijkstra-algorithm)
          * [A* algorithm](#a-algorithm)
          * [D* algorithm](#d-algorithm)
-         * [D* Lite algorithm](#dstarlite-algorithm)
+         * [D* Lite algorithm](#d-lite-algorithm)
          * [Potential Field algorithm](#potential-field-algorithm)
          * [Grid based coverage path planning](#grid-based-coverage-path-planning)
       * [State Lattice Planning](#state-lattice-planning)
