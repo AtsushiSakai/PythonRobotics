@@ -13,10 +13,10 @@ import numpy as np
 from scipy.spatial.transform import Rotation as Rot
 import matplotlib.pyplot as plt
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + \
-               "/../../Mapping/")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/../../Mapping/")
 
-try :
+try:
     from grid_map_lib.grid_map_lib import GridMap
 except ImportError:
     raise
@@ -258,13 +258,14 @@ def planning(ox, oy, resolution,
              ):
     sweep_vec, sweep_start_position = find_sweep_direction_and_start_position(
         ox, oy)
+    print("sweep_vec", sweep_vec, sweep_start_position)
 
     rox, roy = convert_grid_coordinate(ox, oy, sweep_vec,
                                        sweep_start_position)
 
     grid_map, x_inds_goal_y, goal_y = setup_grid_map(rox, roy, resolution,
                                                      sweeping_direction)
-
+    print(x_inds_goal_y, goal_y)
     sweep_searcher = SweepSearcher(moving_direction, sweeping_direction,
                                    x_inds_goal_y, goal_y)
 
@@ -310,7 +311,7 @@ def main():  # pragma: no cover
 
     ox = [0.0, 20.0, 50.0, 100.0, 130.0, 40.0, 0.0]
     oy = [0.0, -20.0, 0.0, 30.0, 60.0, 80.0, 0.0]
-    resolution = 5.0
+    resolution = 1.0
     planning_animation(ox, oy, resolution)
 
     ox = [0.0, 50.0, 50.0, 0.0, 0.0]
