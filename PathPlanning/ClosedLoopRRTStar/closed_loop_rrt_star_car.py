@@ -11,6 +11,8 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 import pure_pursuit
 import unicycle_model
 
