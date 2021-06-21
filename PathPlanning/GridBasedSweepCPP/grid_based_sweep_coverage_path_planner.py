@@ -264,7 +264,7 @@ def planning(ox, oy, resolution,
 
     grid_map, x_inds_goal_y, goal_y = setup_grid_map(rox, roy, resolution,
                                                      sweeping_direction)
-    print(x_inds_goal_y, goal_y)
+
     sweep_searcher = SweepSearcher(moving_direction, sweeping_direction,
                                    x_inds_goal_y, goal_y)
 
