@@ -5,12 +5,21 @@ author: Atsushi Sakai
 """
 
 import math
+import os
+import sys
 from enum import IntEnum
 
 import numpy as np
 from scipy.spatial.transform import Rotation as Rot
-from Mapping.grid_map_lib.grid_map_lib import GridMap
 import matplotlib.pyplot as plt
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/../../Mapping/")
+
+try:
+    from grid_map_lib.grid_map_lib import GridMap
+except ImportError:
+    raise
 
 do_animation = True
 

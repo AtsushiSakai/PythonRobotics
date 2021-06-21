@@ -5,14 +5,27 @@ Path planning Sample Code with Closed loop RRT for car like robot.
 author: AtsushiSakai(@Atsushi_twi)
 
 """
+import os
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-import reeds_shepp_path_planning
-from rrt_star_reeds_shepp import RRTStarReedsShepp
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 import pure_pursuit
 import unicycle_model
+
+sys.path.append(os.path.dirname(
+    os.path.abspath(__file__)) + "/../ReedsSheppPath/")
+sys.path.append(os.path.dirname(
+    os.path.abspath(__file__)) + "/../RRTStarReedsShepp/")
+
+try:
+    import reeds_shepp_path_planning
+    from rrt_star_reeds_shepp import RRTStarReedsShepp
+except ImportError:
+    raise
 
 show_animation = True
 
