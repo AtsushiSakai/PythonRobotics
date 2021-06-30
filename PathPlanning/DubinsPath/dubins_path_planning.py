@@ -258,9 +258,9 @@ def generate_local_course(total_length, lengths, mode, max_curvature,
         if len == 0:
             continue
         elif len > 0.0:
-            d = step_size
+            dist = step_size
         else:
-            d = -step_size
+            dist = -step_size
 
         # set origin state
         origin_x, origin_y, origin_yaw = \
@@ -268,18 +268,18 @@ def generate_local_course(total_length, lengths, mode, max_curvature,
 
         index -= 1
         if i >= 1 and (lengths[i - 1] * lengths[i]) > 0:
-            pd = - d - ll
+            pd = - dist - ll
         else:
-            pd = d - ll
+            pd = dist - ll
 
         while abs(pd) <= abs(l):
             index += 1
             path_x, path_y, path_yaw, directions = interpolate(
                 index, pd, mode, max_curvature, origin_x, origin_y, origin_yaw,
                 path_x, path_y, path_yaw, directions)
-            pd += d
+            pd += dist
 
-        ll = len - pd - d  # calc remain length
+        ll = len - pd - dist  # calc remain length
 
         index += 1
         path_x, path_y, path_yaw, directions = interpolate(
