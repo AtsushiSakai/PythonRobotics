@@ -136,5 +136,5 @@ class DijkstraSearch:
     @staticmethod
     def is_same_node(node_a, node_b):
         dist = np.hypot(node_a.x - node_b.x,
-                        node_b.y - node_b.y)
+                        node_a.y - node_b.y)
         return dist <= 0.1
