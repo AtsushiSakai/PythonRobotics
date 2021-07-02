@@ -285,8 +285,10 @@ def generate_local_course(total_length, lengths, mode, max_curvature, step_size)
 
     ll = 0.0
 
-    for (m, l, i) in zip(mode, lengths, range(len(mode))):
-        if l > 0.0:
+    for (m, length, i) in zip(mode, lengths, range(len(mode))):
+        if length == 0.0:
+            continue
+        elif length > 0.0:
             d = step_size
         else:
             d = -step_size
@@ -300,17 +302,19 @@ def generate_local_course(total_length, lengths, mode, max_curvature, step_size)
         else:
             pd = d - ll
 
-        while abs(pd) <= abs(l):
+        while abs(pd) <= abs(length):
             ind += 1
             px, py, pyaw, directions = interpolate(
-                ind, pd, m, max_curvature, ox, oy, oyaw, px, py, pyaw, directions)
+                ind, pd, m, max_curvature, ox, oy, oyaw,
+                px, py, pyaw, directions)
             pd += d
 
-        ll = l - pd - d  # calc remain length
+        ll = length - pd - d  # calc remain length
 
         ind += 1
         px, py, pyaw, directions = interpolate(
-            ind, l, m, max_curvature, ox, oy, oyaw, px, py, pyaw, directions)
+            ind, length, m, max_curvature, ox, oy, oyaw,
+            px, py, pyaw, directions)
 
     # remove unused data
     while px[-1] == 0.0:
@@ -390,7 +394,8 @@ def main():
     step_size = 0.1
 
     px, py, pyaw, mode, clen = reeds_shepp_path_planning(
-        start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature, step_size)
+        start_x, start_y, start_yaw, end_x, end_y, end_yaw,
+        curvature, step_size)
 
     if show_animation:  # pragma: no cover
         plt.cla()

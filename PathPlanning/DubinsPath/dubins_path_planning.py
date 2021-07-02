@@ -255,7 +255,7 @@ def generate_local_course(total_length, lengths, mode, max_curvature,
     ll = 0.0
 
     for (m, length, i) in zip(mode, lengths, range(len(mode))):
-        if length == 0:
+        if length == 0.0:
             continue
         elif length > 0.0:
             dist = step_size
