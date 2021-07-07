@@ -17,7 +17,7 @@ class DMP(object):
             for t in self.train_t_vals[:-125]:
                 self.training_data.append(np.random.normal(np.sin(t), 0.02))
             for t in self.train_t_vals[125:]:
-                self.training_data.append(np.random.normal(self.training_data[-1], 0.005))
+                self.training_data.append(self.training_data[-1])
 
             dt = np.max(self.train_t_vals)/(self.train_t_vals.size - 1)
             self.find_basis_functions_weights(training_data, dt)
@@ -26,6 +26,8 @@ class DMP(object):
 
     def find_basis_functions_weights(self, data, dt):
         # need to do linear regression to get w
+        for i in range(len(data)):
+            print(i)
 
         self.w = [-275, 405.7, -535, 264, -111]
 
