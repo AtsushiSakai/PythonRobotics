@@ -64,7 +64,7 @@ class DMP(object):
             qdd = (qd - qd_last)/dt
 
             f = (qdd * self.T_orig**2 - self.K * (g - q) + self.B * qd
-                * self.T_orig) / (g - q0)
+                 * self.T_orig) / (g - q0)
 
             phi_vals.append(Phi)
             f_vals.append(f)
