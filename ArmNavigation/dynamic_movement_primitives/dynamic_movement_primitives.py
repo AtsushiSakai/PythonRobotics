@@ -11,7 +11,7 @@ import numpy as np
 class DMP(object):
 
     def __init__(self, K=156.25, B=25, dt=0.001, timesteps=5000,
-                training_data=None):
+                 training_data=None):
         self.K = K  # virtual spring constant
         self.B = B  # virtual damper coefficient
 
@@ -42,7 +42,7 @@ class DMP(object):
         H = (0.65*(1./(num_weights-1))**2)
 
         q0 = data[0]  # initial pos
-        g  = data[-1]  # assume goal is reached by end of data
+        g = data[-1]  # assume goal is reached by end of data
         self.T_orig = len(data)*dt  # time duration of data
 
         q = q0
@@ -58,13 +58,13 @@ class DMP(object):
                 qd = (data[i+1] - data[i]) / dt
 
             Phi = [np.exp(-0.5 * ((i * dt / self.T_orig) - c)**2 / H)
-                    for c in C]
+                   for c in C]
             Phi = Phi/np.sum(Phi)
 
             qdd = (qd - qd_last)/dt
 
             f = (qdd * self.T_orig**2 - self.K * (g - q) + self.B * qd
-                        * self.T_orig) / (g - q0)
+                * self.T_orig) / (g - q0)
 
             phi_vals.append(Phi)
             f_vals.append(f)
@@ -90,7 +90,7 @@ class DMP(object):
         nrBasis = len(self.w)  # number of gaussian basis functions
 
         # means (C) and std devs (H) of gaussian basis functions
-        C = np.linspace(0,1,nrBasis)
+        C = np.linspace(0, 1, nrBasis)
         H = (0.65*(1./(nrBasis-1))**2)
 
         # initialize virtual system
@@ -107,7 +107,7 @@ class DMP(object):
                 Phi = Phi / np.sum(Phi)
                 f = np.dot(Phi, self.w)
             else:
-                f=0
+                f = 0
 
             # simulate dynamics
             qdd = self.K*(g-q)/T**2 - self.B*qd/T + (g-q0)*f/T**2
@@ -115,7 +115,7 @@ class DMP(object):
             q = q + qd * self.dt
             positions.append(q)
 
-        return np.arange(0,self.timesteps * self.dt, self.dt), positions
+        return np.arange(0, self.timesteps * self.dt, self.dt), positions
 
     def solve_trajectory(self, q0, g, T, visualize=True):
 
@@ -123,8 +123,8 @@ class DMP(object):
 
         if visualize:
             plt.plot(self.train_t_vals, self.training_data,
-                    label="Training Data")
-            plt.plot(t,pos,label="DMP Approximation")
+                     label="Training Data")
+            plt.plot(t, pos, label="DMP Approximation")
             plt.xlabel("Time [s]")
             plt.ylabel("Position [m]")
             plt.legend()
@@ -143,20 +143,23 @@ class DMP(object):
         g_orig = self.training_data[-1]
 
         t_norm, pos_norm = self.recreate_trajectory(q0_orig,
-                                    g_orig, self.T_orig)
+                                                    g_orig,
+                                                    self.T_orig)
         t_fast, pos_fast = self.recreate_trajectory(q0_orig,
-                                    g_orig, self.T_orig/2)
+                                                    g_orig,
+                                                    self.T_orig/2)
         t_close, pos_close = self.recreate_trajectory(q0_orig,
-                                    g_orig/2, self.T_orig)
+                                                      g_orig/2,
+                                                      self.T_orig)
 
         plt.plot(self.train_t_vals, self.training_data,
-                label="Training Data")
-        plt.plot(t_norm,pos_norm,label="DMP Approximation",
-                linestyle='--')
+                 label="Training Data")
+        plt.plot(t_norm, pos_norm, label="DMP Approximation",
+                 linestyle='--')
         plt.plot(t_fast, pos_fast, label="Decreasing time duration",
-                linestyle='--')
+                 linestyle='--')
         plt.plot(t_close, pos_close, label='Decreasing goal position',
-                linestyle='--')
+                 linestyle='--')
         plt.xlabel("Time [s]")
         plt.ylabel("Position [m]")
         plt.legend()

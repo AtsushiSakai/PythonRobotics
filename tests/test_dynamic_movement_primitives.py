@@ -15,7 +15,7 @@ def test_2():
     t = np.arange(0, 5, 0.01)
     sin_t = np.sin(t)
 
-    train_data = [t,sin_t]
+    train_data = [t, sin_t]
     DMP_controller = dynamic_movement_primitives.DMP(training_data=train_data)
     DMP_controller.solve_trajectory(-3, 3, 4, visualize=False)
 
@@ -27,9 +27,10 @@ def test_3():
 
     train_data = [t, sin_t]
     DMP_controller = dynamic_movement_primitives.DMP(dt=0.01,
-                    timesteps=len(t), training_data=train_data)
+                                                     timesteps=len(t),
+                                                     training_data=train_data)
     t, pos = DMP_controller.solve_trajectory(0, -1, 3*np.pi/2,
-                    visualize=False)
+                                             visualize=False)
 
     diff = abs(pos - sin_t)
     assert(max(diff) < 0.1)
