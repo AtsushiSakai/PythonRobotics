@@ -6,7 +6,8 @@ from PathPlanning.DubinsPath import dubins_path_planning
 np.random.seed(12345)
 
 
-def check_edge_condition(px, py, pyaw, start_x, start_y, start_yaw, end_x, end_y, end_yaw):
+def check_edge_condition(px, py, pyaw, start_x, start_y, start_yaw, end_x,
+                         end_y, end_yaw):
     assert (abs(px[0] - start_x) <= 0.01)
     assert (abs(py[0] - start_y) <= 0.01)
     assert (abs(pyaw[0] - start_yaw) <= 0.01)
@@ -16,7 +17,8 @@ def check_edge_condition(px, py, pyaw, start_x, start_y, start_yaw, end_x, end_y
 
 
 def check_path_length(px, py, lengths):
-    path_len = sum([np.hypot(dx, dy) for (dx, dy) in zip(np.diff(px), np.diff(py))])
+    path_len = sum(
+        [np.hypot(dx, dy) for (dx, dy) in zip(np.diff(px), np.diff(py))])
     print(path_len)
     assert (abs(path_len - sum(lengths)) <= 0.01)
 
@@ -35,7 +37,8 @@ def test_1():
     px, py, pyaw, mode, lengths = dubins_path_planning.dubins_path_planning(
         start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature)
 
-    check_edge_condition(px, py, pyaw, start_x, start_y, start_yaw, end_x, end_y, end_yaw)
+    check_edge_condition(px, py, pyaw, start_x, start_y, start_yaw, end_x,
+                         end_y, end_yaw)
     check_path_length(px, py, lengths)
 
 
@@ -58,11 +61,12 @@ def test_3():
 
         curvature = 1.0 / (np.random.rand() * 5.0)
 
-        px, py, pyaw, mode, lengths = dubins_path_planning.dubins_path_planning(
-            start_x, start_y, start_yaw, end_x, end_y,
-            end_yaw, curvature)
+        px, py, pyaw, mode, lengths = \
+            dubins_path_planning.dubins_path_planning(
+            start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature)
 
-        check_edge_condition(px, py, pyaw, start_x, start_y, start_yaw, end_x, end_y, end_yaw)
+        check_edge_condition(px, py, pyaw, start_x, start_y, start_yaw, end_x,
+                             end_y, end_yaw)
         check_path_length(px, py, lengths)
 
 
