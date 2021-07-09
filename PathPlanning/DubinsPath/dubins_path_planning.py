@@ -298,11 +298,11 @@ def generate_local_course(total_length, lengths, modes, max_curvature,
 
         ind += 1
         p_x, p_y, p_yaw, directions = interpolate(ind, length, m,
-                                                           max_curvature,
-                                                           origin_x, origin_y,
-                                                           origin_yaw, p_x,
-                                                           p_y, p_yaw,
-                                                           directions)
+                                                  max_curvature,
+                                                  origin_x, origin_y,
+                                                  origin_yaw, p_x,
+                                                  p_y, p_yaw,
+                                                  directions)
 
     if len(p_x) <= 1:
         return [], [], [], []
