@@ -133,9 +133,10 @@ class RRTDubins(RRT):
 
     def steer(self, from_node, to_node):
 
-        px, py, pyaw, mode, course_lengths = dubins_path_planning.dubins_path_planning(
-            from_node.x, from_node.y, from_node.yaw,
-            to_node.x, to_node.y, to_node.yaw, self.curvature)
+        px, py, pyaw, mode, course_lengths = \
+            dubins_path_planning.dubins_path_planning(
+                from_node.x, from_node.y, from_node.yaw,
+                to_node.x, to_node.y, to_node.yaw, self.curvature)
 
         if len(px) <= 1:  # cannot find a dubins path
             return None
