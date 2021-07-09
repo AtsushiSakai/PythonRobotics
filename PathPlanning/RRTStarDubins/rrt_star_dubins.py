@@ -154,7 +154,7 @@ class RRTStarDubins(RRTStar):
         new_node.path_x = px
         new_node.path_y = py
         new_node.path_yaw = pyaw
-        new_node.cost += course_length
+        new_node.cost += sum([abs(c) for c in course_lengths])
         new_node.parent = from_node
 
         return new_node

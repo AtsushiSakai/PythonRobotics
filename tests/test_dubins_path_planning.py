@@ -19,7 +19,7 @@ def check_edge_condition(px, py, pyaw, start_x, start_y, start_yaw, end_x,
 def check_path_length(px, py, lengths):
     path_len = sum(
         [np.hypot(dx, dy) for (dx, dy) in zip(np.diff(px), np.diff(py))])
-    assert (abs(path_len - sum(lengths)) <= 0.01)
+    assert (abs(path_len - sum(lengths)) <= 0.1)
 
 
 def test_1():
