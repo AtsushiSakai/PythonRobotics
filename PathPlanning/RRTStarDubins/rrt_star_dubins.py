@@ -162,11 +162,13 @@ class RRTStarDubins(RRTStar):
 
     def calc_new_cost(self, from_node, to_node):
 
-        _, _, _, _, course_length = dubins_path_planning.dubins_path_planning(
+        _, _, _, _, course_lengths = dubins_path_planning.dubins_path_planning(
             from_node.x, from_node.y, from_node.yaw,
             to_node.x, to_node.y, to_node.yaw, self.curvature)
 
-        return from_node.cost + course_length
+        cost = sum([abs(c) for c in course_lengths])
+
+        return from_node.cost + cost
 
     def get_random_node(self):
 
