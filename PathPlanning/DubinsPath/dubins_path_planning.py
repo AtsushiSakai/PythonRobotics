@@ -252,11 +252,11 @@ def generate_local_course(total_length, lengths, modes, max_curvature,
                           step_size):
     n_point = math.trunc(total_length / step_size) + len(lengths) + 4
 
-    path_x = [0.0 for _ in range(n_point)]
-    path_y = [0.0 for _ in range(n_point)]
-    path_yaw = [0.0 for _ in range(n_point)]
+    p_x = [0.0 for _ in range(n_point)]
+    p_y = [0.0 for _ in range(n_point)]
+    p_yaw = [0.0 for _ in range(n_point)]
     directions = [0.0 for _ in range(n_point)]
-    index = 1
+    ind = 1
 
     if lengths[0] > 0.0:
         directions[0] = 1
@@ -274,48 +274,47 @@ def generate_local_course(total_length, lengths, modes, max_curvature,
             dist = -step_size
 
         # set origin state
-        origin_x, origin_y, origin_yaw = path_x[index], path_y[index], \
-                                         path_yaw[index]
+        origin_x, origin_y, origin_yaw = p_x[ind], p_y[ind], p_yaw[ind]
 
-        index -= 1
+        ind -= 1
         if i >= 1 and (lengths[i - 1] * lengths[i]) > 0:
             pd = - dist - ll
         else:
             pd = dist - ll
 
         while abs(pd) <= abs(length):
-            index += 1
-            path_x, path_y, path_yaw, directions = interpolate(index, pd, m,
+            ind += 1
+            p_x, p_y, p_yaw, directions = interpolate(ind, pd, m,
                                                                max_curvature,
                                                                origin_x,
                                                                origin_y,
                                                                origin_yaw,
-                                                               path_x, path_y,
-                                                               path_yaw,
+                                                               p_x, p_y,
+                                                               p_yaw,
                                                                directions)
             pd += dist
 
         ll = length - pd - dist  # calc remain length
 
-        index += 1
-        path_x, path_y, path_yaw, directions = interpolate(index, length, m,
+        ind += 1
+        p_x, p_y, p_yaw, directions = interpolate(ind, length, m,
                                                            max_curvature,
                                                            origin_x, origin_y,
-                                                           origin_yaw, path_x,
-                                                           path_y, path_yaw,
+                                                           origin_yaw, p_x,
+                                                           p_y, p_yaw,
                                                            directions)
 
-    if len(path_x) <= 1:
+    if len(p_x) <= 1:
         return [], [], [], []
 
     # remove unused data
-    while len(path_x) >= 1 and path_x[-1] == 0.0:
-        path_x.pop()
-        path_y.pop()
-        path_yaw.pop()
+    while len(p_x) >= 1 and p_x[-1] == 0.0:
+        p_x.pop()
+        p_y.pop()
+        p_yaw.pop()
         directions.pop()
 
-    return path_x, path_y, path_yaw, directions
+    return p_x, p_y, p_yaw, directions
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r",
@@ -342,13 +341,13 @@ def main():
 
     curvature = 1.0
 
-    path_x, path_y, path_yaw, mode, path_length = dubins_path_planning(start_x,
-                                                                       start_y,
-                                                                       start_yaw,
-                                                                       end_x,
-                                                                       end_y,
-                                                                       end_yaw,
-                                                                       curvature)
+    path_x, path_y, path_yaw, mode, lengths = dubins_path_planning(start_x,
+                                                                   start_y,
+                                                                   start_yaw,
+                                                                   end_x,
+                                                                   end_y,
+                                                                   end_yaw,
+                                                                   curvature)
 
     if show_animation:
         plt.plot(path_x, path_y, label="final course " + "".join(mode))
