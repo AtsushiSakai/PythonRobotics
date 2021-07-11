@@ -63,7 +63,8 @@ class NLinkArm:
 
         if plot:
             self.fig = plt.figure()
-            self.ax = Axes3D(self.fig)
+            self.ax = Axes3D(self.fig, auto_add_to_figure=False)
+            self.fig.add_axes(self.ax)
 
             x_list = []
             y_list = []
