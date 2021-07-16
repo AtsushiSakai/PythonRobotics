@@ -365,8 +365,8 @@ def reeds_shepp_path_planning(sx, sy, syaw, gx, gy, gyaw, maxc, step_size=0.2):
     best_path_index = paths.index(min(paths, key=lambda p: abs(p.L)))
     best_path = paths[best_path_index]
 
-    return best_path.x, best_path.y, best_path.yaw, best_path.ctypes, \
-           best_path.lengths
+    return best_path.x, best_path.y, best_path.yaw,\
+           best_path.ctypes, best_path.lengths
 
 
 def main():
