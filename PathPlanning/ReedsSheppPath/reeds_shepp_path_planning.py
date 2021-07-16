@@ -14,28 +14,29 @@ show_animation = True
 
 
 class Path:
+    """
+    Path data container
+    """
 
     def __init__(self):
+        # course segment length  (negative value is backward segment)
         self.lengths = []
+        # course segment type char ("S": straight, "L": left, "R": right)
         self.ctypes = []
-        self.L = 0.0
-        self.x = []
-        self.y = []
-        self.yaw = []
-        self.directions = []
+        self.L = 0.0  # Total lengths of the path
+        self.x = []  # x positions
+        self.y = []  # y positions
+        self.yaw = []  # orientations [rad]
+        self.directions = []  # directions (1:forward, -1:backward)
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
-    """
-    Plot arrow
-    """
-
-    if not isinstance(x, float):
+    if isinstance(x, list):
         for (ix, iy, iyaw) in zip(x, y, yaw):
             plot_arrow(ix, iy, iyaw)
     else:
-        plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),
-                  fc=fc, ec=ec, head_width=width, head_length=width)
+        plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw), fc=fc,
+                  ec=ec, head_width=width, head_length=width)
         plt.plot(x, y)
 
 
@@ -72,20 +73,20 @@ def set_path(paths, lengths, ctypes):
     path = Path()
     path.ctypes = ctypes
     path.lengths = lengths
+    path.L = sum(np.abs(lengths))
 
     # check same path exist
-    for tpath in paths:
-        typeissame = (tpath.ctypes == path.ctypes)
-        if typeissame:
-            if sum(np.abs(tpath.lengths)) - sum(np.abs(path.lengths)) <= 0.01:
-                return paths  # not insert path
+    for i_path in paths:
+        type_is_same = (i_path.ctypes == path.ctypes)
+        length_is_close = (sum(np.abs(i_path.lengths)) - path.L) <= 0.01
+        if type_is_same and length_is_close:
+            return paths  # not insert path
 
-    path.L = sum([abs(i) for i in lengths])
+    # check path is long enough
+    if path.L <= 0.01:
+        return paths  # not insert path
 
-    # Base.Test.@test path.L >= 0.01
-    if path.L >= 0.01:
-        paths.append(path)
-
+    paths.append(path)
     return paths
 
 
@@ -239,7 +240,8 @@ def generate_path(q0, q1, max_curvature):
     return paths
 
 
-def interpolate(ind, length, mode, max_curvature, origin_x, origin_y, origin_yaw, path_x, path_y, path_yaw, directions):
+def interpolate(ind, length, mode, max_curvature, origin_x, origin_y,
+                origin_yaw, path_x, path_y, path_yaw, directions):
     if mode == "S":
         path_x[ind] = origin_x + length / max_curvature * math.cos(origin_yaw)
         path_y[ind] = origin_y + length / max_curvature * math.sin(origin_yaw)
@@ -269,7 +271,8 @@ def interpolate(ind, length, mode, max_curvature, origin_x, origin_y, origin_yaw
     return path_x, path_y, path_yaw, directions
 
 
-def generate_local_course(total_length, lengths, mode, max_curvature, step_size):
+def generate_local_course(total_length, lengths, mode, max_curvature,
+                          step_size):
     n_point = math.trunc(total_length / step_size) + len(lengths) + 4
 
     px = [0.0 for _ in range(n_point)]
@@ -304,17 +307,17 @@ def generate_local_course(total_length, lengths, mode, max_curvature, step_size)
 
         while abs(pd) <= abs(length):
             ind += 1
-            px, py, pyaw, directions = interpolate(
-                ind, pd, m, max_curvature, ox, oy, oyaw,
-                px, py, pyaw, directions)
+            px, py, pyaw, directions = interpolate(ind, pd, m, max_curvature,
+                                                   ox, oy, oyaw, px, py, pyaw,
+                                                   directions)
             pd += d
 
         ll = length - pd - d  # calc remain length
 
         ind += 1
-        px, py, pyaw, directions = interpolate(
-            ind, length, m, max_curvature, ox, oy, oyaw,
-            px, py, pyaw, directions)
+        px, py, pyaw, directions = interpolate(ind, length, m, max_curvature,
+                                               ox, oy, oyaw, px, py, pyaw,
+                                               directions)
 
     # remove unused data
     while px[-1] == 0.0:
@@ -336,14 +339,15 @@ def calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size):
 
     paths = generate_path(q0, q1, maxc)
     for path in paths:
-        x, y, yaw, directions = generate_local_course(
-            path.L, path.lengths, path.ctypes, maxc, step_size * maxc)
+        x, y, yaw, directions = generate_local_course(path.L, path.lengths,
+                                                      path.ctypes, maxc,
+                                                      step_size * maxc)
 
         # convert global coordinate
-        path.x = [math.cos(-q0[2]) * ix + math.sin(-q0[2])
-                  * iy + q0[0] for (ix, iy) in zip(x, y)]
-        path.y = [-math.sin(-q0[2]) * ix + math.cos(-q0[2])
-                  * iy + q0[1] for (ix, iy) in zip(x, y)]
+        path.x = [math.cos(-q0[2]) * ix + math.sin(-q0[2]) * iy + q0[0] for
+                  (ix, iy) in zip(x, y)]
+        path.y = [-math.sin(-q0[2]) * ix + math.cos(-q0[2]) * iy + q0[1] for
+                  (ix, iy) in zip(x, y)]
         path.yaw = [pi_2_pi(iyaw + q0[2]) for iyaw in yaw]
         path.directions = directions
         path.lengths = [length / maxc for length in path.lengths]
@@ -352,23 +356,17 @@ def calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size):
     return paths
 
 
-def reeds_shepp_path_planning(sx, sy, syaw,
-                              gx, gy, gyaw, maxc, step_size=0.2):
+def reeds_shepp_path_planning(sx, sy, syaw, gx, gy, gyaw, maxc, step_size=0.2):
     paths = calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size)
-
     if not paths:
-        return None, None, None, None, None
+        return None, None, None, None, None  # could not generate any path
 
-    minL = float("Inf")
-    best_path_index = -1
-    for i, _ in enumerate(paths):
-        if paths[i].L <= minL:
-            minL = paths[i].L
-            best_path_index = i
+    # search minimum cost path
+    best_path_index = paths.index(min(paths, key=lambda p: abs(p.L)))
+    best_path = paths[best_path_index]
 
-    bpath = paths[best_path_index]
-
-    return bpath.x, bpath.y, bpath.yaw, bpath.ctypes, bpath.lengths
+    return best_path.x, best_path.y, best_path.yaw, best_path.ctypes, \
+           best_path.lengths
 
 
 def main():
@@ -382,20 +380,19 @@ def main():
     # end_y = 5.0  # [m]
     # end_yaw = np.deg2rad(25.0)  # [rad]
 
-    start_x = 0.0  # [m]
-    start_y = 0.0  # [m]
-    start_yaw = np.deg2rad(0.0)  # [rad]
+    start_x = -90.0356
+    start_y = -136.6776
+    start_yaw = -1.7133897266828333
+    end_x = -90.4311
+    end_y = -136.6672
+    end_yaw = 1.670105561233374
+    curvature = 5.0
+    step_size = 0.05
 
-    end_x = 0.0  # [m]
-    end_y = 0.0  # [m]
-    end_yaw = np.deg2rad(0.0)  # [rad]
-
-    curvature = 1.0
-    step_size = 0.1
-
-    px, py, pyaw, mode, clen = reeds_shepp_path_planning(
-        start_x, start_y, start_yaw, end_x, end_y, end_yaw,
-        curvature, step_size)
+    px, py, pyaw, mode, clen = reeds_shepp_path_planning(start_x, start_y,
+                                                         start_yaw, end_x,
+                                                         end_y, end_yaw,
+                                                         curvature, step_size)
 
     if show_animation:  # pragma: no cover
         plt.cla()
