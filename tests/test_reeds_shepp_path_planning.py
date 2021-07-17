@@ -15,7 +15,7 @@ def check_edge_condition(px, py, pyaw, start_x, start_y, start_yaw, end_x,
 
 
 def check_path_length(px, py, lengths):
-    sum_len = sum(abs(l) for l in lengths)
+    sum_len = sum(abs(length) for length in lengths)
     dpx = np.diff(px)
     dpy = np.diff(py)
     actual_len = sum(
