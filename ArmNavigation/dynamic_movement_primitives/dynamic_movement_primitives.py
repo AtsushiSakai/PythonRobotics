@@ -11,7 +11,7 @@ import numpy as np
 class DMP(object):
 
     def __init__(self, training_data, data_period, K=156.25, B=25, dt=0.001,
-                 timesteps=5000):
+                 timesteps=5000, repel_factor=1):
         """
         Arguments:
             training_data - data in for [(x1,y1), (x2,y2), ...]
@@ -19,6 +19,7 @@ class DMP(object):
             K and B       - spring and damper constants to define DMP behavior
             dt            - timestep between points in generated trajectories
             timesteps     - number of points in generated trajectories
+            repel_factor  - controls how much path will avoid obstacles
         """
         self.K = K  # virtual spring constant
         self.B = B  # virtual damper coefficient
@@ -27,6 +28,8 @@ class DMP(object):
         self.timesteps = timesteps
 
         self.weights = None  # weights used to generate DMP trajectories
+
+        self.repel_factor = repel_factor
 
         # self.T_orig = data_period
         # self.training_data = training_data
@@ -64,7 +67,6 @@ class DMP(object):
             phi_vals = []
             f_vals = []
 
-            #TODO: fix dimensions
             for i, _ in enumerate(dimension_data):
                 if i + 1 == len(dimension_data):
                     qd = 0
@@ -117,6 +119,7 @@ class DMP(object):
         state_double_dot = [0,0]
         t = 0
 
+        # for plotting
         self.train_t_vals = np.arange(0, T, self.timesteps)
         # TODO: is self.period variable used
 
@@ -124,6 +127,10 @@ class DMP(object):
         for k in range(self.timesteps):
             new_state = []
             t = t + self.dt
+
+            obs_force = 0
+            if self.obstacles is not None:
+                obs_force = self.get_obstacle_force(state)
 
             for dim in range(self.weights.shape[0]):
 
@@ -141,7 +148,8 @@ class DMP(object):
                     f = 0
 
                 # simulate dynamics
-                qdd = self.K*(g-q)/T**2 - self.B*qd/T + (g-q0)*f/T**2
+                qdd = self.K*(g-q)/T**2 - self.B*qd/T + (g-q0)*f/T**2 \
+                      + obs_force[dim]
                 qd = qd + qdd * self.dt
                 q = q + qd * self.dt
 
@@ -155,23 +163,45 @@ class DMP(object):
 
         return np.arange(0, self.timesteps * self.dt, self.dt), positions
 
-    def solve_trajectory(self, q0, g, T, visualize=True):
+    def get_obstacle_force(self, state):
+
+        obstacle_force = np.asarray([0.0, 0.0])
+
+        for obs in self.obstacles:
+            new_force = []
+
+            dist = np.sum(np.sqrt((obs - state)**2))
+            force = self.repel_factor * dist
+
+            # TODO: all lists or all np arrays for inputs
+            for dim in range(len(self.obstacles[0])):
+                new_force.append(force * (state[dim] - obs[dim]) / dist)
+
+            obstacle_force += np.array(new_force)
+
+        return obstacle_force
+
+    def solve_trajectory(self, q0, g, T, visualize=True, obstacles=None):
+
+        self.obstacles = obstacles
 
         t, pos = self.recreate_trajectory(q0, g, T)
 
         state_hist = np.asarray(pos)
 
         if visualize:
-            plt.plot(self.training_data[:,0], self.training_data[:,1],
-                     label="Training Data")
-            plt.plot(state_hist[:,0], state_hist[:,1],
-                     label="DMP Approximation")
-            plt.xlabel("Time [s]")
-            plt.ylabel("Position [m]")
-            plt.legend()
-            plt.show()
-
-
+            if self.training_data.shape[1] == 2:
+                if self.obstacles is not None:
+                    for obs in self.obstacles:
+                        plt.scatter(obs[0], obs[1], color='k')
+                plt.plot(self.training_data[:,0], self.training_data[:,1],
+                         label="Training Data")
+                plt.plot(state_hist[:,0], state_hist[:,1],
+                         label="DMP Approximation")
+                plt.xlabel("Time [s]")
+                plt.ylabel("Position [m]")
+                plt.legend()
+                plt.show()
 
         return t, pos
 
@@ -203,8 +233,8 @@ class DMP(object):
                  linestyle='--')
         plt.plot(t_close, pos_close, label='Decreasing goal position',
                  linestyle='--')
-        plt.xlabel("Time [s]")
-        plt.ylabel("Position [m]")
+        plt.xlabel("X Position")
+        plt.ylabel("Y Position")
         plt.legend()
         plt.show()
 
@@ -212,8 +242,11 @@ class DMP(object):
 if __name__ == '__main__':
     period = np.pi / 2
     t = np.arange(0, period, 0.01)
-    training_data = np.asarray([np.sin(t), np.cos(t)]).T
+    training_data = np.asarray([np.sin(t) + 0.02*np.random.rand(t.shape[0]),
+                                np.cos(t) + 0.02*np.random.rand(t.shape[0]) ]).T
 
     DMP_controller = DMP(training_data, period)
     # DMP_controller.show_DMP_purpose()
-    DMP_controller.solve_trajectory([0,1], [1,0], 3)
+
+    obs = np.asarray([[0.4,0.8], [1,0.5]])
+    DMP_controller.solve_trajectory([0,1], [1,0], 3, obstacles=obs)
