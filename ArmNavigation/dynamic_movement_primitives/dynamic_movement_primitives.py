@@ -10,21 +10,20 @@ import numpy as np
 
 class DMP(object):
 
-    def __init__(self, training_data, data_period, K=156.25, B=25, dt=0.001,
-                 timesteps=5000, repel_factor=1):
+    def __init__(self, training_data, data_period, K=156.25, B=25,
+                 timesteps=500, repel_factor=1):
         """
         Arguments:
             training_data - data in for [(x1,y1), (x2,y2), ...]
             data_period   - amount of time training data covers
             K and B       - spring and damper constants to define DMP behavior
-            dt            - timestep between points in generated trajectories
             timesteps     - number of points in generated trajectories
             repel_factor  - controls how much path will avoid obstacles
         """
         self.K = K  # virtual spring constant
         self.B = B  # virtual damper coefficient
 
-        self.dt = dt
+        self.dt = data_period / timesteps
         self.timesteps = timesteps
 
         self.weights = None  # weights used to generate DMP trajectories
@@ -146,6 +145,7 @@ class DMP(object):
                     f = np.dot(Phi, self.weights[dim])
                 else:
                     f = 0
+                    return np.arange(0, self.timesteps * self.dt, self.dt), positions
 
                 # simulate dynamics
                 qdd = self.K*(g-q)/T**2 - self.B*qd/T + (g-q0)*f/T**2 \
@@ -165,19 +165,20 @@ class DMP(object):
 
     def get_obstacle_force(self, state):
 
-        obstacle_force = np.asarray([0.0, 0.0])
+        obstacle_force = np.zeros(len(self.obstacles[0]))
 
         for obs in self.obstacles:
             new_force = []
 
-            dist = np.sum(np.sqrt((obs - state)**2))
+            dist = np.sum(np.sqrt((state - obs)**2))
             force = self.repel_factor * dist
 
             # TODO: all lists or all np arrays for inputs
             for dim in range(len(self.obstacles[0])):
-                new_force.append(force * (state[dim] - obs[dim]) / dist)
+                new_force.append(force * (state[dim] - obs[dim])**2)
 
             obstacle_force += np.array(new_force)
+            # print(obs, new_force, obstacle_force)
 
         return obstacle_force
 
