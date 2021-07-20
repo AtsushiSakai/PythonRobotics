@@ -11,7 +11,7 @@ import numpy as np
 class DMP(object):
 
     def __init__(self, training_data, data_period, K=156.25, B=25,
-                 timesteps=500, repel_factor=1):
+                 timesteps=500, repel_factor=3):
         """
         Arguments:
             training_data - data in for [(x1,y1), (x2,y2), ...]
@@ -124,10 +124,11 @@ class DMP(object):
 
         positions = []
         for k in range(self.timesteps):
+        # while(0.01 > self.dist_between(state, goal_state)):
             new_state = []
             t = t + self.dt
 
-            obs_force = 0
+            obs_force = np.zeros(self.weights.shape[0])
             if self.obstacles is not None:
                 obs_force = self.get_obstacle_force(state)
 
@@ -163,6 +164,7 @@ class DMP(object):
 
         return np.arange(0, self.timesteps * self.dt, self.dt), positions
 
+
     def get_obstacle_force(self, state):
 
         obstacle_force = np.zeros(len(self.obstacles[0]))
@@ -193,14 +195,17 @@ class DMP(object):
         if visualize:
             if self.training_data.shape[1] == 2:
                 if self.obstacles is not None:
-                    for obs in self.obstacles:
-                        plt.scatter(obs[0], obs[1], color='k')
+                    for i, obs in enumerate(self.obstacles):
+                        if i == 0:
+                            plt.scatter(obs[0], obs[1], color='k', label='Obstacle')
+                        else:
+                            plt.scatter(obs[0], obs[1], color='k')
                 plt.plot(self.training_data[:,0], self.training_data[:,1],
                          label="Training Data")
                 plt.plot(state_hist[:,0], state_hist[:,1],
                          label="DMP Approximation")
-                plt.xlabel("Time [s]")
-                plt.ylabel("Position [m]")
+                plt.xlabel("X Position")
+                plt.ylabel("Y Position")
                 plt.legend()
                 plt.show()
 
@@ -249,5 +254,5 @@ if __name__ == '__main__':
     DMP_controller = DMP(training_data, period)
     # DMP_controller.show_DMP_purpose()
 
-    obs = np.asarray([[0.4,0.8], [1,0.5]])
-    DMP_controller.solve_trajectory([0,1], [1,0], 3, obstacles=obs)
+    obs = np.asarray([[0.435,0.875], [1,0.5]])
+    DMP_controller.solve_trajectory([0,1], [1,0], 3, obstacles=None)
