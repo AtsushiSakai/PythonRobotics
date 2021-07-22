@@ -6,6 +6,7 @@ https://www.frontiersin.org/articles/10.3389/fncom.2013.00138/full
 """
 import matplotlib.pyplot as plt
 import numpy as np
+import copy
 
 
 class DMP(object):
@@ -118,6 +119,8 @@ class DMP(object):
         state_double_dot = [0,0]
         t = 0
 
+
+
         # for plotting
         self.train_t_vals = np.arange(0, T, self.timesteps)
         # TODO: is self.period variable used
@@ -128,6 +131,7 @@ class DMP(object):
             new_state = []
             t = t + self.dt
 
+            goal_force = self.goal_attraction(copy.deepcopy(state))
             obs_force = np.zeros(self.weights.shape[0])
             if self.obstacles is not None:
                 obs_force = self.get_obstacle_force(state)
@@ -150,7 +154,7 @@ class DMP(object):
 
                 # simulate dynamics
                 qdd = self.K*(g-q)/T**2 - self.B*qd/T + (g-q0)*f/T**2 \
-                      + obs_force[dim]
+                      + obs_force[dim] + goal_force[dim]
                 qd = qd + qdd * self.dt
                 q = q + qd * self.dt
 
@@ -177,12 +181,22 @@ class DMP(object):
 
             # TODO: all lists or all np arrays for inputs
             for dim in range(len(self.obstacles[0])):
-                new_force.append(force * (state[dim] - obs[dim])**2)
+                new_force.append(force * (obs[dim] - state[dim])**2)
 
             obstacle_force += np.array(new_force)
-            # print(obs, new_force, obstacle_force)
 
         return obstacle_force
+
+    def goal_attraction(self, state):
+
+        state = np.asarray(state)
+
+        dx = state[0] - self.training_data[-1,0]
+        dy = state[1] - self.training_data[-1,1]
+        dist = np.sqrt(dx**2 + dy**2)
+
+        return np.array([dx**2/dist, dy**2/dist])/2
+        # return np.zeros(2)
 
     def solve_trajectory(self, q0, g, T, visualize=True, obstacles=None):
 
@@ -246,8 +260,8 @@ class DMP(object):
 
 
 if __name__ == '__main__':
-    period = np.pi / 2
-    t = np.arange(0, period, 0.01)
+    period = 6*np.pi
+    t = np.arange(0, np.pi/2, 0.01)
     training_data = np.asarray([np.sin(t) + 0.02*np.random.rand(t.shape[0]),
                                 np.cos(t) + 0.02*np.random.rand(t.shape[0]) ]).T
 
@@ -255,4 +269,6 @@ if __name__ == '__main__':
     # DMP_controller.show_DMP_purpose()
 
     obs = np.asarray([[0.435,0.875], [1,0.5]])
-    DMP_controller.solve_trajectory([0,1], [1,0], 3, obstacles=None)
+    # obs = np.asarray([[0.435,0.875]])
+    # obs = np.asarray([[1,0.5]])
+    DMP_controller.solve_trajectory([0,1], [1,0], 3, obstacles=obs)
