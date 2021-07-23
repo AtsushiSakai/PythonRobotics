@@ -12,7 +12,7 @@ import copy
 class DMP(object):
 
     def __init__(self, training_data, data_period, K=156.25, B=25,
-                 timesteps=500, repel_factor=2):
+                 timesteps=500, repel_factor=5):
         """
         Arguments:
             training_data - data in for [(x1,y1), (x2,y2), ...]
@@ -143,10 +143,20 @@ class DMP(object):
                 obs_force = np.zeros(dimensions)
                 if self.obstacles is not None:
                     obs_force = self.get_obstacle_force(q)
-                qdd = self.K*(goal_state - q)/T**2/10 - self.B*qd/T + self.goal_attraction(q, path[k]) + obs_force
+                goal_dist = self.dist_between(q, goal_state)
 
-                if 0.01 > self.dist_between(q, goal_state):
+                if 0.01 > goal_dist:
                     break
+
+                goal_force = 0
+                # if np.linalg.norm(obs_force) > 0:
+                # if(self.dist_between(goal_state, q) * 5 < self.dist_between(init_state, goal_state)):
+                #     goal_force = self.K*(goal_state - q)/5
+
+                print(k, goal_force, obs_force)
+
+                qdd = 4*self.K*(path[k] - q)/T**2 - 0.1*self.B*qd/T + goal_force -0.002*obs_force
+                 # - obs_force
 
             else:
 
@@ -162,7 +172,6 @@ class DMP(object):
                         f = 0
 
                     # simulate dynamics
-                    # print(self.K*(goal_state[dim] - q[dim])/T**2)# - self.B*qd[dim]/T + (goal_state[dim] - init_state[dim])*f/T**2)
                     qdd[dim] = self.K*(goal_state[dim] - q[dim])/T**2 - self.B*qd[dim]/T + (goal_state[dim] - init_state[dim])*f/T**2
 
             qd = qd + qdd * self.dt
@@ -184,22 +193,21 @@ class DMP(object):
         for obs in self.obstacles:
             new_force = []
 
-            dist = -np.sum(np.sqrt((state - obs)**2))
+            dist = np.sum(np.sqrt((state - obs)**2))
             force = self.repel_factor * dist
 
             # TODO: all lists or all np arrays for inputs
             for dim in range(len(self.obstacles[0])):
-                new_force.append(force * (obs[dim] - state[dim])**2)
+                new_force.append(force / (obs[dim] - state[dim]))
 
-            obstacle_force += np.array(new_force)
+                obstacle_force += np.array(new_force)
 
-        return obstacle_force*10
+        return obstacle_force
 
     def goal_attraction(self, state, path_point):
 
         state = np.asarray(state)
 
-        # print(state, path_point)
         dx = state[0] - path_point[0]
         dy = state[1] - path_point[1]
         dist = -np.sqrt(dx**2 + dy**2)
@@ -212,7 +220,6 @@ class DMP(object):
         return np.linalg.norm(p1 - p2)
 
     def solve_trajectory(self, q0, g, T, visualize=True, obstacles=None):
-
 
         _, path = self.recreate_trajectory(q0, g, T, None)
 
@@ -288,7 +295,7 @@ if __name__ == '__main__':
     DMP_controller = DMP(training_data, period)
     # DMP_controller.show_DMP_purpose()
 
-    obs = np.asarray([[0.435,0.875], [1,0.5]])
-    # obs = np.asarray([[0.435,0.875]])
-    # obs = np.asarray([[1,0.5]])
+    # obs = np.asarray([[0.435,0.8], [0.87,0.5]])
+    # obs = np.asarray([[0.435,0.8]])
+    obs = np.asarray([[0.83,0.7]])
     DMP_controller.solve_trajectory([0,1], [1,0], 3, obstacles=obs)
