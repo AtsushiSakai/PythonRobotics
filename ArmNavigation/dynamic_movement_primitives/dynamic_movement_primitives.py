@@ -12,7 +12,7 @@ import copy
 class DMP(object):
 
     def __init__(self, training_data, data_period, K=156.25, B=25,
-                 timesteps=500, repel_factor=5):
+                 timesteps=2500, repel_factor=0.1):
         """
         Arguments:
             training_data - data in for [(x1,y1), (x2,y2), ...]
@@ -145,18 +145,14 @@ class DMP(object):
                     obs_force = self.get_obstacle_force(q)
                 goal_dist = self.dist_between(q, goal_state)
 
-                if 0.01 > goal_dist:
+                if 0.02 > goal_dist:
                     break
 
                 goal_force = 0
-                # if np.linalg.norm(obs_force) > 0:
-                # if(self.dist_between(goal_state, q) * 5 < self.dist_between(init_state, goal_state)):
-                #     goal_force = self.K*(goal_state - q)/5
 
-                print(k, goal_force, obs_force)
-
-                qdd = 4*self.K*(path[k] - q)/T**2 - 0.1*self.B*qd/T + goal_force -0.002*obs_force
-                 # - obs_force
+                qdd = self.B*qd/T
+                # - obs_force
+                q = path[k] - obs_force
 
             else:
 
@@ -194,13 +190,12 @@ class DMP(object):
             new_force = []
 
             dist = np.sum(np.sqrt((state - obs)**2))
-            force = self.repel_factor * dist
+
+            force = self.repel_factor / dist
 
             # TODO: all lists or all np arrays for inputs
             for dim in range(len(self.obstacles[0])):
-                new_force.append(force / (obs[dim] - state[dim]))
-
-                obstacle_force += np.array(new_force)
+                obstacle_force[dim] = (force * (obs[dim] - state[dim]))
 
         return obstacle_force
 
@@ -295,7 +290,7 @@ if __name__ == '__main__':
     DMP_controller = DMP(training_data, period)
     # DMP_controller.show_DMP_purpose()
 
-    # obs = np.asarray([[0.435,0.8], [0.87,0.5]])
+    obs = np.asarray([[0.435,0.8], [0.87,0.5]])
     # obs = np.asarray([[0.435,0.8]])
-    obs = np.asarray([[0.83,0.7]])
+    # obs = np.asarray([[0.7,0.7]])
     DMP_controller.solve_trajectory([0,1], [1,0], 3, obstacles=obs)
