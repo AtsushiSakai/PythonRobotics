@@ -12,7 +12,7 @@ import copy
 class DMP(object):
 
     def __init__(self, training_data, data_period, K=156.25, B=25,
-                 timesteps=2500, repel_factor=0.001):
+                 timesteps=500, repel_factor=0.001):
         """
         Arguments:
             training_data - data in for [(x1,y1), (x2,y2), ...]
@@ -145,6 +145,7 @@ class DMP(object):
                 if k+1 < self.timesteps:
                     path_norm_vec = self.get_vec_normal_to_path(path[k], path[k+1])
 
+                print(path_norm_vec, q)
                 if self.obstacles is not None:
                     obs_force = self.get_obstacle_force(path[k], path_norm_vec)
                 goal_dist = self.dist_between(q, goal_state)
@@ -201,6 +202,7 @@ class DMP(object):
 
         obstacle_force = np.zeros(len(self.obstacles[0]))
 
+        print("shooby dooby!")
         for obs in self.obstacles:
             new_force = []
 
@@ -209,8 +211,10 @@ class DMP(object):
 
             force = self.repel_factor / dist**2
 
+            print("\t", obs, dist, force)
 
-            obstacle_force = (force * (obs - state)) @ normal_vec
+
+            obstacle_force += (force * (obs - state)) @ normal_vec
             # TODO: all lists or all np arrays for inputs
             # for dim in range(len(self.obstacles[0])):
             #     obstacle_force[dim] = (force * (obs[dim] - state[dim]))
@@ -308,7 +312,28 @@ if __name__ == '__main__':
     DMP_controller = DMP(training_data, period)
     # DMP_controller.show_DMP_purpose()
 
-    obs = np.asarray([[0.435,0.8], [0.87,0.5]])
+    obs = np.asarray([[0.435,0.9], [0.87,0.5]])
     # obs = np.asarray([[0.435,0.8]])
     # obs = np.asarray([[0.7,0.7]])
     DMP_controller.solve_trajectory([0,1], [1,0], 3, obstacles=obs)
+
+"""
+okay here's how to handle the obstacles:
+- draw circle around each obstacle point
+- dubins curve from two points before first intersection to furthest point on circle
+    (create angle with obstacle point as center & the two points [next to intersection points && not inside circle]
+    and draw bisector of circle_radius, add point with heading tangent to circ there)
+      -> probably want points to be slightly further than radius length to give dubins some slack to work with
+- dubins curve from the two circle tangent points from bisector to the two points right after second intersection
+- to handle close obstacles:
+    for multiple obs in obstacles:
+        if dist_nearest_obstacle(obs) < turning_radius:
+            -average two points
+            - draw larger circle around average (~1.5x max(turning_radius, dist(obs, nearest_obs)))
+            - remove two points from obs, add larger circ (or maybe just have a separate storage for these)
+              - next point is skipped in loop
+    - keep doing above loop until it loops through all points without making a change
+
+
+
+"""
