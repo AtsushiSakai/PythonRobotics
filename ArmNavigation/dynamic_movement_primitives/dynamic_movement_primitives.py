@@ -12,7 +12,7 @@ import copy
 class DMP(object):
 
     def __init__(self, training_data, data_period, K=156.25, B=25,
-                 timesteps=2500, repel_factor=0.1):
+                 timesteps=2500, repel_factor=0.001):
         """
         Arguments:
             training_data - data in for [(x1,y1), (x2,y2), ...]
@@ -141,8 +141,12 @@ class DMP(object):
             if path is not None:
 
                 obs_force = np.zeros(dimensions)
+                path_norm_vec = np.zeros(2)
+                if k+1 < self.timesteps:
+                    path_norm_vec = self.get_vec_normal_to_path(path[k], path[k+1])
+
                 if self.obstacles is not None:
-                    obs_force = self.get_obstacle_force(q)
+                    obs_force = self.get_obstacle_force(path[k], path_norm_vec)
                 goal_dist = self.dist_between(q, goal_state)
 
                 if 0.02 > goal_dist:
@@ -179,10 +183,21 @@ class DMP(object):
 
             positions.append(new_state)
 
+        pos_arr = np.asarray(positions)
+        dists = []
+        for i in range(1,pos_arr.shape[0]):
+            dists.append(self.dist_between(pos_arr[i-1], pos_arr[i]))
+        dists.sort()
+
+
         return np.arange(0, self.timesteps * self.dt, self.dt), positions
 
+    def get_vec_normal_to_path(self, last_state, next_state):
+        diffs = np.array([next_state[0] - last_state[0], next_state[1] - last_state[1]])
+        normal_vec = np.array([diffs[0], -1 / diffs[1]])
+        return normal_vec / np.linalg.norm(normal_vec)
 
-    def get_obstacle_force(self, state):
+    def get_obstacle_force(self, state, normal_vec):
 
         obstacle_force = np.zeros(len(self.obstacles[0]))
 
@@ -191,11 +206,14 @@ class DMP(object):
 
             dist = np.sum(np.sqrt((state - obs)**2))
 
-            force = self.repel_factor / dist
 
+            force = self.repel_factor / dist**2
+
+
+            obstacle_force = (force * (obs - state)) @ normal_vec
             # TODO: all lists or all np arrays for inputs
-            for dim in range(len(self.obstacles[0])):
-                obstacle_force[dim] = (force * (obs[dim] - state[dim]))
+            # for dim in range(len(self.obstacles[0])):
+            #     obstacle_force[dim] = (force * (obs[dim] - state[dim]))
 
         return obstacle_force
 
