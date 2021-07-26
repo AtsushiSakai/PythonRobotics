@@ -2,4 +2,4 @@ numpy == 1.21.1
 scipy == 1.7.0
 pandas == 1.3.1
 matplotlib == 3.4.2
-cvxpy == 1.1.13
+cvxpy == 1.1.14
