@@ -31,6 +31,7 @@ class DMP(object):
         self.obstacles = None
 
         self.repel_factor = repel_factor
+        self.avoidance_distance = 0.1
         self.DMP_path_attraction = 10
 
         # self.T_orig = data_period
@@ -145,9 +146,9 @@ class DMP(object):
                 if k+1 < self.timesteps:
                     path_norm_vec = self.get_vec_normal_to_path(path[k], path[k+1])
 
-                print(path_norm_vec, q)
+                print("path norm vec q", path_norm_vec, q)
                 if self.obstacles is not None:
-                    obs_force = self.get_obstacle_force(path[k], path_norm_vec)
+                    obs_force = self.get_obstacle_force((q+path[k])/2, path_norm_vec)
                 goal_dist = self.dist_between(q, goal_state)
 
                 if 0.02 > goal_dist:
@@ -198,11 +199,13 @@ class DMP(object):
         normal_vec = np.array([diffs[0], -1 / diffs[1]])
         return normal_vec / np.linalg.norm(normal_vec)
 
+    def account_for_obstacles(self, path):
+        raise notimplementederror
+
     def get_obstacle_force(self, state, normal_vec):
 
         obstacle_force = np.zeros(len(self.obstacles[0]))
 
-        print("shooby dooby!")
         for obs in self.obstacles:
             new_force = []
 
@@ -211,10 +214,10 @@ class DMP(object):
 
             force = self.repel_factor / dist**2
 
-            print("\t", obs, dist, force)
+            print("\t obs dist force the quantity", obs, dist, force, ((obs - state) @ normal_vec))
 
 
-            obstacle_force += (force * (obs - state)) @ normal_vec
+            obstacle_force += force * ((obs - state) @ normal_vec) / np.linalg.norm(obs - state)
             # TODO: all lists or all np arrays for inputs
             # for dim in range(len(self.obstacles[0])):
             #     obstacle_force[dim] = (force * (obs[dim] - state[dim]))
@@ -305,14 +308,17 @@ class DMP(object):
 
 if __name__ == '__main__':
     period = 2*np.pi
-    t = np.arange(0, np.pi/2, 0.01)
-    training_data = np.asarray([np.sin(t) + 0.02*np.random.rand(t.shape[0]),
-                                np.cos(t) + 0.02*np.random.rand(t.shape[0]) ]).T
+    # t = np.arange(0, np.pi/2, 0.01)
+    # training_data = np.asarray([np.sin(t) + 0.02*np.random.rand(t.shape[0]),
+    #                             np.cos(t) + 0.02*np.random.rand(t.shape[0]) ]).T
+    t = np.arange(0,1,0.01)
+    training_data = np.asarray([t, np.flip(t,0)]).T
 
     DMP_controller = DMP(training_data, period)
     # DMP_controller.show_DMP_purpose()
 
-    obs = np.asarray([[0.435,0.9], [0.87,0.5]])
+    obs = np.asarray([[0.3, 0.6], [0.7,0.25]])
+    # obs = np.asarray([[0.435,0.9], [0.87,0.5]])
     # obs = np.asarray([[0.435,0.8]])
     # obs = np.asarray([[0.7,0.7]])
     DMP_controller.solve_trajectory([0,1], [1,0], 3, obstacles=obs)
