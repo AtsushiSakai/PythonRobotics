@@ -7,6 +7,23 @@ https://www.frontiersin.org/articles/10.3389/fncom.2013.00138/full
 import matplotlib.pyplot as plt
 import numpy as np
 import copy
+import math as m
+
+class ObstacleCircle(object):
+    def __init__(self, origin, radius):
+        self.x = origin[0]
+        self.y = origin[1]
+        self.radius = radius
+
+    def distance_to(self, item):
+        if isinstance(item, ObstacleCircle):
+            return m.sqrt((self.x - item.x)**2 + (self.y - item.y)**2)
+        else:
+            # assume point
+            return m.sqrt((self.x - item[0])**2 + (self.y - item[1])**2)
+
+    def __repr__(self):
+        return "Origin: (" + str(self.x) + ", " + str(self.y) + ") ~ r" + str(self.radius)
 
 
 class DMP(object):
@@ -141,12 +158,14 @@ class DMP(object):
 
             if path is not None:
 
+                self.account_for_obstacles(path)
+
                 obs_force = np.zeros(dimensions)
                 path_norm_vec = np.zeros(2)
                 if k+1 < self.timesteps:
                     path_norm_vec = self.get_vec_normal_to_path(path[k], path[k+1])
 
-                print("path norm vec q", path_norm_vec, q)
+                # print("path norm vec q", path_norm_vec, q)
                 if self.obstacles is not None:
                     obs_force = self.get_obstacle_force((q+path[k])/2, path_norm_vec)
                 goal_dist = self.dist_between(q, goal_state)
@@ -200,7 +219,46 @@ class DMP(object):
         return normal_vec / np.linalg.norm(normal_vec)
 
     def account_for_obstacles(self, path):
-        raise notimplementederror
+        obstacle_circles = []
+        for obs in self.obstacles:
+            obstacle_circles.append(ObstacleCircle(obs, self.avoidance_distance))
+
+        # combine circles that overlap
+        i = 0
+        while(i < len(obstacle_circles)-1):
+            j = i+1
+            while(j < len(obstacle_circles)):
+                circ_dist = obstacle_circles[i].distance_to(obstacle_circles[j])
+                if circ_dist < max(obstacle_circles[i].radius, obstacle_circles[j].radius):
+
+                    circ2 = obstacle_circles.pop(j)
+                    circ1 = obstacle_circles.pop(i)
+                    new_circ_x = (circ1.x + circ2.x)/2
+                    new_circ_y = (circ1.y + circ2.y)/2
+                    new_circ_rad = max(circ1.radius, circ2.radius) + circ_dist
+
+                    obstacle_circles.append(ObstacleCircle([new_circ_x, new_circ_y], new_circ_rad))
+                    i = -1  # gets set to 0 by i++ below
+                    break
+
+                else:
+                    j += 1
+            i += 1
+
+        for circ in obstacle_circles:
+            path = self.add_circle_to_path(path, circ)
+
+    def add_circle_to_path(self, path, circle):
+        """
+        TODO
+        - find intersections between obstacle and path (if any, if none return path)
+        - draw perpendicular line to path through circle center
+        - of 2 intersections perp line makes with circ, use one that is closer to path
+        - draw dubins from before first int to that point
+        - draw dubins from that point to after second int
+        """
+
+        return path
 
     def get_obstacle_force(self, state, normal_vec):
 
@@ -214,7 +272,7 @@ class DMP(object):
 
             force = self.repel_factor / dist**2
 
-            print("\t obs dist force the quantity", obs, dist, force, ((obs - state) @ normal_vec))
+            # print("\t obs dist force the quantity", obs, dist, force, ((obs - state) @ normal_vec))
 
 
             obstacle_force += force * ((obs - state) @ normal_vec) / np.linalg.norm(obs - state)
