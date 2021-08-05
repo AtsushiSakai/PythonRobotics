@@ -19,12 +19,21 @@ class ObstacleCircle(object):
         if isinstance(item, ObstacleCircle):
             return m.sqrt((self.x - item.x)**2 + (self.y - item.y)**2)
         else:
-            # assume point
+            # assume point that can be indexed
             return m.sqrt((self.x - item[0])**2 + (self.y - item[1])**2)
 
     def __repr__(self):
         return "Origin: (" + str(self.x) + ", " + str(self.y) + ") ~ r" + str(self.radius)
 
+class CircleEvent(ObstacleCircle):
+
+    def __init__(self, circle, start_pt):
+        self.circle = circle
+        self.start_pt = start_pt
+        self.end_pt = None
+
+    def __repr__(self):
+        return "Origin: (" + str(self.x) + ", " + str(self.y) + ") ~ r" + str(self.radius)
 
 class DMP(object):
 
@@ -245,20 +254,38 @@ class DMP(object):
                     j += 1
             i += 1
 
-        for circ in obstacle_circles:
-            path = self.add_circle_to_path(path, circ)
+        circle_events = self.get_circle_events(path, obstacle_circles)
 
-    def add_circle_to_path(self, path, circle):
         """
         TODO
-        - find intersections between obstacle and path (if any, if none return path)
+
         - draw perpendicular line to path through circle center
         - of 2 intersections perp line makes with circ, use one that is closer to path
         - draw dubins from before first int to that point
         - draw dubins from that point to after second int
         """
 
-        return path
+    def get_circle_events(self, path, circles):
+
+        circle_flags = np.zeros(len(circles))
+
+        circle_events = []
+        for i in range(len(circles)):
+            circle_events.append(None)
+
+        for path_pt in path:
+            for i, circ in enumerate(circles):
+                dist = circ.distance_to(path_pt)
+                if dist < self.avoidance_distance and not circle_flags[i]:
+                    # circle in range
+                    circle_flags[i] = 1
+                    circle_events[i] = (CircleEvent(circ, path_pt))
+                elif dist > self.avoidance_distance and circle_flags[i]:
+                    # circle out of range
+                    circle_flags[i] = 0
+                    circle_events[i].end_pt = path_pt
+
+        return circle_events
 
     def get_obstacle_force(self, state, normal_vec):
 
