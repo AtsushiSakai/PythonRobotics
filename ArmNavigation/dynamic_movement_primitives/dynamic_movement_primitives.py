@@ -7,7 +7,7 @@ https://www.frontiersin.org/articles/10.3389/fncom.2013.00138/full
 import matplotlib.pyplot as plt
 import numpy as np
 import copy
-import math as m
+import math
 
 class ObstacleCircle(object):
     def __init__(self, origin, radius):
@@ -17,20 +17,20 @@ class ObstacleCircle(object):
 
     def distance_to(self, item):
         if isinstance(item, ObstacleCircle):
-            return m.sqrt((self.x - item.x)**2 + (self.y - item.y)**2)
+            return math.sqrt((self.x - item.x)**2 + (self.y - item.y)**2)
         else:
             # assume point that can be indexed
-            return m.sqrt((self.x - item[0])**2 + (self.y - item[1])**2)
+            return math.sqrt((self.x - item[0])**2 + (self.y - item[1])**2)
 
     def __repr__(self):
         return "Origin: (" + str(self.x) + ", " + str(self.y) + ") ~ r" + str(self.radius)
 
 class CircleEvent(ObstacleCircle):
 
-    def __init__(self, circle, start_pt):
+    def __init__(self, circle, start_pt_idx):
         self.circle = circle
-        self.start_pt = start_pt
-        self.end_pt = None
+        self.start_pt_idx = start_pt_idx
+        self.end_pt_idx = None
 
     def __repr__(self):
         return "Origin: (" + str(self.x) + ", " + str(self.y) + ") ~ r" + str(self.radius)
@@ -219,7 +219,6 @@ class DMP(object):
             dists.append(self.dist_between(pos_arr[i-1], pos_arr[i]))
         dists.sort()
 
-
         return np.arange(0, self.timesteps * self.dt, self.dt), positions
 
     def get_vec_normal_to_path(self, last_state, next_state):
@@ -256,6 +255,29 @@ class DMP(object):
 
         circle_events = self.get_circle_events(path, obstacle_circles)
 
+        for event in circle_events:
+            start_pt = path[event.start_pt_idx]
+            end_pt = path[event.end_pt_idx]
+
+            circ_center = event.circle
+
+            start_ang = math.atan2(start_pt[1] - circ_center[1],
+                                   start_pt[0] - circ_center[0])
+
+            end_ang = math.atan2(end_pt[1] - circ_center[1],
+                                 end_pt[0] - circ_center[0])
+
+            count_up = False
+
+            if(start_ang > end_ang):
+                if(start_ang - end_ang < math.pi):
+                    count_up = True
+            else:
+                if(end_ang - start_ang < math.pi):
+                    count_up = True
+
+            # just find point that is halfway through arc and use that
+
         """
         TODO
 
@@ -273,17 +295,17 @@ class DMP(object):
         for i in range(len(circles)):
             circle_events.append(None)
 
-        for path_pt in path:
+        for path_dex, path_pt in enumerate(path):
             for i, circ in enumerate(circles):
                 dist = circ.distance_to(path_pt)
                 if dist < self.avoidance_distance and not circle_flags[i]:
                     # circle in range
                     circle_flags[i] = 1
-                    circle_events[i] = (CircleEvent(circ, path_pt))
+                    circle_events[i] = (CircleEvent(circ, path_dex))
                 elif dist > self.avoidance_distance and circle_flags[i]:
                     # circle out of range
                     circle_flags[i] = 0
-                    circle_events[i].end_pt = path_pt
+                    circle_events[i].end_pt_idx = path_dex
 
         return circle_events
 
