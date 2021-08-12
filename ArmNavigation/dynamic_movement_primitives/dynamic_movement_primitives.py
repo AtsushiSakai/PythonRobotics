@@ -267,14 +267,32 @@ class DMP(object):
             end_ang = math.atan2(end_pt[1] - circ_center[1],
                                  end_pt[0] - circ_center[0])
 
-            count_up = False
+            # TODO: put in its own function
+            start_center_slope = (start_pt[1] - circ_center[1]) / (start_pt[0] - circ_center[0])
+            tangent_at_start = -1 /start_center_slope
+            tangent_vec = [1, tangent_at_start] / math.sqrt(1 + tangent_at_start**2)
 
-            if(start_ang > end_ang):
-                if(start_ang - end_ang < math.pi):
-                    count_up = True
-            else:
-                if(end_ang - start_ang < math.pi):
-                    count_up = True
+            chord_vec = np.asarray([end_pt[0] - start_pt[0], end_pt[1] - start_pt[1]])
+            chord_vec = chord_vec / np.linalg.norm(chord_vec)
+
+            angle_from_tangent = chord_vec - tangent_vec
+
+            while angle_from_tangent > math.pi:
+                angle_from_tangent -= math.pi
+
+            while angle_from_tangent < -math.pi:
+                angle_from_tangent += math.pi
+
+            arc_angle = 2 * angle_from_tangent
+            end_angle = start_ang + arc_angle
+
+
+            # if(start_ang > end_ang):
+            #     if(start_ang - end_ang < math.pi):
+            #         count_up = True
+            # else:
+            #     if(end_ang - start_ang < math.pi):
+            #         count_up = True
 
             # just find point that is halfway through arc and use that
 
