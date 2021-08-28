@@ -187,7 +187,7 @@ class RRT:
                      [self.play_area.ymin, self.play_area.ymin,
                       self.play_area.ymax, self.play_area.ymax,
                       self.play_area.ymin],
-                      "-k")
+                     "-k")
 
         plt.plot(self.start.x, self.start.y, "xr")
         plt.plot(self.end.x, self.end.y, "xr")
