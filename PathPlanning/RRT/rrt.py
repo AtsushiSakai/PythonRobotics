@@ -32,7 +32,6 @@ class RRT:
             self.path_y = []
             self.parent = None
 
-
     class AreaBounds:
 
         def __init__(self, area):
@@ -68,7 +67,7 @@ class RRT:
         self.min_rand = rand_area[0]
         self.max_rand = rand_area[1]
         if play_area is not None:
-            self.play_area=self.AreaBounds(play_area)
+            self.play_area = self.AreaBounds(play_area)
         else:
             self.play_area = None
         self.expand_dis = expand_dis
@@ -93,7 +92,7 @@ class RRT:
 
             new_node = self.steer(nearest_node, rnd_node, self.expand_dis)
 
-            if self.check_if_outside_play_area(new_node,self.play_area) and \
+            if self.check_if_outside_play_area(new_node, self.play_area) and \
                self.check_collision(new_node, self.obstacle_list):
                 self.node_list.append(new_node)
 
@@ -182,8 +181,13 @@ class RRT:
             self.plot_circle(ox, oy, size)
 
         if self.play_area is not None:
-            plt.plot([self.play_area.xmin, self.play_area.xmax, self.play_area.xmax, self.play_area.xmin, self.play_area.xmin],
-                     [self.play_area.ymin, self.play_area.ymin, self.play_area.ymax, self.play_area.ymax, self.play_area.ymin], "-k")
+            plt.plot([self.play_area.xmin, self.play_area.xmax,
+                      self.play_area.xmax, self.play_area.xmin,
+                      self.play_area.xmin],
+                     [self.play_area.ymin, self.play_area.ymin,
+                      self.play_area.ymax, self.play_area.ymax,
+                      self.play_area.ymin],
+                      "-k")
 
         plt.plot(self.start.x, self.start.y, "xr")
         plt.plot(self.end.x, self.end.y, "xr")
@@ -209,16 +213,16 @@ class RRT:
         return minind
 
     @staticmethod
-    def check_if_outside_play_area(node,play_area):
+    def check_if_outside_play_area(node, play_area):
 
         if play_area is None:
-            return True # no play_area was defined, every pos should be ok
+            return True  # no play_area was defined, every pos should be ok
 
         if node.x < play_area.xmin or node.x > play_area.xmax or \
            node.y < play_area.ymin or node.y > play_area.ymax:
             return False  # outside - bad
         else:
-            return True # inside - ok
+            return True  # inside - ok
 
     @staticmethod
     def check_collision(node, obstacleList):
@@ -257,7 +261,7 @@ def main(gx=6.0, gy=10.0):
         goal=[gx, gy],
         rand_area=[-2, 15],
         obstacle_list=obstacleList,
-#        play_area=[0,10,0,14]
+        #play_area=[0, 10, 0, 14]
         )
     path = rrt.planning(animation=show_animation)
 
