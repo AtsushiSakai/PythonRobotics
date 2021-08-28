@@ -36,10 +36,10 @@ class RRT:
     class AreaBounds:
 
         def __init__(self, area):
-            self.xmin = float(area[0]);
-            self.xmax = float(area[1]);
-            self.ymin = float(area[2]);
-            self.ymax = float(area[3]);
+            self.xmin = float(area[0])
+            self.xmax = float(area[1])
+            self.ymin = float(area[2])
+            self.ymax = float(area[3])
 
 
     def __init__(self,
@@ -180,7 +180,7 @@ class RRT:
         for (ox, oy, size) in self.obstacle_list:
             self.plot_circle(ox, oy, size)
 
-        if self.play_area != None:
+        if self.play_area is not None:
             plt.plot([self.play_area.xmin, self.play_area.xmax, self.play_area.xmax, self.play_area.xmin, self.play_area.xmin],
                      [self.play_area.ymin, self.play_area.ymin, self.play_area.ymax, self.play_area.ymax, self.play_area.ymin], "-k")
 
