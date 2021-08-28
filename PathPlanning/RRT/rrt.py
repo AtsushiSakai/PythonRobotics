@@ -47,11 +47,12 @@ class RRT:
                  goal,
                  obstacle_list,
                  rand_area,
-                 play_area=None,
                  expand_dis=3.0,
                  path_resolution=0.5,
                  goal_sample_rate=5,
-                 max_iter=500):
+                 max_iter=500,
+                 play_area=None
+                 ):
         """
         Setting Parameter
 
@@ -255,8 +256,9 @@ def main(gx=6.0, gy=10.0):
         start=[0, 0],
         goal=[gx, gy],
         rand_area=[-2, 15],
-#        play_area=[0,10,0,14],
-        obstacle_list=obstacleList)
+        obstacle_list=obstacleList,
+#        play_area=[0,10,0,14]
+        )
     path = rrt.planning(animation=show_animation)
 
     if path is None:
