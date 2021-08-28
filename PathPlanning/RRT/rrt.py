@@ -261,7 +261,7 @@ def main(gx=6.0, gy=10.0):
         goal=[gx, gy],
         rand_area=[-2, 15],
         obstacle_list=obstacleList,
-        #play_area=[0, 10, 0, 14]
+        # play_area=[0, 10, 0, 14]
         )
     path = rrt.planning(animation=show_animation)
 
