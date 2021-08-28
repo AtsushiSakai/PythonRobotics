@@ -180,6 +180,10 @@ class RRT:
         for (ox, oy, size) in self.obstacle_list:
             self.plot_circle(ox, oy, size)
 
+        if self.play_area != None:
+            plt.plot([self.play_area.xmin, self.play_area.xmax, self.play_area.xmax, self.play_area.xmin, self.play_area.xmin],
+                     [self.play_area.ymin, self.play_area.ymin, self.play_area.ymax, self.play_area.ymax, self.play_area.ymin], "-k")
+
         plt.plot(self.start.x, self.start.y, "xr")
         plt.plot(self.end.x, self.end.y, "xr")
         plt.axis("equal")
@@ -251,7 +255,7 @@ def main(gx=6.0, gy=10.0):
         start=[0, 0],
         goal=[gx, gy],
         rand_area=[-2, 15],
-#        play_area=[0,10,0,15],
+#        play_area=[0,10,0,14],
         obstacle_list=obstacleList)
     path = rrt.planning(animation=show_animation)
 
