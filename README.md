@@ -33,14 +33,14 @@ Python codes for robotics algorithm.
       * [Iterative Closest Point (ICP) Matching](#iterative-closest-point-icp-matching)
       * [FastSLAM 1.0](#fastslam-10)
    * [Path Planning](#path-planning)
-      * [Dynamic Window Approach](#dynamic-window-approach)
-      * [Grid based search](#grid-based-search)
+      * [Dynamic-Window Approach](#dynamic-window-approach)
+      * [Grid-based search](#grid-based-search)
          * [Dijkstra algorithm](#dijkstra-algorithm)
          * [A* algorithm](#a-algorithm)
          * [D* algorithm](#d-algorithm)
          * [D* Lite algorithm](#d-lite-algorithm)
          * [Potential Field algorithm](#potential-field-algorithm)
-         * [Grid based coverage path planning](#grid-based-coverage-path-planning)
+         * [Grid-based coverage path planning](#grid-based-coverage-path-planning)
       * [State Lattice Planning](#state-lattice-planning)
          * [Biased polar sampling](#biased-polar-sampling)
          * [Lane sampling](#lane-sampling)
@@ -56,7 +56,7 @@ Python codes for robotics algorithm.
    * [Path Tracking](#path-tracking)
       * [move to a pose control](#move-to-a-pose-control)
       * [Stanley control](#stanley-control)
-      * [Rear wheel feedback control](#rear-wheel-feedback-control)
+      * [Rear-wheel feedback control](#rear-wheel-feedback-control)
       * [Linear–quadratic regulator (LQR) speed and steering control](#linearquadratic-regulator-lqr-speed-and-steering-control)
       * [Model predictive speed and steering control](#model-predictive-speed-and-steering-control)
       * [Nonlinear Model predictive control with C-GMRES](#nonlinear-model-predictive-control-with-c-gmres)
@@ -65,9 +65,9 @@ Python codes for robotics algorithm.
       * [Arm navigation with obstacle avoidance](#arm-navigation-with-obstacle-avoidance)
    * [Aerial Navigation](#aerial-navigation)
       * [drone 3d trajectory following](#drone-3d-trajectory-following)
-      * [rocket powered landing](#rocket-powered-landing)
+      * [rocket-powered landing](#rocket-powered-landing)
    * [Bipedal](#bipedal)
-      * [bipedal planner with inverted pendulum](#bipedal-planner-with-inverted-pendulum)
+      * [bipedal planner with an inverted pendulum](#bipedal-planner-with-inverted-pendulum)
    * [License](#license)
    * [Use-case](#use-case)
    * [Contribution](#contribution)
@@ -100,7 +100,7 @@ For running each sample code:
 
 - Python 3.9.x
 
-- numpy
+- NumPy
 
 - scipy
 
@@ -195,7 +195,7 @@ In this simulation, x,y are unknown, yaw is known.
 
 The filter integrates speed input and range observations from RFID for localization.
 
-Initial position is not needed.
+An Initial position is not needed.
 
 Ref:
 
