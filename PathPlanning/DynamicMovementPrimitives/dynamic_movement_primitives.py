@@ -188,8 +188,8 @@ class DMP(object):
                          label="Training Data")
                 plt.plot(path[:,0], path[:,1],
                          label="DMP Approximation")
-                plt.xlim(0,2)
-                plt.ylim(0,2)
+                # plt.xlim(0,2)
+                # plt.ylim(0,2)
 
                 plt.xlabel("X Position")
                 plt.ylabel("Y Position")
@@ -212,10 +212,12 @@ class DMP(object):
         g_orig = self.training_data[-1]
         T_orig = self.T_orig
 
-        q0_vals = np.vstack([np.linspace(q0_orig, 2*q0_orig, 20), np.linspace(q0_orig, q0_orig/2, 20)])
+        dist = np.linalg.norm(g_orig - q0_orig)
+
+        q0_vals = np.vstack([np.linspace(q0_orig, dist/4, 20), np.linspace(q0_orig, -dist/10, 20)])
 
         g_vals = np.vstack([np.linspace(g_orig, 2*g_orig, 20), np.linspace(g_orig, g_orig/2, 20)])
-        T_vals = np.hstack([np.linspace(T_orig, 2*T_orig, 20), np.linspace(T_orig, T_orig/2, 20)])
+        T_vals = np.linspace(T_orig, 2*T_orig, 20)
 
         for new_q0_value in q0_vals:
             plot_title = "Initial Position = [" + \
@@ -225,14 +227,13 @@ class DMP(object):
                                          title=plot_title)
 
         for new_g_value in g_vals:
-            plot_title = "Initial Position = [" + \
+            plot_title = "Goal Position = [" + \
                          str(round(new_g_value[0],2)) + ", " \
                          + str(round(new_g_value[1], 2)) + "]"
 
             _, _ = self.solve_trajectory(q0_orig, new_g_value, T_orig,
                                          title=plot_title)
 
-        print(T_vals)
         for new_T_value in T_vals:
             plot_title = "Period = " + str(round(new_T_value,2)) + "[sec]"
 
@@ -240,10 +241,17 @@ class DMP(object):
                                          title=plot_title)
 
 if __name__ == '__main__':
+
     period = 2*np.pi
-    t = np.arange(0, np.pi/2, 0.01)
-    training_data = np.asarray([np.sin(t) + 0.02*np.random.rand(t.shape[0]),
-                                np.cos(t) + 0.02*np.random.rand(t.shape[0]) ]).T
+    t = np.arange(0, 3*period/4, 0.01)
+    t1 = np.arange(3*np.pi/2, 2*np.pi, 0.01)[:-1]
+    t2 = np.arange(0, np.pi/2, 0.01)[:-1]
+    t3 = np.arange(np.pi, 3*np.pi/2, 0.01)
+    data_x = t + 0.02*np.random.rand(t.shape[0])
+    data_y = np.concatenate([np.cos(t1) + 0.02*np.random.rand(t1.shape[0]),
+                        np.cos(t2) + 0.02*np.random.rand(t2.shape[0]),
+                        np.sin(t3) + 0.02*np.random.rand(t3.shape[0])])
+    training_data = np.vstack([data_x, data_y]).T
 
     DMP_controller = DMP(training_data, period)
 
