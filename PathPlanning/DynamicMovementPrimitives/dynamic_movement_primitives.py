@@ -157,7 +157,6 @@ class DMP(object):
             qd = qd + qdd * self.dt
             q = q + qd * self.dt
 
-            # # TODO: get rid of this
             if not isinstance(q, list):
                 new_state = q.tolist()
 
