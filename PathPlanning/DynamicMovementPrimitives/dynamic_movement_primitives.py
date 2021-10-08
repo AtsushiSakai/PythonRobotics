@@ -10,38 +10,31 @@ import numpy as np
 import copy
 import math
 
-import imageio
 
 class DMP(object):
 
-    def __init__(self, training_data, data_period, K=156.25, B=25,
-                 timesteps=500, repel_factor=0.001):
+    def __init__(self, training_data, data_period, K=156.25, B=25):
         """
         Arguments:
             training_data - data in for [(x1,y1), (x2,y2), ...]
             data_period   - amount of time training data covers
             K and B       - spring and damper constants to define DMP behavior
-            timesteps     - number of points in generated trajectories
-            repel_factor  - controls how much path will avoid obstacles
         """
+
         self.K = K  # virtual spring constant
         self.B = B  # virtual damper coefficient
 
-        self.dt = data_period / timesteps
-        self.timesteps = timesteps
+        self.timesteps = training_data.shape[0]
+        self.dt = data_period / self.timesteps
 
         self.weights = None  # weights used to generate DMP trajectories
         self.obstacles = None
 
-        self.repel_factor = repel_factor
         self.avoidance_distance = 0.1
         self.DMP_path_attraction = 10
 
         self.T_orig = data_period
         # self.training_data = training_data
-
-        self.images = []
-        self.counter = 0
 
         self.find_basis_functions_weights(training_data, data_period)
 
@@ -52,12 +45,17 @@ class DMP(object):
             data_period [float] - time duration of data
         """
 
+        if not isinstance(training_data, np.ndarray):
+            print("Warning: you should input training data as an np.ndarray")
+        elif training_data.shape[0] < training_data.shape[1]:
+            print("Warning: you probably need to transpose your training data")
+
         self.training_data = training_data # for plotting
 
         dt = data_period / len(training_data)
 
-        init_state = training_data[0]  # initial pos
-        goal_state = training_data[-1]  # assume goal is reached by end of data
+        init_state = training_data[0]
+        goal_state = training_data[-1]
 
         # means (C) and std devs (H) of gaussian basis functions
         C = np.linspace(0, 1, num_weights)
@@ -126,7 +124,6 @@ class DMP(object):
 
         # for plotting
         self.train_t_vals = np.arange(0, T, self.timesteps)
-        # TODO: is self.period variable used
 
         if not isinstance(init_state, np.ndarray):
             init_state = np.asarray(init_state)
@@ -160,13 +157,14 @@ class DMP(object):
             qd = qd + qdd * self.dt
             q = q + qd * self.dt
 
-            # TODO: get rid of this
+            # # TODO: get rid of this
             if not isinstance(q, list):
                 new_state = q.tolist()
 
             positions.append(new_state)
 
-        return np.arange(0, self.timesteps * self.dt, self.dt), positions
+        t = np.arange(0, self.timesteps * self.dt, self.dt)
+        return t, np.asarray(positions)
 
     @staticmethod
     def dist_between(p1, p2):
@@ -180,7 +178,7 @@ class DMP(object):
         plt.plot(self.training_data[:,0], self.training_data[:,1],
                  label="Training Data")
         plt.plot(path[:,0], path[:,1],
-                 label="DMP Approximation")
+                 linewidth=2, label="DMP Approximation")
 
         plt.xlim([-0.5,5])
         plt.ylim([-2,2])
@@ -190,11 +188,8 @@ class DMP(object):
         if title is not None:
             plt.title(title)
         plt.legend()
-        # plt.draw()
-        # plt.pause(0.02)
-        print(self.counter)
-        plt.savefig("{i}.jpg".format(i=self.counter))
-        self.counter+=1
+        plt.draw()
+        plt.pause(0.02)
 
         return t, path
 
@@ -260,9 +255,3 @@ if __name__ == '__main__':
     DMP_controller = DMP(training_data, period)
 
     DMP_controller.show_DMP_purpose()
-
-    gif_path = "normal.gif"
-    frames_path = "{i}.jpg"
-    with imageio.get_writer(gif_path, mode='I') as writer:
-        for i in range(DMP_controller.counter):
-            writer.append_data(imageio.imread(frames_path.format(i=i)))

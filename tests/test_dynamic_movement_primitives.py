@@ -1,39 +1,32 @@
 import conftest
 import numpy as np
-from ArmNavigation.dynamic_movement_primitives import \
+from PathPlanning.DynamicMovementPrimitives import \
             dynamic_movement_primitives
 
-
 def test_1():
-    # test that functions work at all
-    DMP_controller = dynamic_movement_primitives.DMP()
-    DMP_controller.solve_trajectory(0, 3, 3, visualize=False)
+    # test that trajectory can be learned from user-passed data
+    T=5
+    t = np.arange(0, T, 0.01)
+    sin_t = np.sin(t)
+    train_data = np.array([t, sin_t]).T
+
+    DMP_controller = dynamic_movement_primitives.DMP(train_data, T)
+    DMP_controller.recreate_trajectory(train_data[0], train_data[-1], 4)
 
 
 def test_2():
-    # test that trajectory can be learned from user-passed data
-    t = np.arange(0, 5, 0.01)
-    sin_t = np.sin(t)
-
-    train_data = [t, sin_t]
-    DMP_controller = dynamic_movement_primitives.DMP(training_data=train_data)
-    DMP_controller.solve_trajectory(-3, 3, 4, visualize=False)
-
-
-def test_3():
     # check that learned trajectory is close to initial
-    t = np.arange(0, 3*np.pi/2, 0.01)
-    sin_t = np.sin(t)
+    T = 3*np.pi/2
+    A_noise = 0.02
+    t = np.arange(0, T, 0.01)
+    noisy_sin_t = np.sin(t) + A_noise*np.random.rand(len(t))
+    train_data = np.array([t, noisy_sin_t]).T
 
-    train_data = [t, sin_t]
-    DMP_controller = dynamic_movement_primitives.DMP(dt=0.01,
-                                                     timesteps=len(t),
-                                                     training_data=train_data)
-    t, pos = DMP_controller.solve_trajectory(0, -1, 3*np.pi/2,
-                                             visualize=False)
+    DMP_controller = dynamic_movement_primitives.DMP(train_data, T)
+    t, pos = DMP_controller.recreate_trajectory(train_data[0], train_data[-1], T)
 
-    diff = abs(pos - sin_t)
-    assert(max(diff) < 0.1)
+    diff = abs(pos[:,1] - noisy_sin_t)
+    assert(max(diff) < 5*A_noise)
 
 
 if __name__ == '__main__':
