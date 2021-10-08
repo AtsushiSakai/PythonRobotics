@@ -5,9 +5,12 @@ https://arxiv.org/abs/2102.03861
 https://www.frontiersin.org/articles/10.3389/fncom.2013.00138/full
 """
 import matplotlib.pyplot as plt
+from matplotlib import animation
 import numpy as np
 import copy
 import math
+
+import imageio
 
 class DMP(object):
 
@@ -36,6 +39,9 @@ class DMP(object):
 
         self.T_orig = data_period
         # self.training_data = training_data
+
+        self.images = []
+        self.counter = 0
 
         self.find_basis_functions_weights(training_data, data_period)
 
@@ -101,15 +107,12 @@ class DMP(object):
             else:
                 self.weights = np.vstack([self.weights, w[0]])
 
-        return self.weights  # TODO: neccesary?
-
 
     def recreate_trajectory(self, init_state, goal_state, T):
         """
         init_state - initial state/position
         goal_state - goal state/position
         T  - amount of time to travek q0 -> g
-        path - TODO
         """
 
         nrBasis = len(self.weights[0])  # number of gaussian basis functions
@@ -169,35 +172,29 @@ class DMP(object):
     def dist_between(p1, p2):
         return np.linalg.norm(p1 - p2)
 
-    def solve_trajectory(self, q0, g, T, visualize=True, obstacles=None, title=None):
+    def view_trajectory(self, path, title=None):
 
-        t, path = self.recreate_trajectory(q0, g, T)
         path = np.asarray(path)
 
-        if visualize:
-            if self.training_data.shape[1] == 2:
-                if self.obstacles is not None:
-                    for i, obs in enumerate(self.obstacles):
-                        if i == 0:
-                            plt.scatter(obs[0], obs[1], color='k', label='Obstacle')
-                        else:
-                            plt.scatter(obs[0], obs[1], color='k')
+        plt.cla()
+        plt.plot(self.training_data[:,0], self.training_data[:,1],
+                 label="Training Data")
+        plt.plot(path[:,0], path[:,1],
+                 label="DMP Approximation")
 
-                plt.cla()
-                plt.plot(self.training_data[:,0], self.training_data[:,1],
-                         label="Training Data")
-                plt.plot(path[:,0], path[:,1],
-                         label="DMP Approximation")
-                # plt.xlim(0,2)
-                # plt.ylim(0,2)
+        plt.xlim([-0.5,5])
+        plt.ylim([-2,2])
 
-                plt.xlabel("X Position")
-                plt.ylabel("Y Position")
-                if title is not None:
-                    plt.title(title)
-                plt.legend()
-                plt.draw()
-                plt.pause(0.02)
+        plt.xlabel("X Position")
+        plt.ylabel("Y Position")
+        if title is not None:
+            plt.title(title)
+        plt.legend()
+        # plt.draw()
+        # plt.pause(0.02)
+        print(self.counter)
+        plt.savefig("{i}.jpg".format(i=self.counter))
+        self.counter+=1
 
         return t, path
 
@@ -208,37 +205,44 @@ class DMP(object):
             and squeeze it in terms of start and stop position
             or time
         """
+
         q0_orig = self.training_data[0]
         g_orig = self.training_data[-1]
         T_orig = self.T_orig
 
-        dist = np.linalg.norm(g_orig - q0_orig)
+        q0_right = q0_orig + np.array([1.0,0])
+        q0_up = q0_orig + np.array([0,0.5])
+        g_left = g_orig - np.array([1.0, 0])
+        g_down = g_orig - np.array([0, 0.5])
 
-        q0_vals = np.vstack([np.linspace(q0_orig, dist/4, 20), np.linspace(q0_orig, -dist/10, 20)])
-
-        g_vals = np.vstack([np.linspace(g_orig, 2*g_orig, 20), np.linspace(g_orig, g_orig/2, 20)])
+        q0_vals = np.vstack([np.linspace(q0_orig, q0_right, 20),
+                             np.linspace(q0_orig, q0_up, 20)])
+        g_vals = np.vstack([np.linspace(g_orig, g_left, 20),
+                            np.linspace(g_orig, g_down, 20)])
         T_vals = np.linspace(T_orig, 2*T_orig, 20)
 
         for new_q0_value in q0_vals:
             plot_title = "Initial Position = [" + \
                          str(round(new_q0_value[0],2)) + ", " \
                          + str(round(new_q0_value[1], 2)) + "]"
-            _, _ = self.solve_trajectory(new_q0_value, g_orig, T_orig,
-                                         title=plot_title)
+            _, path = self.recreate_trajectory(new_q0_value, g_orig, T_orig)
+            self.view_trajectory(path, title=plot_title)
 
         for new_g_value in g_vals:
             plot_title = "Goal Position = [" + \
                          str(round(new_g_value[0],2)) + ", " \
                          + str(round(new_g_value[1], 2)) + "]"
 
-            _, _ = self.solve_trajectory(q0_orig, new_g_value, T_orig,
-                                         title=plot_title)
+            _, path = self.recreate_trajectory(q0_orig, new_g_value, T_orig)
+            self.view_trajectory(path, title=plot_title)
+
 
         for new_T_value in T_vals:
             plot_title = "Period = " + str(round(new_T_value,2)) + "[sec]"
 
-            _, _ = self.solve_trajectory(q0_orig, g_orig, new_T_value,
-                                         title=plot_title)
+            _, path = self.recreate_trajectory(q0_orig, g_orig, new_T_value)
+            self.view_trajectory(path, title=plot_title)
+
 
 if __name__ == '__main__':
 
@@ -248,13 +252,17 @@ if __name__ == '__main__':
     t2 = np.arange(0, np.pi/2, 0.01)[:-1]
     t3 = np.arange(np.pi, 3*np.pi/2, 0.01)
     data_x = t + 0.02*np.random.rand(t.shape[0])
-    data_y = np.concatenate([np.cos(t1) + 0.02*np.random.rand(t1.shape[0]),
-                        np.cos(t2) + 0.02*np.random.rand(t2.shape[0]),
-                        np.sin(t3) + 0.02*np.random.rand(t3.shape[0])])
+    data_y = np.concatenate([np.cos(t1) + 0.1*np.random.rand(t1.shape[0]),
+                        np.cos(t2) + 0.1*np.random.rand(t2.shape[0]),
+                        np.sin(t3) + 0.1*np.random.rand(t3.shape[0])])
     training_data = np.vstack([data_x, data_y]).T
 
     DMP_controller = DMP(training_data, period)
 
-    # DMP_controller.solve_trajectory([0,1], [1,0], 3)
-
     DMP_controller.show_DMP_purpose()
+
+    gif_path = "normal.gif"
+    frames_path = "{i}.jpg"
+    with imageio.get_writer(gif_path, mode='I') as writer:
+        for i in range(DMP_controller.counter):
+            writer.append_data(imageio.imread(frames_path.format(i=i)))
