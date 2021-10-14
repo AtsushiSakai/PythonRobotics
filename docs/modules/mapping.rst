@@ -37,7 +37,7 @@ The red crosses are observations from a ranging sensor.
 
 The red circle is the estimated object shape using circle fitting.
 
-.. |2| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/gaussian_grid_map/animation.gif
-.. |3| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/raycasting_grid_map/animation.gif
-.. |4| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/kmeans_clustering/animation.gif
-.. |5| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/Mapping/circle_fitting/animation.gif
+.. |2| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/gaussian_grid_map/animation.gif
+.. |3| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/raycasting_grid_map/animation.gif
+.. |4| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/kmeans_clustering/animation.gif
+.. |5| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/circle_fitting/animation.gif

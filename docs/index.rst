@@ -8,7 +8,7 @@ Welcome to PythonRobotics's documentation!
 
 Python codes for robotics algorithm. The project is on `GitHub`_.
 
-This is a Python code collection of robotics algorithms, especially for autonomous navigation.
+This is a Python code collection of robotics algorithms.
 
 Features:
 
@@ -23,6 +23,7 @@ See this paper for more details:
 -  `[1808.10703] PythonRobotics: a Python code collection of robotics
    algorithms`_ (`BibTeX`_)
 
+
 .. _`[1808.10703] PythonRobotics: a Python code collection of robotics algorithms`: https://arxiv.org/abs/1808.10703
 .. _BibTeX: https://github.com/AtsushiSakai/PythonRoboticsPaper/blob/master/python_robotics.bib
 .. _GitHub: https://github.com/AtsushiSakai/PythonRobotics
@@ -33,6 +34,7 @@ See this paper for more details:
    :caption: Guide
 
    getting_started
+   modules/introduction
    modules/localization
    modules/mapping
    modules/slam

@@ -1,18 +1,19 @@
 """
 
-Quinitc Polynomials Planner
+Quintic Polynomials Planner
 
 author: Atsushi Sakai (@Atsushi_twi)
 
 Ref:
 
-- [Local Path Planning And Motion Control For Agv In Positioning](http://ieeexplore.ieee.org/document/637936/)
+- [Local Path planning And Motion Control For Agv In Positioning](http://ieeexplore.ieee.org/document/637936/)
 
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
 import math
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 # parameter
 MAX_T = 100.0  # maximum time to the goal [s]
@@ -21,27 +22,20 @@ MIN_T = 5.0  # minimum time to the goal[s]
 show_animation = True
 
 
-class quinic_polynomial:
+class QuinticPolynomial:
 
-    def __init__(self, xs, vxs, axs, xe, vxe, axe, T):
-
-        # calc coefficient of quinic polynomial
-        self.xs = xs
-        self.vxs = vxs
-        self.axs = axs
-        self.xe = xe
-        self.vxe = vxe
-        self.axe = axe
-
+    def __init__(self, xs, vxs, axs, xe, vxe, axe, time):
+        # calc coefficient of quintic polynomial
+        # See jupyter notebook document for derivation of this equation.
         self.a0 = xs
         self.a1 = vxs
         self.a2 = axs / 2.0
 
-        A = np.array([[T**3, T**4, T**5],
-                      [3 * T ** 2, 4 * T ** 3, 5 * T ** 4],
-                      [6 * T, 12 * T ** 2, 20 * T ** 3]])
-        b = np.array([xe - self.a0 - self.a1 * T - self.a2 * T**2,
-                      vxe - self.a1 - 2 * self.a2 * T,
+        A = np.array([[time ** 3, time ** 4, time ** 5],
+                      [3 * time ** 2, 4 * time ** 3, 5 * time ** 4],
+                      [6 * time, 12 * time ** 2, 20 * time ** 3]])
+        b = np.array([xe - self.a0 - self.a1 * time - self.a2 * time ** 2,
+                      vxe - self.a1 - 2 * self.a2 * time,
                       axe - 2 * self.a2])
         x = np.linalg.solve(A, b)
 
@@ -50,36 +44,36 @@ class quinic_polynomial:
         self.a5 = x[2]
 
     def calc_point(self, t):
-        xt = self.a0 + self.a1 * t + self.a2 * t**2 + \
-            self.a3 * t**3 + self.a4 * t**4 + self.a5 * t**5
+        xt = self.a0 + self.a1 * t + self.a2 * t ** 2 + \
+             self.a3 * t ** 3 + self.a4 * t ** 4 + self.a5 * t ** 5
 
         return xt
 
     def calc_first_derivative(self, t):
         xt = self.a1 + 2 * self.a2 * t + \
-            3 * self.a3 * t**2 + 4 * self.a4 * t**3 + 5 * self.a5 * t**4
+             3 * self.a3 * t ** 2 + 4 * self.a4 * t ** 3 + 5 * self.a5 * t ** 4
 
         return xt
 
     def calc_second_derivative(self, t):
-        xt = 2 * self.a2 + 6 * self.a3 * t + 12 * self.a4 * t**2 + 20 * self.a5 * t**3
+        xt = 2 * self.a2 + 6 * self.a3 * t + 12 * self.a4 * t ** 2 + 20 * self.a5 * t ** 3
 
         return xt
 
     def calc_third_derivative(self, t):
-        xt = 6 * self.a3 + 24 * self.a4 * t + 60 * self.a5 * t**2
+        xt = 6 * self.a3 + 24 * self.a4 * t + 60 * self.a5 * t ** 2
 
         return xt
 
 
-def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_accel, max_jerk, dt):
+def quintic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_accel, max_jerk, dt):
     """
-    quinic polynomial planner
+    quintic polynomial planner
 
     input
-        sx: start x position [m]
-        sy: start y position [m]
-        syaw: start yaw angle [rad]
+        s_x: start x position [m]
+        s_y: start y position [m]
+        s_yaw: start yaw angle [rad]
         sa: start accel [m/ss]
         gx: goal x position [m]
         gy: goal y position [m]
@@ -109,9 +103,11 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
     axg = ga * math.cos(gyaw)
     ayg = ga * math.sin(gyaw)
 
+    time, rx, ry, ryaw, rv, ra, rj = [], [], [], [], [], [], []
+
     for T in np.arange(MIN_T, MAX_T, MIN_T):
-        xqp = quinic_polynomial(sx, vxs, axs, gx, vxg, axg, T)
-        yqp = quinic_polynomial(sy, vys, ays, gy, vyg, ayg, T)
+        xqp = QuinticPolynomial(sx, vxs, axs, gx, vxg, axg, T)
+        yqp = QuinticPolynomial(sy, vys, ays, gy, vyg, ayg, T)
 
         time, rx, ry, ryaw, rv, ra, rj = [], [], [], [], [], [], []
 
@@ -145,9 +141,12 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
             print("find path!!")
             break
 
-    if show_animation:
-        for i in range(len(rx)):
+    if show_animation:  # pragma: no cover
+        for i, _ in enumerate(time):
             plt.cla()
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                                         lambda event: [exit(0) if event.key == 'escape' else None])
             plt.grid(True)
             plt.axis("equal")
             plot_arrow(sx, sy, syaw)
@@ -163,7 +162,7 @@ def quinic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_a
     return time, rx, ry, ryaw, rv, ra, rj
 
 
-def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
+def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no cover
     """
     Plot arrow
     """
@@ -194,10 +193,10 @@ def main():
     max_jerk = 0.5  # max jerk [m/sss]
     dt = 0.1  # time tick [s]
 
-    time, x, y, yaw, v, a, j = quinic_polynomials_planner(
+    time, x, y, yaw, v, a, j = quintic_polynomials_planner(
         sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_accel, max_jerk, dt)
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plt.plot(x, y, "-r")
 
         plt.subplots()

@@ -1,4 +1,6 @@
 *.csv
+*.gif
+*.g2o
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -66,3 +68,6 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+matplotrecorder/*
+.vscode/settings.json

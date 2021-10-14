@@ -42,7 +42,7 @@ def pi_2_pi(angle):
     return (angle + math.pi) % (2 * math.pi) - math.pi
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     print("start unicycle simulation")
     import matplotlib.pyplot as plt
 

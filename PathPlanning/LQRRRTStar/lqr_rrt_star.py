@@ -5,111 +5,168 @@ Path planning code with LQR RRT*
 author: AtsushiSakai(@Atsushi_twi)
 
 """
-
-import sys
-sys.path.append("../LQRPlanner/")
-
-import random
-import math
 import copy
-import numpy as np
+import math
+import os
+import random
+import sys
+
 import matplotlib.pyplot as plt
-import LQRplanner
+import numpy as np
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../LQRPlanner/")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../RRTStar/")
+
+try:
+    from LQRplanner import LQRPlanner
+    from rrt_star import RRTStar
+except ImportError:
+    raise
 
 show_animation = True
 
-LQRplanner.show_animation = False
 
-STEP_SIZE = 0.05  # step size of local path
-XYTH = 0.5  # [m] acceptance xy distance in final paths
-
-
-class RRT():
+class LQRRRTStar(RRTStar):
     """
-    Class for RRT Planning
+    Class for RRT star planning with LQR planning
     """
 
-    def __init__(self, start, goal, obstacleList, randArea,
-                 goalSampleRate=10, maxIter=200):
+    def __init__(self, start, goal, obstacle_list, rand_area,
+                 goal_sample_rate=10,
+                 max_iter=200,
+                 connect_circle_dist=50.0,
+                 step_size=0.2
+                 ):
         """
         Setting Parameter
 
         start:Start Position [x,y]
         goal:Goal Position [x,y]
         obstacleList:obstacle Positions [[x,y,size],...]
-        randArea:Ramdom Samping Area [min,max]
+        randArea:Random Sampling Area [min,max]
 
         """
-        self.start = Node(start[0], start[1])
-        self.end = Node(goal[0], goal[1])
-        self.minrand = randArea[0]
-        self.maxrand = randArea[1]
-        self.goalSampleRate = goalSampleRate
-        self.maxIter = maxIter
-        self.obstacleList = obstacleList
+        self.start = self.Node(start[0], start[1])
+        self.end = self.Node(goal[0], goal[1])
+        self.min_rand = rand_area[0]
+        self.max_rand = rand_area[1]
+        self.goal_sample_rate = goal_sample_rate
+        self.max_iter = max_iter
+        self.obstacle_list = obstacle_list
+        self.connect_circle_dist = connect_circle_dist
 
-    def planning(self, animation=True):
+        self.curvature = 1.0
+        self.goal_xy_th = 0.5
+        self.step_size = step_size
+
+        self.lqr_planner = LQRPlanner()
+
+    def planning(self, animation=True, search_until_max_iter=True):
         """
-        Pathplanning
+        RRT Star planning
 
         animation: flag for animation on or off
         """
 
-        self.nodeList = [self.start]
-        for i in range(self.maxIter):
-            rnd = self.get_random_point()
-            nind = self.get_nearest_index(self.nodeList, rnd)
+        self.node_list = [self.start]
+        for i in range(self.max_iter):
+            print("Iter:", i, ", number of nodes:", len(self.node_list))
+            rnd = self.get_random_node()
+            nearest_ind = self.get_nearest_node_index(self.node_list, rnd)
+            new_node = self.steer(self.node_list[nearest_ind], rnd)
 
-            newNode = self.steer(rnd, nind)
-            if newNode is None:
-                continue
-
-            if self.check_collision(newNode, self.obstacleList):
-                nearinds = self.find_near_nodes(newNode)
-                newNode = self.choose_parent(newNode, nearinds)
-                if newNode is None:
-                    continue
-                self.nodeList.append(newNode)
-                self.rewire(newNode, nearinds)
+            if self.check_collision(new_node, self.obstacle_list):
+                near_indexes = self.find_near_nodes(new_node)
+                new_node = self.choose_parent(new_node, near_indexes)
+                if new_node:
+                    self.node_list.append(new_node)
+                    self.rewire(new_node, near_indexes)
 
             if animation and i % 5 == 0:
-                self.draw_graph(rnd=rnd)
+                self.draw_graph(rnd)
 
-        # generate coruse
-        lastIndex = self.get_best_last_index()
-        if lastIndex is None:
+            if (not search_until_max_iter) and new_node:  # check reaching the goal
+                last_index = self.search_best_goal_node()
+                if last_index:
+                    return self.generate_final_course(last_index)
+
+        print("reached max iteration")
+
+        last_index = self.search_best_goal_node()
+        if last_index:
+            return self.generate_final_course(last_index)
+        else:
+            print("Cannot find path")
+
+        return None
+
+    def draw_graph(self, rnd=None):
+        plt.clf()
+        # for stopping simulation with the esc key.
+        plt.gcf().canvas.mpl_connect('key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
+        if rnd is not None:
+            plt.plot(rnd.x, rnd.y, "^k")
+        for node in self.node_list:
+            if node.parent:
+                plt.plot(node.path_x, node.path_y, "-g")
+
+        for (ox, oy, size) in self.obstacle_list:
+            plt.plot(ox, oy, "ok", ms=30 * size)
+
+        plt.plot(self.start.x, self.start.y, "xr")
+        plt.plot(self.end.x, self.end.y, "xr")
+        plt.axis([-2, 15, -2, 15])
+        plt.grid(True)
+        plt.pause(0.01)
+
+    def search_best_goal_node(self):
+        dist_to_goal_list = [self.calc_dist_to_goal(n.x, n.y) for n in self.node_list]
+        goal_inds = [dist_to_goal_list.index(i) for i in dist_to_goal_list if i <= self.goal_xy_th]
+
+        if not goal_inds:
             return None
-        path = self.gen_final_course(lastIndex)
+
+        min_cost = min([self.node_list[i].cost for i in goal_inds])
+        for i in goal_inds:
+            if self.node_list[i].cost == min_cost:
+                return i
+
+        return None
+
+    def calc_new_cost(self, from_node, to_node):
+
+        wx, wy = self.lqr_planner.lqr_planning(
+            from_node.x, from_node.y, to_node.x, to_node.y, show_animation=False)
+
+        px, py, course_lengths = self.sample_path(wx, wy, self.step_size)
+
+        if not course_lengths:
+            return float("inf")
+
+        return from_node.cost + sum(course_lengths)
+
+    def get_random_node(self):
+
+        if random.randint(0, 100) > self.goal_sample_rate:
+            rnd = self.Node(random.uniform(self.min_rand, self.max_rand),
+                            random.uniform(self.min_rand, self.max_rand)
+                            )
+        else:  # goal point sampling
+            rnd = self.Node(self.end.x, self.end.y)
+
+        return rnd
+
+    def generate_final_course(self, goal_index):
+        print("final")
+        path = [[self.end.x, self.end.y]]
+        node = self.node_list[goal_index]
+        while node.parent:
+            for (ix, iy) in zip(reversed(node.path_x), reversed(node.path_y)):
+                path.append([ix, iy])
+            node = node.parent
+        path.append([self.start.x, self.start.y])
         return path
-
-    def choose_parent(self, newNode, nearinds):
-        if len(nearinds) == 0:
-            return newNode
-
-        dlist = []
-        for i in nearinds:
-            tNode = self.steer(newNode, i)
-            if tNode is None:
-                continue
-
-            if self.check_collision(tNode, self.obstacleList):
-                dlist.append(tNode.cost)
-            else:
-                dlist.append(float("inf"))
-
-        mincost = min(dlist)
-        minind = nearinds[dlist.index(mincost)]
-
-        if mincost == float("inf"):
-            print("mincost is inf")
-            return newNode
-
-        newNode = self.steer(newNode, minind)
-
-        return newNode
-
-    def pi_2_pi(self, angle):
-        return (angle + math.pi) % (2*math.pi) - math.pi
 
     def sample_path(self, wx, wy, step):
 
@@ -124,163 +181,33 @@ class RRT():
         dx = np.diff(px)
         dy = np.diff(py)
 
-        clen = [math.sqrt(idx**2 + idy**2) for (idx, idy) in zip(dx, dy)]
+        clen = [math.sqrt(idx ** 2 + idy ** 2) for (idx, idy) in zip(dx, dy)]
 
         return px, py, clen
 
-    def steer(self, rnd, nind):
+    def steer(self, from_node, to_node):
 
-        nearestNode = self.nodeList[nind]
+        wx, wy = self.lqr_planner.lqr_planning(
+            from_node.x, from_node.y, to_node.x, to_node.y, show_animation=False)
 
-        wx, wy = LQRplanner.LQRplanning(
-            nearestNode.x, nearestNode.y, rnd.x, rnd.y)
-
-        px, py, clen = self.sample_path(wx, wy, STEP_SIZE)
+        px, py, course_lens = self.sample_path(wx, wy, self.step_size)
 
         if px is None:
             return None
 
-        newNode = copy.deepcopy(nearestNode)
+        newNode = copy.deepcopy(from_node)
         newNode.x = px[-1]
         newNode.y = py[-1]
-
         newNode.path_x = px
         newNode.path_y = py
-        newNode.cost += sum([abs(c) for c in clen])
-        newNode.parent = nind
+        newNode.cost += sum([abs(c) for c in course_lens])
+        newNode.parent = from_node
 
         return newNode
 
-    def get_random_point(self):
 
-        if random.randint(0, 100) > self.goalSampleRate:
-            rnd = [random.uniform(self.minrand, self.maxrand),
-                   random.uniform(self.minrand, self.maxrand),
-                   random.uniform(-math.pi, math.pi)
-                   ]
-        else:  # goal point sampling
-            rnd = [self.end.x, self.end.y]
-
-        node = Node(rnd[0], rnd[1])
-
-        return node
-
-    def get_best_last_index(self):
-        #  print("get_best_last_index")
-
-        goalinds = []
-        for (i, node) in enumerate(self.nodeList):
-            if self.calc_dist_to_goal(node.x, node.y) <= XYTH:
-                goalinds.append(i)
-
-        if len(goalinds) == 0:
-            return None
-
-        mincost = min([self.nodeList[i].cost for i in goalinds])
-        for i in goalinds:
-            if self.nodeList[i].cost == mincost:
-                return i
-
-        return None
-
-    def gen_final_course(self, goalind):
-        path = [[self.end.x, self.end.y]]
-        while self.nodeList[goalind].parent is not None:
-            node = self.nodeList[goalind]
-            for (ix, iy) in zip(reversed(node.path_x), reversed(node.path_y)):
-                path.append([ix, iy])
-            goalind = node.parent
-        path.append([self.start.x, self.start.y])
-        return path
-
-    def calc_dist_to_goal(self, x, y):
-        return np.linalg.norm([x - self.end.x, y - self.end.y])
-
-    def find_near_nodes(self, newNode):
-        nnode = len(self.nodeList)
-        r = 50.0 * math.sqrt((math.log(nnode) / nnode))
-        dlist = [(node.x - newNode.x) ** 2 +
-                 (node.y - newNode.y) ** 2
-                 for node in self.nodeList]
-        nearinds = [dlist.index(i) for i in dlist if i <= r ** 2]
-        return nearinds
-
-    def rewire(self, newNode, nearinds):
-
-        nnode = len(self.nodeList)
-
-        for i in nearinds:
-            nearNode = self.nodeList[i]
-            tNode = self.steer(nearNode, nnode - 1)
-            if tNode is None:
-                continue
-
-            obstacleOK = self.check_collision(tNode, self.obstacleList)
-            imporveCost = nearNode.cost > tNode.cost
-
-            if obstacleOK and imporveCost:
-                #  print("rewire")
-                self.nodeList[i] = tNode
-
-    def draw_graph(self, rnd=None):
-        plt.clf()
-        if rnd is not None:
-            plt.plot(rnd.x, rnd.y, "^k")
-
-        for node in self.nodeList:
-            if node.parent is not None:
-                plt.plot(node.path_x, node.path_y, "-g")
-
-        for (ox, oy, size) in self.obstacleList:
-            plt.plot(ox, oy, "ok", ms=30 * size)
-
-        plt.plot(self.start.x, self.start.y, "or")
-        plt.plot(self.end.x, self.end.y, "or")
-
-        plt.axis([-2, 15, -2, 15])
-        plt.grid(True)
-        plt.pause(0.01)
-
-    def get_nearest_index(self, nodeList, rnd):
-        dlist = [(node.x - rnd.x) ** 2 +
-                 (node.y - rnd.y) ** 2
-                 for node in nodeList]
-        minind = dlist.index(min(dlist))
-
-        return minind
-
-    def check_collision(self, node, obstacleList):
-
-        px = np.array(node.path_x)
-        py = np.array(node.path_y)
-
-        for (ox, oy, size) in obstacleList:
-            dx = ox - px
-            dy = oy - py
-            d = dx ** 2 + dy ** 2
-            dmin = min(d)
-            if dmin <= size ** 2:
-                return False  # collision
-
-        return True  # safe
-
-
-class Node():
-    """
-    RRT Node
-    """
-
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.path_x = []
-        self.path_y = []
-        self.cost = 0.0
-        self.parent = None
-
-
-def main():
-    print("Start rrt start planning")
+def main(maxIter=200):
+    print("Start " + __file__)
 
     # ====Search Path with RRT====
     obstacleList = [
@@ -296,12 +223,14 @@ def main():
     start = [0.0, 0.0]
     goal = [6.0, 7.0]
 
-    rrt = RRT(start, goal, randArea=[-2.0, 15.0], obstacleList=obstacleList)
-    path = rrt.planning(animation=show_animation)
+    lqr_rrt_star = LQRRRTStar(start, goal,
+                              obstacleList,
+                              [-2.0, 15.0])
+    path = lqr_rrt_star.planning(animation=show_animation)
 
     # Draw final path
-    if show_animation:
-        rrt.draw_graph()
+    if show_animation:  # pragma: no cover
+        lqr_rrt_star.draw_graph()
         plt.plot([x for (x, y) in path], [y for (x, y) in path], '-r')
         plt.grid(True)
         plt.pause(0.001)

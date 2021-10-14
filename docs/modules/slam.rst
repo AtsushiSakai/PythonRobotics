@@ -37,18 +37,7 @@ Ref:
 
 -  `PROBABILISTIC ROBOTICS`_
 
-FastSLAM 1.0
-------------
-
-This is a feature based SLAM example using FastSLAM 1.0.
-
-The blue line is ground truth, the black line is dead reckoning, the red
-line is the estimated trajectory with FastSLAM.
-
-The red points are particles of FastSLAM.
-
-Black points are landmarks, blue crosses are estimated landmark
-positions by FastSLAM.
+.. include:: FastSLAM1.rst
 
 |5|
 
@@ -97,8 +86,8 @@ Ref:
 .. _SLAM simulations by Tim Bailey: http://www-personal.acfr.usyd.edu.au/tbailey/software/slam_simulations.htm
 .. _A Tutorial on Graph-Based SLAM: http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf
 
-.. |3| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/iterative_closest_point/animation.gif
-.. |4| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/EKFSLAM/animation.gif
-.. |5| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/FastSLAM1/animation.gif
-.. |6| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/FastSLAM2/animation.gif
-.. |7| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/SLAM/GraphBasedSLAM/animation.gif
+.. |3| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/iterative_closest_point/animation.gif
+.. |4| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/EKFSLAM/animation.gif
+.. |5| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/FastSLAM1/animation.gif
+.. |6| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/FastSLAM2/animation.gif
+.. |7| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/GraphBasedSLAM/animation.gif

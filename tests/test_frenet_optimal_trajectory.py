@@ -1,15 +1,12 @@
-from unittest import TestCase
-
-import sys
-sys.path.append("./PathPlanning/FrenetOptimalTrajectory/")
-
+import conftest
 from PathPlanning.FrenetOptimalTrajectory import frenet_optimal_trajectory as m
 
-print(__file__)
+
+def test1():
+    m.show_animation = False
+    m.SIM_LOOP = 5
+    m.main()
 
 
-class Test(TestCase):
-
-    def test1(self):
-        m.show_animation = False
-        m.main()
+if __name__ == '__main__':
+    conftest.run_this_test(__file__)

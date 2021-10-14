@@ -1,12 +1,13 @@
-from unittest import TestCase
-
-from SLAM.iterative_closest_point import iterative_closest_point as m
-
-print(__file__)
+import conftest
+from PathPlanning.ClosedLoopRRTStar import closed_loop_rrt_star_car as m
+import random
 
 
-class Test(TestCase):
+def test_1():
+    random.seed(12345)
+    m.show_animation = False
+    m.main(gx=1.0, gy=0.0, gyaw=0.0, max_iter=5)
 
-    def test1(self):
-        m.show_animation = False
-        m.main()
+
+if __name__ == '__main__':
+    conftest.run_this_test(__file__)

@@ -6,17 +6,24 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import numpy as np
 import math
-import matplotlib.pyplot as plt
 
-# Estimation parameter of EKF
-Q = np.diag([0.1, 0.1, np.deg2rad(1.0), 1.0])**2  # predict state covariance
-R = np.diag([1.0, 1.0])**2  # Observation x,y position covariance
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.spatial.transform import Rotation as Rot
+
+# Covariance for EKF simulation
+Q = np.diag([
+    0.1,  # variance of location on x-axis
+    0.1,  # variance of location on y-axis
+    np.deg2rad(1.0),  # variance of yaw angle
+    1.0  # variance of velocity
+]) ** 2  # predict state covariance
+R = np.diag([1.0, 1.0]) ** 2  # Observation x,y position covariance
 
 #  Simulation parameter
-Qsim = np.diag([1.0, np.deg2rad(30.0)])**2
-Rsim = np.diag([0.5, 0.5])**2
+INPUT_NOISE = np.diag([1.0, np.deg2rad(30.0)]) ** 2
+GPS_NOISE = np.diag([0.5, 0.5]) ** 2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
@@ -27,23 +34,18 @@ show_animation = True
 def calc_input():
     v = 1.0  # [m/s]
     yawrate = 0.1  # [rad/s]
-    u = np.array([[v, yawrate]]).T
+    u = np.array([[v], [yawrate]])
     return u
 
 
 def observation(xTrue, xd, u):
-
     xTrue = motion_model(xTrue, u)
 
     # add noise to gps x-y
-    zx = xTrue[0, 0] + np.random.randn() * Rsim[0, 0]
-    zy = xTrue[1, 0] + np.random.randn() * Rsim[1, 1]
-    z = np.array([[zx, zy]]).T
+    z = observation_model(xTrue) + GPS_NOISE @ np.random.randn(2, 1)
 
     # add noise to input
-    ud1 = u[0, 0] + np.random.randn() * Qsim[0, 0]
-    ud2 = u[1, 0] + np.random.randn() * Qsim[1, 1]
-    ud = np.array([[ud1, ud2]]).T
+    ud = u + INPUT_NOISE @ np.random.randn(2, 1)
 
     xd = motion_model(xd, ud)
 
@@ -51,7 +53,6 @@ def observation(xTrue, xd, u):
 
 
 def motion_model(x, u):
-
     F = np.array([[1.0, 0, 0, 0],
                   [0, 1.0, 0, 0],
                   [0, 0, 1.0, 0],
@@ -62,24 +63,23 @@ def motion_model(x, u):
                   [0.0, DT],
                   [1.0, 0.0]])
 
-    x = F@x + B@u
+    x = F @ x + B @ u
 
     return x
 
 
 def observation_model(x):
-    #  Observation Model
     H = np.array([
         [1, 0, 0, 0],
         [0, 1, 0, 0]
     ])
 
-    z = H@x
+    z = H @ x
 
     return z
 
 
-def jacobF(x, u):
+def jacob_f(x, u):
     """
     Jacobian of Motion Model
 
@@ -105,7 +105,7 @@ def jacobF(x, u):
     return jF
 
 
-def jacobH(x):
+def jacob_h():
     # Jacobian of Observation Model
     jH = np.array([
         [1, 0, 0, 0],
@@ -116,25 +116,23 @@ def jacobH(x):
 
 
 def ekf_estimation(xEst, PEst, z, u):
-
     #  Predict
     xPred = motion_model(xEst, u)
-    jF = jacobF(xPred, u)
-    PPred = jF@PEst@jF.T + Q
+    jF = jacob_f(xEst, u)
+    PPred = jF @ PEst @ jF.T + Q
 
     #  Update
-    jH = jacobH(xPred)
+    jH = jacob_h()
     zPred = observation_model(xPred)
     y = z - zPred
-    S = jH@PPred@jH.T + R
-    K = PPred@jH.T@np.linalg.inv(S)
-    xEst = xPred + K@y
-    PEst = (np.eye(len(xEst)) - K@jH)@PPred
-
+    S = jH @ PPred @ jH.T + R
+    K = PPred @ jH.T @ np.linalg.inv(S)
+    xEst = xPred + K @ y
+    PEst = (np.eye(len(xEst)) - K @ jH) @ PPred
     return xEst, PEst
 
 
-def plot_covariance_ellipse(xEst, PEst):
+def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
     Pxy = PEst[0:2, 0:2]
     eigval, eigvec = np.linalg.eig(Pxy)
 
@@ -150,10 +148,9 @@ def plot_covariance_ellipse(xEst, PEst):
     b = math.sqrt(eigval[smallind])
     x = [a * math.cos(it) for it in t]
     y = [b * math.sin(it) for it in t]
-    angle = math.atan2(eigvec[bigind, 1], eigvec[bigind, 0])
-    R = np.array([[math.cos(angle), math.sin(angle)],
-                  [-math.sin(angle), math.cos(angle)]])
-    fx = R@(np.array([x, y]))
+    angle = math.atan2(eigvec[1, bigind], eigvec[0, bigind])
+    rot = Rot.from_euler('z', angle).as_matrix()[0:2, 0:2]
+    fx = rot @ (np.array([x, y]))
     px = np.array(fx[0, :] + xEst[0, 0]).flatten()
     py = np.array(fx[1, :] + xEst[1, 0]).flatten()
     plt.plot(px, py, "--r")
@@ -193,7 +190,10 @@ def main():
 
         if show_animation:
             plt.cla()
-            plt.plot(hz[:, 0], hz[:, 1], ".g")
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
+            plt.plot(hz[0, :], hz[1, :], ".g")
             plt.plot(hxTrue[0, :].flatten(),
                      hxTrue[1, :].flatten(), "-b")
             plt.plot(hxDR[0, :].flatten(),

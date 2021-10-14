@@ -1,15 +1,14 @@
 """
 
-Path Planning with Bezier curve.
+Path planning with Bezier curve.
 
 author: Atsushi Sakai(@Atsushi_twi)
 
 """
-from __future__ import division, print_function
 
-import scipy.special
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import scipy.special
 
 show_animation = True
 
@@ -27,7 +26,7 @@ def calc_4points_bezier_path(sx, sy, syaw, ex, ey, eyaw, offset):
     :param offset: (float)
     :return: (numpy array, numpy array)
     """
-    dist = np.sqrt((sx - ex) ** 2 + (sy - ey) ** 2) / offset
+    dist = np.hypot(sx - ex, sy - ey) / offset
     control_points = np.array(
         [[sx, sy],
          [sx + dist * np.cos(syaw), sy + dist * np.sin(syaw)],
@@ -94,7 +93,8 @@ def bezier_derivatives_control_points(control_points, n_derivatives):
     w = {0: control_points}
     for i in range(n_derivatives):
         n = len(w[i])
-        w[i + 1] = np.array([(n - 1) * (w[i][j + 1] - w[i][j]) for j in range(n - 1)])
+        w[i + 1] = np.array([(n - 1) * (w[i][j + 1] - w[i][j])
+                             for j in range(n - 1)])
     return w
 
 
@@ -111,7 +111,7 @@ def curvature(dx, dy, ddx, ddy):
     return (dx * ddy - dy * ddx) / (dx ** 2 + dy ** 2) ** (3 / 2)
 
 
-def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
+def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no cover
     """Plot arrow."""
     if not isinstance(x, float):
         for (ix, iy, iyaw) in zip(x, y, yaw):
@@ -155,17 +155,19 @@ def main():
     tangent = np.array([point, point + dt])
     normal = np.array([point, point + [- dt[1], dt[0]]])
     curvature_center = point + np.array([- dt[1], dt[0]]) * radius
-    circle = plt.Circle(tuple(curvature_center), radius, color=(0, 0.8, 0.8), fill=False, linewidth=1)
+    circle = plt.Circle(tuple(curvature_center), radius,
+                        color=(0, 0.8, 0.8), fill=False, linewidth=1)
 
     assert path.T[0][0] == start_x, "path is invalid"
     assert path.T[1][0] == start_y, "path is invalid"
     assert path.T[0][-1] == end_x, "path is invalid"
     assert path.T[1][-1] == end_y, "path is invalid"
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         fig, ax = plt.subplots()
         ax.plot(path.T[0], path.T[1], label="Bezier Path")
-        ax.plot(control_points.T[0], control_points.T[1], '--o', label="Control Points")
+        ax.plot(control_points.T[0], control_points.T[1],
+                '--o', label="Control Points")
         ax.plot(x_target, y_target)
         ax.plot(tangent[:, 0], tangent[:, 1], label="Tangent")
         ax.plot(normal[:, 0], normal[:, 1], label="Normal")
@@ -196,10 +198,10 @@ def main2():
         assert path.T[0][-1] == end_x, "path is invalid"
         assert path.T[1][-1] == end_y, "path is invalid"
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.plot(path.T[0], path.T[1], label="Offset=" + str(offset))
 
-    if show_animation:
+    if show_animation:  # pragma: no cover
         plot_arrow(start_x, start_y, start_yaw)
         plot_arrow(end_x, end_y, end_yaw)
         plt.legend()

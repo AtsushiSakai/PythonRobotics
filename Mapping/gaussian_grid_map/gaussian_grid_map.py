@@ -31,7 +31,7 @@ def generate_gaussian_grid_map(ox, oy, xyreso, std):
             # Search minimum distance
             mindis = float("inf")
             for (iox, ioy) in zip(ox, oy):
-                d = math.sqrt((iox - x)**2 + (ioy - y)**2)
+                d = math.hypot(iox - x, ioy - y)
                 if mindis >= d:
                     mindis = d
 
@@ -71,8 +71,11 @@ def main():
         gmap, minx, maxx, miny, maxy = generate_gaussian_grid_map(
             ox, oy, xyreso, STD)
 
-        if show_animation:
+        if show_animation:  # pragma: no cover
             plt.cla()
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             draw_heatmap(gmap, minx, maxx, miny, maxy, xyreso)
             plt.plot(ox, oy, "xr")
             plt.plot(0.0, 0.0, "ob")

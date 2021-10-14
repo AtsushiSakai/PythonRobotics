@@ -1,16 +1,17 @@
-from unittest import TestCase
-
 import sys
-if 'cvxpy' in sys.modules:
-    sys.path.append("./PathTracking/model_predictive_speed_and_steer_control/")
 
-    from PathTracking.model_predictive_speed_and_steer_control import model_predictive_speed_and_steer_control as m
+if 'cvxpy' in sys.modules:  # pragma: no cover
 
-    print(__file__)
+    from PathTracking.model_predictive_speed_and_steer_control \
+        import model_predictive_speed_and_steer_control as m
 
-    class Test(TestCase):
+    def test_1():
+        m.show_animation = False
+        m.main()
 
-        def test1(self):
-            m.show_animation = False
-            m.main()
-            m.main2()
+    def test_2():
+        m.show_animation = False
+        m.main2()
+
+if __name__ == '__main__':
+    conftest.run_this_test(__file__)

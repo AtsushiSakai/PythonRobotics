@@ -5,9 +5,11 @@ Path tracking simulation with pure pursuit steering control and PID speed contro
 author: Atsushi Sakai
 
 """
-import numpy as np
 import math
+
 import matplotlib.pyplot as plt
+import numpy as np
+
 import unicycle_model
 
 Kp = 2.0  # speed propotional gain
@@ -38,7 +40,7 @@ def pure_pursuit_control(state, cx, cy, pind):
     if pind >= ind:
         ind = pind
 
-    #  print(pind, ind)
+    #  print(parent_index, ind)
     if ind < len(cx):
         tx = cx[ind]
         ty = cy[ind]
@@ -66,17 +68,17 @@ def calc_target_index(state, cx, cy):
     dx = [state.x - icx for icx in cx]
     dy = [state.y - icy for icy in cy]
 
-    d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
+    d = np.hypot(dx, dy)
     mindis = min(d)
 
-    ind = d.index(mindis)
+    ind = np.argmin(d)
 
     L = 0.0
 
     while Lf > L and (ind + 1) < len(cx):
         dx = cx[ind + 1] - cx[ind]
-        dy = cx[ind + 1] - cx[ind]
-        L += math.sqrt(dx ** 2 + dy ** 2)
+        dy = cy[ind + 1] - cy[ind]
+        L += math.hypot(dx, dy)
         ind += 1
 
     #  print(mindis)
@@ -119,7 +121,7 @@ def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
         # check goal
         dx = state.x - goal[0]
         dy = state.y - goal[1]
-        if math.sqrt(dx ** 2 + dy ** 2) <= goal_dis:
+        if math.hypot(dx, dy) <= goal_dis:
             find_goal = True
             break
 
@@ -131,15 +133,18 @@ def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
         a.append(ai)
         d.append(di)
 
-        if target_ind % 1 == 0 and animation:
+        if target_ind % 1 == 0 and animation:  # pragma: no cover
             plt.cla()
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(cx, cy, "-r", label="course")
             plt.plot(x, y, "ob", label="trajectory")
             plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")
             plt.axis("equal")
             plt.grid(True)
-            plt.title("speed:" + str(round(state.v, 2)) +
-                      "tind:" + str(target_ind))
+            plt.title("speed:" + str(round(state.v, 2))
+                      + "tind:" + str(target_ind))
             plt.pause(0.0001)
 
     else:
@@ -153,12 +158,13 @@ def set_stop_point(target_speed, cx, cy, cyaw):
     forward = True
 
     d = []
+    is_back = False
 
     # Set stop point
     for i in range(len(cx) - 1):
         dx = cx[i + 1] - cx[i]
         dy = cy[i + 1] - cy[i]
-        d.append(math.sqrt(dx ** 2.0 + dy ** 2.0))
+        d.append(math.hypot(dx, dy))
         iyaw = cyaw[i]
         move_direction = math.atan2(dy, dx)
         is_back = abs(move_direction - iyaw) >= math.pi / 2.0
@@ -175,12 +181,12 @@ def set_stop_point(target_speed, cx, cy, cyaw):
             speed_profile[i] = 0.0
             forward = False
             #  plt.plot(cx[i], cy[i], "xb")
-            #  print(iyaw, move_direction, dx, dy)
+            #  print(i_yaw, move_direction, dx, dy)
         elif not is_back and not forward:
             speed_profile[i] = 0.0
             forward = True
             #  plt.plot(cx[i], cy[i], "xb")
-            #  print(iyaw, move_direction, dx, dy)
+            #  print(i_yaw, move_direction, dx, dy)
     speed_profile[0] = 0.0
     if is_back:
         speed_profile[-1] = -stop_speed
@@ -196,7 +202,7 @@ def calc_speed_profile(cx, cy, cyaw, target_speed):
 
     speed_profile, d = set_stop_point(target_speed, cx, cy, cyaw)
 
-    if animation:
+    if animation:  # pragma: no cover
         plt.plot(speed_profile, "xb")
 
     return speed_profile
@@ -220,9 +226,8 @@ def extend_path(cx, cy, cyaw):
     return cx, cy, cyaw
 
 
-def main():
+def main():  # pragma: no cover
     #  target course
-    import numpy as np
     cx = np.arange(0, 50, 0.1)
     cy = [math.sin(ix / 5.0) * ix / 2.0 for ix in cx]
 
@@ -245,7 +250,7 @@ def main():
     yaw = [state.yaw]
     v = [state.v]
     t = [0.0]
-    target_ind = calc_target_index(state, cx, cy)
+    target_ind, dis = calc_target_index(state, cx, cy)
 
     while T >= time and lastIndex > target_ind:
         ai = PIDControl(target_speed, state.v)
@@ -278,42 +283,6 @@ def main():
     plt.axis("equal")
     plt.grid(True)
 
-    subplots(1)
-    plt.plot(t, [iv * 3.6 for iv in v], "-r")
-    plt.xlabel("Time[s]")
-    plt.ylabel("Speed[km/h]")
-    plt.grid(True)
-    plt.show()
-
-
-def main2():
-    import pandas as pd
-    data = pd.read_csv("rrt_course.csv")
-    cx = np.array(data["x"])
-    cy = np.array(data["y"])
-    cyaw = np.array(data["yaw"])
-
-    target_speed = 10.0 / 3.6
-
-    goal = [cx[-1], cy[-1]]
-
-    cx, cy, cyaw = extend_path(cx, cy, cyaw)
-
-    speed_profile = calc_speed_profile(cx, cy, cyaw, target_speed)
-
-    t, x, y, yaw, v, a, d, flag = closed_loop_prediction(
-        cx, cy, cyaw, speed_profile, goal)
-
-    plt.subplots(1)
-    plt.plot(cx, cy, ".r", label="course")
-    plt.plot(x, y, "-b", label="trajectory")
-    plt.plot(goal[0], goal[1], "xg", label="goal")
-    plt.legend()
-    plt.xlabel("x[m]")
-    plt.ylabel("y[m]")
-    plt.axis("equal")
-    plt.grid(True)
-
     plt.subplots(1)
     plt.plot(t, [iv * 3.6 for iv in v], "-r")
     plt.xlabel("Time[s]")
@@ -322,7 +291,6 @@ def main2():
     plt.show()
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     print("Pure pursuit path tracking simulation start")
-    #  main()
-    main2()
+    main()

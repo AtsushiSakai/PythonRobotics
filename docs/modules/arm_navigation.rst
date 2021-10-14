@@ -27,5 +27,5 @@ Arm navigation with obstacle avoidance simulation.
 
 |obstacle|
 
-.. |n_joints_arm| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/ArmNavigation/n_joint_arm_to_point_control/animation.gif
-.. |obstacle| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/ArmNavigation/arm_obstacle_navigation/animation.gif
+.. |n_joints_arm| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/ArmNavigation/n_joint_arm_to_point_control/animation.gif
+.. |obstacle| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/ArmNavigation/arm_obstacle_navigation/animation.gif

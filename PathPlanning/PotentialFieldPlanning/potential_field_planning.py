@@ -9,6 +9,7 @@ https://www.cs.cmu.edu/~motionplanning/lecture/Chap4-Potential-Field_howie.pdf
 
 """
 
+from collections import deque
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -16,15 +17,17 @@ import matplotlib.pyplot as plt
 KP = 5.0  # attractive potential gain
 ETA = 100.0  # repulsive potential gain
 AREA_WIDTH = 30.0  # potential area width [m]
+# the number of previous positions used to check oscillations
+OSCILLATIONS_DETECTION_LENGTH = 3
 
 show_animation = True
 
 
-def calc_potential_field(gx, gy, ox, oy, reso, rr):
-    minx = min(ox) - AREA_WIDTH / 2.0
-    miny = min(oy) - AREA_WIDTH / 2.0
-    maxx = max(ox) + AREA_WIDTH / 2.0
-    maxy = max(oy) + AREA_WIDTH / 2.0
+def calc_potential_field(gx, gy, ox, oy, reso, rr, sx, sy):
+    minx = min(min(ox), sx, gx) - AREA_WIDTH / 2.0
+    miny = min(min(oy), sy, gy) - AREA_WIDTH / 2.0
+    maxx = max(max(ox), sx, gx) + AREA_WIDTH / 2.0
+    maxy = max(max(oy), sy, gy) + AREA_WIDTH / 2.0
     xw = int(round((maxx - minx) / reso))
     yw = int(round((maxy - miny) / reso))
 
@@ -52,7 +55,7 @@ def calc_repulsive_potential(x, y, ox, oy, rr):
     # search nearest obstacle
     minid = -1
     dmin = float("inf")
-    for i in range(len(ox)):
+    for i, _ in enumerate(ox):
         d = np.hypot(x - ox[i], y - oy[i])
         if dmin >= d:
             dmin = d
@@ -84,10 +87,26 @@ def get_motion_model():
     return motion
 
 
+def oscillations_detection(previous_ids, ix, iy):
+    previous_ids.append((ix, iy))
+
+    if (len(previous_ids) > OSCILLATIONS_DETECTION_LENGTH):
+        previous_ids.popleft()
+
+    # check if contains any duplicates by copying into a set
+    previous_ids_set = set()
+    for index in previous_ids:
+        if index in previous_ids_set:
+            return True
+        else:
+            previous_ids_set.add(index)
+    return False
+
+
 def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
 
     # calc potential field
-    pmap, minx, miny = calc_potential_field(gx, gy, ox, oy, reso, rr)
+    pmap, minx, miny = calc_potential_field(gx, gy, ox, oy, reso, rr, sx, sy)
 
     # search path
     d = np.hypot(sx - gx, sy - gy)
@@ -98,19 +117,25 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
 
     if show_animation:
         draw_heatmap(pmap)
+        # for stopping simulation with the esc key.
+        plt.gcf().canvas.mpl_connect('key_release_event',
+                lambda event: [exit(0) if event.key == 'escape' else None])
         plt.plot(ix, iy, "*k")
         plt.plot(gix, giy, "*m")
 
     rx, ry = [sx], [sy]
     motion = get_motion_model()
+    previous_ids = deque()
+
     while d >= reso:
         minp = float("inf")
         minix, miniy = -1, -1
-        for i in range(len(motion)):
+        for i, _ in enumerate(motion):
             inx = int(ix + motion[i][0])
             iny = int(iy + motion[i][1])
-            if inx >= len(pmap) or iny >= len(pmap[0]):
+            if inx >= len(pmap) or iny >= len(pmap[0]) or inx < 0 or iny < 0:
                 p = float("inf")  # outside area
+                print("outside potential!")
             else:
                 p = pmap[inx][iny]
             if minp > p:
@@ -124,6 +149,10 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
         d = np.hypot(gx - xp, gy - yp)
         rx.append(xp)
         ry.append(yp)
+
+        if (oscillations_detection(previous_ids, ix, iy)):
+            print("Oscillation detected at ({},{})!".format(ix, iy))
+            break
 
         if show_animation:
             plt.plot(ix, iy, ".r")
@@ -157,11 +186,8 @@ def main():
         plt.axis("equal")
 
     # path generation
-    rx, ry = potential_field_planning(
+    _, _ = potential_field_planning(
         sx, sy, gx, gy, ox, oy, grid_size, robot_radius)
-
-    print(rx)
-    print(ry)
 
     if show_animation:
         plt.show()

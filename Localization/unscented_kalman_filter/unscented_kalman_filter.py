@@ -6,18 +6,25 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import numpy as np
-import scipy.linalg
 import math
-import matplotlib.pyplot as plt
 
-# Estimation parameter of UKF
-Q = np.diag([0.1, 0.1, np.deg2rad(1.0), 1.0])**2
-R = np.diag([1.0, np.deg2rad(40.0)])**2
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.spatial.transform import Rotation as Rot
+import scipy.linalg
+
+# Covariance for UKF simulation
+Q = np.diag([
+    0.1,  # variance of location on x-axis
+    0.1,  # variance of location on y-axis
+    np.deg2rad(1.0),  # variance of yaw angle
+    1.0  # variance of velocity
+]) ** 2  # predict state covariance
+R = np.diag([1.0, 1.0]) ** 2  # Observation x,y position covariance
 
 #  Simulation parameter
-Qsim = np.diag([0.5, 0.5])**2
-Rsim = np.diag([1.0, np.deg2rad(30.0)])**2
+INPUT_NOISE = np.diag([1.0, np.deg2rad(30.0)]) ** 2
+GPS_NOISE = np.diag([0.5, 0.5]) ** 2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
@@ -38,18 +45,13 @@ def calc_input():
 
 
 def observation(xTrue, xd, u):
-
     xTrue = motion_model(xTrue, u)
 
     # add noise to gps x-y
-    zx = xTrue[0, 0] + np.random.randn() * Qsim[0, 0]
-    zy = xTrue[1, 0] + np.random.randn() * Qsim[1, 1]
-    z = np.array([[zx, zy]]).T
+    z = observation_model(xTrue) + GPS_NOISE @ np.random.randn(2, 1)
 
     # add noise to input
-    ud1 = u[0] + np.random.randn() * Rsim[0, 0]
-    ud2 = u[1] + np.random.randn() * Rsim[1, 1]
-    ud = np.array([ud1, ud2])
+    ud = u + INPUT_NOISE @ np.random.randn(2, 1)
 
     xd = motion_model(xd, ud)
 
@@ -57,7 +59,6 @@ def observation(xTrue, xd, u):
 
 
 def motion_model(x, u):
-
     F = np.array([[1.0, 0, 0, 0],
                   [0, 1.0, 0, 0],
                   [0, 0, 1.0, 0],
@@ -100,7 +101,9 @@ def generate_sigma_points(xEst, PEst, gamma):
 
 
 def predict_sigma_motion(sigma, u):
-    #  Sigma Points prediction with motion model
+    """
+        Sigma Points prediction with motion model
+    """
     for i in range(sigma.shape[1]):
         sigma[:, i:i + 1] = motion_model(sigma[:, i:i + 1], u)
 
@@ -108,7 +111,9 @@ def predict_sigma_motion(sigma, u):
 
 
 def predict_sigma_observation(sigma):
-    # Sigma Points prediction with observation model
+    """
+        Sigma Points prediction with observation model
+    """
     for i in range(sigma.shape[1]):
         sigma[0:2, i] = observation_model(sigma[:, i])
 
@@ -139,7 +144,6 @@ def calc_pxz(sigma, x, z_sigma, zb, wc):
 
 
 def ukf_estimation(xEst, PEst, z, u, wm, wc, gamma):
-
     #  Predict
     sigma = generate_sigma_points(xEst, PEst, gamma)
     sigma = predict_sigma_motion(sigma, u)
@@ -161,7 +165,7 @@ def ukf_estimation(xEst, PEst, z, u, wm, wc, gamma):
     return xEst, PEst
 
 
-def plot_covariance_ellipse(xEst, PEst):
+def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
     Pxy = PEst[0:2, 0:2]
     eigval, eigvec = np.linalg.eig(Pxy)
 
@@ -177,10 +181,9 @@ def plot_covariance_ellipse(xEst, PEst):
     b = math.sqrt(eigval[smallind])
     x = [a * math.cos(it) for it in t]
     y = [b * math.sin(it) for it in t]
-    angle = math.atan2(eigvec[bigind, 1], eigvec[bigind, 0])
-    R = np.array([[math.cos(angle), math.sin(angle)],
-                  [-math.sin(angle), math.cos(angle)]])
-    fx = R @ np.array([x, y])
+    angle = math.atan2(eigvec[1, bigind], eigvec[0, bigind])
+    rot = Rot.from_euler('z', angle).as_matrix()[0:2, 0:2]
+    fx = rot @ np.array([x, y])
     px = np.array(fx[0, :] + xEst[0, 0]).flatten()
     py = np.array(fx[1, :] + xEst[1, 0]).flatten()
     plt.plot(px, py, "--r")
@@ -237,6 +240,9 @@ def main():
 
         if show_animation:
             plt.cla()
+            # for stopping simulation with the esc key.
+            plt.gcf().canvas.mpl_connect('key_release_event',
+                    lambda event: [exit(0) if event.key == 'escape' else None])
             plt.plot(hz[0, :], hz[1, :], ".g")
             plt.plot(np.array(hxTrue[0, :]).flatten(),
                      np.array(hxTrue[1, :]).flatten(), "-b")

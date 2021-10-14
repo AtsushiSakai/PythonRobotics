@@ -4,9 +4,13 @@ Inverse kinematics for an n-link arm using the Jacobian inverse method
 Author: Daniel Ingram (daniel-s-ingram)
         Atsushi Sakai (@Atsushi_twi)
 """
-import numpy as np
 
-from NLinkArm import NLinkArm
+import numpy as np
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent.parent))
+
+from ArmNavigation.n_joint_arm_to_point_control.NLinkArm import NLinkArm
 
 # Simulation parameters
 Kp = 2
@@ -21,7 +25,7 @@ MOVING_TO_GOAL = 2
 show_animation = True
 
 
-def main():
+def main():  # pragma: no cover
     """
     Creates an arm using the NLinkArm class and uses its inverse kinematics
     to move it to the desired position.
@@ -148,7 +152,7 @@ def jacobian_inverse(link_lengths, joint_angles):
 def distance_to_goal(current_pos, goal_pos):
     x_diff = goal_pos[0] - current_pos[0]
     y_diff = goal_pos[1] - current_pos[1]
-    return np.array([x_diff, y_diff]).T, np.math.sqrt(x_diff**2 + y_diff**2)
+    return np.array([x_diff, y_diff]).T, np.hypot(x_diff, y_diff)
 
 
 def ang_diff(theta1, theta2):
@@ -159,5 +163,5 @@ def ang_diff(theta1, theta2):
 
 
 if __name__ == '__main__':
-    main()
-    # animation()
+    # main()
+    animation()

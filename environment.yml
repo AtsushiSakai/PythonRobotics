@@ -1,9 +1,11 @@
 name: python_robotics
+channels:
+  - conda-forge
 dependencies:
-- python==3.6
-- matplotlib
-- scipy
-- numpy
-- pandas
-- pip:
-    - cvxpy
+  - python=3.9
+  - pip
+  - scipy
+  - numpy
+  - pandas
+  - cvxpy
+  - matplotlib

@@ -73,8 +73,8 @@ def quad_sim(x_c, y_c, z_c):
             # des_x_pos = calculate_position(x_c[i], t)
             # des_y_pos = calculate_position(y_c[i], t)
             des_z_pos = calculate_position(z_c[i], t)
-            des_x_vel = calculate_velocity(x_c[i], t)
-            des_y_vel = calculate_velocity(y_c[i], t)
+            # des_x_vel = calculate_velocity(x_c[i], t)
+            # des_y_vel = calculate_velocity(y_c[i], t)
             des_z_vel = calculate_velocity(z_c[i], t)
             des_x_acc = calculate_acceleration(x_c[i], t)
             des_y_acc = calculate_acceleration(y_c[i], t)
@@ -99,7 +99,7 @@ def quad_sim(x_c, y_c, z_c):
 
             R = rotation_matrix(roll, pitch, yaw)
             acc = (np.matmul(R, np.array(
-                [0, 0, thrust]).T) - np.array([0, 0, m * g]).T) / m
+                [0, 0, thrust.item()]).T) - np.array([0, 0, m * g]).T) / m
             x_acc = acc[0]
             y_acc = acc[1]
             z_acc = acc[2]

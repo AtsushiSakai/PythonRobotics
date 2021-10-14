@@ -5,13 +5,13 @@ Jupyter notebook converter to rst file
 author: Atsushi Sakai
 
 """
+import subprocess
+import os.path
+import os
+import glob
+
 
 NOTEBOOK_DIR = "../"
-
-import glob
-import os
-import os.path
-import subprocess
 
 
 def get_notebook_path_list(ndir):
@@ -20,8 +20,9 @@ def get_notebook_path_list(ndir):
 
 
 def convert_rst(rstpath):
-    with open(rstpath, "r") as file:
-        filedata = file.read()
+
+    with open(rstpath, "r") as bfile:
+        filedata = bfile.read()
 
         # convert from code directive to code-block
         # because showing code in Sphinx
@@ -29,8 +30,8 @@ def convert_rst(rstpath):
         after = ".. code-block:: ipython3"
         filedata = filedata.replace(before, after)
 
-    with open(rstpath, "w") as file:
-        file.write(filedata)
+    with open(rstpath, "w") as afile:
+        afile.write(filedata)
 
 
 def generate_rst(npath):
@@ -82,7 +83,8 @@ def main():
     # print(notebook_path_list)
 
     for npath in notebook_path_list:
-        generate_rst(npath)
+        if "template" not in npath:
+            generate_rst(npath)
 
     print("done!!")
 
