@@ -15,12 +15,17 @@ from matplotlib import animation
 Point = namedtuple("Point", ["x", "y"])
 
 
-def draw_clothoids(theta1, num_clothoids=75, num_steps=100, save_animation=False):
+def draw_clothoids(
+    theta1_vals, 
+    theta2_vals, 
+    num_clothoids=75, 
+    num_steps=100, 
+    save_animation=False
+):
     p1 = Point(0, 0)
     p2 = Point(10, 0)
-    theta2_vals = np.linspace(-pi, pi, num_clothoids)
     clothoids = [
-        get_clothoid_points(p1, p2, theta1, theta2, num_steps) for theta2 in theta2_vals
+        get_clothoid_points(p1, p2, theta1, theta2, num_steps) for theta1 in theta1_vals for theta2 in theta2_vals
     ]
 
     fig = plt.figure(figsize=(10, 10))
@@ -29,7 +34,7 @@ def draw_clothoids(theta1, num_clothoids=75, num_steps=100, save_animation=False
 
     axes.plot(p1.x, p1.y, 'ro')
     axes.plot(p2.x, p2.y, 'ro')
-    lines = [axes.plot([], [], 'b-')[0] for _ in range(num_clothoids)]
+    lines = [axes.plot([], [], 'b-')[0] for _ in range(len(clothoids))]
 
     def animate(i):
         for line, clothoid in zip(lines, clothoids):
@@ -132,4 +137,6 @@ def get_axes_limits(clothoids):
 
 
 if __name__ == "__main__":
-    draw_clothoids(0, num_clothoids=50, save_animation=False)
+    theta1_vals = [0]
+    theta2_vals = np.linspace(-pi, pi, 75)
+    draw_clothoids(theta1_vals, theta2_vals, save_animation=False)
