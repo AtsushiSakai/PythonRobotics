@@ -16,17 +16,19 @@ Point = namedtuple("Point", ["x", "y"])
 
 
 def draw_clothoids(
-    theta1_vals, 
-    theta2_vals, 
-    num_clothoids=75, 
-    num_steps=100, 
+    theta1_vals,
+    theta2_vals,
+    num_clothoids=75,
+    num_steps=100,
     save_animation=False
 ):
     p1 = Point(0, 0)
     p2 = Point(10, 0)
-    clothoids = [
-        get_clothoid_points(p1, p2, theta1, theta2, num_steps) for theta1 in theta1_vals for theta2 in theta2_vals
-    ]
+    clothoids = []
+    for theta1 in theta1_vals:
+        for theta2 in theta2_vals:
+            clothoid = get_clothoid_points(p1, p2, theta1, theta2, num_steps)
+            clothoids.append(clothoid)
 
     fig = plt.figure(figsize=(10, 10))
     x_min, x_max, y_min, y_max = get_axes_limits(clothoids)
@@ -48,7 +50,7 @@ def draw_clothoids(
         fig,
         animate,
         frames=num_steps,
-        interval=25, 
+        interval=25,
         blit=True
     )
     if save_animation:
@@ -119,7 +121,7 @@ def normalize_angle(angle_rad):
 def get_axes_limits(clothoids):
     x_vals = [p.x for clothoid in clothoids for p in clothoid]
     y_vals = [p.y for clothoid in clothoids for p in clothoid]
-    
+
     x_min = min(x_vals)
     x_max = max(x_vals)
     y_min = min(y_vals)
