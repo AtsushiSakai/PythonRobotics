@@ -153,8 +153,8 @@ class DMP(object):
 
                 # simulate dynamics
                 qdd[dim] = self.K*(goal_state[dim] - q[dim])/T**2 \
-                         - self.B*qd[dim]/T \
-                         + (goal_state[dim] - init_state[dim])*f/T**2
+                     - self.B*qd[dim]/T \
+                     + (goal_state[dim] - init_state[dim])*f/T**2
 
             qd = qd + qdd * self.dt
             q = q + qd * self.dt
