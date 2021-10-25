@@ -3,10 +3,11 @@ Author: Jonathan Schwartz (github.com/SchwartzCode)
 More information on Dynamic Movement Primitives available at:
 https://arxiv.org/abs/2102.03861
 https://www.frontiersin.org/articles/10.3389/fncom.2013.00138/full
+
 """
 
 
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
 from matplotlib import animation
 import numpy as np
 import copy
@@ -20,7 +21,8 @@ class DMP(object):
         Arguments:
             training_data - input data of form [N, dim]
             data_period   - amount of time training data covers
-            K and B     - spring and damper constants to define DMP behavior
+            K and B       - spring and damper constants to define
+                            DMP behavior
         """
 
         self.K = K  # virtual spring constant
@@ -151,8 +153,8 @@ class DMP(object):
 
                 # simulate dynamics
                 qdd[dim] = self.K*(goal_state[dim] - q[dim])/T**2 \
-                          - self.B*qd[dim]/T \
-                          + (goal_state[dim] - init_state[dim])*f/T**2
+                         - self.B*qd[dim]/T \
+                         + (goal_state[dim] - init_state[dim])*f/T**2
 
             qd = qd + qdd * self.dt
             q = q + qd * self.dt
