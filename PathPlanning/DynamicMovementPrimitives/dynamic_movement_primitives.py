@@ -4,6 +4,8 @@ More information on Dynamic Movement Primitives available at:
 https://arxiv.org/abs/2102.03861
 https://www.frontiersin.org/articles/10.3389/fncom.2013.00138/full
 """
+
+
 import matplotlib.pyplot as plt
 from matplotlib import animation
 import numpy as np
@@ -18,7 +20,7 @@ class DMP(object):
         Arguments:
             training_data - data in for [(x1,y1), (x2,y2), ...]
             data_period   - amount of time training data covers
-            K and B       - spring and damper constants to define DMP behavior
+            K and B     - spring and damper constants to define DMP behavior
         """
 
         self.K = K  # virtual spring constant
@@ -34,7 +36,8 @@ class DMP(object):
 
         self.find_basis_functions_weights(training_data, data_period)
 
-    def find_basis_functions_weights(self, training_data, data_period, num_weights=10):
+    def find_basis_functions_weights(self, training_data, data_period,
+                                     num_weights=10):
         """
         Arguments:
             data [(steps x spacial dim) np array] - data to replicate with DMP
@@ -46,7 +49,7 @@ class DMP(object):
         elif training_data.shape[0] < training_data.shape[1]:
             print("Warning: you probably need to transpose your training data")
 
-        self.training_data = training_data # for plotting
+        self.training_data = training_data
 
         dt = data_period / len(training_data)
 
@@ -57,9 +60,9 @@ class DMP(object):
         C = np.linspace(0, 1, num_weights)
         H = (0.65*(1./(num_weights-1))**2)
 
-        for dim in range(len(training_data[0])):
+        for dim, _ in enumerate(training_data[0]):
 
-            dimension_data = training_data[:,dim]
+            dimension_data = training_data[:, dim]
 
             q0 = init_state[dim]
             g = goal_state[dim]
@@ -100,7 +103,6 @@ class DMP(object):
                 self.weights = np.asarray(w[0])
             else:
                 self.weights = np.vstack([self.weights, w[0]])
-
 
     def recreate_trajectory(self, init_state, goal_state, T):
         """
@@ -148,7 +150,9 @@ class DMP(object):
                     f = 0
 
                 # simulate dynamics
-                qdd[dim] = self.K*(goal_state[dim] - q[dim])/T**2 - self.B*qd[dim]/T + (goal_state[dim] - init_state[dim])*f/T**2
+                qdd[dim] = self.K*(goal_state[dim] - q[dim])/T**2 \
+                           - self.B*qd[dim]/T \
+                           + (goal_state[dim] - init_state[dim])*f/T**2
 
             qd = qd + qdd * self.dt
             q = q + qd * self.dt
@@ -170,11 +174,10 @@ class DMP(object):
         path = np.asarray(path)
 
         plt.cla()
-        plt.plot(self.training_data[:,0], self.training_data[:,1],
+        plt.plot(self.training_data[:, 0], self.training_data[:, 1],
                  label="Training Data")
-        plt.plot(path[:,0], path[:,1],
+        plt.plot(path[:, 0], path[:, 1],
                  linewidth=2, label="DMP Approximation")
-
 
         plt.xlabel("X Position")
         plt.ylabel("Y Position")
@@ -184,8 +187,8 @@ class DMP(object):
             plt.title(title)
 
         if demo:
-            plt.xlim([-0.5,5])
-            plt.ylim([-2,2])
+            plt.xlim([-0.5, 5])
+            plt.ylim([-2, 2])
             plt.draw()
             plt.pause(0.02)
         else:
@@ -205,8 +208,11 @@ class DMP(object):
         g_orig = self.training_data[-1]
         T_orig = self.T_orig
 
-        q0_right = q0_orig + np.array([1.0,0])
-        q0_up = q0_orig + np.array([0,0.5])
+        # TODO: make this scale
+        # max = np.amax()
+
+        q0_right = q0_orig + np.array([1.0, 0])
+        q0_up = q0_orig + np.array([0, 0.5])
         g_left = g_orig - np.array([1.0, 0])
         g_down = g_orig - np.array([0, 0.5])
 
@@ -218,22 +224,21 @@ class DMP(object):
 
         for new_q0_value in q0_vals:
             plot_title = "Initial Position = [" + \
-                         str(round(new_q0_value[0],2)) + ", " \
+                         str(round(new_q0_value[0], 2)) + ", " \
                          + str(round(new_q0_value[1], 2)) + "]"
             _, path = self.recreate_trajectory(new_q0_value, g_orig, T_orig)
             self.view_trajectory(path, title=plot_title, demo=True)
 
         for new_g_value in g_vals:
             plot_title = "Goal Position = [" + \
-                         str(round(new_g_value[0],2)) + ", " \
+                         str(round(new_g_value[0], 2)) + ", " \
                          + str(round(new_g_value[1], 2)) + "]"
 
             _, path = self.recreate_trajectory(q0_orig, new_g_value, T_orig)
             self.view_trajectory(path, title=plot_title, demo=True)
 
-
         for new_T_value in T_vals:
-            plot_title = "Period = " + str(round(new_T_value,2)) + "[sec]"
+            plot_title = "Period = " + str(round(new_T_value, 2)) + "[sec]"
 
             _, path = self.recreate_trajectory(q0_orig, g_orig, new_T_value)
             self.view_trajectory(path, title=plot_title, demo=True)
@@ -247,13 +252,12 @@ if __name__ == '__main__':
     t3 = np.arange(np.pi, 3*np.pi/2, 0.01)
     data_x = t + 0.02*np.random.rand(t.shape[0])
     data_y = np.concatenate([np.cos(t1) + 0.1*np.random.rand(t1.shape[0]),
-                        np.cos(t2) + 0.1*np.random.rand(t2.shape[0]),
-                        np.sin(t3) + 0.1*np.random.rand(t3.shape[0])])
+                             np.cos(t2) + 0.1*np.random.rand(t2.shape[0]),
+                             np.sin(t3) + 0.1*np.random.rand(t3.shape[0])])
     training_data = np.vstack([data_x, data_y]).T
 
     period = 3*np.pi/2
     DMP_controller = DMP(training_data, period)
 
     DMP_controller.show_DMP_purpose()
-    # _, path = DMP_controller.recreate_trajectory(training_data[0], training_data[-1], period)
     # DMP_controller.view_trajectory(path)
