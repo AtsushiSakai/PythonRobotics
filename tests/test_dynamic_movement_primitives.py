@@ -3,9 +3,10 @@ import numpy as np
 from PathPlanning.DynamicMovementPrimitives import \
             dynamic_movement_primitives
 
+
 def test_1():
     # test that trajectory can be learned from user-passed data
-    T=5
+    T = 5
     t = np.arange(0, T, 0.01)
     sin_t = np.sin(t)
     train_data = np.array([t, sin_t]).T
@@ -23,9 +24,10 @@ def test_2():
     train_data = np.array([t, noisy_sin_t]).T
 
     DMP_controller = dynamic_movement_primitives.DMP(train_data, T)
-    t, pos = DMP_controller.recreate_trajectory(train_data[0], train_data[-1], T)
+    t, pos = DMP_controller.recreate_trajectory(train_data[0],
+                                                train_data[-1], T)
 
-    diff = abs(pos[:,1] - noisy_sin_t)
+    diff = abs(pos[:, 1] - noisy_sin_t)
     assert(max(diff) < 5*A_noise)
 
 
