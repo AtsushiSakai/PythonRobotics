@@ -18,7 +18,7 @@ class DMP(object):
     def __init__(self, training_data, data_period, K=156.25, B=25):
         """
         Arguments:
-            training_data - data in for [(x1,y1), (x2,y2), ...]
+            training_data - input data of form [N, dim]
             data_period   - amount of time training data covers
             K and B     - spring and damper constants to define DMP behavior
         """
@@ -151,8 +151,8 @@ class DMP(object):
 
                 # simulate dynamics
                 qdd[dim] = self.K*(goal_state[dim] - q[dim])/T**2 \
-                           - self.B*qd[dim]/T \
-                           + (goal_state[dim] - init_state[dim])*f/T**2
+                          - self.B*qd[dim]/T \
+                          + (goal_state[dim] - init_state[dim])*f/T**2
 
             qd = qd + qdd * self.dt
             q = q + qd * self.dt
@@ -208,7 +208,7 @@ class DMP(object):
         g_orig = self.training_data[-1]
         T_orig = self.T_orig
 
-        data_range = (np.amax(self.training_data[:, 0]) \
+        data_range = (np.amax(self.training_data[:, 0])
                       - np.amin(self.training_data[:, 0])) / 4
 
         q0_right = q0_orig + np.array([data_range, 0])
