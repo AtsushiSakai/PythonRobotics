@@ -208,13 +208,13 @@ class DMP(object):
         g_orig = self.training_data[-1]
         T_orig = self.T_orig
 
-        # TODO: make this scale
-        # max = np.amax()
+        data_range = (np.amax(self.training_data[:, 0]) \
+                      - np.amin(self.training_data[:, 0])) / 4
 
-        q0_right = q0_orig + np.array([1.0, 0])
-        q0_up = q0_orig + np.array([0, 0.5])
-        g_left = g_orig - np.array([1.0, 0])
-        g_down = g_orig - np.array([0, 0.5])
+        q0_right = q0_orig + np.array([data_range, 0])
+        q0_up = q0_orig + np.array([0, data_range/2])
+        g_left = g_orig - np.array([data_range, 0])
+        g_down = g_orig - np.array([0, data_range/2])
 
         q0_vals = np.vstack([np.linspace(q0_orig, q0_right, 20),
                              np.linspace(q0_orig, q0_up, 20)])
