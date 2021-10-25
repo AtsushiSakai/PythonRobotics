@@ -195,7 +195,7 @@ def main():  # pragma: no cover
     import matplotlib.pyplot as plt
     x = [-2.5, 0.0, 2.5, 5.0, 7.5, 3.0, -1.0]
     y = [0.7, -6, 5, 6.5, 0.0, 5.0, -2.0]
-    ds = 0.1  # [m] distance of each intepolated points
+    ds = 0.1  # [m] distance of each interpolated points
 
     sp = Spline2D(x, y)
     s = np.arange(0, sp.s[-1], ds)

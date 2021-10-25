@@ -12,7 +12,7 @@ import numpy as np
 from scipy import interpolate
 from scipy import optimize
 
-Kp = 1.0  # speed propotional gain
+Kp = 1.0  # speed proportional gain
 # steering control parameter
 KTH = 1.0
 KE = 0.5
