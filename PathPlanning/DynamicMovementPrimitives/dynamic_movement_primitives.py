@@ -28,10 +28,6 @@ class DMP(object):
         self.dt = data_period / self.timesteps
 
         self.weights = None  # weights used to generate DMP trajectories
-        self.obstacles = None
-
-        self.avoidance_distance = 0.1
-        self.DMP_path_attraction = 10
 
         self.T_orig = data_period
         # self.training_data = training_data
@@ -169,7 +165,7 @@ class DMP(object):
     def dist_between(p1, p2):
         return np.linalg.norm(p1 - p2)
 
-    def view_trajectory(self, path, title=None):
+    def view_trajectory(self, path, title=None, demo=False):
 
         path = np.asarray(path)
 
@@ -179,16 +175,21 @@ class DMP(object):
         plt.plot(path[:,0], path[:,1],
                  linewidth=2, label="DMP Approximation")
 
-        plt.xlim([-0.5,5])
-        plt.ylim([-2,2])
 
         plt.xlabel("X Position")
         plt.ylabel("Y Position")
+        plt.legend()
+
         if title is not None:
             plt.title(title)
-        plt.legend()
-        plt.draw()
-        plt.pause(0.02)
+
+        if demo:
+            plt.xlim([-0.5,5])
+            plt.ylim([-2,2])
+            plt.draw()
+            plt.pause(0.02)
+        else:
+            plt.show()
 
         return t, path
 
@@ -220,7 +221,7 @@ class DMP(object):
                          str(round(new_q0_value[0],2)) + ", " \
                          + str(round(new_q0_value[1], 2)) + "]"
             _, path = self.recreate_trajectory(new_q0_value, g_orig, T_orig)
-            self.view_trajectory(path, title=plot_title)
+            self.view_trajectory(path, title=plot_title, demo=True)
 
         for new_g_value in g_vals:
             plot_title = "Goal Position = [" + \
@@ -228,20 +229,19 @@ class DMP(object):
                          + str(round(new_g_value[1], 2)) + "]"
 
             _, path = self.recreate_trajectory(q0_orig, new_g_value, T_orig)
-            self.view_trajectory(path, title=plot_title)
+            self.view_trajectory(path, title=plot_title, demo=True)
 
 
         for new_T_value in T_vals:
             plot_title = "Period = " + str(round(new_T_value,2)) + "[sec]"
 
             _, path = self.recreate_trajectory(q0_orig, g_orig, new_T_value)
-            self.view_trajectory(path, title=plot_title)
+            self.view_trajectory(path, title=plot_title, demo=True)
 
 
 if __name__ == '__main__':
 
-    period = 2*np.pi
-    t = np.arange(0, 3*period/4, 0.01)
+    t = np.arange(0, 3*np.pi/2, 0.01)
     t1 = np.arange(3*np.pi/2, 2*np.pi, 0.01)[:-1]
     t2 = np.arange(0, np.pi/2, 0.01)[:-1]
     t3 = np.arange(np.pi, 3*np.pi/2, 0.01)
@@ -251,6 +251,9 @@ if __name__ == '__main__':
                         np.sin(t3) + 0.1*np.random.rand(t3.shape[0])])
     training_data = np.vstack([data_x, data_y]).T
 
+    period = 3*np.pi/2
     DMP_controller = DMP(training_data, period)
 
     DMP_controller.show_DMP_purpose()
+    # _, path = DMP_controller.recreate_trajectory(training_data[0], training_data[-1], period)
+    # DMP_controller.view_trajectory(path)
