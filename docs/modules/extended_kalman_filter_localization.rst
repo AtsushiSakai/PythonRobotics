@@ -77,32 +77,36 @@ Motion Model
 
 The robot model is
 
-.. math::  \dot{x} = vcos(\phi)
+.. math::  \dot{x} = v \cos(\phi)
 
-.. math::  \dot{y} = vsin((\phi)
+.. math::  \dot{y} = v \sin(\phi)
 
 .. math::  \dot{\phi} = \omega
 
 So, the motion model is
 
-.. math:: \textbf{x}_{t+1} = F\textbf{x}_t+B\textbf{u}_t
+.. math:: \textbf{x}_{t+1} = f(\textbf{x}_t, \textbf{u}_t) = F\textbf{x}_t+B\textbf{u}_t
 
 where
 
 :math:`\begin{equation*} F= \begin{bmatrix} 1 & 0 & 0 & 0\\ 0 & 1 & 0 & 0\\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 0 \\ \end{bmatrix} \end{equation*}`
 
-:math:`\begin{equation*} B= \begin{bmatrix} cos(\phi)dt & 0\\ sin(\phi)dt & 0\\ 0 & dt\\ 1 & 0\\ \end{bmatrix} \end{equation*}`
+:math:`\begin{equation*} B= \begin{bmatrix} cos(\phi) \Delta t & 0\\ sin(\phi) \Delta t & 0\\ 0 & \Delta t\\ 1 & 0\\ \end{bmatrix} \end{equation*}`
 
-:math:`dt` is a time interval.
+:math:`\Delta t` is a time interval.
 
 This is implemented at
 `code <https://github.com/AtsushiSakai/PythonRobotics/blob/916b4382de090de29f54538b356cef1c811aacce/Localization/extended_kalman_filter/extended_kalman_filter.py#L53-L67>`__
 
+The motion function is that
+
+:math:`\begin{equation*} \begin{bmatrix} x' \\ y' \\ w' \\ v' \end{bmatrix} = f(\textbf{x}, \textbf{u}) = \begin{bmatrix} x + v\cos(\phi)\Delta t \\ y + v\sin(\phi) \\ \phi + \omega \Delta t \\ v \end{bmatrix} \end{equation*}`
+
 Its Jacobian matrix is
 
-:math:`\begin{equation*} J_F= \begin{bmatrix} \frac{dx}{dx}& \frac{dx}{dy} & \frac{dx}{d\phi} & \frac{dx}{dv}\\ \frac{dy}{dx}& \frac{dy}{dy} & \frac{dy}{d\phi} & \frac{dy}{dv}\\ \frac{d\phi}{dx}& \frac{d\phi}{dy} & \frac{d\phi}{d\phi} & \frac{d\phi}{dv}\\ \frac{dv}{dx}& \frac{dv}{dy} & \frac{dv}{d\phi} & \frac{dv}{dv}\\ \end{bmatrix} \end{equation*}`
+:math:`\begin{equation*} J_f = \begin{bmatrix} \frac{\partial x'}{\partial x}& \frac{\partial x'}{\partial y} & \frac{\partial x'}{\partial \phi} & \frac{\partial x'}{\partial v}\\ \frac{\partial y'}{\partial x}& \frac{\partial y'}{\partial y} & \frac{\partial y'}{\partial \phi} & \frac{\partial y'}{\partial v}\\ \frac{\partial \phi'}{\partial x}& \frac{\partial \phi'}{\partial y} & \frac{\partial \phi'}{\partial \phi} & \frac{\partial \phi'}{\partial v}\\ \frac{\partial v'}{\partial x}& \frac{\partial v'}{\partial y} & \frac{\partial v'}{\partial \phi} & \frac{\partial v'}{\partial v} \end{bmatrix} \end{equation*}`
 
-:math:`\begin{equation*} 　= \begin{bmatrix} 1& 0 & -v sin(\phi)dt & cos(\phi)dt\\ 0 & 1 & v cos(\phi)dt & sin(\phi) dt\\ 0 & 0 & 1 & 0\\ 0 & 0 & 0 & 1\\ \end{bmatrix} \end{equation*}`
+:math:`\begin{equation*} 　= \begin{bmatrix} 1& 0 & -v \sin(\phi) \Delta t & \cos(\phi) \Delta t\\ 0 & 1 & v \cos(\phi) \Delta t & \sin(\phi) \Delta t\\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix} \end{equation*}`
 
 Observation Model
 ~~~~~~~~~~~~~~~~~
@@ -111,15 +115,19 @@ The robot can get x-y position infomation from GPS.
 
 So GPS Observation model is
 
-.. math:: \textbf{z}_{t} = H\textbf{x}_t
+.. math:: \textbf{z}_{t} = g(\textbf{x}_t) = H \textbf{x}_t
 
 where
 
-:math:`\begin{equation*} B= \begin{bmatrix} 1 & 0 & 0& 0\\ 0 & 1 & 0& 0\\ \end{bmatrix} \end{equation*}`
+:math:`\begin{equation*} H = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ \end{bmatrix} \end{equation*}`
+
+The observation function states that
+
+:math:`\begin{equation*} \begin{bmatrix} x' \\ y' \end{bmatrix} = g(\textbf{x}) = \begin{bmatrix} x \\ y \end{bmatrix} \end{equation*}`
 
 Its Jacobian matrix is
 
-:math:`\begin{equation*} J_H= \begin{bmatrix} \frac{dx}{dx}& \frac{dx}{dy} & \frac{dx}{d\phi} & \frac{dx}{dv}\\ \frac{dy}{dx}& \frac{dy}{dy} & \frac{dy}{d\phi} & \frac{dy}{dv}\\ \end{bmatrix} \end{equation*}`
+:math:`\begin{equation*} J_g = \begin{bmatrix} \frac{\partial x'}{\partial x} & \frac{\partial x'}{\partial y} & \frac{\partial x'}{\partial \phi} & \frac{\partial x'}{\partial v}\\ \frac{\partial y'}{\partial x}& \frac{\partial y'}{\partial y} & \frac{\partial y'}{\partial \phi} & \frac{\partial y'}{ \partialv}\\ \end{bmatrix} \end{equation*}`
 
 :math:`\begin{equation*} 　= \begin{bmatrix} 1& 0 & 0 & 0\\ 0 & 1 & 0 & 0\\ \end{bmatrix} \end{equation*}`
 
@@ -132,7 +140,7 @@ Localization process using Extendted Kalman Filter:EKF is
 
 :math:`x_{Pred} = Fx_t+Bu_t`
 
-:math:`P_{Pred} = J_FP_t J_F^T + Q`
+:math:`P_{Pred} = J_f P_t J_f^T + Q`
 
 === Update ===
 
@@ -140,13 +148,13 @@ Localization process using Extendted Kalman Filter:EKF is
 
 :math:`y = z - z_{Pred}`
 
-:math:`S = J_H P_{Pred}.J_H^T + R`
+:math:`S = J_g P_{Pred}.J_g^T + R`
 
-:math:`K = P_{Pred}.J_H^T S^{-1}`
+:math:`K = P_{Pred}.J_g^T S^{-1}`
 
 :math:`x_{t+1} = x_{Pred} + Ky`
 
-:math:`P_{t+1} = ( I - K J_H) P_{Pred}`
+:math:`P_{t+1} = ( I - K J_g) P_{Pred}`
 
 Ref:
 ~~~~
