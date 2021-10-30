@@ -130,7 +130,6 @@ class DMP(object):
         q = init_state
         dimensions = self.weights.shape[0]
         qd = np.zeros(dimensions)
-        qdd = np.zeros(dimensions)
 
         positions = []
         for k in range(self.timesteps):
