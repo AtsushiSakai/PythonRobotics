@@ -262,4 +262,3 @@ if __name__ == '__main__':
     DMP_controller = DMP(training_data, period)
 
     DMP_controller.show_DMP_purpose()
-    # DMP_controller.view_trajectory(path)
