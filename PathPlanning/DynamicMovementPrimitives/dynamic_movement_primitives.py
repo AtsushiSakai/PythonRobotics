@@ -8,10 +8,7 @@ https://www.frontiersin.org/articles/10.3389/fncom.2013.00138/full
 
 
 from matplotlib import pyplot as plt
-from matplotlib import animation
 import numpy as np
-import copy
-import math
 
 
 class DMP(object):
