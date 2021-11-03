@@ -31,8 +31,8 @@ class DMP(object):
         self.weights = None  # weights used to generate DMP trajectories
 
         self.T_orig = data_period
-        # self.training_data = training_data
 
+        self.training_data = training_data
         self.find_basis_functions_weights(training_data, data_period)
 
     def find_basis_functions_weights(self, training_data, data_period,
@@ -47,8 +47,6 @@ class DMP(object):
             print("Warning: you should input training data as an np.ndarray")
         elif training_data.shape[0] < training_data.shape[1]:
             print("Warning: you probably need to transpose your training data")
-
-        self.training_data = training_data
 
         dt = data_period / len(training_data)
 
@@ -78,16 +76,16 @@ class DMP(object):
                 else:
                     qd = (dimension_data[i+1] - dimension_data[i]) / dt
 
-                Phi = [np.exp(-0.5 * ((i * dt / data_period) - c)**2 / H)
+                phi = [np.exp(-0.5 * ((i * dt / data_period) - c)**2 / H)
                        for c in C]
-                Phi = Phi/np.sum(Phi)
+                phi = phi/np.sum(phi)
 
                 qdd = (qd - qd_last)/dt
 
                 f = (qdd * data_period**2 - self.K * (g - q) + self.B * qd
                      * data_period) / (g - q0)
 
-                phi_vals.append(Phi)
+                phi_vals.append(phi)
                 f_vals.append(f)
 
                 qd_last = qd
@@ -107,7 +105,7 @@ class DMP(object):
         """
         init_state - initial state/position
         goal_state - goal state/position
-        T  - amount of time to travek q0 -> g
+        T  - amount of time to travel q0 -> g
         """
 
         nrBasis = len(self.weights[0])  # number of gaussian basis functions
@@ -117,33 +115,28 @@ class DMP(object):
         H = (0.65*(1./(nrBasis-1))**2)
 
         # initialize virtual system
-        t = 0
+        time = 0
 
         # for plotting
         self.train_t_vals = np.arange(0, T, self.timesteps)
-
-        if not isinstance(init_state, np.ndarray):
-            init_state = np.asarray(init_state)
-        if not isinstance(goal_state, np.ndarray):
-            goal_state = np.asarray(goal_state)
 
         q = init_state
         dimensions = self.weights.shape[0]
         qd = np.zeros(dimensions)
 
-        positions = []
+        positions = np.array([])
         for k in range(self.timesteps):
             new_state = []
-            t = t + self.dt
+            time = time + self.dt
 
             qdd = np.zeros(dimensions)
 
             for dim in range(dimensions):
 
-                if t <= T:
-                    Phi = [np.exp(-0.5 * ((t / T) - c)**2 / H) for c in C]
-                    Phi = Phi / np.sum(Phi)
-                    f = np.dot(Phi, self.weights[dim])
+                if time <= T:
+                    phi = [np.exp(-0.5 * ((time / T) - c)**2 / H) for c in C]
+                    phi = phi / np.sum(phi)
+                    f = np.dot(phi, self.weights[dim])
                 else:
                     f = 0
 
@@ -155,13 +148,13 @@ class DMP(object):
             qd = qd + qdd * self.dt
             q = q + qd * self.dt
 
-            if not isinstance(q, list):
-                new_state = q.tolist()
-
-            positions.append(new_state)
+            if positions.size == 0:
+                positions = q
+            else:
+                positions = np.vstack([positions, q])
 
         t = np.arange(0, self.timesteps * self.dt, self.dt)
-        return t, np.asarray(positions)
+        return t, positions
 
     @staticmethod
     def dist_between(p1, p2):
@@ -192,8 +185,6 @@ class DMP(object):
         else:
             plt.show()
 
-        return t, path
-
     def show_DMP_purpose(self):
         """
         This function conveys the purpose of DMPs:
@@ -221,29 +212,31 @@ class DMP(object):
         T_vals = np.linspace(T_orig, 2*T_orig, 20)
 
         for new_q0_value in q0_vals:
-            plot_title = "Initial Position = [" + \
-                         str(round(new_q0_value[0], 2)) + ", " \
-                         + str(round(new_q0_value[1], 2)) + "]"
+            plot_title = "Initial Position = [%s, %s]" % \
+                         (round(new_q0_value[0], 2), round(new_q0_value[1], 2))
+
             _, path = self.recreate_trajectory(new_q0_value, g_orig, T_orig)
             self.view_trajectory(path, title=plot_title, demo=True)
 
         for new_g_value in g_vals:
-            plot_title = "Goal Position = [" + \
-                         str(round(new_g_value[0], 2)) + ", " \
-                         + str(round(new_g_value[1], 2)) + "]"
+            plot_title = "Goal Position = [%s, %s]" % \
+                         (round(new_g_value[0], 2), round(new_g_value[1], 2))
 
             _, path = self.recreate_trajectory(q0_orig, new_g_value, T_orig)
             self.view_trajectory(path, title=plot_title, demo=True)
 
         for new_T_value in T_vals:
-            plot_title = "Period = " + str(round(new_T_value, 2)) + "[sec]"
+            plot_title = "Period = %s [sec]" % round(new_T_value, 2)
 
             _, path = self.recreate_trajectory(q0_orig, g_orig, new_T_value)
             self.view_trajectory(path, title=plot_title, demo=True)
 
 
-if __name__ == '__main__':
-
+def example_DMP():
+    """
+    Creates a noisy trajectory, fits weights to it, and then adjusts the
+    trajectory by moving its start position, goal position, or period
+    """
     t = np.arange(0, 3*np.pi/2, 0.01)
     t1 = np.arange(3*np.pi/2, 2*np.pi, 0.01)[:-1]
     t2 = np.arange(0, np.pi/2, 0.01)[:-1]
@@ -258,3 +251,8 @@ if __name__ == '__main__':
     DMP_controller = DMP(training_data, period)
 
     DMP_controller.show_DMP_purpose()
+
+
+if __name__ == '__main__':
+
+    example_DMP()
