@@ -126,7 +126,6 @@ class DMP(object):
 
         positions = np.array([])
         for k in range(self.timesteps):
-            new_state = []
             time = time + self.dt
 
             qdd = np.zeros(dimensions)

@@ -23,7 +23,8 @@ def test_2():
     train_data = np.array([t, sin_t]).T
 
     DMP_controller = dynamic_movement_primitives.DMP(train_data, T)
-    t, path = DMP_controller.recreate_trajectory(train_data[0], train_data[-1], 4)
+    t, path = DMP_controller.recreate_trajectory(train_data[0],
+                                                 train_data[-1], 4)
 
     assert(path.shape[0] == DMP_controller.timesteps)
 
