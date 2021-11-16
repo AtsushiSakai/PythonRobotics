@@ -20,7 +20,7 @@ import os
 # -- Project information -----------------------------------------------------
 
 project = 'PythonRobotics'
-copyright = '2018, Atsushi Sakai'
+copyright = '2018-2021, Atsushi Sakai'
 author = 'Atsushi Sakai'
 
 # The short X.Y version
