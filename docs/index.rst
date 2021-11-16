@@ -35,14 +35,14 @@ See this paper for more details:
 
    getting_started
    modules/introduction
-   modules/localization
-   modules/mapping
-   modules/slam
-   modules/path_planning
-   modules/path_tracking
-   modules/arm_navigation
-   modules/aerial_navigation
-   modules/appendix
+   modules/localization/localization
+   modules/mapping/mapping
+   modules/slam/slam
+   modules/path_planning/path_planning
+   modules/path_tracking/path_tracking
+   modules/arm_navigation/arm_navigation
+   modules/aerial_navigation/aerial_navigation
+   modules/appendix/appendix
 
 
 Indices and tables
