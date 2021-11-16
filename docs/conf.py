@@ -20,7 +20,7 @@ import os
 # -- Project information -----------------------------------------------------
 
 project = 'PythonRobotics'
-copyright = '2018, Atsushi Sakai'
+copyright = '2018-2021, Atsushi Sakai'
 author = 'Atsushi Sakai'
 
 # The short X.Y version
@@ -43,6 +43,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'sphinx.ext.viewcode',
+    'IPython.sphinxext.ipython_console_highlighting',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

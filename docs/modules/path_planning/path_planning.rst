@@ -39,7 +39,7 @@ In the animation, cyan points are searched nodes.
 
 Its heuristic is 2D Euclid distance.
 
-.. _a*-algorithm:
+.. _D*-algorithm:
 
 D\* algorithm
 ~~~~~~~~~~~~~
