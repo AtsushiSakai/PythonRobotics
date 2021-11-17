@@ -10,9 +10,9 @@ environment:
   matrix:
      - PYTHON_DIR: C:\Python39-x64
 
- branches:
-   only:
-     - master
+branches:
+  only:
+    - master
 
 init:
   - "ECHO %PYTHON_DIR%"

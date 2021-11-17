@@ -15,7 +15,9 @@ jobs:
       - run:
           name: doc_build
           command: |
+            python -m venv venv
             . venv/bin/activate
+            pip install -r requirements.txt
             cd docs;make html
       - store_artifacts:
           path: docs/_build/html/
