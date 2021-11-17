@@ -9,9 +9,7 @@ jobs:
       - image: circleci/python:3.9
     steps:
       - checkout
-      - python/load-cache
-      - python/install-deps
-      - python/save-cache
+      - python/install-packages:
       - run: pip list
       - run:
           command: cd docs;make html
