@@ -13,8 +13,10 @@ jobs:
         pkg-manager: pipenv
       - run: pip list
       - run:
-          command: cd docs;make html
           name: doc_build
+          command: |
+            . venv/bin/activate
+            cd docs;make html
       - store_artifacts:
           path: docs/_build/html/
           destination: html
