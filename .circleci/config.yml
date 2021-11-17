@@ -10,6 +10,7 @@ jobs:
     steps:
       - checkout
       - python/install-packages:
+        pkg-manager: pip
       - run: pip list
       - run:
           command: cd docs;make html
