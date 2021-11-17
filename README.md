@@ -117,7 +117,7 @@ For development:
   
 - mypy (for type check)
   
-- Sphinx (for document generation)
+- sphinx (for document generation)
   
 - pycodestyle (for code style check)
 
