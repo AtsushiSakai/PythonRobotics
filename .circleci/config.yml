@@ -9,9 +9,6 @@ jobs:
       - image: circleci/python:3.9
     steps:
       - checkout
-      - python/install-packages:
-        pkg-manager: pipenv
-      - run: pip list
       - run:
           name: doc_build
           command: |
