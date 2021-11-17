@@ -4,7 +4,12 @@ name: MacOS_CI
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
 
 jobs:
   build:
