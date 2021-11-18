@@ -41,7 +41,7 @@ This measurements are used for PF localization.
 How to calculate covariance matrix from particles
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The covariance matrix $\Xi$ from particle information is calculated by the following equation:
+The covariance matrix :math:`\Xi` from particle information is calculated by the following equation:
 
 .. math:: \Xi_{j,k}=\frac{1}{1-\sum^N_{i=1}(w^i)^2}\sum^N_{i=1}w^i(x^i_j-\mu_j)(x^i_k-\mu_k)
 
