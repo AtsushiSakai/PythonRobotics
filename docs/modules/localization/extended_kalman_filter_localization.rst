@@ -2,14 +2,6 @@
 Extended Kalman Filter Localization
 -----------------------------------
 
-.. code-block:: ipython3
-
-    from IPython.display import Image
-    Image(filename="ekf.png",width=600)
-
-
-
-
 .. image:: extended_kalman_filter_localization_files/extended_kalman_filter_localization_1_0.png
    :width: 600px
 
@@ -17,8 +9,6 @@ Extended Kalman Filter Localization
 
 .. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/extended_kalman_filter/animation.gif
    :alt: EKF
-
-   EKF
 
 This is a sensor fusion localization with Extended Kalman Filter(EKF).
 
@@ -127,7 +117,7 @@ The observation function states that
 
 Its Jacobian matrix is
 
-:math:`\begin{equation*} J_g = \begin{bmatrix} \frac{\partial x'}{\partial x} & \frac{\partial x'}{\partial y} & \frac{\partial x'}{\partial \phi} & \frac{\partial x'}{\partial v}\\ \frac{\partial y'}{\partial x}& \frac{\partial y'}{\partial y} & \frac{\partial y'}{\partial \phi} & \frac{\partial y'}{ \partialv}\\ \end{bmatrix} \end{equation*}`
+:math:`\begin{equation*} J_g = \begin{bmatrix} \frac{\partial x'}{\partial x} & \frac{\partial x'}{\partial y} & \frac{\partial x'}{\partial \phi} & \frac{\partial x'}{\partial v}\\ \frac{\partial y'}{\partial x}& \frac{\partial y'}{\partial y} & \frac{\partial y'}{\partial \phi} & \frac{\partial y'}{ \partial v}\\ \end{bmatrix} \end{equation*}`
 
 :math:`\begin{equation*} 　= \begin{bmatrix} 1& 0 & 0 & 0\\ 0 & 1 & 0 & 0\\ \end{bmatrix} \end{equation*}`
 
