@@ -222,9 +222,8 @@ described with two parameters, the mean (:math:`\mu`) and the variance
     
    f(x, \mu, \sigma) = \frac{1}{\sigma\sqrt{2\pi}} \exp\big [{-\frac{(x-\mu)^2}{2\sigma^2} }\big ]
 
- Range is
 
-.. math:: [-\inf,\inf] 
+Range is :math:`[-\inf,\inf]`
 
 This is just a function of mean(\ :math:`\mu`) and standard deviation
 (:math:`\sigma`) and what gives the normal distribution the
@@ -279,7 +278,8 @@ New mean is
 
 .. math:: \mu_\mathtt{new} = \frac{\sigma_z^2\bar\mu + \bar\sigma^2z}{\bar\sigma^2+\sigma_z^2}
 
- New variance is
+
+New variance is
 
 .. math::
 
@@ -336,7 +336,7 @@ of the two.
 .. math::
 
    \begin{gathered}\mu_x = \mu_p + \mu_z \\
-   \sigma_x^2 = \sigma_z^2+\sigma_p^2\, \square\end{gathered}
+   \sigma_x^2 = \sigma_z^2+\sigma_p^2\, \end{gathered}
 
 .. code-block:: ipython3
 
