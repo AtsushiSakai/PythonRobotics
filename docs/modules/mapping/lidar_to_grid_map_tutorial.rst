@@ -15,8 +15,6 @@ unknown (unobserved) areas, which are close to 0.5.
 .. figure:: lidar_to_grid_map_tutorial_files/grid_map_example.png
    :alt: Example
 
-   Example
-
 In order to construct the grid map from the measurement we need to
 discretise the values. But, first let’s need to ``import`` some
 necessary packages.
