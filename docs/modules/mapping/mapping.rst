@@ -17,6 +17,11 @@ This is a 2D ray casting grid mapping example.
 
 |3|
 
+Lidar to grid map
+--------------------
+
+.. include:: lidar_to_grid_map_tutorial.rst
+
 k-means object clustering
 -------------------------
 
