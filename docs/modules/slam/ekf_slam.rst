@@ -1,6 +1,3 @@
-EKF SLAM
-========
-
 .. code:: ipython3
 
     from IPython.display import Image
@@ -15,7 +12,7 @@ EKF SLAM
 
 
 Simulation
-----------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This is a simulation of EKF SLAM.
 
@@ -26,7 +23,7 @@ This is a simulation of EKF SLAM.
 -  Red line: EKF SLAM position estimation
 
 Introduction
-------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 EKF SLAM models the SLAM problem in a single EKF where the modeled state
 is both the pose :math:`(x, y, \theta)` and an array of landmarks
@@ -91,7 +88,7 @@ Take care to note the difference between :math:`X` (state) and :math:`x`
     show_animation = True
 
 Algorithm Walkthrough
----------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 At each time step, the following is done. - predict the new state using
 the control functions - update the belief in landmark positions based on
@@ -122,7 +119,7 @@ the estimated state and measurements
 
 
 1- Predict
-----------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Predict State update:** The following equations describe the predicted
 motion model of the robot in case we provide only the control
@@ -210,7 +207,7 @@ the landmarks.
         return x
 
 2 - Update
-----------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In the update phase, the observations of nearby landmarks are used to
 correct the location estimate.
@@ -356,7 +353,7 @@ $ P_{t} = (I-K_tH_t):raw-latex:`\bar`{P_t} $
         return H
 
 Observation Step
-----------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The observation step described here is outside the main EKF SLAM process
 and is primarily used as a method of driving the simulation. The
