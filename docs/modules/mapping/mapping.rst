@@ -17,6 +17,13 @@ This is a 2D ray casting grid mapping example.
 
 |3|
 
+Lidar to grid map
+--------------------
+
+|6|
+
+.. include:: lidar_to_grid_map_tutorial.rst
+
 k-means object clustering
 -------------------------
 
@@ -41,3 +48,4 @@ The red circle is the estimated object shape using circle fitting.
 .. |3| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/raycasting_grid_map/animation.gif
 .. |4| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/kmeans_clustering/animation.gif
 .. |5| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/circle_fitting/animation.gif
+.. |6| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/lidar_to_grid_map/animation.gif
