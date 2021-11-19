@@ -1,5 +1,3 @@
-LIDAR to 2D grid map example
-----------------------------
 
 This simple tutorial shows how to read LIDAR (range) measurements from a
 file and convert it to occupancy grid.
@@ -14,7 +12,7 @@ a ``numpy array``, and numbers close to 1 means the cell is occupied
 free (*marked with green*). The grid has the ability to represent
 unknown (unobserved) areas, which are close to 0.5.
 
-.. figure:: grid_map_example.png
+.. figure:: lidar_to_grid_map_tutorial_files/grid_map_example.png
    :alt: Example
 
    Example
