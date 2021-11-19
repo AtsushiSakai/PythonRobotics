@@ -33,6 +33,8 @@ The green crosses are estimated landmarks.
 
 |4|
 
+.. include:: ekf_slam.rst
+
 Ref:
 
 -  `PROBABILISTIC ROBOTICS`_
