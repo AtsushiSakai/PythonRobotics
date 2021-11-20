@@ -79,6 +79,9 @@ The black stars are landmarks for graph edge generation.
 
 |7|
 
+.. include:: graphSLAM_doc.rst
+.. include:: graphSLAM_SE2_example.rst
+
 Ref:
 
 -  `A Tutorial on Graph-Based SLAM`_

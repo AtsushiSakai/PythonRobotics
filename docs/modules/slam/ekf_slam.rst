@@ -233,8 +233,8 @@ prediction based on the uncertainty in the predict step and the update
 step.
 
 $ K =
-:raw-latex:`\bar`{P_t}H_t\ :sup:`T(H_t:raw-latex:`\bar`{P_t}H_t`\ T +
-Q_t)^{-1} $ In these equations, :math:`H` is the jacobian of the
+:math:`\bar{P_t}H_t\ :sup:T(H_t:raw-latex:\bar{P_t}H_t\ T + Q_t)^{-1}`
+In these equations, :math:`H` is the jacobian of the
 measurement function. The multiplications by :math:`H^T` and :math:`H`
 represent the application of the delta to the measurement covariance.
 Intuitively, this equation is applying the following from the single
