@@ -10,7 +10,7 @@ Introduction
 ^^^^^^^^^^^^
 
 For a complete derivation of the Graph SLAM algorithm, please see
-`graphSLAM_formulation.pdf <./graphSLAM_formulation.pdf>`__.
+`Graph SLAM Formulation`_.
 
 This notebook illustrates the iterative optimization of a real-world
 :math:`SE(2)` dataset. The code can be found in the ``graphslam``

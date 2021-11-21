@@ -27,14 +27,6 @@ Ref:
 
 .. include:: FastSLAM1.rst
 
-|5|
-
-Ref:
-
--  `PROBABILISTIC ROBOTICS`_
-
--  `SLAM simulations by Tim Bailey`_
-
 FastSLAM 2.0
 ------------
 
@@ -44,7 +36,8 @@ The animation has the same meanings as one of FastSLAM 1.0.
 
 |6|
 
-Ref:
+References
+~~~~~~~~~~
 
 -  `PROBABILISTIC ROBOTICS`_
 

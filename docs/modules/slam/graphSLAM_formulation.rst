@@ -1,3 +1,5 @@
+.. _Graph SLAM Formulation:
+
 Graph SLAM Formulation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Author Jeff Irion
