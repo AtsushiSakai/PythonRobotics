@@ -207,5 +207,5 @@ Using this notation, we obtain the optimal update as
 We apply this update to the poses via `[eq:update] <#eq:update>`__ and
 repeat until convergence.
 
-.. [blanco2010tutorial] Blanco, J.-L.A tutorial onSE(3) transformation parameterization and on-manifold optimization.University of Malaga, Tech. Rep 3(2010)
-.. [grisetti2010tutorial] Grisetti, G., Kummerle, R., Stachniss, C., and Burgard, W.A tutorial on graph-based SLAM.IEEE Intelligent Transportation Systems Magazine 2, 4 (2010), 31–43.
+
+.. _PROBABILISTIC ROBOTICS: http://www.probabilistic-robotics.org/

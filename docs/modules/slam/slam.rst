@@ -91,6 +91,8 @@ Ref:
 .. _PROBABILISTIC ROBOTICS: http://www.probabilistic-robotics.org/
 .. _SLAM simulations by Tim Bailey: http://www-personal.acfr.usyd.edu.au/tbailey/software/slam_simulations.htm
 .. _A Tutorial on Graph-Based SLAM: http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf
+.. [blanco2010tutorial] Blanco, J.-L.A tutorial onSE(3) transformation parameterization and on-manifold optimization.University of Malaga, Tech. Rep 3(2010)
+.. [grisetti2010tutorial] Grisetti, G., Kummerle, R., Stachniss, C., and Burgard, W.A tutorial on graph-based SLAM.IEEE Intelligent Transportation Systems Magazine 2, 4 (2010), 31–43.
 
 .. |3| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/iterative_closest_point/animation.gif
 .. |4| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/EKFSLAM/animation.gif
