@@ -2,14 +2,6 @@
 FastSLAM1.0
 -----------
 
-.. code-block:: ipython3
-
-    from IPython.display import Image
-    Image(filename="animation.png",width=600)
-
-
-
-
 .. image:: FastSLAM1_files/FastSLAM1_1_0.png
    :width: 600px
 
@@ -30,8 +22,6 @@ positions by FastSLAM.
 
 .. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/FastSLAM1/animation.gif
    :alt: gif
-
-   gif
 
 Introduction
 ~~~~~~~~~~~~
@@ -547,6 +537,9 @@ indices
 References
 ~~~~~~~~~~
 
-http://www.probabilistic-robotics.org/
+-  `PROBABILISTIC ROBOTICS`_
 
-http://ais.informatik.uni-freiburg.de/teaching/ws12/mapping/pdf/slam10-fastslam.pdf
+-  `FastSLAM Lecture`_
+
+.. _PROBABILISTIC ROBOTICS: http://www.probabilistic-robotics.org/
+.. _FastSLAM Lecture: http://ais.informatik.uni-freiburg.de/teaching/ws12/mapping/pdf/slam10-fastslam.pdf
