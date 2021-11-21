@@ -45,7 +45,10 @@ noise with zero mean and covariance matrix :math:`\Omega_j^{-1}`; we
 refer to :math:`\Omega_j` as the *information matrix* for measurement
 :math:`j`. That is,
 
-.. math:: p(\mathbf{z}_j \ | \ \mathbf{p}_1, \ldots, \mathbf{p}_N) = \eta_j \exp \left( (-\mathbf{e}_j(\mathbf{z}_j, \hat{\mathbf{z}}_j))^{\scriptstyle{\mathsf{T}}}\Omega_j \mathbf{e}_j(\mathbf{z}_j, \hat{\mathbf{z}}_j) \right), \label{eq:observation_probability}
+.. math::
+    \begin{align}
+    p(\mathbf{z}_j \ | \ \mathbf{p}_1, \ldots, \mathbf{p}_N) = \eta_j \exp \left( (-\mathbf{e}_j(\mathbf{z}_j, \hat{\mathbf{z}}_j))^{\scriptstyle{\mathsf{T}}}\Omega_j \mathbf{e}_j(\mathbf{z}_j, \hat{\mathbf{z}}_j) \right) \label{observation_probability} \tag{1}
+    \end{align}
 
 where :math:`\eta_j` is the normalization constant.
 
@@ -66,7 +69,7 @@ Using Bayes’ rule, we can write this probability as
 since :math:`p(\mathcal{Z})` is a constant (albeit, an unknown constant)
 and we assume that :math:`p(\mathbf{p}_1, \ldots, \mathbf{p}_N)` is
 uniformly distributed `PROBABILISTIC ROBOTICS`_. Therefore, we
-can use `[eq:observation_probability] <#eq:observation_probability>`__
+can use eq:(:math:`\ref{observation_probability}`) and
 and `[eq:bayes] <#eq:bayes>`__ to simplify the Graph SLAM optimization
 as follows:
 

@@ -168,8 +168,6 @@ different data sources into a single optimization problem.
 .. figure:: graphSLAM_SE2_example_files/Graph_SLAM_optimization.gif
    :alt: Graph_SLAM_optimization.gif
 
-   Graph_SLAM_optimization.gif
-
 .. code:: ipython3
 
     g.plot(title="Optimized")

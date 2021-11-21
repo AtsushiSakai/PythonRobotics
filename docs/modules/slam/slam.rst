@@ -21,23 +21,9 @@ Ref:
 
 -  `Introduction to Mobile Robotics: Iterative Closest Point Algorithm`_
 
-EKF SLAM
---------
-
-This is an Extended Kalman Filter based SLAM example.
-
-The blue line is ground truth, the black line is dead reckoning, the red
-line is the estimated trajectory with EKF SLAM.
-
-The green crosses are estimated landmarks.
-
-|4|
 
 .. include:: ekf_slam.rst
 
-Ref:
-
--  `PROBABILISTIC ROBOTICS`_
 
 .. include:: FastSLAM1.rst
 
