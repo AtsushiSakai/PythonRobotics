@@ -57,7 +57,7 @@ pose estimates. These edges can be classified into two categories:
    odometry data.
 2. Scan-matching edges constrain two non-consecutive vertices. These
    scan matches can be computed using, for example, 2-D LiDAR data or
-   landmarks; the details of how these contstraints are determined is
+   landmarks; the details of how these constraints are determined is
    beyond the scope of this example. This is often referred to as *loop
    closure* in the Graph SLAM literature.
 

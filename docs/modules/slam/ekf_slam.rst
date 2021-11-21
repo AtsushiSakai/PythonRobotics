@@ -1,11 +1,3 @@
-.. code:: ipython3
-
-    from IPython.display import Image
-    Image(filename="animation.png",width=600)
-
-
-
-
 .. image:: ekf_slam_files/ekf_slam_1_0.png
    :width: 600px
 
@@ -37,7 +29,7 @@ are also tracked.
 
 A single estimate of the pose is tracked over time, while the confidence
 in the pose is tracked by the covariance matrix :math:`P`. :math:`P` is
-a symmetric square matrix whith each element in the matrix corresponding
+a symmetric square matrix which each element in the matrix corresponding
 to the covariance between two parts of the system. For example,
 :math:`\sigma_{xy}` represents the covariance between the belief of
 :math:`x` and :math:`y` and is equal to :math:`\sigma_{yx}`.
@@ -87,7 +79,7 @@ Take care to note the difference between :math:`X` (state) and :math:`x`
     
     show_animation = True
 
-Algorithm Walkthrough
+Algorithm Walk through
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 At each time step, the following is done. - predict the new state using
@@ -123,7 +115,7 @@ the estimated state and measurements
 
 **Predict State update:** The following equations describe the predicted
 motion model of the robot in case we provide only the control
-:math:`(v,w)`, which are the linear and angular velocity repsectively.
+:math:`(v,w)`, which are the linear and angular velocity respectively.
 
 :math:`\begin{equation*} F= \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix} \end{equation*}`
 
@@ -136,8 +128,8 @@ motion model of the robot in case we provide only the control
 :math:`\begin{equation*} \begin{bmatrix} x_{t+1} \\ y_{t+1} \\ \theta_{t+1} \end{bmatrix}= \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}\begin{bmatrix} x_{t} \\ y_{t} \\ \theta_{t} \end{bmatrix}+ \begin{bmatrix} \Delta t cos(\theta) & 0\\ \Delta t sin(\theta) & 0\\ 0 & \Delta t \end{bmatrix} \begin{bmatrix} v_{t} + \sigma_v\\ w_{t} + \sigma_w\\ \end{bmatrix} \end{equation*}`
 
 Notice that while :math:`U` is only defined by :math:`v_t` and
-:math:`w_t`, in the actual calcuations, a :math:`+\sigma_v` and
-:math:`+\sigma_w` appear. These values represent the error bewteen the
+:math:`w_t`, in the actual calculations, a :math:`+\sigma_v` and
+:math:`+\sigma_w` appear. These values represent the error between the
 given control inputs and the actual control inputs.
 
 As a result, the simulation is set up as the following. :math:`R`
