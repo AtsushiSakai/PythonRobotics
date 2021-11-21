@@ -24,7 +24,7 @@ EKF, UKF, particle filters, and so on, the graph technique formulates
 the SLAM as an optimization problem. It is mostly used to solve the full
 SLAM problem in an offline fashion, i.e. optimize all the poses of the
 robot after the path has been traversed. However, some variants are
-availble that uses graph-based approaches to perform online estimation
+available that uses graph-based approaches to perform online estimation
 or to solve for a subset of the poses.
 
 GraphSLAM uses the motion information as well as the observations of the
@@ -38,7 +38,7 @@ The following example illustrates the main idea behind graphSLAM. A
 simple case of a 1D robot is considered that can only move in 1
 direction. The robot is commanded to move forward with a control input
 :math:`u_t=1`, however, the motion is not perfect and the measured
-odometry will deviate from the true path. At each timestep the robot can
+odometry will deviate from the true path. At each time step the robot can
 observe its environment, for this simple case as well, there is only a
 single landmark at coordinates :math:`x=3`. The measured observations
 are the range between the robot and landmark. These measurements are
