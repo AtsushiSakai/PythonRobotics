@@ -155,13 +155,13 @@ values incorporate the error into the estimation.
 The implementation of the motion model prediciton code is shown in
 ``motion_model``. The ``observation`` function shows how the simulation
 uses (or doesn’t use) the process noise ``Rsim`` to the find the ground
-truth and dead reckoning estimtates of the pose.
+truth and dead reckoning estimates of the pose.
 
 **Predict covariance:** Add the state covariance to the the current
 uncertainty of the EKF. At each time step, the uncertainty in the system
 grows by the covariance of the pose, :math:`Cx`.
 
-$ P = G^TPG + Cx $
+:math:`P = G^TPG + Cx`
 
 Notice this uncertainty is only growing with respect to the pose, not
 the landmarks.
@@ -173,7 +173,7 @@ the landmarks.
         Performs the prediction step of EKF SLAM
         
         :param xEst: nx1 state vector
-        :param PEst: nxn covariacne matrix
+        :param PEst: nxn covariance matrix
         :param u:    2x1 control vector
         :returns:    predicted state vector, predicted covariance, jacobian of control vector, transition fx
         """
@@ -193,7 +193,7 @@ the landmarks.
         
         :param x: 3x1 pose estimation
         :param u: 2x1 control input [v; w]
-        :returns: the resutling state after the control function is applied
+        :returns: the resulting state after the control function is applied
         """
         F = np.array([[1.0, 0, 0],
                       [0, 1.0, 0],
@@ -224,7 +224,7 @@ difference between the observation and the observation that *should*
 have been made if the observation were made from the pose predicted in
 the predict stage.
 
-$ y = z_t - h(X) $
+:math:`y = z_t - h(X)`
 
 With the innovation calculated, the question becomes which to trust more
 - the observations or the predictions? To determine this, we calculate
@@ -232,16 +232,15 @@ the Kalman Gain - a percent of how much of the innovation to add to the
 prediction based on the uncertainty in the predict step and the update
 step.
 
-$ K =
-:math:`\bar{P_t}H_t\ :sup:T(H_t:raw-latex:\bar{P_t}H_t\ T + Q_t)^{-1}`
+:math:`K = \bar{P_t}H_t^T(H_t\bar{P_t}H_t^T + Q_t)^{-1}`
 In these equations, :math:`H` is the jacobian of the
 measurement function. The multiplications by :math:`H^T` and :math:`H`
 represent the application of the delta to the measurement covariance.
 Intuitively, this equation is applying the following from the single
 variate Kalman equation but in the multivariate form, i.e. finding the
-ratio of the uncertianty of the process compared the measurment.
+ratio of the uncertainty of the process compared the measurement.
 
-$ K = :raw-latex:`\frac{\bar{P_t}}{\bar{P_t} + Q_t}` $
+K = :math:`\frac{\bar{P_t}}{\bar{P_t} + Q_t}`
 
 If :math:`Q_t << \bar{P_t}`, (i.e. the measurement covariance is low
 relative to the current estimate), then the Kalman gain will be
@@ -254,12 +253,12 @@ measurement.
 
 The update is captured in the following.
 
-$ xUpdate = xEst + (K \* y) $
+:math:`xUpdate = xEst + (K * y)`
 
 Of course, the covariance must also be updated as well to account for
 the changing uncertainty.
 
-$ P_{t} = (I-K_tH_t):raw-latex:`\bar`{P_t} $
+:math:`P_{t} = (I-K_tH_t)\bar{P_t}`
 
 .. code:: ipython3
 
@@ -357,9 +356,9 @@ Observation Step
 
 The observation step described here is outside the main EKF SLAM process
 and is primarily used as a method of driving the simulation. The
-observations funciton is in charge of calcualting how the poses of the
+observations function is in charge of calculating how the poses of the
 robots change and accumulate error over time, and the theoretical
-measuremnts that are expected as a result of each measurement.
+measurements that are expected as a result of each measurement.
 
 Observations are based on the TRUE position of the robot. Error in dead
 reckoning and control functions are passed along here as well.
@@ -443,7 +442,7 @@ reckoning and control functions are passed along here as well.
 
     def calc_LM_Pos(x, z):
         """
-        Calcualtes the pose in the world coordinate frame of a landmark at the given measurement. 
+        Calculates the pose in the world coordinate frame of a landmark at the given measurement.
     
         :param x: [x; y; theta]
         :param z: [range; bearing]

@@ -208,12 +208,11 @@ Graph Optimization
 ^^^^^^^^^^^^^^^^^^
 
 The result from this formulation yields an overdetermined system of
-equations. The goal after constructing the graph is to find: $x^\* =
-:raw-latex:`\underset{x}{\mathrm{argmin}}` ~ :raw-latex:`\underset{ij}`
-:raw-latex:`\Sigma `~ f(e_{ij}) $, where :math:`f` is some error
-function that depends on the edges between to related nodes :math:`i`
-and :math:`j`. The derivation in the references arrive at the solution
-for :math:`x^* = H^{-1}b`
+equations. The goal after constructing the graph is to find:
+:math:`x^*=\underset{x}{\mathrm{argmin}}~\underset{ij}\Sigma~f(e_{ij})`,
+where :math:`f` is some error function that depends on the edges between
+to related nodes :math:`i` and :math:`j`. The derivation in the references
+arrive at the solution for :math:`x^* = H^{-1}b`
 
 Planar Example:
 ^^^^^^^^^^^^^^^
@@ -327,16 +326,12 @@ construction -> optimization -> estimate update.
 
 
 In the following code snippet the error based on the virtual measurement
-between node 0 and 1 will be created. The equations for the error is as
-follows: $e_{ij}^x = x_j + d_j cos(:raw-latex:`\psi`\_j +
-:raw-latex:`\theta`\_j) - x_i - d_i cos(:raw-latex:`\psi`\_i +
-:raw-latex:`\theta`\_i) $
+between node 0 and 1 will be created. The equations for the error is as follows:
+:math:`e_{ij}^x = x_j + d_j cos(\psi_j +\theta_j) - x_i - d_i cos(\psi_i + \theta_i)`
 
-$e_{ij}^y = y_j + d_j sin(:raw-latex:`\psi`\_j + :raw-latex:`\theta`\_j)
-- y_i - d_i sin(:raw-latex:`\psi`\_i + :raw-latex:`\theta`\_i) $
+:math:`e_{ij}^y = y_j + d_j sin(\psi_j + \theta_j) - y_i - d_i sin(\psi_i + \theta_i)`
 
-$e_{ij}^x = :raw-latex:`\psi`\_j + :raw-latex:`\theta`\_j -
-:raw-latex:`\psi`\_i - :raw-latex:`\theta`\_i $
+:math:`e_{ij}^x = \psi_j + \theta_j - \psi_i - \theta_i`
 
 Where :math:`[x_i, y_i, \psi_i]` is the pose for node :math:`i` and
 similarly for node :math:`j`, :math:`d` is the measured distance at
@@ -345,8 +340,7 @@ bearing to the landmark. The difference is visualized with the figure in
 the next cell.
 
 In case of perfect motion and perfect measurement the error shall be
-zero since $ x_j + d_j cos(:raw-latex:`\psi`\_j +
-:raw-latex:`\theta`\_j)$ should equal
+zero since :math:`x_j + d_j cos(\psi_j + \theta_j)` should equal
 :math:`x_i + d_i cos(\psi_i + \theta_i)`
 
 .. code:: ipython3
