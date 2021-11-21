@@ -540,3 +540,6 @@ References
 -  `PROBABILISTIC ROBOTICS`_
 
 -  `FastSLAM Lecture`_
+
+.. _PROBABILISTIC ROBOTICS: http://www.probabilistic-robotics.org/
+.. _FastSLAM Lecture: http://ais.informatik.uni-freiburg.de/teaching/ws12/mapping/pdf/slam10-fastslam.pdf

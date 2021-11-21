@@ -587,3 +587,7 @@ References:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  `PROBABILISTIC ROBOTICS`_
+
+.. _PROBABILISTIC ROBOTICS: http://www.probabilistic-robotics.org/
+
+.. |4| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/EKFSLAM/animation.gif

@@ -46,9 +46,8 @@ refer to :math:`\Omega_j` as the *information matrix* for measurement
 :math:`j`. That is,
 
 .. math::
-    \begin{align}
-    p(\mathbf{z}_j \ | \ \mathbf{p}_1, \ldots, \mathbf{p}_N) = \eta_j \exp \left( (-\mathbf{e}_j(\mathbf{z}_j, \hat{\mathbf{z}}_j))^{\scriptstyle{\mathsf{T}}}\Omega_j \mathbf{e}_j(\mathbf{z}_j, \hat{\mathbf{z}}_j) \right) \label{observation_probability} \tag{1}
-    \end{align}
+    p(\mathbf{z}_j \ | \ \mathbf{p}_1, \ldots, \mathbf{p}_N) = \eta_j \exp (-\mathbf{e}_j(\mathbf{z}_j, \hat{\mathbf{z}}_j))^{\mathsf{T}}\Omega_j \mathbf{e}_j(\mathbf{z}_j, \hat{\mathbf{z}}_j)
+    :label: infomat
 
 where :math:`\eta_j` is the normalization constant.
 
@@ -63,15 +62,15 @@ Using Bayes’ rule, we can write this probability as
 .. math::
     \begin{aligned}
        p(\mathbf{p}_1, \ldots, \mathbf{p}_N \ | \ \mathcal{Z}) &= \frac{p( \mathcal{Z} \ | \ \mathbf{p}_1, \ldots, \mathbf{p}_N) p(\mathbf{p}_1, \ldots, \mathbf{p}_N) }{ p(\mathcal{Z}) } \notag \\
-       &\propto p( \mathcal{Z} \ | \ \mathbf{p}_1, \ldots, \mathbf{p}_N), \label{bayes} \tag{2}
+       &\propto p( \mathcal{Z} \ | \ \mathbf{p}_1, \ldots, \mathbf{p}_N)
     \end{aligned}
+    :label: bayes
 
 since :math:`p(\mathcal{Z})` is a constant (albeit, an unknown constant)
 and we assume that :math:`p(\mathbf{p}_1, \ldots, \mathbf{p}_N)` is
 uniformly distributed `PROBABILISTIC ROBOTICS`_. Therefore, we
-can use eq:(:math:`\ref{observation_probability}`) and
-and eq:(:math:`\ref{bayes}`) to simplify the Graph SLAM optimization
-as follows:
+can use Eq. :eq:`infomat` and and Eq. :eq:`bayes` to simplify the Graph SLAM
+optimization as follows:
 
 .. math::
 
@@ -169,23 +168,25 @@ of pose :math:`\mathbf{p}_i \in \mathcal{M}`, and let
 
 We will solve this optimization problem iteratively. Let
 
-.. math:: \mathbf{x}^{k+1} := \mathbf{x}^k \boxplus \Delta \mathbf{x}^k = \begin{bmatrix} \mathbf{x}_1 \boxplus \Delta \mathbf{x}_1 \\ \mathbf{x}_2 \boxplus \Delta \mathbf{x}_2 \\ \vdots \\ \mathbf{x}_N \boxplus \Delta \mathbf{x}_2 \end{bmatrix} \label{eq:update}
+.. math:: \mathbf{x}^{k+1} := \mathbf{x}^k \boxplus \Delta \mathbf{x}^k = \begin{bmatrix} \mathbf{x}_1 \boxplus \Delta \mathbf{x}_1 \\ \mathbf{x}_2 \boxplus \Delta \mathbf{x}_2 \\ \vdots \\ \mathbf{x}_N \boxplus \Delta \mathbf{x}_2 \end{bmatrix}
+    :label: update
 
 The :math:`\chi^2` error at iteration :math:`k+1` is
 
-.. math:: \chi_{k+1}^2 = \sum_{e_j \in \mathcal{E}} \underbrace{\left[ \mathbf{e}_j(\mathbf{x}^{k+1}) \right]^{\scriptstyle{\mathsf{T}}}}_{1 \times \bullet} \underbrace{\Omega_j}_{\bullet \times \bullet} \underbrace{\mathbf{e}_j(\mathbf{x}^{k+1})}_{\bullet \times 1}.  \label{eq:chisq_at_kplusone}
+.. math:: \chi_{k+1}^2 = \sum_{e_j \in \mathcal{E}} \underbrace{\left[ \mathbf{e}_j(\mathbf{x}^{k+1}) \right]^{\scriptstyle{\mathsf{T}}}}_{1 \times \bullet} \underbrace{\Omega_j}_{\bullet \times \bullet} \underbrace{\mathbf{e}_j(\mathbf{x}^{k+1})}_{\bullet \times 1}.
+    :label: chisq_at_kplusone
 
 We will linearize the residuals as:
 
 .. math::
+    \begin{aligned}
+        \mathbf{e}_j(\mathbf{x}^{k+1}) &= \mathbf{e}_j(\mathbf{x}^k \boxplus \Delta \mathbf{x}^k) \\
+        &\approx \mathbf{e}_j(\mathbf{x}^{k}) + \frac{\partial}{\partial \Delta \mathbf{x}^k} \left[ \mathbf{e}_j(\mathbf{x}^k \boxplus \Delta \mathbf{x}^k) \right] \Delta \mathbf{x}^k \\
+        &= \mathbf{e}_j(\mathbf{x}^{k}) + \left( \left. \frac{\partial \mathbf{e}_j(\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)}{\partial (\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)} \right|_{\Delta \mathbf{x}^k = \mathbf{0}} \right) \frac{\partial (\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)}{\partial \Delta \mathbf{x}^k} \Delta \mathbf{x}^k.
+    \end{aligned}
+    :label: linearization
 
-   \begin{aligned}
-       \mathbf{e}_j(\mathbf{x}^{k+1}) &= \mathbf{e}_j(\mathbf{x}^k \boxplus \Delta \mathbf{x}^k) \notag \\
-       &\approx \mathbf{e}_j(\mathbf{x}^{k}) + \frac{\partial}{\partial \Delta \mathbf{x}^k} \left[ \mathbf{e}_j(\mathbf{x}^k \boxplus \Delta \mathbf{x}^k) \right] \Delta \mathbf{x}^k \notag \\
-       &= \mathbf{e}_j(\mathbf{x}^{k}) + \left( \left. \frac{\partial \mathbf{e}_j(\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)}{\partial (\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)} \right|_{\Delta \mathbf{x}^k = \mathbf{0}} \right) \frac{\partial (\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)}{\partial \Delta \mathbf{x}^k} \Delta \mathbf{x}^k.  \label{eq:linearization}\end{aligned}
-
-Plugging `[eq:linearization] <#eq:linearization>`__ into
-`[eq:chisq_at_kplusone] <#eq:chisq_at_kplusone>`__, we get:
+Plugging :eq:`linearization` into :eq:`chisq_at_kplusone`, we get:
 
 .. math::
 
@@ -207,8 +208,7 @@ Using this notation, we obtain the optimal update as
 
 .. math:: \Delta \mathbf{x}^k = -H^{-1} \mathbf{b}.  \label{eq:deltax}
 
-We apply this update to the poses via `[eq:update] <#eq:update>`__ and
-repeat until convergence.
+We apply this update to the poses via :eq:`update` and repeat until convergence.
 
 
 .. _PROBABILISTIC ROBOTICS: http://www.probabilistic-robotics.org/
