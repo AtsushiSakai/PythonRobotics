@@ -61,16 +61,16 @@ other words, we want to find
 Using Bayes’ rule, we can write this probability as
 
 .. math::
-
-   \begin{aligned}
+    \begin{aligned}
        p(\mathbf{p}_1, \ldots, \mathbf{p}_N \ | \ \mathcal{Z}) &= \frac{p( \mathcal{Z} \ | \ \mathbf{p}_1, \ldots, \mathbf{p}_N) p(\mathbf{p}_1, \ldots, \mathbf{p}_N) }{ p(\mathcal{Z}) } \notag \\
-       &\propto p( \mathcal{Z} \ | \ \mathbf{p}_1, \ldots, \mathbf{p}_N), \label{eq:bayes}\end{aligned}
+       &\propto p( \mathcal{Z} \ | \ \mathbf{p}_1, \ldots, \mathbf{p}_N), \label{bayes} \tag{2}
+    \end{aligned}
 
 since :math:`p(\mathcal{Z})` is a constant (albeit, an unknown constant)
 and we assume that :math:`p(\mathbf{p}_1, \ldots, \mathbf{p}_N)` is
 uniformly distributed `PROBABILISTIC ROBOTICS`_. Therefore, we
 can use eq:(:math:`\ref{observation_probability}`) and
-and `[eq:bayes] <#eq:bayes>`__ to simplify the Graph SLAM optimization
+and eq:(:math:`\ref{bayes}`) to simplify the Graph SLAM optimization
 as follows:
 
 .. math::
