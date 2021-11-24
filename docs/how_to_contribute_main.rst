@@ -56,12 +56,26 @@ Step 4: Write a document about the algorithm
 ----------------------------------------------
 
 
+
 .. _`submit a pull request`:
 
 Step 5: Submit a pull request and fix codes based on review
 ------------------------------------------------------------
 
-Please fix all issues on CI (All CI should be green), before code review.
+Let's submit a pull request when your code, test, and doc are ready.
+
+At first, please fix all CI errors before code review.
+
+You can check your PR doc from the CI panel.
+
+After the "ci/circleci: build_doc" CI is succeeded,
+you can access you PR doc with clicking the [Details] of the "ci/circleci: build_doc artifact" CI.
+
+.. image:: /_static/img/doc_ci.png
+
+After that, I will start the review.
+
+Note that this is my hobby project; I appreciate your patience during the review process.
 
 Reporting and fixing a defect
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
