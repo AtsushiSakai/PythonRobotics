@@ -27,13 +27,28 @@ In that case, please share any papers or documentations to implement it.
 Step 2: Implement the algorithm with matplotlib based animation
 ----------------------------------------------------------------
 
-This project only accept codes for python 3.9 or higher.
+When you implement an algorithm, please keep the following items in mind.
+
+1. Use only Python. Other language code is not acceptable.
+
+2. This project only accept codes for python 3.9 or higher.
+
+3. Use matplotlib based animation to show how the algorithm works.
+
+4. Only using current :ref:`Requirements` libraries for your code, not adding new dependencies.
+
+5. Keep simple your code. The main goal is to make it easy for users to understand the algorithm, not for practical usage.
+
+
 
 Step 3: Add a unittest
 ----------------------
-If you add a new algorithm sample code, please add a unit test file under `tests` dir.
+If you add a new algorithm sample code, please add a unit test file under `tests dir`_.
 
-This sample test code might help you : https://github.com/AtsushiSakai/PythonRobotics/blob/master/tests/test_a_star.py
+This sample test code might help you : `test_a_star.py`_.
+
+At the least, try to run the example code without animation in the unit test.
+
 
 .. _`how to write doc`:
 
@@ -82,4 +97,6 @@ This doc `how to write doc`_ can be helpful to write documents.
 
 .. _`Python Robotics Docs`: https://pythonrobotics.readthedocs.io/en/latest/
 .. _`bug labeled issues`: https://github.com/AtsushiSakai/PythonRobotics/issues?q=is%3Aissue+is%3Aopen+label%3Abug
+.. _`tests dir`: https://github.com/AtsushiSakai/PythonRobotics/tree/master/tests
+.. _`test_a_star.py`: https://github.com/AtsushiSakai/PythonRobotics/blob/master/tests/test_a_star.py
 
