@@ -40,7 +40,6 @@ When you implement an algorithm, please keep the following items in mind.
 5. Keep simple your code. The main goal is to make it easy for users to understand the algorithm, not for practical usage.
 
 
-
 Step 3: Add a unittest
 ----------------------
 If you add a new algorithm sample code, please add a unit test file under `tests dir`_.
@@ -58,7 +57,7 @@ Please add a document to describe the algorithm details, mathematical background
 
 This project is using `Sphinx`_ as a document builder, all documentations are written by `reStructuredText`_.
 
-You can add a new rst file under the subdirectory in `doc modules dir`_ and the top rst file include it.
+You can add a new rst file under the subdirectory in `doc modules dir`_ and the top rst file can include it.
 
 Please check other documents for details.
 
@@ -85,6 +84,7 @@ After that, I will start the review.
 
 Note that this is my hobby project; I appreciate your patience during the review process.
 
+
 Reporting and fixing a defect
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -105,6 +105,7 @@ If you fix a bug of existing codes, please add a test function
 in the test code to show the issue was solved.
 
 This doc `submit a pull request`_ can be helpful to submit a pull request.
+
 
 Adding missed documentations for existing examples
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
