@@ -96,17 +96,17 @@ See this paper for more details:
 
 For running each sample code:
 
-- Python 3.9.x
+- [Python 3.9.x](https://www.python.org/)
+ 
+- [NumPy](https://numpy.org/)
+ 
+- [SciPy](https://scipy.org/)
+ 
+- [Matplotlib](https://matplotlib.org/)
+ 
+- [pandas](https://pandas.pydata.org/)
 
-- numpy
-
-- scipy
-
-- matplotlib
-
-- pandas
-
-- [cvxpy](https://www.cvxpy.org/index.html) 
+- [cvxpy](https://www.cvxpy.org/) 
 
 For development:
   
