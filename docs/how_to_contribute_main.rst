@@ -12,7 +12,7 @@ Step 1: Choose an algorithm to implement
 -----------------------------------------
 
 Before choosing an algorithm, please check the :ref:`getting started` doc to
-understand this project's philosophy.
+understand this project's philosophy and setup your development environment.
 
 If an algorithm is widely used and successful, let's create an issue to
 propose it for our community.
@@ -35,7 +35,7 @@ When you implement an algorithm, please keep the following items in mind.
 
 3. Use matplotlib based animation to show how the algorithm works.
 
-4. Only using current :ref:`Requirements` libraries for your code, not adding new dependencies.
+4. Only use current :ref:`Requirements` libraries, not adding new dependencies.
 
 5. Keep simple your code. The main goal is to make it easy for users to understand the algorithm, not for practical usage.
 
@@ -54,7 +54,15 @@ At the least, try to run the example code without animation in the unit test.
 
 Step 4: Write a document about the algorithm
 ----------------------------------------------
+Please add a document to describe the algorithm details, mathematical backgrounds and show graphs and animation gif.
 
+This project is using `Sphinx`_ as a document builder, all documentations are written by `reStructuredText`_.
+
+You can add a new rst file under the subdirectory in `doc modules dir`_ and the top rst file include it.
+
+Please check other documents for details.
+
+You can build the doc locally based on `doc README`_.
 
 
 .. _`submit a pull request`:
@@ -113,4 +121,8 @@ This doc `how to write doc`_ can be helpful to write documents.
 .. _`bug labeled issues`: https://github.com/AtsushiSakai/PythonRobotics/issues?q=is%3Aissue+is%3Aopen+label%3Abug
 .. _`tests dir`: https://github.com/AtsushiSakai/PythonRobotics/tree/master/tests
 .. _`test_a_star.py`: https://github.com/AtsushiSakai/PythonRobotics/blob/master/tests/test_a_star.py
+.. _`Sphinx`: https://www.sphinx-doc.org/
+.. _`reStructuredText`: https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
+.. _`doc modules dir`: https://github.com/AtsushiSakai/PythonRobotics/tree/master/docs/modules
+.. _`doc README`: https://github.com/AtsushiSakai/PythonRobotics/blob/master/docs/README.md
 

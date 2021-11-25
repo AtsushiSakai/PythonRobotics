@@ -24,3 +24,6 @@ if you want to building each time a file is changed:
 sphinx-autobuild . _build/html
 ```
 
+#### Check the generated doc
+
+Open the index.html file under docs/_build/
