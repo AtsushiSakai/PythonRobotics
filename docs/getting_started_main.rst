@@ -1,4 +1,4 @@
-.. _getting_started:
+.. _`getting started`:
 
 Getting Started
 ===============
@@ -21,27 +21,60 @@ See this paper for more details:
 
 - PythonRobotics: a Python code collection of robotics algorithms: https://arxiv.org/abs/1808.10703
 
+.. _`Requirements`:
 
 Requirements
 -------------
 
--  Python 3.9.x
--  numpy
--  scipy
--  matplotlib
--  pandas
+-  `Python 3.9.x`_
+-  `NumPy`_
+-  `SciPy`_
+-  `Matplotlib`_
+-  `pandas`_
 -  `cvxpy`_
 
-.. _cvxpy: http://www.cvxpy.org/en/latest/
+For development:
+
+-  pytest (for unit tests)
+-  pytest-xdist (for parallel unit tests)
+-  mypy (for type check)
+-  sphinx (for document generation)
+-  pycodestyle (for code style check)
+
+.. _`Python 3.9.x`: https://www.python.org/
+.. _`NumPy`: https://numpy.org/
+.. _`SciPy`: https://scipy.org/
+.. _`Matplotlib`: https://matplotlib.org/
+.. _`pandas`: https://pandas.pydata.org/
+.. _`cvxpy`: https://www.cvxpy.org/
 
 
 How to use
 ----------
 
-1. Install the required libraries. You can use environment.yml with
-   conda command.
+1. Clone this repo and go into dir.
 
-2. Clone this repo.
+.. code-block::
+
+    >$ git clone https://github.com/AtsushiSakai/PythonRobotics.git
+
+    >$ cd PythonRobotics
+
+
+2. Install the required libraries.
+
+using conda :
+
+.. code-block::
+
+    >$ conda env create -f environment.yml
+
+using pip :
+
+.. code-block::
+
+    >$ pip install -r requirements.txt
+
 
 3. Execute python script in each directory.
 
