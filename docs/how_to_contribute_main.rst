@@ -127,19 +127,18 @@ Supporting this project financially is also a great contribution!!.
 
 If you or your company would like to support this project, please consider:
 
-- [Sponsor @AtsushiSakai on GitHub Sponsors](https://github.com/sponsors/AtsushiSakai)
+- `Sponsor @AtsushiSakai on GitHub Sponsors`_
 
-- [Become a backer or sponsor on Patreon](https://www.patreon.com/myenigma)
+- `Become a backer or sponsor on Patreon`_
 
-- [One-time donation via PayPal](https://www.paypal.me/myenigmapay/)
+- `One-time donation via PayPal`_
 
 If you would like to support us in some other way, please contact with creating an issue.
 
-## Sponsors
+Sponsors
+---------
 
-### [JetBrains](https://www.jetbrains.com/)
-
-They are providing a free license of their IDEs for this OSS development.
+1. `JetBrains`_ : They are providing a free license of their IDEs for this OSS development.
 
 
 .. _`Python Robotics Docs`: https://pythonrobotics.readthedocs.io/en/latest/
@@ -150,4 +149,9 @@ They are providing a free license of their IDEs for this OSS development.
 .. _`reStructuredText`: https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
 .. _`doc modules dir`: https://github.com/AtsushiSakai/PythonRobotics/tree/master/docs/modules
 .. _`doc README`: https://github.com/AtsushiSakai/PythonRobotics/blob/master/docs/README.md
+.. _`JetBrains`: https://www.jetbrains.com/
+.. _`Sponsor @AtsushiSakai on GitHub Sponsors`: https://github.com/sponsors/AtsushiSakai
+.. _`Become a backer or sponsor on Patreon`: https://www.patreon.com/myenigma
+.. _`One-time donation via PayPal`: https://www.paypal.me/myenigmapay/
+
 
