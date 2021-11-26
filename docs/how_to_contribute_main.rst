@@ -48,6 +48,8 @@ This sample test code might help you : `test_a_star.py`_.
 
 At the least, try to run the example code without animation in the unit test.
 
+If you want to run the test suites locally, you can use the `runtests.sh` script by just executing it.
+
 
 .. _`how to write doc`:
 
@@ -118,6 +120,27 @@ but no detailed algorithm or mathematical description.
 
 This doc `how to write doc`_ can be helpful to write documents.
 
+Supporting this project
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Supporting this project financially is also a great contribution!!.
+
+If you or your company would like to support this project, please consider:
+
+- `Sponsor @AtsushiSakai on GitHub Sponsors`_
+
+- `Become a backer or sponsor on Patreon`_
+
+- `One-time donation via PayPal`_
+
+If you would like to support us in some other way, please contact with creating an issue.
+
+Sponsors
+---------
+
+1. `JetBrains`_ : They are providing a free license of their IDEs for this OSS development.
+
+
 .. _`Python Robotics Docs`: https://pythonrobotics.readthedocs.io/en/latest/
 .. _`bug labeled issues`: https://github.com/AtsushiSakai/PythonRobotics/issues?q=is%3Aissue+is%3Aopen+label%3Abug
 .. _`tests dir`: https://github.com/AtsushiSakai/PythonRobotics/tree/master/tests
@@ -126,4 +149,9 @@ This doc `how to write doc`_ can be helpful to write documents.
 .. _`reStructuredText`: https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
 .. _`doc modules dir`: https://github.com/AtsushiSakai/PythonRobotics/tree/master/docs/modules
 .. _`doc README`: https://github.com/AtsushiSakai/PythonRobotics/blob/master/docs/README.md
+.. _`JetBrains`: https://www.jetbrains.com/
+.. _`Sponsor @AtsushiSakai on GitHub Sponsors`: https://github.com/sponsors/AtsushiSakai
+.. _`Become a backer or sponsor on Patreon`: https://www.patreon.com/myenigma
+.. _`One-time donation via PayPal`: https://www.paypal.me/myenigmapay/
+
 

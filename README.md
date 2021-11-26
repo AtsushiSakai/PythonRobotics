@@ -603,11 +603,13 @@ If this project helps your robotics project, please let me know with creating an
 
 Your robot's video, which is using PythonRobotics, is very welcome!!
 
-This is a list of other user's comment and references:[users\_comments](https://github.com/AtsushiSakai/PythonRobotics/blob/master/users_comments.md)
+This is a list of user's comment and references:[users\_comments](https://github.com/AtsushiSakai/PythonRobotics/blob/master/users_comments.md)
 
 # Contribution
 
-Any contribution is welcome!!
+Any contribution is welcome!! 
+
+Please check this document:[How to contribute](https://pythonrobotics.readthedocs.io/en/latest/how_to_contribute.html#)
 
 # Citing
 
@@ -615,7 +617,7 @@ If you use this project's code for your academic work, we encourage you to cite 
 
 If you use this project's code in industry, we'd love to hear from you as well; feel free to reach out to the developers directly.
 
-# Support
+# Supporting this project
 
 If you or your company would like to support this project, please consider:
 
@@ -627,9 +629,9 @@ If you or your company would like to support this project, please consider:
 
 If you would like to support us in some other way, please contact with creating an issue.
 
-# Sponsors
+## Sponsors
 
-## [JetBrains](https://www.jetbrains.com/)
+### [JetBrains](https://www.jetbrains.com/)
 
 They are providing a free license of their IDEs for this OSS development.   
 
