@@ -91,6 +91,9 @@ Ref:
 -  `Optimal rough terrain trajectory generation for wheeled mobile
    robots <http://journals.sagepub.com/doi/pdf/10.1177/0278364906075328>`__
 
+
+
+
 State Lattice Planning
 ----------------------
 
@@ -179,27 +182,8 @@ This is a simple path planning code with Rapidly-Exploring Random Trees
 Black circles are obstacles, green line is a searched tree, red crosses
 are start and goal positions.
 
-.. _rrt*:
-
-RRT\*
-~~~~~
-
-|10|
-
-This is a path planning code with RRT\*
-
-Black circles are obstacles, green line is a searched tree, red crosses
-are start and goal positions.
-
 .. include:: rrt_star.rst
 
-Ref:
-
--  `Incremental Sampling-based Algorithms for Optimal Motion
-   Planning <https://arxiv.org/abs/1005.0416>`__
-
--  `Sampling-based Algorithms for Optimal Motion
-   Planning <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.419.5503&rep=rep1&type=pdf>`__
 
 RRT with dubins path
 ~~~~~~~~~~~~~~~~~~~~
@@ -367,20 +351,9 @@ Ref:
    Autonomous
    Vehicles <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.294.6438&rep=rep1&type=pdf>`__
 
-Quintic polynomials planning
-----------------------------
 
-Motion planning with quintic polynomials.
+.. include:: quintic_polynomials_planner.rst
 
-|2|
-
-It can calculate 2D path, velocity, and acceleration profile based on
-quintic polynomials.
-
-Ref:
-
--  `Local Path Planning And Motion Control For Agv In
-   Positioning <http://ieeexplore.ieee.org/document/637936/>`__
 
 Dubins path planning
 --------------------
