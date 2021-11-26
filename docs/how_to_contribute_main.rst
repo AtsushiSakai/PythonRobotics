@@ -48,6 +48,8 @@ This sample test code might help you : `test_a_star.py`_.
 
 At the least, try to run the example code without animation in the unit test.
 
+If you want to run the test suites locally, you can use the `runtests.sh` script by just executing it.
+
 
 .. _`how to write doc`:
 
@@ -117,6 +119,28 @@ only have a simulation gif or short overview descriptions,
 but no detailed algorithm or mathematical description.
 
 This doc `how to write doc`_ can be helpful to write documents.
+
+Supporting this project
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Supporting this project financially is also a great contribution!!.
+
+If you or your company would like to support this project, please consider:
+
+- [Sponsor @AtsushiSakai on GitHub Sponsors](https://github.com/sponsors/AtsushiSakai)
+
+- [Become a backer or sponsor on Patreon](https://www.patreon.com/myenigma)
+
+- [One-time donation via PayPal](https://www.paypal.me/myenigmapay/)
+
+If you would like to support us in some other way, please contact with creating an issue.
+
+## Sponsors
+
+### [JetBrains](https://www.jetbrains.com/)
+
+They are providing a free license of their IDEs for this OSS development.
+
 
 .. _`Python Robotics Docs`: https://pythonrobotics.readthedocs.io/en/latest/
 .. _`bug labeled issues`: https://github.com/AtsushiSakai/PythonRobotics/issues?q=is%3Aissue+is%3Aopen+label%3Abug
