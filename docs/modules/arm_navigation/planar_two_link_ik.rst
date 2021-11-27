@@ -5,14 +5,11 @@ Two joint arm to point control
 .. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/ArmNavigation/two_joint_arm_to_point_control/animation.gif
    :alt: TwoJointArmToPointControl
 
-   TwoJointArmToPointControl
-
 This is two joint arm to a point control simulation.
 
 This is a interactive simulation.
 
-You can set the goal position of the end effector with left-click on the
-ploting area.
+You can set the goal position of the end effector with left-click on the plotting area.
 
 Inverse Kinematics for a Planar Two-Link Robotic Arm
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

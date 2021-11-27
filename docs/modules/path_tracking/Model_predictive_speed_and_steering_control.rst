@@ -15,7 +15,7 @@ AtsushiSakai/PythonRobotics <https://github.com/AtsushiSakai/PythonRobotics/blob
 This is a path tracking simulation using model predictive control (MPC).
 
 The MPC controller controls vehicle speed and steering base on
-linealized model.
+linearized model.
 
 This code uses cvxpy as an optimization modeling tool.
 

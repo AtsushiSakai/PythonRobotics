@@ -337,13 +337,13 @@ A sample code of Bezier path planning.
 
 It is based on 4 control points Beier path.
 
-|Bezier1|
+.. image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/docs/modules/path_planning/Bezier_path_planning/Figure_1.png?raw=True
 
 If you change the offset distance from start and end point,
 
 You can get different Beizer course:
 
-|Bezier2|
+.. image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/docs/modules/path_planning/Bezier_path_planning/Figure_2.png?raw=True
 
 Ref:
 
@@ -439,7 +439,6 @@ Ref:
 .. |B-Spline| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/BSplinePath/Figure_1.png?raw=True
 .. |eta3| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/Eta3SplinePath/animation.gif
 .. |Bezier1| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/BezierPath/Figure_1.png?raw=True
-.. |Bezier2| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/BezierPath/Figure_2.png?raw=True
 .. |2| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/QuinticPolynomialsPlanner/animation.gif
 .. |dubins| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DubinsPath/animation.gif?raw=True
 .. |RSPlanning| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ReedsSheppPath/animation.gif?raw=true

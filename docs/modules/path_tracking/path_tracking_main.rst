@@ -8,7 +8,7 @@ move to a pose control
 
 This is a simulation of moving to a pose control
 
-|2|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/move_to_pose/animation.gif
 
 Ref:
 
@@ -21,7 +21,7 @@ Pure pursuit tracking
 Path tracking simulation with pure pursuit steering control and PID
 speed control.
 
-|3|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/pure_pursuit/animation.gif
 
 The red line is a target course, the green cross means the target point
 for pure pursuit control, the blue line is the tracking.
@@ -37,7 +37,7 @@ Stanley control
 Path tracking simulation with Stanley steering control and PID speed
 control.
 
-|4|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/stanley_controller/animation.gif
 
 Ref:
 
@@ -53,7 +53,7 @@ Rear wheel feedback control
 Path tracking simulation with rear wheel feedback steering control and
 PID speed control.
 
-|5|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/rear_wheel_feedback/animation.gif
 
 Ref:
 
@@ -68,7 +68,7 @@ Linear–quadratic regulator (LQR) steering control
 Path tracking simulation with LQR steering control and PID speed
 control.
 
-|6|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/lqr_steer_control/animation.gif
 
 Ref:
 
@@ -82,7 +82,7 @@ Linear–quadratic regulator (LQR) speed and steering control
 
 Path tracking simulation with LQR speed and steering control.
 
-|7|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/lqr_speed_steer_control/animation.gif
 
 Ref:
 
@@ -92,16 +92,5 @@ Ref:
 
 .. include:: Model_predictive_speed_and_steering_control.rst
 
-Ref:
-
--  `notebook <https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/model_predictive_speed_and_steer_control.ipynb>`__
-
-
 .. include:: cgmres_nmpc.rst
 
-.. |2| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/move_to_pose/animation.gif
-.. |3| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/pure_pursuit/animation.gif
-.. |4| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/stanley_controller/animation.gif
-.. |5| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/rear_wheel_feedback/animation.gif
-.. |6| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/lqr_steer_control/animation.gif
-.. |7| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/lqr_speed_steer_control/animation.gif
