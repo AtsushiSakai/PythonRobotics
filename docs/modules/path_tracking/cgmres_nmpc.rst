@@ -2,59 +2,20 @@
 Nonlinear Model Predictive Control with C-GMRES
 -----------------------------------------------
 
-.. code-block:: ipython3
-
-    from IPython.display import Image
-    Image(filename="Figure_4.png",width=600)
-
-
-
-
 .. image:: cgmres_nmpc_files/cgmres_nmpc_1_0.png
    :width: 600px
-
-
-
-.. code-block:: ipython3
-
-    Image(filename="Figure_1.png",width=600)
-
-
-
 
 .. image:: cgmres_nmpc_files/cgmres_nmpc_2_0.png
    :width: 600px
 
-
-
-.. code-block:: ipython3
-
-    Image(filename="Figure_2.png",width=600)
-
-
-
-
 .. image:: cgmres_nmpc_files/cgmres_nmpc_3_0.png
    :width: 600px
-
-
-
-.. code-block:: ipython3
-
-    Image(filename="Figure_3.png",width=600)
-
-
-
 
 .. image:: cgmres_nmpc_files/cgmres_nmpc_4_0.png
    :width: 600px
 
-
-
 .. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/cgmres_nmpc/animation.gif
    :alt: gif
-
-   gif
 
 Mathematical Formulation
 ~~~~~~~~~~~~~~~~~~~~~~~~
