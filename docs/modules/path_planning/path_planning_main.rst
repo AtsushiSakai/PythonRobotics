@@ -11,7 +11,7 @@ This is a 2D navigation sample code with Dynamic Window Approach.
 -  `The Dynamic Window Approach to Collision
    Avoidance <https://www.ri.cmu.edu/pub_files/pub1/fox_dieter_1997_1/fox_dieter_1997_1.pdf>`__
 
-|DWA|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DynamicWindowApproach/animation.gif
 
 Grid based search
 -----------------
@@ -22,7 +22,7 @@ Dijkstra algorithm
 This is a 2D grid based shortest path planning with Dijkstra's
 algorithm.
 
-|Dijkstra|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/Dijkstra/animation.gif
 
 In the animation, cyan points are searched nodes.
 
@@ -33,7 +33,7 @@ A\* algorithm
 
 This is a 2D grid based shortest path planning with A star algorithm.
 
-|astar|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/AStar/animation.gif
 
 In the animation, cyan points are searched nodes.
 
@@ -46,7 +46,7 @@ D\* algorithm
 
 This is a 2D grid based shortest path planning with D star algorithm.
 
-|dstar|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DStar/animation.gif
 
 The animation shows a robot finding its path avoiding an obstacle using the D* search algorithm.
 
@@ -59,7 +59,7 @@ Potential Field algorithm
 
 This is a 2D grid based path planning with Potential Field algorithm.
 
-|PotentialField|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/PotentialFieldPlanning/animation.gif
 
 In the animation, the blue heat map shows potential value on each grid.
 
@@ -79,19 +79,17 @@ This algorithm is used for state lattice planner.
 Path optimization sample
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-|4|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ModelPredictiveTrajectoryGenerator/kn05animation.gif
 
 Lookup table generation sample
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-|5|
+.. image:: model_predictive_trajectry_generator/lookuptable.png
 
 Ref:
 
 -  `Optimal rough terrain trajectory generation for wheeled mobile
    robots <http://journals.sagepub.com/doi/pdf/10.1177/0278364906075328>`__
-
-
 
 
 State Lattice Planning
@@ -114,24 +112,24 @@ Ref:
 Uniform polar sampling
 ~~~~~~~~~~~~~~~~~~~~~~
 
-|6|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/StateLatticePlanner/UniformPolarSampling.gif
 
 Biased polar sampling
 ~~~~~~~~~~~~~~~~~~~~~
 
-|7|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/StateLatticePlanner/BiasedPolarSampling.gif
 
 Lane sampling
 ~~~~~~~~~~~~~
 
-|8|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/StateLatticePlanner/LaneSampling.gif
 
 .. _probabilistic-road-map-(prm)-planning:
 
 Probabilistic Road-Map (PRM) planning
 -------------------------------------
 
-|PRM|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ProbabilisticRoadMap/animation.gif
 
 This PRM planner uses Dijkstra method for graph search.
 
@@ -151,7 +149,7 @@ Ref:
 Voronoi Road-Map planning
 -------------------------
 
-|VRM|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/VoronoiRoadMap/animation.gif
 
 This Voronoi road-map planner uses Dijkstra method for graph search.
 
@@ -174,7 +172,7 @@ Rapidly-Exploring Random Trees (RRT)
 Basic RRT
 ~~~~~~~~~
 
-|9|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRT/animation.gif
 
 This is a simple path planning code with Rapidly-Exploring Random Trees
 (RRT)
@@ -188,7 +186,7 @@ are start and goal positions.
 RRT with dubins path
 ~~~~~~~~~~~~~~~~~~~~
 
-|PythonRobotics|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTDubins/animation.gif
 
 Path planning for a car robot with RRT and dubins path planner.
 
@@ -197,7 +195,7 @@ Path planning for a car robot with RRT and dubins path planner.
 RRT\* with dubins path
 ~~~~~~~~~~~~~~~~~~~~~~
 
-|AtsushiSakai/PythonRobotics|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTStarDubins/animation.gif
 
 Path planning for a car robot with RRT\* and dubins path planner.
 
@@ -206,7 +204,7 @@ Path planning for a car robot with RRT\* and dubins path planner.
 RRT\* with reeds-sheep path
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-|11|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTStarReedsShepp/animation.gif
 
 Path planning for a car robot with RRT\* and reeds sheep path planner.
 
@@ -215,7 +213,7 @@ Path planning for a car robot with RRT\* and reeds sheep path planner.
 Informed RRT\*
 ~~~~~~~~~~~~~~
 
-|irrt|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/InformedRRTStar/animation.gif
 
 This is a path planning code with Informed RRT*.
 
@@ -232,7 +230,7 @@ Ref:
 Batch Informed RRT\*
 ~~~~~~~~~~~~~~~~~~~~
 
-|irrt2|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/BatchInformedRRTStar/animation.gif
 
 This is a path planning code with Batch Informed RRT*.
 
@@ -249,7 +247,7 @@ Closed Loop RRT\*
 
 A vehicle model based path planning with closed loop RRT*.
 
-|CLRRT|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ClosedLoopRRTStar/animation.gif
 
 In this code, pure-pursuit algorithm is used for steering control,
 
@@ -275,7 +273,7 @@ This is a path planning simulation with LQR-RRT*.
 
 A double integrator motion model is used for LQR local planner.
 
-|LQRRRT|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/LQRRRTStar/animation.gif
 
 Ref:
 
@@ -297,14 +295,14 @@ with cubic spline.
 
 Heading angle of each point can be also calculated analytically.
 
-|12|
-|13|
-|14|
+.. image:: cubic_spline/Figure_1.png
+.. image:: cubic_spline/Figure_2.png
+.. image:: cubic_spline/Figure_3.png
 
 B-Spline planning
 -----------------
 
-|B-Spline|
+.. image:: bspline_path/Figure_1.png
 
 This is a path planning with B-Spline curse.
 
@@ -321,7 +319,7 @@ Ref:
 Eta^3 Spline path planning
 --------------------------
 
-|eta3|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/Eta3SplinePath/animation.gif
 
 This is a path planning with Eta^3 spline.
 
@@ -360,7 +358,7 @@ Dubins path planning
 
 A sample code for Dubins path planning.
 
-|dubins|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DubinsPath/animation.gif?raw=True
 
 Ref:
 
@@ -372,7 +370,7 @@ Reeds Shepp planning
 
 A sample code with Reeds Shepp path planning.
 
-|RSPlanning|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ReedsSheppPath/animation.gif?raw=true
 
 Ref:
 
@@ -390,12 +388,12 @@ LQR based path planning
 
 A sample code using LQR based path planning for double integrator model.
 
-|RSPlanning2|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/LQRPlanner/animation.gif?raw=true
 
 Optimal Trajectory in a Frenet Frame
 ------------------------------------
 
-|15|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/FrenetOptimalTrajectory/animation.gif
 
 This is optimal trajectory generation in a Frenet Frame.
 
@@ -412,35 +410,3 @@ Ref:
 -  `Optimal trajectory generation for dynamic street scenarios in a
    Frenet Frame <https://www.youtube.com/watch?v=Cj6tAQe7UCY>`__
 
-.. |DWA| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DynamicWindowApproach/animation.gif
-.. |Dijkstra| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/Dijkstra/animation.gif
-.. |astar| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/AStar/animation.gif
-.. |dstar| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DStar/animation.gif
-.. |PotentialField| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/PotentialFieldPlanning/animation.gif
-.. |4| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ModelPredictiveTrajectoryGenerator/kn05animation.gif
-.. |5| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/ModelPredictiveTrajectoryGenerator/lookuptable.png?raw=True
-.. |6| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/StateLatticePlanner/UniformPolarSampling.gif
-.. |7| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/StateLatticePlanner/BiasedPolarSampling.gif
-.. |8| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/StateLatticePlanner/LaneSampling.gif
-.. |PRM| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ProbabilisticRoadMap/animation.gif
-.. |VRM| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/VoronoiRoadMap/animation.gif
-.. |9| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRT/animation.gif
-.. |10| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTstar/animation.gif
-.. |PythonRobotics| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTDubins/animation.gif
-.. |AtsushiSakai/PythonRobotics| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTStarDubins/animation.gif
-.. |11| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTStarReedsShepp/animation.gif
-.. |irrt| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/InformedRRTStar/animation.gif
-.. |irrt2| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/BatchInformedRRTStar/animation.gif
-.. |CLRRT| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ClosedLoopRRTStar/animation.gif
-.. |LQRRRT| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/LQRRRTStar/animation.gif
-.. |12| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/CubicSpline/Figure_1.png?raw=True
-.. |13| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/CubicSpline/Figure_2.png?raw=True
-.. |14| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/CubicSpline/Figure_3.png?raw=True
-.. |B-Spline| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/BSplinePath/Figure_1.png?raw=True
-.. |eta3| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/Eta3SplinePath/animation.gif
-.. |Bezier1| image:: https://github.com/AtsushiSakai/PythonRobotics/raw/master/PathPlanning/BezierPath/Figure_1.png?raw=True
-.. |2| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/QuinticPolynomialsPlanner/animation.gif
-.. |dubins| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DubinsPath/animation.gif?raw=True
-.. |RSPlanning| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ReedsSheppPath/animation.gif?raw=true
-.. |RSPlanning2| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/LQRPlanner/animation.gif?raw=true
-.. |15| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/FrenetOptimalTrajectory/animation.gif

@@ -4,7 +4,7 @@ Quintic polynomials planning
 
 Motion planning with quintic polynomials.
 
-|2|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/QuinticPolynomialsPlanner/animation.gif
 
 It can calculate 2D path, velocity, and acceleration profile based on
 quintic polynomials.
