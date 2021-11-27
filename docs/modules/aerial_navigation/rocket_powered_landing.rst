@@ -1,3 +1,5 @@
+Rocket powered landing
+-----------------------------
 
 Simulation
 ~~~~~~~~~~
@@ -31,8 +33,6 @@ Simulation
 
 .. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/AerialNavigation/rocket_powered_landing/animation.gif
    :alt: gif
-
-   gif
 
 Equation generation
 ~~~~~~~~~~~~~~~~~~~
@@ -145,8 +145,8 @@ Equation generation
 
 
 
-Ref
-~~~
+References
+~~~~~~~~~~
 
 -  Python implementation of ‘Successive Convexification for 6-DoF Mars
    Rocket Powered Landing with Free-Final-Time’ paper by Michael Szmuk
