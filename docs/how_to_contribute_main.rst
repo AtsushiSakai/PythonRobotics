@@ -1,4 +1,4 @@
-How to contribute
+How To Contribute
 =================
 
 This document describes how to contribute this project.

@@ -1,6 +1,6 @@
 .. _path_tracking:
 
-Path tracking
+Path Tracking
 =============
 
 move to a pose control
