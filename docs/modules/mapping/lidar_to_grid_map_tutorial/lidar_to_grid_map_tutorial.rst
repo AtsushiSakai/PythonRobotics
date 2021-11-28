@@ -1,3 +1,7 @@
+Lidar to grid map
+--------------------
+
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/lidar_to_grid_map/animation.gif
 
 This simple tutorial shows how to read LIDAR (range) measurements from a
 file and convert it to occupancy grid.
@@ -12,8 +16,7 @@ a ``numpy array``, and numbers close to 1 means the cell is occupied
 free (*marked with green*). The grid has the ability to represent
 unknown (unobserved) areas, which are close to 0.5.
 
-.. figure:: lidar_to_grid_map_tutorial_files/grid_map_example.png
-   :alt: Example
+.. figure:: lidar_to_grid_map_tutorial/grid_map_example.png
 
 In order to construct the grid map from the measurement we need to
 discretise the values. But, first let’s need to ``import`` some
@@ -65,7 +68,7 @@ From the distances and the angles it is easy to determine the ``x`` and
 
 
 
-.. image:: lidar_to_grid_map_tutorial_files/lidar_to_grid_map_tutorial_5_0.png
+.. image:: lidar_to_grid_map_tutorial/lidar_to_grid_map_tutorial_5_0.png
 
 
 The ``lidar_to_grid_map.py`` contains handy functions which can used to
@@ -86,7 +89,7 @@ map. Let’s see how this works.
 
 
 
-.. image:: lidar_to_grid_map_tutorial_files/lidar_to_grid_map_tutorial_7_0.png
+.. image:: lidar_to_grid_map_tutorial/lidar_to_grid_map_tutorial_7_0.png
 
 
 .. code:: ipython3
@@ -103,7 +106,7 @@ map. Let’s see how this works.
 
 
 
-.. image:: lidar_to_grid_map_tutorial_files/lidar_to_grid_map_tutorial_8_0.png
+.. image:: lidar_to_grid_map_tutorial/lidar_to_grid_map_tutorial_8_0.png
 
 
 To fill empty areas, a queue-based algorithm can be used that can be
@@ -160,7 +163,7 @@ from a center point (e.g. (10, 20)) with zeros:
 
 
 
-.. image:: lidar_to_grid_map_tutorial_files/lidar_to_grid_map_tutorial_12_0.png
+.. image:: lidar_to_grid_map_tutorial/lidar_to_grid_map_tutorial_12_0.png
 
 
 Let’s use this flood fill on real data:
@@ -191,5 +194,5 @@ Let’s use this flood fill on real data:
 
 
 
-.. image:: lidar_to_grid_map_tutorial_files/lidar_to_grid_map_tutorial_14_1.png
+.. image:: lidar_to_grid_map_tutorial/lidar_to_grid_map_tutorial_14_1.png
 
