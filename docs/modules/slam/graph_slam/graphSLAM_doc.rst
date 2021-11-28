@@ -543,11 +543,11 @@ Similarly, :math:`B = \frac{\partial e_{ij}}{\partial \boldsymbol{x}_j}`
 The references:
 ^^^^^^^^^^^^^^^
 
--  http://robots.stanford.edu/papers/thrun.graphslam.pdf
+-  `The GraphSLAM Algorithm with Applications to Large-Scale Mapping of Urban Structures <http://robots.stanford.edu/papers/thrun.graphslam.pdf>`_
 
--  http://ais.informatik.uni-freiburg.de/teaching/ss13/robotics/slides/16-graph-slam.pdf
+-  `Introduction to Mobile Robotics Graph-Based SLAM <http://ais.informatik.uni-freiburg.de/teaching/ss13/robotics/slides/16-graph-slam.pdf>`_
 
--  http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf
+-  `A Tutorial on Graph-Based SLAM < http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf>`_
 
 N.B. An additional step is required that uses the estimated path to
 update the belief regarding the map.
