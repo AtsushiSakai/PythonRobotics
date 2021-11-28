@@ -48,7 +48,7 @@ jobs:
           mypy -p AerialNavigation
           mypy -p ArmNavigation
           mypy -p Bipedal
-          mypy -p InvertedPendulumCart
+          mypy -p Control
           mypy -p Localization
           mypy -p Mapping
           mypy -p PathPlanning

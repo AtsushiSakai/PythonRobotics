@@ -8,7 +8,6 @@ Extended Kalman Filter Localization
 
 
 .. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/extended_kalman_filter/animation.gif
-   :alt: EKF
 
 This is a sensor fusion localization with Extended Kalman Filter(EKF).
 
