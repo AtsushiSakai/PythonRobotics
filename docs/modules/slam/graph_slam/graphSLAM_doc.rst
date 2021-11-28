@@ -547,7 +547,7 @@ The references:
 
 -  `Introduction to Mobile Robotics Graph-Based SLAM <http://ais.informatik.uni-freiburg.de/teaching/ss13/robotics/slides/16-graph-slam.pdf>`_
 
--  `A Tutorial on Graph-Based SLAM < http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf>`_
+-  `A Tutorial on Graph-Based SLAM <http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf>`_
 
 N.B. An additional step is required that uses the estimated path to
 update the belief regarding the map.
