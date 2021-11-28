@@ -2,8 +2,7 @@
 FastSLAM1.0
 -----------
 
-.. image:: FastSLAM1_files/FastSLAM1_1_0.png
-   :width: 600px
+.. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/FastSLAM1/animation.gif
 
 
 
@@ -11,6 +10,9 @@ Simulation
 ~~~~~~~~~~
 
 This is a feature based SLAM example using FastSLAM 1.0.
+
+.. image:: FastSLAM1/FastSLAM1_1_0.png
+   :width: 600px
 
 The blue line is ground truth, the black line is dead reckoning, the red
 line is the estimated trajectory with FastSLAM.
@@ -20,8 +22,6 @@ The red points are particles of FastSLAM.
 Black points are landmarks, blue crosses are estimated landmark
 positions by FastSLAM.
 
-.. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/FastSLAM1/animation.gif
-   :alt: gif
 
 Introduction
 ~~~~~~~~~~~~
@@ -527,19 +527,13 @@ indices
 
 
 
-.. image:: FastSLAM1_files/FastSLAM1_12_0.png
-
-
-
-.. image:: FastSLAM1_files/FastSLAM1_12_1.png
+.. image:: FastSLAM1/FastSLAM1_12_0.png
+.. image:: FastSLAM1/FastSLAM1_12_1.png
 
 
 References
 ~~~~~~~~~~
 
--  `PROBABILISTIC ROBOTICS`_
+- `PROBABILISTIC ROBOTICS <http://www.probabilistic-robotics.org/>`_
 
--  `FastSLAM Lecture`_
-
-.. _PROBABILISTIC ROBOTICS: http://www.probabilistic-robotics.org/
-.. _FastSLAM Lecture: http://ais.informatik.uni-freiburg.de/teaching/ws12/mapping/pdf/slam10-fastslam.pdf
+-  `FastSLAM Lecture <http://ais.informatik.uni-freiburg.de/teaching/ws12/mapping/pdf/slam10-fastslam.pdf>`_
