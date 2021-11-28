@@ -3,94 +3,11 @@
 Path Tracking
 =============
 
-move to a pose control
-----------------------
-
-This is a simulation of moving to a pose control
-
-.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/move_to_pose/animation.gif
-
-Ref:
-
--  `P. I. Corke, "Robotics, Vision and Control" \| SpringerLink
-   p102 <https://link.springer.com/book/10.1007/978-3-642-20144-8>`__
-
-Pure pursuit tracking
----------------------
-
-Path tracking simulation with pure pursuit steering control and PID
-speed control.
-
-.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/pure_pursuit/animation.gif
-
-The red line is a target course, the green cross means the target point
-for pure pursuit control, the blue line is the tracking.
-
-Ref:
-
--  `A Survey of Motion Planning and Control Techniques for Self-driving
-   Urban Vehicles <https://arxiv.org/abs/1604.07446>`__
-
-Stanley control
----------------
-
-Path tracking simulation with Stanley steering control and PID speed
-control.
-
-.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/stanley_controller/animation.gif
-
-Ref:
-
--  `Stanley: The robot that won the DARPA grand
-   challenge <http://robots.stanford.edu/papers/thrun.stanley05.pdf>`__
-
--  `Automatic Steering Methods for Autonomous Automobile Path
-   Tracking <https://www.ri.cmu.edu/pub_files/2009/2/Automatic_Steering_Methods_for_Autonomous_Automobile_Path_Tracking.pdf>`__
-
-Rear wheel feedback control
----------------------------
-
-Path tracking simulation with rear wheel feedback steering control and
-PID speed control.
-
-.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/rear_wheel_feedback/animation.gif
-
-Ref:
-
--  `A Survey of Motion Planning and Control Techniques for Self-driving
-   Urban Vehicles <https://arxiv.org/abs/1604.07446>`__
-
-.. _linearquadratic-regulator-(lqr)-steering-control:
-
-Linear–quadratic regulator (LQR) steering control
--------------------------------------------------
-
-Path tracking simulation with LQR steering control and PID speed
-control.
-
-.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/lqr_steer_control/animation.gif
-
-Ref:
-
--  `ApolloAuto/apollo: An open autonomous driving
-   platform <https://github.com/ApolloAuto/apollo>`__
-
-.. _linearquadratic-regulator-(lqr)-speed-and-steering-control:
-
-Linear–quadratic regulator (LQR) speed and steering control
------------------------------------------------------------
-
-Path tracking simulation with LQR speed and steering control.
-
-.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/lqr_speed_steer_control/animation.gif
-
-Ref:
-
--  `Towards fully autonomous driving: Systems and algorithms - IEEE
-   Conference
-   Publication <http://ieeexplore.ieee.org/document/5940562/>`__
-
-.. include:: Model_predictive_speed_and_steering_control.rst
-
-.. include:: cgmres_nmpc.rst
+.. include:: pure_pursuit_tracking/pure_pursuit_tracking.rst
+.. include:: stanley_control/stanley_control.rst
+.. include:: rear_wheel_feedback_control/rear_wheel_feedback_control.rst
+.. include:: lqr_steering_control/lqr_steering_control.rst
+.. include:: lqr_speed_and_steering_control/lqr_speed_and_steering_control.rst
+.. include:: model_predictive_speed_and_steering_control/model_predictive_speed_and_steering_control.rst
+.. include:: cgmres_nmpc/cgmres_nmpc.rst
 

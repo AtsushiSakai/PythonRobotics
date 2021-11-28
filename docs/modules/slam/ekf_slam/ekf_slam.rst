@@ -8,7 +8,7 @@ line is the estimated trajectory with EKF SLAM.
 
 The green crosses are estimated landmarks.
 
-|4|
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/EKFSLAM/animation.gif
 
 Simulation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -581,13 +581,11 @@ reckoning and control functions are passed along here as well.
     New LM
     New LM
 
-.. image:: ekf_slam_files/ekf_slam_1_0.png
+.. image:: ekf_slam/ekf_slam_1_0.png
 
 References:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  `PROBABILISTIC ROBOTICS`_
+- `PROBABILISTIC ROBOTICS <http://www.probabilistic-robotics.org/>`_
 
-.. _PROBABILISTIC ROBOTICS: http://www.probabilistic-robotics.org/
 
-.. |4| image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/EKFSLAM/animation.gif

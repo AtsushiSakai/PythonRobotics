@@ -142,7 +142,7 @@ created based on the information of the motion and the observation.
 
 
 
-.. image:: graphSLAM_doc_files/graphSLAM_doc_2_0.png
+.. image:: graph_slam/graphSLAM_doc_files/graphSLAM_doc_2_0.png
 
 
 .. parsed-literal::
@@ -157,7 +157,7 @@ created based on the information of the motion and the observation.
 
 
 
-.. image:: graphSLAM_doc_files/graphSLAM_doc_2_2.png
+.. image:: graph_slam/graphSLAM_doc_files/graphSLAM_doc_2_2.png
 
 
 In particular, the tasks are split into 2 parts, graph construction, and
@@ -289,7 +289,7 @@ robot with 3DoF, namely, :math:`[x, y, \theta]^T`
 
 
 
-.. image:: graphSLAM_doc_files/graphSLAM_doc_4_0.png
+.. image:: graph_slam/graphSLAM_doc_files/graphSLAM_doc_4_0.png
 
 
 .. code:: ipython3
@@ -420,7 +420,7 @@ zero since :math:`x_j + d_j cos(\psi_j + \theta_j)` should equal
 
 
 
-.. image:: graphSLAM_doc_files/graphSLAM_doc_9_1.png
+.. image:: graph_slam/graphSLAM_doc_files/graphSLAM_doc_9_1.png
 
 
 Since the constraints equations derived before are non-linear,
@@ -494,12 +494,9 @@ Similarly, :math:`B = \frac{\partial e_{ij}}{\partial \boldsymbol{x}_j}`
 
 
 
-.. image:: graphSLAM_doc_files/graphSLAM_doc_11_1.png
+.. image:: graph_slam/graphSLAM_doc_files/graphSLAM_doc_11_1.png
 
-
-
-.. image:: graphSLAM_doc_files/graphSLAM_doc_11_2.png
-
+.. image:: graph_slam/graphSLAM_doc_files/graphSLAM_doc_11_2.png
 
 .. code:: ipython3
 
@@ -546,11 +543,11 @@ Similarly, :math:`B = \frac{\partial e_{ij}}{\partial \boldsymbol{x}_j}`
 The references:
 ^^^^^^^^^^^^^^^
 
--  http://robots.stanford.edu/papers/thrun.graphslam.pdf
+-  `The GraphSLAM Algorithm with Applications to Large-Scale Mapping of Urban Structures <http://robots.stanford.edu/papers/thrun.graphslam.pdf>`_
 
--  http://ais.informatik.uni-freiburg.de/teaching/ss13/robotics/slides/16-graph-slam.pdf
+-  `Introduction to Mobile Robotics Graph-Based SLAM <http://ais.informatik.uni-freiburg.de/teaching/ss13/robotics/slides/16-graph-slam.pdf>`_
 
--  http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf
+-  `A Tutorial on Graph-Based SLAM <http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf>`_
 
 N.B. An additional step is required that uses the estimated path to
 update the belief regarding the map.
