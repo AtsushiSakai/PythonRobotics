@@ -7,4 +7,4 @@ pytest == 6.2.5 # For unit test
 pytest-xdist == 2.4.0 # For unit test
 sphinx < 4.0 # For sphinx documentation
 sphinx_rtd_theme == 1.0.0
-IPython == 7.29.0 # For sphinx documentation
+IPython == 7.30.0 # For sphinx documentation
