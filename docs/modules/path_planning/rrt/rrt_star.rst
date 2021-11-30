@@ -2,7 +2,6 @@ RRT\*
 ~~~~~
 
 .. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTstar/animation.gif
-   :alt: gif
 
 This is a path planning code with RRT\*
 
@@ -11,7 +10,7 @@ Black circles are obstacles, green line is a searched tree, red crosses are star
 Simulation
 ^^^^^^^^^^
 
-.. image:: rrt_star_files/rrt_star_1_0.png
+.. image:: rrt/rrt_star/rrt_star_1_0.png
    :width: 600px
 
 
