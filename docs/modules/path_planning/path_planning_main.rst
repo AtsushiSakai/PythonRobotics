@@ -4,6 +4,7 @@ Path Planning
 =============
 
 .. include:: dynamic_window_approach/dynamic_window_approach.rst
+.. include:: bugplanner/bugplanner.rst
 .. include:: grid_base_search/grid_base_search.rst
 .. include:: model_predictive_trajectory_generator/model_predictive_trajectory_generator.rst
 .. include:: state_lattice_planner/state_lattice_planner.rst
@@ -18,6 +19,6 @@ Path Planning
 .. include:: dubins_path/dubins_path.rst
 .. include:: reeds_shepp_path/reeds_shepp_path.rst
 .. include:: lqr_path/lqr_path.rst
+.. include:: hybridastar/hybridastar.rst
 .. include:: frenet_frame_path/frenet_frame_path.rst
-
-
+.. include:: coverage_path/coverage_path.rst
