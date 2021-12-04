@@ -9,6 +9,7 @@ Path Planning
 .. include:: model_predictive_trajectory_generator/model_predictive_trajectory_generator.rst
 .. include:: state_lattice_planner/state_lattice_planner.rst
 .. include:: prm_planner/prm_planner.rst
+.. include:: visibility_road_map_planner/visibility_road_map_planner.rst
 .. include:: vrm_planner/vrm_planner.rst
 .. include:: rrt/rrt.rst
 .. include:: cubic_spline/cubic_spline.rst
