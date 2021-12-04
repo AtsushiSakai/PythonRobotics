@@ -19,6 +19,8 @@ This is a 2D grid based path planning with Depth first search algorithm.
 
 In the animation, cyan points are searched nodes.
 
+.. _dijkstra:
+
 Dijkstra algorithm
 ~~~~~~~~~~~~~~~~~~
 
