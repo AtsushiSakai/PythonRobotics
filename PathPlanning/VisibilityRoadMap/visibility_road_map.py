@@ -29,8 +29,8 @@ class VisibilityRoadMap:
 
     def planning(self, start_x, start_y, goal_x, goal_y, obstacles):
 
-        nodes = self.generate_visibility_nodes(start_x, start_y, goal_x, goal_y,
-                                               obstacles)
+        nodes = self.generate_visibility_nodes(start_x, start_y,
+                                               goal_x, goal_y, obstacles)
 
         road_map_info = self.generate_road_map_info(nodes, obstacles)
 
@@ -48,7 +48,8 @@ class VisibilityRoadMap:
 
         return rx, ry
 
-    def generate_visibility_nodes(self, start_x, start_y, goal_x, goal_y, obstacles):
+    def generate_visibility_nodes(self, start_x, start_y, goal_x, goal_y,
+                                  obstacles):
 
         # add start and goal as nodes
         nodes = [DijkstraSearch.Node(start_x, start_y),
@@ -209,8 +210,8 @@ def main():
         plt.axis("equal")
         plt.pause(1.0)
 
-    rx, ry = VisibilityRoadMap(expand_distance, do_plot=show_animation).planning(
-        sx, sy, gx, gy, obstacles)
+    rx, ry = VisibilityRoadMap(expand_distance, do_plot=show_animation)\
+        .planning(sx, sy, gx, gy, obstacles)
 
     if show_animation:  # pragma: no cover
         plt.plot(rx, ry, "-r")
