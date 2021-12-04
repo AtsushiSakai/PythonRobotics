@@ -3,6 +3,8 @@ Visibility Road-Map planner
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/VisibilityRoadMap/animation.gif
 
+`[Code] <https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/VisibilityRoadMap/visibility_road_map.py>`_
+
 This visibility road-map planner uses Dijkstra method for graph search.
 
 In the animation, the black lines are polygon obstacles,
