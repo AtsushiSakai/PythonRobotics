@@ -20,8 +20,8 @@ Kp_beta = -3
 dt = 0.01
 
 # Robot specifications
-_MAX_LINEAR_SPEED = 15
-_MAX_ANGULAR_SPEED = 7
+MAX_LINEAR_SPEED = 15
+MAX_ANGULAR_SPEED = 7
 
 show_animation = True
 
@@ -67,11 +67,11 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
         if alpha > np.pi / 2 or alpha < -np.pi / 2:
             v = -v
 
-        if abs(v) > _MAX_LINEAR_SPEED:
-            v = v/abs(v) * _MAX_LINEAR_SPEED 
+        if abs(v) > MAX_LINEAR_SPEED:
+            v = v/abs(v) * MAX_LINEAR_SPEED 
 
-        if abs(w) > _MAX_ANGULAR_SPEED:
-            w = w/abs(w) * _MAX_ANGULAR_SPEED
+        if abs(w) > MAX_ANGULAR_SPEED:
+            w = w/abs(w) * MAX_ANGULAR_SPEED
 
         theta = theta + w * dt
         x = x + v * np.cos(theta) * dt
