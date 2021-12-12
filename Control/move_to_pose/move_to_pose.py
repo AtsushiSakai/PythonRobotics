@@ -68,10 +68,10 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
             v = -v
 
         if abs(v) > MAX_LINEAR_SPEED:
-            v = v/abs(v) * MAX_LINEAR_SPEED 
+            v = np.sign(v) * MAX_LINEAR_SPEED
 
         if abs(w) > MAX_ANGULAR_SPEED:
-            w = w/abs(w) * MAX_ANGULAR_SPEED
+            w = np.sign(w) * MAX_ANGULAR_SPEED
 
         theta = theta + w * dt
         x = x + v * np.cos(theta) * dt
