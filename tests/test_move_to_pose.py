@@ -9,8 +9,8 @@ def test_1():
 
 def test_2():
     """
-    This unit test tests the move_to_pose.py program for a random
-    MAX_LINEAR_SPEED and MAX_ANGULAR_SPEED
+    This unit test tests the move_to_pose.py program for a MAX_LINEAR_SPEED and
+    MAX_ANGULAR_SPEED
     """
     m.show_animation = False
     m.MAX_LINEAR_SPEED = 11
