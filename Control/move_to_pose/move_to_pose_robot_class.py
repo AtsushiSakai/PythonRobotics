@@ -45,7 +45,7 @@ class PathFinderController:
 
 class Robot:
     """Robot class"""
-    instances = []
+    instances = [] # type: List[<Robot>]
 
     def __init__(self, name, color, max_linear_speed, max_angular_speed,
                  path_finder_controller):
