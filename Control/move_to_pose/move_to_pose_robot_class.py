@@ -6,7 +6,7 @@ Author: Daniel Ingram (daniel-s-ingram)
         Atsushi Sakai(@Atsushi_twi)
         Seied Muhammad Yazdian (@Muhammad-Yazdian)
 
-P. I. Corke, "Robotics, Vision & Control", Springer 2017, ISBN 978-3-319-54413-7
+P.I. Corke, "Robotics, Vision & Control", Springer 2017, ISBN 978-3-319-54413-7
 
 """
 
@@ -112,10 +112,10 @@ def run_simulation(robots):
     """
     rho is the distance between the robot and the target position
     alpha is the angle to the target relative to the heading of the robot
-    beta is the angle between the robot's position and the target position plus 
+    beta is the angle between the robot's position and the target position plus
     the target angle
 
-    Kp_rho*rho and Kp_alpha*alpha drive the robot along a line towards the 
+    Kp_rho*rho and Kp_alpha*alpha drive the robot along a line towards the
     target
     Kp_beta*beta rotates the line so that it is parallel to the target angle
     """
