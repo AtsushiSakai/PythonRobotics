@@ -45,7 +45,6 @@ class PathFinderController:
 
 class Robot:
     """Robot class"""
-    instances = [] # type: List[Robot]
 
     def __init__(self, name, color, max_linear_speed, max_angular_speed,
                  path_finder_controller):
@@ -61,7 +60,6 @@ class Robot:
         self.pose_start = Pose(0, 0, 0)
         self.pose_target = Pose(0, 0, 0)
         self.is_at_target = False
-        self.__class__.instances.append(self)
 
     def set_start_target_poses(self, pose_start, pose_target):
         self.pose_start = copy.copy(pose_start)
@@ -232,7 +230,12 @@ def main():
     robot_2.set_start_target_poses(pose_start_2, pose_target)
     robot_3.set_start_target_poses(pose_start_3, pose_target)
 
-    run_simulation(Robot.instances)
+    robots: list[Robot] = []
+    robots.append(robot_1)
+    robots.append(robot_2)
+    robots.append(robot_3)
+
+    run_simulation(robots)
 
 
 if __name__ == '__main__':
