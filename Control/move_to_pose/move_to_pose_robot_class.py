@@ -3,7 +3,7 @@
 Move to specified pose (with Robot class)
 
 Author: Daniel Ingram (daniel-s-ingram)
-        Atsushi Sakai(@Atsushi_twi)
+        Atsushi Sakai (@Atsushi_twi)
         Seied Muhammad Yazdian (@Muhammad-Yazdian)
 
 P.I. Corke, "Robotics, Vision & Control", Springer 2017, ISBN 978-3-319-54413-7
@@ -12,7 +12,6 @@ P.I. Corke, "Robotics, Vision & Control", Springer 2017, ISBN 978-3-319-54413-7
 
 import matplotlib.pyplot as plt
 import numpy as np
-from random import random
 import copy
 
 # Simulation parameters
@@ -20,6 +19,9 @@ TIME_DURATION = 1000
 TIME_STEP = 0.01
 AT_TARGET_ACCEPTANCE_THRESHOULD = 0.01
 SHOW_ANIMATION = True
+PLOT_WINDOW_SIZE_X = 20
+PLOT_WINDOW_SIZE_Y = 20
+PLOT_FONT_SIZE = 8
 
 simulation_running = True
 all_robots_are_at_target = False
@@ -123,10 +125,6 @@ def run_simulation(robots):
     global all_robots_are_at_target
     global simulation_running
 
-    PLOT_WINDOW_SIZE_X = 20
-    PLOT_WINDOW_SIZE_Y = 20
-    PLOT_FONT_SIZE = 8
-
     robot_names = []
     for instance in robots:
         robot_names.append(instance.name)
@@ -192,9 +190,9 @@ def plot_vehicle(x, y, theta, x_traj, y_traj, color):
     p3_i = np.array([-0.5, -0.25, 1]).T
 
     T = transformation_matrix(x, y, theta)
-    p1 = np.matmul(T, p1_i)
-    p2 = np.matmul(T, p2_i)
-    p3 = np.matmul(T, p3_i)
+    p1 = T @ p1_i
+    p2 = T @ p2_i
+    p3 = T @ p3_i
 
     plt.plot([p1[0], p2[0]], [p1[1], p2[1]], color+'-')
     plt.plot([p2[0], p3[0]], [p2[1], p3[1]], color+'-')
