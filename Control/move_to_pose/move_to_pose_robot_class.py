@@ -17,7 +17,7 @@ import copy
 # Simulation parameters
 TIME_DURATION = 1000
 TIME_STEP = 0.01
-AT_TARGET_ACCEPTANCE_THRESHOULD = 0.01
+AT_TARGET_ACCEPTANCE_THRESHOLD = 0.01
 SHOW_ANIMATION = True
 PLOT_WINDOW_SIZE_X = 20
 PLOT_WINDOW_SIZE_Y = 20
@@ -76,7 +76,7 @@ class Robot:
         y_diff = self.pose_target.y - self.pose.y
         rho = np.hypot(x_diff, y_diff)
 
-        if(rho < AT_TARGET_ACCEPTANCE_THRESHOULD):
+        if rho < AT_TARGET_ACCEPTANCE_THRESHOLD:
             self.is_at_target = True
 
         # Restrict alpha and beta (angle differences) to the range
@@ -130,12 +130,12 @@ def run_simulation(robots):
         robot_names.append(instance.name)
 
     time = 0
-    while (simulation_running and time < TIME_DURATION):
+    while simulation_running and time < TIME_DURATION:
         time += TIME_STEP
         robots_are_at_target = []
 
         for instance in robots:
-            if(not instance.is_at_target):
+            if not instance.is_at_target:
                 instance.move(TIME_STEP)
             robots_are_at_target.append(instance.is_at_target)
 
