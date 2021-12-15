@@ -13,6 +13,7 @@ P.I. Corke, "Robotics, Vision & Control", Springer 2017, ISBN 978-3-319-54413-7
 import matplotlib.pyplot as plt
 import numpy as np
 import copy
+from move_to_pose import PathFinderController
 
 # Simulation parameters
 TIME_DURATION = 1000
@@ -34,15 +35,6 @@ class Pose:
         self.x = x
         self.y = y
         self.theta = theta
-
-
-class PathFinderController:
-    """Path finder controller"""
-
-    def __init__(self, Kp_rho, Kp_alpha, Kp_beta):
-        self.Kp_rho = Kp_rho
-        self.Kp_alpha = Kp_alpha
-        self.Kp_beta = Kp_beta
 
 
 class Robot:

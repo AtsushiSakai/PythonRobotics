@@ -13,10 +13,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 from random import random
 
+
+class PathFinderController:
+    """Path finder controller"""
+
+    def __init__(self, Kp_rho, Kp_alpha, Kp_beta):
+        self.Kp_rho = Kp_rho
+        self.Kp_alpha = Kp_alpha
+        self.Kp_beta = Kp_beta
+
+
 # simulation parameters
-Kp_rho = 9
-Kp_alpha = 15
-Kp_beta = -3
+controller = PathFinderController(9, 15, -3)
 dt = 0.01
 
 # Robot specifications
@@ -61,8 +69,8 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
                  - theta + np.pi) % (2 * np.pi) - np.pi
         beta = (theta_goal - theta - alpha + np.pi) % (2 * np.pi) - np.pi
 
-        v = Kp_rho * rho
-        w = Kp_alpha * alpha + Kp_beta * beta
+        v = controller.Kp_rho * rho
+        w = controller.Kp_alpha * alpha + controller.Kp_beta * beta
 
         if alpha > np.pi / 2 or alpha < -np.pi / 2:
             v = -v
