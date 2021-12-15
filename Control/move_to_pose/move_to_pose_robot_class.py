@@ -228,10 +228,7 @@ def main():
     robot_2.set_start_target_poses(pose_start_2, pose_target)
     robot_3.set_start_target_poses(pose_start_3, pose_target)
 
-    robots: list[Robot] = []
-    robots.append(robot_1)
-    robots.append(robot_2)
-    robots.append(robot_3)
+    robots: list[Robot] = [robot_1, robot_2, robot_3]
 
     run_simulation(robots)
 
