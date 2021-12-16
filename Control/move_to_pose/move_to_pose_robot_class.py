@@ -64,28 +64,14 @@ class Robot:
         self.x_traj.append(self.pose.x)
         self.y_traj.append(self.pose.y)
 
-        x_diff = self.pose_target.x - self.pose.x
-        y_diff = self.pose_target.y - self.pose.y
-        rho = np.hypot(x_diff, y_diff)
+        rho, linear_velocity, angular_velocity = \
+            self.path_finder_controller.update_command(
+                self.pose_target.x - self.pose.x, 
+                self.pose_target.y - self.pose.y, 
+                self.pose.theta, self.pose_target.theta)
 
         if rho < AT_TARGET_ACCEPTANCE_THRESHOLD:
             self.is_at_target = True
-
-        # Restrict alpha and beta (angle differences) to the range
-        # [-pi, pi] to prevent unstable behavior e.g. difference going
-        # from 0 rad to 2*pi rad with slight turn
-
-        alpha = (np.arctan2(y_diff, x_diff)
-                 - self.pose.theta + np.pi) % (2 * np.pi) - np.pi
-        beta = (self.pose_target.theta - self.pose.theta - alpha
-                + np.pi) % (2 * np.pi) - np.pi
-
-        linear_velocity = self.path_finder_controller.Kp_rho * rho
-        angular_velocity = (self.path_finder_controller.Kp_alpha * alpha
-                            - self.path_finder_controller.Kp_beta * beta)
-
-        if alpha > np.pi / 2 or alpha < -np.pi / 2:
-            linear_velocity = -linear_velocity
 
         if abs(linear_velocity) > self.MAX_LINEAR_SPEED:
             linear_velocity = (np.sign(linear_velocity)
@@ -208,9 +194,9 @@ def main():
     pose_start_2 = Pose(5, 2, 0)
     pose_start_3 = Pose(5, 2, 0)
 
-    controller_1 = PathFinderController(9, 15, 3)
-    controller_2 = PathFinderController(9, 30, 3)
-    controller_3 = PathFinderController(18, 30, 1)
+    controller_1 = PathFinderController(5, 8, 2)
+    controller_2 = PathFinderController(5, 16, 4)
+    controller_3 = PathFinderController(10, 25, 6)
 
     robot_1 = Robot("Yellow Robot", "y", 12, 5, controller_1)
     robot_2 = Robot("Black Robot", "k", 16, 5, controller_2)
