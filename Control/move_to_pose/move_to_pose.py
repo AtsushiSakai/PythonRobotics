@@ -24,13 +24,13 @@ class PathFinderController:
 
     def update_command(self, x_diff, y_diff, theta, theta_goal):
         """Updates the command linera and angular velocities"""
-        
+
         rho = np.hypot(x_diff, y_diff)
 
         # Restrict alpha and beta (angle differences) to the range
         # [-pi, pi] to prevent unstable behavior e.g. difference going
         # from 0 rad to 2*pi rad with slight turn
-        
+
         alpha = (np.arctan2(y_diff, x_diff)
                  - theta + np.pi) % (2 * np.pi) - np.pi
         beta = (theta_goal - theta - alpha + np.pi) % (2 * np.pi) - np.pi
@@ -80,7 +80,8 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
         x_diff = x_goal - x
         y_diff = y_goal - y
 
-        rho, v, w = controller.update_command(x_diff, y_diff, theta, theta_goal)
+        rho, v, w = controller.update_command(
+            x_diff, y_diff, theta, theta_goal)
 
         if abs(v) > MAX_LINEAR_SPEED:
             v = np.sign(v) * MAX_LINEAR_SPEED
