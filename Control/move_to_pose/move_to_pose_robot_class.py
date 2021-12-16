@@ -82,7 +82,7 @@ class Robot:
 
         linear_velocity = self.path_finder_controller.Kp_rho * rho
         angular_velocity = (self.path_finder_controller.Kp_alpha * alpha
-                            + self.path_finder_controller.Kp_beta * beta)
+                            - self.path_finder_controller.Kp_beta * beta)
 
         if alpha > np.pi / 2 or alpha < -np.pi / 2:
             linear_velocity = -linear_velocity
@@ -208,9 +208,9 @@ def main():
     pose_start_2 = Pose(5, 2, 0)
     pose_start_3 = Pose(5, 2, 0)
 
-    controller_1 = PathFinderController(9, 15, -3)
-    controller_2 = PathFinderController(9, 15, -3)
-    controller_3 = PathFinderController(9, 15, -3)
+    controller_1 = PathFinderController(9, 15, 3)
+    controller_2 = PathFinderController(9, 30, 3)
+    controller_3 = PathFinderController(18, 30, 1)
 
     robot_1 = Robot("Yellow Robot", "y", 12, 5, controller_1)
     robot_2 = Robot("Black Robot", "k", 16, 5, controller_2)

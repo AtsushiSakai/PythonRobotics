@@ -24,7 +24,7 @@ class PathFinderController:
 
 
 # simulation parameters
-controller = PathFinderController(9, 15, -3)
+controller = PathFinderController(9, 15, 3)
 dt = 0.01
 
 # Robot specifications
@@ -70,7 +70,7 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
         beta = (theta_goal - theta - alpha + np.pi) % (2 * np.pi) - np.pi
 
         v = controller.Kp_rho * rho
-        w = controller.Kp_alpha * alpha + controller.Kp_beta * beta
+        w = controller.Kp_alpha * alpha - controller.Kp_beta * beta
 
         if alpha > np.pi / 2 or alpha < -np.pi / 2:
             v = -v
