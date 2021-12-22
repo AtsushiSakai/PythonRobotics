@@ -65,7 +65,7 @@ class Robot:
         self.y_traj.append(self.pose.y)
 
         rho, linear_velocity, angular_velocity = \
-            self.path_finder_controller.update_command(
+            self.path_finder_controller.calc_control_command(
                 self.pose_target.x - self.pose.x,
                 self.pose_target.y - self.pose.y,
                 self.pose.theta, self.pose_target.theta)

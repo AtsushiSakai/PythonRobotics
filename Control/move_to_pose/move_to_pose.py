@@ -22,8 +22,12 @@ class PathFinderController:
         self.Kp_alpha = Kp_alpha
         self.Kp_beta = Kp_beta
 
-    def update_command(self, x_diff, y_diff, theta, theta_goal):
-        """Updates the command linera and angular velocities"""
+    def calc_control_command(self, x_diff, y_diff, theta, theta_goal):
+        """
+        Returns the control command for the linear and angular velocities as
+        well as the distance to goal (rho)
+        
+        """
 
         rho = np.hypot(x_diff, y_diff)
 
@@ -80,7 +84,7 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
         x_diff = x_goal - x
         y_diff = y_goal - y
 
-        rho, v, w = controller.update_command(
+        rho, v, w = controller.calc_control_command(
             x_diff, y_diff, theta, theta_goal)
 
         if abs(v) > MAX_LINEAR_SPEED:
