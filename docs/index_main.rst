@@ -42,7 +42,10 @@ See this paper for more details:
    modules/path_tracking/path_tracking
    modules/arm_navigation/arm_navigation
    modules/aerial_navigation/aerial_navigation
+   modules/bipedal/bipedal
+   modules/control/control
    modules/appendix/appendix
+   how_to_contribute
 
 
 Indices and tables

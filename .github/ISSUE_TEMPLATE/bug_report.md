@@ -17,5 +17,6 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
- - Python version (This repo only supports Python 3.7.x or higher).
+ - Python version (This repo only supports Python 3.9.x or higher).
  - Each library version
+ - OS version
