@@ -44,11 +44,11 @@ class Robot:
 
     Parameters
     ----------
-    name : (string) 
+    name : (string)
         The name of the robot
-    color : (string) 
+    color : (string)
         The color of the robot
-    max_linear_speed : (float) 
+    max_linear_speed : (float)
         The maximum linear speed that the robot can go
     max_angular_speed : (float)
         The maximum angular speed that the robot can rotate about its vertical
@@ -78,9 +78,9 @@ class Robot:
 
         Parameters
         ----------
-        pose_start : (Pose) 
+        pose_start : (Pose)
             Start postion of the robot (see the Pose class)
-        pose_target : (Pose) 
+        pose_target : (Pose)
             Target postion of the robot (see the Pose class)
         """
         self.pose_start = copy.copy(pose_start)
