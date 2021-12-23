@@ -48,7 +48,7 @@ class PathFinderController:
                  in y direction
         theta : The current heading angle of robot with respect to x axis
         theta_goal: The target angle of robot with respect to x axis
-        
+
         Returns
         -------
         rho : The distance between the robot and the goal position

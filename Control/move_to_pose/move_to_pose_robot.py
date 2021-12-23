@@ -39,7 +39,7 @@ class Pose:
 
 class Robot:
     """
-    Constructs an instantiate of the 3-DOF wheeled Robot navigating on a 
+    Constructs an instantiate of the 3-DOF wheeled Robot navigating on a
     2D plane
 
     Parameters
