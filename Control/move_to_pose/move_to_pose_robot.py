@@ -38,11 +38,28 @@ class Pose:
 
 
 class Robot:
-    """Robot class"""
+    """
+    Constructs an instantiate of the 3-DOF wheeled Robot navigating on a 
+    2D plane
+
+    Parameters
+    ----------
+    name : (string) 
+        The name of the robot
+    color : (string) 
+        The color of the robot
+    max_linear_speed : (float) 
+        The maximum linear speed that the robot can go
+    max_angular_speed : (float)
+        The maximum angular speed that the robot can rotate about its vertical
+        axis
+    path_finder_controller : (PathFinderController)
+        A configurable controller to finds the path and calculates command
+        linear and angular velocities.
+    """
 
     def __init__(self, name, color, max_linear_speed, max_angular_speed,
                  path_finder_controller):
-        """Inits Robot using its general specifications"""
         self.name = name
         self.color = color
         self.MAX_LINEAR_SPEED = max_linear_speed
@@ -56,11 +73,29 @@ class Robot:
         self.is_at_target = False
 
     def set_start_target_poses(self, pose_start, pose_target):
+        """
+        Sets the start and target positions of the robot
+
+        Parameters
+        ----------
+        pose_start : (Pose) 
+            Start postion of the robot (see the Pose class)
+        pose_target : (Pose) 
+            Target postion of the robot (see the Pose class)
+        """
         self.pose_start = copy.copy(pose_start)
         self.pose_target = pose_target
         self.pose = pose_start
 
     def move(self, dt):
+        """
+        Moves the robot for one time step increment
+
+        Parameters
+        ----------
+        dt : (float)
+            time step
+        """
         self.x_traj.append(self.pose.x)
         self.y_traj.append(self.pose.y)
 
@@ -89,17 +124,7 @@ class Robot:
 
 
 def run_simulation(robots):
-    """
-    rho is the distance between the robot and the target position
-    alpha is the angle to the target relative to the heading of the robot
-    beta is the angle between the robot's position and the target position plus
-    the target angle
-
-    Kp_rho*rho and Kp_alpha*alpha drive the robot along a line towards the
-    target
-    Kp_beta*beta rotates the line so that it is parallel to the target angle
-    """
-
+    """Simulates all robots simultaneously"""
     global all_robots_are_at_target
     global simulation_running
 
