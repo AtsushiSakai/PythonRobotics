@@ -4,7 +4,7 @@ from Control.move_to_pose import move_to_pose as m
 
 def test_1():
     """
-    This unit test tests the move_to_pose_robot_class.py program
+    This unit test tests the move_to_pose_robot.py program
     """
     m.show_animation = False
     m.main()
