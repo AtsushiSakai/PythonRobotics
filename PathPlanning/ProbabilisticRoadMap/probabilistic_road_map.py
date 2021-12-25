@@ -6,7 +6,6 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import random
 import math
 import numpy as np
 import matplotlib.pyplot as plt
