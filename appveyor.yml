@@ -1,4 +1,4 @@
-os: Visual Studio 2019
+os: Visual Studio 2022
 
 environment:
   global:
