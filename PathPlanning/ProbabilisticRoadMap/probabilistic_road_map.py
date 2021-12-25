@@ -6,11 +6,10 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import random
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.spatial import cKDTree
+from scipy.spatial import KDTree
 
 # parameter
 N_SAMPLE = 500  # number of sample_points
@@ -36,19 +35,35 @@ class Node:
                str(self.cost) + "," + str(self.parent_index)
 
 
-def prm_planning(sx, sy, gx, gy, ox, oy, rr):
+def prm_planning(start_x, start_y, goal_x, goal_y,
+                 obstacle_x_list, obstacle_y_list, robot_radius, *, rng=None):
+    """
+    Run probabilistic road map planning
 
-    obstacle_kd_tree = cKDTree(np.vstack((ox, oy)).T)
+    :param start_x:
+    :param start_y:
+    :param goal_x:
+    :param goal_y:
+    :param obstacle_x_list:
+    :param obstacle_y_list:
+    :param robot_radius:
+    :param rng:
+    :return:
+    """
+    obstacle_kd_tree = KDTree(np.vstack((obstacle_x_list, obstacle_y_list)).T)
 
-    sample_x, sample_y = sample_points(sx, sy, gx, gy,
-                                       rr, ox, oy, obstacle_kd_tree)
+    sample_x, sample_y = sample_points(start_x, start_y, goal_x, goal_y,
+                                       robot_radius,
+                                       obstacle_x_list, obstacle_y_list,
+                                       obstacle_kd_tree, rng)
     if show_animation:
         plt.plot(sample_x, sample_y, ".b")
 
-    road_map = generate_road_map(sample_x, sample_y, rr, obstacle_kd_tree)
+    road_map = generate_road_map(sample_x, sample_y,
+                                 robot_radius, obstacle_kd_tree)
 
     rx, ry = dijkstra_planning(
-        sx, sy, gx, gy, road_map, sample_x, sample_y)
+        start_x, start_y, goal_x, goal_y, road_map, sample_x, sample_y)
 
     return rx, ry
 
@@ -88,13 +103,13 @@ def generate_road_map(sample_x, sample_y, rr, obstacle_kd_tree):
 
     sample_x: [m] x positions of sampled points
     sample_y: [m] y positions of sampled points
-    rr: Robot Radius[m]
+    robot_radius: Robot Radius[m]
     obstacle_kd_tree: KDTree object of obstacles
     """
 
     road_map = []
     n_sample = len(sample_x)
-    sample_kd_tree = cKDTree(np.vstack((sample_x, sample_y)).T)
+    sample_kd_tree = KDTree(np.vstack((sample_x, sample_y)).T)
 
     for (i, ix, iy) in zip(range(n_sample), sample_x, sample_y):
 
@@ -122,11 +137,11 @@ def dijkstra_planning(sx, sy, gx, gy, road_map, sample_x, sample_y):
     """
     s_x: start x position [m]
     s_y: start y position [m]
-    gx: goal x position [m]
-    gy: goal y position [m]
-    ox: x position list of Obstacles [m]
-    oy: y position list of Obstacles [m]
-    rr: robot radius [m]
+    goal_x: goal x position [m]
+    goal_y: goal y position [m]
+    obstacle_x_list: x position list of Obstacles [m]
+    obstacle_y_list: y position list of Obstacles [m]
+    robot_radius: robot radius [m]
     road_map: ??? [m]
     sample_x: ??? [m]
     sample_y: ??? [m]
@@ -215,7 +230,7 @@ def plot_road_map(road_map, sample_x, sample_y):  # pragma: no cover
                      [sample_y[i], sample_y[ind]], "-k")
 
 
-def sample_points(sx, sy, gx, gy, rr, ox, oy, obstacle_kd_tree):
+def sample_points(sx, sy, gx, gy, rr, ox, oy, obstacle_kd_tree, rng):
     max_x = max(ox)
     max_y = max(oy)
     min_x = min(ox)
@@ -223,9 +238,12 @@ def sample_points(sx, sy, gx, gy, rr, ox, oy, obstacle_kd_tree):
 
     sample_x, sample_y = [], []
 
+    if rng is None:
+        rng = np.random.default_rng()
+
     while len(sample_x) <= N_SAMPLE:
-        tx = (random.random() * (max_x - min_x)) + min_x
-        ty = (random.random() * (max_y - min_y)) + min_y
+        tx = (rng.random() * (max_x - min_x)) + min_x
+        ty = (rng.random() * (max_y - min_y)) + min_y
 
         dist, index = obstacle_kd_tree.query([tx, ty])
 
@@ -241,7 +259,7 @@ def sample_points(sx, sy, gx, gy, rr, ox, oy, obstacle_kd_tree):
     return sample_x, sample_y
 
 
-def main():
+def main(rng=None):
     print(__file__ + " start!!")
 
     # start and goal position
@@ -280,7 +298,7 @@ def main():
         plt.grid(True)
         plt.axis("equal")
 
-    rx, ry = prm_planning(sx, sy, gx, gy, ox, oy, robot_size)
+    rx, ry = prm_planning(sx, sy, gx, gy, ox, oy, robot_size, rng=rng)
 
     assert rx, 'Cannot found path'
 
