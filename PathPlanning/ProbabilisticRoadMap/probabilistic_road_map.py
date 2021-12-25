@@ -60,7 +60,8 @@ def prm_planning(start_x, start_y, goal_x, goal_y,
     if show_animation:
         plt.plot(sample_x, sample_y, ".b")
 
-    road_map = generate_road_map(sample_x, sample_y, robot_radius, obstacle_kd_tree)
+    road_map = generate_road_map(sample_x, sample_y,
+                                 robot_radius, obstacle_kd_tree)
 
     rx, ry = dijkstra_planning(
         start_x, start_y, goal_x, goal_y, road_map, sample_x, sample_y)
