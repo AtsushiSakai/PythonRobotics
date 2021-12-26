@@ -20,7 +20,7 @@ Constructs an instantiate of the PathFinderController for navigating a 3-DOF whe
 
 Parameters:
 
-- | :math:`Kp_rho` : The linear velocity gain to translate the robot along a line towards the goal
+- | :math:`Kp_{rho}` : The linear velocity gain to translate the robot along a line towards the goal
 - | :math:`Kp_alpha` : The angular velocity gain to rotate the robot towards the goal
 - | :math:`Kp_beta` : The offset angular velocity gain accounting for smooth merging to the goal angle (i.e., it helps the robot heading to be parallel to the target angle.)
 
