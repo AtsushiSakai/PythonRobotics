@@ -1,9 +1,21 @@
-Move to a pose control
+Position Control of non-Holonomic Systems
+-----------------------------------------
+
+This section explains the logic of a position controller for systems with constraint (non-Holonomic system).
+
+The position control of a 1-DOF (Degree of Freedom) system is quite straightforward. We only need to compute a position error and multiply it with a proportional gain to create a command. The actuator of the system takes this command and drive the system to the target position. This controller can be easily extended to higher dimensions (e.g., using Kp_x and Kp_y gains for a 2D position control). In these systems, the number of control commands is equal to the number of degrees of freedom (Holonomic system). 
+
+To describe the configuration of a car on a 2D plane, we need three DOFs (i.e., x, y, and theta). But to drive a car we only need two control commands (theta_engine and theta_steering_wheel). This difference is because of a constraint between the x and y DOFs. The relationship between the delta_x and delta_y is governed by the theta_steering_wheel.
+
+Note that a car is normally a non-Holonomic system but if the road is slippery, the car turns into a Holonomic system and thus it needs three independt commands to be controlled.
+
+Move to a Pose Control
 ----------------------
 
-This is a simulation of moving to a pose control.
+In this section, we present the logic of PathFinderController that drives a car from a start pose (x, y, theta) to a goal pose. A simulation of moving to a pose control is presented below.
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/move_to_pose/animation.gif
+
 
 
 PathFinderController class
