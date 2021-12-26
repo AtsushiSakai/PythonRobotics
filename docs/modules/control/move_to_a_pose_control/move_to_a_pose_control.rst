@@ -52,7 +52,7 @@ Move to a Pose Robot (Class)
 This program (move_to_pose_robot.py) provides a Robot class to define different robots with different specifications. 
 Using this class, you can simulate different robots simultaneously and compare the effect of your parameter settings.
 
-.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/move_to_pos_robot_class/animation.gif
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/move_to_pos_robot_class/animation.gif
 
 Note: The robot class is based on PathFinderController class in 'the move_to_pose.py'.
 
