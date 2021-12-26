@@ -65,6 +65,10 @@ Please check other documents for details.
 
 You can build the doc locally based on `doc README`_.
 
+Note that the `reStructuredText`_ based doc should only focus on the mathematics and the algorithm of the example.
+
+Documentations related codes should be in the python script as the header comments of the script or docstrings of each function.
+
 
 .. _`submit a pull request`:
 
