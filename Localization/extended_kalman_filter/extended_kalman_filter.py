@@ -11,6 +11,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.transform import Rotation as Rot
+import sys
 
 # Covariance for EKF simulation
 Q = np.diag([
