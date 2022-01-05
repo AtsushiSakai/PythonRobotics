@@ -39,10 +39,6 @@ jobs:
         run: pip install coverage
       - name: install mypy
         run: pip install mypy
-      - name: install pycodestyle
-        run: pip install pycodestyle
-      - name: install pytest-xdist
-        run: pip install pytest-xdist
       - name: mypy check
         run: |
           mypy -p AerialNavigation
@@ -54,12 +50,5 @@ jobs:
           mypy -p PathPlanning
           mypy -p PathTracking
           mypy -p SLAM
-      - name: do diff style check
-        run: bash rundiffstylecheck.sh
-
       - name: do all unit tests
         run: bash runtests.sh
-
-
-
-

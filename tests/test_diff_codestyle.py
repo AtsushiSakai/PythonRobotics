@@ -63,7 +63,7 @@ def run_flake8(diff):
 
 
 def test():
-    branch_commit = find_branch_point("master")
+    branch_commit = find_branch_point("origin/master")
     diff = find_diff(branch_commit)
     rc, errors = run_flake8(diff)
     if errors:
