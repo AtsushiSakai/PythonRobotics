@@ -50,6 +50,8 @@ At the least, try to run the example code without animation in the unit test.
 
 If you want to run the test suites locally, you can use the `runtests.sh` script by just executing it.
 
+The `test_diff_codestyle.py`_ check code style for your PR's codes.
+
 
 .. _`how to write doc`:
 
@@ -153,6 +155,7 @@ Sponsors
 .. _`reStructuredText`: https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
 .. _`doc modules dir`: https://github.com/AtsushiSakai/PythonRobotics/tree/master/docs/modules
 .. _`doc README`: https://github.com/AtsushiSakai/PythonRobotics/blob/master/docs/README.md
+.. _`test_diff_codestyle.py`: https://github.com/AtsushiSakai/PythonRobotics/blob/master/tests/test_diff_codestyle.py
 .. _`JetBrains`: https://www.jetbrains.com/
 .. _`Sponsor @AtsushiSakai on GitHub Sponsors`: https://github.com/sponsors/AtsushiSakai
 .. _`Become a backer or sponsor on Patreon`: https://www.patreon.com/myenigma
