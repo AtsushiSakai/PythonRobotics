@@ -10,7 +10,10 @@ import cvxpy
 import math
 import numpy as np
 import sys
-sys.path.append("../../PathPlanning/CubicSpline/")
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/../../PathPlanning/CubicSpline/")
 
 try:
     import cubic_spline_planner
