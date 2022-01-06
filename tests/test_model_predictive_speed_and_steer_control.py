@@ -1,4 +1,5 @@
 import sys
+import conftest
 
 if 'cvxpy' in sys.modules:  # pragma: no cover
 
