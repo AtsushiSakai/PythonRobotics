@@ -1,7 +1,8 @@
 """
 Diff based code style checker with flake8
 
-This code come from: https://github.com/scipy/scipy/blob/main/tools/lint_diff.py
+This code come from:
+https://github.com/scipy/scipy/blob/main/tools/lint_diff.py
 
 Scipy's licence: https://github.com/scipy/scipy/blob/main/LICENSE.txt
 Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
