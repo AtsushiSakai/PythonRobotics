@@ -17,7 +17,8 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 import sys
 import os
-sys.path.append(os.path.relpath("../Eta3SplinePath"))
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/../Eta3SplinePath")
 
 try:
     from eta3_spline_path import Eta3Path, Eta3PathSegment

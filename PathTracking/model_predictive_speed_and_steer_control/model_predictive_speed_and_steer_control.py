@@ -10,7 +10,10 @@ import cvxpy
 import math
 import numpy as np
 import sys
-sys.path.append("../../PathPlanning/CubicSpline/")
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/../../PathPlanning/CubicSpline/")
 
 try:
     import cubic_spline_planner
@@ -175,9 +178,9 @@ def update_state(state, a, delta):
     state.yaw = state.yaw + state.v / WB * math.tan(delta) * DT
     state.v = state.v + a * DT
 
-    if state. v > MAX_SPEED:
+    if state.v > MAX_SPEED:
         state.v = MAX_SPEED
-    elif state. v < MIN_SPEED:
+    elif state.v < MIN_SPEED:
         state.v = MIN_SPEED
 
     return state
@@ -272,7 +275,7 @@ def linear_mpc_control(xref, xbar, x0, dref):
 
         A, B, C = get_linear_model_matrix(
             xbar[2, t], xbar[3, t], dref[0, t])
-        constraints += [x[:, t + 1] == A * x[:, t] + B * u[:, t] + C]
+        constraints += [x[:, t + 1] == A @ x[:, t] + B @ u[:, t] + C]
 
         if t < (T - 1):
             cost += cvxpy.quad_form(u[:, t + 1] - u[:, t], Rd)

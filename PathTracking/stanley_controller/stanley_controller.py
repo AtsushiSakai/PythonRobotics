@@ -12,7 +12,10 @@ Ref:
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
-sys.path.append("../../PathPlanning/CubicSpline/")
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/../../PathPlanning/CubicSpline/")
 
 try:
     import cubic_spline_planner
