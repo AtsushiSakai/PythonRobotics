@@ -304,7 +304,7 @@ class Rocket_Model_6DoF:
         ]
 
         # linearized lower thrust constraint
-        rhs = [U_last_p[:, k] / cvxpy.norm(U_last_p[:, k]) * U_v[:, k]
+        rhs = [U_last_p[:, k] / cvxpy.norm(U_last_p[:, k]) @ U_v[:, k]
                for k in range(X_v.shape[1])]
         constraints += [
             self.T_min <= cvxpy.vstack(rhs)
