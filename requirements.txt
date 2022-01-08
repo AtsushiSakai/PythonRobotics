@@ -5,6 +5,7 @@ matplotlib == 3.5.1
 cvxpy == 1.1.18
 pytest == 6.2.5 # For unit test
 pytest-xdist == 2.5.0 # For unit test
+mypy == 0.931 # For unit test
 flake8 == 4.0.1 # For unit test
 sphinx == 4.3.2 # For sphinx documentation
 sphinx_rtd_theme == 1.0.0
