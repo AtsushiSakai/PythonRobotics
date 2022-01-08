@@ -460,11 +460,11 @@ class SCProblem:
         # x_t+1 = A_*x_t+B_*U_t+C_*U_T+1*S_*sigma+zbar+nu
         constraints += [
             self.var['X'][:, k + 1] ==
-            cvxpy.reshape(self.par['A_bar'][:, k], (m.n_x, m.n_x)) *
+            cvxpy.reshape(self.par['A_bar'][:, k], (m.n_x, m.n_x)) @
             self.var['X'][:, k] +
-            cvxpy.reshape(self.par['B_bar'][:, k], (m.n_x, m.n_u)) *
+            cvxpy.reshape(self.par['B_bar'][:, k], (m.n_x, m.n_u)) @
             self.var['U'][:, k] +
-            cvxpy.reshape(self.par['C_bar'][:, k], (m.n_x, m.n_u)) *
+            cvxpy.reshape(self.par['C_bar'][:, k], (m.n_x, m.n_u)) @
             self.var['U'][:, k + 1] +
             self.par['S_bar'][:, k] * self.var['sigma'] +
             self.par['z_bar'][:, k] +
