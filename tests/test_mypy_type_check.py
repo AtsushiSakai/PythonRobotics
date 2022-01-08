@@ -3,7 +3,7 @@ import subprocess
 
 import conftest
 
-SRC_DIR_LIST = [
+SUBPACKAGE_LIST = [
     "AerialNavigation",
     "ArmNavigation",
     "Bipedal",
@@ -16,14 +16,16 @@ SRC_DIR_LIST = [
 ]
 
 
-def run_mypy(dir_name, config_path):
+def run_mypy(dir_name, project_path, config_path):
     res = subprocess.run(
         ['mypy',
          '--config-file',
          config_path,
+         '-p',
          dir_name],
+        cwd=project_path,
         stdout=subprocess.PIPE,
-        encoding='utf-8', )
+        encoding='utf-8')
     return res.returncode, res.stdout
 
 
@@ -35,10 +37,8 @@ def test():
     config_path = os.path.join(project_dir_path, "mypy.ini")
     print(f"{config_path=}")
 
-    for dir_name in SRC_DIR_LIST:
-        dir_path = os.path.join(project_dir_path, dir_name)
-        print(f"{dir_path=}")
-        rc, errors = run_mypy(dir_path, config_path)
+    for sub_package_name in SUBPACKAGE_LIST:
+        rc, errors = run_mypy(sub_package_name, project_dir_path, config_path)
         if errors:
             print(errors)
         else:
