@@ -1,13 +1,20 @@
 import conftest  # Add root path to sys.path
 import sys
+import numpy as np
+from numpy.testing import suppress_warnings
 
-if 'cvxpy' in sys.modules:  # pragma: no cover
+from AerialNavigation.rocket_powered_landing import rocket_powered_landing as m
 
-    from AerialNavigation.rocket_powered_landing import rocket_powered_landing as m
 
-    def test1():
-        m.show_animation = False
-        m.main()
+def test1():
+    m.show_animation = False
+    with suppress_warnings() as sup:
+        sup.filter(UserWarning,
+                   "You are solving a parameterized problem that is not DPP"
+                   )
+        sup.filter(UserWarning,
+                   "Solution may be inaccurate")
+        m.main(rng=np.random.default_rng(1234))
 
 
 if __name__ == '__main__':
