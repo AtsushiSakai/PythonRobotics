@@ -12,6 +12,8 @@ def test1():
         sup.filter(UserWarning,
                    "You are solving a parameterized problem that is not DPP"
                    )
+        sup.filter(UserWarning,
+                   "Solution may be inaccurate")
         m.main(rng=np.random.default_rng(1234))
 
 
