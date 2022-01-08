@@ -1,5 +1,6 @@
 import conftest  # Add root path to sys.path
 import sys
+import numpy as np
 from numpy.testing import suppress_warnings
 
 from AerialNavigation.rocket_powered_landing import rocket_powered_landing as m
@@ -11,7 +12,7 @@ def test1():
         sup.filter(UserWarning,
                    "You are solving a parameterized problem that is not DPP"
                    )
-        m.main()
+        m.main(rng=np.random.default_rng(1234))
 
 
 if __name__ == '__main__':

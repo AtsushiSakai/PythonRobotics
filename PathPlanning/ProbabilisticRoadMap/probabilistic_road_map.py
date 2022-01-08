@@ -40,14 +40,14 @@ def prm_planning(start_x, start_y, goal_x, goal_y,
     """
     Run probabilistic road map planning
 
-    :param start_x:
-    :param start_y:
-    :param goal_x:
-    :param goal_y:
-    :param obstacle_x_list:
-    :param obstacle_y_list:
-    :param robot_radius:
-    :param rng:
+    :param start_x: start x position
+    :param start_y: start y position
+    :param goal_x: goal x position
+    :param goal_y: goal y position
+    :param obstacle_x_list: obstacle x positions
+    :param obstacle_y_list: obstacle y positions
+    :param robot_radius: robot radius
+    :param rng: (Optional) Random generator
     :return:
     """
     obstacle_kd_tree = KDTree(np.vstack((obstacle_x_list, obstacle_y_list)).T)

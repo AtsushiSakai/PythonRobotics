@@ -43,7 +43,7 @@ class Rocket_Model_6DoF:
     A 6 degree of freedom rocket landing problem.
     """
 
-    def __init__(self):
+    def __init__(self, rng):
         """
         A large r_scale for a small scale problem will
         ead to numerical problems as parameters become excessively small
@@ -92,7 +92,7 @@ class Rocket_Model_6DoF:
         # Vector from thrust point to CoM
         self.r_T_B = np.array([-1e-2, 0., 0.])
 
-        self.set_random_initial_state()
+        self.set_random_initial_state(rng)
 
         self.x_init = np.concatenate(
             ((self.m_wet,), self.r_I_init, self.v_I_init, self.q_B_I_init, self.w_B_init))
@@ -102,22 +102,25 @@ class Rocket_Model_6DoF:
         self.r_scale = np.linalg.norm(self.r_I_init)
         self.m_scale = self.m_wet
 
-    def set_random_initial_state(self):
+    def set_random_initial_state(self, rng):
+        if rng is None:
+            rng = np.random.default_rng()
+
         self.r_I_init = np.array((0., 0., 0.))
-        self.r_I_init[0] = np.random.uniform(3, 4)
-        self.r_I_init[1:3] = np.random.uniform(-2, 2, size=2)
+        self.r_I_init[0] = rng.uniform(3, 4)
+        self.r_I_init[1:3] = rng.uniform(-2, 2, size=2)
 
         self.v_I_init = np.array((0., 0., 0.))
-        self.v_I_init[0] = np.random.uniform(-1, -0.5)
-        self.v_I_init[1:3] = np.random.uniform(
-            -0.5, -0.2, size=2) * self.r_I_init[1:3]
+        self.v_I_init[0] = rng.uniform(-1, -0.5)
+        self.v_I_init[1:3] = rng.uniform(-0.5, -0.2,
+                                         size=2) * self.r_I_init[1:3]
 
         self.q_B_I_init = self.euler_to_quat((0,
-                                              np.random.uniform(-30, 30),
-                                              np.random.uniform(-30, 30)))
+                                              rng.uniform(-30, 30),
+                                              rng.uniform(-30, 30)))
         self.w_B_init = np.deg2rad((0,
-                                    np.random.uniform(-20, 20),
-                                    np.random.uniform(-20, 20)))
+                                    rng.uniform(-20, 20),
+                                    rng.uniform(-20, 20)))
 
     def f_func(self, x, u):
         m, rx, ry, rz, vx, vy, vz, q0, q1, q2, q3, wx, wy, wz = x[0], x[1], x[
@@ -606,9 +609,9 @@ def plot_animation(X, U):  # pragma: no cover
         plt.pause(0.5)
 
 
-def main():
+def main(rng=None):
     print("start!!")
-    m = Rocket_Model_6DoF()
+    m = Rocket_Model_6DoF(rng)
 
     # state and input list
     X = np.empty(shape=[m.n_x, K])
