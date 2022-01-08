@@ -124,7 +124,7 @@ class Rocket_Model_6DoF:
             2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10], x[11], x[12], x[13]
         ux, uy, uz = u[0], u[1], u[2]
 
-        return np.matrix([
+        return np.array([
             [-0.01 * np.sqrt(ux**2 + uy**2 + uz**2)],
             [vx],
             [vy],
@@ -149,7 +149,7 @@ class Rocket_Model_6DoF:
             2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10], x[11], x[12], x[13]
         ux, uy, uz = u[0], u[1], u[2]
 
-        return np.matrix([
+        return np.array([
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -177,7 +177,7 @@ class Rocket_Model_6DoF:
             2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10], x[11], x[12], x[13]
         ux, uy, uz = u[0], u[1], u[2]
 
-        return np.matrix([
+        return np.array([
             [-0.01 * ux / np.sqrt(ux**2 + uy**2 + uz**2),
              -0.01 * uy / np.sqrt(ux ** 2 + uy**2 + uz**2),
              -0.01 * uz / np.sqrt(ux**2 + uy**2 + uz**2)],
@@ -219,14 +219,14 @@ class Rocket_Model_6DoF:
         return q
 
     def skew(self, v):
-        return np.matrix([
+        return np.array([
             [0, -v[2], v[1]],
             [v[2], 0, -v[0]],
             [-v[1], v[0], 0]
         ])
 
     def dir_cosine(self, q):
-        return np.matrix([
+        return np.array([
             [1 - 2 * (q[2] ** 2 + q[3] ** 2), 2 * (q[1] * q[2]
                                                    + q[0] * q[3]), 2 * (q[1] * q[3] - q[0] * q[2])],
             [2 * (q[1] * q[2] - q[0] * q[3]), 1 - 2
@@ -236,7 +236,7 @@ class Rocket_Model_6DoF:
         ])
 
     def omega(self, w):
-        return np.matrix([
+        return np.array([
             [0, -w[0], -w[1], -w[2]],
             [w[0], 0, w[2], -w[1]],
             [w[1], -w[2], 0, w[0]],
