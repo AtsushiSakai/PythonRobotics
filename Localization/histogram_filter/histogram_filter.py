@@ -88,7 +88,7 @@ def observation_update(grid_map, z, std):
     return grid_map
 
 
-def calc_input():
+def calc_control_input():
     v = 1.0  # [m/s]
     yaw_rate = 0.1  # [rad/s]
     u = np.array([v, yaw_rate]).reshape(2, 1)
@@ -113,6 +113,7 @@ def motion_model(x, u):
 
 def draw_heat_map(data, mx, my):
     max_value = max([max(i_data) for i_data in data])
+    plt.grid(False)
     plt.pcolor(mx, my, data, vmax=max_value, cmap=plt.cm.get_cmap("Blues"))
     plt.axis("equal")
 
@@ -230,9 +231,9 @@ def main():
 
     while SIM_TIME >= time:
         time += DT
-        print("Time:", time)
+        print(f"{time=:.1f}")
 
-        u = calc_input()
+        u = calc_control_input()
 
         yaw = xTrue[2, 0]  # Orientation is known
         xTrue, z, ud = observation(xTrue, u, RF_ID)
@@ -249,8 +250,9 @@ def main():
             plt.plot(xTrue[0, :], xTrue[1, :], "xr")
             plt.plot(RF_ID[:, 0], RF_ID[:, 1], ".k")
             for i in range(z.shape[0]):
-                plt.plot([xTrue[0, :], z[i, 1]], [
-                    xTrue[1, :], z[i, 2]], "-k")
+                plt.plot([xTrue[0, 0], z[i, 1]],
+                         [xTrue[1, 0], z[i, 2]],
+                         "-k")
             plt.title("Time[s]:" + str(time)[0: 4])
             plt.pause(0.1)
 
