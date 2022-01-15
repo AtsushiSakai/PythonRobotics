@@ -20,7 +20,11 @@ Initial position information is not needed.
 Filtering algorithm
 ~~~~~~~~~~~~~~~~~~~~
 
-Histogram filter
+Histogram filter is using girds to manage probability of the robot existence.
+
+If a grid has higher probability, it means that the robot is likely to be there.
+
+There are 4 steps for the histogram filter to estimate the probability as below:
 
 Step1: Filter initialization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
