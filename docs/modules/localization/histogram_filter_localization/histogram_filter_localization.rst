@@ -37,7 +37,7 @@ In that case, we can initialize each grid probability as a same value.
 
 If we can use initial position information, we can set initial probabilities based on it.
 
-:ref:`Gaussian grid map` might be useful when the initial position information is provided as gaussian distribution.
+:ref:`gaussian_grid_map` might be useful when the initial position information is provided as gaussian distribution.
 
 Step2: Update probability by motion
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
