@@ -59,6 +59,41 @@ Returns:
 - | **v** : Command linear velocity
 - | **w** : Command angular velocity
 
+How does the Algorithm Work
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The distance between the robot and the goal position, :math:`\rho`, is computed as
+
+.. math::
+ \rho = \sqrt{(x_{robot} - x_{target})^2 + (y_{robot} - y_{target})^2}.
+
+The distance :math:`\rho` is used to determine the robot speed. The idea is to slow down the robot as it gets closer to the target.
+
+.. math::
+ \color{Red} {v = K_P{_\rho} \times \rho} (Eq. 1)
+
+Note that for your applications, you need to tune the speed gain, :math:`K_P{_\rho}` to a proper value.
+
+To turn the robot and align its heading, :math:`\theta`, toward the target position (not orientation),  :math:`\rho \vec{u}`, we need to compute the angle difference :math:`\alpha`. 
+
+.. math::
+ \alpha = (\arctan2(y_diff, x_diff) - \theta + \pi) mod (2\pi) - \pi
+
+The term :math:`mod(2\pi)` is used to map the angle to :math:`[-\pi, \pi)` range.
+
+Lastly to correct the orientation of the robot, we need to compute the orientation error, :math:`\beta`, of the robot.
+
+.. math::
+ \beta = (\theta_{goal} - \theta - \alpha + \pi) mod (2\pi) - \pi
+
+Note that to cancel out the effect of :math:`\alpha` when the robot is at the vicinity of the target, the term 
+
+:math:`-\alpha` is included.
+
+The final angular velocity command is given by
+
+.. math::
+ \color{Red} {w = K_P{_\alpha} \alpha - K_P{_\beta} \beta} (Eq. 2)
+
 Move to a Pose Robot (Class)
 ----------------------------
 This program (move_to_pose_robot.py) provides a Robot class to define different robots with different specifications. 
