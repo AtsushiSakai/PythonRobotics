@@ -32,9 +32,9 @@ Constructs an instantiate of the PathFinderController for navigating a 3-DOF whe
 
 Parameters:
 
-- | :math:`Kp_{rho}` : The linear velocity gain to translate the robot along a line towards the goal
-- | :math:`Kp_alpha` : The angular velocity gain to rotate the robot towards the goal
-- | :math:`Kp_beta` : The offset angular velocity gain accounting for smooth merging to the goal angle (i.e., it helps the robot heading to be parallel to the target angle.)
+- | **Kp_rho** : The linear velocity gain to translate the robot along a line towards the goal
+- | **Kp_alpha** : The angular velocity gain to rotate the robot towards the goal
+- | **Kp_beta** : The offset angular velocity gain accounting for smooth merging to the goal angle (i.e., it helps the robot heading to be parallel to the target angle.)
 
 
 Member function(s)
@@ -48,16 +48,16 @@ Returns the control command for the linear and angular velocities as well as the
 
 Parameters:
 
-- | :math:`x_diff` : The position of target with respect to current robot position in x direction
-- | :math:`y_diff` : The position of target with respect to current robot position in y direction
-- | :math:`theta` : The current heading angle of robot with respect to x axis
-- | :math:`theta_goal` : The target angle of robot with respect to x axis
+- | **x_diff** : The position of target with respect to current robot position in x direction
+- | **y_diff** : The position of target with respect to current robot position in y direction
+- | **theta** : The current heading angle of robot with respect to x axis
+- | **theta_goal** : The target angle of robot with respect to x axis
 
 Returns:
 
-- | :math:`rho` : The distance between the robot and the goal position
-- | :math:`v` : Command linear velocity
-- | :math:`w` : Command angular velocity
+- | **rho** : The distance between the robot and the goal position
+- | **v** : Command linear velocity
+- | **w** : Command angular velocity
 
 Move to a Pose Robot (Class)
 ----------------------------
@@ -82,11 +82,11 @@ Constructs an instantiate of the 3-DOF wheeled Robot navigating on a 2D plane
 
 Parameters:
 
-- | :math:`name` : (string) The name of the robot
-- | :math:`color` : (string) The color of the robot
-- | :math:`max_linear_speed` : (float) The maximum linear speed that the robot can go
-- | :math:`max_angular_speed` : (float) The maximum angular speed that the robot can rotate about its vertical axis
-- | :math:`path_finder_controller` : (PathFinderController) A configurable controller to finds the path and calculates command linear and angular velocities.
+- | **name** : (string) The name of the robot
+- | **color** : (string) The color of the robot
+- | **max_linear_speed** : (float) The maximum linear speed that the robot can go
+- | **max_angular_speed** : (float) The maximum angular speed that the robot can rotate about its vertical axis
+- | **path_finder_controller** : (PathFinderController) A configurable controller to finds the path and calculates command linear and angular velocities.
 
 Member function(s)
 ~~~~~~~~~~~~~~~~~~
@@ -99,8 +99,8 @@ Sets the start and target positions of the robot.
 
 Parameters:
 
-- | :math:`pose_start` : (Pose) Start postion of the robot (see the Pose class)
-- | :math:`pose_target` : (Pose) Target postion of the robot (see the Pose class)
+- | **pose_start** : (Pose) Start postion of the robot (see the Pose class)
+- | **pose_target** : (Pose) Target postion of the robot (see the Pose class)
 
 .. code-block:: ipython3
 
@@ -110,7 +110,7 @@ Move the robot for one time step increment
 
 Parameters:
 
-- | :math:`dt` : <float> time increment
+- | **dt** : <float> time increment
 
 See Also 
 --------
