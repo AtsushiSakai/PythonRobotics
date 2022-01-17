@@ -120,10 +120,10 @@ Its Jacobian matrix is
 
 :math:`\begin{equation*} 　= \begin{bmatrix} 1& 0 & 0 & 0\\ 0 & 1 & 0 & 0\\ \end{bmatrix} \end{equation*}`
 
-Extented Kalman Filter
+Extended Kalman Filter
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Localization process using Extendted Kalman Filter:EKF is
+Localization process using Extended Kalman Filter:EKF is
 
 === Predict ===
 

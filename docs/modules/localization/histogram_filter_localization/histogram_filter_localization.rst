@@ -24,21 +24,31 @@ Histogram filter is using girds to manage probability of the robot existence.
 
 If a grid has higher probability, it means that the robot is likely to be there.
 
+In the simulation, we want to estimate x-y position, so we use 2D grid data.
+
 There are 4 steps for the histogram filter to estimate the probability as below:
 
 Step1: Filter initialization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Step1: Update probability by motion
+Histogram filter does not need initial position information.
+
+In that case, we can initialize each grid probability as a same value.
+
+If we can use initial position information, we can set initial probabilities based on it.
+
+:ref:`Gaussian grid map` might be useful when the initial position information is provided as gaussian distribution.
+
+Step2: Update probability by motion
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Step2: Add uncertainty to probability
+Step3: Add uncertainty to probability
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Step3: Update probability by observation
+Step4: Update probability by observation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Step4: Estimate position from probability
+Step5: Estimate position from probability
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
