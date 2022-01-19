@@ -76,7 +76,7 @@ Note that for your applications, you need to tune the speed gain, :math:`K_P{_\r
 To turn the robot and align its heading, :math:`\theta`, toward the target position (not orientation),  :math:`\rho \vec{u}`, we need to compute the angle difference :math:`\alpha`. 
 
 .. math::
- \alpha = (\arctan2(y_diff, x_diff) - \theta + \pi) mod (2\pi) - \pi
+ \alpha = (\arctan2(y_{diff}, x_{diff}) - \theta + \pi) mod (2\pi) - \pi
 
 The term :math:`mod(2\pi)` is used to map the angle to :math:`[-\pi, \pi)` range.
 
