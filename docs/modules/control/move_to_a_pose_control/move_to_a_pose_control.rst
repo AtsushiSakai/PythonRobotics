@@ -7,7 +7,7 @@ The position control of a 1-DOF (Degree of Freedom) system is quite straightforw
 
 To describe the configuration of a car on a 2D plane, we need three DOFs (i.e., x, y, and theta). But to drive a car we only need two control commands (theta_engine and theta_steering_wheel). This difference is because of a constraint between the x and y DOFs. The relationship between the delta_x and delta_y is governed by the theta_steering_wheel.
 
-Note that a car is normally a non-Holonomic system but if the road is slippery, the car turns into a Holonomic system and thus it needs three independt commands to be controlled.
+Note that a car is normally a non-Holonomic system but if the road is slippery, the car turns into a Holonomic system and thus it needs three independent commands to be controlled.
 
 Move to a Pose Control
 ----------------------
