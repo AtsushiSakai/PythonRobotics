@@ -20,7 +20,9 @@ Initial position information is not needed.
 Filtering algorithm
 ~~~~~~~~~~~~~~~~~~~~
 
-Histogram filter is using girds to manage probability of the robot existence.
+Histogram filter is a discrete Bayes filter in continuous space.
+
+It uses regular girds to manage probability of the robot existence.
 
 If a grid has higher probability, it means that the robot is likely to be there.
 
@@ -39,16 +41,24 @@ If we can use initial position information, we can set initial probabilities bas
 
 :ref:`gaussian_grid_map` might be useful when the initial position information is provided as gaussian distribution.
 
-Step2: Update probability by motion
+Step2: Predict probability by motion
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Step3: Add uncertainty to probability
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In histogram filter, when a robot move to a next grid,
+all probability information of each grid are shifted towards the movement direction.
 
-Step4: Update probability by observation
+This process represents the change in the probability distribution as the robot moves.
+
+After the robot has moved, the probability distribution needs reflect
+the estimation error due to the movement.
+
+The `gaussian filter <https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.gaussian_filter.html>`_
+is used in the simulation for adding noize.
+
+Step3: Update probability by observation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Step5: Estimate position from probability
+Step4: Estimate position from probability
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 

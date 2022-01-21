@@ -198,6 +198,7 @@ def motion_update(grid_map, u, yaw):
         grid_map.dx -= x_shift * grid_map.xy_resolution
         grid_map.dy -= y_shift * grid_map.xy_resolution
 
+    # Add motion noise
     grid_map.data = gaussian_filter(grid_map.data, sigma=MOTION_STD)
 
     return grid_map
