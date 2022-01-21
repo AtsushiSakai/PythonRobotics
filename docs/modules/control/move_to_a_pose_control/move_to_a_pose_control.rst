@@ -69,7 +69,8 @@ The distance between the robot and the goal position, :math:`\rho`, is computed 
 The distance :math:`\rho` is used to determine the robot speed. The idea is to slow down the robot as it gets closer to the target.
 
 .. math::
- v = K_P{_\rho} \times \rho\qquad (Eq. 1)
+ v = K_P{_\rho} \times \rho\qquad
+ :label: eq1
 
 Note that for your applications, you need to tune the speed gain, :math:`K_P{_\rho}` to a proper value.
 
@@ -92,9 +93,10 @@ Note that to cancel out the effect of :math:`\alpha` when the robot is at the vi
 The final angular speed command is given by
 
 .. math::
- \omega = K_P{_\alpha} \alpha - K_P{_\beta} \beta\qquad (Eq. 2)
+ \omega = K_P{_\alpha} \alpha - K_P{_\beta} \beta\qquad
+ :label: eq2
  
- The linear and angular speeds (Equations 1 and 2) are the output of the algorithm.
+The linear and angular speeds (Equations :eq:`eq1` and :eq:`eq2`) are the output of the algorithm.
 
 Move to a Pose Robot (Class)
 ----------------------------
