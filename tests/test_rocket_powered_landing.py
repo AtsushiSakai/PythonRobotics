@@ -1,5 +1,4 @@
 import conftest  # Add root path to sys.path
-import sys
 import numpy as np
 from numpy.testing import suppress_warnings
 
