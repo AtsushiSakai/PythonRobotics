@@ -1,5 +1,12 @@
+Move to a Pose Control
+----------------------
+
+In this section, we present the logic of PathFinderController that drives a car from a start pose (x, y, theta) to a goal pose. A simulation of moving to a pose control is presented below.
+
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/move_to_pose/animation.gif
+
 Position Control of non-Holonomic Systems
------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This section explains the logic of a position controller for systems with constraint (non-Holonomic system).
 
@@ -9,20 +16,11 @@ To describe the configuration of a car on a 2D plane, we need three DOFs (i.e., 
 
 Note that a car is normally a non-Holonomic system but if the road is slippery, the car turns into a Holonomic system and thus it needs three independent commands to be controlled.
 
-Move to a Pose Control
-----------------------
-
-In this section, we present the logic of PathFinderController that drives a car from a start pose (x, y, theta) to a goal pose. A simulation of moving to a pose control is presented below.
-
-.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/move_to_pose/animation.gif
-
-
-
 PathFinderController class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Constructor
-~~~~~~~~~~~
+^^^^^^^^^^^
 
 .. code-block:: ipython3
 
@@ -38,7 +36,7 @@ Parameters:
 
 
 Member function(s)
-~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^
 
 .. code-block:: ipython3
 
@@ -99,7 +97,8 @@ The final angular speed command is given by
 The linear and angular speeds (Equations :eq:`eq1` and :eq:`eq2`) are the output of the algorithm.
 
 Move to a Pose Robot (Class)
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 This program (move_to_pose_robot.py) provides a Robot class to define different robots with different specifications. 
 Using this class, you can simulate different robots simultaneously and compare the effect of your parameter settings.
 
@@ -108,10 +107,10 @@ Using this class, you can simulate different robots simultaneously and compare t
 Note: The robot class is based on PathFinderController class in 'the move_to_pose.py'.
 
 Robot Class
-~~~~~~~~~~~
+^^^^^^^^^^^^
 
 Constructor
-~~~~~~~~~~~
+^^^^^^^^^^^^
 
 .. code-block:: ipython3
 
@@ -128,7 +127,7 @@ Parameters:
 - | **path_finder_controller** : (PathFinderController) A configurable controller to finds the path and calculates command linear and angular velocities.
 
 Member function(s)
-~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: ipython3
 
@@ -151,12 +150,10 @@ Parameters:
 
 - | **dt** : <float> time increment
 
-See Also 
---------
+
+
+References
+~~~~~~~~~~~~
 - PathFinderController class
-
-
-Ref:
-----
 -  `P. I. Corke, "Robotics, Vision and Control" \| SpringerLink
    p102 <https://link.springer.com/book/10.1007/978-3-642-20144-8>`__

@@ -141,11 +141,11 @@ All animation gifs are stored here: [AtsushiSakai/PythonRoboticsGifs: Animation 
 
 using conda :
 
-> conda env create -f environment.yml
+> conda env create -f requirements/environment.yml
  
 using pip :
 
-> pip install -r requirements.txt
+> pip install -r requirements/requirements.txt
 
 
 3. Execute python script in each directory.
