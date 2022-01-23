@@ -57,7 +57,11 @@ is used in the simulation for adding noize.
 
 Step3: Update probability by observation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In this step, all probabilities are updated by observations, this is the update step of bayesian filter.
 
+The probability update formula is different based on used sensor model.
+This simulation uses range observation model (using RF-ID).
+So, the probability of each grid is updated by this formula:
 Step4: Estimate position from probability
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
