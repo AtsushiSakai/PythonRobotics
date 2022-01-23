@@ -68,7 +68,7 @@ The distance :math:`\rho` is used to determine the robot speed. The idea is to s
 
 .. math::
  v = K_P{_\rho} \times \rho\qquad
- :label: eq1
+ :label: move_to_a_pose_eq1
 
 Note that for your applications, you need to tune the speed gain, :math:`K_P{_\rho}` to a proper value.
 
@@ -92,9 +92,9 @@ The final angular speed command is given by
 
 .. math::
  \omega = K_P{_\alpha} \alpha - K_P{_\beta} \beta\qquad
- :label: eq2
+ :label: move_to_a_pose_eq2
  
-The linear and angular speeds (Equations :eq:`eq1` and :eq:`eq2`) are the output of the algorithm.
+The linear and angular speeds (Equations :eq:`move_to_a_pose_eq1` and :eq:`move_to_a_pose_eq2`) are the output of the algorithm.
 
 Move to a Pose Robot (Class)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
