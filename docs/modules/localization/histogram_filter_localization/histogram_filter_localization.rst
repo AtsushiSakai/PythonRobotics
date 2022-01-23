@@ -64,7 +64,11 @@ This simulation uses range observation model (using RF-ID).
 So, the probability of each grid is updated by this formula:
 Step4: Estimate position from probability
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In each time step, we can calculate the final robot position from current probability distribution.
+There are two ways to calculate the final positions:
+1. Using the maximum probability grid position.
 
+2. Using the average of probability weighted position.
 
 References:
 ~~~~~~~~~~~
