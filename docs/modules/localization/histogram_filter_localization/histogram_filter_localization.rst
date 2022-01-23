@@ -62,6 +62,7 @@ In this step, all probabilities are updated by observations, this is the update 
 The probability update formula is different based on used sensor model.
 This simulation uses range observation model (using RF-ID).
 So, the probability of each grid is updated by this formula:
+
 Step4: Estimate position from probability
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 In each time step, we can calculate the final robot position from current probability distribution.
