@@ -1,12 +1,12 @@
 """
-Inverted Pendulum MPC control
-author: Atsushi Sakai
+Inverted Pendulum LQR control
+author: Trung Kien - letrungkien.k53.hut@gmail.com
 """
 
 import math
 import time
 
-import cvxpy
+import scipy.linalg as la
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -38,13 +38,8 @@ def main():
     x = np.copy(x0)
 
     for i in range(50):
-
         # calc control input
-        opt_x, opt_delta_x, opt_theta, opt_delta_theta, opt_input = \
-            mpc_control(x)
-
-        # get input
-        u = opt_input[0]
+        u = lqr_control(x)
 
         # simulate inverted pendulum cart
         x = simulation(x, u)
@@ -71,38 +66,49 @@ def simulation(x, u):
     return x
 
 
-def mpc_control(x0):
-    x = cvxpy.Variable((nx, T + 1))
-    u = cvxpy.Variable((nu, T))
+def solve_DARE(A, B, Q, R):
+    """
+    solve a discrete time_Algebraic Riccati equation (DARE)
+    """
+    X = Q
+    maxiter = 150
+    eps = 0.01
 
+    for i in range(maxiter):
+        Xn = A.T @ X @ A - A.T @ X @ B @ \
+            la.inv(R + B.T @ X @ B) @ B.T @ X @ A + Q
+        if (abs(Xn - X)).max() < eps:
+            break
+        X = Xn
+
+    return Xn
+
+
+def dlqr(A, B, Q, R):
+    """Solve the discrete time lqr controller.
+    x[k+1] = A x[k] + B u[k]
+    cost = sum x[k].T*Q*x[k] + u[k].T*R*u[k]
+    # ref Bertsekas, p.151
+    """
+
+    # first, try to solve the ricatti equation
+    X = solve_DARE(A, B, Q, R)
+
+    # compute the LQR gain
+    K = la.inv(B.T @ X @ B + R) @ (B.T @ X @ A)
+
+    eigVals, eigVecs = la.eig(A - B @ K)
+    return K, X, eigVals
+
+
+def lqr_control(x):
     A, B = get_model_matrix()
-
-    cost = 0.0
-    constr = []
-    for t in range(T):
-        cost += cvxpy.quad_form(x[:, t + 1], Q)
-        cost += cvxpy.quad_form(u[:, t], R)
-        constr += [x[:, t + 1] == A @ x[:, t] + B @ u[:, t]]
-
-    constr += [x[:, 0] == x0[:, 0]]
-    prob = cvxpy.Problem(cvxpy.Minimize(cost), constr)
-
     start = time.time()
-    prob.solve(verbose=False)
+    K, _, _ = dlqr(A, B, Q, R)
+    u = -K@x
     elapsed_time = time.time() - start
     print("calc time:{0} [sec]".format(elapsed_time))
-
-    if prob.status == cvxpy.OPTIMAL:
-        ox = get_numpy_array_from_matrix(x.value[0, :])
-        dx = get_numpy_array_from_matrix(x.value[1, :])
-        theta = get_numpy_array_from_matrix(x.value[2, :])
-        d_theta = get_numpy_array_from_matrix(x.value[3, :])
-
-        ou = get_numpy_array_from_matrix(u.value[0, :])
-    else:
-        ox, dx, theta, d_theta, ou = None, None, None, None, None
-
-    return ox, dx, theta, d_theta, ou
+    return u
 
 
 def get_numpy_array_from_matrix(x):
