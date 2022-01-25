@@ -71,7 +71,7 @@ def calc_gaussian_observation_pdf(grid_map, z, iz, ix, iy, std):
     d = math.hypot(x - z[iz, 1], y - z[iz, 2])
 
     # likelihood
-    pdf = (1.0 - norm.cdf(abs(d - z[iz, 0]), 0.0, std))
+    pdf = norm.pdf(d - z[iz, 0], 0.0, std)
 
     return pdf
 
