@@ -52,11 +52,15 @@ This process represents the change in the probability distribution as the robot 
 After the robot has moved, the probability distribution needs reflect
 the estimation error due to the movement.
 
+For example, the position probability is peaky with observations:
+
 .. image:: histogram_filter_localization/1.png
-   :width: 600px
+   :width: 400px
+
+But, the probability is getting uncertain without observations:
 
 .. image:: histogram_filter_localization/2.png
-   :width: 600px
+   :width: 400px
 
 
 The `gaussian filter <https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.gaussian_filter.html>`_
