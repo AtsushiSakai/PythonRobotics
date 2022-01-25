@@ -72,7 +72,14 @@ In this step, all probabilities are updated by observations, this is the update 
 
 The probability update formula is different based on used sensor model.
 This simulation uses range observation model (using RF-ID).
+
 So, the probability of each grid is updated by this formula:
+
+
+The observation probability distribution looks a circle when a RF-ID is observed like:
+
+.. image:: histogram_filter_localization/2.png
+   :width: 400px
 
 Step4: Estimate position from probability
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
