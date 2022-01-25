@@ -52,9 +52,9 @@ This process represents the change in the probability distribution as the robot 
 After the robot has moved, the probability distribution needs reflect
 the estimation error due to the movement.
 
-.. image:: histograms_filter_localization/1.png
+.. image:: histogram_filter_localization/1.png
 
-.. image:: histograms_filter_localization/2.png
+.. image:: histogram_filter_localization/2.png
 
 
 The `gaussian filter <https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.gaussian_filter.html>`_
