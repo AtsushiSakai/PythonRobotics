@@ -52,6 +52,11 @@ This process represents the change in the probability distribution as the robot 
 After the robot has moved, the probability distribution needs reflect
 the estimation error due to the movement.
 
+.. image:: histograms_filter_localization/1.png
+
+.. image:: histograms_filter_localization/2.png
+
+
 The `gaussian filter <https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.gaussian_filter.html>`_
 is used in the simulation for adding noize.
 
@@ -67,6 +72,7 @@ Step4: Estimate position from probability
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 In each time step, we can calculate the final robot position from current probability distribution.
 There are two ways to calculate the final positions:
+
 1. Using the maximum probability grid position.
 
 2. Using the average of probability weighted position.
@@ -74,4 +80,5 @@ There are two ways to calculate the final positions:
 References:
 ~~~~~~~~~~~
 
--  `PROBABILISTIC ROBOTICS`_
+- `PROBABILISTIC ROBOTICS`_
+- `Robust Vehicle Localization in Urban Environments Using Probabilistic Maps <http://driving.stanford.edu/papers/ICRA2010.pdf>`_
