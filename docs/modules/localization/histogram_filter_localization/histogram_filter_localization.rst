@@ -53,8 +53,10 @@ After the robot has moved, the probability distribution needs reflect
 the estimation error due to the movement.
 
 .. image:: histogram_filter_localization/1.png
+   :width: 600px
 
 .. image:: histogram_filter_localization/2.png
+   :width: 600px
 
 
 The `gaussian filter <https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.gaussian_filter.html>`_
