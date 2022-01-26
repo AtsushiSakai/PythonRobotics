@@ -77,7 +77,17 @@ This simulation uses range observation model (using RF-ID).
 
 So, the probability of each grid is updated by this formula:
 
-.. math:: f(x)=\frac{\exp \left(-x^{2} / 2\right)}{\sqrt{2 \pi}}
+.. math:: p_t=p_{t-1}*h(z)
+
+.. math:: h(z)=\frac{\exp \left(-(d - z)^{2} / 2\right)}{\sqrt{2 \pi}}
+
+- :math:`p_t` is the probability at the time `t`.
+
+- :math:`h(z)` is the observation probability with the observation `z`.
+
+- :math:`d` is the known distance from the RD-ID to the grid center.
+
+When the `d` is 3.0, the `h(z)` distribution is:
 
 .. image:: histogram_filter_localization/4.png
    :width: 400px
