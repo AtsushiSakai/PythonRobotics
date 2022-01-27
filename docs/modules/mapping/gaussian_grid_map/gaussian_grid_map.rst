@@ -1,3 +1,5 @@
+.. _gaussian_grid_map:
+
 Gaussian grid map
 -----------------
 
