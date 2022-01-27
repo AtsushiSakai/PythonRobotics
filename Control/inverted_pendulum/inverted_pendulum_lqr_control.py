@@ -6,9 +6,9 @@ author: Trung Kien - letrungkien.k53.hut@gmail.com
 import math
 import time
 
-import scipy.linalg as la
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy.linalg import inv, eig
 
 # Model parameters
 
@@ -17,11 +17,11 @@ M = 1.0  # [kg]
 m = 0.3  # [kg]
 g = 9.8  # [m/s^2]
 
-Q = np.diag([0.0, 1.0, 1.0, 0.0])
-R = np.diag([0.01])
 nx = 4  # number of state
 nu = 1  # number of input
-T = 30  # Horizon length
+Q = np.diag([0.0, 1.0, 1.0, 0.0])  # state cost matrix
+R = np.diag([0.01])  # input cost matrix
+
 delta_t = 0.1  # time tick
 
 animation = True
@@ -52,23 +52,22 @@ def main():
             plt.xlim([-5.0, 2.0])
             plt.pause(0.001)
 
-    print("final state: x:" + str(round(px, 2)) +
-          ", theta:" + str(round(math.degrees(theta), 2)))
+    print("Finish")
+    print(f"x={px:.2f} [m] , theta={math.degrees(theta):.2f} [deg]")
     if animation:
         plt.show()
 
 
 def simulation(x, u):
     A, B = get_model_matrix()
-
-    x = np.dot(A, x) + np.dot(B, u)
+    x = A @ x + B @ u
 
     return x
 
 
 def solve_DARE(A, B, Q, R):
     """
-    solve a discrete time_Algebraic Riccati equation (DARE)
+    Solve a discrete time_Algebraic Riccati equation (DARE)
     """
     X = Q
     maxiter = 150
@@ -76,7 +75,7 @@ def solve_DARE(A, B, Q, R):
 
     for i in range(maxiter):
         Xn = A.T @ X @ A - A.T @ X @ B @ \
-            la.inv(R + B.T @ X @ B) @ B.T @ X @ A + Q
+            inv(R + B.T @ X @ B) @ B.T @ X @ A + Q
         if (abs(Xn - X)).max() < eps:
             break
         X = Xn
@@ -85,7 +84,8 @@ def solve_DARE(A, B, Q, R):
 
 
 def dlqr(A, B, Q, R):
-    """Solve the discrete time lqr controller.
+    """
+    Solve the discrete time lqr controller.
     x[k+1] = A x[k] + B u[k]
     cost = sum x[k].T*Q*x[k] + u[k].T*R*u[k]
     # ref Bertsekas, p.151
@@ -95,9 +95,9 @@ def dlqr(A, B, Q, R):
     X = solve_DARE(A, B, Q, R)
 
     # compute the LQR gain
-    K = la.inv(B.T @ X @ B + R) @ (B.T @ X @ A)
+    K = inv(B.T @ X @ B + R) @ (B.T @ X @ A)
 
-    eigVals, eigVecs = la.eig(A - B @ K)
+    eigVals, eigVecs = eig(A - B @ K)
     return K, X, eigVals
 
 
@@ -105,9 +105,9 @@ def lqr_control(x):
     A, B = get_model_matrix()
     start = time.time()
     K, _, _ = dlqr(A, B, Q, R)
-    u = -K@x
+    u = -K @ x
     elapsed_time = time.time() - start
-    print("calc time:{0} [sec]".format(elapsed_time))
+    print(f"calc time:{elapsed_time:.6f} [sec]")
     return u
 
 
@@ -176,8 +176,7 @@ def plot_cart(xt, theta):
     plt.plot(flatten(rwx), flatten(rwy), "-k")
     plt.plot(flatten(lwx), flatten(lwy), "-k")
     plt.plot(flatten(wx), flatten(wy), "-k")
-    plt.title("x:" + str(round(xt, 2)) + ",theta:" +
-              str(round(math.degrees(theta), 2)))
+    plt.title(f"x: {xt:.2f} , theta: {math.degrees(theta):.2f}")
 
     plt.axis("equal")
 

@@ -17,10 +17,11 @@ M = 1.0  # [kg]
 m = 0.3  # [kg]
 g = 9.8  # [m/s^2]
 
-Q = np.diag([0.0, 1.0, 1.0, 0.0])
-R = np.diag([0.01])
 nx = 4  # number of state
 nu = 1  # number of input
+Q = np.diag([0.0, 1.0, 1.0, 0.0])  # state cost matrix
+R = np.diag([0.01])  # input cost matrix
+
 T = 30  # Horizon length
 delta_t = 0.1  # time tick
 
@@ -57,15 +58,14 @@ def main():
             plt.xlim([-5.0, 2.0])
             plt.pause(0.001)
 
-    print("final state: x:" + str(round(px, 2)) +
-          ", theta:" + str(round(math.degrees(theta), 2)))
+    print("Finish")
+    print(f"x={px:.2f} [m] , theta={math.degrees(theta):.2f} [deg]")
     if animation:
         plt.show()
 
 
 def simulation(x, u):
     A, B = get_model_matrix()
-
     x = np.dot(A, x) + np.dot(B, u)
 
     return x
@@ -90,7 +90,7 @@ def mpc_control(x0):
     start = time.time()
     prob.solve(verbose=False)
     elapsed_time = time.time() - start
-    print("calc time:{0} [sec]".format(elapsed_time))
+    print(f"calc time:{elapsed_time:.6f} [sec]")
 
     if prob.status == cvxpy.OPTIMAL:
         ox = get_numpy_array_from_matrix(x.value[0, :])
@@ -170,8 +170,7 @@ def plot_cart(xt, theta):
     plt.plot(flatten(rwx), flatten(rwy), "-k")
     plt.plot(flatten(lwx), flatten(lwy), "-k")
     plt.plot(flatten(wx), flatten(wy), "-k")
-    plt.title("x:" + str(round(xt, 2)) + ",theta:" +
-              str(round(math.degrees(theta), 2)))
+    plt.title(f"x: {xt:.2f} , theta: {math.degrees(theta):.2f}")
 
     plt.axis("equal")
 
