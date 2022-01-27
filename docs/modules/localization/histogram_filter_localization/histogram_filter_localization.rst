@@ -12,8 +12,7 @@ The blue grid shows a position probability of histogram filter.
 In this simulation, we assume the robot's yaw orientation and RFID's positions are known,
 but x,y positions are unknown.
 
-The filter integrates speed input and range observations from RFID to known
-localization.
+The filter uses speed input and range observations from RFID for localization.
 
 Initial position information is not needed.
 
@@ -28,7 +27,7 @@ If a grid has higher probability, it means that the robot is likely to be there.
 
 In the simulation, we want to estimate x-y position, so we use 2D grid data.
 
-There are 4 steps for the histogram filter to estimate the probability as below:
+There are 4 steps for the histogram filter to estimate the probability distribution.
 
 Step1: Filter initialization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -71,11 +70,11 @@ Step3: Update probability by observation
 In this step, all probabilities are updated by observations,
 this is the update step of bayesian filter.
 
-The probability update formula is different based on used sensor model.
+The probability update formula is different by the used sensor model.
 
-This simulation uses range observation model (using RF-ID).
+This simulation uses range observation model.
 
-So, the probability of each grid is updated by this formula:
+The probability of each grid is updated by this formula:
 
 .. math:: p_t=p_{t-1}*h(z)
 
@@ -92,19 +91,21 @@ When the `d` is 3.0, the `h(z)` distribution is:
 .. image:: histogram_filter_localization/4.png
    :width: 400px
 
-The observation probability distribution looks a circle when a RF-ID is observed like:
+The observation probability distribution looks a circle when a RF-ID is observed:
 
 .. image:: histogram_filter_localization/3.png
    :width: 400px
 
 Step4: Estimate position from probability
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-In each time step, we can calculate the final robot position from current probability distribution.
+In each time step, we can calculate the final robot position from the current probability distribution.
 There are two ways to calculate the final positions:
 
 1. Using the maximum probability grid position.
 
-2. Using the average of probability weighted position.
+2. Using the average of probability weighted grind position.
+
+
 
 References:
 ~~~~~~~~~~~
