@@ -69,18 +69,18 @@ def solve_DARE(A, B, Q, R):
     """
     Solve a discrete time_Algebraic Riccati equation (DARE)
     """
-    X = Q
+    P = Q
     maxiter = 150
     eps = 0.01
 
     for i in range(maxiter):
-        Xn = A.T @ X @ A - A.T @ X @ B @ \
-            inv(R + B.T @ X @ B) @ B.T @ X @ A + Q
-        if (abs(Xn - X)).max() < eps:
+        Pn = A.T @ P @ A - A.T @ P @ B @ \
+            inv(R + B.T @ P @ B) @ B.T @ P @ A + Q
+        if (abs(Pn - P)).max() < eps:
             break
-        X = Xn
+        P = Pn
 
-    return Xn
+    return Pn
 
 
 def dlqr(A, B, Q, R):
@@ -92,13 +92,13 @@ def dlqr(A, B, Q, R):
     """
 
     # first, try to solve the ricatti equation
-    X = solve_DARE(A, B, Q, R)
+    P = solve_DARE(A, B, Q, R)
 
     # compute the LQR gain
-    K = inv(B.T @ X @ B + R) @ (B.T @ X @ A)
+    K = inv(B.T @ P @ B + R) @ (B.T @ P @ A)
 
     eigVals, eigVecs = eig(A - B @ K)
-    return K, X, eigVals
+    return K, P, eigVals
 
 
 def lqr_control(x):
