@@ -76,10 +76,10 @@ the feedback control law that minimizes the value of the cost is:
 .. math::  u = -K x
 where:
 
-.. math::  K = (B^T P B + R)^{-1} (B^T P A)
+.. math::  K = (B^T P B + R)^{-1} B^T P A
 and :math:`P` is the unique positive definite solution to the discrete time `algebraic Riccati equation <https://en.wikipedia.org/wiki/Inverted_pendulum#From_Lagrange's_equations>`__  (DARE):
 
-.. math::  P = A^T P A - (A^T P B + N) ( R + B^T P B )^{-1} (B^T P A) + Q
+.. math::  P = A^T P A - A^T P B ( R + B^T P B )^{-1} B^T P A + Q
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/InvertedPendulumCart/animation_lqr.gif
 
