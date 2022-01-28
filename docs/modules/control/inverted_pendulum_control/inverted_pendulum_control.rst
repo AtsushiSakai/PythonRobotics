@@ -34,8 +34,7 @@ So
     & \ddot{\theta} = \frac{g(M + m)sin{\theta} - \dot{\theta}^2lmsin{\theta}cos{\theta} + ucos{\theta}}{l(M + m - mcos^2{\theta})}
 
 
-when :math:`\theta` small, :math:`cos{\theta} \approx 1`, :math:`sin{\theta} \approx \theta`, :math:`\dot{\theta}^2 \approx 0`
-Approximations
+Linearlied model when :math:`\theta` small, :math:`cos{\theta} \approx 1`, :math:`sin{\theta} \approx \theta`, :math:`\dot{\theta}^2 \approx 0`.
 
 .. math::
     & \ddot{x} =  \frac{gm}{M}\theta + \frac{1}{M}u\\
@@ -43,22 +42,56 @@ Approximations
 
 State space:
 
-.. math:: x = Ax + Bu
+.. math::
+    & \dot{x} = Ax + Bu \\
+    & y = Cx + Du
 
 where
 
-.. math:: 
+.. math::
     & x = [x, \dot{x}, \theta,\dot{\theta}]\\
     & A = \begin{bmatrix}  0 & 1 & 0 & 0\\0 & 0 & \frac{gm}{M} & 0\\0 & 0 & 0 & 1\\0 & 0 & \frac{g(M + m)}{Ml} & 0 \end{bmatrix}\\
     & B = \begin{bmatrix}  0 \\ \frac{1}{M} \\ 0 \\ \frac{1}{Ml} \end{bmatrix}
 
+If control only \theta
+
+.. math::
+    & C = \begin{bmatrix} 0 & 0 & 1 & 0 \end{bmatrix}\\
+    & D = [0]
+
+If control x and \theta
+
+.. math::
+    & C = \begin{bmatrix} 1 & 0 & 0 & 0\\0 & 0 & 1 & 0 \end{bmatrix}\\
+    & D = \begin{bmatrix} 0 \\ 0 \end{bmatrix}
+
 LQR control
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Updating ...
+
+The LQR cotroller minimize this cost function defined as:
+
+.. math::  J = x^T Q x + u^T R u
+the feedback control law that minimizes the value of the cost is:
+
+.. math::  u = -K x
+where:
+
+.. math::  K = (B^T P B + R)^{-1} (B^T P A)
+and :math:`P` is the unique positive definite solution to the discrete time `algebraic Riccati equation <https://en.wikipedia.org/wiki/Inverted_pendulum#From_Lagrange's_equations>`__  (DARE):
+
+.. math::  P = A^T P A - (A^T P B + N) ( R + B^T P B )^{-1} (B^T P A) + Q
+
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/InvertedPendulumCart/animation_lqr.gif
 
 MPC control
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Updating ...
+The MPC cotroller minimize this cost function defined as:
+
+.. math:: J = x^T Q x + u^T R u
+
+subject to:
+
+- Linearlied Inverted Pendulum model
+- Initial state
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/InvertedPendulumCart/animation.gif
