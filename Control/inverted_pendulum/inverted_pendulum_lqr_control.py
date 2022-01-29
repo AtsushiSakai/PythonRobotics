@@ -22,7 +22,8 @@ nu = 1  # number of input
 Q = np.diag([0.0, 1.0, 1.0, 0.0])  # state cost matrix
 R = np.diag([0.01])  # input cost matrix
 
-delta_t = 0.1  # time tick
+delta_t = 0.1  # time tick [s]
+sim_time = 5.0  # simulation time [s]
 
 animation = True
 
@@ -36,8 +37,11 @@ def main():
     ])
 
     x = np.copy(x0)
+    time = 0.0
 
-    for i in range(50):
+    while sim_time > time:
+        time += delta_t
+
         # calc control input
         u = lqr_control(x)
 
@@ -53,7 +57,7 @@ def main():
             plt.pause(0.001)
 
     print("Finish")
-    print(f"x={px:.2f} [m] , theta={math.degrees(theta):.2f} [deg]")
+    print(f"x={float(x[0]):.2f} [m] , theta={math.degrees(x[2]):.2f} [deg]")
     if animation:
         plt.show()
 
@@ -65,13 +69,11 @@ def simulation(x, u):
     return x
 
 
-def solve_DARE(A, B, Q, R):
+def solve_DARE(A, B, Q, R, maxiter=150, eps=0.01):
     """
     Solve a discrete time_Algebraic Riccati equation (DARE)
     """
     P = Q
-    maxiter = 150
-    eps = 0.01
 
     for i in range(maxiter):
         Pn = A.T @ P @ A - A.T @ P @ B @ \
@@ -177,6 +179,11 @@ def plot_cart(xt, theta):
     plt.plot(flatten(lwx), flatten(lwy), "-k")
     plt.plot(flatten(wx), flatten(wy), "-k")
     plt.title(f"x: {xt:.2f} , theta: {math.degrees(theta):.2f}")
+
+    # for stopping simulation with the esc key.
+    plt.gcf().canvas.mpl_connect(
+        'key_release_event',
+        lambda event: [exit(0) if event.key == 'escape' else None])
 
     plt.axis("equal")
 
