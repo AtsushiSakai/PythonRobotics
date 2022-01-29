@@ -26,7 +26,7 @@ T = 30  # Horizon length
 delta_t = 0.1  # time tick
 sim_time = 5.0  # simulation time [s]
 
-animation = True
+show_animation = True
 
 
 def main():
@@ -53,7 +53,7 @@ def main():
         # simulate inverted pendulum cart
         x = simulation(x, u)
 
-        if animation:
+        if show_animation:
             plt.clf()
             px = float(x[0])
             theta = float(x[2])
@@ -63,7 +63,7 @@ def main():
 
     print("Finish")
     print(f"x={float(x[0]):.2f} [m] , theta={math.degrees(x[2]):.2f} [deg]")
-    if animation:
+    if show_animation:
         plt.show()
 
 
