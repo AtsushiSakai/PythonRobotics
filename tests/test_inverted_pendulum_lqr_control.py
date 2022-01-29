@@ -1,9 +1,8 @@
 import conftest
+from Control.inverted_pendulum import inverted_pendulum_lqr_control as m
 
-from Control.inverted_pendulum import inverted_pendulum_mpc_control as m
 
-
-def test1():
+def test_1():
     m.show_animation = False
     m.main()
 
