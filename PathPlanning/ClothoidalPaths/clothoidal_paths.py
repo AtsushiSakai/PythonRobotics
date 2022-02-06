@@ -1,56 +1,20 @@
 """
 Clothoidal Path Planner
 Author: Daniel Ingram (daniel-s-ingram)
-Reference paper: https://www.researchgate.net/publication/237062806
+Reference paper: Fast and accurate G1 fitting of clothoid curves https://www.researchgate.net/publication/237062806
 """
 
+from collections import namedtuple
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.integrate as integrate
-from collections import namedtuple
 from scipy.optimize import fsolve
 from math import atan2, cos, hypot, pi, sin
 from matplotlib import animation
 
 Point = namedtuple("Point", ["x", "y"])
 
-
-def draw_clothoids(
-    theta1_vals,
-    theta2_vals,
-    num_steps=100,
-    save_animation=False
-):
-    p1 = Point(0, 0)
-    p2 = Point(10, 0)
-    clothoids = get_clothoid_paths(num_steps, p1, p2, theta1_vals, theta2_vals)
-
-    fig = plt.figure(figsize=(10, 10))
-    x_min, x_max, y_min, y_max = get_axes_limits(clothoids)
-    axes = plt.axes(xlim=(x_min, x_max), ylim=(y_min, y_max))
-
-    axes.plot(p1.x, p1.y, 'ro')
-    axes.plot(p2.x, p2.y, 'ro')
-    lines = [axes.plot([], [], 'b-')[0] for _ in range(len(clothoids))]
-
-    def animate(i):
-        for line, clothoid in zip(lines, clothoids):
-            x = [p.x for p in clothoid[:i]]
-            y = [p.y for p in clothoid[:i]]
-            line.set_data(x, y)
-
-        return lines
-
-    anim = animation.FuncAnimation(
-        fig,
-        animate,
-        frames=num_steps,
-        interval=25,
-        blit=True
-    )
-    if save_animation:
-        anim.save('clothoid.gif', fps=30, writer="imagemagick")
-    plt.show()
+show_animation = True
 
 
 def get_clothoid_paths(num_steps, p1, p2, theta1_vals, theta2_vals):
@@ -142,10 +106,46 @@ def get_axes_limits(clothoids):
     return x_min, x_max, y_min, y_max
 
 
+def draw_clothoids(start, goal, num_steps, clothoidal_paths,
+                   save_animation=False):
+
+    fig = plt.figure(figsize=(10, 10))
+    x_min, x_max, y_min, y_max = get_axes_limits(clothoidal_paths)
+    axes = plt.axes(xlim=(x_min, x_max), ylim=(y_min, y_max))
+
+    axes.plot(start.x, start.y, 'ro')
+    axes.plot(goal.x, goal.y, 'ro')
+    lines = [axes.plot([], [], 'b-')[0] for _ in range(len(clothoidal_paths))]
+
+    def animate(i):
+        for line, clothoid_path in zip(lines, clothoidal_paths):
+            x = [p.x for p in clothoid_path[:i]]
+            y = [p.y for p in clothoid_path[:i]]
+            line.set_data(x, y)
+
+        return lines
+
+    anim = animation.FuncAnimation(
+        fig,
+        animate,
+        frames=num_steps,
+        interval=25,
+        blit=True
+    )
+    if save_animation:
+        anim.save('clothoid.gif', fps=30, writer="imagemagick")
+    plt.show()
+
+
 def main():
     theta1_vals = [0]
     theta2_vals = np.linspace(-pi, pi, 75)
-    draw_clothoids(theta1_vals, theta2_vals, save_animation=False)
+    start = Point(0, 0)
+    goal = Point(10, 0)
+    num_steps = 100
+    clothoid_paths = get_clothoid_paths(num_steps, start, goal, theta1_vals, theta2_vals)
+    if show_animation:
+        draw_clothoids(start, goal, num_steps, clothoid_paths, save_animation=False)
 
 
 if __name__ == "__main__":
