@@ -1,7 +1,8 @@
 """
 Clothoidal Path Planner
 Author: Daniel Ingram (daniel-s-ingram)
-Reference paper: Fast and accurate G1 fitting of clothoid curves https://www.researchgate.net/publication/237062806
+Reference paper: Fast and accurate G1 fitting of clothoid curves
+https://www.researchgate.net/publication/237062806
 """
 
 from collections import namedtuple
