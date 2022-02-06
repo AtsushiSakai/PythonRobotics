@@ -18,17 +18,12 @@ Point = namedtuple("Point", ["x", "y"])
 def draw_clothoids(
     theta1_vals,
     theta2_vals,
-    num_clothoids=75,
     num_steps=100,
     save_animation=False
 ):
     p1 = Point(0, 0)
     p2 = Point(10, 0)
-    clothoids = []
-    for theta1 in theta1_vals:
-        for theta2 in theta2_vals:
-            clothoid = get_clothoid_points(p1, p2, theta1, theta2, num_steps)
-            clothoids.append(clothoid)
+    clothoids = get_clothoid_paths(num_steps, p1, p2, theta1_vals, theta2_vals)
 
     fig = plt.figure(figsize=(10, 10))
     x_min, x_max, y_min, y_max = get_axes_limits(clothoids)
@@ -56,6 +51,15 @@ def draw_clothoids(
     if save_animation:
         anim.save('clothoid.gif', fps=30, writer="imagemagick")
     plt.show()
+
+
+def get_clothoid_paths(num_steps, p1, p2, theta1_vals, theta2_vals):
+    clothoids = []
+    for theta1 in theta1_vals:
+        for theta2 in theta2_vals:
+            clothoid = get_clothoid_points(p1, p2, theta1, theta2, num_steps)
+            clothoids.append(clothoid)
+    return clothoids
 
 
 def get_clothoid_points(p1, p2, theta1, theta2, num_steps=100):
@@ -138,7 +142,11 @@ def get_axes_limits(clothoids):
     return x_min, x_max, y_min, y_max
 
 
-if __name__ == "__main__":
+def main():
     theta1_vals = [0]
     theta2_vals = np.linspace(-pi, pi, 75)
     draw_clothoids(theta1_vals, theta2_vals, save_animation=False)
+
+
+if __name__ == "__main__":
+    main()
