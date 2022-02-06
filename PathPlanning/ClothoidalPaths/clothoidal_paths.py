@@ -144,9 +144,11 @@ def main():
     start = Point(0, 0)
     goal = Point(10, 0)
     num_steps = 100
-    clothoid_paths = get_clothoid_paths(num_steps, start, goal, theta1_vals, theta2_vals)
+    clothoid_paths = get_clothoid_paths(num_steps, start, goal,
+                                        theta1_vals, theta2_vals)
     if show_animation:
-        draw_clothoids(start, goal, num_steps, clothoid_paths, save_animation=False)
+        draw_clothoids(start, goal, num_steps, clothoid_paths,
+                       save_animation=False)
 
 
 if __name__ == "__main__":
