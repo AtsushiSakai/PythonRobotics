@@ -217,7 +217,7 @@ This is a 2D ray casting grid mapping example.
 
 This example shows how to convert a 2D range measurement to a grid map.
 
-![2](Mapping/lidar_to_grid_map/animation.gif)
+![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/lidar_to_grid_map/animation.gif)
 
 ## k-means object clustering
 
