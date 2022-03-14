@@ -3,7 +3,7 @@ scipy == 1.7.3
 pandas == 1.4.1
 matplotlib == 3.5.1
 cvxpy == 1.1.18
-pytest == 7.0.1 # For unit test
+pytest == 7.1.0 # For unit test
 pytest-xdist == 2.5.0 # For unit test
 mypy == 0.941 # For unit test
 flake8 == 4.0.1 # For unit test
