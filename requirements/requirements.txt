@@ -2,7 +2,7 @@ numpy == 1.22.3
 scipy == 1.7.3
 pandas == 1.4.1
 matplotlib == 3.5.1
-cvxpy == 1.1.18
+cvxpy == 1.2.0
 pytest == 7.1.0 # For unit test
 pytest-xdist == 2.5.0 # For unit test
 mypy == 0.941 # For unit test
