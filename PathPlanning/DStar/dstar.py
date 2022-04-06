@@ -160,7 +160,7 @@ class Dstar:
         rx = []
         ry = []
 
-        self.open_list.add(end)
+        self.insert(end, 0.0)
 
         while True:
             self.process_state()
