@@ -18,6 +18,7 @@ def test_no_obstacle():
     path = rrt_star.planning(animation=False)
     assert path is not None
 
+
 def test_no_obstacle_and_robot_radius():
     obstacle_list = []
 
