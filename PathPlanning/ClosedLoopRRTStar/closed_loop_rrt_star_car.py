@@ -129,7 +129,8 @@ class ClosedLoopRRTStar(RRTStarReedsShepp):
             print("path is too long")
             find_goal = False
 
-        if not self.collision_check_with_xy(x, y, self.obstacle_list, self.robot_radius):
+        if not self.collision_check_with_xy(
+                x, y, self.obstacle_list, self.robot_radius):
             print("This path is collision")
             find_goal = False
 

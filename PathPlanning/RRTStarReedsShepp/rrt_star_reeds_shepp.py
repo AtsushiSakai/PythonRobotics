@@ -84,7 +84,8 @@ class RRTStarReedsShepp(RRTStar):
             nearest_ind = self.get_nearest_node_index(self.node_list, rnd)
             new_node = self.steer(self.node_list[nearest_ind], rnd)
 
-            if self.check_collision(new_node, self.obstacle_list, self.robot_radius):
+            if self.check_collision(
+                    new_node, self.obstacle_list, self.robot_radius):
                 near_indexes = self.find_near_nodes(new_node)
                 new_node = self.choose_parent(new_node, near_indexes)
                 if new_node:
@@ -119,7 +120,8 @@ class RRTStarReedsShepp(RRTStar):
         if new_node is None:
             return
 
-        if self.check_collision(new_node, self.obstacle_list, self.robot_radius):
+        if self.check_collision(
+                new_node, self.obstacle_list, self.robot_radius):
             self.node_list.append(new_node)
 
     def draw_graph(self, rnd=None):

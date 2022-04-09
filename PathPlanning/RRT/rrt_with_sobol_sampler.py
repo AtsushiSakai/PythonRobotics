@@ -102,7 +102,8 @@ class RRTSobol:
 
             new_node = self.steer(nearest_node, rnd_node, self.expand_dis)
 
-            if self.check_collision(new_node, self.obstacle_list, self.robot_radius):
+            if self.check_collision(
+                    new_node, self.obstacle_list, self.robot_radius):
                 self.node_list.append(new_node)
 
             if animation and i % 5 == 0:
@@ -112,7 +113,8 @@ class RRTSobol:
                                       self.node_list[-1].y) <= self.expand_dis:
                 final_node = self.steer(self.node_list[-1], self.end,
                                         self.expand_dis)
-                if self.check_collision(final_node, self.obstacle_list, self.robot_radius):
+                if self.check_collision(
+                        final_node, self.obstacle_list, self.robot_radius):
                     return self.generate_final_course(len(self.node_list) - 1)
 
             if animation and i % 5:

@@ -84,7 +84,8 @@ class RRTDubins(RRT):
             nearest_ind = self.get_nearest_node_index(self.node_list, rnd)
             new_node = self.steer(self.node_list[nearest_ind], rnd)
 
-            if self.check_collision(new_node, self.obstacle_list, self.robot_radius):
+            if self.check_collision(
+                    new_node, self.obstacle_list, self.robot_radius):
                 self.node_list.append(new_node)
 
             if animation and i % 5 == 0:
