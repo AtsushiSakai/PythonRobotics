@@ -71,13 +71,17 @@ LQR control
 The LQR cotroller minimize this cost function defined as:
 
 .. math::  J = x^T Q x + u^T R u
+
 the feedback control law that minimizes the value of the cost is:
 
 .. math::  u = -K x
+
 where:
 
 .. math::  K = (B^T P B + R)^{-1} B^T P A
-and :math:`P` is the unique positive definite solution to the discrete time `algebraic Riccati equation <https://en.wikipedia.org/wiki/Inverted_pendulum#From_Lagrange's_equations>`__  (DARE):
+
+and :math:`P` is the unique positive definite solution to the discrete time
+`algebraic Riccati equation <https://en.wikipedia.org/wiki/Inverted_pendulum#From_Lagrange's_equations>`__  (DARE):
 
 .. math::  P = A^T P A - A^T P B ( R + B^T P B )^{-1} B^T P A + Q
 

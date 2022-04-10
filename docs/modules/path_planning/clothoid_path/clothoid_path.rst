@@ -14,5 +14,4 @@ This is a clothoid path planning.
 References
 ~~~~~~~~~~
 
--  `Fast and accurate G1 fitting of clothoid curves
-    <https://www.researchgate.net/publication/237062806>`__
+-  `Fast and accurate G1 fitting of clothoid curves <https://www.researchgate.net/publication/237062806>`__

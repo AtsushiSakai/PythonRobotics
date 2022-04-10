@@ -189,7 +189,8 @@ def main():
         goal_point, goal_orientation_list,
         num_path_points)
     if show_animation:
-        draw_clothoids(start_point, goal_point, num_path_points, clothoid_paths,
+        draw_clothoids(start_point, goal_point,
+                       num_path_points, clothoid_paths,
                        save_animation=False)
 
 
