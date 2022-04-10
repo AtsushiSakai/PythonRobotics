@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  python: circleci/python@1.4.0
+  python: cimg/python@1.4.0
 
 jobs:
   build_doc:
