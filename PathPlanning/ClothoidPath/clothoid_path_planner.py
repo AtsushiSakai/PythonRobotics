@@ -1,7 +1,7 @@
 """
 Clothoid Path Planner
 Author: Daniel Ingram (daniel-s-ingram)
-        Atsushi Sakai
+        Atsushi Sakai (AtsushiSakai)
 Reference paper: Fast and accurate G1 fitting of clothoid curves
 https://www.researchgate.net/publication/237062806
 """
@@ -15,7 +15,6 @@ from math import atan2, cos, hypot, pi, sin
 from matplotlib import animation
 
 Point = namedtuple("Point", ["x", "y"])
-Pose = namedtuple("Pose", ["x", "y", "yaw"])
 
 show_animation = True
 
