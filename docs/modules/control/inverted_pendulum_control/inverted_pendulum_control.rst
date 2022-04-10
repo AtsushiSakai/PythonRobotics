@@ -68,7 +68,7 @@ If control x and \theta
 LQR control
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The LQR cotroller minimize this cost function defined as:
+The LQR controller minimize this cost function defined as:
 
 .. math::  J = x^T Q x + u^T R u
 
@@ -89,13 +89,13 @@ and :math:`P` is the unique positive definite solution to the discrete time
 
 MPC control
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The MPC cotroller minimize this cost function defined as:
+The MPC controller minimize this cost function defined as:
 
 .. math:: J = x^T Q x + u^T R u
 
 subject to:
 
-- Linearlied Inverted Pendulum model
+- Linearized Inverted Pendulum model
 - Initial state
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/InvertedPendulumCart/animation.gif

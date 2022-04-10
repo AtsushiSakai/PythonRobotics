@@ -9,8 +9,8 @@ Clothoid path planning
 
 This is a clothoid path planning sample code.
 
-This can interpolate two 2D pose (x, y, yaw) with a clothoid path.
-This means its curvature is linearly continuous.
+This can interpolate two 2D pose (x, y, yaw) with a clothoid path,
+which its curvature is linearly continuous.
 In other words, this is G1 Hermite interpolation with a single clothoid segment.
 
 This path planning algorithm as follows:
@@ -18,23 +18,46 @@ This path planning algorithm as follows:
 Step1: Solve g function
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+.. math::
+
+    g(A):=Y\left(2A, \delta-A, \phi_{0})
+
+
 Step2: Calculate path parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Using :math:`A`, we can calculate these path parameters:
+
+- :math:`L`: path length
 
 .. math::
 
         L=\frac{\sqrt{\Delta x^{2}+\Delta y^{2}}}{X\left(2 A, \delta-A, \phi_{0}\right)}
+
+- :math:`\kappa`: curvature
+
+.. math::
+
+        \kappa=(\delta-A) / L
+
+
+- :math:`\kappa'`: curvature rate
+
+.. math::
+
+        \kappa^{\prime}=2 A / L^{2}
+
 
 Step3: Construct a path with Fresnel integral
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The final clothoid path can be calculated with the path parameters and Fresnel integrals.
 
-\begin{aligned}
-&x(s)=x_{0}+\int_{0}^{s} \cos \left(\frac{1}{2} \kappa^{\prime} \tau^{2}+\kappa \tau+\vartheta_{0}\right) \mathrm{d} \tau \\
-&y(s)=y_{0}+\int_{0}^{s} \sin \left(\frac{1}{2} \kappa^{\prime} \tau^{2}+\kappa \tau+\vartheta_{0}\right) \mathrm{d} \tau
-\end{aligned}
+.. math::
+        \begin{aligned}
+        &x(s)=x_{0}+\int_{0}^{s} \cos \left(\frac{1}{2} \kappa^{\prime} \tau^{2}+\kappa \tau+\vartheta_{0}\right) \mathrm{d} \tau \\
+        &y(s)=y_{0}+\int_{0}^{s} \sin \left(\frac{1}{2} \kappa^{\prime} \tau^{2}+\kappa \tau+\vartheta_{0}\right) \mathrm{d} \tau
+        \end{aligned}
 
 
 References
