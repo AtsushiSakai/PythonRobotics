@@ -1,12 +1,12 @@
 version: 2.1
 
 orbs:
-  python: cimg/python@1.4.0
+  python: circleci/python@1.4.0
 
 jobs:
   build_doc:
     docker:
-      - image: circleci/python:3.9
+      - image: cimg/python:3.9
     steps:
       - checkout
       - run:
