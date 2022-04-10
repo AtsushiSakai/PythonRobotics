@@ -29,9 +29,9 @@ def generate_clothoid_paths(start_point, start_yaw_list,
     (yaw) at goal point.
 
     :param start_point: Start point of the path
-    :param start_yaw_list: Orientation list at start point
+    :param start_yaw_list: Orientation list at start point in radian
     :param goal_point: Goal point of the path
-    :param goal_yaw_list: Orientation list at goal point
+    :param goal_yaw_list: Orientation list at goal point in radian
     :param n_path_points: number of path points
     :return: clothoid path list
     """
@@ -51,9 +51,9 @@ def generate_clothoid_path(start_point, start_yaw,
     Generate a clothoid path list.
 
     :param start_point: Start point of the path
-    :param start_yaw: Orientation at start point
+    :param start_yaw: Orientation at start point in radian
     :param goal_point: Goal point of the path
-    :param goal_yaw: Orientation at goal point
+    :param goal_yaw: Orientation at goal point in radian
     :param n_path_points: number of path points
     :return: a clothoid path
     """
@@ -67,20 +67,24 @@ def generate_clothoid_path(start_point, start_yaw,
     delta = phi2 - phi1
 
     try:
-        A = solve_for_root(phi1, phi2, delta)
+        # Step1: Solve g function
+        A = solve_g_for_root(phi1, phi2, delta)
+
+        # Step2: Calculate path parameters
         L = compute_path_length(r, phi1, delta, A)
-        curv = compute_curvature(delta, A, L)
-        curv_rate = compute_curvature_rate(A, L)
+        curvature = compute_curvature(delta, A, L)
+        curvature_rate = compute_curvature_rate(A, L)
     except Exception as e:
         print(f"Failed to generate clothoid points: {e}")
         return None
 
+    # Step3: Construct a path with Fresnel integral
     points = []
     for s in np.linspace(0, L, n_path_points):
         try:
-            x = start_point.x + s * X(curv_rate * s ** 2, curv * s,
+            x = start_point.x + s * X(curvature_rate * s ** 2, curvature * s,
                                       start_yaw)
-            y = start_point.y + s * Y(curv_rate * s ** 2, curv * s,
+            y = start_point.y + s * Y(curvature_rate * s ** 2, curvature * s,
                                       start_yaw)
             points.append(Point(x, y))
         except Exception as e:
@@ -97,9 +101,9 @@ def Y(a, b, c):
     return integrate.quad(lambda t: sin((a/2)*t**2 + b*t + c), 0, 1)[0]
 
 
-def solve_for_root(theta1, theta2, delta):
+def solve_g_for_root(theta1, theta2, delta):
     initial_guess = 3*(theta1 + theta2)
-    return fsolve(lambda x: Y(2*x, delta - x, theta1), [initial_guess])
+    return fsolve(lambda A: Y(2*A, delta - A, theta1), [initial_guess])
 
 
 def compute_path_length(r, theta1, delta, A):
@@ -180,7 +184,7 @@ def draw_clothoids(start, goal, num_steps, clothoidal_paths,
 
 def main():
     start_point = Point(0, 0)
-    start_orientation_list = [0]
+    start_orientation_list = [0.0]
     goal_point = Point(10, 0)
     goal_orientation_list = np.linspace(-pi, pi, 75)
     num_path_points = 100
