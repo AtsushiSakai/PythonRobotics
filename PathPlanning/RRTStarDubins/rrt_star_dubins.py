@@ -56,6 +56,7 @@ class RRTStarDubins(RRTStar):
         goal:Goal Position [x,y]
         obstacleList:obstacle Positions [[x,y,size],...]
         randArea:Random Sampling Area [min,max]
+        robot_radius: robot body modeled as circle with given radius
 
         """
         self.start = self.Node(start[0], start[1], start[2])
