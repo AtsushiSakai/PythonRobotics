@@ -14,6 +14,7 @@ Path Planning
 .. include:: rrt/rrt.rst
 .. include:: cubic_spline/cubic_spline.rst
 .. include:: bspline_path/bspline_path.rst
+.. include:: clothoid_path/clothoid_path.rst
 .. include:: eta3_spline/eta3_spline.rst
 .. include:: bezier_path/bezier_path.rst
 .. include:: quintic_polynomials_planner/quintic_polynomials_planner.rst

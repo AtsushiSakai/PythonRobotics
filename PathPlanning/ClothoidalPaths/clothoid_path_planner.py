@@ -1,6 +1,7 @@
 """
-Clothoidal Path Planner
+Clothoid Path Planner
 Author: Daniel Ingram (daniel-s-ingram)
+        Atsushi Sakai
 Reference paper: Fast and accurate G1 fitting of clothoid curves
 https://www.researchgate.net/publication/237062806
 """
@@ -14,32 +15,60 @@ from math import atan2, cos, hypot, pi, sin
 from matplotlib import animation
 
 Point = namedtuple("Point", ["x", "y"])
+Pose = namedtuple("Pose", ["x", "y", "yaw"])
 
 show_animation = True
 
 
-def get_clothoid_paths(num_steps, p1, p2, theta1_vals, theta2_vals):
+def generate_clothoid_paths(start_point, start_yaw_list,
+                            goal_point, goal_yaw_list,
+                            n_path_points):
+    """
+    Generate clothoid path list. This function generate multiple clothoid paths
+    from multiple orientations(yaw) at start points to multiple orientations
+    (yaw) at goal point.
+
+    :param start_point: Start point of the path
+    :param start_yaw_list: Orientation list at start point
+    :param goal_point: Goal point of the path
+    :param goal_yaw_list: Orientation list at goal point
+    :param n_path_points: number of path points
+    :return: clothoid path list
+    """
     clothoids = []
-    for theta1 in theta1_vals:
-        for theta2 in theta2_vals:
-            clothoid = get_clothoid_points(p1, p2, theta1, theta2, num_steps)
+    for start_yaw in start_yaw_list:
+        for goal_yaw in goal_yaw_list:
+            clothoid = generate_clothoid_path(start_point, start_yaw,
+                                              goal_point, goal_yaw,
+                                              n_path_points)
             clothoids.append(clothoid)
     return clothoids
 
 
-def get_clothoid_points(p1, p2, theta1, theta2, num_steps=100):
-    dx = p2.x - p1.x
-    dy = p2.y - p1.y
+def generate_clothoid_path(start_point, start_yaw,
+                           goal_point, goal_yaw, n_path_points):
+    """
+    Generate a clothoid path list.
+
+    :param start_point: Start point of the path
+    :param start_yaw: Orientation at start point
+    :param goal_point: Goal point of the path
+    :param goal_yaw: Orientation at goal point
+    :param n_path_points: number of path points
+    :return: a clothoid path
+    """
+    dx = goal_point.x - start_point.x
+    dy = goal_point.y - start_point.y
     r = hypot(dx, dy)
 
     phi = atan2(dy, dx)
-    phi1 = normalize_angle(theta1 - phi)
-    phi2 = normalize_angle(theta2 - phi)
+    phi1 = normalize_angle(start_yaw - phi)
+    phi2 = normalize_angle(goal_yaw - phi)
     delta = phi2 - phi1
 
     try:
         A = solve_for_root(phi1, phi2, delta)
-        L = compute_length(r, phi1, delta, A)
+        L = compute_path_length(r, phi1, delta, A)
         curv = compute_curvature(delta, A, L)
         curv_rate = compute_curvature_rate(A, L)
     except Exception as e:
@@ -47,10 +76,12 @@ def get_clothoid_points(p1, p2, theta1, theta2, num_steps=100):
         return None
 
     points = []
-    for s in np.linspace(0, L, num_steps):
+    for s in np.linspace(0, L, n_path_points):
         try:
-            x = p1.x + s*X(curv_rate*s**2, curv*s, theta1)
-            y = p1.y + s*Y(curv_rate*s**2, curv*s, theta1)
+            x = start_point.x + s * X(curv_rate * s ** 2, curv * s,
+                                      start_yaw)
+            y = start_point.y + s * Y(curv_rate * s ** 2, curv * s,
+                                      start_yaw)
             points.append(Point(x, y))
         except Exception as e:
             print(f"Skipping failed clothoid point: {e}")
@@ -71,7 +102,16 @@ def solve_for_root(theta1, theta2, delta):
     return fsolve(lambda x: Y(2*x, delta - x, theta1), [initial_guess])
 
 
-def compute_length(r, theta1, delta, A):
+def compute_path_length(r, theta1, delta, A):
+    """
+
+
+    :param r:
+    :param theta1:
+    :param delta:
+    :param A:
+    :return:
+    """
     return r / X(2*A, delta - A, theta1)
 
 
@@ -139,15 +179,17 @@ def draw_clothoids(start, goal, num_steps, clothoidal_paths,
 
 
 def main():
-    theta1_vals = [0]
-    theta2_vals = np.linspace(-pi, pi, 75)
-    start = Point(0, 0)
-    goal = Point(10, 0)
-    num_steps = 100
-    clothoid_paths = get_clothoid_paths(num_steps, start, goal,
-                                        theta1_vals, theta2_vals)
+    start_point = Point(0, 0)
+    start_orientation_list = [0]
+    goal_point = Point(10, 0)
+    goal_orientation_list = np.linspace(-pi, pi, 75)
+    num_path_points = 100
+    clothoid_paths = generate_clothoid_paths(
+        start_point, start_orientation_list,
+        goal_point, goal_orientation_list,
+        num_path_points)
     if show_animation:
-        draw_clothoids(start, goal, num_steps, clothoid_paths,
+        draw_clothoids(start_point, goal_point, num_path_points, clothoid_paths,
                        save_animation=False)
 
 
