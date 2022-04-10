@@ -129,7 +129,7 @@ class ClosedLoopRRTStar(RRTStarReedsShepp):
             print("path is too long")
             find_goal = False
 
-        tmp_node = self.Node(0,0,0)
+        tmp_node = self.Node(0, 0, 0)
         tmp_node.path_x = x
         tmp_node.path_y = y
         if not self.check_collision(
