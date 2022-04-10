@@ -107,15 +107,6 @@ def solve_g_for_root(theta1, theta2, delta):
 
 
 def compute_path_length(r, theta1, delta, A):
-    """
-
-
-    :param r:
-    :param theta1:
-    :param delta:
-    :param A:
-    :return:
-    """
     return r / X(2*A, delta - A, theta1)
 
 

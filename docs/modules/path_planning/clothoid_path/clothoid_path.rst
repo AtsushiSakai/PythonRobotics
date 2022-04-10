@@ -18,21 +18,33 @@ This path planning algorithm as follows:
 Step1: Solve g function
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+Solve the g(A) function with a nonlinear optimization solver.
+
 .. math::
 
-    g(A):=Y\left(2A, \delta-A, \phi_{0})
+    g(A):=Y(2A, \delta-A, \phi_{s})
+
+Where
+- :math:`\delta`: the orientation difference between start and goal pose.
+- :math:`\phi_{s}`: the orientation of the start pose.
+- :math:`Y`: :math:`Y(a, b, c)=\int_{0}^{1} \sin \left(\frac{a}{2} \tau^{2}+b \tau+c\right) d \tau`
 
 
 Step2: Calculate path parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Using :math:`A`, we can calculate these path parameters:
+We can calculate these path parameters using :math:`A`,
 
-- :math:`L`: path length
+:math:`L`: path length
 
 .. math::
 
-        L=\frac{\sqrt{\Delta x^{2}+\Delta y^{2}}}{X\left(2 A, \delta-A, \phi_{0}\right)}
+        L=\frac{R}{X\left(2 A, \delta-A, \phi_{s}\right)}
+
+where
+- :math:`R`: the distance between start and goal pose
+- :math:`X`: :math:`X(a, b, c)=\int_{0}^{1} \cos \left(\frac{a}{2} \tau^{2}+b \tau+c\right) d \tau`
+
 
 - :math:`\kappa`: curvature
 

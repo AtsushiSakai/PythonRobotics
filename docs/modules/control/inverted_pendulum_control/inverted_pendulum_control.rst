@@ -34,7 +34,7 @@ So
     & \ddot{\theta} = \frac{g(M + m)sin{\theta} - \dot{\theta}^2lmsin{\theta}cos{\theta} + ucos{\theta}}{l(M + m - mcos^2{\theta})}
 
 
-Linearlied model when :math:`\theta` small, :math:`cos{\theta} \approx 1`, :math:`sin{\theta} \approx \theta`, :math:`\dot{\theta}^2 \approx 0`.
+Linearized model when :math:`\theta` small, :math:`cos{\theta} \approx 1`, :math:`sin{\theta} \approx \theta`, :math:`\dot{\theta}^2 \approx 0`.
 
 .. math::
     & \ddot{x} =  \frac{gm}{M}\theta + \frac{1}{M}u\\
