@@ -1,5 +1,5 @@
 import conftest
-from PathPlanning.ClothoidalPaths import clothoidal_paths as m
+from PathPlanning.ClothoidPath import clothoid_path_planner as m
 
 
 def test_1():

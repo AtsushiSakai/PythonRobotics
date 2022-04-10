@@ -3,7 +3,9 @@
 Clothoid path planning
 --------------------------
 
-.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/Eta3SplinePath/animation.gif
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/PathPlanning/ClothoidPath/animation1.gif
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/PathPlanning/ClothoidPath/animation2.gif
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/PathPlanning/ClothoidPath/animation3.gif
 
 This is a clothoid path planning.
 
