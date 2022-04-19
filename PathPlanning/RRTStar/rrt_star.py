@@ -42,7 +42,8 @@ class RRTStar(RRT):
                  goal_sample_rate=20,
                  max_iter=300,
                  connect_circle_dist=50.0,
-                 search_until_max_iter=False):
+                 search_until_max_iter=False,
+                 robot_radius=0.0):
         """
         Setting Parameter
 
@@ -53,7 +54,8 @@ class RRTStar(RRT):
 
         """
         super().__init__(start, goal, obstacle_list, rand_area, expand_dis,
-                         path_resolution, goal_sample_rate, max_iter)
+                         path_resolution, goal_sample_rate, max_iter,
+                         robot_radius=robot_radius)
         self.connect_circle_dist = connect_circle_dist
         self.goal_node = self.Node(goal[0], goal[1])
         self.search_until_max_iter = search_until_max_iter
@@ -77,7 +79,8 @@ class RRTStar(RRT):
                 math.hypot(new_node.x-near_node.x,
                            new_node.y-near_node.y)
 
-            if self.check_collision(new_node, self.obstacle_list):
+            if self.check_collision(
+                    new_node, self.obstacle_list, self.robot_radius):
                 near_inds = self.find_near_nodes(new_node)
                 node_with_updated_parent = self.choose_parent(
                     new_node, near_inds)
@@ -128,7 +131,8 @@ class RRTStar(RRT):
         for i in near_inds:
             near_node = self.node_list[i]
             t_node = self.steer(near_node, new_node)
-            if t_node and self.check_collision(t_node, self.obstacle_list):
+            if t_node and self.check_collision(
+                    t_node, self.obstacle_list, self.robot_radius):
                 costs.append(self.calc_new_cost(near_node, new_node))
             else:
                 costs.append(float("inf"))  # the cost of collision node
@@ -156,7 +160,8 @@ class RRTStar(RRT):
         safe_goal_inds = []
         for goal_ind in goal_inds:
             t_node = self.steer(self.node_list[goal_ind], self.goal_node)
-            if self.check_collision(t_node, self.obstacle_list):
+            if self.check_collision(
+                    t_node, self.obstacle_list, self.robot_radius):
                 safe_goal_inds.append(goal_ind)
 
         if not safe_goal_inds:
@@ -219,7 +224,8 @@ class RRTStar(RRT):
                 continue
             edge_node.cost = self.calc_new_cost(new_node, near_node)
 
-            no_collision = self.check_collision(edge_node, self.obstacle_list)
+            no_collision = self.check_collision(
+                edge_node, self.obstacle_list, self.robot_radius)
             improved_cost = near_node.cost > edge_node.cost
 
             if no_collision and improved_cost:
@@ -264,7 +270,8 @@ def main():
         goal=[6, 10],
         rand_area=[-2, 15],
         obstacle_list=obstacle_list,
-        expand_dis=1)
+        expand_dis=1,
+        robot_radius=0.8)
     path = rrt_star.planning(animation=show_animation)
 
     if path is None:

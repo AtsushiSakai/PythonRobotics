@@ -50,7 +50,8 @@ class RRT:
                  path_resolution=0.5,
                  goal_sample_rate=5,
                  max_iter=500,
-                 play_area=None
+                 play_area=None,
+                 robot_radius=0.0,
                  ):
         """
         Setting Parameter
@@ -60,6 +61,7 @@ class RRT:
         obstacleList:obstacle Positions [[x,y,size],...]
         randArea:Random Sampling Area [min,max]
         play_area:stay inside this area [xmin,xmax,ymin,ymax]
+        robot_radius: robot body modeled as circle with given radius
 
         """
         self.start = self.Node(start[0], start[1])
@@ -76,6 +78,7 @@ class RRT:
         self.max_iter = max_iter
         self.obstacle_list = obstacle_list
         self.node_list = []
+        self.robot_radius = robot_radius
 
     def planning(self, animation=True):
         """
@@ -93,7 +96,8 @@ class RRT:
             new_node = self.steer(nearest_node, rnd_node, self.expand_dis)
 
             if self.check_if_outside_play_area(new_node, self.play_area) and \
-               self.check_collision(new_node, self.obstacle_list):
+               self.check_collision(
+                   new_node, self.obstacle_list, self.robot_radius):
                 self.node_list.append(new_node)
 
             if animation and i % 5 == 0:
@@ -103,7 +107,8 @@ class RRT:
                                       self.node_list[-1].y) <= self.expand_dis:
                 final_node = self.steer(self.node_list[-1], self.end,
                                         self.expand_dis)
-                if self.check_collision(final_node, self.obstacle_list):
+                if self.check_collision(
+                        final_node, self.obstacle_list, self.robot_radius):
                     return self.generate_final_course(len(self.node_list) - 1)
 
             if animation and i % 5:
@@ -173,6 +178,8 @@ class RRT:
             lambda event: [exit(0) if event.key == 'escape' else None])
         if rnd is not None:
             plt.plot(rnd.x, rnd.y, "^k")
+            if self.robot_radius > 0.0:
+                self.plot_circle(rnd.x, rnd.y, self.robot_radius, '-r')
         for node in self.node_list:
             if node.parent:
                 plt.plot(node.path_x, node.path_y, "-g")
@@ -225,7 +232,7 @@ class RRT:
             return True  # inside - ok
 
     @staticmethod
-    def check_collision(node, obstacleList):
+    def check_collision(node, obstacleList, robot_radius):
 
         if node is None:
             return False
@@ -235,7 +242,7 @@ class RRT:
             dy_list = [oy - y for y in node.path_y]
             d_list = [dx * dx + dy * dy for (dx, dy) in zip(dx_list, dy_list)]
 
-            if min(d_list) <= size**2:
+            if min(d_list) <= (size+robot_radius)**2:
                 return False  # collision
 
         return True  # safe
@@ -262,6 +269,7 @@ def main(gx=6.0, gy=10.0):
         rand_area=[-2, 15],
         obstacle_list=obstacleList,
         # play_area=[0, 10, 0, 14]
+        robot_radius=0.8
         )
     path = rrt.planning(animation=show_animation)
 

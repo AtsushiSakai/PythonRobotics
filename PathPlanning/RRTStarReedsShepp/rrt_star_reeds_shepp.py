@@ -45,7 +45,8 @@ class RRTStarReedsShepp(RRTStar):
 
     def __init__(self, start, goal, obstacle_list, rand_area,
                  max_iter=200,
-                 connect_circle_dist=50.0
+                 connect_circle_dist=50.0,
+                 robot_radius=0.0
                  ):
         """
         Setting Parameter
@@ -54,6 +55,7 @@ class RRTStarReedsShepp(RRTStar):
         goal:Goal Position [x,y]
         obstacleList:obstacle Positions [[x,y,size],...]
         randArea:Random Sampling Area [min,max]
+        robot_radius: robot body modeled as circle with given radius
 
         """
         self.start = self.Node(start[0], start[1], start[2])
@@ -63,6 +65,7 @@ class RRTStarReedsShepp(RRTStar):
         self.max_iter = max_iter
         self.obstacle_list = obstacle_list
         self.connect_circle_dist = connect_circle_dist
+        self.robot_radius = robot_radius
 
         self.curvature = 1.0
         self.goal_yaw_th = np.deg2rad(1.0)
@@ -82,7 +85,8 @@ class RRTStarReedsShepp(RRTStar):
             nearest_ind = self.get_nearest_node_index(self.node_list, rnd)
             new_node = self.steer(self.node_list[nearest_ind], rnd)
 
-            if self.check_collision(new_node, self.obstacle_list):
+            if self.check_collision(
+                    new_node, self.obstacle_list, self.robot_radius):
                 near_indexes = self.find_near_nodes(new_node)
                 new_node = self.choose_parent(new_node, near_indexes)
                 if new_node:
@@ -117,7 +121,8 @@ class RRTStarReedsShepp(RRTStar):
         if new_node is None:
             return
 
-        if self.check_collision(new_node, self.obstacle_list):
+        if self.check_collision(
+                new_node, self.obstacle_list, self.robot_radius):
             self.node_list.append(new_node)
 
     def draw_graph(self, rnd=None):
