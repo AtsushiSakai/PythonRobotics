@@ -1,7 +1,7 @@
 version: 2
 updates:
 - package-ecosystem: pip
-  directory: "/"
+  directory: "/requirements"
   schedule:
     interval: weekly
     time: "20:00"

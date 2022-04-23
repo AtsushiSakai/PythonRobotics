@@ -46,7 +46,8 @@ class RRTStarDubins(RRTStar):
     def __init__(self, start, goal, obstacle_list, rand_area,
                  goal_sample_rate=10,
                  max_iter=200,
-                 connect_circle_dist=50.0
+                 connect_circle_dist=50.0,
+                 robot_radius=0.0,
                  ):
         """
         Setting Parameter
@@ -55,6 +56,7 @@ class RRTStarDubins(RRTStar):
         goal:Goal Position [x,y]
         obstacleList:obstacle Positions [[x,y,size],...]
         randArea:Random Sampling Area [min,max]
+        robot_radius: robot body modeled as circle with given radius
 
         """
         self.start = self.Node(start[0], start[1], start[2])
@@ -69,6 +71,7 @@ class RRTStarDubins(RRTStar):
         self.curvature = 1.0  # for dubins path
         self.goal_yaw_th = np.deg2rad(1.0)
         self.goal_xy_th = 0.5
+        self.robot_radius = robot_radius
 
     def planning(self, animation=True, search_until_max_iter=True):
         """
@@ -84,7 +87,8 @@ class RRTStarDubins(RRTStar):
             nearest_ind = self.get_nearest_node_index(self.node_list, rnd)
             new_node = self.steer(self.node_list[nearest_ind], rnd)
 
-            if self.check_collision(new_node, self.obstacle_list):
+            if self.check_collision(
+                    new_node, self.obstacle_list, self.robot_radius):
                 near_indexes = self.find_near_nodes(new_node)
                 new_node = self.choose_parent(new_node, near_indexes)
                 if new_node:

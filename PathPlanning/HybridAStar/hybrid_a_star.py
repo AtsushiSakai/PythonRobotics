@@ -20,7 +20,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__))
 try:
     from dynamic_programming_heuristic import calc_distance_heuristic
     import reeds_shepp_path_planning as rs
-    from car import move, check_car_collision, MAX_STEER, WB, plot_car
+    from car import move, check_car_collision, MAX_STEER, WB, plot_car,\
+        BUBBLE_R
 except Exception:
     raise
 
@@ -28,7 +29,6 @@ XY_GRID_RESOLUTION = 2.0  # [m]
 YAW_GRID_RESOLUTION = np.deg2rad(15.0)  # [rad]
 MOTION_RESOLUTION = 0.1  # [m] path interpolate resolution
 N_STEER = 20  # number of steer command
-VR = 1.0  # robot radius
 
 SB_COST = 100.0  # switch back penalty cost
 BACK_COST = 5.0  # backward penalty cost
@@ -276,7 +276,7 @@ def hybrid_a_star_planning(start, goal, ox, oy, xy_resolution, yaw_resolution):
 
     h_dp = calc_distance_heuristic(
         goal_node.x_list[-1], goal_node.y_list[-1],
-        ox, oy, xy_resolution, VR)
+        ox, oy, xy_resolution, BUBBLE_R)
 
     pq = []
     openList[calc_index(start_node, config)] = start_node

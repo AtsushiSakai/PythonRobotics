@@ -37,11 +37,13 @@ class ClosedLoopRRTStar(RRTStarReedsShepp):
 
     def __init__(self, start, goal, obstacle_list, rand_area,
                  max_iter=200,
-                 connect_circle_dist=50.0
+                 connect_circle_dist=50.0,
+                 robot_radius=0.0
                  ):
         super().__init__(start, goal, obstacle_list, rand_area,
                          max_iter=max_iter,
                          connect_circle_dist=connect_circle_dist,
+                         robot_radius=robot_radius
                          )
 
         self.target_speed = 10.0 / 3.6
@@ -127,7 +129,11 @@ class ClosedLoopRRTStar(RRTStarReedsShepp):
             print("path is too long")
             find_goal = False
 
-        if not self.collision_check_with_xy(x, y, self.obstacle_list):
+        tmp_node = self.Node(x, y, 0)
+        tmp_node.path_x = x
+        tmp_node.path_y = y
+        if not self.check_collision(
+                tmp_node, self.obstacle_list, self.robot_radius):
             print("This path is collision")
             find_goal = False
 
@@ -150,19 +156,6 @@ class ClosedLoopRRTStar(RRTStarReedsShepp):
         print(len(fgoalinds))
 
         return fgoalinds
-
-    @staticmethod
-    def collision_check_with_xy(x, y, obstacle_list):
-
-        for (ox, oy, size) in obstacle_list:
-            for (ix, iy) in zip(x, y):
-                dx = ox - ix
-                dy = oy - iy
-                d = dx * dx + dy * dy
-                if d <= size ** 2:
-                    return False  # collision
-
-        return True  # safe
 
 
 def main(gx=6.0, gy=7.0, gyaw=np.deg2rad(90.0), max_iter=100):

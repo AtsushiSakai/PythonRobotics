@@ -1,5 +1,5 @@
 import conftest  # Add root path to sys.path
-import rrt_star_reeds_shepp as m
+from PathPlanning.RRTStarReedsShepp import rrt_star_reeds_shepp as m
 
 
 def test1():

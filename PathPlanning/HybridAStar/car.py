@@ -12,14 +12,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.transform import Rotation as Rot
 
-WB = 3.  # rear to front wheel
-W = 2.  # width of car
+WB = 3.0  # rear to front wheel
+W = 2.0  # width of car
 LF = 3.3  # distance from rear to vehicle front end
 LB = 1.0  # distance from rear to vehicle back end
 MAX_STEER = 0.6  # [rad] maximum steering angle
 
-W_BUBBLE_DIST = (LF - LB) / 2.0
-W_BUBBLE_R = sqrt(((LF + LB) / 2.0) ** 2 + 1)
+BUBBLE_DIST = (LF - LB) / 2.0  # distance from rear to center of vehicle.
+BUBBLE_R = np.hypot((LF + LB) / 2.0, W / 2.0)  # bubble radius
 
 # vehicle rectangle vertices
 VRX = [LF, LF, -LB, -LB, LF]
@@ -28,10 +28,10 @@ VRY = [W / 2, -W / 2, -W / 2, W / 2, W / 2]
 
 def check_car_collision(x_list, y_list, yaw_list, ox, oy, kd_tree):
     for i_x, i_y, i_yaw in zip(x_list, y_list, yaw_list):
-        cx = i_x + W_BUBBLE_DIST * cos(i_yaw)
-        cy = i_y + W_BUBBLE_DIST * sin(i_yaw)
+        cx = i_x + BUBBLE_DIST * cos(i_yaw)
+        cy = i_y + BUBBLE_DIST * sin(i_yaw)
 
-        ids = kd_tree.query_ball_point([cx, cy], W_BUBBLE_R)
+        ids = kd_tree.query_ball_point([cx, cy], BUBBLE_R)
 
         if not ids:
             continue

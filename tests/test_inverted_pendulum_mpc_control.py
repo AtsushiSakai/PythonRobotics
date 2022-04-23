@@ -1,13 +1,11 @@
 import conftest
-import sys
-if 'cvxpy' in sys.modules:  # pragma: no cover
 
-    from InvertedPendulumCart.InvertedPendulumMPCControl \
-        import inverted_pendulum_mpc_control as m
+from Control.inverted_pendulum import inverted_pendulum_mpc_control as m
 
-    def test1():
-        m.show_animation = False
-        m.main()
+
+def test1():
+    m.show_animation = False
+    m.main()
 
 
 if __name__ == '__main__':

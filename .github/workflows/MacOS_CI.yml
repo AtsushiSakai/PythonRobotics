@@ -4,7 +4,12 @@ name: MacOS_CI
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
 
 jobs:
   build:
@@ -28,33 +33,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install numpy # cvxpy install workaround
-          pip install -r requirements.txt
-      - name: install coverage
-        run: pip install coverage
-      - name: install mypy
-        run: pip install mypy
-      - name: install pycodestyle
-        run: pip install pycodestyle
-      - name: install pytest-xdist
-        run: pip install pytest-xdist
-      - name: mypy check
-        run: |
-          mypy -p AerialNavigation
-          mypy -p ArmNavigation
-          mypy -p Bipedal
-          mypy -p InvertedPendulumCart
-          mypy -p Localization
-          mypy -p Mapping
-          mypy -p PathPlanning
-          mypy -p PathTracking
-          mypy -p SLAM
-      - name: do diff style check
-        run: bash rundiffstylecheck.sh
-
+          #pip install numpy # cvxpy install workaround
+          pip install -r requirements/requirements.txt
       - name: do all unit tests
         run: bash runtests.sh
-
-
-
-

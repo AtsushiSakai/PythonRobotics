@@ -1,4 +1,4 @@
-os: Visual Studio 2019
+os: Visual Studio 2022
 
 environment:
   global:
@@ -9,6 +9,10 @@ environment:
 
   matrix:
      - PYTHON_DIR: C:\Python39-x64
+
+branches:
+  only:
+    - master
 
 init:
   - "ECHO %PYTHON_DIR%"
@@ -33,7 +37,7 @@ install:
   - SET PATH=%PYTHON%;%PYTHON%\Scripts;%PYTHON%\Library\bin;%PATH%
   - SET PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin
   - "python -m pip install --upgrade pip"
-  - "python -m pip install -r requirements.txt"
+  - "python -m pip install -r requirements/requirements.txt"
   - "python -m pip install pytest-xdist"
 
   # Check that we have the expected version and architecture for Python

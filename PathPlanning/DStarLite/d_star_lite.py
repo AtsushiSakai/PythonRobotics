@@ -64,15 +64,15 @@ class DStarLite:
                           for x, y in zip(ox, oy)]
         self.start = Node(0, 0)
         self.goal = Node(0, 0)
-        self.U = list()
+        self.U = list()  # type: ignore
         self.km = 0.0
         self.kold = 0.0
-        self.rhs = list()
-        self.g = list()
-        self.detected_obstacles = list()
+        self.rhs = list()  # type: ignore
+        self.g = list()  # type: ignore
+        self.detected_obstacles = list()  # type: ignore
         if show_animation:
-            self.detected_obstacles_for_plotting_x = list()
-            self.detected_obstacles_for_plotting_y = list()
+            self.detected_obstacles_for_plotting_x = list()  # type: ignore
+            self.detected_obstacles_for_plotting_y = list()  # type: ignore
 
     def create_grid(self, val: float):
         grid = list()
@@ -248,7 +248,7 @@ class DStarLite:
                 return False
         return True
 
-    def display_path(self, path: list, colour: str, alpha: int = 1):
+    def display_path(self, path: list, colour: str, alpha: float = 1.0):
         px = [(node.x + self.x_min_world) for node in path]
         py = [(node.y + self.y_min_world) for node in path]
         drawing = plt.plot(px, py, colour, alpha=alpha)
