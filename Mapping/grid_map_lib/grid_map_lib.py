@@ -120,8 +120,8 @@ class GridMap:
 
         # making ring polygon
         if (pol_x[0] != pol_x[-1]) or (pol_y[0] != pol_y[-1]):
-            pol_x.append(pol_x[0])
-            pol_y.append(pol_y[0])
+            np.append(pol_x, pol_x[0])
+            np.append(pol_y, pol_y[0])
 
         # setting value for all grid
         for x_ind in range(self.width):
