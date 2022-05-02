@@ -12,11 +12,9 @@ Dubims path is a analyrical path planning algorithm for a simple car model.
 It can generates a shortest path between 2D poses (x, y, yaw) with maximum curvture comstraint and tangent(yaw angle) constraint.
 
 
-
-
-
 Reference
 ~~~~~~~~~~~~~~~~~~~~
 
 -  `Dubins path - Wikipedia <https://en.wikipedia.org/wiki/Dubins_path>`__
 -  `15.3.1 Dubins Curves <http://planning.cs.uiuc.edu/node821.html>`__
+-  `A Comprehensive, Step-by-Step Tutorial to Computing Dubin’s Paths <https://gieseanw.wordpress.com/2012/10/21/a-comprehensive-step-by-step-tutorial-to-computing-dubins-paths/>`__
