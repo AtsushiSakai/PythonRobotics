@@ -7,9 +7,17 @@ A sample code for Dubins path planning.
 
 Dubins path
 ~~~~~~~~~~~~
-Dubims path is a analyrical path planning algorithm for a simple car model.
+Dubins path is a analyrical path planning algorithm for a simple car model.
 
 It can generates a shortest path between 2D poses (x, y, yaw) with maximum curvture comstraint and tangent(yaw angle) constraint.
+
+The path consist of 3 segments of maximum curvature curves or a straight line segment.
+
+Each segment type can is categorized by 3 type: 'Right turn (R)' , 'Left turn (L)', and 'Straight (S).' 
+
+Possible path will be at least one of these six types: RSR, RSL, LSR, LSL, RLR, LRL. 
+
+For example, one of RSR Dubins paths is:
 
 
 Reference
