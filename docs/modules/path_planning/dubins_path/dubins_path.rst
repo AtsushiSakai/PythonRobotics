@@ -19,7 +19,8 @@ Possible path will be at least one of these six types: RSR, RSL, LSR, LSL, RLR, 
 
 For example, one of RSR Dubins paths is:
 
-.. image:: dubins_path/RSR.png
+.. image:: dubins_path/RSR.jpg
+   :width: 400px
 
 
 Reference
