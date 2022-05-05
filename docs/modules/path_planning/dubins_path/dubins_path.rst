@@ -7,7 +7,7 @@ A sample code for Dubins path planning.
 
 Dubins path
 ~~~~~~~~~~~~
-Dubins path is a analyrical path planning algorithm for a simple car model.
+Dubins path is a analytical path planning algorithm for a simple car model.
 
 It can generates a shortest path between 2D poses (x, y, yaw) with maximum curvture comstraint and tangent(yaw angle) constraint.
 
@@ -21,6 +21,12 @@ For example, one of RSR Dubins paths is:
 
 .. image:: dubins_path/RSR.jpg
    :width: 400px
+
+one of RLR Dubins paths is:
+
+.. image:: dubins_path/RLR.jpg
+   :width: 400px
+
 
 
 Reference
