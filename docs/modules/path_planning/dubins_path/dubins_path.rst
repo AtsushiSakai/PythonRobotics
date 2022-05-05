@@ -25,7 +25,7 @@ For example, one of RSR Dubins paths is:
 one of RLR Dubins paths is:
 
 .. image:: dubins_path/RLR.jpg
-   :width: 400px
+   :width: 200px
 
 
 
