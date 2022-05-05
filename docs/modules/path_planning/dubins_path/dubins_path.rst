@@ -27,6 +27,11 @@ one of RLR Dubins paths is:
 .. image:: dubins_path/RLR.jpg
    :width: 200px
 
+Dubins path planner can output three types and distances of each course segment.
+
+You can generate a path from these information and the maximum curvature information.
+
+In the example code, a path which is minimum course length one among 6 course type is selected and then a path is constructed.
 
 
 Reference
