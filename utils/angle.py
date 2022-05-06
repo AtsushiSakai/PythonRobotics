@@ -1,4 +1,20 @@
 import numpy as np
+from scipy.spatial.transform import Rotation as Rot
+
+
+def create_2d_rotation_matrix(angle):
+    """
+    Create 2D totation matrix from an angle
+
+    Parameters
+    ----------
+    angle :
+
+    Returns
+    -------
+
+    """
+    return Rot.from_euler('z', angle).as_matrix()[0:2, 0:2]
 
 
 def angle_mod(x, zero_2_2pi=False, degree=False):

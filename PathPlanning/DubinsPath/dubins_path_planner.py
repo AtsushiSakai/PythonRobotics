@@ -12,7 +12,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/")
 import math
 import numpy as np
 from scipy.spatial.transform import Rotation as Rot
-from utils.angle import angle_mod
+from utils.angle import angle_mod, create_2d_rotation_matrix
 
 show_animation = True
 
@@ -34,7 +34,7 @@ def path_dubins_path(s_x, s_y, s_yaw,
     g_yaw : yaw angle of the end point [rad]
     curvature : curvature for curve [1/m]
     step_size : (optional) step size between two path points [m].
-     Default is 0.1
+                Default is 0.1
 
     Returns
     -------
@@ -46,7 +46,7 @@ def path_dubins_path(s_x, s_y, s_yaw,
 
     """
     # calculate local goal x, y, yaw
-    l_rot = Rot.from_euler('z', s_yaw).as_matrix()[0:2, 0:2]
+    l_rot = create_2d_rotation_matrix(s_yaw)
     le_xy = np.stack([g_x - s_x, g_y - s_y]).T @ l_rot
     local_goal_x = le_xy[0]
     local_goal_y = le_xy[1]
@@ -56,7 +56,7 @@ def path_dubins_path(s_x, s_y, s_yaw,
         local_goal_x, local_goal_y, local_goal_yaw, curvature, step_size)
 
     # Convert a local coordinate path to the global coordinate
-    rot = Rot.from_euler('z', -s_yaw).as_matrix()[0:2, 0:2]
+    rot = create_2d_rotation_matrix(-s_yaw)
     converted_xy = np.stack([lp_x, lp_y]).T @ rot
     x_list = converted_xy[:, 0] + s_x
     y_list = converted_xy[:, 1] + s_y
@@ -166,7 +166,7 @@ def right_left_right(alpha, beta, d):
     return t, p, q, mode
 
 
-def left_right_left(alpha, beta, d):
+def _LRL(alpha, beta, d):
     sa = math.sin(alpha)
     sb = math.sin(beta)
     ca = math.cos(alpha)
@@ -197,7 +197,7 @@ def dubins_path_planning_from_origin(end_x, end_y, end_yaw, curvature,
 
     planning_funcs = [_LSL, right_straight_right,
                       left_straight_right, right_straight_left,
-                      right_left_right, left_right_left]
+                      right_left_right, _LRL]
 
     best_cost = float("inf")
     bt, bp, bq, best_mode = None, None, None, None
