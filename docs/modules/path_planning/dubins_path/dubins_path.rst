@@ -33,6 +33,12 @@ You can generate a path from these information and the maximum curvature informa
 
 In the example code, a path which is minimum course length one among 6 course type is selected and then a path is constructed.
 
+Code
+~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: PathPlanning.DubinsPath.dubins_path_planner
+    :members:
+
 
 Reference
 ~~~~~~~~~~~~~~~~~~~~

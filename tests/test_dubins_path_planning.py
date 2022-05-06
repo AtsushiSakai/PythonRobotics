@@ -33,7 +33,7 @@ def test_1():
 
     curvature = 1.0
 
-    px, py, pyaw, mode, lengths = dubins_path_planner.path_dubins_path(
+    px, py, pyaw, mode, lengths = dubins_path_planner.plan_dubins_path(
         start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature)
 
     check_edge_condition(px, py, pyaw, start_x, start_y, start_yaw, end_x,
@@ -61,7 +61,7 @@ def test_3():
         curvature = 1.0 / (np.random.rand() * 5.0)
 
         px, py, pyaw, mode, lengths = \
-            dubins_path_planner.path_dubins_path(
+            dubins_path_planner.plan_dubins_path(
                 start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature)
 
         check_edge_condition(px, py, pyaw, start_x, start_y, start_yaw, end_x,

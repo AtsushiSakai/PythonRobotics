@@ -144,7 +144,7 @@ class RRTStarDubins(RRTStar):
     def steer(self, from_node, to_node):
 
         px, py, pyaw, mode, course_lengths = \
-            dubins_path_planner.path_dubins_path(
+            dubins_path_planner.plan_dubins_path(
                 from_node.x, from_node.y, from_node.yaw,
                 to_node.x, to_node.y, to_node.yaw, self.curvature)
 
@@ -166,7 +166,7 @@ class RRTStarDubins(RRTStar):
 
     def calc_new_cost(self, from_node, to_node):
 
-        _, _, _, _, course_lengths = dubins_path_planner.path_dubins_path(
+        _, _, _, _, course_lengths = dubins_path_planner.plan_dubins_path(
             from_node.x, from_node.y, from_node.yaw,
             to_node.x, to_node.y, to_node.yaw, self.curvature)
 

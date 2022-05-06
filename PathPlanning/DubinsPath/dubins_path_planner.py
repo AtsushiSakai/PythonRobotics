@@ -11,13 +11,12 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/")
 
 import math
 import numpy as np
-from scipy.spatial.transform import Rotation as Rot
 from utils.angle import angle_mod, create_2d_rotation_matrix
 
 show_animation = True
 
 
-def path_dubins_path(s_x, s_y, s_yaw,
+def plan_dubins_path(s_x, s_y, s_yaw,
                      g_x, g_y, g_yaw,
                      curvature,
                      step_size=0.1):
@@ -26,23 +25,35 @@ def path_dubins_path(s_x, s_y, s_yaw,
 
     Parameters
     ----------
-    s_x : x position of the start point [m]
-    s_y : y position of the start point [m]
-    s_yaw : yaw angle of the start point [rad]
-    g_x : x position of the goal point [m]
-    g_y : y position of the end point [m]
-    g_yaw : yaw angle of the end point [rad]
-    curvature : curvature for curve [1/m]
-    step_size : (optional) step size between two path points [m].
-                Default is 0.1
+    s_x : float
+        x position of the start point [m]
+    s_y : float
+        y position of the start point [m]
+    s_yaw : float
+        yaw angle of the start point [rad]
+    g_x : float
+        x position of the goal point [m]
+    g_y : float
+        y position of the end point [m]
+    g_yaw : float
+        yaw angle of the end point [rad]
+    curvature : float
+        curvature for curve [1/m]
+    step_size : float (optional)
+        step size between two path points [m]. Default is 0.1
 
     Returns
     -------
-    x_list: x positions of the path
-    y_list: y positions of the path
-    yaw_list: yaw angles of the path
-    modes: mode list of the path
-    lengths: length list of the path segments.
+    x_list: array
+        x positions of the path
+    y_list: array
+        y positions of the path
+    yaw_list: array
+        yaw angles of the path
+    modes: array
+        mode list of the path
+    lengths: array
+        length list of the path segments.
 
     """
     # calculate local goal x, y, yaw
@@ -350,7 +361,7 @@ def main():
 
     curvature = 1.0
 
-    path_x, path_y, path_yaw, mode, lengths = path_dubins_path(start_x,
+    path_x, path_y, path_yaw, mode, lengths = plan_dubins_path(start_x,
                                                                start_y,
                                                                start_yaw,
                                                                end_x,
