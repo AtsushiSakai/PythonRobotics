@@ -20,7 +20,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
 
 try:
     from rrt import RRT
-    import dubins_path_planning
+    import dubins_path_planner
 except ImportError:
     raise
 
@@ -130,15 +130,15 @@ class RRTDubins(RRT):
         plt.pause(0.01)
 
     def plot_start_goal_arrow(self):  # pragma: no cover
-        dubins_path_planning.plot_arrow(
+        dubins_path_planner.plot_arrow(
             self.start.x, self.start.y, self.start.yaw)
-        dubins_path_planning.plot_arrow(
+        dubins_path_planner.plot_arrow(
             self.end.x, self.end.y, self.end.yaw)
 
     def steer(self, from_node, to_node):
 
         px, py, pyaw, mode, course_lengths = \
-            dubins_path_planning.dubins_path_planning(
+            dubins_path_planner.plan_dubins_path(
                 from_node.x, from_node.y, from_node.yaw,
                 to_node.x, to_node.y, to_node.yaw, self.curvature)
 
@@ -160,7 +160,7 @@ class RRTDubins(RRT):
 
     def calc_new_cost(self, from_node, to_node):
 
-        _, _, _, _, course_length = dubins_path_planning.dubins_path_planning(
+        _, _, _, _, course_length = dubins_path_planner.plan_dubins_path(
             from_node.x, from_node.y, from_node.yaw,
             to_node.x, to_node.y, to_node.yaw, self.curvature)
 

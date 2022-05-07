@@ -6,7 +6,7 @@ author: Zheng Zh (@Zhengzh)
 
 """
 
-from math import sqrt, cos, sin, tan, pi
+from math import cos, sin, tan, pi
 
 import matplotlib.pyplot as plt
 import numpy as np

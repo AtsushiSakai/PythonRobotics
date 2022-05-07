@@ -92,7 +92,9 @@ def find_diff(sha):
 def run_flake8(diff):
     """Run flake8 on the given diff."""
     res = subprocess.run(
-        ['flake8', '--diff'],
+        ['flake8', '--diff', '--ignore',
+         'E402'  # top level import for sys.path.append
+         ],
         input=diff,
         stdout=subprocess.PIPE,
         encoding='utf-8',

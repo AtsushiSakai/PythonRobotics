@@ -5,64 +5,82 @@ Dubins path planner sample code
 author Atsushi Sakai(@Atsushi_twi)
 
 """
-import math
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/")
 
-import matplotlib.pyplot as plt
+import math
 import numpy as np
-from scipy.spatial.transform import Rotation as Rot
+from utils.angle import angle_mod, create_2d_rotation_matrix
 
 show_animation = True
 
 
-def dubins_path_planning(s_x, s_y, s_yaw, g_x, g_y, g_yaw, curvature,
-                         step_size=0.1):
+def plan_dubins_path(s_x, s_y, s_yaw,
+                     g_x, g_y, g_yaw,
+                     curvature,
+                     step_size=0.1):
     """
-    Dubins path planner
+    Path dubins path
 
-    :param s_x: x position of start point [m]
-    :param s_y: y position of start point [m]
-    :param s_yaw: yaw angle of start point [rad]
-    :param g_x: x position of end point [m]
-    :param g_y: y position of end point [m]
-    :param g_yaw: yaw angle of end point [rad]
-    :param curvature: curvature for curve [1/m]
-    :param step_size: (optional) step size between two path points [m]
-    :return:
-        x_list: x positions of a path
-        y_list: y positions of a path
-        yaw_list: yaw angles of a path
-        modes: mode list of a path
-        lengths: length of path segments.
+    Parameters
+    ----------
+    s_x : float
+        x position of the start point [m]
+    s_y : float
+        y position of the start point [m]
+    s_yaw : float
+        yaw angle of the start point [rad]
+    g_x : float
+        x position of the goal point [m]
+    g_y : float
+        y position of the end point [m]
+    g_yaw : float
+        yaw angle of the end point [rad]
+    curvature : float
+        curvature for curve [1/m]
+    step_size : float (optional)
+        step size between two path points [m]. Default is 0.1
+
+    Returns
+    -------
+    x_list: array
+        x positions of the path
+    y_list: array
+        y positions of the path
+    yaw_list: array
+        yaw angles of the path
+    modes: array
+        mode list of the path
+    lengths: array
+        length list of the path segments.
+
     """
-
-    g_x -= s_x
-    g_y -= s_y
-
-    l_rot = Rot.from_euler('z', s_yaw).as_matrix()[0:2, 0:2]
-    le_xy = np.stack([g_x, g_y]).T @ l_rot
-    le_yaw = g_yaw - s_yaw
+    # calculate local goal x, y, yaw
+    l_rot = create_2d_rotation_matrix(s_yaw)
+    le_xy = np.stack([g_x - s_x, g_y - s_y]).T @ l_rot
+    local_goal_x = le_xy[0]
+    local_goal_y = le_xy[1]
+    local_goal_yaw = g_yaw - s_yaw
 
     lp_x, lp_y, lp_yaw, modes, lengths = dubins_path_planning_from_origin(
-        le_xy[0], le_xy[1], le_yaw, curvature, step_size)
+        local_goal_x, local_goal_y, local_goal_yaw, curvature, step_size)
 
-    rot = Rot.from_euler('z', -s_yaw).as_matrix()[0:2, 0:2]
+    # Convert a local coordinate path to the global coordinate
+    rot = create_2d_rotation_matrix(-s_yaw)
     converted_xy = np.stack([lp_x, lp_y]).T @ rot
     x_list = converted_xy[:, 0] + s_x
     y_list = converted_xy[:, 1] + s_y
-    yaw_list = [pi_2_pi(i_yaw + s_yaw) for i_yaw in lp_yaw]
+    yaw_list = angle_mod(np.array(lp_yaw) + s_yaw)
 
     return x_list, y_list, yaw_list, modes, lengths
 
 
-def mod2pi(theta):
-    return theta - 2.0 * math.pi * math.floor(theta / 2.0 / math.pi)
+def _mod2pi(theta):
+    return angle_mod(theta, zero_2_2pi=True)
 
 
-def pi_2_pi(angle):
-    return (angle + math.pi) % (2 * math.pi) - math.pi
-
-
-def left_straight_left(alpha, beta, d):
+def _LSL(alpha, beta, d):
     sa = math.sin(alpha)
     sb = math.sin(beta)
     ca = math.cos(alpha)
@@ -76,9 +94,9 @@ def left_straight_left(alpha, beta, d):
     if p_squared < 0:
         return None, None, None, mode
     tmp1 = math.atan2((cb - ca), tmp0)
-    t = mod2pi(-alpha + tmp1)
+    t = _mod2pi(-alpha + tmp1)
     p = math.sqrt(p_squared)
-    q = mod2pi(beta - tmp1)
+    q = _mod2pi(beta - tmp1)
 
     return t, p, q, mode
 
@@ -96,9 +114,9 @@ def right_straight_right(alpha, beta, d):
     if p_squared < 0:
         return None, None, None, mode
     tmp1 = math.atan2((ca - cb), tmp0)
-    t = mod2pi(alpha - tmp1)
+    t = angle_mod(alpha - tmp1, zero_2_2pi=True)
     p = math.sqrt(p_squared)
-    q = mod2pi(-beta + tmp1)
+    q = _mod2pi(-beta + tmp1)
 
     return t, p, q, mode
 
@@ -116,8 +134,8 @@ def left_straight_right(alpha, beta, d):
         return None, None, None, mode
     p = math.sqrt(p_squared)
     tmp2 = math.atan2((-ca - cb), (d + sa + sb)) - math.atan2(-2.0, p)
-    t = mod2pi(-alpha + tmp2)
-    q = mod2pi(-mod2pi(beta) + tmp2)
+    t = _mod2pi(-alpha + tmp2)
+    q = _mod2pi(-_mod2pi(beta) + tmp2)
 
     return t, p, q, mode
 
@@ -135,8 +153,8 @@ def right_straight_left(alpha, beta, d):
         return None, None, None, mode
     p = math.sqrt(p_squared)
     tmp2 = math.atan2((ca + cb), (d - sa - sb)) - math.atan2(2.0, p)
-    t = mod2pi(alpha - tmp2)
-    q = mod2pi(beta - tmp2)
+    t = _mod2pi(alpha - tmp2)
+    q = _mod2pi(beta - tmp2)
 
     return t, p, q, mode
 
@@ -153,13 +171,13 @@ def right_left_right(alpha, beta, d):
     if abs(tmp_rlr) > 1.0:
         return None, None, None, mode
 
-    p = mod2pi(2 * math.pi - math.acos(tmp_rlr))
-    t = mod2pi(alpha - math.atan2(ca - cb, d - sa + sb) + mod2pi(p / 2.0))
-    q = mod2pi(alpha - beta - t + mod2pi(p))
+    p = _mod2pi(2 * math.pi - math.acos(tmp_rlr))
+    t = _mod2pi(alpha - math.atan2(ca - cb, d - sa + sb) + _mod2pi(p / 2.0))
+    q = _mod2pi(alpha - beta - t + _mod2pi(p))
     return t, p, q, mode
 
 
-def left_right_left(alpha, beta, d):
+def _LRL(alpha, beta, d):
     sa = math.sin(alpha)
     sb = math.sin(beta)
     ca = math.cos(alpha)
@@ -170,9 +188,9 @@ def left_right_left(alpha, beta, d):
     tmp_lrl = (6.0 - d * d + 2.0 * c_ab + 2.0 * d * (- sa + sb)) / 8.0
     if abs(tmp_lrl) > 1:
         return None, None, None, mode
-    p = mod2pi(2 * math.pi - math.acos(tmp_lrl))
-    t = mod2pi(-alpha - math.atan2(ca - cb, d + sa - sb) + p / 2.0)
-    q = mod2pi(mod2pi(beta) - alpha - t + mod2pi(p))
+    p = _mod2pi(2 * math.pi - math.acos(tmp_lrl))
+    t = _mod2pi(-alpha - math.atan2(ca - cb, d + sa - sb) + p / 2.0)
+    q = _mod2pi(_mod2pi(beta) - alpha - t + _mod2pi(p))
 
     return t, p, q, mode
 
@@ -184,13 +202,13 @@ def dubins_path_planning_from_origin(end_x, end_y, end_yaw, curvature,
     D = math.hypot(dx, dy)
     d = D * curvature
 
-    theta = mod2pi(math.atan2(dy, dx))
-    alpha = mod2pi(- theta)
-    beta = mod2pi(end_yaw - theta)
+    theta = _mod2pi(math.atan2(dy, dx))
+    alpha = _mod2pi(- theta)
+    beta = _mod2pi(end_yaw - theta)
 
-    planning_funcs = [left_straight_left, right_straight_right,
+    planning_funcs = [_LSL, right_straight_right,
                       left_straight_right, right_straight_left,
-                      right_left_right, left_right_left]
+                      right_left_right, _LRL]
 
     best_cost = float("inf")
     bt, bp, bq, best_mode = None, None, None, None
@@ -319,6 +337,7 @@ def generate_local_course(total_length, lengths, modes, max_curvature,
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r",
                ec="k"):  # pragma: no cover
+    import matplotlib.pyplot as plt
     if not isinstance(x, float):
         for (i_x, i_y, i_yaw) in zip(x, y, yaw):
             plot_arrow(i_x, i_y, i_yaw)
@@ -330,6 +349,7 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r",
 
 def main():
     print("Dubins path planner sample start!!")
+    import matplotlib.pyplot as plt
 
     start_x = 1.0  # [m]
     start_y = 1.0  # [m]
@@ -341,13 +361,13 @@ def main():
 
     curvature = 1.0
 
-    path_x, path_y, path_yaw, mode, lengths = dubins_path_planning(start_x,
-                                                                   start_y,
-                                                                   start_yaw,
-                                                                   end_x,
-                                                                   end_y,
-                                                                   end_yaw,
-                                                                   curvature)
+    path_x, path_y, path_yaw, mode, lengths = plan_dubins_path(start_x,
+                                                               start_y,
+                                                               start_yaw,
+                                                               end_x,
+                                                               end_y,
+                                                               end_yaw,
+                                                               curvature)
 
     if show_animation:
         plt.plot(path_x, path_y, label="final course " + "".join(mode))
