@@ -16,7 +16,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        python-version: [ '3.9' ]
+        python-version: [ '3.10' ]
     name: Python ${{ matrix.python-version }} CI
     steps:
       - uses: actions/checkout@v2
@@ -32,8 +32,8 @@ jobs:
 
       - name: Install dependencies
         run: |
+          python --version
           python -m pip install --upgrade pip
-          #pip install numpy # cvxpy install workaround
           pip install -r requirements/requirements.txt
       - name: do all unit tests
         run: bash runtests.sh
