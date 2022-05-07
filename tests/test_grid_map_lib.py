@@ -1,4 +1,5 @@
 from Mapping.grid_map_lib.grid_map_lib import GridMap
+import numpy as np
 
 
 def test_position_set():
@@ -19,6 +20,8 @@ def test_polygon_set():
     grid_map = GridMap(600, 290, 0.7, 60.0, 30.5)
 
     grid_map.set_value_from_polygon(ox, oy, 1.0, inside=False)
+    grid_map.set_value_from_polygon(np.array(ox), np.array(oy),
+                                    1.0, inside=False)
 
 
 if __name__ == '__main__':
