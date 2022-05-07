@@ -581,7 +581,7 @@ reckoning and control functions are passed along here as well.
     New LM
     New LM
 
-.. image:: ekf_slam/ekf_slam_1_0.png
+.. image:: ekf_slam_1_0.png
 
 References:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

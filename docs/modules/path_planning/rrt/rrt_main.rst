@@ -14,7 +14,7 @@ This is a simple path planning code with Rapidly-Exploring Random Trees
 Black circles are obstacles, green line is a searched tree, red crosses
 are start and goal positions.
 
-.. include:: rrt/rrt_star.rst
+.. include:: rrt_star.rst
 
 
 RRT with dubins path

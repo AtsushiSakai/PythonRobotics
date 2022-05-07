@@ -8,6 +8,6 @@ with cubic spline.
 
 Heading angle of each point can be also calculated analytically.
 
-.. image:: cubic_spline/Figure_1.png
-.. image:: cubic_spline/Figure_2.png
-.. image:: cubic_spline/Figure_3.png
+.. image:: Figure_1.png
+.. image:: Figure_2.png
+.. image:: Figure_3.png

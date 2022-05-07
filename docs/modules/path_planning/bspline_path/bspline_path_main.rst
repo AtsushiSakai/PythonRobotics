@@ -1,7 +1,7 @@
 B-Spline planning
 -----------------
 
-.. image:: bspline_path/Figure_1.png
+.. image:: Figure_1.png
 
 This is a path planning with B-Spline curse.
 

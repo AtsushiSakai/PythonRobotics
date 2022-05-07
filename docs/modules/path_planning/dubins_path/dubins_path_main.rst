@@ -19,12 +19,12 @@ Possible path will be at least one of these six types: RSR, RSL, LSR, LSL, RLR, 
 
 For example, one of RSR Dubins paths is:
 
-.. image:: dubins_path/RSR.jpg
+.. image:: RSR.jpg
    :width: 400px
 
 one of RLR Dubins paths is:
 
-.. image:: dubins_path/RLR.jpg
+.. image:: RLR.jpg
    :width: 200px
 
 Dubins path planner can output three types and distances of each course segment.

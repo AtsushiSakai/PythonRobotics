@@ -53,12 +53,12 @@ the estimation error due to the movement.
 
 For example, the position probability is peaky with observations:
 
-.. image:: histogram_filter_localization/1.png
+.. image:: 1.png
    :width: 400px
 
 But, the probability is getting uncertain without observations:
 
-.. image:: histogram_filter_localization/2.png
+.. image:: 2.png
    :width: 400px
 
 
@@ -88,12 +88,12 @@ The probability of each grid is updated by this formula:
 
 When the `d` is 3.0, the `h(z)` distribution is:
 
-.. image:: histogram_filter_localization/4.png
+.. image:: 4.png
    :width: 400px
 
 The observation probability distribution looks a circle when a RF-ID is observed:
 
-.. image:: histogram_filter_localization/3.png
+.. image:: 3.png
    :width: 400px
 
 Step4: Estimate position from probability
@@ -110,5 +110,5 @@ There are two ways to calculate the final positions:
 References:
 ~~~~~~~~~~~
 
-- `PROBABILISTIC ROBOTICS`_
+- `_PROBABILISTIC ROBOTICS: <http://www.probabilistic-robotics.org>`_
 - `Robust Vehicle Localization in Urban Environments Using Probabilistic Maps <http://driving.stanford.edu/papers/ICRA2010.pdf>`_

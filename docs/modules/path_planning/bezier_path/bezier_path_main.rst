@@ -5,13 +5,13 @@ A sample code of Bezier path planning.
 
 It is based on 4 control points Beizer path.
 
-.. image:: Bezier_path/Figure_1.png
+.. image:: Figure_1.png
 
 If you change the offset distance from start and end point,
 
 You can get different Beizer course:
 
-.. image:: Bezier_path/Figure_2.png
+.. image:: Figure_2.png
 
 Ref:
 

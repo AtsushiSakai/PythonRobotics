@@ -14,7 +14,7 @@ Path optimization sample
 Lookup table generation sample
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. image:: model_predictive_trajectory_generator/lookup_table.png
+.. image:: lookup_table.png
 
 Ref:
 

@@ -142,7 +142,7 @@ created based on the information of the motion and the observation.
 
 
 
-.. image:: graph_slam/graphSLAM_doc_files/graphSLAM_doc_2_0.png
+.. image:: graphSLAM_doc_files/graphSLAM_doc_2_0.png
 
 
 .. parsed-literal::
@@ -157,7 +157,7 @@ created based on the information of the motion and the observation.
 
 
 
-.. image:: graph_slam/graphSLAM_doc_files/graphSLAM_doc_2_2.png
+.. image:: graphSLAM_doc_files/graphSLAM_doc_2_2.png
 
 
 In particular, the tasks are split into 2 parts, graph construction, and
@@ -289,7 +289,7 @@ robot with 3DoF, namely, :math:`[x, y, \theta]^T`
 
 
 
-.. image:: graph_slam/graphSLAM_doc_files/graphSLAM_doc_4_0.png
+.. image:: graphSLAM_doc_files/graphSLAM_doc_4_0.png
 
 
 .. code:: ipython3
@@ -420,7 +420,7 @@ zero since :math:`x_j + d_j cos(\psi_j + \theta_j)` should equal
 
 
 
-.. image:: graph_slam/graphSLAM_doc_files/graphSLAM_doc_9_1.png
+.. image:: graphSLAM_doc_files/graphSLAM_doc_9_1.png
 
 
 Since the constraints equations derived before are non-linear,
@@ -494,9 +494,9 @@ Similarly, :math:`B = \frac{\partial e_{ij}}{\partial \boldsymbol{x}_j}`
 
 
 
-.. image:: graph_slam/graphSLAM_doc_files/graphSLAM_doc_11_1.png
+.. image:: graphSLAM_doc_files/graphSLAM_doc_11_1.png
 
-.. image:: graph_slam/graphSLAM_doc_files/graphSLAM_doc_11_2.png
+.. image:: graphSLAM_doc_files/graphSLAM_doc_11_2.png
 
 .. code:: ipython3
 
