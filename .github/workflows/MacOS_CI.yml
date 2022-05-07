@@ -1,0 +1,39 @@
+# This is a basic workflow to help you get started with Actions
+
+name: MacOS_CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+
+jobs:
+  build:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: [ '3.10' ]
+    name: Python ${{ matrix.python-version }} CI
+    steps:
+      - uses: actions/checkout@v2
+      - run: git fetch --prune --unshallow
+
+      - name: Update bash
+        run: brew install bash
+
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python --version
+          python -m pip install --upgrade pip
+          pip install -r requirements/requirements.txt
+      - name: do all unit tests
+        run: bash runtests.sh

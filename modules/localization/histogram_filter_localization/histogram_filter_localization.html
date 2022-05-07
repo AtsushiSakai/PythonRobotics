@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Histogram filter localization &mdash; PythonRobotics  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Particle filter localization" href="../particle_filter_localization/particle_filter_localization.html" />
+    <link rel="prev" title="Unscented Kalman Filter localization" href="../unscented_kalman_filter_localization/unscented_kalman_filter_localization.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> PythonRobotics
+            <img src="../../../_static/icon.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../localization.html">Localization</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../extended_kalman_filter_localization_files/extended_kalman_filter_localization.html">Extended Kalman Filter Localization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ensamble_kalman_filter_localization_files/ensamble_kalman_filter_localization.html">Ensamble Kalman Filter Localization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../unscented_kalman_filter_localization/unscented_kalman_filter_localization.html">Unscented Kalman Filter localization</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Histogram filter localization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#filtering-algorithm">Filtering algorithm</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#step1-filter-initialization">Step1: Filter initialization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#step2-predict-probability-by-motion">Step2: Predict probability by motion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#step3-update-probability-by-observation">Step3: Update probability by observation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#step4-estimate-position-from-probability">Step4: Estimate position from probability</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#references">References:</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../particle_filter_localization/particle_filter_localization.html">Particle filter localization</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../mapping/mapping.html">Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../slam/slam.html">SLAM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_planning/path_planning.html">Path Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_tracking/path_tracking.html">Path Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../arm_navigation/arm_navigation.html">Arm Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../aerial_navigation/aerial_navigation.html">Aerial Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bipedal/bipedal.html">Bipedal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../appendix/appendix.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how_to_contribute.html">How To Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PythonRobotics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../localization.html">Localization</a> &raquo;</li>
+      <li>Histogram filter localization</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/modules/localization/histogram_filter_localization/histogram_filter_localization_main.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="histogram-filter-localization">
+<h1>Histogram filter localization<a class="headerlink" href="#histogram-filter-localization" title="Permalink to this headline"></a></h1>
+<img alt="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/histogram_filter/animation.gif" src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/histogram_filter/animation.gif" />
+<p>This is a 2D localization example with Histogram filter.</p>
+<p>The red cross is true position, black points are RFID positions.</p>
+<p>The blue grid shows a position probability of histogram filter.</p>
+<p>In this simulation, we assume the robot’s yaw orientation and RFID’s positions are known,
+but x,y positions are unknown.</p>
+<p>The filter uses speed input and range observations from RFID for localization.</p>
+<p>Initial position information is not needed.</p>
+<section id="filtering-algorithm">
+<h2>Filtering algorithm<a class="headerlink" href="#filtering-algorithm" title="Permalink to this headline"></a></h2>
+<p>Histogram filter is a discrete Bayes filter in continuous space.</p>
+<p>It uses regular girds to manage probability of the robot existence.</p>
+<p>If a grid has higher probability, it means that the robot is likely to be there.</p>
+<p>In the simulation, we want to estimate x-y position, so we use 2D grid data.</p>
+<p>There are 4 steps for the histogram filter to estimate the probability distribution.</p>
+<section id="step1-filter-initialization">
+<h3>Step1: Filter initialization<a class="headerlink" href="#step1-filter-initialization" title="Permalink to this headline"></a></h3>
+<p>Histogram filter does not need initial position information.</p>
+<p>In that case, we can initialize each grid probability as a same value.</p>
+<p>If we can use initial position information, we can set initial probabilities based on it.</p>
+<p><a class="reference internal" href="../../mapping/gaussian_grid_map/gaussian_grid_map.html#gaussian-grid-map"><span class="std std-ref">Gaussian grid map</span></a> might be useful when the initial position information is provided as gaussian distribution.</p>
+</section>
+<section id="step2-predict-probability-by-motion">
+<h3>Step2: Predict probability by motion<a class="headerlink" href="#step2-predict-probability-by-motion" title="Permalink to this headline"></a></h3>
+<p>In histogram filter, when a robot move to a next grid,
+all probability information of each grid are shifted towards the movement direction.</p>
+<p>This process represents the change in the probability distribution as the robot moves.</p>
+<p>After the robot has moved, the probability distribution needs reflect
+the estimation error due to the movement.</p>
+<p>For example, the position probability is peaky with observations:</p>
+<a class="reference internal image-reference" href="../../../_images/1.png"><img alt="../../../_images/1.png" src="../../../_images/1.png" style="width: 400px;" /></a>
+<p>But, the probability is getting uncertain without observations:</p>
+<a class="reference internal image-reference" href="../../../_images/2.png"><img alt="../../../_images/2.png" src="../../../_images/2.png" style="width: 400px;" /></a>
+<p>The <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.gaussian_filter.html">gaussian filter</a>
+is used in the simulation for adding noize.</p>
+</section>
+<section id="step3-update-probability-by-observation">
+<h3>Step3: Update probability by observation<a class="headerlink" href="#step3-update-probability-by-observation" title="Permalink to this headline"></a></h3>
+<p>In this step, all probabilities are updated by observations,
+this is the update step of bayesian filter.</p>
+<p>The probability update formula is different by the used sensor model.</p>
+<p>This simulation uses range observation model.</p>
+<p>The probability of each grid is updated by this formula:</p>
+<div class="math notranslate nohighlight">
+\[p_t=p_{t-1}*h(z)\]</div>
+<div class="math notranslate nohighlight">
+\[h(z)=\frac{\exp \left(-(d - z)^{2} / 2\right)}{\sqrt{2 \pi}}\]</div>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(p_t\)</span> is the probability at the time <cite>t</cite>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(h(z)\)</span> is the observation probability with the observation <cite>z</cite>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(d\)</span> is the known distance from the RD-ID to the grid center.</p></li>
+</ul>
+<p>When the <cite>d</cite> is 3.0, the <cite>h(z)</cite> distribution is:</p>
+<a class="reference internal image-reference" href="../../../_images/4.png"><img alt="../../../_images/4.png" src="../../../_images/4.png" style="width: 400px;" /></a>
+<p>The observation probability distribution looks a circle when a RF-ID is observed:</p>
+<a class="reference internal image-reference" href="../../../_images/3.png"><img alt="../../../_images/3.png" src="../../../_images/3.png" style="width: 400px;" /></a>
+</section>
+<section id="step4-estimate-position-from-probability">
+<h3>Step4: Estimate position from probability<a class="headerlink" href="#step4-estimate-position-from-probability" title="Permalink to this headline"></a></h3>
+<p>In each time step, we can calculate the final robot position from the current probability distribution.
+There are two ways to calculate the final positions:</p>
+<ol class="arabic simple">
+<li><p>Using the maximum probability grid position.</p></li>
+<li><p>Using the average of probability weighted grind position.</p></li>
+</ol>
+</section>
+</section>
+<section id="references">
+<h2>References:<a class="headerlink" href="#references" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.probabilistic-robotics.org">_PROBABILISTIC ROBOTICS:</a></p></li>
+<li><p><a class="reference external" href="http://driving.stanford.edu/papers/ICRA2010.pdf">Robust Vehicle Localization in Urban Environments Using Probabilistic Maps</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../unscented_kalman_filter_localization/unscented_kalman_filter_localization.html" class="btn btn-neutral float-left" title="Unscented Kalman Filter localization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../particle_filter_localization/particle_filter_localization.html" class="btn btn-neutral float-right" title="Particle filter localization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2021, Atsushi Sakai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

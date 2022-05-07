@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Extended Kalman Filter Localization &mdash; PythonRobotics  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Ensamble Kalman Filter Localization" href="../ensamble_kalman_filter_localization_files/ensamble_kalman_filter_localization.html" />
+    <link rel="prev" title="Localization" href="../localization.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> PythonRobotics
+            <img src="../../../_static/icon.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../localization.html">Localization</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Extended Kalman Filter Localization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#filter-design">Filter design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#motion-model">Motion Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#observation-model">Observation Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#extended-kalman-filter">Extended Kalman Filter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ref">Ref:</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../ensamble_kalman_filter_localization_files/ensamble_kalman_filter_localization.html">Ensamble Kalman Filter Localization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../unscented_kalman_filter_localization/unscented_kalman_filter_localization.html">Unscented Kalman Filter localization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../histogram_filter_localization/histogram_filter_localization.html">Histogram filter localization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../particle_filter_localization/particle_filter_localization.html">Particle filter localization</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../mapping/mapping.html">Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../slam/slam.html">SLAM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_planning/path_planning.html">Path Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_tracking/path_tracking.html">Path Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../arm_navigation/arm_navigation.html">Arm Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../aerial_navigation/aerial_navigation.html">Aerial Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bipedal/bipedal.html">Bipedal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../appendix/appendix.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how_to_contribute.html">How To Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PythonRobotics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../localization.html">Localization</a> &raquo;</li>
+      <li>Extended Kalman Filter Localization</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/modules/localization/extended_kalman_filter_localization_files/extended_kalman_filter_localization_main.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="extended-kalman-filter-localization">
+<h1>Extended Kalman Filter Localization<a class="headerlink" href="#extended-kalman-filter-localization" title="Permalink to this headline"></a></h1>
+<a class="reference internal image-reference" href="../../../_images/extended_kalman_filter_localization_1_0.png"><img alt="../../../_images/extended_kalman_filter_localization_1_0.png" src="../../../_images/extended_kalman_filter_localization_1_0.png" style="width: 600px;" /></a>
+<figure class="align-default">
+<img alt="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/extended_kalman_filter/animation.gif" src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/extended_kalman_filter/animation.gif" />
+</figure>
+<p>This is a sensor fusion localization with Extended Kalman Filter(EKF).</p>
+<p>The blue line is true trajectory, the black line is dead reckoning
+trajectory,</p>
+<p>the green point is positioning observation (ex. GPS), and the red line
+is estimated trajectory with EKF.</p>
+<p>The red ellipse is estimated covariance ellipse with EKF.</p>
+<p>Code: <a class="reference external" href="https://github.com/AtsushiSakai/PythonRobotics/blob/master/Localization/extended_kalman_filter/extended_kalman_filter.py">PythonRobotics/extended_kalman_filter.py at master ·
+AtsushiSakai/PythonRobotics</a></p>
+<section id="filter-design">
+<h2>Filter design<a class="headerlink" href="#filter-design" title="Permalink to this headline"></a></h2>
+<p>In this simulation, the robot has a state vector includes 4 states at
+time <span class="math notranslate nohighlight">\(t\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\textbf{x}_t=[x_t, y_t, \phi_t, v_t]\]</div>
+<p>x, y are a 2D x-y position, <span class="math notranslate nohighlight">\(\phi\)</span> is orientation, and v is
+velocity.</p>
+<p>In the code, “xEst” means the state vector.
+<a class="reference external" href="https://github.com/AtsushiSakai/PythonRobotics/blob/916b4382de090de29f54538b356cef1c811aacce/Localization/extended_kalman_filter/extended_kalman_filter.py#L168">code</a></p>
+<p>And, <span class="math notranslate nohighlight">\(P_t\)</span> is covariace matrix of the state,</p>
+<p><span class="math notranslate nohighlight">\(Q\)</span> is covariance matrix of process noise,</p>
+<p><span class="math notranslate nohighlight">\(R\)</span> is covariance matrix of observation noise at time <span class="math notranslate nohighlight">\(t\)</span></p>
+<p>The robot has a speed sensor and a gyro sensor.</p>
+<p>So, the input vecor can be used as each time step</p>
+<div class="math notranslate nohighlight">
+\[\textbf{u}_t=[v_t, \omega_t]\]</div>
+<p>Also, the robot has a GNSS sensor, it means that the robot can observe
+x-y position at each time.</p>
+<div class="math notranslate nohighlight">
+\[\textbf{z}_t=[x_t,y_t]\]</div>
+<p>The input and observation vector includes sensor noise.</p>
+<p>In the code, “observation” function generates the input and observation
+vector with noise
+<a class="reference external" href="https://github.com/AtsushiSakai/PythonRobotics/blob/916b4382de090de29f54538b356cef1c811aacce/Localization/extended_kalman_filter/extended_kalman_filter.py#L34-L50">code</a></p>
+</section>
+<section id="motion-model">
+<h2>Motion Model<a class="headerlink" href="#motion-model" title="Permalink to this headline"></a></h2>
+<p>The robot model is</p>
+<div class="math notranslate nohighlight">
+\[\dot{x} = v \cos(\phi)\]</div>
+<div class="math notranslate nohighlight">
+\[\dot{y} = v \sin(\phi)\]</div>
+<div class="math notranslate nohighlight">
+\[\dot{\phi} = \omega\]</div>
+<p>So, the motion model is</p>
+<div class="math notranslate nohighlight">
+\[\textbf{x}_{t+1} = f(\textbf{x}_t, \textbf{u}_t) = F\textbf{x}_t+B\textbf{u}_t\]</div>
+<p>where</p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} F= \begin{bmatrix} 1 &amp; 0 &amp; 0 &amp; 0\\ 0 &amp; 1 &amp; 0 &amp; 0\\ 0 &amp; 0 &amp; 1 &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; 0 \\ \end{bmatrix} \end{equation*}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} B= \begin{bmatrix} cos(\phi) \Delta t &amp; 0\\ sin(\phi) \Delta t &amp; 0\\ 0 &amp; \Delta t\\ 1 &amp; 0\\ \end{bmatrix} \end{equation*}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\Delta t\)</span> is a time interval.</p>
+<p>This is implemented at
+<a class="reference external" href="https://github.com/AtsushiSakai/PythonRobotics/blob/916b4382de090de29f54538b356cef1c811aacce/Localization/extended_kalman_filter/extended_kalman_filter.py#L53-L67">code</a></p>
+<p>The motion function is that</p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} \begin{bmatrix} x' \\ y' \\ w' \\ v' \end{bmatrix} = f(\textbf{x}, \textbf{u}) = \begin{bmatrix} x + v\cos(\phi)\Delta t \\ y + v\sin(\phi)\Delta t \\ \phi + \omega \Delta t \\ v \end{bmatrix} \end{equation*}\)</span></p>
+<p>Its Jacobian matrix is</p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} J_f = \begin{bmatrix} \frac{\partial x'}{\partial x}&amp; \frac{\partial x'}{\partial y} &amp; \frac{\partial x'}{\partial \phi} &amp; \frac{\partial x'}{\partial v}\\ \frac{\partial y'}{\partial x}&amp; \frac{\partial y'}{\partial y} &amp; \frac{\partial y'}{\partial \phi} &amp; \frac{\partial y'}{\partial v}\\ \frac{\partial \phi'}{\partial x}&amp; \frac{\partial \phi'}{\partial y} &amp; \frac{\partial \phi'}{\partial \phi} &amp; \frac{\partial \phi'}{\partial v}\\ \frac{\partial v'}{\partial x}&amp; \frac{\partial v'}{\partial y} &amp; \frac{\partial v'}{\partial \phi} &amp; \frac{\partial v'}{\partial v} \end{bmatrix} \end{equation*}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} 　= \begin{bmatrix} 1&amp; 0 &amp; -v \sin(\phi) \Delta t &amp; \cos(\phi) \Delta t\\ 0 &amp; 1 &amp; v \cos(\phi) \Delta t &amp; \sin(\phi) \Delta t\\ 0 &amp; 0 &amp; 1 &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; 1 \end{bmatrix} \end{equation*}\)</span></p>
+</section>
+<section id="observation-model">
+<h2>Observation Model<a class="headerlink" href="#observation-model" title="Permalink to this headline"></a></h2>
+<p>The robot can get x-y position infomation from GPS.</p>
+<p>So GPS Observation model is</p>
+<div class="math notranslate nohighlight">
+\[\textbf{z}_{t} = g(\textbf{x}_t) = H \textbf{x}_t\]</div>
+<p>where</p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} H = \begin{bmatrix} 1 &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; 1 &amp; 0 &amp; 0 \\ \end{bmatrix} \end{equation*}\)</span></p>
+<p>The observation function states that</p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} \begin{bmatrix} x' \\ y' \end{bmatrix} = g(\textbf{x}) = \begin{bmatrix} x \\ y \end{bmatrix} \end{equation*}\)</span></p>
+<p>Its Jacobian matrix is</p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} J_g = \begin{bmatrix} \frac{\partial x'}{\partial x} &amp; \frac{\partial x'}{\partial y} &amp; \frac{\partial x'}{\partial \phi} &amp; \frac{\partial x'}{\partial v}\\ \frac{\partial y'}{\partial x}&amp; \frac{\partial y'}{\partial y} &amp; \frac{\partial y'}{\partial \phi} &amp; \frac{\partial y'}{ \partial v}\\ \end{bmatrix} \end{equation*}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} 　= \begin{bmatrix} 1&amp; 0 &amp; 0 &amp; 0\\ 0 &amp; 1 &amp; 0 &amp; 0\\ \end{bmatrix} \end{equation*}\)</span></p>
+</section>
+<section id="extended-kalman-filter">
+<h2>Extended Kalman Filter<a class="headerlink" href="#extended-kalman-filter" title="Permalink to this headline"></a></h2>
+<p>Localization process using Extended Kalman Filter:EKF is</p>
+<p>=== Predict ===</p>
+<p><span class="math notranslate nohighlight">\(x_{Pred} = Fx_t+Bu_t\)</span></p>
+<p><span class="math notranslate nohighlight">\(P_{Pred} = J_f P_t J_f^T + Q\)</span></p>
+<p>=== Update ===</p>
+<p><span class="math notranslate nohighlight">\(z_{Pred} = Hx_{Pred}\)</span></p>
+<p><span class="math notranslate nohighlight">\(y = z - z_{Pred}\)</span></p>
+<p><span class="math notranslate nohighlight">\(S = J_g P_{Pred}.J_g^T + R\)</span></p>
+<p><span class="math notranslate nohighlight">\(K = P_{Pred}.J_g^T S^{-1}\)</span></p>
+<p><span class="math notranslate nohighlight">\(x_{t+1} = x_{Pred} + Ky\)</span></p>
+<p><span class="math notranslate nohighlight">\(P_{t+1} = ( I - K J_g) P_{Pred}\)</span></p>
+</section>
+<section id="ref">
+<h2>Ref:<a class="headerlink" href="#ref" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.probabilistic-robotics.org/">PROBABILISTIC-ROBOTICS.ORG</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../localization.html" class="btn btn-neutral float-left" title="Localization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../ensamble_kalman_filter_localization_files/ensamble_kalman_filter_localization.html" class="btn btn-neutral float-right" title="Ensamble Kalman Filter Localization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2021, Atsushi Sakai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

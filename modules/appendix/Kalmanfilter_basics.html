@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KF Basics - Part I &mdash; PythonRobotics  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="KF Basics - Part 2" href="Kalmanfilter_basics_2.html" />
+    <link rel="prev" title="Appendix" href="appendix.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> PythonRobotics
+            <img src="../../_static/icon.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../localization/localization.html">Localization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mapping/mapping.html">Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../slam/slam.html">SLAM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../path_planning/path_planning.html">Path Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../path_tracking/path_tracking.html">Path Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../arm_navigation/arm_navigation.html">Arm Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../aerial_navigation/aerial_navigation.html">Aerial Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bipedal/bipedal.html">Bipedal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../control/control.html">Control</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="appendix.html">Appendix</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">KF Basics - Part I</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#what-is-the-need-to-describe-belief-in-terms-of-pdfs">What is the need to describe belief in terms of PDF’s?</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#what-is-expectation-of-a-random-variables">What is Expectation of a Random Variables?</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#what-is-the-advantage-of-representing-the-belief-as-a-unimodal-as-opposed-to-multimodal">What is the advantage of representing the belief as a unimodal as opposed to multimodal?</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#variance-covariance-and-correlation">Variance, Covariance and Correlation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#variance">Variance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#covariance">Covariance</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gaussians">Gaussians</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#central-limit-theorem">Central Limit Theorem</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gaussian-distribution">Gaussian Distribution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#why-do-we-need-gaussian-distributions">Why do we need Gaussian distributions?</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#gaussian-properties">Gaussian Properties</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#references">References:</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Kalmanfilter_basics_2.html">KF Basics - Part 2</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../how_to_contribute.html">How To Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PythonRobotics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="appendix.html">Appendix</a> &raquo;</li>
+      <li>KF Basics - Part I</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/modules/appendix/Kalmanfilter_basics_main.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="kf-basics-part-i">
+<h1>KF Basics - Part I<a class="headerlink" href="#kf-basics-part-i" title="Permalink to this headline"></a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h2>
+<section id="what-is-the-need-to-describe-belief-in-terms-of-pdfs">
+<h3>What is the need to describe belief in terms of PDF’s?<a class="headerlink" href="#what-is-the-need-to-describe-belief-in-terms-of-pdfs" title="Permalink to this headline"></a></h3>
+<p>This is because robot environments are stochastic. A robot environment
+may have cows with Tesla by side. That is a robot and it’s environment
+cannot be deterministically modelled(e.g as a function of something like
+time t). In the real world sensors are also error prone, and hence
+there’ll be a set of values with a mean and variance that it can take.
+Hence, we always have to model around some mean and variances
+associated.</p>
+</section>
+<section id="what-is-expectation-of-a-random-variables">
+<h3>What is Expectation of a Random Variables?<a class="headerlink" href="#what-is-expectation-of-a-random-variables" title="Permalink to this headline"></a></h3>
+<p>Expectation is nothing but an average of the probabilites</p>
+<div class="math notranslate nohighlight">
+\[\mathbb E[X] = \sum_{i=1}^n p_ix_i\]</div>
+<p>In the continous form,</p>
+<div class="math notranslate nohighlight">
+\[\mathbb E[X] = \int_{-\infty}^\infty x\, f(x) \,dx\]</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.4</span><span class="p">]</span>
+<span class="n">E_x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">p</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">E_x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">1.4000000000000001</span>
+</pre></div>
+</div>
+</section>
+<section id="what-is-the-advantage-of-representing-the-belief-as-a-unimodal-as-opposed-to-multimodal">
+<h3>What is the advantage of representing the belief as a unimodal as opposed to multimodal?<a class="headerlink" href="#what-is-the-advantage-of-representing-the-belief-as-a-unimodal-as-opposed-to-multimodal" title="Permalink to this headline"></a></h3>
+<p>Obviously, it makes sense because we can’t multiple probabilities to a
+car moving for two locations. This would be too confusing and the
+information will not be useful.</p>
+</section>
+</section>
+<section id="variance-covariance-and-correlation">
+<h2>Variance, Covariance and Correlation<a class="headerlink" href="#variance-covariance-and-correlation" title="Permalink to this headline"></a></h2>
+<section id="variance">
+<h3>Variance<a class="headerlink" href="#variance" title="Permalink to this headline"></a></h3>
+<p>Variance is the spread of the data. The mean does’nt tell much <strong>about</strong>
+the data. Therefore the variance tells us about the <strong>story</strong> about the
+data meaning the spread of the data.</p>
+<div class="math notranslate nohighlight">
+\[\mathit{VAR}(X) = \frac{1}{n}\sum_{i=1}^n (x_i - \mu)^2\]</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">1.0224618077401504</span>
+</pre></div>
+</div>
+</section>
+<section id="covariance">
+<h3>Covariance<a class="headerlink" href="#covariance" title="Permalink to this headline"></a></h3>
+<p>This is for a multivariate distribution. For example, a robot in 2-D
+space can take values in both x and y. To describe them, a normal
+distribution with mean in both x and y is needed.</p>
+<p>For a multivariate distribution, mean <span class="math notranslate nohighlight">\(\mu\)</span> can be represented as
+a matrix,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mu = \begin{bmatrix}\mu_1\\\mu_2\\ \vdots \\\mu_n\end{bmatrix}\end{split}\]</div>
+<p>Similarly, variance can also be represented.</p>
+<p>But an important concept is that in the same way as every variable or
+dimension has a variation in its values, it is also possible that there
+will be values on how they <strong>together vary</strong>. This is also a measure of
+how two datasets are related to each other or <strong>correlation</strong>.</p>
+<p>For example, as height increases weight also generally increases. These
+variables are correlated. They are positively correlated because as one
+variable gets larger so does the other.</p>
+<p>We use a <strong>covariance matrix</strong> to denote covariances of a multivariate
+normal distribution:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\Sigma = \begin{bmatrix}
+  \sigma_1^2 &amp; \sigma_{12} &amp; \cdots &amp; \sigma_{1n} \\
+  \sigma_{21} &amp;\sigma_2^2 &amp; \cdots &amp; \sigma_{2n} \\
+  \vdots  &amp; \vdots  &amp; \ddots &amp; \vdots  \\
+  \sigma_{n1} &amp; \sigma_{n2} &amp; \cdots &amp; \sigma_n^2
+ \end{bmatrix}\end{split}\]</div>
+<p><strong>Diagonal</strong> - Variance of each variable associated.</p>
+<p><strong>Off-Diagonal</strong> - covariance between ith and jth variables.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}VAR(X) = \sigma_x^2 &amp;=  \frac{1}{n}\sum_{i=1}^n(X - \mu)^2\\
+COV(X, Y) = \sigma_{xy} &amp;= \frac{1}{n}\sum_{i=1}^n[(X-\mu_x)(Y-\mu_y)\big]\end{aligned}\end{split}\]</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span><span class="mf">0.08868895</span><span class="p">,</span> <span class="mf">0.05064471</span><span class="p">,</span> <span class="mf">0.08855629</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.05064471</span><span class="p">,</span> <span class="mf">0.06219243</span><span class="p">,</span> <span class="mf">0.11555291</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.08855629</span><span class="p">,</span> <span class="mf">0.11555291</span><span class="p">,</span> <span class="mf">0.21534324</span><span class="p">]])</span>
+</pre></div>
+</div>
+<p>Covariance taking the data as <strong>sample</strong> with <span class="math notranslate nohighlight">\(\frac{1}{N-1}\)</span></p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x_cor</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">y_cor</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">x_cor</span><span class="p">,</span><span class="n">y_cor</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.1571437</span> <span class="p">,</span> <span class="o">-</span><span class="mf">0.00766623</span><span class="p">],</span>
+       <span class="p">[</span><span class="o">-</span><span class="mf">0.00766623</span><span class="p">,</span>  <span class="mf">0.13957621</span><span class="p">]])</span>
+</pre></div>
+</div>
+<p>Covariance taking the data as <strong>population</strong> with <span class="math notranslate nohighlight">\(\frac{1}{N}\)</span></p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">x_cor</span><span class="p">,</span><span class="n">y_cor</span><span class="p">,</span><span class="n">bias</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.14142933</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0068996</span> <span class="p">],</span>
+       <span class="p">[</span><span class="o">-</span><span class="mf">0.0068996</span> <span class="p">,</span>  <span class="mf">0.12561859</span><span class="p">]])</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="gaussians">
+<h2>Gaussians<a class="headerlink" href="#gaussians" title="Permalink to this headline"></a></h2>
+<section id="central-limit-theorem">
+<h3>Central Limit Theorem<a class="headerlink" href="#central-limit-theorem" title="Permalink to this headline"></a></h3>
+<p>According to this theorem, the average of n samples of random and
+independent variables tends to follow a normal distribution as we
+increase the sample size.(Generally, for n&gt;=30)</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">100</span><span class="p">,))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+    <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
+    <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">/</span><span class="mi">1000</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">array</span><span class="p">([</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">,</span>  <span class="mf">9.</span><span class="p">,</span> <span class="mf">12.</span><span class="p">,</span> <span class="mf">12.</span><span class="p">,</span> <span class="mf">20.</span><span class="p">,</span> <span class="mf">16.</span><span class="p">,</span> <span class="mf">16.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">,</span>  <span class="mf">6.</span><span class="p">]),</span>
+ <span class="n">array</span><span class="p">([</span><span class="mf">5.30943011</span><span class="p">,</span> <span class="mf">5.34638597</span><span class="p">,</span> <span class="mf">5.38334183</span><span class="p">,</span> <span class="mf">5.42029769</span><span class="p">,</span> <span class="mf">5.45725355</span><span class="p">,</span>
+        <span class="mf">5.49420941</span><span class="p">,</span> <span class="mf">5.53116527</span><span class="p">,</span> <span class="mf">5.56812114</span><span class="p">,</span> <span class="mf">5.605077</span>  <span class="p">,</span> <span class="mf">5.64203286</span><span class="p">,</span>
+        <span class="mf">5.67898872</span><span class="p">]),</span>
+ <span class="o">&lt;</span><span class="n">a</span> <span class="nb">list</span> <span class="n">of</span> <span class="mi">10</span> <span class="n">Patch</span> <span class="n">objects</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../_images/Kalmanfilter_basics_14_1.png" src="../../_images/Kalmanfilter_basics_14_1.png" />
+</section>
+<section id="gaussian-distribution">
+<h3>Gaussian Distribution<a class="headerlink" href="#gaussian-distribution" title="Permalink to this headline"></a></h3>
+<p>A Gaussian is a <em>continuous probability distribution</em> that is completely
+described with two parameters, the mean (<span class="math notranslate nohighlight">\(\mu\)</span>) and the variance
+(<span class="math notranslate nohighlight">\(\sigma^2\)</span>). It is defined as:</p>
+<div class="math notranslate nohighlight">
+\[f(x, \mu, \sigma) = \frac{1}{\sigma\sqrt{2\pi}} \exp\big [{-\frac{(x-\mu)^2}{2\sigma^2} }\big ]\]</div>
+<p>Range is <span class="math notranslate nohighlight">\([-\inf,\inf]\)</span></p>
+<p>This is just a function of mean(<span class="math notranslate nohighlight">\(\mu\)</span>) and standard deviation
+(<span class="math notranslate nohighlight">\(\sigma\)</span>) and what gives the normal distribution the
+charecteristic <strong>bell curve</strong>.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.mlab</span> <span class="k">as</span> <span class="nn">mlab</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span>
+
+<span class="n">mu</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">variance</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">variance</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">mu</span> <span class="o">-</span> <span class="mi">5</span><span class="o">*</span><span class="n">sigma</span><span class="p">,</span> <span class="n">mu</span> <span class="o">+</span> <span class="mi">5</span><span class="o">*</span><span class="n">sigma</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../_images/Kalmanfilter_basics_16_0.png" src="../../_images/Kalmanfilter_basics_16_0.png" />
+</section>
+<section id="why-do-we-need-gaussian-distributions">
+<h3>Why do we need Gaussian distributions?<a class="headerlink" href="#why-do-we-need-gaussian-distributions" title="Permalink to this headline"></a></h3>
+<p>Since it becomes really difficult in the real world to deal with
+multimodal distribution as we cannot put the belief in two seperate
+location of the robots. This becomes really confusing and in practice
+impossible to comprehend. Gaussian probability distribution allows us to
+drive the robots using only one mode with peak at the mean with some
+variance.</p>
+</section>
+</section>
+<section id="gaussian-properties">
+<h2>Gaussian Properties<a class="headerlink" href="#gaussian-properties" title="Permalink to this headline"></a></h2>
+<p><strong>Multiplication</strong></p>
+<p>For the measurement update in a Bayes Filter, the algorithm tells us to
+multiply the Prior P(X_t) and measurement P(Z_t|X_t) to calculate the
+posterior:</p>
+<div class="math notranslate nohighlight">
+\[P(X \mid Z) = \frac{P(Z \mid X)P(X)}{P(Z)}\]</div>
+<p>Here for the numerator, <span class="math notranslate nohighlight">\(P(Z \mid X),P(X)\)</span> both are gaussian.</p>
+<p><span class="math notranslate nohighlight">\(N(\bar\mu, \bar\sigma^1)\)</span> and <span class="math notranslate nohighlight">\(N(\bar\mu, \bar\sigma^2)\)</span>
+are their mean and variances.</p>
+<p>New mean is</p>
+<div class="math notranslate nohighlight">
+\[\mu_\mathtt{new} = \frac{\sigma_z^2\bar\mu + \bar\sigma^2z}{\bar\sigma^2+\sigma_z^2}\]</div>
+<p>New variance is</p>
+<div class="math notranslate nohighlight">
+\[\sigma_\mathtt{new} = \frac{\sigma_z^2\bar\sigma^2}{\bar\sigma^2+\sigma_z^2}\]</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.mlab</span> <span class="k">as</span> <span class="nn">mlab</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="n">mu1</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">variance1</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">variance1</span><span class="p">)</span>
+<span class="n">x1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">mu1</span> <span class="o">-</span> <span class="mi">3</span><span class="o">*</span><span class="n">sigma</span><span class="p">,</span> <span class="n">mu1</span> <span class="o">+</span> <span class="mi">3</span><span class="o">*</span><span class="n">sigma</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">mu1</span><span class="p">,</span> <span class="n">sigma</span><span class="p">),</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;prior&#39;</span><span class="p">)</span>
+
+<span class="n">mu2</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">variance2</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">variance2</span><span class="p">)</span>
+<span class="n">x2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">mu2</span> <span class="o">-</span> <span class="mi">3</span><span class="o">*</span><span class="n">sigma</span><span class="p">,</span> <span class="n">mu2</span> <span class="o">+</span> <span class="mi">3</span><span class="o">*</span><span class="n">sigma</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">mu2</span><span class="p">,</span> <span class="n">sigma</span><span class="p">),</span><span class="s2">&quot;g-&quot;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;measurement&#39;</span><span class="p">)</span>
+
+
+<span class="n">mu_new</span><span class="o">=</span><span class="p">(</span><span class="n">mu1</span><span class="o">*</span><span class="n">variance2</span><span class="o">+</span><span class="n">mu2</span><span class="o">*</span><span class="n">variance1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">variance1</span><span class="o">+</span><span class="n">variance2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;New mean is at: &quot;</span><span class="p">,</span><span class="n">mu_new</span><span class="p">)</span>
+<span class="n">var_new</span><span class="o">=</span><span class="p">(</span><span class="n">variance1</span><span class="o">*</span><span class="n">variance2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">variance1</span><span class="o">+</span><span class="n">variance2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;New variance is: &quot;</span><span class="p">,</span><span class="n">var_new</span><span class="p">)</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var_new</span><span class="p">)</span>
+<span class="n">x3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">mu_new</span> <span class="o">-</span> <span class="mi">3</span><span class="o">*</span><span class="n">sigma</span><span class="p">,</span> <span class="n">mu_new</span> <span class="o">+</span> <span class="mi">3</span><span class="o">*</span><span class="n">sigma</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span> <span class="n">mu_new</span><span class="p">,</span> <span class="n">var_new</span><span class="p">),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;posterior&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">New</span> <span class="n">mean</span> <span class="ow">is</span> <span class="n">at</span><span class="p">:</span>  <span class="mf">5.0</span>
+<span class="n">New</span> <span class="n">variance</span> <span class="ow">is</span><span class="p">:</span>  <span class="mf">1.0</span>
+</pre></div>
+</div>
+<img alt="../../_images/Kalmanfilter_basics_19_1.png" src="../../_images/Kalmanfilter_basics_19_1.png" />
+<p><strong>Addition</strong></p>
+<p>The motion step involves a case of adding up probability (Since it has
+to abide the Law of Total Probability). This means their beliefs are to
+be added and hence two gaussians. They are simply arithmetic additions
+of the two.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{gathered}\mu_x = \mu_p + \mu_z \\
+\sigma_x^2 = \sigma_z^2+\sigma_p^2\, \end{gathered}\end{split}\]</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.mlab</span> <span class="k">as</span> <span class="nn">mlab</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="n">mu1</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">variance1</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">variance1</span><span class="p">)</span>
+<span class="n">x1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">mu1</span> <span class="o">-</span> <span class="mi">3</span><span class="o">*</span><span class="n">sigma</span><span class="p">,</span> <span class="n">mu1</span> <span class="o">+</span> <span class="mi">3</span><span class="o">*</span><span class="n">sigma</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">mu1</span><span class="p">,</span> <span class="n">sigma</span><span class="p">),</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;prior&#39;</span><span class="p">)</span>
+
+<span class="n">mu2</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">variance2</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">variance2</span><span class="p">)</span>
+<span class="n">x2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">mu2</span> <span class="o">-</span> <span class="mi">3</span><span class="o">*</span><span class="n">sigma</span><span class="p">,</span> <span class="n">mu2</span> <span class="o">+</span> <span class="mi">3</span><span class="o">*</span><span class="n">sigma</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">mu2</span><span class="p">,</span> <span class="n">sigma</span><span class="p">),</span><span class="s2">&quot;g-&quot;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;measurement&#39;</span><span class="p">)</span>
+
+
+<span class="n">mu_new</span><span class="o">=</span><span class="n">mu1</span><span class="o">+</span><span class="n">mu2</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;New mean is at: &quot;</span><span class="p">,</span><span class="n">mu_new</span><span class="p">)</span>
+<span class="n">var_new</span><span class="o">=</span><span class="p">(</span><span class="n">variance1</span><span class="o">+</span><span class="n">variance2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;New variance is: &quot;</span><span class="p">,</span><span class="n">var_new</span><span class="p">)</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var_new</span><span class="p">)</span>
+<span class="n">x3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">mu_new</span> <span class="o">-</span> <span class="mi">3</span><span class="o">*</span><span class="n">sigma</span><span class="p">,</span> <span class="n">mu_new</span> <span class="o">+</span> <span class="mi">3</span><span class="o">*</span><span class="n">sigma</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span> <span class="n">mu_new</span><span class="p">,</span> <span class="n">var_new</span><span class="p">),</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;posterior&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">New</span> <span class="n">mean</span> <span class="ow">is</span> <span class="n">at</span><span class="p">:</span>  <span class="mi">15</span>
+<span class="n">New</span> <span class="n">variance</span> <span class="ow">is</span><span class="p">:</span>  <span class="mi">2</span>
+</pre></div>
+</div>
+<img alt="../../_images/Kalmanfilter_basics_21_1.png" src="../../_images/Kalmanfilter_basics_21_1.png" />
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Example from:</span>
+<span class="c1">#https://scipython.com/blog/visualizing-the-bivariate-gaussian-distribution/</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">cm</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">Axes3D</span>
+
+<span class="c1"># Our 2-dimensional distribution will be over variables X and Y</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+
+<span class="c1"># Mean vector and covariance matrix</span>
+<span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">])</span>
+<span class="n">Sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mf">1.</span> <span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span>  <span class="mf">1.5</span><span class="p">]])</span>
+
+<span class="c1"># Pack X and Y into a single 3-dimensional array</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
+<span class="n">pos</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span>
+<span class="n">pos</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">Y</span>
+
+<span class="k">def</span> <span class="nf">multivariate_gaussian</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">Sigma</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the multivariate Gaussian distribution on array pos.</span>
+
+<span class="sd">    pos is an array constructed by packing the meshed arrays of variables</span>
+<span class="sd">    x_1, x_2, x_3, ..., x_k into its _last_ dimension.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="n">mu</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">Sigma_det</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">Sigma</span><span class="p">)</span>
+    <span class="n">Sigma_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">Sigma</span><span class="p">)</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">**</span><span class="n">n</span> <span class="o">*</span> <span class="n">Sigma_det</span><span class="p">)</span>
+    <span class="c1"># This einsum call calculates (x-mu)T.Sigma-1.(x-mu) in a vectorized</span>
+    <span class="c1"># way across all the input variables.</span>
+    <span class="n">fac</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;...k,kl,...l-&gt;...&#39;</span><span class="p">,</span> <span class="n">pos</span><span class="o">-</span><span class="n">mu</span><span class="p">,</span> <span class="n">Sigma_inv</span><span class="p">,</span> <span class="n">pos</span><span class="o">-</span><span class="n">mu</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">fac</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">N</span>
+
+<span class="c1"># The distribution on the variables X, Y packed into pos.</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">multivariate_gaussian</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">Sigma</span><span class="p">)</span>
+
+<span class="c1"># Create a surface plot and projected filled contour plot under it.</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">gca</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot_surface</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">rstride</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">cstride</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">antialiased</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">cmap</span><span class="o">=</span><span class="n">cm</span><span class="o">.</span><span class="n">viridis</span><span class="p">)</span>
+
+<span class="n">cset</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">zdir</span><span class="o">=</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="n">offset</span><span class="o">=-</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cm</span><span class="o">.</span><span class="n">viridis</span><span class="p">)</span>
+
+<span class="c1"># Adjust the limits, ticks and view angle</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_zlim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.15</span><span class="p">,</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_zticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="mi">27</span><span class="p">,</span> <span class="o">-</span><span class="mi">21</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../_images/Kalmanfilter_basics_22_0.png" src="../../_images/Kalmanfilter_basics_22_0.png" />
+<p>This is a 3D projection of the gaussians involved with the lower surface
+showing the 2D projection of the 3D projection above. The innermost
+ellipse represents the highest peak, that is the maximum probability for
+a given (X,Y) value.</p>
+<p>** numpy einsum examples **</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span> <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">2</span>  <span class="mi">3</span>  <span class="mi">4</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">8</span>  <span class="mi">9</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">10</span> <span class="mi">11</span> <span class="mi">12</span> <span class="mi">13</span> <span class="mi">14</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">15</span> <span class="mi">16</span> <span class="mi">17</span> <span class="mi">18</span> <span class="mi">19</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">20</span> <span class="mi">21</span> <span class="mi">22</span> <span class="mi">23</span> <span class="mi">24</span><span class="p">]]</span>
+<span class="p">[</span><span class="mi">0</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span><span class="p">]</span>
+<span class="p">[[</span><span class="mi">0</span> <span class="mi">1</span> <span class="mi">2</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">3</span> <span class="mi">4</span> <span class="mi">5</span><span class="p">]]</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#this is the diagonal sum, i repeated means the diagonal</span>
+<span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij&#39;</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+<span class="c1">#this takes the output ii which is the diagonal and outputs to a</span>
+<span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ii-&gt;i&#39;</span><span class="p">,</span><span class="n">a</span><span class="p">)</span>
+<span class="c1">#this takes in the array A represented by their axes &#39;ij&#39; and  B by its only axes&#39;j&#39;</span>
+<span class="c1">#and multiples them element wise</span>
+<span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,j&#39;</span><span class="p">,</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mi">30</span><span class="p">,</span>  <span class="mi">80</span><span class="p">,</span> <span class="mi">130</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">230</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">3</span><span class="p">],</span>
+              <span class="p">[</span> <span class="mi">4</span><span class="p">,</span>  <span class="mi">5</span><span class="p">,</span>  <span class="mi">6</span><span class="p">,</span>  <span class="mi">7</span><span class="p">],</span>
+              <span class="p">[</span> <span class="mi">8</span><span class="p">,</span>  <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">]])</span>
+<span class="n">C</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">C</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">76</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">E</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">3</span><span class="p">],</span>
+              <span class="p">[</span> <span class="mi">4</span><span class="p">,</span>  <span class="mi">5</span><span class="p">,</span>  <span class="mi">6</span><span class="p">,</span>  <span class="mi">7</span><span class="p">],</span>
+              <span class="p">[</span> <span class="mi">8</span><span class="p">,</span>  <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">]])</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;i,ij-&gt;i&#39;</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">E</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">76</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">multivariate_normal</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">:</span><span class="mi">5</span><span class="p">:</span><span class="mf">.1</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">:</span><span class="mi">5</span><span class="p">:</span><span class="mf">.1</span><span class="p">]</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
+<span class="n">pos</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span> <span class="n">pos</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
+<span class="n">rv</span> <span class="o">=</span> <span class="n">multivariate_normal</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">],</span> <span class="p">[[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">rv</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">pos</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">contour</span><span class="o">.</span><span class="n">QuadContourSet</span> <span class="n">at</span> <span class="mh">0x139196438</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="../../_images/Kalmanfilter_basics_28_1.png" src="../../_images/Kalmanfilter_basics_28_1.png" />
+</section>
+<section id="references">
+<h2>References:<a class="headerlink" href="#references" title="Permalink to this headline"></a></h2>
+<ol class="arabic simple">
+<li><p>Roger Labbe’s
+<a class="reference external" href="https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python">repo</a>
+on Kalman Filters. (Majority of the examples in the notes are from
+this)</p></li>
+<li><p>Probabilistic Robotics by Sebastian Thrun, Wolfram Burgard and Dieter
+Fox, MIT Press.</p></li>
+<li><p>Scipy
+<a class="reference external" href="https://scipython.com/blog/visualizing-the-bivariate-gaussian-distribution/">Documentation</a></p></li>
+</ol>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="appendix.html" class="btn btn-neutral float-left" title="Appendix" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Kalmanfilter_basics_2.html" class="btn btn-neutral float-right" title="KF Basics - Part 2" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2021, Atsushi Sakai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

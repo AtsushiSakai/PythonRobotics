@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Model predictive speed and steering control &mdash; PythonRobotics  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Nonlinear Model Predictive Control with C-GMRES" href="../cgmres_nmpc/cgmres_nmpc.html" />
+    <link rel="prev" title="Linear–quadratic regulator (LQR) speed and steering control" href="../lqr_speed_and_steering_control/lqr_speed_and_steering_control.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> PythonRobotics
+            <img src="../../../_static/icon.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../localization/localization.html">Localization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mapping/mapping.html">Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../slam/slam.html">SLAM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_planning/path_planning.html">Path Planning</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../path_tracking.html">Path Tracking</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../pure_pursuit_tracking/pure_pursuit_tracking.html">Pure pursuit tracking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../stanley_control/stanley_control.html">Stanley control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rear_wheel_feedback_control/rear_wheel_feedback_control.html">Rear wheel feedback control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lqr_steering_control/lqr_steering_control.html">Linear–quadratic regulator (LQR) steering control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lqr_speed_and_steering_control/lqr_speed_and_steering_control.html">Linear–quadratic regulator (LQR) speed and steering control</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Model predictive speed and steering control</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mpc-modeling">MPC modeling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#vehicle-model-linearization">Vehicle model linearization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../cgmres_nmpc/cgmres_nmpc.html">Nonlinear Model Predictive Control with C-GMRES</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../arm_navigation/arm_navigation.html">Arm Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../aerial_navigation/aerial_navigation.html">Aerial Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bipedal/bipedal.html">Bipedal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../appendix/appendix.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how_to_contribute.html">How To Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PythonRobotics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../path_tracking.html">Path Tracking</a> &raquo;</li>
+      <li>Model predictive speed and steering control</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/modules/path_tracking/model_predictive_speed_and_steering_control/model_predictive_speed_and_steering_control_main.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="model-predictive-speed-and-steering-control">
+<h1>Model predictive speed and steering control<a class="headerlink" href="#model-predictive-speed-and-steering-control" title="Permalink to this headline"></a></h1>
+<figure class="align-default" id="id1">
+<img alt="Model predictive speed and steering control" src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif?raw=true" />
+<figcaption>
+<p><span class="caption-text">Model predictive speed and steering control</span><a class="headerlink" href="#id1" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+<p>code:</p>
+<p><a class="reference external" href="https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/model_predictive_speed_and_steer_control.py">PythonRobotics/model_predictive_speed_and_steer_control.py at master ·
+AtsushiSakai/PythonRobotics</a></p>
+<p>This is a path tracking simulation using model predictive control (MPC).</p>
+<p>The MPC controller controls vehicle speed and steering base on
+linearized model.</p>
+<p>This code uses cvxpy as an optimization modeling tool.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.cvxpy.org/">Welcome to CVXPY 1.0 — CVXPY 1.0.6
+documentation</a></p></li>
+</ul>
+<section id="mpc-modeling">
+<h2>MPC modeling<a class="headerlink" href="#mpc-modeling" title="Permalink to this headline"></a></h2>
+<p>State vector is:</p>
+<div class="math notranslate nohighlight">
+\[z = [x, y, v,\phi]\]</div>
+<p>x: x-position, y:y-position, v:velocity, φ: yaw angle</p>
+<p>Input vector is:</p>
+<div class="math notranslate nohighlight">
+\[u = [a, \delta]\]</div>
+<p>a: accellation, δ: steering angle</p>
+<p>The MPC cotroller minimize this cost function for path tracking:</p>
+<div class="math notranslate nohighlight">
+\[min\ Q_f(z_{T,ref}-z_{T})^2+Q\Sigma({z_{t,ref}-z_{t}})^2+R\Sigma{u_t}^2+R_d\Sigma({u_{t+1}-u_{t}})^2\]</div>
+<p>z_ref come from target path and speed.</p>
+<p>subject to:</p>
+<ul class="simple">
+<li><p>Linearlied vehicle model</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[z_{t+1}=Az_t+Bu+C\]</div>
+<ul class="simple">
+<li><p>Maximum steering speed</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[|u_{t+1}-u_{t}|&lt;du_{max}\]</div>
+<ul class="simple">
+<li><p>Maximum steering angle</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[|u_{t}|&lt;u_{max}\]</div>
+<ul class="simple">
+<li><p>Initial state</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[z_0 = z_{0,ob}\]</div>
+<ul class="simple">
+<li><p>Maximum and minimum speed</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[v_{min} &lt; v_t &lt; v_{max}\]</div>
+<ul class="simple">
+<li><p>Maximum and minimum input</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[u_{min} &lt; u_t &lt; u_{max}\]</div>
+<p>This is implemented at</p>
+<p><a class="reference external" href="https://github.com/AtsushiSakai/PythonRobotics/blob/f51a73f47cb922a12659f8ce2d544c347a2a8156/PathTracking/model_predictive_speed_and_steer_control/model_predictive_speed_and_steer_control.py#L247-L301">PythonRobotics/model_predictive_speed_and_steer_control.py at
+f51a73f47cb922a12659f8ce2d544c347a2a8156 ·
+AtsushiSakai/PythonRobotics</a></p>
+</section>
+<section id="vehicle-model-linearization">
+<h2>Vehicle model linearization<a class="headerlink" href="#vehicle-model-linearization" title="Permalink to this headline"></a></h2>
+<p>Vehicle model is</p>
+<div class="math notranslate nohighlight">
+\[\dot{x} = vcos(\phi)\]</div>
+<div class="math notranslate nohighlight">
+\[\dot{y} = vsin((\phi)\]</div>
+<div class="math notranslate nohighlight">
+\[\dot{v} = a\]</div>
+<div class="math notranslate nohighlight">
+\[\dot{\phi} = \frac{vtan(\delta)}{L}\]</div>
+<p>ODE is</p>
+<div class="math notranslate nohighlight">
+\[\dot{z} =\frac{\partial }{\partial z} z = f(z, u) = A'z+B'u\]</div>
+<p>where</p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} A' = \begin{bmatrix} \frac{\partial }{\partial x}vcos(\phi) &amp; \frac{\partial }{\partial y}vcos(\phi) &amp; \frac{\partial }{\partial v}vcos(\phi) &amp; \frac{\partial }{\partial \phi}vcos(\phi)\\ \frac{\partial }{\partial x}vsin(\phi) &amp; \frac{\partial }{\partial y}vsin(\phi) &amp; \frac{\partial }{\partial v}vsin(\phi) &amp; \frac{\partial }{\partial \phi}vsin(\phi)\\ \frac{\partial }{\partial x}a&amp; \frac{\partial }{\partial y}a&amp; \frac{\partial }{\partial v}a&amp; \frac{\partial }{\partial \phi}a\\ \frac{\partial }{\partial x}\frac{vtan(\delta)}{L}&amp; \frac{\partial }{\partial y}\frac{vtan(\delta)}{L}&amp; \frac{\partial }{\partial v}\frac{vtan(\delta)}{L}&amp; \frac{\partial }{\partial \phi}\frac{vtan(\delta)}{L}\\ \end{bmatrix} \\ 　= \begin{bmatrix} 0 &amp; 0 &amp; cos(\bar{\phi}) &amp; -\bar{v}sin(\bar{\phi})\\ 0 &amp; 0 &amp; sin(\bar{\phi}) &amp; \bar{v}cos(\bar{\phi}) \\ 0 &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; 0 &amp;\frac{tan(\bar{\delta})}{L} &amp; 0 \\ \end{bmatrix} \end{equation*}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} B' = \begin{bmatrix} \frac{\partial }{\partial a}vcos(\phi) &amp; \frac{\partial }{\partial \delta}vcos(\phi)\\ \frac{\partial }{\partial a}vsin(\phi) &amp; \frac{\partial }{\partial \delta}vsin(\phi)\\ \frac{\partial }{\partial a}a &amp; \frac{\partial }{\partial \delta}a\\ \frac{\partial }{\partial a}\frac{vtan(\delta)}{L} &amp; \frac{\partial }{\partial \delta}\frac{vtan(\delta)}{L}\\ \end{bmatrix} \\ 　= \begin{bmatrix} 0 &amp; 0 \\ 0 &amp; 0 \\ 1 &amp; 0 \\ 0 &amp; \frac{\bar{v}}{Lcos^2(\bar{\delta})} \\ \end{bmatrix} \end{equation*}\)</span></p>
+<p>You can get a discrete-time mode with Forward Euler Discretization with
+sampling time dt.</p>
+<div class="math notranslate nohighlight">
+\[z_{k+1}=z_k+f(z_k,u_k)dt\]</div>
+<p>Using first degree Tayer expantion around zbar and ubar</p>
+<div class="math notranslate nohighlight">
+\[z_{k+1}=z_k+(f(\bar{z},\bar{u})+A'z_k+B'u_k-A'\bar{z}-B'\bar{u})dt\]</div>
+<div class="math notranslate nohighlight">
+\[z_{k+1}=(I + dtA')z_k+(dtB')u_k + (f(\bar{z},\bar{u})-A'\bar{z}-B'\bar{u})dt\]</div>
+<p>So,</p>
+<div class="math notranslate nohighlight">
+\[z_{k+1}=Az_k+Bu_k +C\]</div>
+<p>where,</p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} A = (I + dtA')\\ = \begin{bmatrix} 1 &amp; 0 &amp; cos(\bar{\phi})dt &amp; -\bar{v}sin(\bar{\phi})dt\\ 0 &amp; 1 &amp; sin(\bar{\phi})dt &amp; \bar{v}cos(\bar{\phi})dt \\ 0 &amp; 0 &amp; 1 &amp; 0 \\ 0 &amp; 0 &amp;\frac{tan(\bar{\delta})}{L}dt &amp; 1 \\ \end{bmatrix} \end{equation*}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} B = dtB'\\ = \begin{bmatrix} 0 &amp; 0 \\ 0 &amp; 0 \\ dt &amp; 0 \\ 0 &amp; \frac{\bar{v}}{Lcos^2(\bar{\delta})}dt \\ \end{bmatrix} \end{equation*}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} C = (f(\bar{z},\bar{u})-A'\bar{z}-B'\bar{u})dt\\ = dt( \begin{bmatrix} \bar{v}cos(\bar{\phi})\\ \bar{v}sin(\bar{\phi}) \\ \bar{a}\\ \frac{\bar{v}tan(\bar{\delta})}{L}\\ \end{bmatrix} - \begin{bmatrix} \bar{v}cos(\bar{\phi})-\bar{v}sin(\bar{\phi})\bar{\phi}\\ \bar{v}sin(\bar{\phi})+\bar{v}cos(\bar{\phi})\bar{\phi}\\ 0\\ \frac{\bar{v}tan(\bar{\delta})}{L}\\ \end{bmatrix} - \begin{bmatrix} 0\\ 0 \\ \bar{a}\\ \frac{\bar{v}\bar{\delta}}{Lcos^2(\bar{\delta})}\\ \end{bmatrix} )\\ = \begin{bmatrix} \bar{v}sin(\bar{\phi})\bar{\phi}dt\\ -\bar{v}cos(\bar{\phi})\bar{\phi}dt\\ 0\\ -\frac{\bar{v}\bar{\delta}}{Lcos^2(\bar{\delta})}dt\\ \end{bmatrix} \end{equation*}\)</span></p>
+<p>This equation is implemented at</p>
+<p><a class="reference external" href="https://github.com/AtsushiSakai/PythonRobotics/blob/eb6d1cbe6fc90c7be9210bf153b3a04f177cc138/PathTracking/model_predictive_speed_and_steer_control/model_predictive_speed_and_steer_control.py#L80-L102">PythonRobotics/model_predictive_speed_and_steer_control.py at
+eb6d1cbe6fc90c7be9210bf153b3a04f177cc138 ·
+AtsushiSakai/PythonRobotics</a></p>
+</section>
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.springer.com/us/book/9781461414322">Vehicle Dynamics and Control | Rajesh Rajamani |
+Springer</a></p></li>
+<li><p><a class="reference external" href="http://www.mpc.berkeley.edu/mpc-course-material">MPC Course Material - MPC Lab &#64;
+UC-Berkeley</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../lqr_speed_and_steering_control/lqr_speed_and_steering_control.html" class="btn btn-neutral float-left" title="Linear–quadratic regulator (LQR) speed and steering control" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../cgmres_nmpc/cgmres_nmpc.html" class="btn btn-neutral float-right" title="Nonlinear Model Predictive Control with C-GMRES" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2021, Atsushi Sakai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

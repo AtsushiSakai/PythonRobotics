@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Particle filter localization &mdash; PythonRobotics  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Mapping" href="../../mapping/mapping.html" />
+    <link rel="prev" title="Histogram filter localization" href="../histogram_filter_localization/histogram_filter_localization.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> PythonRobotics
+            <img src="../../../_static/icon.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../localization.html">Localization</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../extended_kalman_filter_localization_files/extended_kalman_filter_localization.html">Extended Kalman Filter Localization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ensamble_kalman_filter_localization_files/ensamble_kalman_filter_localization.html">Ensamble Kalman Filter Localization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../unscented_kalman_filter_localization/unscented_kalman_filter_localization.html">Unscented Kalman Filter localization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../histogram_filter_localization/histogram_filter_localization.html">Histogram filter localization</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Particle filter localization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-calculate-covariance-matrix-from-particles">How to calculate covariance matrix from particles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#references">References:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../mapping/mapping.html">Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../slam/slam.html">SLAM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_planning/path_planning.html">Path Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_tracking/path_tracking.html">Path Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../arm_navigation/arm_navigation.html">Arm Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../aerial_navigation/aerial_navigation.html">Aerial Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bipedal/bipedal.html">Bipedal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../appendix/appendix.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how_to_contribute.html">How To Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PythonRobotics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../localization.html">Localization</a> &raquo;</li>
+      <li>Particle filter localization</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/modules/localization/particle_filter_localization/particle_filter_localization_main.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="particle-filter-localization">
+<h1>Particle filter localization<a class="headerlink" href="#particle-filter-localization" title="Permalink to this headline"></a></h1>
+<img alt="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/particle_filter/animation.gif" src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/particle_filter/animation.gif" />
+<p>This is a sensor fusion localization with Particle Filter(PF).</p>
+<p>The blue line is true trajectory, the black line is dead reckoning
+trajectory,</p>
+<p>and the red line is estimated trajectory with PF.</p>
+<p>It is assumed that the robot can measure a distance from landmarks
+(RFID).</p>
+<p>This measurements are used for PF localization.</p>
+<section id="how-to-calculate-covariance-matrix-from-particles">
+<h2>How to calculate covariance matrix from particles<a class="headerlink" href="#how-to-calculate-covariance-matrix-from-particles" title="Permalink to this headline"></a></h2>
+<p>The covariance matrix <span class="math notranslate nohighlight">\(\Xi\)</span> from particle information is calculated by the following equation:</p>
+<div class="math notranslate nohighlight">
+\[\Xi_{j,k}=\frac{1}{1-\sum^N_{i=1}(w^i)^2}\sum^N_{i=1}w^i(x^i_j-\mu_j)(x^i_k-\mu_k)\]</div>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\Xi_{j,k}\)</span> is covariance matrix element at row <span class="math notranslate nohighlight">\(i\)</span> and column <span class="math notranslate nohighlight">\(k\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(w^i\)</span> is the weight of the <span class="math notranslate nohighlight">\(i\)</span> th particle.</p></li>
+<li><p><span class="math notranslate nohighlight">\(x^i_j\)</span> is the <span class="math notranslate nohighlight">\(j\)</span> th state of the <span class="math notranslate nohighlight">\(i\)</span> th particle.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\mu_j\)</span> is the <span class="math notranslate nohighlight">\(j\)</span> th mean state of particles.</p></li>
+</ul>
+</section>
+<section id="references">
+<h2>References:<a class="headerlink" href="#references" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.probabilistic-robotics.org">_PROBABILISTIC ROBOTICS:</a></p></li>
+<li><p><a class="reference external" href="https://arxiv.org/pdf/1801.07000.pdf">Improving the particle filter in high dimensions using conjugate artificial process noise</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../histogram_filter_localization/histogram_filter_localization.html" class="btn btn-neutral float-left" title="Histogram filter localization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../mapping/mapping.html" class="btn btn-neutral float-right" title="Mapping" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2021, Atsushi Sakai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

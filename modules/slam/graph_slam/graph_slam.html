@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Graph based SLAM &mdash; PythonRobotics  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Path Planning" href="../../path_planning/path_planning.html" />
+    <link rel="prev" title="FastSLAM 2.0" href="../FastSLAM2/FastSLAM2.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> PythonRobotics
+            <img src="../../../_static/icon.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../localization/localization.html">Localization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mapping/mapping.html">Mapping</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../slam.html">SLAM</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../iterative_closest_point_matching/iterative_closest_point_matching.html">Iterative Closest Point (ICP) Matching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ekf_slam/ekf_slam.html">EKF SLAM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../FastSLAM1/FastSLAM1.html">FastSLAM1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../FastSLAM2/FastSLAM2.html">FastSLAM 2.0</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Graph based SLAM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#graph-slam">Graph SLAM</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#minimal-example">Minimal Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#graph-optimization">Graph Optimization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#planar-example">Planar Example:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-references">The references:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#graph-slam-formulation">Graph SLAM Formulation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#problem-formulation">Problem Formulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dimensionality-and-pose-representation">Dimensionality and Pose Representation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#graph-slam-algorithm">Graph SLAM Algorithm</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#graph-slam-for-a-real-world-se-2-dataset">Graph SLAM for a real-world SE(2) dataset</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Introduction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-dataset">The Dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#optimization">Optimization</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#references">References:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_planning/path_planning.html">Path Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_tracking/path_tracking.html">Path Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../arm_navigation/arm_navigation.html">Arm Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../aerial_navigation/aerial_navigation.html">Aerial Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bipedal/bipedal.html">Bipedal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../appendix/appendix.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how_to_contribute.html">How To Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PythonRobotics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../slam.html">SLAM</a> &raquo;</li>
+      <li>Graph based SLAM</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/modules/slam/graph_slam/graph_slam_main.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="graph-based-slam">
+<h1>Graph based SLAM<a class="headerlink" href="#graph-based-slam" title="Permalink to this headline"></a></h1>
+<p>This is a graph based SLAM example.</p>
+<p>The blue line is ground truth.</p>
+<p>The black line is dead reckoning.</p>
+<p>The red line is the estimated trajectory with Graph based SLAM.</p>
+<p>The black stars are landmarks for graph edge generation.</p>
+<img alt="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/GraphBasedSLAM/animation.gif" src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/GraphBasedSLAM/animation.gif" />
+<section id="graph-slam">
+<h2>Graph SLAM<a class="headerlink" href="#graph-slam" title="Permalink to this headline"></a></h2>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">graph_based_slam</span> <span class="kn">import</span> <span class="n">calc_rotational_matrix</span><span class="p">,</span> <span class="n">calc_jacobian</span><span class="p">,</span> <span class="n">cal_observation_sigma</span><span class="p">,</span> \
+                             <span class="n">calc_input</span><span class="p">,</span> <span class="n">observation</span><span class="p">,</span> <span class="n">motion_model</span><span class="p">,</span> <span class="n">Edge</span><span class="p">,</span> <span class="n">pi_2_pi</span>
+
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="introduction">
+<h3>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h3>
+<p>In contrast to the probabilistic approaches for solving SLAM, such as
+EKF, UKF, particle filters, and so on, the graph technique formulates
+the SLAM as an optimization problem. It is mostly used to solve the full
+SLAM problem in an offline fashion, i.e. optimize all the poses of the
+robot after the path has been traversed. However, some variants are
+available that uses graph-based approaches to perform online estimation
+or to solve for a subset of the poses.</p>
+<p>GraphSLAM uses the motion information as well as the observations of the
+environment to create least square problem that can be solved using
+standard optimization techniques.</p>
+</section>
+<section id="minimal-example">
+<h3>Minimal Example<a class="headerlink" href="#minimal-example" title="Permalink to this headline"></a></h3>
+<p>The following example illustrates the main idea behind graphSLAM. A
+simple case of a 1D robot is considered that can only move in 1
+direction. The robot is commanded to move forward with a control input
+<span class="math notranslate nohighlight">\(u_t=1\)</span>, however, the motion is not perfect and the measured
+odometry will deviate from the true path. At each time step the robot can
+observe its environment, for this simple case as well, there is only a
+single landmark at coordinates <span class="math notranslate nohighlight">\(x=3\)</span>. The measured observations
+are the range between the robot and landmark. These measurements are
+also subjected to noise. No bearing information is required since this
+is a 1D problem.</p>
+<p>To solve this, graphSLAM creates what is called as the system
+information matrix <span class="math notranslate nohighlight">\(\Omega\)</span> also referred to as <span class="math notranslate nohighlight">\(H\)</span> and the
+information vector <span class="math notranslate nohighlight">\(\xi\)</span> also known as <span class="math notranslate nohighlight">\(b\)</span>. The entries are
+created based on the information of the motion and the observation.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">R</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">Q</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">graphics_radius</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+<span class="n">odom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">N</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">obs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">N</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">x_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">N</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="n">landmark</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="c1"># Simulated readings of odometry and observations</span>
+<span class="n">x_true</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">odom</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">obs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.9</span>
+<span class="n">x_true</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">odom</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">obs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.0</span>
+<span class="n">x_true</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">odom</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">obs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">,</span> <span class="mf">1.0</span>
+
+<span class="n">hxDR</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">odom</span><span class="p">)</span>
+<span class="c1"># Visualization</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">landmark</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;*k&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">odom</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">odom</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">odom</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">graphics_radius</span><span class="p">],</span>
+             <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">odom</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mf">0.02</span><span class="p">,</span> <span class="s2">&quot;X_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="n">odom</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;brown&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_true</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;.g&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="c1"># Defined as a function to facilitate iteration</span>
+<span class="k">def</span> <span class="nf">get_H_b</span><span class="p">(</span><span class="n">odom</span><span class="p">,</span> <span class="n">obs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create the information matrix and information vector. This implementation is</span>
+<span class="sd">    based on the concept of virtual measurement i.e. the observations of the</span>
+<span class="sd">    landmarks are converted into constraints (edges) between the nodes that</span>
+<span class="sd">    have observed this landmark.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">measure_constraints</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">omegas</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">zids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">),</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span><span class="n">N</span><span class="p">))</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">zids</span><span class="p">:</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="n">odom</span><span class="p">[</span><span class="n">t1</span><span class="p">]</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">odom</span><span class="p">[</span><span class="n">t2</span><span class="p">]</span>
+        <span class="n">z1</span> <span class="o">=</span> <span class="n">obs</span><span class="p">[</span><span class="n">t1</span><span class="p">]</span>
+        <span class="n">z2</span> <span class="o">=</span> <span class="n">obs</span><span class="p">[</span><span class="n">t2</span><span class="p">]</span>
+
+        <span class="c1"># Adding virtual measurement constraint</span>
+        <span class="n">measure_constraints</span><span class="p">[(</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x2</span><span class="o">-</span><span class="n">x1</span><span class="o">-</span><span class="n">z1</span><span class="o">+</span><span class="n">z2</span><span class="p">)</span>
+        <span class="n">omegas</span><span class="p">[(</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">Q</span><span class="p">))</span>
+
+        <span class="c1"># populate system&#39;s information matrix and vector</span>
+        <span class="n">H</span><span class="p">[</span><span class="n">t1</span><span class="p">,</span><span class="n">t1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">omegas</span><span class="p">[(</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">)]</span>
+        <span class="n">H</span><span class="p">[</span><span class="n">t2</span><span class="p">,</span><span class="n">t2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">omegas</span><span class="p">[(</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">)]</span>
+        <span class="n">H</span><span class="p">[</span><span class="n">t2</span><span class="p">,</span><span class="n">t1</span><span class="p">]</span> <span class="o">-=</span> <span class="n">omegas</span><span class="p">[(</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">)]</span>
+        <span class="n">H</span><span class="p">[</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">]</span> <span class="o">-=</span> <span class="n">omegas</span><span class="p">[(</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">)]</span>
+
+        <span class="n">b</span><span class="p">[</span><span class="n">t1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">omegas</span><span class="p">[(</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">)]</span> <span class="o">*</span> <span class="n">measure_constraints</span><span class="p">[(</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">)]</span>
+        <span class="n">b</span><span class="p">[</span><span class="n">t2</span><span class="p">]</span> <span class="o">-=</span> <span class="n">omegas</span><span class="p">[(</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">)]</span> <span class="o">*</span> <span class="n">measure_constraints</span><span class="p">[(</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">)]</span>
+
+    <span class="k">return</span> <span class="n">H</span><span class="p">,</span> <span class="n">b</span>
+
+
+<span class="n">H</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">get_H_b</span><span class="p">(</span><span class="n">odom</span><span class="p">,</span> <span class="n">obs</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The determinant of H: &quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
+<span class="n">H</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span> <span class="c1"># np.inf ?</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The determinant of H after anchoring constraint: &quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">H</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">get_H_b</span><span class="p">(</span><span class="n">odom</span><span class="p">,</span> <span class="n">obs</span><span class="p">)</span>
+    <span class="n">H</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># Recover the posterior over the path</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">H</span><span class="p">)</span> <span class="o">@</span> <span class="n">b</span>
+    <span class="n">odom</span> <span class="o">+=</span> <span class="n">dx</span>
+    <span class="c1"># repeat till convergence</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running graphSLAM ...&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Odometry values after optimzation: </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">odom</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_true</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">x_true</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Ground truth&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">odom</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">x_true</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Estimation&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">hxDR</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">x_true</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Odom&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../../_images/graphSLAM_doc_2_0.png" src="../../../_images/graphSLAM_doc_2_0.png" />
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">determinant</span> <span class="n">of</span> <span class="n">H</span><span class="p">:</span>  <span class="mf">0.0</span>
+<span class="n">The</span> <span class="n">determinant</span> <span class="n">of</span> <span class="n">H</span> <span class="n">after</span> <span class="n">anchoring</span> <span class="n">constraint</span><span class="p">:</span>  <span class="mf">18.750000000000007</span>
+<span class="n">Running</span> <span class="n">graphSLAM</span> <span class="o">...</span>
+<span class="n">Odometry</span> <span class="n">values</span> <span class="n">after</span> <span class="n">optimzation</span><span class="p">:</span>
+ <span class="p">[[</span><span class="o">-</span><span class="mf">0.</span> <span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.9</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">1.9</span><span class="p">]]</span>
+</pre></div>
+</div>
+<img alt="../../../_images/graphSLAM_doc_2_2.png" src="../../../_images/graphSLAM_doc_2_2.png" />
+<p>In particular, the tasks are split into 2 parts, graph construction, and
+graph optimization. ### Graph Construction</p>
+<p>Firstly the nodes are defined
+<span class="math notranslate nohighlight">\(\boldsymbol{x} = \boldsymbol{x}_{1:n}\)</span> such that each node is the
+pose of the robot at time <span class="math notranslate nohighlight">\(t_i\)</span> Secondly, the edges i.e. the
+constraints, are constructed according to the following conditions:</p>
+<ul class="simple">
+<li><p>robot moves from <span class="math notranslate nohighlight">\(\boldsymbol{x}_i\)</span> to
+<span class="math notranslate nohighlight">\(\boldsymbol{x}_j\)</span>. This edge corresponds to the odometry
+measurement. Relative motion constraints (Not included in the
+previous minimal example).</p></li>
+<li><p>Measurement constraints, this can be done in two ways:</p>
+<ul>
+<li><p>The information matrix is set in such a way that it includes the
+landmarks in the map as well. Then the constraints can be entered
+in a straightforward fashion between a node
+<span class="math notranslate nohighlight">\(\boldsymbol{x}_i\)</span> and some landmark <span class="math notranslate nohighlight">\(m_k\)</span></p></li>
+<li><p>Through creating a virtual measurement among all the node that
+have observed the same landmark. More concretely, robot observes
+the same landmark from <span class="math notranslate nohighlight">\(\boldsymbol{x}_i\)</span> and
+<span class="math notranslate nohighlight">\(\boldsymbol{x}_j\)</span>. Relative measurement constraint. The
+“virtual measurement” <span class="math notranslate nohighlight">\(\boldsymbol{z}_{ij}\)</span>, which is the
+estimated pose of <span class="math notranslate nohighlight">\(\boldsymbol{x}_j\)</span> as seen from the node
+<span class="math notranslate nohighlight">\(\boldsymbol{x}_i\)</span>. The virtual measurement can then be
+entered in the information matrix and vector in a similar fashion
+to the motion constraints.</p></li>
+</ul>
+</li>
+</ul>
+<p>An edge is fully characterized by the values of the error (entry to
+information vector) and the local information matrix (entry to the
+system’s information vector). The larger the local information matrix
+(lower <span class="math notranslate nohighlight">\(Q\)</span> or <span class="math notranslate nohighlight">\(R\)</span>) the values that this edge will contribute
+with.</p>
+<p>Important Notes:</p>
+<ul class="simple">
+<li><p>The addition to the information matrix and vector are added to the
+earlier values.</p></li>
+<li><p>In the case of 2D robot, the constraints will be non-linear,
+therefore, a Jacobian of the error w.r.t the states is needed when
+updated <span class="math notranslate nohighlight">\(H\)</span> and <span class="math notranslate nohighlight">\(b\)</span>.</p></li>
+<li><p>The anchoring constraint is needed in order to avoid having a
+singular information matri.</p></li>
+</ul>
+</section>
+<section id="graph-optimization">
+<h3>Graph Optimization<a class="headerlink" href="#graph-optimization" title="Permalink to this headline"></a></h3>
+<p>The result from this formulation yields an overdetermined system of
+equations. The goal after constructing the graph is to find:
+<span class="math notranslate nohighlight">\(x^*=\underset{x}{\mathrm{argmin}}~\underset{ij}\Sigma~f(e_{ij})\)</span>,
+where <span class="math notranslate nohighlight">\(f\)</span> is some error function that depends on the edges between
+to related nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>. The derivation in the references
+arrive at the solution for <span class="math notranslate nohighlight">\(x^* = H^{-1}b\)</span></p>
+</section>
+<section id="planar-example">
+<h3>Planar Example:<a class="headerlink" href="#planar-example" title="Permalink to this headline"></a></h3>
+<p>Now we will go through an example with a more realistic case of a 2D
+robot with 3DoF, namely, <span class="math notranslate nohighlight">\([x, y, \theta]^T\)</span></p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#  Simulation parameter</span>
+<span class="n">Qsim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">0.010</span><span class="p">)])</span><span class="o">**</span><span class="mi">2</span> <span class="c1"># error added to range and bearing</span>
+<span class="n">Rsim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)])</span><span class="o">**</span><span class="mi">2</span> <span class="c1"># error added to [v, w]</span>
+
+<span class="n">DT</span> <span class="o">=</span> <span class="mf">2.0</span>  <span class="c1"># time tick [s]</span>
+<span class="n">SIM_TIME</span> <span class="o">=</span> <span class="mf">100.0</span>  <span class="c1"># simulation time [s]</span>
+<span class="n">MAX_RANGE</span> <span class="o">=</span> <span class="mf">30.0</span>  <span class="c1"># maximum observation range</span>
+<span class="n">STATE_SIZE</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># State size [x,y,yaw]</span>
+
+<span class="c1"># TODO: Why not use Qsim ?</span>
+<span class="c1"># Covariance parameter of Graph Based SLAM</span>
+<span class="n">C_SIGMA1</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">C_SIGMA2</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">C_SIGMA3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+
+<span class="n">MAX_ITR</span> <span class="o">=</span> <span class="mi">20</span>  <span class="c1"># Maximum iteration during optimization</span>
+<span class="n">timesteps</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1"># consider only 2 landmarks for simplicity</span>
+<span class="c1"># RFID positions [x, y, yaw]</span>
+<span class="n">RFID</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">10.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+<span class="c1">#                  [15.0, 10.0, 0.0],</span>
+<span class="c1">#                  [3.0, 15.0, 0.0],</span>
+<span class="c1">#                  [-5.0, 20.0, 0.0],</span>
+<span class="c1">#                  [-5.0, 5.0, 0.0]</span>
+                 <span class="p">])</span>
+
+<span class="c1"># State Vector [x y yaw v]&#39;</span>
+<span class="n">xTrue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">STATE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">xDR</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">STATE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># Dead reckoning</span>
+<span class="n">xTrue</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mi">45</span><span class="p">)</span>
+<span class="n">xDR</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mi">45</span><span class="p">)</span>
+<span class="c1"># history initial values</span>
+<span class="n">hxTrue</span> <span class="o">=</span> <span class="n">xTrue</span>
+<span class="n">hxDR</span> <span class="o">=</span> <span class="n">xTrue</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">observation</span><span class="p">(</span><span class="n">xTrue</span><span class="p">,</span> <span class="n">xDR</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">RFID</span><span class="p">)</span>
+<span class="n">hz</span> <span class="o">=</span> <span class="p">[</span><span class="n">z</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">timesteps</span><span class="p">):</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">calc_input</span><span class="p">()</span>
+    <span class="n">xTrue</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">xDR</span><span class="p">,</span> <span class="n">ud</span> <span class="o">=</span> <span class="n">observation</span><span class="p">(</span><span class="n">xTrue</span><span class="p">,</span> <span class="n">xDR</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">RFID</span><span class="p">)</span>
+    <span class="n">hxDR</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">hxDR</span><span class="p">,</span> <span class="n">xDR</span><span class="p">))</span>
+    <span class="n">hxTrue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">hxTrue</span><span class="p">,</span> <span class="n">xTrue</span><span class="p">))</span>
+    <span class="n">hz</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+
+<span class="c1"># visualize</span>
+<span class="n">graphics_radius</span> <span class="o">=</span> <span class="mf">0.3</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RFID</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">RFID</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;*k&quot;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">hxDR</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">hxDR</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Odom&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">hxTrue</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">hxTrue</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;X_true&#39;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">hxDR</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">hxDR</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">hxDR</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
+    <span class="n">yaw</span> <span class="o">=</span> <span class="n">hxDR</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">graphics_radius</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">yaw</span><span class="p">)],</span>
+             <span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">graphics_radius</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">yaw</span><span class="p">)],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">hz</span><span class="p">[</span><span class="n">i</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">angle</span> <span class="o">=</span> <span class="n">hz</span><span class="p">[</span><span class="n">i</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x</span> <span class="o">+</span> <span class="n">d</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span> <span class="o">+</span> <span class="n">yaw</span><span class="p">)],</span> <span class="p">[</span><span class="n">y</span> <span class="o">+</span> <span class="n">d</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span> <span class="o">+</span> <span class="n">yaw</span><span class="p">)],</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span>
+             <span class="n">markersize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../../_images/graphSLAM_doc_4_0.png" src="../../../_images/graphSLAM_doc_4_0.png" />
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Copy the data to have a consistent naming with the .py file</span>
+<span class="n">zlist</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">hz</span><span class="p">)</span>
+<span class="n">x_opt</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">hxDR</span><span class="p">)</span>
+<span class="n">xlist</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">hxDR</span><span class="p">)</span>
+<span class="n">number_of_nodes</span> <span class="o">=</span> <span class="n">x_opt</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">number_of_nodes</span> <span class="o">*</span> <span class="n">STATE_SIZE</span>
+</pre></div>
+</div>
+<p>After the data has been saved, the graph will be constructed by looking
+at each pair for nodes. The virtual measurement is only created if two
+nodes have observed the same landmark at different points in time. The
+next cells are a walk through for a single iteration of graph
+construction -&gt; optimization -&gt; estimate update.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># get all the possible combination of the different node</span>
+<span class="n">zids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">zlist</span><span class="p">)),</span> <span class="mi">2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Node combinations: </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">zids</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xlist</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Node </span><span class="si">{}</span><span class="s2"> observed landmark with ID </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">zlist</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">]))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Node</span> <span class="n">combinations</span><span class="p">:</span>
+ <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+<span class="n">Node</span> <span class="mi">0</span> <span class="n">observed</span> <span class="n">landmark</span> <span class="k">with</span> <span class="n">ID</span> <span class="mf">0.0</span>
+<span class="n">Node</span> <span class="mi">1</span> <span class="n">observed</span> <span class="n">landmark</span> <span class="k">with</span> <span class="n">ID</span> <span class="mf">0.0</span>
+</pre></div>
+</div>
+<p>In the following code snippet the error based on the virtual measurement
+between node 0 and 1 will be created. The equations for the error is as follows:
+<span class="math notranslate nohighlight">\(e_{ij}^x = x_j + d_j cos(\psi_j +\theta_j) - x_i - d_i cos(\psi_i + \theta_i)\)</span></p>
+<p><span class="math notranslate nohighlight">\(e_{ij}^y = y_j + d_j sin(\psi_j + \theta_j) - y_i - d_i sin(\psi_i + \theta_i)\)</span></p>
+<p><span class="math notranslate nohighlight">\(e_{ij}^x = \psi_j + \theta_j - \psi_i - \theta_i\)</span></p>
+<p>Where <span class="math notranslate nohighlight">\([x_i, y_i, \psi_i]\)</span> is the pose for node <span class="math notranslate nohighlight">\(i\)</span> and
+similarly for node <span class="math notranslate nohighlight">\(j\)</span>, <span class="math notranslate nohighlight">\(d\)</span> is the measured distance at
+nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, and <span class="math notranslate nohighlight">\(\theta\)</span> is the measured
+bearing to the landmark. The difference is visualized with the figure in
+the next cell.</p>
+<p>In case of perfect motion and perfect measurement the error shall be
+zero since <span class="math notranslate nohighlight">\(x_j + d_j cos(\psi_j + \theta_j)\)</span> should equal
+<span class="math notranslate nohighlight">\(x_i + d_i cos(\psi_i + \theta_i)\)</span></p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize edges list</span>
+<span class="n">edges</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># Go through all the different combinations</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">zids</span><span class="p">:</span>
+    <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">yaw1</span> <span class="o">=</span> <span class="n">xlist</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">t1</span><span class="p">],</span> <span class="n">xlist</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">t1</span><span class="p">],</span> <span class="n">xlist</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">t1</span><span class="p">]</span>
+    <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">yaw2</span> <span class="o">=</span> <span class="n">xlist</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">t2</span><span class="p">],</span> <span class="n">xlist</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">t2</span><span class="p">],</span> <span class="n">xlist</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">t2</span><span class="p">]</span>
+
+    <span class="c1"># All nodes have valid observation with ID=0, therefore, no data association condition</span>
+    <span class="n">iz1</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">iz2</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">d1</span> <span class="o">=</span> <span class="n">zlist</span><span class="p">[</span><span class="n">t1</span><span class="p">][</span><span class="n">iz1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">angle1</span><span class="p">,</span> <span class="n">phi1</span> <span class="o">=</span> <span class="n">zlist</span><span class="p">[</span><span class="n">t1</span><span class="p">][</span><span class="n">iz1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">zlist</span><span class="p">[</span><span class="n">t1</span><span class="p">][</span><span class="n">iz1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">d2</span> <span class="o">=</span> <span class="n">zlist</span><span class="p">[</span><span class="n">t2</span><span class="p">][</span><span class="n">iz2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">angle2</span><span class="p">,</span> <span class="n">phi2</span> <span class="o">=</span> <span class="n">zlist</span><span class="p">[</span><span class="n">t2</span><span class="p">][</span><span class="n">iz2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">zlist</span><span class="p">[</span><span class="n">t2</span><span class="p">][</span><span class="n">iz2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+
+    <span class="c1"># find angle between observation and horizontal</span>
+    <span class="n">tangle1</span> <span class="o">=</span> <span class="n">pi_2_pi</span><span class="p">(</span><span class="n">yaw1</span> <span class="o">+</span> <span class="n">angle1</span><span class="p">)</span>
+    <span class="n">tangle2</span> <span class="o">=</span> <span class="n">pi_2_pi</span><span class="p">(</span><span class="n">yaw2</span> <span class="o">+</span> <span class="n">angle2</span><span class="p">)</span>
+
+    <span class="c1"># project the observations</span>
+    <span class="n">tmp1</span> <span class="o">=</span> <span class="n">d1</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">tangle1</span><span class="p">)</span>
+    <span class="n">tmp2</span> <span class="o">=</span> <span class="n">d2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">tangle2</span><span class="p">)</span>
+    <span class="n">tmp3</span> <span class="o">=</span> <span class="n">d1</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">tangle1</span><span class="p">)</span>
+    <span class="n">tmp4</span> <span class="o">=</span> <span class="n">d2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">tangle2</span><span class="p">)</span>
+
+    <span class="n">edge</span> <span class="o">=</span> <span class="n">Edge</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span> <span class="n">tmp3</span><span class="p">,</span> <span class="n">tmp4</span><span class="p">)</span>
+    <span class="c1"># calculate the error of the virtual measurement</span>
+    <span class="c1"># node 1 as seen from node 2 throught the observations 1,2</span>
+    <span class="n">edge</span><span class="o">.</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span> <span class="o">-</span> <span class="n">tmp1</span> <span class="o">+</span> <span class="n">tmp2</span>
+    <span class="n">edge</span><span class="o">.</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span> <span class="o">-</span> <span class="n">tmp3</span> <span class="o">+</span> <span class="n">tmp4</span>
+    <span class="n">edge</span><span class="o">.</span><span class="n">e</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">pi_2_pi</span><span class="p">(</span><span class="n">yaw2</span> <span class="o">-</span> <span class="n">yaw1</span> <span class="o">-</span> <span class="n">tangle1</span> <span class="o">+</span> <span class="n">tangle2</span><span class="p">)</span>
+
+    <span class="n">edge</span><span class="o">.</span><span class="n">d1</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">d2</span> <span class="o">=</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span>
+    <span class="n">edge</span><span class="o">.</span><span class="n">yaw1</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">yaw2</span> <span class="o">=</span> <span class="n">yaw1</span><span class="p">,</span> <span class="n">yaw2</span>
+    <span class="n">edge</span><span class="o">.</span><span class="n">angle1</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">angle2</span> <span class="o">=</span> <span class="n">angle1</span><span class="p">,</span> <span class="n">angle2</span>
+    <span class="n">edge</span><span class="o">.</span><span class="n">id1</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">id2</span> <span class="o">=</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span>
+
+    <span class="n">edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">edge</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;For nodes&quot;</span><span class="p">,(</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Added edge with errors: </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="c1"># Visualize measurement projections</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RFID</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">RFID</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;*k&quot;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span><span class="n">x2</span><span class="p">],[</span><span class="n">y1</span><span class="p">,</span><span class="n">y2</span><span class="p">],</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">graphics_radius</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">yaw1</span><span class="p">)],</span>
+             <span class="p">[</span><span class="n">y1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">+</span> <span class="n">graphics_radius</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">yaw1</span><span class="p">)],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x2</span><span class="p">,</span> <span class="n">x2</span> <span class="o">+</span> <span class="n">graphics_radius</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">yaw2</span><span class="p">)],</span>
+             <span class="p">[</span><span class="n">y2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">+</span> <span class="n">graphics_radius</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">yaw2</span><span class="p">)],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span><span class="n">x1</span><span class="o">+</span><span class="n">tmp1</span><span class="p">],</span> <span class="p">[</span><span class="n">y1</span><span class="p">,</span><span class="n">y1</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;obs 1 x&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x2</span><span class="p">,</span><span class="n">x2</span><span class="o">+</span><span class="n">tmp2</span><span class="p">],</span> <span class="p">[</span><span class="n">y2</span><span class="p">,</span><span class="n">y2</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;obs 2 x&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span><span class="n">x1</span><span class="p">],</span> <span class="p">[</span><span class="n">y1</span><span class="p">,</span><span class="n">y1</span><span class="o">+</span><span class="n">tmp3</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;obs 1 y&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x2</span><span class="p">,</span><span class="n">x2</span><span class="p">],</span> <span class="p">[</span><span class="n">y2</span><span class="p">,</span><span class="n">y2</span><span class="o">+</span><span class="n">tmp4</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;obs 2 y&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x1</span><span class="o">+</span><span class="n">tmp1</span><span class="p">,</span> <span class="n">y1</span><span class="o">+</span><span class="n">tmp3</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x2</span><span class="o">+</span><span class="n">tmp2</span><span class="p">,</span> <span class="n">y2</span><span class="o">+</span><span class="n">tmp4</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.0</span> <span class="mf">1.427649841628278</span> <span class="o">-</span><span class="mf">2.0126109674819155</span> <span class="o">-</span><span class="mf">3.524048014922737</span>
+<span class="n">For</span> <span class="n">nodes</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">Added</span> <span class="n">edge</span> <span class="k">with</span> <span class="n">errors</span><span class="p">:</span>
+ <span class="p">[[</span><span class="o">-</span><span class="mf">0.02</span> <span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">0.084</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.</span>   <span class="p">]]</span>
+</pre></div>
+</div>
+<img alt="../../../_images/graphSLAM_doc_9_1.png" src="../../../_images/graphSLAM_doc_9_1.png" />
+<p>Since the constraints equations derived before are non-linear,
+linearization is needed before we can insert them into the information
+matrix and information vector. Two jacobians</p>
+<p><span class="math notranslate nohighlight">\(A = \frac{\partial e_{ij}}{\partial \boldsymbol{x}_i}\)</span> as
+<span class="math notranslate nohighlight">\(\boldsymbol{x}_i\)</span> holds the three variabls x, y, and theta.
+Similarly, <span class="math notranslate nohighlight">\(B = \frac{\partial e_{ij}}{\partial \boldsymbol{x}_j}\)</span></p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize the system information matrix and information vector</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">x_opt</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">hxDR</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">:</span>
+    <span class="n">id1</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">id1</span> <span class="o">*</span> <span class="n">STATE_SIZE</span>
+    <span class="n">id2</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">id2</span> <span class="o">*</span> <span class="n">STATE_SIZE</span>
+
+    <span class="n">t1</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">yaw1</span> <span class="o">+</span> <span class="n">edge</span><span class="o">.</span><span class="n">angle1</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">d1</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t1</span><span class="p">)],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="n">edge</span><span class="o">.</span><span class="n">d1</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t1</span><span class="p">)],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">]])</span>
+
+    <span class="n">t2</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">yaw2</span> <span class="o">+</span> <span class="n">edge</span><span class="o">.</span><span class="n">angle2</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">edge</span><span class="o">.</span><span class="n">d2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t2</span><span class="p">)],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">d2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t2</span><span class="p">)],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span>
+
+    <span class="c1"># TODO: use Qsim instead of sigma</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="n">C_SIGMA1</span><span class="p">,</span> <span class="n">C_SIGMA2</span><span class="p">,</span> <span class="n">C_SIGMA3</span><span class="p">])</span>
+    <span class="n">Rt1</span> <span class="o">=</span> <span class="n">calc_rotational_matrix</span><span class="p">(</span><span class="n">tangle1</span><span class="p">)</span>
+    <span class="n">Rt2</span> <span class="o">=</span> <span class="n">calc_rotational_matrix</span><span class="p">(</span><span class="n">tangle2</span><span class="p">)</span>
+    <span class="n">edge</span><span class="o">.</span><span class="n">omega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">Rt1</span> <span class="o">@</span> <span class="n">sigma</span> <span class="o">@</span> <span class="n">Rt1</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="n">Rt2</span> <span class="o">@</span> <span class="n">sigma</span> <span class="o">@</span> <span class="n">Rt2</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+    <span class="c1"># Fill in entries in H and b</span>
+    <span class="n">H</span><span class="p">[</span><span class="n">id1</span><span class="p">:</span><span class="n">id1</span> <span class="o">+</span> <span class="n">STATE_SIZE</span><span class="p">,</span> <span class="n">id1</span><span class="p">:</span><span class="n">id1</span> <span class="o">+</span> <span class="n">STATE_SIZE</span><span class="p">]</span> <span class="o">+=</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">edge</span><span class="o">.</span><span class="n">omega</span> <span class="o">@</span> <span class="n">A</span>
+    <span class="n">H</span><span class="p">[</span><span class="n">id1</span><span class="p">:</span><span class="n">id1</span> <span class="o">+</span> <span class="n">STATE_SIZE</span><span class="p">,</span> <span class="n">id2</span><span class="p">:</span><span class="n">id2</span> <span class="o">+</span> <span class="n">STATE_SIZE</span><span class="p">]</span> <span class="o">+=</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">edge</span><span class="o">.</span><span class="n">omega</span> <span class="o">@</span> <span class="n">B</span>
+    <span class="n">H</span><span class="p">[</span><span class="n">id2</span><span class="p">:</span><span class="n">id2</span> <span class="o">+</span> <span class="n">STATE_SIZE</span><span class="p">,</span> <span class="n">id1</span><span class="p">:</span><span class="n">id1</span> <span class="o">+</span> <span class="n">STATE_SIZE</span><span class="p">]</span> <span class="o">+=</span> <span class="n">B</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">edge</span><span class="o">.</span><span class="n">omega</span> <span class="o">@</span> <span class="n">A</span>
+    <span class="n">H</span><span class="p">[</span><span class="n">id2</span><span class="p">:</span><span class="n">id2</span> <span class="o">+</span> <span class="n">STATE_SIZE</span><span class="p">,</span> <span class="n">id2</span><span class="p">:</span><span class="n">id2</span> <span class="o">+</span> <span class="n">STATE_SIZE</span><span class="p">]</span> <span class="o">+=</span> <span class="n">B</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">edge</span><span class="o">.</span><span class="n">omega</span> <span class="o">@</span> <span class="n">B</span>
+
+    <span class="n">b</span><span class="p">[</span><span class="n">id1</span><span class="p">:</span><span class="n">id1</span> <span class="o">+</span> <span class="n">STATE_SIZE</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">edge</span><span class="o">.</span><span class="n">omega</span> <span class="o">@</span> <span class="n">edge</span><span class="o">.</span><span class="n">e</span><span class="p">)</span>
+    <span class="n">b</span><span class="p">[</span><span class="n">id2</span><span class="p">:</span><span class="n">id2</span> <span class="o">+</span> <span class="n">STATE_SIZE</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">edge</span><span class="o">.</span><span class="n">omega</span> <span class="o">@</span> <span class="n">edge</span><span class="o">.</span><span class="n">e</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The determinant of H: &quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Fix the origin, multiply by large number gives same results but better visualization</span>
+<span class="n">H</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">STATE_SIZE</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">STATE_SIZE</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">STATE_SIZE</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The determinant of H after origin constraint: &quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">determinant</span> <span class="n">of</span> <span class="n">H</span><span class="p">:</span>  <span class="mf">0.0</span>
+<span class="n">The</span> <span class="n">determinant</span> <span class="n">of</span> <span class="n">H</span> <span class="n">after</span> <span class="n">origin</span> <span class="n">constraint</span><span class="p">:</span>  <span class="mf">716.1972439134893</span>
+</pre></div>
+</div>
+<img alt="../../../_images/graphSLAM_doc_11_1.png" src="../../../_images/graphSLAM_doc_11_1.png" />
+<img alt="../../../_images/graphSLAM_doc_11_2.png" src="../../../_images/graphSLAM_doc_11_2.png" />
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Find the solution (first iteration)</span>
+<span class="n">dx</span> <span class="o">=</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">H</span><span class="p">)</span> <span class="o">@</span> <span class="n">b</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_nodes</span><span class="p">):</span>
+    <span class="n">x_opt</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">dx</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="mi">3</span><span class="p">:</span><span class="n">i</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dx: </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span><span class="n">dx</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ground truth: </span><span class="se">\n</span><span class="s2"> &quot;</span><span class="p">,</span><span class="n">hxTrue</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Odom: </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">hxDR</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;SLAM: </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">x_opt</span><span class="p">)</span>
+
+<span class="c1"># performance will improve with more iterations, nodes and landmarks.</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">graphSLAM localization error: &quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">x_opt</span> <span class="o">-</span> <span class="n">hxTrue</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Odom localization error: &quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">hxDR</span> <span class="o">-</span> <span class="n">hxTrue</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dx</span><span class="p">:</span>
+ <span class="p">[[</span><span class="o">-</span><span class="mf">0.</span>   <span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">0.</span>   <span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.</span>   <span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.02</span> <span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.084</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">0.</span>   <span class="p">]]</span>
+<span class="n">ground</span> <span class="n">truth</span><span class="p">:</span>
+  <span class="p">[[</span><span class="mf">0.</span>    <span class="mf">1.414</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span>    <span class="mf">1.414</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.785</span> <span class="mf">0.985</span><span class="p">]]</span>
+<span class="n">Odom</span><span class="p">:</span>
+ <span class="p">[[</span><span class="mf">0.</span>    <span class="mf">1.428</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span>    <span class="mf">1.428</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.785</span> <span class="mf">0.976</span><span class="p">]]</span>
+<span class="n">SLAM</span><span class="p">:</span>
+ <span class="p">[[</span><span class="o">-</span><span class="mf">0.</span>     <span class="mf">1.448</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">0.</span>     <span class="mf">1.512</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.785</span>  <span class="mf">0.976</span><span class="p">]]</span>
+
+<span class="n">graphSLAM</span> <span class="n">localization</span> <span class="n">error</span><span class="p">:</span>  <span class="mf">0.010729072751057656</span>
+<span class="n">Odom</span> <span class="n">localization</span> <span class="n">error</span><span class="p">:</span>  <span class="mf">0.0004460978857535104</span>
+</pre></div>
+</div>
+</section>
+<section id="the-references">
+<h3>The references:<a class="headerlink" href="#the-references" title="Permalink to this headline"></a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="http://robots.stanford.edu/papers/thrun.graphslam.pdf">The GraphSLAM Algorithm with Applications to Large-Scale Mapping of Urban Structures</a></p></li>
+<li><p><a class="reference external" href="http://ais.informatik.uni-freiburg.de/teaching/ss13/robotics/slides/16-graph-slam.pdf">Introduction to Mobile Robotics Graph-Based SLAM</a></p></li>
+<li><p><a class="reference external" href="http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf">A Tutorial on Graph-Based SLAM</a></p></li>
+</ul>
+<p>N.B. An additional step is required that uses the estimated path to
+update the belief regarding the map.</p>
+</section>
+</section>
+<section id="graph-slam-formulation">
+<span id="id1"></span><h2>Graph SLAM Formulation<a class="headerlink" href="#graph-slam-formulation" title="Permalink to this headline"></a></h2>
+<p>Author Jeff Irion</p>
+<section id="problem-formulation">
+<h3>Problem Formulation<a class="headerlink" href="#problem-formulation" title="Permalink to this headline"></a></h3>
+<p>Let a robot’s trajectory through its environment be represented by a
+sequence of <span class="math notranslate nohighlight">\(N\)</span> poses:
+<span class="math notranslate nohighlight">\(\mathbf{p}_1, \mathbf{p}_2, \ldots, \mathbf{p}_N\)</span>. Each pose lies
+on a manifold: <span class="math notranslate nohighlight">\(\mathbf{p}_i \in \mathcal{M}\)</span>. Simple examples of
+manifolds used in Graph SLAM include 1-D, 2-D, and 3-D space, i.e.,
+<span class="math notranslate nohighlight">\(\mathbb{R}\)</span>, <span class="math notranslate nohighlight">\(\mathbb{R}^2\)</span>, and <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span>.
+These environments are <em>rectilinear</em>, meaning that there is no concept
+of orientation. By contrast, in <span class="math notranslate nohighlight">\(SE(2)\)</span> problem settings a robot’s
+pose consists of its location in <span class="math notranslate nohighlight">\(\mathbb{R}^2\)</span> and its
+orientation <span class="math notranslate nohighlight">\(\theta\)</span>. Similarly, in <span class="math notranslate nohighlight">\(SE(3)\)</span> a robot’s pose
+consists of its location in <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span> and its orientation,
+which can be represented via Euler angles, quaternions, or <span class="math notranslate nohighlight">\(SO(3)\)</span>
+rotation matrices.</p>
+<p>As the robot explores its environment, it collects a set of <span class="math notranslate nohighlight">\(M\)</span>
+measurements <span class="math notranslate nohighlight">\(\mathcal{Z} = \{\mathbf{z}_j\}\)</span>. Examples of such
+measurements include odometry, GPS, and IMU data. Given a set of poses
+<span class="math notranslate nohighlight">\(\mathbf{p}_1, \ldots, \mathbf{p}_N\)</span>, we can compute the estimated
+measurement
+<span class="math notranslate nohighlight">\(\hat{\mathbf{z}}_j(\mathbf{p}_1, \ldots, \mathbf{p}_N)\)</span>. We can
+then compute the <em>residual</em>
+<span class="math notranslate nohighlight">\(\mathbf{e}_j(\mathbf{z}_j, \hat{\mathbf{z}}_j)\)</span> for measurement
+<span class="math notranslate nohighlight">\(j\)</span>. The formula for the residual depends on the type of
+measurement. As an example, let <span class="math notranslate nohighlight">\(\mathbf{z}_1\)</span> be an odometry
+measurement that was collected when the robot traveled from
+<span class="math notranslate nohighlight">\(\mathbf{p}_1\)</span> to <span class="math notranslate nohighlight">\(\mathbf{p}_2\)</span>. The expected measurement
+and the residual are computed as</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+    \hat{\mathbf{z}}_1(\mathbf{p}_1, \mathbf{p}_2) &amp;= \mathbf{p}_2 \ominus \mathbf{p}_1 \\
+    \mathbf{e}_1(\mathbf{z}_1, \hat{\mathbf{z}}_1) &amp;= \mathbf{z}_1 \ominus \hat{\mathbf{z}}_1 = \mathbf{z}_1 \ominus (\mathbf{p}_2 \ominus \mathbf{p}_1),\end{aligned}\end{split}\]</div>
+<p>where the <span class="math notranslate nohighlight">\(\ominus\)</span> operator indicates inverse pose composition.
+We model measurement <span class="math notranslate nohighlight">\(\mathbf{z}_j\)</span> as having independent Gaussian
+noise with zero mean and covariance matrix <span class="math notranslate nohighlight">\(\Omega_j^{-1}\)</span>; we
+refer to <span class="math notranslate nohighlight">\(\Omega_j\)</span> as the <em>information matrix</em> for measurement
+<span class="math notranslate nohighlight">\(j\)</span>. That is,</p>
+<div class="math notranslate nohighlight" id="equation-infomat">
+<span class="eqno">(1)<a class="headerlink" href="#equation-infomat" title="Permalink to this equation"></a></span>\[p(\mathbf{z}_j \ | \ \mathbf{p}_1, \ldots, \mathbf{p}_N) = \eta_j \exp (-\mathbf{e}_j(\mathbf{z}_j, \hat{\mathbf{z}}_j))^{\mathsf{T}}\Omega_j \mathbf{e}_j(\mathbf{z}_j, \hat{\mathbf{z}}_j)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\eta_j\)</span> is the normalization constant.</p>
+<p>The objective of Graph SLAM is to find the maximum likelihood set of
+poses given the measurements <span class="math notranslate nohighlight">\(\mathcal{Z} = \{\mathbf{z}_j\}\)</span>; in
+other words, we want to find</p>
+<div class="math notranslate nohighlight">
+\[\mathop{\mathrm{arg\,max}}_{\mathbf{p}_1, \ldots, \mathbf{p}_N} \ p(\mathbf{p}_1, \ldots, \mathbf{p}_N \ | \ \mathcal{Z})\]</div>
+<p>Using Bayes’ rule, we can write this probability as</p>
+<div class="math notranslate nohighlight" id="equation-bayes">
+<span class="eqno">(2)<a class="headerlink" href="#equation-bayes" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+   p(\mathbf{p}_1, \ldots, \mathbf{p}_N \ | \ \mathcal{Z}) &amp;= \frac{p( \mathcal{Z} \ | \ \mathbf{p}_1, \ldots, \mathbf{p}_N) p(\mathbf{p}_1, \ldots, \mathbf{p}_N) }{ p(\mathcal{Z}) } \notag \\
+   &amp;\propto p( \mathcal{Z} \ | \ \mathbf{p}_1, \ldots, \mathbf{p}_N)
+\end{aligned}\end{split}\]</div>
+<p>since <span class="math notranslate nohighlight">\(p(\mathcal{Z})\)</span> is a constant (albeit, an unknown constant)
+and we assume that <span class="math notranslate nohighlight">\(p(\mathbf{p}_1, \ldots, \mathbf{p}_N)\)</span> is
+uniformly distributed. Therefore, we
+can use Eq. <a class="reference internal" href="#equation-infomat">(1)</a> and and Eq. <a class="reference internal" href="#equation-bayes">(2)</a> to simplify the Graph SLAM
+optimization as follows:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+    \mathop{\mathrm{arg\,max}}_{\mathbf{p}_1, \ldots, \mathbf{p}_N} \ p(\mathbf{p}_1, \ldots, \mathbf{p}_N \ | \ \mathcal{Z}) &amp;= \mathop{\mathrm{arg\,max}}_{\mathbf{p}_1, \ldots, \mathbf{p}_N} \ p( \mathcal{Z} \ | \ \mathbf{p}_1, \ldots, \mathbf{p}_N) \\
+    &amp;= \mathop{\mathrm{arg\,max}}_{\mathbf{p}_1, \ldots, \mathbf{p}_N} \prod_{j=1}^M p(\mathbf{z}_j \ | \ \mathbf{p}_1, \ldots, \mathbf{p}_N) \\
+    &amp;= \mathop{\mathrm{arg\,max}}_{\mathbf{p}_1, \ldots, \mathbf{p}_N} \prod_{j=1}^M \exp \left( -(\mathbf{e}_j(\mathbf{z}_j, \hat{\mathbf{z}}_j))^{\scriptstyle{\mathsf{T}}}\Omega_j \mathbf{e}_j(\mathbf{z}_j, \hat{\mathbf{z}}_j) \right) \\
+    &amp;= \mathop{\mathrm{arg\,min}}_{\mathbf{p}_1, \ldots, \mathbf{p}_N} \sum_{j=1}^M (\mathbf{e}_j(\mathbf{z}_j, \hat{\mathbf{z}}_j))^{\scriptstyle{\mathsf{T}}}\Omega_j \mathbf{e}_j(\mathbf{z}_j, \hat{\mathbf{z}}_j).\end{aligned}\end{split}\]</div>
+<p>We define</p>
+<div class="math notranslate nohighlight">
+\[\chi^2 := \sum_{j=1}^M (\mathbf{e}_j(\mathbf{z}_j, \hat{\mathbf{z}}_j))^{\scriptstyle{\mathsf{T}}}\Omega_j \mathbf{e}_j(\mathbf{z}_j, \hat{\mathbf{z}}_j),\]</div>
+<p>and this is what we seek to minimize.</p>
+</section>
+<section id="dimensionality-and-pose-representation">
+<h3>Dimensionality and Pose Representation<a class="headerlink" href="#dimensionality-and-pose-representation" title="Permalink to this headline"></a></h3>
+<p>Before proceeding further, it is helpful to discuss the dimensionality
+of the problem. We have:</p>
+<ul class="simple">
+<li><p>A set of <span class="math notranslate nohighlight">\(N\)</span> poses
+<span class="math notranslate nohighlight">\(\mathbf{p}_1, \mathbf{p}_2, \ldots, \mathbf{p}_N\)</span>, where each
+pose lies on the manifold <span class="math notranslate nohighlight">\(\mathcal{M}\)</span></p>
+<ul>
+<li><p>Each pose <span class="math notranslate nohighlight">\(\mathbf{p}_i\)</span> is represented as a vector in (a
+subset of) <span class="math notranslate nohighlight">\(\mathbb{R}^d\)</span>. For example:</p>
+<ul>
+<li><p>An <span class="math notranslate nohighlight">\(SE(2)\)</span> pose is typically represented as
+<span class="math notranslate nohighlight">\((x, y, \theta)\)</span>, and thus <span class="math notranslate nohighlight">\(d = 3\)</span>.</p></li>
+<li><p>An <span class="math notranslate nohighlight">\(SE(3)\)</span> pose is typically represented as
+<span class="math notranslate nohighlight">\((x, y, z, q_x, q_y, q_z, q_w)\)</span>, where <span class="math notranslate nohighlight">\((x, y, z)\)</span>
+is a point in <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span> and
+<span class="math notranslate nohighlight">\((q_x, q_y, q_z, q_w)\)</span> is a <em>quaternion</em>, and so
+<span class="math notranslate nohighlight">\(d = 7\)</span>. For more information about <span class="math notranslate nohighlight">\(SE(3)\)</span>
+parameterization and pose transformations, see
+<a class="reference internal" href="#blanco2010tutorial" id="id2"><span>[blanco2010tutorial]</span></a>.</p></li>
+</ul>
+</li>
+<li><p>We also need to be able to represent each pose compactly as a
+vector in (a subset of) <span class="math notranslate nohighlight">\(\mathbb{R}^c\)</span>.</p>
+<ul>
+<li><p>Since an <span class="math notranslate nohighlight">\(SE(2)\)</span> pose has three degrees of freedom, the
+<span class="math notranslate nohighlight">\((x, y, \theta)\)</span> representation is again sufficient and
+<span class="math notranslate nohighlight">\(c=3\)</span>.</p></li>
+<li><p>An <span class="math notranslate nohighlight">\(SE(3)\)</span> pose only has six degrees of freedom, and we
+can represent it compactly as <span class="math notranslate nohighlight">\((x, y, z, q_x, q_y, q_z)\)</span>,
+and thus <span class="math notranslate nohighlight">\(c=6\)</span>.</p></li>
+</ul>
+</li>
+<li><p>We use the <span class="math notranslate nohighlight">\(\boxplus\)</span> operator to indicate pose composition
+when one or both of the poses are represented compactly. The
+output can be a pose in <span class="math notranslate nohighlight">\(\mathcal{M}\)</span> or a vector in
+<span class="math notranslate nohighlight">\(\mathbb{R}^c\)</span>, as required by context.</p></li>
+</ul>
+</li>
+<li><p>A set of <span class="math notranslate nohighlight">\(M\)</span> measurements
+<span class="math notranslate nohighlight">\(\mathcal{Z} = \{\mathbf{z}_1, \mathbf{z}_2, \ldots, \mathbf{z}_M\}\)</span></p>
+<ul>
+<li><p>Each measurement’s dimensionality can be unique, and we will use
+<span class="math notranslate nohighlight">\(\bullet\)</span> to denote a “wildcard” variable.</p></li>
+<li><p>Measurement <span class="math notranslate nohighlight">\(\mathbf{z}_j \in \mathbb{R}^\bullet\)</span> has an
+associated information matrix
+<span class="math notranslate nohighlight">\(\Omega_j \in \mathbb{R}^{\bullet \times \bullet}\)</span> and
+residual function
+<span class="math notranslate nohighlight">\(\mathbf{e}_j(\mathbf{z}_j, \hat{\mathbf{z}}_j) = \mathbf{e}_j(\mathbf{z}_j, \mathbf{p}_1, \ldots, \mathbf{p}_N) \in \mathbb{R}^\bullet\)</span>.</p></li>
+<li><p>A measurement could, in theory, constrain anywhere from 1 pose to
+all <span class="math notranslate nohighlight">\(N\)</span> poses. In practice, each measurement usually
+constrains only 1 or 2 poses.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="graph-slam-algorithm">
+<h3>Graph SLAM Algorithm<a class="headerlink" href="#graph-slam-algorithm" title="Permalink to this headline"></a></h3>
+<p>The “Graph” in Graph SLAM refers to the fact that we view the problem as
+a graph. The graph has a set <span class="math notranslate nohighlight">\(\mathcal{V}\)</span> of <span class="math notranslate nohighlight">\(N\)</span> vertices,
+where each vertex <span class="math notranslate nohighlight">\(v_i\)</span> has an associated pose
+<span class="math notranslate nohighlight">\(\mathbf{p}_i\)</span>. Similarly, the graph has a set <span class="math notranslate nohighlight">\(\mathcal{E}\)</span>
+of <span class="math notranslate nohighlight">\(M\)</span> edges, where each edge <span class="math notranslate nohighlight">\(e_j\)</span> has an associated
+measurement <span class="math notranslate nohighlight">\(\mathbf{z}_j\)</span>. In practice, the edges in this graph
+are either unary (i.e., a loop) or binary. (Note: <span class="math notranslate nohighlight">\(e_j\)</span> refers to
+the edge in the graph associated with measurement <span class="math notranslate nohighlight">\(\mathbf{z}_j\)</span>,
+whereas <span class="math notranslate nohighlight">\(\mathbf{e}_j\)</span> refers to the residual function associated
+with <span class="math notranslate nohighlight">\(\mathbf{z}_j\)</span>.) For more information about the Graph SLAM
+algorithm, see <a class="reference internal" href="#grisetti2010tutorial" id="id3"><span>[grisetti2010tutorial]</span></a>.</p>
+<p>We want to optimize</p>
+<div class="math notranslate nohighlight">
+\[\chi^2 = \sum_{e_j \in \mathcal{E}} \mathbf{e}_j^{\scriptstyle{\mathsf{T}}}\Omega_j \mathbf{e}_j.\]</div>
+<p>Let <span class="math notranslate nohighlight">\(\mathbf{x}_i \in \mathbb{R}^c\)</span> be the compact representation
+of pose <span class="math notranslate nohighlight">\(\mathbf{p}_i \in \mathcal{M}\)</span>, and let</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mathbf{x} := \begin{bmatrix} \mathbf{x}_1 \\ \mathbf{x}_2 \\ \vdots \\ \mathbf{x}_N \end{bmatrix} \in \mathbb{R}^{cN}\end{split}\]</div>
+<p>We will solve this optimization problem iteratively. Let</p>
+<div class="math notranslate nohighlight" id="equation-update">
+<span class="eqno">(3)<a class="headerlink" href="#equation-update" title="Permalink to this equation"></a></span>\[\begin{split}\mathbf{x}^{k+1} := \mathbf{x}^k \boxplus \Delta \mathbf{x}^k = \begin{bmatrix} \mathbf{x}_1 \boxplus \Delta \mathbf{x}_1 \\ \mathbf{x}_2 \boxplus \Delta \mathbf{x}_2 \\ \vdots \\ \mathbf{x}_N \boxplus \Delta \mathbf{x}_2 \end{bmatrix}\end{split}\]</div>
+<p>The <span class="math notranslate nohighlight">\(\chi^2\)</span> error at iteration <span class="math notranslate nohighlight">\(k+1\)</span> is</p>
+<div class="math notranslate nohighlight" id="equation-chisq-at-kplusone">
+<span class="eqno">(4)<a class="headerlink" href="#equation-chisq-at-kplusone" title="Permalink to this equation"></a></span>\[\chi_{k+1}^2 = \sum_{e_j \in \mathcal{E}} \underbrace{\left[ \mathbf{e}_j(\mathbf{x}^{k+1}) \right]^{\scriptstyle{\mathsf{T}}}}_{1 \times \bullet} \underbrace{\Omega_j}_{\bullet \times \bullet} \underbrace{\mathbf{e}_j(\mathbf{x}^{k+1})}_{\bullet \times 1}.\]</div>
+<p>We will linearize the residuals as:</p>
+<div class="math notranslate nohighlight" id="equation-linearization">
+<span class="eqno">(5)<a class="headerlink" href="#equation-linearization" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+    \mathbf{e}_j(\mathbf{x}^{k+1}) &amp;= \mathbf{e}_j(\mathbf{x}^k \boxplus \Delta \mathbf{x}^k) \\
+    &amp;\approx \mathbf{e}_j(\mathbf{x}^{k}) + \frac{\partial}{\partial \Delta \mathbf{x}^k} \left[ \mathbf{e}_j(\mathbf{x}^k \boxplus \Delta \mathbf{x}^k) \right] \Delta \mathbf{x}^k \\
+    &amp;= \mathbf{e}_j(\mathbf{x}^{k}) + \left( \left. \frac{\partial \mathbf{e}_j(\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)}{\partial (\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)} \right|_{\Delta \mathbf{x}^k = \mathbf{0}} \right) \frac{\partial (\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)}{\partial \Delta \mathbf{x}^k} \Delta \mathbf{x}^k.
+\end{aligned}\end{split}\]</div>
+<p>Plugging <a class="reference internal" href="#equation-linearization">(5)</a> into <a class="reference internal" href="#equation-chisq-at-kplusone">(4)</a>, we get:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+    \chi_{k+1}^2 &amp;\approx \ \ \ \ \ \sum_{e_j \in \mathcal{E}} \underbrace{[ \mathbf{e}_j(\mathbf{x}^k)]^{\scriptstyle{\mathsf{T}}}}_{1 \times \bullet} \underbrace{\Omega_j}_{\bullet \times \bullet} \underbrace{\mathbf{e}_j(\mathbf{x}^k)}_{\bullet \times 1} \notag \\
+    &amp;\hphantom{\approx} \ \ \ + \sum_{e_j \in \mathcal{E}} \underbrace{[ \mathbf{e}_j(\mathbf{x^k}) ]^{\scriptstyle{\mathsf{T}}}}_{1 \times \bullet} \underbrace{\Omega_j}_{\bullet \times \bullet} \underbrace{\left( \left. \frac{\partial \mathbf{e}_j(\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)}{\partial (\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)} \right|_{\Delta \mathbf{x}^k = \mathbf{0}} \right)}_{\bullet \times dN} \underbrace{\frac{\partial (\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)}{\partial \Delta \mathbf{x}^k}}_{dN \times cN} \underbrace{\Delta \mathbf{x}^k}_{cN \times 1} \notag \\
+    &amp;\hphantom{\approx} \ \ \ + \sum_{e_j \in \mathcal{E}} \underbrace{(\Delta \mathbf{x}^k)^{\scriptstyle{\mathsf{T}}}}_{1 \times cN} \underbrace{ \left( \frac{\partial (\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)}{\partial \Delta \mathbf{x}^k} \right)^{\scriptstyle{\mathsf{T}}}}_{cN \times dN} \underbrace{\left( \left. \frac{\partial \mathbf{e}_j(\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)}{\partial (\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)} \right|_{\Delta \mathbf{x}^k = \mathbf{0}} \right)^{\scriptstyle{\mathsf{T}}}}_{dN \times \bullet} \underbrace{\Omega_j}_{\bullet \times \bullet} \underbrace{\left( \left. \frac{\partial \mathbf{e}_j(\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)}{\partial (\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)} \right|_{\Delta \mathbf{x}^k = \mathbf{0}} \right)}_{\bullet \times dN} \underbrace{\frac{\partial (\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)}{\partial \Delta \mathbf{x}^k}}_{dN \times cN} \underbrace{\Delta \mathbf{x}^k}_{cN \times 1} \notag \\
+    &amp;= \chi_k^2 + 2 \mathbf{b}^{\scriptstyle{\mathsf{T}}}\Delta \mathbf{x}^k + (\Delta \mathbf{x}^k)^{\scriptstyle{\mathsf{T}}}H \Delta \mathbf{x}^k,  \notag\end{aligned}\end{split}\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+    \mathbf{b}^{\scriptstyle{\mathsf{T}}}&amp;= \sum_{e_j \in \mathcal{E}} \underbrace{[ \mathbf{e}_j(\mathbf{x^k}) ]^{\scriptstyle{\mathsf{T}}}}_{1 \times \bullet} \underbrace{\Omega_j}_{\bullet \times \bullet} \underbrace{\left( \left. \frac{\partial \mathbf{e}_j(\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)}{\partial (\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)} \right|_{\Delta \mathbf{x}^k = \mathbf{0}} \right)}_{\bullet \times dN} \underbrace{\frac{\partial (\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)}{\partial \Delta \mathbf{x}^k}}_{dN \times cN} \\
+    H &amp;= \sum_{e_j \in \mathcal{E}} \underbrace{ \left( \frac{\partial (\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)}{\partial \Delta \mathbf{x}^k} \right)^{\scriptstyle{\mathsf{T}}}}_{cN \times dN} \underbrace{\left( \left. \frac{\partial \mathbf{e}_j(\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)}{\partial (\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)} \right|_{\Delta \mathbf{x}^k = \mathbf{0}} \right)^{\scriptstyle{\mathsf{T}}}}_{dN \times \bullet} \underbrace{\Omega_j}_{\bullet \times \bullet} \underbrace{\left( \left. \frac{\partial \mathbf{e}_j(\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)}{\partial (\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)} \right|_{\Delta \mathbf{x}^k = \mathbf{0}} \right)}_{\bullet \times dN} \underbrace{\frac{\partial (\mathbf{x}^k \boxplus \Delta \mathbf{x}^k)}{\partial \Delta \mathbf{x}^k}}_{dN \times cN}.\end{aligned}\end{split}\]</div>
+<p>Using this notation, we obtain the optimal update as</p>
+<div class="math notranslate nohighlight">
+\[\Delta \mathbf{x}^k = -H^{-1} \mathbf{b}.  \label{eq:deltax}\]</div>
+<p>We apply this update to the poses via <a class="reference internal" href="#equation-update">(3)</a> and repeat until convergence.</p>
+<dl class="citation">
+<dt class="label" id="blanco2010tutorial"><span class="brackets"><a class="fn-backref" href="#id2">blanco2010tutorial</a></span></dt>
+<dd><p>Blanco, J.-L.A tutorial onSE(3) transformation parameterization and on-manifold optimization.University of Malaga, Tech. Rep 3(2010)</p>
+</dd>
+<dt class="label" id="grisetti2010tutorial"><span class="brackets"><a class="fn-backref" href="#id3">grisetti2010tutorial</a></span></dt>
+<dd><p>Grisetti, G., Kummerle, R., Stachniss, C., and Burgard, W.A tutorial on graph-based SLAM.IEEE Intelligent Transportation Systems Magazine 2, 4 (2010), 31–43.</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="graph-slam-for-a-real-world-se-2-dataset">
+<h2>Graph SLAM for a real-world SE(2) dataset<a class="headerlink" href="#graph-slam-for-a-real-world-se-2-dataset" title="Permalink to this headline"></a></h2>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphslam.graph</span> <span class="kn">import</span> <span class="n">Graph</span>
+<span class="kn">from</span> <span class="nn">graphslam.load</span> <span class="kn">import</span> <span class="n">load_g2o_se2</span>
+</pre></div>
+</div>
+<section id="id4">
+<h3>Introduction<a class="headerlink" href="#id4" title="Permalink to this headline"></a></h3>
+<p>For a complete derivation of the Graph SLAM algorithm, please see
+<a class="reference internal" href="#graph-slam-formulation">Graph SLAM Formulation</a>.</p>
+<p>This notebook illustrates the iterative optimization of a real-world
+<span class="math notranslate nohighlight">\(SE(2)\)</span> dataset. The code can be found in the <code class="docutils literal notranslate"><span class="pre">graphslam</span></code>
+folder. For simplicity, numerical differentiation is used in lieu of
+analytic Jacobians. This code originated from the
+<a class="reference external" href="https://github.com/JeffLIrion/python-graphslam">python-graphslam</a>
+repo, which is a full-featured Graph SLAM solver. The dataset in this
+example is used with permission from Luca Carlone and was downloaded
+from his <a class="reference external" href="https://lucacarlone.mit.edu/datasets/">website</a>.</p>
+</section>
+<section id="the-dataset">
+<h3>The Dataset<a class="headerlink" href="#the-dataset" title="Permalink to this headline"></a></h3>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="n">load_g2o_se2</span><span class="p">(</span><span class="s2">&quot;data/input_INTEL.g2o&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of edges:    </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">_edges</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of vertices: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">_vertices</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Number</span> <span class="n">of</span> <span class="n">edges</span><span class="p">:</span>    <span class="mi">1483</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">vertices</span><span class="p">:</span> <span class="mi">1228</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Original ($\chi^2 = </span><span class="si">{:.0f}</span><span class="s2">$)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">calc_chi2</span><span class="p">()))</span>
+</pre></div>
+</div>
+<img alt="../../../_images/graphSLAM_SE2_example_4_0.png" src="../../../_images/graphSLAM_SE2_example_4_0.png" />
+<p>Each edge in this dataset is a constraint that compares the measured
+<span class="math notranslate nohighlight">\(SE(2)\)</span> transformation between two poses to the expected
+<span class="math notranslate nohighlight">\(SE(2)\)</span> transformation between them, as computed using the current
+pose estimates. These edges can be classified into two categories:</p>
+<ol class="arabic simple">
+<li><p>Odometry edges constrain two consecutive vertices, and the
+measurement for the <span class="math notranslate nohighlight">\(SE(2)\)</span> transformation comes directly from
+odometry data.</p></li>
+<li><p>Scan-matching edges constrain two non-consecutive vertices. These
+scan matches can be computed using, for example, 2-D LiDAR data or
+landmarks; the details of how these constraints are determined is
+beyond the scope of this example. This is often referred to as <em>loop
+closure</em> in the Graph SLAM literature.</p></li>
+</ol>
+<p>We can easily parse out the two different types of edges present in this
+dataset and plot them.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">parse_edges</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Split the graph `g` into two graphs, one with only odometry edges and the other with only scan-matching edges.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    g : graphslam.graph.Graph</span>
+<span class="sd">        The input graph</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    g_odom : graphslam.graph.Graph</span>
+<span class="sd">        A graph consisting of the vertices and odometry edges from `g`</span>
+<span class="sd">    g_scan : graphslam.graph.Graph</span>
+<span class="sd">        A graph consisting of the vertices and scan-matching edges from `g`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">edges_odom</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">edges_scan</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">_edges</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">vertex_ids</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">e</span><span class="o">.</span><span class="n">vertex_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">edges_odom</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">edges_scan</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="n">g_odom</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">(</span><span class="n">edges_odom</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">_vertices</span><span class="p">)</span>
+    <span class="n">g_scan</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">(</span><span class="n">edges_scan</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">_vertices</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">g_odom</span><span class="p">,</span> <span class="n">g_scan</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g_odom</span><span class="p">,</span> <span class="n">g_scan</span> <span class="o">=</span> <span class="n">parse_edges</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of odometry edges:      </span><span class="si">{:4d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g_odom</span><span class="o">.</span><span class="n">_edges</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of scan-matching edges: </span><span class="si">{:4d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g_scan</span><span class="o">.</span><span class="n">_edges</span><span class="p">)))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">χ^2 error from odometry edges:       </span><span class="si">{:11.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">g_odom</span><span class="o">.</span><span class="n">calc_chi2</span><span class="p">()))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;χ^2 error from scan-matching edges:  </span><span class="si">{:11.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">g_scan</span><span class="o">.</span><span class="n">calc_chi2</span><span class="p">()))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Number</span> <span class="n">of</span> <span class="n">odometry</span> <span class="n">edges</span><span class="p">:</span>      <span class="mi">1227</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">scan</span><span class="o">-</span><span class="n">matching</span> <span class="n">edges</span><span class="p">:</span>  <span class="mi">256</span>
+
+<span class="n">χ</span><span class="o">^</span><span class="mi">2</span> <span class="n">error</span> <span class="kn">from</span> <span class="nn">odometry</span> <span class="n">edges</span><span class="p">:</span>             <span class="mf">0.232</span>
+<span class="n">χ</span><span class="o">^</span><span class="mi">2</span> <span class="n">error</span> <span class="kn">from</span> <span class="nn">scan</span><span class="o">-</span><span class="n">matching</span> <span class="n">edges</span><span class="p">:</span>  <span class="mf">7191686.151</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g_odom</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Odometry edges&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/graphSLAM_SE2_example_8_0.png" src="../../../_images/graphSLAM_SE2_example_8_0.png" />
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g_scan</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Scan-matching edges&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/graphSLAM_SE2_example_9_0.png" src="../../../_images/graphSLAM_SE2_example_9_0.png" />
+</section>
+<section id="optimization">
+<h3>Optimization<a class="headerlink" href="#optimization" title="Permalink to this headline"></a></h3>
+<p>Initially, the pose estimates are consistent with the collected odometry
+measurements, and the odometry edges contribute almost zero towards the
+<span class="math notranslate nohighlight">\(\chi^2\)</span> error. However, there are large discrepancies between the
+scan-matching constraints and the initial pose estimates. This is not
+surprising, since small errors in odometry readings that are propagated
+over time can lead to large errors in the robot’s trajectory. What makes
+Graph SLAM effective is that it allows incorporation of multiple
+different data sources into a single optimization problem.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Iteration</span>                <span class="n">chi</span><span class="o">^</span><span class="mi">2</span>        <span class="n">rel</span><span class="o">.</span> <span class="n">change</span>
+<span class="o">---------</span>                <span class="o">-----</span>        <span class="o">-----------</span>
+        <span class="mi">0</span>         <span class="mf">7191686.3825</span>
+        <span class="mi">1</span>       <span class="mf">320031728.8624</span>          <span class="mf">43.500234</span>
+        <span class="mi">2</span>       <span class="mf">125083004.3299</span>          <span class="o">-</span><span class="mf">0.609154</span>
+        <span class="mi">3</span>          <span class="mf">338155.9074</span>          <span class="o">-</span><span class="mf">0.997297</span>
+        <span class="mi">4</span>             <span class="mf">735.1344</span>          <span class="o">-</span><span class="mf">0.997826</span>
+        <span class="mi">5</span>             <span class="mf">215.8405</span>          <span class="o">-</span><span class="mf">0.706393</span>
+        <span class="mi">6</span>             <span class="mf">215.8405</span>          <span class="o">-</span><span class="mf">0.000000</span>
+</pre></div>
+</div>
+<figure class="align-default">
+<img alt="../../../_images/Graph_SLAM_optimization.gif" src="../../../_images/Graph_SLAM_optimization.gif" />
+</figure>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Optimized&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/graphSLAM_SE2_example_13_0.png" src="../../../_images/graphSLAM_SE2_example_13_0.png" />
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">χ^2 error from odometry edges:       </span><span class="si">{:7.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">g_odom</span><span class="o">.</span><span class="n">calc_chi2</span><span class="p">()))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;χ^2 error from scan-matching edges:  </span><span class="si">{:7.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">g_scan</span><span class="o">.</span><span class="n">calc_chi2</span><span class="p">()))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">χ</span><span class="o">^</span><span class="mi">2</span> <span class="n">error</span> <span class="kn">from</span> <span class="nn">odometry</span> <span class="n">edges</span><span class="p">:</span>       <span class="mf">142.189</span>
+<span class="n">χ</span><span class="o">^</span><span class="mi">2</span> <span class="n">error</span> <span class="kn">from</span> <span class="nn">scan</span><span class="o">-</span><span class="n">matching</span> <span class="n">edges</span><span class="p">:</span>   <span class="mf">73.652</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g_odom</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Odometry edges&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/graphSLAM_SE2_example_15_0.png" src="../../../_images/graphSLAM_SE2_example_15_0.png" />
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g_scan</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Scan-matching edges&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/graphSLAM_SE2_example_16_0.png" src="../../../_images/graphSLAM_SE2_example_16_0.png" />
+</section>
+</section>
+<section id="references">
+<h2>References:<a class="headerlink" href="#references" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf">A Tutorial on Graph-Based SLAM</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../FastSLAM2/FastSLAM2.html" class="btn btn-neutral float-left" title="FastSLAM 2.0" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../path_planning/path_planning.html" class="btn btn-neutral float-right" title="Path Planning" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2021, Atsushi Sakai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

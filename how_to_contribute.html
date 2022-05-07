@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How To Contribute &mdash; PythonRobotics  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="KF Basics - Part 2" href="modules/appendix/Kalmanfilter_basics_2.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> PythonRobotics
+            <img src="_static/icon.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/localization/localization.html">Localization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/mapping/mapping.html">Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/slam/slam.html">SLAM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/path_planning/path_planning.html">Path Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/path_tracking/path_tracking.html">Path Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/arm_navigation/arm_navigation.html">Arm Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/aerial_navigation/aerial_navigation.html">Aerial Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/bipedal/bipedal.html">Bipedal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/appendix/appendix.html">Appendix</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How To Contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#adding-a-new-algorithm-example">Adding a new algorithm example</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#step-1-choose-an-algorithm-to-implement">Step 1: Choose an algorithm to implement</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-2-implement-the-algorithm-with-matplotlib-based-animation">Step 2: Implement the algorithm with matplotlib based animation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-3-add-a-unittest">Step 3: Add a unittest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-4-write-a-document-about-the-algorithm">Step 4: Write a document about the algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-5-submit-a-pull-request-and-fix-codes-based-on-review">Step 5: Submit a pull request and fix codes based on review</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#reporting-and-fixing-a-defect">Reporting and fixing a defect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-missed-documentations-for-existing-examples">Adding missed documentations for existing examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#supporting-this-project">Supporting this project</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#sponsors">Sponsors</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PythonRobotics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>How To Contribute</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/how_to_contribute_main.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="how-to-contribute">
+<h1>How To Contribute<a class="headerlink" href="#how-to-contribute" title="Permalink to this headline"></a></h1>
+<p>This document describes how to contribute this project.</p>
+<section id="adding-a-new-algorithm-example">
+<h2>Adding a new algorithm example<a class="headerlink" href="#adding-a-new-algorithm-example" title="Permalink to this headline"></a></h2>
+<p>This is a step by step manual to add a new algorithm example.</p>
+<section id="step-1-choose-an-algorithm-to-implement">
+<h3>Step 1: Choose an algorithm to implement<a class="headerlink" href="#step-1-choose-an-algorithm-to-implement" title="Permalink to this headline"></a></h3>
+<p>Before choosing an algorithm, please check the <a class="reference internal" href="getting_started.html#getting-started"><span class="std std-ref">Getting Started</span></a> doc to
+understand this project’s philosophy and setup your development environment.</p>
+<p>If an algorithm is widely used and successful, let’s create an issue to
+propose it for our community.</p>
+<p>If some people agree by thumbs up or posting positive comments, let go to next step.</p>
+<p>It is OK to just create an issue to propose adding an algorithm, someone might implement it.</p>
+<p>In that case, please share any papers or documentations to implement it.</p>
+</section>
+<section id="step-2-implement-the-algorithm-with-matplotlib-based-animation">
+<h3>Step 2: Implement the algorithm with matplotlib based animation<a class="headerlink" href="#step-2-implement-the-algorithm-with-matplotlib-based-animation" title="Permalink to this headline"></a></h3>
+<p>When you implement an algorithm, please keep the following items in mind.</p>
+<ol class="arabic simple">
+<li><p>Use only Python. Other language code is not acceptable.</p></li>
+<li><p>This project only accept codes for python 3.9 or higher.</p></li>
+<li><p>Use matplotlib based animation to show how the algorithm works.</p></li>
+<li><p>Only use current <a class="reference internal" href="getting_started.html#requirements"><span class="std std-ref">Requirements</span></a> libraries, not adding new dependencies.</p></li>
+<li><p>Keep simple your code. The main goal is to make it easy for users to understand the algorithm, not for practical usage.</p></li>
+</ol>
+</section>
+<section id="step-3-add-a-unittest">
+<h3>Step 3: Add a unittest<a class="headerlink" href="#step-3-add-a-unittest" title="Permalink to this headline"></a></h3>
+<p>If you add a new algorithm sample code, please add a unit test file under <a class="reference external" href="https://github.com/AtsushiSakai/PythonRobotics/tree/master/tests">tests dir</a>.</p>
+<p>This sample test code might help you : <a class="reference external" href="https://github.com/AtsushiSakai/PythonRobotics/blob/master/tests/test_a_star.py">test_a_star.py</a>.</p>
+<p>At the least, try to run the example code without animation in the unit test.</p>
+<p>If you want to run the test suites locally, you can use the <cite>runtests.sh</cite> script by just executing it.</p>
+<p>The <a class="reference external" href="https://github.com/AtsushiSakai/PythonRobotics/blob/master/tests/test_diff_codestyle.py">test_diff_codestyle.py</a> check code style for your PR’s codes.</p>
+</section>
+<section id="step-4-write-a-document-about-the-algorithm">
+<span id="how-to-write-doc"></span><h3>Step 4: Write a document about the algorithm<a class="headerlink" href="#step-4-write-a-document-about-the-algorithm" title="Permalink to this headline"></a></h3>
+<p>Please add a document to describe the algorithm details, mathematical backgrounds and show graphs and animation gif.</p>
+<p>This project is using <a class="reference external" href="https://www.sphinx-doc.org/">Sphinx</a> as a document builder, all documentations are written by <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html">reStructuredText</a>.</p>
+<p>You can add a new rst file under the subdirectory in <a class="reference external" href="https://github.com/AtsushiSakai/PythonRobotics/tree/master/docs/modules">doc modules dir</a> and the top rst file can include it.</p>
+<p>Please check other documents for details.</p>
+<p>You can build the doc locally based on <a class="reference external" href="https://github.com/AtsushiSakai/PythonRobotics/blob/master/docs/README.md">doc README</a>.</p>
+<p>Note that the <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html">reStructuredText</a> based doc should only focus on the mathematics and the algorithm of the example.</p>
+<p>Documentations related codes should be in the python script as the header comments of the script or docstrings of each function.</p>
+</section>
+<section id="step-5-submit-a-pull-request-and-fix-codes-based-on-review">
+<span id="submit-a-pull-request"></span><h3>Step 5: Submit a pull request and fix codes based on review<a class="headerlink" href="#step-5-submit-a-pull-request-and-fix-codes-based-on-review" title="Permalink to this headline"></a></h3>
+<p>Let’s submit a pull request when your code, test, and doc are ready.</p>
+<p>At first, please fix all CI errors before code review.</p>
+<p>You can check your PR doc from the CI panel.</p>
+<p>After the “ci/circleci: build_doc” CI is succeeded,
+you can access you PR doc with clicking the [Details] of the “ci/circleci: build_doc artifact” CI.</p>
+<img alt="_images/doc_ci.png" src="_images/doc_ci.png" />
+<p>After that, I will start the review.</p>
+<p>Note that this is my hobby project; I appreciate your patience during the review process.</p>
+</section>
+</section>
+<section id="reporting-and-fixing-a-defect">
+<h2>Reporting and fixing a defect<a class="headerlink" href="#reporting-and-fixing-a-defect" title="Permalink to this headline"></a></h2>
+<p>Reporting and fixing a defect is also great contribution.</p>
+<p>When you report an issue, please provide these information:</p>
+<ul class="simple">
+<li><p>A clear and concise description of what the bug is.</p></li>
+<li><p>A clear and concise description of what you expected to happen.</p></li>
+<li><p>Screenshots to help explain your problem if applicable.</p></li>
+<li><p>OS version</p></li>
+<li><p>Python version</p></li>
+<li><p>Each library versions</p></li>
+</ul>
+<p>If you want to fix any bug, you can find reported issues in <a class="reference external" href="https://github.com/AtsushiSakai/PythonRobotics/issues?q=is%3Aissue+is%3Aopen+label%3Abug">bug labeled issues</a>.</p>
+<p>If you fix a bug of existing codes, please add a test function
+in the test code to show the issue was solved.</p>
+<p>This doc <a class="reference internal" href="#submit-a-pull-request">submit a pull request</a> can be helpful to submit a pull request.</p>
+</section>
+<section id="adding-missed-documentations-for-existing-examples">
+<h2>Adding missed documentations for existing examples<a class="headerlink" href="#adding-missed-documentations-for-existing-examples" title="Permalink to this headline"></a></h2>
+<p>Adding the missed documentations for existing examples is also great contribution.</p>
+<p>If you check the <a class="reference external" href="https://pythonrobotics.readthedocs.io/en/latest/">Python Robotics Docs</a>, you can notice that some of the examples
+only have a simulation gif or short overview descriptions,
+but no detailed algorithm or mathematical description.</p>
+<p>This doc <a class="reference internal" href="#how-to-write-doc">how to write doc</a> can be helpful to write documents.</p>
+</section>
+<section id="supporting-this-project">
+<h2>Supporting this project<a class="headerlink" href="#supporting-this-project" title="Permalink to this headline"></a></h2>
+<p>Supporting this project financially is also a great contribution!!.</p>
+<p>If you or your company would like to support this project, please consider:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/sponsors/AtsushiSakai">Sponsor &#64;AtsushiSakai on GitHub Sponsors</a></p></li>
+<li><p><a class="reference external" href="https://www.patreon.com/myenigma">Become a backer or sponsor on Patreon</a></p></li>
+<li><p><a class="reference external" href="https://www.paypal.me/myenigmapay/">One-time donation via PayPal</a></p></li>
+</ul>
+<p>If you would like to support us in some other way, please contact with creating an issue.</p>
+<section id="sponsors">
+<h3>Sponsors<a class="headerlink" href="#sponsors" title="Permalink to this headline"></a></h3>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="https://www.jetbrains.com/">JetBrains</a> : They are providing a free license of their IDEs for this OSS development.</p></li>
+</ol>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules/appendix/Kalmanfilter_basics_2.html" class="btn btn-neutral float-left" title="KF Basics - Part 2" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2021, Atsushi Sakai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

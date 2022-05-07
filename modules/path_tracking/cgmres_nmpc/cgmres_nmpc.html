@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nonlinear Model Predictive Control with C-GMRES &mdash; PythonRobotics  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Arm Navigation" href="../../arm_navigation/arm_navigation.html" />
+    <link rel="prev" title="Model predictive speed and steering control" href="../model_predictive_speed_and_steering_control/model_predictive_speed_and_steering_control.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> PythonRobotics
+            <img src="../../../_static/icon.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../localization/localization.html">Localization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mapping/mapping.html">Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../slam/slam.html">SLAM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_planning/path_planning.html">Path Planning</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../path_tracking.html">Path Tracking</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../pure_pursuit_tracking/pure_pursuit_tracking.html">Pure pursuit tracking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../stanley_control/stanley_control.html">Stanley control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rear_wheel_feedback_control/rear_wheel_feedback_control.html">Rear wheel feedback control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lqr_steering_control/lqr_steering_control.html">Linear–quadratic regulator (LQR) steering control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lqr_speed_and_steering_control/lqr_speed_and_steering_control.html">Linear–quadratic regulator (LQR) speed and steering control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_predictive_speed_and_steering_control/model_predictive_speed_and_steering_control.html">Model predictive speed and steering control</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Nonlinear Model Predictive Control with C-GMRES</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mathematical-formulation">Mathematical Formulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ref">Ref</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../arm_navigation/arm_navigation.html">Arm Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../aerial_navigation/aerial_navigation.html">Aerial Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bipedal/bipedal.html">Bipedal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../appendix/appendix.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how_to_contribute.html">How To Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PythonRobotics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../path_tracking.html">Path Tracking</a> &raquo;</li>
+      <li>Nonlinear Model Predictive Control with C-GMRES</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/modules/path_tracking/cgmres_nmpc/cgmres_nmpc_main.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="nonlinear-model-predictive-control-with-c-gmres">
+<h1>Nonlinear Model Predictive Control with C-GMRES<a class="headerlink" href="#nonlinear-model-predictive-control-with-c-gmres" title="Permalink to this headline"></a></h1>
+<a class="reference internal image-reference" href="../../../_images/cgmres_nmpc_1_0.png"><img alt="../../../_images/cgmres_nmpc_1_0.png" src="../../../_images/cgmres_nmpc_1_0.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../../../_images/cgmres_nmpc_2_0.png"><img alt="../../../_images/cgmres_nmpc_2_0.png" src="../../../_images/cgmres_nmpc_2_0.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../../../_images/cgmres_nmpc_3_0.png"><img alt="../../../_images/cgmres_nmpc_3_0.png" src="../../../_images/cgmres_nmpc_3_0.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../../../_images/cgmres_nmpc_4_0.png"><img alt="../../../_images/cgmres_nmpc_4_0.png" src="../../../_images/cgmres_nmpc_4_0.png" style="width: 600px;" /></a>
+<figure class="align-default">
+<img alt="gif" src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/cgmres_nmpc/animation.gif" />
+</figure>
+<section id="mathematical-formulation">
+<h2>Mathematical Formulation<a class="headerlink" href="#mathematical-formulation" title="Permalink to this headline"></a></h2>
+<p>Motion model is</p>
+<div class="math notranslate nohighlight">
+\[\dot{x}=vcos\theta\]</div>
+<div class="math notranslate nohighlight">
+\[\dot{y}=vsin\theta\]</div>
+<div class="math notranslate nohighlight">
+\[\dot{\theta}=\frac{v}{WB}sin(u_{\delta})\]</div>
+<p>(tan is not good for optimization)</p>
+<div class="math notranslate nohighlight">
+\[\dot{v}=u_a\]</div>
+<p>Cost function is</p>
+<div class="math notranslate nohighlight">
+\[J=\frac{1}{2}(u_a^2+u_{\delta}^2)-\phi_a d_a-\phi_\delta d_\delta\]</div>
+<p>Input constraints are</p>
+<div class="math notranslate nohighlight">
+\[|u_a| \leq u_{a,max}\]</div>
+<div class="math notranslate nohighlight">
+\[|u_\delta| \leq u_{\delta,max}\]</div>
+<p>So, Hamiltonian　is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}J=\frac{1}{2}(u_a^2+u_{\delta}^2)-\phi_a d_a-\phi_\delta d_\delta\\ +\lambda_1vcos\theta+\lambda_2vsin\theta+\lambda_3\frac{v}{WB}sin(u_{\delta})+\lambda_4u_a\\
++\rho_1(u_a^2+d_a^2+u_{a,max}^2)+\rho_2(u_\delta^2+d_\delta^2+u_{\delta,max}^2)\end{split}\]</div>
+<p>Partial differential equations of the Hamiltonian are:</p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} \frac{\partial H}{\partial \bf{x}}=\\ \begin{bmatrix} \frac{\partial H}{\partial x}= 0&amp;\\ \frac{\partial H}{\partial y}= 0&amp;\\ \frac{\partial H}{\partial \theta}= -\lambda_1vsin\theta+\lambda_2vcos\theta&amp;\\ \frac{\partial H}{\partial v}=-\lambda_1cos\theta+\lambda_2sin\theta+\lambda_3\frac{1}{WB}sin(u_{\delta})&amp;\\ \end{bmatrix} \\ \end{equation*}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} \frac{\partial H}{\partial \bf{u}}=\\ \begin{bmatrix} \frac{\partial H}{\partial u_a}= u_a+\lambda_4+2\rho_1u_a&amp;\\ \frac{\partial H}{\partial u_\delta}= u_\delta+\lambda_3\frac{v}{WB}cos(u_{\delta})+2\rho_2u_\delta&amp;\\ \frac{\partial H}{\partial d_a}= -\phi_a+2\rho_1d_a&amp;\\ \frac{\partial H}{\partial d_\delta}=-\phi_\delta+2\rho_2d_\delta&amp;\\ \end{bmatrix} \\ \end{equation*}\)</span></p>
+</section>
+<section id="ref">
+<h2>Ref<a class="headerlink" href="#ref" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/Shunichi09/nonlinear_control">Shunichi09/nonlinear_control: Implementing the nonlinear model
+predictive control, sliding mode
+control</a></p></li>
+<li><p><a class="reference external" href="https://qiita.com/MENDY/items/4108190a579395053924">非線形モデル予測制御におけるCGMRES法をpythonで実装する -
+Qiita</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../model_predictive_speed_and_steering_control/model_predictive_speed_and_steering_control.html" class="btn btn-neutral float-left" title="Model predictive speed and steering control" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../arm_navigation/arm_navigation.html" class="btn btn-neutral float-right" title="Arm Navigation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2021, Atsushi Sakai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

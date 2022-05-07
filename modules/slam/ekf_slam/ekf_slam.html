@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EKF SLAM &mdash; PythonRobotics  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="FastSLAM1.0" href="../FastSLAM1/FastSLAM1.html" />
+    <link rel="prev" title="Iterative Closest Point (ICP) Matching" href="../iterative_closest_point_matching/iterative_closest_point_matching.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> PythonRobotics
+            <img src="../../../_static/icon.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../localization/localization.html">Localization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mapping/mapping.html">Mapping</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../slam.html">SLAM</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../iterative_closest_point_matching/iterative_closest_point_matching.html">Iterative Closest Point (ICP) Matching</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">EKF SLAM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#simulation">Simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#algorithm-walk-through">Algorithm Walk through</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#predict">1- Predict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#update">2 - Update</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#observation-step">Observation Step</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#references">References:</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../FastSLAM1/FastSLAM1.html">FastSLAM1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../FastSLAM2/FastSLAM2.html">FastSLAM 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../graph_slam/graph_slam.html">Graph based SLAM</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_planning/path_planning.html">Path Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_tracking/path_tracking.html">Path Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../arm_navigation/arm_navigation.html">Arm Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../aerial_navigation/aerial_navigation.html">Aerial Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bipedal/bipedal.html">Bipedal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../appendix/appendix.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how_to_contribute.html">How To Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PythonRobotics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../slam.html">SLAM</a> &raquo;</li>
+      <li>EKF SLAM</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/modules/slam/ekf_slam/ekf_slam_main.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ekf-slam">
+<h1>EKF SLAM<a class="headerlink" href="#ekf-slam" title="Permalink to this headline"></a></h1>
+<p>This is an Extended Kalman Filter based SLAM example.</p>
+<p>The blue line is ground truth, the black line is dead reckoning, the red
+line is the estimated trajectory with EKF SLAM.</p>
+<p>The green crosses are estimated landmarks.</p>
+<img alt="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/EKFSLAM/animation.gif" src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/EKFSLAM/animation.gif" />
+<section id="simulation">
+<h2>Simulation<a class="headerlink" href="#simulation" title="Permalink to this headline"></a></h2>
+<p>This is a simulation of EKF SLAM.</p>
+<ul class="simple">
+<li><p>Black stars: landmarks</p></li>
+<li><p>Green crosses: estimates of landmark positions</p></li>
+<li><p>Black line: dead reckoning</p></li>
+<li><p>Blue line: ground truth</p></li>
+<li><p>Red line: EKF SLAM position estimation</p></li>
+</ul>
+</section>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h2>
+<p>EKF SLAM models the SLAM problem in a single EKF where the modeled state
+is both the pose <span class="math notranslate nohighlight">\((x, y, \theta)\)</span> and an array of landmarks
+<span class="math notranslate nohighlight">\([(x_1, y_1), (x_2, x_y), ... , (x_n, y_n)]\)</span> for <span class="math notranslate nohighlight">\(n\)</span>
+landmarks. The covariance between each of the positions and landmarks
+are also tracked.</p>
+<p><span class="math notranslate nohighlight">\(\begin{equation} X = \begin{bmatrix} x \\ y \\ \theta \\ x_1 \\ y_1 \\ x_2 \\ y_2 \\ \dots \\ x_n \\ y_n \end{bmatrix} \end{equation}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\begin{equation} P = \begin{bmatrix} \sigma_{xx} &amp; \sigma_{xy} &amp; \sigma_{x\theta} &amp; \sigma_{xx_1} &amp; \sigma_{xy_1} &amp; \sigma_{xx_2} &amp; \sigma_{xy_2} &amp; \dots &amp; \sigma_{xx_n} &amp; \sigma_{xy_n} \\ \sigma_{yx} &amp; \sigma_{yy} &amp; \sigma_{y\theta} &amp; \sigma_{yx_1} &amp; \sigma_{yy_1} &amp; \sigma_{yx_2} &amp; \sigma_{yy_2} &amp; \dots &amp; \sigma_{yx_n} &amp; \sigma_{yy_n} \\  &amp; &amp; &amp; &amp; \vdots &amp; &amp; &amp; &amp; &amp; \\ \sigma_{x_nx} &amp; \sigma_{x_ny} &amp; \sigma_{x_n\theta} &amp; \sigma_{x_nx_1} &amp; \sigma_{x_ny_1} &amp; \sigma_{x_nx_2} &amp; \sigma_{x_ny_2} &amp; \dots &amp; \sigma_{x_nx_n} &amp; \sigma_{x_ny_n} \end{bmatrix} \end{equation}\)</span></p>
+<p>A single estimate of the pose is tracked over time, while the confidence
+in the pose is tracked by the covariance matrix <span class="math notranslate nohighlight">\(P\)</span>. <span class="math notranslate nohighlight">\(P\)</span> is
+a symmetric square matrix which each element in the matrix corresponding
+to the covariance between two parts of the system. For example,
+<span class="math notranslate nohighlight">\(\sigma_{xy}\)</span> represents the covariance between the belief of
+<span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> and is equal to <span class="math notranslate nohighlight">\(\sigma_{yx}\)</span>.</p>
+<p>The state can be represented more concisely as follows.</p>
+<p><span class="math notranslate nohighlight">\(\begin{equation} X = \begin{bmatrix} x \\ m \end{bmatrix} \end{equation}\)</span>
+<span class="math notranslate nohighlight">\(\begin{equation} P = \begin{bmatrix} \Sigma_{xx} &amp; \Sigma_{xm}\\ \Sigma_{mx} &amp; \Sigma_{mm}\\ \end{bmatrix} \end{equation}\)</span></p>
+<p>Here the state simplifies to a combination of pose (<span class="math notranslate nohighlight">\(x\)</span>) and map
+(<span class="math notranslate nohighlight">\(m\)</span>). The covariance matrix becomes easier to understand and
+simply reads as the uncertainty of the robots pose
+(<span class="math notranslate nohighlight">\(\Sigma_{xx}\)</span>), the uncertainty of the map (<span class="math notranslate nohighlight">\(\Sigma_{mm}\)</span>),
+and the uncertainty of the robots pose with respect to the map and vice
+versa (<span class="math notranslate nohighlight">\(\Sigma_{xm}\)</span>, <span class="math notranslate nohighlight">\(\Sigma_{mx}\)</span>).</p>
+<p>Take care to note the difference between <span class="math notranslate nohighlight">\(X\)</span> (state) and <span class="math notranslate nohighlight">\(x\)</span>
+(pose).</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Extended Kalman Filter SLAM example</span>
+<span class="sd">original author: Atsushi Sakai (@Atsushi_twi)</span>
+<span class="sd">notebook author: Andrew Tu (drewtu2)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="o">%</span><span class="k">matplotlib</span> notebook
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+
+<span class="c1"># EKF state covariance</span>
+<span class="n">Cx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">30.0</span><span class="p">)])</span><span class="o">**</span><span class="mi">2</span> <span class="c1"># Change in covariance</span>
+
+<span class="c1">#  Simulation parameter</span>
+<span class="n">Qsim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)])</span><span class="o">**</span><span class="mi">2</span>  <span class="c1"># Sensor Noise</span>
+<span class="n">Rsim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)])</span><span class="o">**</span><span class="mi">2</span> <span class="c1"># Process Noise</span>
+
+<span class="n">DT</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># time tick [s]</span>
+<span class="n">SIM_TIME</span> <span class="o">=</span> <span class="mf">50.0</span>  <span class="c1"># simulation time [s]</span>
+<span class="n">MAX_RANGE</span> <span class="o">=</span> <span class="mf">20.0</span>  <span class="c1"># maximum observation range</span>
+<span class="n">M_DIST_TH</span> <span class="o">=</span> <span class="mf">2.0</span>  <span class="c1"># Threshold of Mahalanobis distance for data association.</span>
+<span class="n">STATE_SIZE</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># State size [x,y,yaw]</span>
+<span class="n">LM_SIZE</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># LM state size [x,y]</span>
+
+<span class="n">show_animation</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</section>
+<section id="algorithm-walk-through">
+<h2>Algorithm Walk through<a class="headerlink" href="#algorithm-walk-through" title="Permalink to this headline"></a></h2>
+<p>At each time step, the following is done. - predict the new state using
+the control functions - update the belief in landmark positions based on
+the estimated state and measurements</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">ekf_slam</span><span class="p">(</span><span class="n">xEst</span><span class="p">,</span> <span class="n">PEst</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs an iteration of EKF SLAM from the available information.</span>
+
+<span class="sd">    :param xEst: the belief in last position</span>
+<span class="sd">    :param PEst: the uncertainty in last position</span>
+<span class="sd">    :param u:    the control function applied to the last position</span>
+<span class="sd">    :param z:    measurements at this step</span>
+<span class="sd">    :returns:    the next estimated position and associated covariance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">STATE_SIZE</span>
+
+    <span class="c1"># Predict</span>
+    <span class="n">xEst</span><span class="p">,</span> <span class="n">PEst</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">Fx</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="n">xEst</span><span class="p">,</span> <span class="n">PEst</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+    <span class="n">initP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># Update</span>
+    <span class="n">xEst</span><span class="p">,</span> <span class="n">PEst</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="n">xEst</span><span class="p">,</span> <span class="n">PEst</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">initP</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">xEst</span><span class="p">,</span> <span class="n">PEst</span>
+</pre></div>
+</div>
+</section>
+<section id="predict">
+<h2>1- Predict<a class="headerlink" href="#predict" title="Permalink to this headline"></a></h2>
+<p><strong>Predict State update:</strong> The following equations describe the predicted
+motion model of the robot in case we provide only the control
+<span class="math notranslate nohighlight">\((v,w)\)</span>, which are the linear and angular velocity respectively.</p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} F= \begin{bmatrix} 1 &amp; 0 &amp; 0 \\ 0 &amp; 1 &amp; 0 \\ 0 &amp; 0 &amp; 1 \end{bmatrix} \end{equation*}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} B= \begin{bmatrix} \Delta t cos(\theta) &amp; 0\\ \Delta t sin(\theta) &amp; 0\\ 0 &amp; \Delta t \end{bmatrix} \end{equation*}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} U= \begin{bmatrix} v_t\\ w_t\\ \end{bmatrix} \end{equation*}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} X = FX + BU \end{equation*}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} \begin{bmatrix} x_{t+1} \\ y_{t+1} \\ \theta_{t+1} \end{bmatrix}= \begin{bmatrix} 1 &amp; 0 &amp; 0 \\ 0 &amp; 1 &amp; 0 \\ 0 &amp; 0 &amp; 1 \end{bmatrix}\begin{bmatrix} x_{t} \\ y_{t} \\ \theta_{t} \end{bmatrix}+ \begin{bmatrix} \Delta t cos(\theta) &amp; 0\\ \Delta t sin(\theta) &amp; 0\\ 0 &amp; \Delta t \end{bmatrix} \begin{bmatrix} v_{t} + \sigma_v\\ w_{t} + \sigma_w\\ \end{bmatrix} \end{equation*}\)</span></p>
+<p>Notice that while <span class="math notranslate nohighlight">\(U\)</span> is only defined by <span class="math notranslate nohighlight">\(v_t\)</span> and
+<span class="math notranslate nohighlight">\(w_t\)</span>, in the actual calculations, a <span class="math notranslate nohighlight">\(+\sigma_v\)</span> and
+<span class="math notranslate nohighlight">\(+\sigma_w\)</span> appear. These values represent the error between the
+given control inputs and the actual control inputs.</p>
+<p>As a result, the simulation is set up as the following. <span class="math notranslate nohighlight">\(R\)</span>
+represents the process noise which is added to the control inputs to
+simulate noise experienced in the real world. A set of truth values are
+computed from the raw control values while the values dead reckoning
+values incorporate the error into the estimation.</p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} R= \begin{bmatrix} \sigma_v\\ \sigma_w\\ \end{bmatrix} \end{equation*}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} X_{true} = FX + B(U) \end{equation*}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} X_{DR} = FX + B(U + R) \end{equation*}\)</span></p>
+<p>The implementation of the motion model prediciton code is shown in
+<code class="docutils literal notranslate"><span class="pre">motion_model</span></code>. The <code class="docutils literal notranslate"><span class="pre">observation</span></code> function shows how the simulation
+uses (or doesn’t use) the process noise <code class="docutils literal notranslate"><span class="pre">Rsim</span></code> to the find the ground
+truth and dead reckoning estimates of the pose.</p>
+<p><strong>Predict covariance:</strong> Add the state covariance to the the current
+uncertainty of the EKF. At each time step, the uncertainty in the system
+grows by the covariance of the pose, <span class="math notranslate nohighlight">\(Cx\)</span>.</p>
+<p><span class="math notranslate nohighlight">\(P = G^TPG + Cx\)</span></p>
+<p>Notice this uncertainty is only growing with respect to the pose, not
+the landmarks.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">xEst</span><span class="p">,</span> <span class="n">PEst</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs the prediction step of EKF SLAM</span>
+
+<span class="sd">    :param xEst: nx1 state vector</span>
+<span class="sd">    :param PEst: nxn covariance matrix</span>
+<span class="sd">    :param u:    2x1 control vector</span>
+<span class="sd">    :returns:    predicted state vector, predicted covariance, jacobian of control vector, transition fx</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">STATE_SIZE</span>
+    <span class="n">G</span><span class="p">,</span> <span class="n">Fx</span> <span class="o">=</span> <span class="n">jacob_motion</span><span class="p">(</span><span class="n">xEst</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">S</span><span class="p">],</span> <span class="n">u</span><span class="p">)</span>
+    <span class="n">xEst</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">S</span><span class="p">]</span> <span class="o">=</span> <span class="n">motion_model</span><span class="p">(</span><span class="n">xEst</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">S</span><span class="p">],</span> <span class="n">u</span><span class="p">)</span>
+    <span class="c1"># Fx is an an identity matrix of size (STATE_SIZE)</span>
+    <span class="c1"># sigma = G*sigma*G.T + Noise</span>
+    <span class="n">PEst</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">S</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">S</span><span class="p">]</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">PEst</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">S</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">S</span><span class="p">]</span> <span class="o">@</span> <span class="n">G</span> <span class="o">+</span> <span class="n">Fx</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">Cx</span> <span class="o">@</span> <span class="n">Fx</span>
+    <span class="k">return</span> <span class="n">xEst</span><span class="p">,</span> <span class="n">PEst</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">Fx</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">motion_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the motion model based on current state and input function.</span>
+
+<span class="sd">    :param x: 3x1 pose estimation</span>
+<span class="sd">    :param u: 2x1 control input [v; w]</span>
+<span class="sd">    :returns: the resulting state after the control function is applied</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span>
+
+    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">DT</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span> <span class="mi">0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="n">DT</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span> <span class="mi">0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">DT</span><span class="p">]])</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">F</span> <span class="o">@</span> <span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">B</span> <span class="o">@</span> <span class="n">u</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span>
+</pre></div>
+</div>
+</section>
+<section id="update">
+<h2>2 - Update<a class="headerlink" href="#update" title="Permalink to this headline"></a></h2>
+<p>In the update phase, the observations of nearby landmarks are used to
+correct the location estimate.</p>
+<p>For every landmark observed, it is associated to a particular landmark
+in the known map. If no landmark exists in the position surrounding the
+landmark, it is taken as a NEW landmark. The distance threshold for how
+far a landmark must be from the next known landmark before its
+considered to be a new landmark is set by <code class="docutils literal notranslate"><span class="pre">M_DIST_TH</span></code>.</p>
+<p>With an observation associated to the appropriate landmark, the
+<strong>innovation</strong> can be calculated. Innovation (<span class="math notranslate nohighlight">\(y\)</span>) is the
+difference between the observation and the observation that <em>should</em>
+have been made if the observation were made from the pose predicted in
+the predict stage.</p>
+<p><span class="math notranslate nohighlight">\(y = z_t - h(X)\)</span></p>
+<p>With the innovation calculated, the question becomes which to trust more
+- the observations or the predictions? To determine this, we calculate
+the Kalman Gain - a percent of how much of the innovation to add to the
+prediction based on the uncertainty in the predict step and the update
+step.</p>
+<p><span class="math notranslate nohighlight">\(K = \bar{P_t}H_t^T(H_t\bar{P_t}H_t^T + Q_t)^{-1}\)</span>
+In these equations, <span class="math notranslate nohighlight">\(H\)</span> is the jacobian of the
+measurement function. The multiplications by <span class="math notranslate nohighlight">\(H^T\)</span> and <span class="math notranslate nohighlight">\(H\)</span>
+represent the application of the delta to the measurement covariance.
+Intuitively, this equation is applying the following from the single
+variate Kalman equation but in the multivariate form, i.e. finding the
+ratio of the uncertainty of the process compared the measurement.</p>
+<p>K = <span class="math notranslate nohighlight">\(\frac{\bar{P_t}}{\bar{P_t} + Q_t}\)</span></p>
+<p>If <span class="math notranslate nohighlight">\(Q_t &lt;&lt; \bar{P_t}\)</span>, (i.e. the measurement covariance is low
+relative to the current estimate), then the Kalman gain will be
+<span class="math notranslate nohighlight">\(~1\)</span>. This results in adding all of the innovation to the estimate
+– and therefore completely believing the measurement.</p>
+<p>However, if <span class="math notranslate nohighlight">\(Q_t &gt;&gt; \bar{P_t}\)</span> then the Kalman gain will go to 0,
+signaling a high trust in the process and little trust in the
+measurement.</p>
+<p>The update is captured in the following.</p>
+<p><span class="math notranslate nohighlight">\(xUpdate = xEst + (K * y)\)</span></p>
+<p>Of course, the covariance must also be updated as well to account for
+the changing uncertainty.</p>
+<p><span class="math notranslate nohighlight">\(P_{t} = (I-K_tH_t)\bar{P_t}\)</span></p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">xEst</span><span class="p">,</span> <span class="n">PEst</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">initP</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs the update step of EKF SLAM</span>
+
+<span class="sd">    :param xEst:  nx1 the predicted pose of the system and the pose of the landmarks</span>
+<span class="sd">    :param PEst:  nxn the predicted covariance</span>
+<span class="sd">    :param u:     2x1 the control function</span>
+<span class="sd">    :param z:     the measurements read at new position</span>
+<span class="sd">    :param initP: 2x2 an identity matrix acting as the initial covariance</span>
+<span class="sd">    :returns:     the updated state and covariance for the system</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">iz</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])):</span>  <span class="c1"># for each observation</span>
+        <span class="n">minid</span> <span class="o">=</span> <span class="n">search_correspond_LM_ID</span><span class="p">(</span><span class="n">xEst</span><span class="p">,</span> <span class="n">PEst</span><span class="p">,</span> <span class="n">z</span><span class="p">[</span><span class="n">iz</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span> <span class="c1"># associate to a known landmark</span>
+
+        <span class="n">nLM</span> <span class="o">=</span> <span class="n">calc_n_LM</span><span class="p">(</span><span class="n">xEst</span><span class="p">)</span> <span class="c1"># number of landmarks we currently know about</span>
+
+        <span class="k">if</span> <span class="n">minid</span> <span class="o">==</span> <span class="n">nLM</span><span class="p">:</span> <span class="c1"># Landmark is a NEW landmark</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;New LM&quot;</span><span class="p">)</span>
+            <span class="c1"># Extend state and covariance matrix</span>
+            <span class="n">xAug</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">xEst</span><span class="p">,</span> <span class="n">calc_LM_Pos</span><span class="p">(</span><span class="n">xEst</span><span class="p">,</span> <span class="n">z</span><span class="p">[</span><span class="n">iz</span><span class="p">,</span> <span class="p">:])))</span>
+            <span class="n">PAug</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">PEst</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">xEst</span><span class="p">),</span> <span class="n">LM_SIZE</span><span class="p">)))),</span>
+                              <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">LM_SIZE</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">xEst</span><span class="p">))),</span> <span class="n">initP</span><span class="p">))))</span>
+            <span class="n">xEst</span> <span class="o">=</span> <span class="n">xAug</span>
+            <span class="n">PEst</span> <span class="o">=</span> <span class="n">PAug</span>
+
+        <span class="n">lm</span> <span class="o">=</span> <span class="n">get_LM_Pos_from_state</span><span class="p">(</span><span class="n">xEst</span><span class="p">,</span> <span class="n">minid</span><span class="p">)</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">calc_innovation</span><span class="p">(</span><span class="n">lm</span><span class="p">,</span> <span class="n">xEst</span><span class="p">,</span> <span class="n">PEst</span><span class="p">,</span> <span class="n">z</span><span class="p">[</span><span class="n">iz</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">minid</span><span class="p">)</span>
+
+        <span class="n">K</span> <span class="o">=</span> <span class="p">(</span><span class="n">PEst</span> <span class="o">@</span> <span class="n">H</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="c1"># Calculate Kalman Gain</span>
+        <span class="n">xEst</span> <span class="o">=</span> <span class="n">xEst</span> <span class="o">+</span> <span class="p">(</span><span class="n">K</span> <span class="o">@</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">PEst</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xEst</span><span class="p">))</span> <span class="o">-</span> <span class="p">(</span><span class="n">K</span> <span class="o">@</span> <span class="n">H</span><span class="p">))</span> <span class="o">@</span> <span class="n">PEst</span>
+
+    <span class="n">xEst</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">pi_2_pi</span><span class="p">(</span><span class="n">xEst</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">xEst</span><span class="p">,</span> <span class="n">PEst</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">calc_innovation</span><span class="p">(</span><span class="n">lm</span><span class="p">,</span> <span class="n">xEst</span><span class="p">,</span> <span class="n">PEst</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">LMid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the innovation based on expected position and landmark position</span>
+
+<span class="sd">    :param lm:   landmark position</span>
+<span class="sd">    :param xEst: estimated position/state</span>
+<span class="sd">    :param PEst: estimated covariance</span>
+<span class="sd">    :param z:    read measurements</span>
+<span class="sd">    :param LMid: landmark id</span>
+<span class="sd">    :returns:    returns the innovation y, and the jacobian H, and S, used to calculate the Kalman Gain</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">lm</span> <span class="o">-</span> <span class="n">xEst</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="n">delta</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">delta</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">zangle</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">delta</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="n">xEst</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">zp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">q</span><span class="p">),</span> <span class="n">pi_2_pi</span><span class="p">(</span><span class="n">zangle</span><span class="p">)]])</span>
+    <span class="c1"># zp is the expected measurement based on xEst and the expected landmark position</span>
+
+    <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">z</span> <span class="o">-</span> <span class="n">zp</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="c1"># y = innovation</span>
+    <span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">pi_2_pi</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">H</span> <span class="o">=</span> <span class="n">jacobH</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">xEst</span><span class="p">,</span> <span class="n">LMid</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">H</span> <span class="o">@</span> <span class="n">PEst</span> <span class="o">@</span> <span class="n">H</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="n">Cx</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">H</span>
+
+<span class="k">def</span> <span class="nf">jacobH</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the jacobian of the measurement function</span>
+
+<span class="sd">    :param q:     the range from the system pose to the landmark</span>
+<span class="sd">    :param delta: the difference between a landmark position and the estimated system position</span>
+<span class="sd">    :param x:     the state, including the estimated system position</span>
+<span class="sd">    :param i:     landmark id + 1</span>
+<span class="sd">    :returns:     the jacobian H</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sq</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="n">sq</span> <span class="o">*</span> <span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="o">-</span> <span class="n">sq</span> <span class="o">*</span> <span class="n">delta</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sq</span> <span class="o">*</span> <span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">sq</span> <span class="o">*</span> <span class="n">delta</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span>
+                  <span class="p">[</span><span class="n">delta</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="o">-</span> <span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="o">-</span> <span class="n">q</span><span class="p">,</span> <span class="o">-</span> <span class="n">delta</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]])</span>
+
+    <span class="n">G</span> <span class="o">=</span> <span class="n">G</span> <span class="o">/</span> <span class="n">q</span>
+    <span class="n">nLM</span> <span class="o">=</span> <span class="n">calc_n_LM</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">F1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">nLM</span><span class="p">))))</span>
+    <span class="n">F2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))),</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">nLM</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">i</span><span class="p">))))</span>
+
+    <span class="n">F</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">F1</span><span class="p">,</span> <span class="n">F2</span><span class="p">))</span>
+
+    <span class="n">H</span> <span class="o">=</span> <span class="n">G</span> <span class="o">@</span> <span class="n">F</span>
+
+    <span class="k">return</span> <span class="n">H</span>
+</pre></div>
+</div>
+</section>
+<section id="observation-step">
+<h2>Observation Step<a class="headerlink" href="#observation-step" title="Permalink to this headline"></a></h2>
+<p>The observation step described here is outside the main EKF SLAM process
+and is primarily used as a method of driving the simulation. The
+observations function is in charge of calculating how the poses of the
+robots change and accumulate error over time, and the theoretical
+measurements that are expected as a result of each measurement.</p>
+<p>Observations are based on the TRUE position of the robot. Error in dead
+reckoning and control functions are passed along here as well.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">observation</span><span class="p">(</span><span class="n">xTrue</span><span class="p">,</span> <span class="n">xd</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">RFID</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param xTrue: the true pose of the system</span>
+<span class="sd">    :param xd:    the current noisy estimate of the system</span>
+<span class="sd">    :param u:     the current control input</span>
+<span class="sd">    :param RFID:  the true position of the landmarks</span>
+
+<span class="sd">    :returns:     Computes the true position, observations, dead reckoning (noisy) position,</span>
+<span class="sd">                  and noisy control function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">xTrue</span> <span class="o">=</span> <span class="n">motion_model</span><span class="p">(</span><span class="n">xTrue</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+
+    <span class="c1"># add noise to gps x-y</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">RFID</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])):</span> <span class="c1"># Test all beacons, only add the ones we can see (within MAX_RANGE)</span>
+
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">RFID</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">xTrue</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="n">RFID</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">xTrue</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">angle</span> <span class="o">=</span> <span class="n">pi_2_pi</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span> <span class="o">-</span> <span class="n">xTrue</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">d</span> <span class="o">&lt;=</span> <span class="n">MAX_RANGE</span><span class="p">:</span>
+            <span class="n">dn</span> <span class="o">=</span> <span class="n">d</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">()</span> <span class="o">*</span> <span class="n">Qsim</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># add noise</span>
+            <span class="n">anglen</span> <span class="o">=</span> <span class="n">angle</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">()</span> <span class="o">*</span> <span class="n">Qsim</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># add noise</span>
+            <span class="n">zi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">dn</span><span class="p">,</span> <span class="n">anglen</span><span class="p">,</span> <span class="n">i</span><span class="p">])</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">z</span><span class="p">,</span> <span class="n">zi</span><span class="p">))</span>
+
+    <span class="c1"># add noise to input</span>
+    <span class="n">ud</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span>
+        <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">()</span> <span class="o">*</span> <span class="n">Rsim</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">()</span> <span class="o">*</span> <span class="n">Rsim</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]])</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="n">xd</span> <span class="o">=</span> <span class="n">motion_model</span><span class="p">(</span><span class="n">xd</span><span class="p">,</span> <span class="n">ud</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">xTrue</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">xd</span><span class="p">,</span> <span class="n">ud</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">calc_n_LM</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the number of landmarks currently tracked in the state</span>
+<span class="sd">    :param x: the state</span>
+<span class="sd">    :returns: the number of landmarks n</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="n">STATE_SIZE</span><span class="p">)</span> <span class="o">/</span> <span class="n">LM_SIZE</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">n</span>
+
+
+<span class="k">def</span> <span class="nf">jacob_motion</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the jacobian of motion model.</span>
+
+<span class="sd">    :param x: The state, including the estimated position of the system</span>
+<span class="sd">    :param u: The control function</span>
+<span class="sd">    :returns: G:  Jacobian</span>
+<span class="sd">              Fx: STATE_SIZE x (STATE_SIZE + 2 * num_landmarks) matrix where the left side is an identity matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># [eye(3) [0 x y; 0 x y; 0 x y]]</span>
+    <span class="n">Fx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">STATE_SIZE</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">STATE_SIZE</span><span class="p">,</span> <span class="n">LM_SIZE</span> <span class="o">*</span> <span class="n">calc_n_LM</span><span class="p">(</span><span class="n">x</span><span class="p">)))))</span>
+
+    <span class="n">jF</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="n">DT</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">])],</span>
+                   <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">DT</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">])],</span>
+                   <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]],</span><span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+
+    <span class="n">G</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">STATE_SIZE</span><span class="p">)</span> <span class="o">+</span> <span class="n">Fx</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">jF</span> <span class="o">@</span> <span class="n">Fx</span>
+    <span class="k">if</span> <span class="n">calc_n_LM</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">Fx</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">G</span><span class="p">,</span> <span class="n">Fx</span><span class="p">,</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">calc_LM_Pos</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the pose in the world coordinate frame of a landmark at the given measurement.</span>
+
+<span class="sd">    :param x: [x; y; theta]</span>
+<span class="sd">    :param z: [range; bearing]</span>
+<span class="sd">    :returns: [x; y] for given measurement</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">zp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="n">zp</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">z</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">zp</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">z</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="c1">#zp[0, 0] = x[0, 0] + z[0, 0] * math.cos(x[2, 0] + z[0, 1])</span>
+    <span class="c1">#zp[1, 0] = x[1, 0] + z[0, 0] * math.sin(x[2, 0] + z[0, 1])</span>
+
+    <span class="k">return</span> <span class="n">zp</span>
+
+
+<span class="k">def</span> <span class="nf">get_LM_Pos_from_state</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ind</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the position of a given landmark</span>
+
+<span class="sd">    :param x:   The state containing all landmark positions</span>
+<span class="sd">    :param ind: landmark id</span>
+<span class="sd">    :returns:   The position of the landmark</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lm</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">STATE_SIZE</span> <span class="o">+</span> <span class="n">LM_SIZE</span> <span class="o">*</span> <span class="n">ind</span><span class="p">:</span> <span class="n">STATE_SIZE</span> <span class="o">+</span> <span class="n">LM_SIZE</span> <span class="o">*</span> <span class="p">(</span><span class="n">ind</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="p">:]</span>
+
+    <span class="k">return</span> <span class="n">lm</span>
+
+
+<span class="k">def</span> <span class="nf">search_correspond_LM_ID</span><span class="p">(</span><span class="n">xAug</span><span class="p">,</span> <span class="n">PAug</span><span class="p">,</span> <span class="n">zi</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Landmark association with Mahalanobis distance.</span>
+
+<span class="sd">    If this landmark is at least M_DIST_TH units away from all known landmarks,</span>
+<span class="sd">    it is a NEW landmark.</span>
+
+<span class="sd">    :param xAug: The estimated state</span>
+<span class="sd">    :param PAug: The estimated covariance</span>
+<span class="sd">    :param zi:   the read measurements of specific landmark</span>
+<span class="sd">    :returns:    landmark id</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">nLM</span> <span class="o">=</span> <span class="n">calc_n_LM</span><span class="p">(</span><span class="n">xAug</span><span class="p">)</span>
+
+    <span class="n">mdist</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nLM</span><span class="p">):</span>
+        <span class="n">lm</span> <span class="o">=</span> <span class="n">get_LM_Pos_from_state</span><span class="p">(</span><span class="n">xAug</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">calc_innovation</span><span class="p">(</span><span class="n">lm</span><span class="p">,</span> <span class="n">xAug</span><span class="p">,</span> <span class="n">PAug</span><span class="p">,</span> <span class="n">zi</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">mdist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">@</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="n">mdist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">M_DIST_TH</span><span class="p">)</span>  <span class="c1"># new landmark</span>
+
+    <span class="n">minid</span> <span class="o">=</span> <span class="n">mdist</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">mdist</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">minid</span>
+
+<span class="k">def</span> <span class="nf">calc_input</span><span class="p">():</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># [m/s]</span>
+    <span class="n">yawrate</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># [rad/s]</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">v</span><span class="p">,</span> <span class="n">yawrate</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">return</span> <span class="n">u</span>
+
+<span class="k">def</span> <span class="nf">pi_2_pi</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">angle</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; start!!&quot;</span><span class="p">)</span>
+
+    <span class="n">time</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="c1"># RFID positions [x, y]</span>
+    <span class="n">RFID</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">10.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">],</span>
+                     <span class="p">[</span><span class="mf">15.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">],</span>
+                     <span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">],</span>
+                     <span class="p">[</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">]])</span>
+
+    <span class="c1"># State Vector [x y yaw v]&#39;</span>
+    <span class="n">xEst</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">STATE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">xTrue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">STATE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">PEst</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">STATE_SIZE</span><span class="p">)</span>
+
+    <span class="n">xDR</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">STATE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># Dead reckoning</span>
+
+    <span class="c1"># history</span>
+    <span class="n">hxEst</span> <span class="o">=</span> <span class="n">xEst</span>
+    <span class="n">hxTrue</span> <span class="o">=</span> <span class="n">xTrue</span>
+    <span class="n">hxDR</span> <span class="o">=</span> <span class="n">xTrue</span>
+
+    <span class="k">while</span> <span class="n">SIM_TIME</span> <span class="o">&gt;=</span> <span class="n">time</span><span class="p">:</span>
+        <span class="n">time</span> <span class="o">+=</span> <span class="n">DT</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">calc_input</span><span class="p">()</span>
+
+        <span class="n">xTrue</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">xDR</span><span class="p">,</span> <span class="n">ud</span> <span class="o">=</span> <span class="n">observation</span><span class="p">(</span><span class="n">xTrue</span><span class="p">,</span> <span class="n">xDR</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">RFID</span><span class="p">)</span>
+
+        <span class="n">xEst</span><span class="p">,</span> <span class="n">PEst</span> <span class="o">=</span> <span class="n">ekf_slam</span><span class="p">(</span><span class="n">xEst</span><span class="p">,</span> <span class="n">PEst</span><span class="p">,</span> <span class="n">ud</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+
+        <span class="n">x_state</span> <span class="o">=</span> <span class="n">xEst</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">STATE_SIZE</span><span class="p">]</span>
+
+        <span class="c1"># store data history</span>
+        <span class="n">hxEst</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">hxEst</span><span class="p">,</span> <span class="n">x_state</span><span class="p">))</span>
+        <span class="n">hxDR</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">hxDR</span><span class="p">,</span> <span class="n">xDR</span><span class="p">))</span>
+        <span class="n">hxTrue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">hxTrue</span><span class="p">,</span> <span class="n">xTrue</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">show_animation</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>
+
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">RFID</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">RFID</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;*k&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xEst</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xEst</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;.r&quot;</span><span class="p">)</span>
+
+            <span class="c1"># plot landmark</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">calc_n_LM</span><span class="p">(</span><span class="n">xEst</span><span class="p">)):</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xEst</span><span class="p">[</span><span class="n">STATE_SIZE</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">2</span><span class="p">],</span>
+                         <span class="n">xEst</span><span class="p">[</span><span class="n">STATE_SIZE</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;xg&quot;</span><span class="p">)</span>
+
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">hxTrue</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span>
+                     <span class="n">hxTrue</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="s2">&quot;-b&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">hxDR</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span>
+                     <span class="n">hxDR</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="s2">&quot;-k&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">hxEst</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span>
+                     <span class="n">hxEst</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="s2">&quot;-r&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> notebook
+<span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> start!!
+New LM
+New LM
+New LM
+</pre></div>
+</div>
+<img alt="../../../_images/ekf_slam_1_0.png" src="../../../_images/ekf_slam_1_0.png" />
+</section>
+<section id="references">
+<h2>References:<a class="headerlink" href="#references" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.probabilistic-robotics.org/">PROBABILISTIC ROBOTICS</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../iterative_closest_point_matching/iterative_closest_point_matching.html" class="btn btn-neutral float-left" title="Iterative Closest Point (ICP) Matching" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../FastSLAM1/FastSLAM1.html" class="btn btn-neutral float-right" title="FastSLAM1.0" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2021, Atsushi Sakai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

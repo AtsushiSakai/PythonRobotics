@@ -1,0 +1,23 @@
+/*
+ * Necessary parts from
+ * Sphinx stylesheet -- basic theme
+ * absent from sphinx_rtd_theme
+ * (see https://github.com/readthedocs/sphinx_rtd_theme/issues/301)
+ * Ref https://github.com/PyAbel/PyAbel/commit/7e4dee81eac3f0a6955a85a4a42cf04a4e0d995c
+ */
+
+/* -- math display ---------------------------------------------------------- */
+
+span.eqno {
+    float: right;
+}
+
+span.eqno a.headerlink {
+    position: absolute;
+    z-index: 1;
+    visibility: hidden;
+}
+
+div.math:hover a.headerlink {
+    visibility: visible;
+}

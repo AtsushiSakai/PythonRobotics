@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inverted Pendulum Control &mdash; PythonRobotics  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Move to a Pose Control" href="../move_to_a_pose_control/move_to_a_pose_control.html" />
+    <link rel="prev" title="Control" href="../control.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> PythonRobotics
+            <img src="../../../_static/icon.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../localization/localization.html">Localization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mapping/mapping.html">Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../slam/slam.html">SLAM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_planning/path_planning.html">Path Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_tracking/path_tracking.html">Path Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../arm_navigation/arm_navigation.html">Arm Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../aerial_navigation/aerial_navigation.html">Aerial Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bipedal/bipedal.html">Bipedal</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../control.html">Control</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Inverted Pendulum Control</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#modeling">Modeling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lqr-control">LQR control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mpc-control">MPC control</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../move_to_a_pose_control/move_to_a_pose_control.html">Move to a Pose Control</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../appendix/appendix.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how_to_contribute.html">How To Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PythonRobotics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../control.html">Control</a> &raquo;</li>
+      <li>Inverted Pendulum Control</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/modules/control/inverted_pendulum_control/inverted_pendulum_control_main.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="inverted-pendulum-control">
+<h1>Inverted Pendulum Control<a class="headerlink" href="#inverted-pendulum-control" title="Permalink to this headline"></a></h1>
+<p>An inverted pendulum on a cart consists of a mass <span class="math notranslate nohighlight">\(m\)</span> at the top of a pole of length <span class="math notranslate nohighlight">\(l\)</span> pivoted on a
+horizontally moving base as shown in the adjacent.</p>
+<p>The objective of the control system is to balance the inverted pendulum by applying a force to the cart that the pendulum is attached to.</p>
+<section id="modeling">
+<h2>Modeling<a class="headerlink" href="#modeling" title="Permalink to this headline"></a></h2>
+<img alt="../../../_images/inverted-pendulum.png" class="align-center" src="../../../_images/inverted-pendulum.png" />
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(M\)</span>: mass of the cart</p></li>
+<li><p><span class="math notranslate nohighlight">\(m\)</span>: mass of the load on the top of the rod</p></li>
+<li><p><span class="math notranslate nohighlight">\(l\)</span>: length of the rod</p></li>
+<li><p><span class="math notranslate nohighlight">\(u\)</span>: force applied to the cart</p></li>
+<li><p><span class="math notranslate nohighlight">\(x\)</span>: cart position coordinate</p></li>
+<li><p><span class="math notranslate nohighlight">\(\theta\)</span>: pendulum angle from vertical</p></li>
+</ul>
+<p>Using Lagrange’s equations:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}&amp; (M + m)\ddot{x} - ml\ddot{\theta}cos{\theta} + ml\dot{\theta^2}\sin{\theta} = u \\
+&amp; l\ddot{\theta} - g\sin{\theta} = \ddot{x}\cos{\theta}\end{split}\]</div>
+<p>See this <a class="reference external" href="https://en.wikipedia.org/wiki/Inverted_pendulum#From_Lagrange's_equations">link</a> for more details.</p>
+<p>So</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}&amp; \ddot{x} =  \frac{m(gcos{\theta} - \dot{\theta}^2l)sin{\theta} + u}{M + m - mcos^2{\theta}} \\
+&amp; \ddot{\theta} = \frac{g(M + m)sin{\theta} - \dot{\theta}^2lmsin{\theta}cos{\theta} + ucos{\theta}}{l(M + m - mcos^2{\theta})}\end{split}\]</div>
+<p>Linearized model when <span class="math notranslate nohighlight">\(\theta\)</span> small, <span class="math notranslate nohighlight">\(cos{\theta} \approx 1\)</span>, <span class="math notranslate nohighlight">\(sin{\theta} \approx \theta\)</span>, <span class="math notranslate nohighlight">\(\dot{\theta}^2 \approx 0\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}&amp; \ddot{x} =  \frac{gm}{M}\theta + \frac{1}{M}u\\
+&amp; \ddot{\theta} = \frac{g(M + m)}{Ml}\theta + \frac{1}{Ml}u\end{split}\]</div>
+<p>State space:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}&amp; \dot{x} = Ax + Bu \\
+&amp; y = Cx + Du\end{split}\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}&amp; x = [x, \dot{x}, \theta,\dot{\theta}]\\
+&amp; A = \begin{bmatrix}  0 &amp; 1 &amp; 0 &amp; 0\\0 &amp; 0 &amp; \frac{gm}{M} &amp; 0\\0 &amp; 0 &amp; 0 &amp; 1\\0 &amp; 0 &amp; \frac{g(M + m)}{Ml} &amp; 0 \end{bmatrix}\\
+&amp; B = \begin{bmatrix}  0 \\ \frac{1}{M} \\ 0 \\ \frac{1}{Ml} \end{bmatrix}\end{split}\]</div>
+<p>If control only theta</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}&amp; C = \begin{bmatrix} 0 &amp; 0 &amp; 1 &amp; 0 \end{bmatrix}\\
+&amp; D = [0]\end{split}\]</div>
+<p>If control x and theta</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}&amp; C = \begin{bmatrix} 1 &amp; 0 &amp; 0 &amp; 0\\0 &amp; 0 &amp; 1 &amp; 0 \end{bmatrix}\\
+&amp; D = \begin{bmatrix} 0 \\ 0 \end{bmatrix}\end{split}\]</div>
+</section>
+<section id="lqr-control">
+<h2>LQR control<a class="headerlink" href="#lqr-control" title="Permalink to this headline"></a></h2>
+<p>The LQR controller minimize this cost function defined as:</p>
+<div class="math notranslate nohighlight">
+\[J = x^T Q x + u^T R u\]</div>
+<p>the feedback control law that minimizes the value of the cost is:</p>
+<div class="math notranslate nohighlight">
+\[u = -K x\]</div>
+<p>where:</p>
+<div class="math notranslate nohighlight">
+\[K = (B^T P B + R)^{-1} B^T P A\]</div>
+<p>and <span class="math notranslate nohighlight">\(P\)</span> is the unique positive definite solution to the discrete time
+<a class="reference external" href="https://en.wikipedia.org/wiki/Inverted_pendulum#From_Lagrange's_equations">algebraic Riccati equation</a>  (DARE):</p>
+<div class="math notranslate nohighlight">
+\[P = A^T P A - A^T P B ( R + B^T P B )^{-1} B^T P A + Q\]</div>
+<img alt="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/InvertedPendulumCart/animation_lqr.gif" src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/InvertedPendulumCart/animation_lqr.gif" />
+</section>
+<section id="mpc-control">
+<h2>MPC control<a class="headerlink" href="#mpc-control" title="Permalink to this headline"></a></h2>
+<p>The MPC controller minimize this cost function defined as:</p>
+<div class="math notranslate nohighlight">
+\[J = x^T Q x + u^T R u\]</div>
+<p>subject to:</p>
+<ul class="simple">
+<li><p>Linearized Inverted Pendulum model</p></li>
+<li><p>Initial state</p></li>
+</ul>
+<img alt="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/InvertedPendulumCart/animation.gif" src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/InvertedPendulumCart/animation.gif" />
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../control.html" class="btn btn-neutral float-left" title="Control" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../move_to_a_pose_control/move_to_a_pose_control.html" class="btn btn-neutral float-right" title="Move to a Pose Control" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2021, Atsushi Sakai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

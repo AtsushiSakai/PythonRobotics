@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Move to a Pose Control &mdash; PythonRobotics  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Appendix" href="../../appendix/appendix.html" />
+    <link rel="prev" title="Inverted Pendulum Control" href="../inverted_pendulum_control/inverted_pendulum_control.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> PythonRobotics
+            <img src="../../../_static/icon.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../localization/localization.html">Localization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mapping/mapping.html">Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../slam/slam.html">SLAM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_planning/path_planning.html">Path Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_tracking/path_tracking.html">Path Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../arm_navigation/arm_navigation.html">Arm Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../aerial_navigation/aerial_navigation.html">Aerial Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bipedal/bipedal.html">Bipedal</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../control.html">Control</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../inverted_pendulum_control/inverted_pendulum_control.html">Inverted Pendulum Control</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Move to a Pose Control</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#position-control-of-non-holonomic-systems">Position Control of non-Holonomic Systems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pathfindercontroller-class">PathFinderController class</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#constructor">Constructor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#member-function-s">Member function(s)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#how-does-the-algorithm-work">How does the Algorithm Work</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#move-to-a-pose-robot-class">Move to a Pose Robot (Class)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#robot-class">Robot Class</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Constructor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Member function(s)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../appendix/appendix.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how_to_contribute.html">How To Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PythonRobotics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../control.html">Control</a> &raquo;</li>
+      <li>Move to a Pose Control</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/modules/control/move_to_a_pose_control/move_to_a_pose_control_main.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="move-to-a-pose-control">
+<h1>Move to a Pose Control<a class="headerlink" href="#move-to-a-pose-control" title="Permalink to this headline"></a></h1>
+<p>In this section, we present the logic of PathFinderController that drives a car from a start pose (x, y, theta) to a goal pose. A simulation of moving to a pose control is presented below.</p>
+<img alt="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/move_to_pose/animation.gif" src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/move_to_pose/animation.gif" />
+<section id="position-control-of-non-holonomic-systems">
+<h2>Position Control of non-Holonomic Systems<a class="headerlink" href="#position-control-of-non-holonomic-systems" title="Permalink to this headline"></a></h2>
+<p>This section explains the logic of a position controller for systems with constraint (non-Holonomic system).</p>
+<p>The position control of a 1-DOF (Degree of Freedom) system is quite straightforward. We only need to compute a position error and multiply it with a proportional gain to create a command. The actuator of the system takes this command and drive the system to the target position. This controller can be easily extended to higher dimensions (e.g., using Kp_x and Kp_y gains for a 2D position control). In these systems, the number of control commands is equal to the number of degrees of freedom (Holonomic system).</p>
+<p>To describe the configuration of a car on a 2D plane, we need three DOFs (i.e., x, y, and theta). But to drive a car we only need two control commands (theta_engine and theta_steering_wheel). This difference is because of a constraint between the x and y DOFs. The relationship between the delta_x and delta_y is governed by the theta_steering_wheel.</p>
+<p>Note that a car is normally a non-Holonomic system but if the road is slippery, the car turns into a Holonomic system and thus it needs three independent commands to be controlled.</p>
+</section>
+<section id="pathfindercontroller-class">
+<h2>PathFinderController class<a class="headerlink" href="#pathfindercontroller-class" title="Permalink to this headline"></a></h2>
+<section id="constructor">
+<h3>Constructor<a class="headerlink" href="#constructor" title="Permalink to this headline"></a></h3>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">PathFinderController</span><span class="p">(</span><span class="n">Kp_rho</span><span class="p">,</span> <span class="n">Kp_alpha</span><span class="p">,</span> <span class="n">Kp_beta</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Constructs an instantiate of the PathFinderController for navigating a 3-DOF wheeled robot on a 2D plane.</p>
+<p>Parameters:</p>
+<ul>
+<li><div class="line-block">
+<div class="line"><strong>Kp_rho</strong> : The linear velocity gain to translate the robot along a line towards the goal</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>Kp_alpha</strong> : The angular velocity gain to rotate the robot towards the goal</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>Kp_beta</strong> : The offset angular velocity gain accounting for smooth merging to the goal angle (i.e., it helps the robot heading to be parallel to the target angle.)</div>
+</div>
+</li>
+</ul>
+</section>
+<section id="member-function-s">
+<h3>Member function(s)<a class="headerlink" href="#member-function-s" title="Permalink to this headline"></a></h3>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">calc_control_command</span><span class="p">(</span><span class="n">x_diff</span><span class="p">,</span> <span class="n">y_diff</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">theta_goal</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Returns the control command for the linear and angular velocities as well as the distance to goal</p>
+<p>Parameters:</p>
+<ul>
+<li><div class="line-block">
+<div class="line"><strong>x_diff</strong> : The position of target with respect to current robot position in x direction</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>y_diff</strong> : The position of target with respect to current robot position in y direction</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>theta</strong> : The current heading angle of robot with respect to x axis</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>theta_goal</strong> : The target angle of robot with respect to x axis</div>
+</div>
+</li>
+</ul>
+<p>Returns:</p>
+<ul>
+<li><div class="line-block">
+<div class="line"><strong>rho</strong> : The distance between the robot and the goal position</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>v</strong> : Command linear velocity</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>w</strong> : Command angular velocity</div>
+</div>
+</li>
+</ul>
+</section>
+</section>
+<section id="how-does-the-algorithm-work">
+<h2>How does the Algorithm Work<a class="headerlink" href="#how-does-the-algorithm-work" title="Permalink to this headline"></a></h2>
+<p>The distance between the robot and the goal position, <span class="math notranslate nohighlight">\(\rho\)</span>, is computed as</p>
+<div class="math notranslate nohighlight">
+\[\rho = \sqrt{(x_{robot} - x_{target})^2 + (y_{robot} - y_{target})^2}.\]</div>
+<p>The distance <span class="math notranslate nohighlight">\(\rho\)</span> is used to determine the robot speed. The idea is to slow down the robot as it gets closer to the target.</p>
+<div class="math notranslate nohighlight" id="equation-move-to-a-pose-eq1">
+<span class="eqno">(1)<a class="headerlink" href="#equation-move-to-a-pose-eq1" title="Permalink to this equation"></a></span>\[v = K_P{_\rho} \times \rho\qquad\]</div>
+<p>Note that for your applications, you need to tune the speed gain, <span class="math notranslate nohighlight">\(K_P{_\rho}\)</span> to a proper value.</p>
+<p>To turn the robot and align its heading, <span class="math notranslate nohighlight">\(\theta\)</span>, toward the target position (not orientation),  <span class="math notranslate nohighlight">\(\rho \vec{u}\)</span>, we need to compute the angle difference <span class="math notranslate nohighlight">\(\alpha\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\alpha = (\arctan2(y_{diff}, x_{diff}) - \theta + \pi) mod (2\pi) - \pi\]</div>
+<p>The term <span class="math notranslate nohighlight">\(mod(2\pi)\)</span> is used to map the angle to <span class="math notranslate nohighlight">\([-\pi, \pi)\)</span> range.</p>
+<p>Lastly to correct the orientation of the robot, we need to compute the orientation error, <span class="math notranslate nohighlight">\(\beta\)</span>, of the robot.</p>
+<div class="math notranslate nohighlight">
+\[\beta = (\theta_{goal} - \theta - \alpha + \pi) mod (2\pi) - \pi\]</div>
+<p>Note that to cancel out the effect of <span class="math notranslate nohighlight">\(\alpha\)</span> when the robot is at the vicinity of the target, the term</p>
+<p><span class="math notranslate nohighlight">\(-\alpha\)</span> is included.</p>
+<p>The final angular speed command is given by</p>
+<div class="math notranslate nohighlight" id="equation-move-to-a-pose-eq2">
+<span class="eqno">(2)<a class="headerlink" href="#equation-move-to-a-pose-eq2" title="Permalink to this equation"></a></span>\[\omega = K_P{_\alpha} \alpha - K_P{_\beta} \beta\qquad\]</div>
+<p>The linear and angular speeds (Equations <a class="reference internal" href="#equation-move-to-a-pose-eq1">(1)</a> and <a class="reference internal" href="#equation-move-to-a-pose-eq2">(2)</a>) are the output of the algorithm.</p>
+</section>
+<section id="move-to-a-pose-robot-class">
+<h2>Move to a Pose Robot (Class)<a class="headerlink" href="#move-to-a-pose-robot-class" title="Permalink to this headline"></a></h2>
+<p>This program (move_to_pose_robot.py) provides a Robot class to define different robots with different specifications.
+Using this class, you can simulate different robots simultaneously and compare the effect of your parameter settings.</p>
+<img alt="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/move_to_pos_robot_class/animation.gif" src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/move_to_pos_robot_class/animation.gif" />
+<p>Note: The robot class is based on PathFinderController class in ‘the move_to_pose.py’.</p>
+<section id="robot-class">
+<h3>Robot Class<a class="headerlink" href="#robot-class" title="Permalink to this headline"></a></h3>
+</section>
+<section id="id1">
+<h3>Constructor<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h3>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Robot</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">max_linear_speed</span><span class="p">,</span> <span class="n">max_angular_speed</span><span class="p">,</span> <span class="n">path_finder_controller</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Constructs an instantiate of the 3-DOF wheeled Robot navigating on a 2D plane</p>
+<p>Parameters:</p>
+<ul>
+<li><div class="line-block">
+<div class="line"><strong>name</strong> : (string) The name of the robot</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>color</strong> : (string) The color of the robot</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>max_linear_speed</strong> : (float) The maximum linear speed that the robot can go</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>max_angular_speed</strong> : (float) The maximum angular speed that the robot can rotate about its vertical axis</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>path_finder_controller</strong> : (PathFinderController) A configurable controller to finds the path and calculates command linear and angular velocities.</div>
+</div>
+</li>
+</ul>
+</section>
+<section id="id2">
+<h3>Member function(s)<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h3>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">set_start_target_poses</span><span class="p">(</span><span class="n">pose_start</span><span class="p">,</span> <span class="n">pose_target</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Sets the start and target positions of the robot.</p>
+<p>Parameters:</p>
+<ul>
+<li><div class="line-block">
+<div class="line"><strong>pose_start</strong> : (Pose) Start postion of the robot (see the Pose class)</div>
+</div>
+</li>
+<li><div class="line-block">
+<div class="line"><strong>pose_target</strong> : (Pose) Target postion of the robot (see the Pose class)</div>
+</div>
+</li>
+</ul>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">move</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Move the robot for one time step increment</p>
+<p>Parameters:</p>
+<ul>
+<li><div class="line-block">
+<div class="line"><strong>dt</strong> : &lt;float&gt; time increment</div>
+</div>
+</li>
+</ul>
+</section>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>PathFinderController class</p></li>
+<li><p><a class="reference external" href="https://link.springer.com/book/10.1007/978-3-642-20144-8">P. I. Corke, “Robotics, Vision and Control” | SpringerLink
+p102</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../inverted_pendulum_control/inverted_pendulum_control.html" class="btn btn-neutral float-left" title="Inverted Pendulum Control" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../appendix/appendix.html" class="btn btn-neutral float-right" title="Appendix" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2021, Atsushi Sakai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

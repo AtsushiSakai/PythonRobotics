@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Two joint arm to point control &mdash; PythonRobotics  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="N joint arm to point control" href="n_joint_arm_to_point_control.html" />
+    <link rel="prev" title="Arm Navigation" href="arm_navigation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> PythonRobotics
+            <img src="../../_static/icon.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../localization/localization.html">Localization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mapping/mapping.html">Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../slam/slam.html">SLAM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../path_planning/path_planning.html">Path Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../path_tracking/path_tracking.html">Path Tracking</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="arm_navigation.html">Arm Navigation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Two joint arm to point control</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#inverse-kinematics-for-a-planar-two-link-robotic-arm">Inverse Kinematics for a Planar Two-Link Robotic Arm</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="n_joint_arm_to_point_control.html">N joint arm to point control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="obstacle_avoidance_arm_navigation.html">Arm navigation with obstacle avoidance</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../aerial_navigation/aerial_navigation.html">Aerial Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bipedal/bipedal.html">Bipedal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/appendix.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../how_to_contribute.html">How To Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PythonRobotics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="arm_navigation.html">Arm Navigation</a> &raquo;</li>
+      <li>Two joint arm to point control</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/modules/arm_navigation/planar_two_link_ik_main.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="two-joint-arm-to-point-control">
+<h1>Two joint arm to point control<a class="headerlink" href="#two-joint-arm-to-point-control" title="Permalink to this headline"></a></h1>
+<figure class="align-default">
+<img alt="TwoJointArmToPointControl" src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/ArmNavigation/two_joint_arm_to_point_control/animation.gif" />
+</figure>
+<p>This is two joint arm to a point control simulation.</p>
+<p>This is a interactive simulation.</p>
+<p>You can set the goal position of the end effector with left-click on the plotting area.</p>
+<section id="inverse-kinematics-for-a-planar-two-link-robotic-arm">
+<h2>Inverse Kinematics for a Planar Two-Link Robotic Arm<a class="headerlink" href="#inverse-kinematics-for-a-planar-two-link-robotic-arm" title="Permalink to this headline"></a></h2>
+<p>A classic problem with robotic arms is getting the end-effector, the
+mechanism at the end of the arm responsible for manipulating the
+environment, to where you need it to be. Maybe the end-effector is a
+gripper and maybe you want to pick up an object and maybe you know where
+that object is relative to the robot - but you cannot tell the
+end-effector where to go directly. Instead, you have to determine the
+joint angles that get the end-effector to where you want it to be. This
+problem is known as inverse kinematics.</p>
+<p>Credit for this solution goes to:
+<a class="reference external" href="https://robotacademy.net.au/lesson/inverse-kinematics-for-a-2-joint-robot-arm-using-geometry/">https://robotacademy.net.au/lesson/inverse-kinematics-for-a-2-joint-robot-arm-using-geometry/</a></p>
+<p>First, let’s define a class to make plotting our arm easier.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">cos</span><span class="p">,</span> <span class="n">sin</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="k">class</span> <span class="nc">TwoLinkArm</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">joint_angles</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shoulder</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">link_lengths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_joints</span><span class="p">(</span><span class="n">joint_angles</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">update_joints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">joint_angles</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">joint_angles</span> <span class="o">=</span> <span class="n">joint_angles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">forward_kinematics</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">forward_kinematics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">theta0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">joint_angles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">theta1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">joint_angles</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">l0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">link_lengths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">l1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">link_lengths</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elbow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shoulder</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">l0</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">theta0</span><span class="p">),</span> <span class="n">l0</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">theta0</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wrist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elbow</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">l1</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">theta0</span> <span class="o">+</span> <span class="n">theta1</span><span class="p">),</span> <span class="n">l1</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">theta0</span> <span class="o">+</span> <span class="n">theta1</span><span class="p">)])</span>
+
+    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">shoulder</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">elbow</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                 <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">shoulder</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">elbow</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+                 <span class="s1">&#39;r-&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">elbow</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                 <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">elbow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+                 <span class="s1">&#39;r-&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shoulder</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">shoulder</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;ko&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elbow</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">elbow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;ko&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;ko&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Let’s also define a function to make it easier to draw an angle on our
+diagram.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span>
+
+<span class="k">def</span> <span class="nf">transform_points</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                  <span class="p">[</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">origin</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">points</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">draw_angle</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">r</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+        <span class="n">x_start</span> <span class="o">=</span> <span class="n">r</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+        <span class="n">x_end</span> <span class="o">=</span> <span class="n">r</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_end</span> <span class="o">-</span> <span class="n">x_start</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">n_points</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_points</span><span class="p">)]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x_start</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_points</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">r</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
+            <span class="n">coords</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">x</span> <span class="o">+=</span> <span class="n">dx</span>
+        <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span>
+        <span class="n">coords</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">transform_points</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;k-&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Okay, we now have a TwoLinkArm class to help us draw the arm, which
+we’ll do several times during our derivation. Notice there is a method
+called forward_kinematics - forward kinematics specifies the
+end-effector position given the joint angles and link lengths. Forward
+kinematics is easier than inverse kinematics.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">arm</span> <span class="o">=</span> <span class="n">TwoLinkArm</span><span class="p">()</span>
+
+<span class="n">theta0</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">theta1</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="n">arm</span><span class="o">.</span><span class="n">update_joints</span><span class="p">([</span><span class="n">theta0</span><span class="p">,</span> <span class="n">theta1</span><span class="p">])</span>
+<span class="n">arm</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">label_diagram</span><span class="p">():</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;k--&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">arm</span><span class="o">.</span><span class="n">elbow</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">arm</span><span class="o">.</span><span class="n">elbow</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">theta0</span><span class="p">)],</span>
+             <span class="p">[</span><span class="n">arm</span><span class="o">.</span><span class="n">elbow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">arm</span><span class="o">.</span><span class="n">elbow</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">theta0</span><span class="p">)],</span>
+             <span class="s1">&#39;k--&#39;</span><span class="p">)</span>
+
+    <span class="n">draw_angle</span><span class="p">(</span><span class="n">theta0</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+    <span class="n">draw_angle</span><span class="p">(</span><span class="n">theta1</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">theta0</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="p">[</span><span class="n">arm</span><span class="o">.</span><span class="n">elbow</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">arm</span><span class="o">.</span><span class="n">elbow</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">r</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;$l_0$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;$l_1$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\theta_0$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\theta_1$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+
+<span class="n">label_diagram</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;Shoulder&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">arm</span><span class="o">.</span><span class="n">shoulder</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">arm</span><span class="o">.</span><span class="n">shoulder</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+    <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.05</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;Elbow&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">arm</span><span class="o">.</span><span class="n">elbow</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">arm</span><span class="o">.</span><span class="n">elbow</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mf">1.25</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">),</span>
+    <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.05</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;Wrist&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.75</span><span class="p">),</span>
+    <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.05</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../_images/Planar_Two_Link_IK_5_0.png" src="../../_images/Planar_Two_Link_IK_5_0.png" />
+<p>It’s common to name arm joints anatomically, hence the names shoulder,
+elbow, and wrist. In this example, the wrist is not itself a joint, but
+we can consider it to be our end-effector. If we constrain the shoulder
+to the origin, we can write the forward kinematics for the elbow and the
+wrist.</p>
+<div class="line-block">
+<div class="line"><span class="math notranslate nohighlight">\(elbow_x = l_0\cos(\theta_0)\)</span></div>
+<div class="line"><span class="math notranslate nohighlight">\(elbow_y = l_0\sin(\theta_0)\)</span></div>
+</div>
+<div class="line-block">
+<div class="line"><span class="math notranslate nohighlight">\(wrist_x = elbow_x + l_1\cos(\theta_0+\theta_1) = l_0\cos(\theta_0) + l_1\cos(\theta_0+\theta_1)\)</span></div>
+<div class="line"><span class="math notranslate nohighlight">\(wrist_y = elbow_y + l_1\sin(\theta_0+\theta_1) = l_0\sin(\theta_0) + l_1\sin(\theta_0+\theta_1)\)</span></div>
+</div>
+<p>Since the wrist is our end-effector, let’s just call its coordinates
+<span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span>. The forward kinematics for our
+end-effector is then</p>
+<div class="line-block">
+<div class="line"><span class="math notranslate nohighlight">\(x = l_0\cos(\theta_0) + l_1\cos(\theta_0+\theta_1)\)</span></div>
+<div class="line"><span class="math notranslate nohighlight">\(y = l_0\sin(\theta_0) + l_1\sin(\theta_0+\theta_1)\)</span></div>
+</div>
+<p>A first attempt to find the joint angles <span class="math notranslate nohighlight">\(\theta_0\)</span> and
+<span class="math notranslate nohighlight">\(\theta_1\)</span> that would get our end-effector to the desired
+coordinates <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> might be to try solving the forward
+kinematics for <span class="math notranslate nohighlight">\(\theta_0\)</span> and <span class="math notranslate nohighlight">\(\theta_1\)</span>, but that would be
+the wrong move. An easier path involves going back to the geometry of
+the arm.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">pi</span>
+
+<span class="n">arm</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">label_diagram</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+         <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+         <span class="s1">&#39;k--&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+         <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+         <span class="s1">&#39;b--&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+         <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+         <span class="s1">&#39;b--&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;$x$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;$y$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;$r$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.45</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\alpha$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+
+<span class="n">alpha</span> <span class="o">=</span> <span class="n">pi</span><span class="o">-</span><span class="n">theta1</span>
+<span class="n">draw_angle</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">theta0</span><span class="o">+</span><span class="n">theta1</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="p">[</span><span class="n">arm</span><span class="o">.</span><span class="n">elbow</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">arm</span><span class="o">.</span><span class="n">elbow</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">r</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../_images/Planar_Two_Link_IK_7_0.png" src="../../_images/Planar_Two_Link_IK_7_0.png" />
+<p>The distance from the end-effector to the robot base (shoulder joint) is
+<span class="math notranslate nohighlight">\(r\)</span> and can be written in terms of the end-effector position using
+the Pythagorean Theorem.</p>
+<p><span class="math notranslate nohighlight">\(r^2\)</span> = <span class="math notranslate nohighlight">\(x^2 + y^2\)</span></p>
+<p>Then, by the law of cosines, <span class="math notranslate nohighlight">\(r\)</span>2 can also be written as:</p>
+<p><span class="math notranslate nohighlight">\(r^2\)</span> = <span class="math notranslate nohighlight">\(l_0^2 + l_1^2 - 2l_0l_1\cos(\alpha)\)</span></p>
+<p>Because <span class="math notranslate nohighlight">\(\alpha\)</span> can be written as <span class="math notranslate nohighlight">\(\pi - \theta_1\)</span>, we can
+relate the desired end-effector position to one of our joint angles,
+<span class="math notranslate nohighlight">\(\theta_1\)</span>.</p>
+<p><span class="math notranslate nohighlight">\(x^2 + y^2\)</span> = <span class="math notranslate nohighlight">\(l_0^2 + l_1^2 - 2l_0l_1\cos(\alpha)\)</span></p>
+<p><span class="math notranslate nohighlight">\(x^2 + y^2\)</span> = <span class="math notranslate nohighlight">\(l_0^2 + l_1^2 - 2l_0l_1\cos(\pi-\theta_1)\)</span></p>
+<p><span class="math notranslate nohighlight">\(2l_0l_1\cos(\pi-\theta_1) = l_0^2 + l_1^2 - x^2 - y^2\)</span></p>
+<div class="line-block">
+<div class="line"><span class="math notranslate nohighlight">\(\cos(\pi-\theta_1) = \frac{l_0^2 + l_1^2 - x^2 - y^2}{2l_0l_1}\)</span></div>
+<div class="line"><span class="math notranslate nohighlight">\(~\)</span></div>
+<div class="line"><span class="math notranslate nohighlight">\(~\)</span></div>
+<div class="line"><span class="math notranslate nohighlight">\(\cos(\pi-\theta_1) = -cos(\theta_1)\)</span> is a trigonometric
+identity, so we can also write</div>
+</div>
+<p><span class="math notranslate nohighlight">\(\cos(\theta_1) = \frac{x^2 + y^2 - l_0^2 - l_1^2}{2l_0l_1}\)</span></p>
+<p>which leads us to an equation for <span class="math notranslate nohighlight">\(\theta_1\)</span> in terms of the link
+lengths and the desired end-effector position!</p>
+<p><span class="math notranslate nohighlight">\(\theta_1 = \cos^{-1}(\frac{x^2 + y^2 - l_0^2 - l_1^2}{2l_0l_1})\)</span></p>
+<p>This is actually one of two possible solutions for <span class="math notranslate nohighlight">\(\theta_1\)</span>, but
+we’ll ignore the other possibility for now. This solution will lead us
+to the “arm-down” configuration of the arm, which is what’s shown in the
+diagram. Now we’ll derive an equation for <span class="math notranslate nohighlight">\(\theta_0\)</span> that depends
+on this value of <span class="math notranslate nohighlight">\(\theta_1\)</span>.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">atan2</span>
+
+<span class="n">arm</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+         <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+         <span class="s1">&#39;k--&#39;</span><span class="p">)</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">cos</span><span class="p">(</span><span class="n">theta1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">arm</span><span class="o">.</span><span class="n">elbow</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">theta0</span><span class="p">)],</span>
+         <span class="p">[</span><span class="n">arm</span><span class="o">.</span><span class="n">elbow</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">theta0</span><span class="p">)],</span>
+         <span class="s1">&#39;b--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">theta0</span><span class="p">)],</span>
+         <span class="p">[</span><span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">theta0</span><span class="p">)],</span>
+         <span class="s1">&#39;b--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="n">beta</span> <span class="o">=</span> <span class="n">atan2</span><span class="p">(</span><span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">-</span><span class="n">theta0</span>
+<span class="n">draw_angle</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">theta0</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mf">0.45</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\beta$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;$r$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.45</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$l_1sin(\theta_1)$&quot;</span><span class="p">,</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">1.25</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$l_1cos(\theta_1)$&quot;</span><span class="p">,</span><span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">)</span>
+
+<span class="n">label_diagram</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../_images/Planar_Two_Link_IK_9_0.png" src="../../_images/Planar_Two_Link_IK_9_0.png" />
+<p>Consider the angle between the displacement vector <span class="math notranslate nohighlight">\(r\)</span> and the
+first link <span class="math notranslate nohighlight">\(l_0\)</span>; let’s call it <span class="math notranslate nohighlight">\(\beta\)</span>. If we extend the
+first link to include the component of the second link in the same
+direction as the first, we form a right triangle with components
+<span class="math notranslate nohighlight">\(l_0+l_1cos(\theta_1)\)</span> and <span class="math notranslate nohighlight">\(l_1sin(\theta_1)\)</span>, allowing us
+to express <span class="math notranslate nohighlight">\(\beta\)</span> as</p>
+<p><span class="math notranslate nohighlight">\(\beta = \tan^{-1}(\frac{l_1\sin(\theta_1)}{l_0+l_1\cos(\theta_1)})\)</span></p>
+<p>We now have an expression for this angle <span class="math notranslate nohighlight">\(\beta\)</span> in terms of one
+of our arm’s joint angles. Now, can we relate <span class="math notranslate nohighlight">\(\beta\)</span> to
+<span class="math notranslate nohighlight">\(\theta_0\)</span>? Yes!</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">arm</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">label_diagram</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+         <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+         <span class="s1">&#39;k--&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+         <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+         <span class="s1">&#39;b--&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+         <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+         <span class="s1">&#39;b--&#39;</span><span class="p">)</span>
+
+<span class="n">gamma</span> <span class="o">=</span> <span class="n">atan2</span><span class="p">(</span><span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">arm</span><span class="o">.</span><span class="n">wrist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">draw_angle</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">theta0</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">draw_angle</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;$x$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;$y$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\beta$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\gamma$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../_images/Planar_Two_Link_IK_12_0.png" src="../../_images/Planar_Two_Link_IK_12_0.png" />
+<p>Our first joint angle <span class="math notranslate nohighlight">\(\theta_0\)</span> added to <span class="math notranslate nohighlight">\(\beta\)</span> gives us
+the angle between the positive <span class="math notranslate nohighlight">\(x\)</span>-axis and the displacement
+vector <span class="math notranslate nohighlight">\(r\)</span>; let’s call this angle <span class="math notranslate nohighlight">\(\gamma\)</span>.</p>
+<p><span class="math notranslate nohighlight">\(\gamma = \theta_0+\beta\)</span></p>
+<p><span class="math notranslate nohighlight">\(\theta_0\)</span>, our remaining joint angle, can then be expressed as</p>
+<p><span class="math notranslate nohighlight">\(\theta_0 = \gamma-\beta\)</span></p>
+<p>We already know <span class="math notranslate nohighlight">\(\beta\)</span>. <span class="math notranslate nohighlight">\(\gamma\)</span> is simply the inverse
+tangent of <span class="math notranslate nohighlight">\(\frac{y}{x}\)</span>, so we have an equation of
+<span class="math notranslate nohighlight">\(\theta_0\)</span>!</p>
+<p><span class="math notranslate nohighlight">\(\theta_0 = \tan^{-1}(\frac{y}{x})-\tan^{-1}(\frac{l_1\sin(\theta_1)}{l_0+l_1\cos(\theta_1)})\)</span></p>
+<p>We now have the inverse kinematics for a planar two-link robotic arm. If
+you’re planning on implementing this in a programming language, it’s
+best to use the atan2 function, which is included in most math libraries
+and correctly accounts for the signs of <span class="math notranslate nohighlight">\(y\)</span> and <span class="math notranslate nohighlight">\(x\)</span>. Notice
+that <span class="math notranslate nohighlight">\(\theta_1\)</span> must be calculated before <span class="math notranslate nohighlight">\(\theta_0\)</span>.</p>
+<div class="line-block">
+<div class="line"><span class="math notranslate nohighlight">\(\theta_1 = \cos^{-1}(\frac{x^2 + y^2 - l_0^2 - l_1^2}{2l_0l_1})\)</span></div>
+<div class="line"><span class="math notranslate nohighlight">\(\theta_0 = atan2(y, x)-atan2(l_1\sin(\theta_1), l_0+l_1\cos(\theta_1))\)</span></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="arm_navigation.html" class="btn btn-neutral float-left" title="Arm Navigation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="n_joint_arm_to_point_control.html" class="btn btn-neutral float-right" title="N joint arm to point control" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2021, Atsushi Sakai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

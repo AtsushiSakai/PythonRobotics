@@ -1,0 +1,29 @@
+name: Pages
+on:
+  push:
+    branches:
+    - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Setup python
+      uses: actions/setup-python@v2
+    - name: Checkout
+      uses: actions/checkout@master
+      with:
+        fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
+    - name: Install dependencies
+      run: |
+        python --version
+        python -m pip install --upgrade pip
+        python -m pip install -r requirements/requirements.txt
+    - name: Build and Commit
+      uses: sphinx-notes/pages@v2
+      with:
+        requirements_path: ./docs/doc_requirements.txt
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: gh-pages

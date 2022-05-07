@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FastSLAM1.0 &mdash; PythonRobotics  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="FastSLAM 2.0" href="../FastSLAM2/FastSLAM2.html" />
+    <link rel="prev" title="EKF SLAM" href="../ekf_slam/ekf_slam.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> PythonRobotics
+            <img src="../../../_static/icon.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../localization/localization.html">Localization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mapping/mapping.html">Mapping</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../slam.html">SLAM</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../iterative_closest_point_matching/iterative_closest_point_matching.html">Iterative Closest Point (ICP) Matching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ekf_slam/ekf_slam.html">EKF SLAM</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">FastSLAM1.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#simulation">Simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#algorithm-walk-through">Algorithm walk through</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#predict">1- Predict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#update">2- Update</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#resampling">3- Resampling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../FastSLAM2/FastSLAM2.html">FastSLAM 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../graph_slam/graph_slam.html">Graph based SLAM</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_planning/path_planning.html">Path Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_tracking/path_tracking.html">Path Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../arm_navigation/arm_navigation.html">Arm Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../aerial_navigation/aerial_navigation.html">Aerial Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bipedal/bipedal.html">Bipedal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../appendix/appendix.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how_to_contribute.html">How To Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PythonRobotics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../slam.html">SLAM</a> &raquo;</li>
+      <li>FastSLAM1.0</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/modules/slam/FastSLAM1/FastSLAM1_main.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="fastslam1-0">
+<h1>FastSLAM1.0<a class="headerlink" href="#fastslam1-0" title="Permalink to this headline"></a></h1>
+<figure class="align-default">
+<img alt="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/FastSLAM1/animation.gif" src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/FastSLAM1/animation.gif" />
+</figure>
+<section id="simulation">
+<h2>Simulation<a class="headerlink" href="#simulation" title="Permalink to this headline"></a></h2>
+<p>This is a feature based SLAM example using FastSLAM 1.0.</p>
+<a class="reference internal image-reference" href="../../../_images/FastSLAM1_1_0.png"><img alt="../../../_images/FastSLAM1_1_0.png" src="../../../_images/FastSLAM1_1_0.png" style="width: 600px;" /></a>
+<p>The blue line is ground truth, the black line is dead reckoning, the red
+line is the estimated trajectory with FastSLAM.</p>
+<p>The red points are particles of FastSLAM.</p>
+<p>Black points are landmarks, blue crosses are estimated landmark
+positions by FastSLAM.</p>
+</section>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h2>
+<p>FastSLAM algorithm implementation is based on particle filters and
+belongs to the family of probabilistic SLAM approaches. It is used with
+feature-based maps (see gif above) or with occupancy grid maps.</p>
+<p>As it is shown, the particle filter differs from EKF by representing the
+robot’s estimation through a set of particles. Each single particle has
+an independent belief, as it holds the pose <span class="math notranslate nohighlight">\((x, y, \theta)\)</span> and
+an array of landmark locations
+<span class="math notranslate nohighlight">\([(x_1, y_1), (x_2, y_2), ... (x_n, y_n)]\)</span> for n landmarks.</p>
+<ul class="simple">
+<li><p>The blue line is the true trajectory</p></li>
+<li><p>The red line is the estimated trajectory</p></li>
+<li><p>The red dots represent the distribution of particles</p></li>
+<li><p>The black line represent dead reckoning tracjectory</p></li>
+<li><p>The blue x is the observed and estimated landmarks</p></li>
+<li><p>The black x is the true landmark</p></li>
+</ul>
+<p>I.e. Each particle maintains a deterministic pose and n-EKFs for each
+landmark and update it with each measurement.</p>
+</section>
+<section id="algorithm-walk-through">
+<h2>Algorithm walk through<a class="headerlink" href="#algorithm-walk-through" title="Permalink to this headline"></a></h2>
+<p>The particles are initially drawn from a uniform distribution the
+represent the initial uncertainty. At each time step we do:</p>
+<ul class="simple">
+<li><p>Predict the pose for each particle by using <span class="math notranslate nohighlight">\(u\)</span> and the motion
+model (the landmarks are not updated).</p></li>
+<li><p>Update the particles with observations <span class="math notranslate nohighlight">\(z\)</span>, where the weights
+are adjusted based on how likely the particle to have the correct
+pose given the sensor measurement</p></li>
+<li><p>Resampling such that the particles with the largest weights survive
+and the unlikely ones with the lowest weights die out.</p></li>
+</ul>
+</section>
+<section id="predict">
+<h2>1- Predict<a class="headerlink" href="#predict" title="Permalink to this headline"></a></h2>
+<p>The following equations and code snippets we can see how the particles
+distribution evolves in case we provide only the control <span class="math notranslate nohighlight">\((v,w)\)</span>,
+which are the linear and angular velocity repsectively.</p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} F= \begin{bmatrix} 1 &amp; 0 &amp; 0 \\ 0 &amp; 1 &amp; 0 \\ 0 &amp; 0 &amp; 1 \end{bmatrix} \end{equation*}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} B= \begin{bmatrix} \Delta t cos(\theta) &amp; 0\\ \Delta t sin(\theta) &amp; 0\\ 0 &amp; \Delta t \end{bmatrix} \end{equation*}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} X = FX + BU \end{equation*}\)</span></p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} \begin{bmatrix} x_{t+1} \\ y_{t+1} \\ \theta_{t+1} \end{bmatrix}= \begin{bmatrix} 1 &amp; 0 &amp; 0 \\ 0 &amp; 1 &amp; 0 \\ 0 &amp; 0 &amp; 1 \end{bmatrix}\begin{bmatrix} x_{t} \\ y_{t} \\ \theta_{t} \end{bmatrix}+ \begin{bmatrix} \Delta t cos(\theta) &amp; 0\\ \Delta t sin(\theta) &amp; 0\\ 0 &amp; \Delta t \end{bmatrix} \begin{bmatrix} v_{t} + \sigma_v\\ w_{t} + \sigma_w\\ \end{bmatrix} \end{equation*}\)</span></p>
+<p>The following snippets playback the recorded trajectory of each
+particle.</p>
+<p>To get the insight of the motion model change the value of <span class="math notranslate nohighlight">\(R\)</span> and
+re-run the cells again. As R is the parameters that indicates how much
+we trust that the robot executed the motion commands.</p>
+<p>It is interesting to notice also that only motion will increase the
+uncertainty in the system as the particles start to spread out more. If
+observations are included the uncertainty will decrease and particles
+will converge to the correct estimate.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># CODE SNIPPET #</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="c1"># Fast SLAM covariance</span>
+<span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)])</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">20.0</span><span class="p">)])</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="c1">#  Simulation parameter</span>
+<span class="n">Qsim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)])</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">Rsim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)])</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">OFFSET_YAWRATE_NOISE</span> <span class="o">=</span> <span class="mf">0.01</span>
+
+<span class="n">DT</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># time tick [s]</span>
+<span class="n">SIM_TIME</span> <span class="o">=</span> <span class="mf">50.0</span>  <span class="c1"># simulation time [s]</span>
+<span class="n">MAX_RANGE</span> <span class="o">=</span> <span class="mf">20.0</span>  <span class="c1"># maximum observation range</span>
+<span class="n">M_DIST_TH</span> <span class="o">=</span> <span class="mf">2.0</span>  <span class="c1"># Threshold of Mahalanobis distance for data association.</span>
+<span class="n">STATE_SIZE</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># State size [x,y,yaw]</span>
+<span class="n">LM_SIZE</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># LM srate size [x,y]</span>
+<span class="n">N_PARTICLE</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># number of particle</span>
+<span class="n">NTH</span> <span class="o">=</span> <span class="n">N_PARTICLE</span> <span class="o">/</span> <span class="mf">1.5</span>  <span class="c1"># Number of particle for re-sampling</span>
+
+<span class="k">class</span> <span class="nc">Particle</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N_LM</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">N_PARTICLE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="c1"># landmark x-y positions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N_LM</span><span class="p">,</span> <span class="n">LM_SIZE</span><span class="p">))</span>
+        <span class="c1"># landmark position covariance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lmP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N_LM</span> <span class="o">*</span> <span class="n">LM_SIZE</span><span class="p">,</span> <span class="n">LM_SIZE</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">motion_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span>
+
+    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">DT</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span> <span class="mi">0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="n">DT</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span> <span class="mi">0</span><span class="p">],</span>
+                  <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">DT</span><span class="p">]])</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">F</span> <span class="o">@</span> <span class="n">x</span> <span class="o">+</span> <span class="n">B</span> <span class="o">@</span> <span class="n">u</span>
+
+    <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">pi_2_pi</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">x</span>
+
+<span class="k">def</span> <span class="nf">predict_particles</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_PARTICLE</span><span class="p">):</span>
+        <span class="n">px</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">STATE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">px</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">x</span>
+        <span class="n">px</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">y</span>
+        <span class="n">px</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">yaw</span>
+        <span class="n">ud</span> <span class="o">=</span> <span class="n">u</span> <span class="o">+</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">@</span> <span class="n">R</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># add noise</span>
+        <span class="n">px</span> <span class="o">=</span> <span class="n">motion_model</span><span class="p">(</span><span class="n">px</span><span class="p">,</span> <span class="n">ud</span><span class="p">)</span>
+        <span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">px</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">px</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">yaw</span> <span class="o">=</span> <span class="n">px</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">particles</span>
+
+<span class="k">def</span> <span class="nf">pi_2_pi</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">angle</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
+
+<span class="c1"># END OF SNIPPET</span>
+
+<span class="n">N_LM</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">particles</span> <span class="o">=</span> <span class="p">[</span><span class="n">Particle</span><span class="p">(</span><span class="n">N_LM</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_PARTICLE</span><span class="p">)]</span>
+<span class="n">time</span><span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">v</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># [m/s]</span>
+<span class="n">yawrate</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># [rad/s]</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">v</span><span class="p">,</span> <span class="n">yawrate</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">history</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">while</span> <span class="n">SIM_TIME</span> <span class="o">&gt;=</span> <span class="n">time</span><span class="p">:</span>
+    <span class="n">time</span> <span class="o">+=</span> <span class="n">DT</span>
+    <span class="n">particles</span> <span class="o">=</span> <span class="n">predict_particles</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+    <span class="n">history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">particles</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># from IPython.html.widgets import *</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="c1"># playback the recorded motion of the particles</span>
+<span class="k">def</span> <span class="nf">plot_particles</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="p">[</span><span class="n">t</span><span class="p">])):</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">history</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">history</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figtext</span><span class="p">(</span><span class="mf">0.15</span><span class="p">,</span><span class="mf">0.82</span><span class="p">,</span><span class="s1">&#39;t = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;.r&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">25</span><span class="p">])</span>
+
+<span class="n">interact</span><span class="p">(</span><span class="n">plot_particles</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">));</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>interactive(children=(IntSlider(value=0, description=&#39;t&#39;, max=499), Output()), _dom_classes=(&#39;widget-interact&#39;…
+</pre></div>
+</div>
+</section>
+<section id="update">
+<h2>2- Update<a class="headerlink" href="#update" title="Permalink to this headline"></a></h2>
+<p>For the update step it is useful to observe a single particle and the
+effect of getting a new measurements on the weight of the particle.</p>
+<p>As mentioned earlier, each particle maintains <span class="math notranslate nohighlight">\(N\)</span> <span class="math notranslate nohighlight">\(2x2\)</span> EKFs
+to estimate the landmarks, which includes the EKF process described in
+the EKF notebook. The difference is the change in the weight of the
+particle according to how likely the measurement is.</p>
+<p>The weight is updated according to the following equation:</p>
+<p><span class="math notranslate nohighlight">\(\begin{equation*} w_i = |2\pi Q|^{\frac{-1}{2}} exp\{\frac{-1}{2}(z_t - \hat z_i)^T Q^{-1}(z_t-\hat z_i)\} \end{equation*}\)</span></p>
+<p>Where, <span class="math notranslate nohighlight">\(w_i\)</span> is the computed weight, <span class="math notranslate nohighlight">\(Q\)</span> is the measurement
+covariance, <span class="math notranslate nohighlight">\(z_t\)</span> is the actual measurment and <span class="math notranslate nohighlight">\(\hat z_i\)</span> is
+the predicted measurement of particle <span class="math notranslate nohighlight">\(i\)</span>.</p>
+<p>To experiment this, a single particle is initialized then passed an
+initial measurement, which results in a relatively average weight.
+However, setting the particle coordinate to a wrong value to simulate
+wrong estimation will result in a very low weight. The lower the weight
+the less likely that this particle will be drawn during resampling and
+probably will die out.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># CODE SNIPPET #</span>
+<span class="k">def</span> <span class="nf">observation</span><span class="p">(</span><span class="n">xTrue</span><span class="p">,</span> <span class="n">xd</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">RFID</span><span class="p">):</span>
+
+    <span class="c1"># calc true state</span>
+    <span class="n">xTrue</span> <span class="o">=</span> <span class="n">motion_model</span><span class="p">(</span><span class="n">xTrue</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+
+    <span class="c1"># add noise to range observation</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">RFID</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])):</span>
+
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">RFID</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">xTrue</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="n">RFID</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">xTrue</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">dy</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">angle</span> <span class="o">=</span> <span class="n">pi_2_pi</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span> <span class="o">-</span> <span class="n">xTrue</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">d</span> <span class="o">&lt;=</span> <span class="n">MAX_RANGE</span><span class="p">:</span>
+            <span class="n">dn</span> <span class="o">=</span> <span class="n">d</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">()</span> <span class="o">*</span> <span class="n">Qsim</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># add noise</span>
+            <span class="n">anglen</span> <span class="o">=</span> <span class="n">angle</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">()</span> <span class="o">*</span> <span class="n">Qsim</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># add noise</span>
+            <span class="n">zi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">dn</span><span class="p">,</span> <span class="n">pi_2_pi</span><span class="p">(</span><span class="n">anglen</span><span class="p">),</span> <span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">z</span><span class="p">,</span> <span class="n">zi</span><span class="p">))</span>
+
+    <span class="c1"># add noise to input</span>
+    <span class="n">ud1</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">()</span> <span class="o">*</span> <span class="n">Rsim</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">ud2</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">()</span> <span class="o">*</span> <span class="n">Rsim</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">OFFSET_YAWRATE_NOISE</span>
+    <span class="n">ud</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ud1</span><span class="p">,</span> <span class="n">ud2</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">xd</span> <span class="o">=</span> <span class="n">motion_model</span><span class="p">(</span><span class="n">xd</span><span class="p">,</span> <span class="n">ud</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">xTrue</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">xd</span><span class="p">,</span> <span class="n">ud</span>
+
+<span class="k">def</span> <span class="nf">update_with_observation</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">iz</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:])):</span>
+
+        <span class="n">lmid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">iz</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_PARTICLE</span><span class="p">):</span>
+            <span class="c1"># new landmark</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">particles</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span><span class="o">.</span><span class="n">lm</span><span class="p">[</span><span class="n">lmid</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="mf">0.01</span><span class="p">:</span>
+                <span class="n">particles</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span> <span class="o">=</span> <span class="n">add_new_lm</span><span class="p">(</span><span class="n">particles</span><span class="p">[</span><span class="n">ip</span><span class="p">],</span> <span class="n">z</span><span class="p">[:,</span> <span class="n">iz</span><span class="p">],</span> <span class="n">Q</span><span class="p">)</span>
+            <span class="c1"># known landmark</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="n">compute_weight</span><span class="p">(</span><span class="n">particles</span><span class="p">[</span><span class="n">ip</span><span class="p">],</span> <span class="n">z</span><span class="p">[:,</span> <span class="n">iz</span><span class="p">],</span> <span class="n">Q</span><span class="p">)</span>
+                <span class="n">particles</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span><span class="o">.</span><span class="n">w</span> <span class="o">*=</span> <span class="n">w</span>
+                <span class="n">particles</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span> <span class="o">=</span> <span class="n">update_landmark</span><span class="p">(</span><span class="n">particles</span><span class="p">[</span><span class="n">ip</span><span class="p">],</span> <span class="n">z</span><span class="p">[:,</span> <span class="n">iz</span><span class="p">],</span> <span class="n">Q</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">particles</span>
+
+<span class="k">def</span> <span class="nf">compute_weight</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">Q</span><span class="p">):</span>
+    <span class="n">lm_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">xf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">lm</span><span class="p">[</span><span class="n">lm_id</span><span class="p">,</span> <span class="p">:])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">Pf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">lmP</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">lm_id</span><span class="p">:</span><span class="mi">2</span> <span class="o">*</span> <span class="n">lm_id</span> <span class="o">+</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="n">zp</span><span class="p">,</span> <span class="n">Hv</span><span class="p">,</span> <span class="n">Hf</span><span class="p">,</span> <span class="n">Sf</span> <span class="o">=</span> <span class="n">compute_jacobians</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">xf</span><span class="p">,</span> <span class="n">Pf</span><span class="p">,</span> <span class="n">Q</span><span class="p">)</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">zp</span>
+    <span class="n">dx</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">pi_2_pi</span><span class="p">(</span><span class="n">dx</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">invS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">Sf</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;singuler&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mf">1.0</span>
+
+    <span class="n">num</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">dx</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">invS</span> <span class="o">@</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">den</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">Sf</span><span class="p">))</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">num</span> <span class="o">/</span> <span class="n">den</span>
+
+    <span class="k">return</span> <span class="n">w</span>
+
+<span class="k">def</span> <span class="nf">compute_jacobians</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">xf</span><span class="p">,</span> <span class="n">Pf</span><span class="p">,</span> <span class="n">Q</span><span class="p">):</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">xf</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">particle</span><span class="o">.</span><span class="n">x</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">xf</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">particle</span><span class="o">.</span><span class="n">y</span>
+    <span class="n">d2</span> <span class="o">=</span> <span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">dy</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">d2</span><span class="p">)</span>
+
+    <span class="n">zp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">d</span><span class="p">,</span> <span class="n">pi_2_pi</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span> <span class="o">-</span> <span class="n">particle</span><span class="o">.</span><span class="n">yaw</span><span class="p">)])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">Hv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="n">dx</span> <span class="o">/</span> <span class="n">d</span><span class="p">,</span> <span class="o">-</span><span class="n">dy</span> <span class="o">/</span> <span class="n">d</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+                   <span class="p">[</span><span class="n">dy</span> <span class="o">/</span> <span class="n">d2</span><span class="p">,</span> <span class="o">-</span><span class="n">dx</span> <span class="o">/</span> <span class="n">d2</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">]])</span>
+
+    <span class="n">Hf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">dx</span> <span class="o">/</span> <span class="n">d</span><span class="p">,</span> <span class="n">dy</span> <span class="o">/</span> <span class="n">d</span><span class="p">],</span>
+                   <span class="p">[</span><span class="o">-</span><span class="n">dy</span> <span class="o">/</span> <span class="n">d2</span><span class="p">,</span> <span class="n">dx</span> <span class="o">/</span> <span class="n">d2</span><span class="p">]])</span>
+
+    <span class="n">Sf</span> <span class="o">=</span> <span class="n">Hf</span> <span class="o">@</span> <span class="n">Pf</span> <span class="o">@</span> <span class="n">Hf</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="n">Q</span>
+
+    <span class="k">return</span> <span class="n">zp</span><span class="p">,</span> <span class="n">Hv</span><span class="p">,</span> <span class="n">Hf</span><span class="p">,</span> <span class="n">Sf</span>
+
+<span class="k">def</span> <span class="nf">add_new_lm</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">Q</span><span class="p">):</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">lm_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">pi_2_pi</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">yaw</span> <span class="o">+</span> <span class="n">b</span><span class="p">))</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">pi_2_pi</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">yaw</span> <span class="o">+</span> <span class="n">b</span><span class="p">))</span>
+
+    <span class="n">particle</span><span class="o">.</span><span class="n">lm</span><span class="p">[</span><span class="n">lm_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">r</span> <span class="o">*</span> <span class="n">c</span>
+    <span class="n">particle</span><span class="o">.</span><span class="n">lm</span><span class="p">[</span><span class="n">lm_id</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">r</span> <span class="o">*</span> <span class="n">s</span>
+
+    <span class="c1"># covariance</span>
+    <span class="n">Gz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">c</span><span class="p">,</span> <span class="o">-</span><span class="n">r</span> <span class="o">*</span> <span class="n">s</span><span class="p">],</span>
+                   <span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">r</span> <span class="o">*</span> <span class="n">c</span><span class="p">]])</span>
+
+    <span class="n">particle</span><span class="o">.</span><span class="n">lmP</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">lm_id</span><span class="p">:</span><span class="mi">2</span> <span class="o">*</span> <span class="n">lm_id</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">Gz</span> <span class="o">@</span> <span class="n">Q</span> <span class="o">@</span> <span class="n">Gz</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">return</span> <span class="n">particle</span>
+
+<span class="k">def</span> <span class="nf">update_KF_with_cholesky</span><span class="p">(</span><span class="n">xf</span><span class="p">,</span> <span class="n">Pf</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">Hf</span><span class="p">):</span>
+    <span class="n">PHt</span> <span class="o">=</span> <span class="n">Pf</span> <span class="o">@</span> <span class="n">Hf</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">Hf</span> <span class="o">@</span> <span class="n">PHt</span> <span class="o">+</span> <span class="n">Q</span>
+
+    <span class="n">S</span> <span class="o">=</span> <span class="p">(</span><span class="n">S</span> <span class="o">+</span> <span class="n">S</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span>
+    <span class="n">SChol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">S</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">SCholInv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">SChol</span><span class="p">)</span>
+    <span class="n">W1</span> <span class="o">=</span> <span class="n">PHt</span> <span class="o">@</span> <span class="n">SCholInv</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="n">W1</span> <span class="o">@</span> <span class="n">SCholInv</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">xf</span> <span class="o">+</span> <span class="n">W</span> <span class="o">@</span> <span class="n">v</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">Pf</span> <span class="o">-</span> <span class="n">W1</span> <span class="o">@</span> <span class="n">W1</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">P</span>
+
+<span class="k">def</span> <span class="nf">update_landmark</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">Q</span><span class="p">):</span>
+
+    <span class="n">lm_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">xf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">lm</span><span class="p">[</span><span class="n">lm_id</span><span class="p">,</span> <span class="p">:])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">Pf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">lmP</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">lm_id</span><span class="p">:</span><span class="mi">2</span> <span class="o">*</span> <span class="n">lm_id</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="p">:])</span>
+
+    <span class="n">zp</span><span class="p">,</span> <span class="n">Hv</span><span class="p">,</span> <span class="n">Hf</span><span class="p">,</span> <span class="n">Sf</span> <span class="o">=</span> <span class="n">compute_jacobians</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">xf</span><span class="p">,</span> <span class="n">Pf</span><span class="p">,</span> <span class="n">Q</span><span class="p">)</span>
+
+    <span class="n">dz</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">zp</span>
+    <span class="n">dz</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">pi_2_pi</span><span class="p">(</span><span class="n">dz</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">xf</span><span class="p">,</span> <span class="n">Pf</span> <span class="o">=</span> <span class="n">update_KF_with_cholesky</span><span class="p">(</span><span class="n">xf</span><span class="p">,</span> <span class="n">Pf</span><span class="p">,</span> <span class="n">dz</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">Hf</span><span class="p">)</span>
+
+    <span class="n">particle</span><span class="o">.</span><span class="n">lm</span><span class="p">[</span><span class="n">lm_id</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">xf</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">particle</span><span class="o">.</span><span class="n">lmP</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">lm_id</span><span class="p">:</span><span class="mi">2</span> <span class="o">*</span> <span class="n">lm_id</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">Pf</span>
+
+    <span class="k">return</span> <span class="n">particle</span>
+
+<span class="c1"># END OF CODE SNIPPET #</span>
+
+
+
+<span class="c1"># Setting up the landmarks</span>
+<span class="n">RFID</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">10.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">],</span>
+                <span class="p">[</span><span class="mf">15.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">]])</span>
+<span class="n">N_LM</span> <span class="o">=</span> <span class="n">RFID</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Initialize 1 particle</span>
+<span class="n">N_PARTICLE</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">particles</span> <span class="o">=</span> <span class="p">[</span><span class="n">Particle</span><span class="p">(</span><span class="n">N_LM</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_PARTICLE</span><span class="p">)]</span>
+
+<span class="n">xTrue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">STATE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">xDR</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">STATE_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;initial weight&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+
+<span class="n">xTrue</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ud</span> <span class="o">=</span> <span class="n">observation</span><span class="p">(</span><span class="n">xTrue</span><span class="p">,</span> <span class="n">xDR</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">RFID</span><span class="p">)</span>
+<span class="c1"># Initialize landmarks</span>
+<span class="n">particles</span> <span class="o">=</span> <span class="n">update_with_observation</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;weight after landmark intialization&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+<span class="n">particles</span> <span class="o">=</span> <span class="n">update_with_observation</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;weight after update &quot;</span><span class="p">,</span> <span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+
+<span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10</span>
+<span class="n">particles</span> <span class="o">=</span> <span class="n">update_with_observation</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;weight after wrong prediction&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">initial</span> <span class="n">weight</span> <span class="mf">1.0</span>
+<span class="n">weight</span> <span class="n">after</span> <span class="n">landmark</span> <span class="n">intialization</span> <span class="mf">1.0</span>
+<span class="n">weight</span> <span class="n">after</span> <span class="n">update</span>  <span class="mf">0.023098460073039763</span>
+<span class="n">weight</span> <span class="n">after</span> <span class="n">wrong</span> <span class="n">prediction</span> <span class="mf">7.951154575772496e-07</span>
+</pre></div>
+</div>
+</section>
+<section id="resampling">
+<h2>3- Resampling<a class="headerlink" href="#resampling" title="Permalink to this headline"></a></h2>
+<p>In the reseampling steps a new set of particles are chosen from the old
+set. This is done according to the weight of each particle.</p>
+<p>The figure shows 100 particles distributed uniformly between [-0.5, 0.5]
+with the weights of each particle distributed according to a Gaussian
+funciton.</p>
+<p>The resampling picks</p>
+<p><span class="math notranslate nohighlight">\(i \in 1,...,N\)</span> particles with probability to pick particle with
+index <span class="math notranslate nohighlight">\(i ∝ \omega_i\)</span>, where <span class="math notranslate nohighlight">\(\omega_i\)</span> is the weight of that
+particle</p>
+<p>To get the intuition of the resampling step we will look at a set of
+particles which are initialized with a given x location and weight.
+After the resampling the particles are more concetrated in the location
+where they had the highest weights. This is also indicated by the
+indices</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># CODE SNIPPET #</span>
+<span class="k">def</span> <span class="nf">normalize_weight</span><span class="p">(</span><span class="n">particles</span><span class="p">):</span>
+
+    <span class="n">sumw</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">w</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">particles</span><span class="p">])</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_PARTICLE</span><span class="p">):</span>
+            <span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">w</span> <span class="o">/=</span> <span class="n">sumw</span>
+    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_PARTICLE</span><span class="p">):</span>
+            <span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">N_PARTICLE</span>
+
+        <span class="k">return</span> <span class="n">particles</span>
+
+    <span class="k">return</span> <span class="n">particles</span>
+
+
+<span class="k">def</span> <span class="nf">resampling</span><span class="p">(</span><span class="n">particles</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    low variance re-sampling</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">particles</span> <span class="o">=</span> <span class="n">normalize_weight</span><span class="p">(</span><span class="n">particles</span><span class="p">)</span>
+
+    <span class="n">pw</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_PARTICLE</span><span class="p">):</span>
+        <span class="n">pw</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+
+    <span class="n">pw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pw</span><span class="p">)</span>
+
+    <span class="n">Neff</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">pw</span> <span class="o">@</span> <span class="n">pw</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>  <span class="c1"># Effective particle number</span>
+    <span class="c1"># print(Neff)</span>
+
+    <span class="k">if</span> <span class="n">Neff</span> <span class="o">&lt;</span> <span class="n">NTH</span><span class="p">:</span>  <span class="c1"># resampling</span>
+        <span class="n">wcum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">pw</span><span class="p">)</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">pw</span> <span class="o">*</span> <span class="mf">0.0</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">N_PARTICLE</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">N_PARTICLE</span>
+        <span class="n">resampleid</span> <span class="o">=</span> <span class="n">base</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">N_PARTICLE</span>
+
+        <span class="n">inds</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_PARTICLE</span><span class="p">):</span>
+            <span class="k">while</span> <span class="p">((</span><span class="n">ind</span> <span class="o">&lt;</span> <span class="n">wcum</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">resampleid</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">wcum</span><span class="p">[</span><span class="n">ind</span><span class="p">])):</span>
+                <span class="n">ind</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+
+        <span class="n">tparticles</span> <span class="o">=</span> <span class="n">particles</span><span class="p">[:]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inds</span><span class="p">)):</span>
+            <span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">tparticles</span><span class="p">[</span><span class="n">inds</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">.</span><span class="n">x</span>
+            <span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">tparticles</span><span class="p">[</span><span class="n">inds</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">.</span><span class="n">y</span>
+            <span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">yaw</span> <span class="o">=</span> <span class="n">tparticles</span><span class="p">[</span><span class="n">inds</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">.</span><span class="n">yaw</span>
+            <span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">N_PARTICLE</span>
+
+    <span class="k">return</span> <span class="n">particles</span><span class="p">,</span> <span class="n">inds</span>
+<span class="c1"># END OF SNIPPET #</span>
+
+
+
+<span class="k">def</span> <span class="nf">gaussian</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">mu</span><span class="p">,</span> <span class="mf">2.</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">sig</span><span class="p">,</span> <span class="mf">2.</span><span class="p">)))</span>
+<span class="n">N_PARTICLE</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">particles</span> <span class="o">=</span> <span class="p">[</span><span class="n">Particle</span><span class="p">(</span><span class="n">N_LM</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_PARTICLE</span><span class="p">)]</span>
+<span class="n">x_pos</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">w</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_PARTICLE</span><span class="p">):</span>
+    <span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="n">N_PARTICLE</span><span class="p">)[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">x_pos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">gaussian</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">N_PARTICLE</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">N_PARTICLE</span><span class="o">/</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">w</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+
+
+<span class="c1"># Normalize weights</span>
+<span class="n">sw</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_PARTICLE</span><span class="p">):</span>
+    <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/=</span> <span class="n">sw</span>
+
+<span class="n">particles</span><span class="p">,</span> <span class="n">new_indices</span> <span class="o">=</span> <span class="n">resampling</span><span class="p">(</span><span class="n">particles</span><span class="p">)</span>
+<span class="n">x_pos2</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_PARTICLE</span><span class="p">):</span>
+    <span class="n">x_pos2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">particles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+
+<span class="c1"># Plot results</span>
+<span class="n">fig</span><span class="p">,</span> <span class="p">((</span><span class="n">ax1</span><span class="p">,</span><span class="n">ax2</span><span class="p">,</span><span class="n">ax3</span><span class="p">))</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_pos</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">N_PARTICLE</span><span class="p">,</span><span class="mi">1</span><span class="p">)),</span> <span class="s1">&#39;.r&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Particles before resampling&quot;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">axis</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Weights distribution&quot;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_pos2</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">N_PARTICLE</span><span class="p">,</span><span class="mi">1</span><span class="p">)),</span> <span class="s1">&#39;.r&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Particles after resampling&quot;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">axis</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">hspace</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">new_indices</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Particles indices to be resampled&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;# of time index is used&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../../_images/FastSLAM1_12_0.png" src="../../../_images/FastSLAM1_12_0.png" />
+<img alt="../../../_images/FastSLAM1_12_1.png" src="../../../_images/FastSLAM1_12_1.png" />
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="http://www.probabilistic-robotics.org/">PROBABILISTIC ROBOTICS</a></p></li>
+<li><p><a class="reference external" href="http://ais.informatik.uni-freiburg.de/teaching/ws12/mapping/pdf/slam10-fastslam.pdf">FastSLAM Lecture</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../ekf_slam/ekf_slam.html" class="btn btn-neutral float-left" title="EKF SLAM" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../FastSLAM2/FastSLAM2.html" class="btn btn-neutral float-right" title="FastSLAM 2.0" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2021, Atsushi Sakai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
