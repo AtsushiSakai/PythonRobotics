@@ -12,6 +12,7 @@ jobs:
       - run:
           name: doc_build
           command: |
+            python --version
             python -m venv venv
             . venv/bin/activate
             pip install -r requirements/requirements.txt
