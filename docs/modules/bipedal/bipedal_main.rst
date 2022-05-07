@@ -3,5 +3,9 @@
 Bipedal
 =================
 
-.. include:: bipedal_planner/bipedal_planner.rst
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents
+
+   bipedal_planner/bipedal_planner
 

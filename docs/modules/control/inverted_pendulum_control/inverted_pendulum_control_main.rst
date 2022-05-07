@@ -9,7 +9,7 @@ The objective of the control system is to balance the inverted pendulum by apply
 Modeling
 ~~~~~~~~~~~~
 
-.. image:: inverted_pendulum_control/inverted-pendulum.png
+.. image:: inverted-pendulum.png
     :align: center
 
 - :math:`M`: mass of the cart

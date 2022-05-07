@@ -3,7 +3,10 @@
 Appendix
 ==============
 
-.. include:: Kalmanfilter_basics.rst
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents
 
-.. include:: Kalmanfilter_basics_2.rst
+   Kalmanfilter_basics
+   Kalmanfilter_basics_2
 
