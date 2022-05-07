@@ -33,5 +33,5 @@ The covariance matrix :math:`\Xi` from particle information is calculated by the
 References:
 ~~~~~~~~~~~
 
--  `PROBABILISTIC ROBOTICS`_
+- `_PROBABILISTIC ROBOTICS: <http://www.probabilistic-robotics.org>`_
 - `Improving the particle filter in high dimensions using conjugate artificial process noise <https://arxiv.org/pdf/1801.07000.pdf>`_

@@ -2,7 +2,7 @@
 Extended Kalman Filter Localization
 -----------------------------------
 
-.. image:: extended_kalman_filter_localization_files/extended_kalman_filter_localization_1_0.png
+.. image:: extended_kalman_filter_localization_1_0.png
    :width: 600px
 
 
