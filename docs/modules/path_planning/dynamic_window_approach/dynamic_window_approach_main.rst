@@ -1,3 +1,5 @@
+.. _dynamic_window_approach:
+
 Dynamic Window Approach
 -----------------------
 

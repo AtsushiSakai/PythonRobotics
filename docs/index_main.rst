@@ -31,7 +31,7 @@ See this paper for more details:
 
 .. toctree::
    :maxdepth: 2
-   :caption: Guide
+   :caption: Contents
 
    getting_started
    modules/introduction

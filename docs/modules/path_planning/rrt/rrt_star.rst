@@ -10,7 +10,7 @@ Black circles are obstacles, green line is a searched tree, red crosses are star
 Simulation
 ^^^^^^^^^^
 
-.. image:: rrt/rrt_star/rrt_star_1_0.png
+.. image:: rrt_star/rrt_star_1_0.png
    :width: 600px
 
 
