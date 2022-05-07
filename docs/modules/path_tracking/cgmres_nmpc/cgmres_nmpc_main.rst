@@ -2,16 +2,16 @@
 Nonlinear Model Predictive Control with C-GMRES
 -----------------------------------------------
 
-.. image:: cgmres_nmpc/cgmres_nmpc_1_0.png
+.. image:: cgmres_nmpc_1_0.png
    :width: 600px
 
-.. image:: cgmres_nmpc/cgmres_nmpc_2_0.png
+.. image:: cgmres_nmpc_2_0.png
    :width: 600px
 
-.. image:: cgmres_nmpc/cgmres_nmpc_3_0.png
+.. image:: cgmres_nmpc_3_0.png
    :width: 600px
 
-.. image:: cgmres_nmpc/cgmres_nmpc_4_0.png
+.. image:: cgmres_nmpc_4_0.png
    :width: 600px
 
 .. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/cgmres_nmpc/animation.gif
