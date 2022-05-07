@@ -11,7 +11,7 @@ Simulation
 
 This is a feature based SLAM example using FastSLAM 1.0.
 
-.. image:: FastSLAM1/FastSLAM1_1_0.png
+.. image:: FastSLAM1_1_0.png
    :width: 600px
 
 The blue line is ground truth, the black line is dead reckoning, the red
@@ -46,8 +46,8 @@ an array of landmark locations
 I.e. Each particle maintains a deterministic pose and n-EKFs for each
 landmark and update it with each measurement.
 
-Algorithm walkthrough
-~~~~~~~~~~~~~~~~~~~~~
+Algorithm walk through
+~~~~~~~~~~~~~~~~~~~~~~~
 
 The particles are initially drawn from a uniform distribution the
 represent the initial uncertainty. At each time step we do:
@@ -75,7 +75,7 @@ which are the linear and angular velocity repsectively.
 
 :math:`\begin{equation*} \begin{bmatrix} x_{t+1} \\ y_{t+1} \\ \theta_{t+1} \end{bmatrix}= \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}\begin{bmatrix} x_{t} \\ y_{t} \\ \theta_{t} \end{bmatrix}+ \begin{bmatrix} \Delta t cos(\theta) & 0\\ \Delta t sin(\theta) & 0\\ 0 & \Delta t \end{bmatrix} \begin{bmatrix} v_{t} + \sigma_v\\ w_{t} + \sigma_w\\ \end{bmatrix} \end{equation*}`
 
-The following snippets playsback the recorded trajectory of each
+The following snippets playback the recorded trajectory of each
 particle.
 
 To get the insight of the motion model change the value of :math:`R` and
@@ -527,8 +527,8 @@ indices
 
 
 
-.. image:: FastSLAM1/FastSLAM1_12_0.png
-.. image:: FastSLAM1/FastSLAM1_12_1.png
+.. image:: FastSLAM1_12_0.png
+.. image:: FastSLAM1_12_1.png
 
 
 References

@@ -70,7 +70,7 @@ Using Bayes’ rule, we can write this probability as
 
 since :math:`p(\mathcal{Z})` is a constant (albeit, an unknown constant)
 and we assume that :math:`p(\mathbf{p}_1, \ldots, \mathbf{p}_N)` is
-uniformly distributed `PROBABILISTIC ROBOTICS`_. Therefore, we
+uniformly distributed. Therefore, we
 can use Eq. :eq:`infomat` and and Eq. :eq:`bayes` to simplify the Graph SLAM
 optimization as follows:
 

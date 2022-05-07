@@ -13,9 +13,9 @@ The black stars are landmarks for graph edge generation.
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/GraphBasedSLAM/animation.gif
 
-.. include:: graph_slam/graphSLAM_doc.rst
-.. include:: graph_slam/graphSLAM_formulation.rst
-.. include:: graph_slam/graphSLAM_SE2_example.rst
+.. include:: graphSLAM_doc.rst
+.. include:: graphSLAM_formulation.rst
+.. include:: graphSLAM_SE2_example.rst
 
 References:
 ~~~~~~~~~~~

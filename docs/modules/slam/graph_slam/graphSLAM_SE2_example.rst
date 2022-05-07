@@ -44,7 +44,7 @@ The Dataset
 
 
 
-.. image:: graph_slam/graphSLAM_SE2_example_files/graphSLAM_SE2_example_4_0.png
+.. image:: graphSLAM_SE2_example_files/graphSLAM_SE2_example_4_0.png
 
 
 Each edge in this dataset is a constraint that compares the measured
@@ -122,7 +122,7 @@ dataset and plot them.
 
 
 
-.. image:: graph_slam/graphSLAM_SE2_example_files/graphSLAM_SE2_example_8_0.png
+.. image:: graphSLAM_SE2_example_files/graphSLAM_SE2_example_8_0.png
 
 
 .. code:: ipython3
@@ -131,7 +131,7 @@ dataset and plot them.
 
 
 
-.. image:: graph_slam/graphSLAM_SE2_example_files/graphSLAM_SE2_example_9_0.png
+.. image:: graphSLAM_SE2_example_files/graphSLAM_SE2_example_9_0.png
 
 
 Optimization
@@ -165,7 +165,7 @@ different data sources into a single optimization problem.
             6             215.8405          -0.000000
 
 
-.. figure:: graph_slam/graphSLAM_SE2_example_files/Graph_SLAM_optimization.gif
+.. figure:: graphSLAM_SE2_example_files/Graph_SLAM_optimization.gif
 
 .. code:: ipython3
 
@@ -173,7 +173,7 @@ different data sources into a single optimization problem.
 
 
 
-.. image:: graph_slam/graphSLAM_SE2_example_files/graphSLAM_SE2_example_13_0.png
+.. image:: graphSLAM_SE2_example_files/graphSLAM_SE2_example_13_0.png
 
 
 .. code:: ipython3
@@ -195,7 +195,7 @@ different data sources into a single optimization problem.
 
 
 
-.. image:: graph_slam/graphSLAM_SE2_example_files/graphSLAM_SE2_example_15_0.png
+.. image:: graphSLAM_SE2_example_files/graphSLAM_SE2_example_15_0.png
 
 
 .. code:: ipython3
@@ -204,5 +204,5 @@ different data sources into a single optimization problem.
 
 
 
-.. image:: graph_slam/graphSLAM_SE2_example_files/graphSLAM_SE2_example_16_0.png
+.. image:: graphSLAM_SE2_example_files/graphSLAM_SE2_example_16_0.png
 
