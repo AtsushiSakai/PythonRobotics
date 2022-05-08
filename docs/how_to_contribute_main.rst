@@ -147,7 +147,7 @@ Sponsors
 1. `JetBrains`_ : They are providing a free license of their IDEs for this OSS development.
 
 
-.. _`Python Robotics Docs`: https://pythonrobotics.readthedocs.io/en/latest/
+.. _`Python Robotics Docs`: https://atsushisakai.github.io/PythonRobotics
 .. _`bug labeled issues`: https://github.com/AtsushiSakai/PythonRobotics/issues?q=is%3Aissue+is%3Aopen+label%3Abug
 .. _`tests dir`: https://github.com/AtsushiSakai/PythonRobotics/tree/master/tests
 .. _`test_a_star.py`: https://github.com/AtsushiSakai/PythonRobotics/blob/master/tests/test_a_star.py

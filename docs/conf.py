@@ -95,6 +95,17 @@ html_theme_options = {
     'display_version': False,
 }
 
+# replace "view page source" with "edit on github" in Read The Docs theme
+#  * https://github.com/readthedocs/sphinx_rtd_theme/issues/529
+html_context = {
+    'display_github': True,
+    'github_user': 'AtsushiSakai',
+    'github_repo': 'PythonRobotics',
+    'github_version': 'master',
+    "conf_py_path": "/docs/",
+    "source_suffix": source_suffix,
+}
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
