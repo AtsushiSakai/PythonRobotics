@@ -1,7 +1,7 @@
 <!-- 
 Thanks for contributing a pull request! 
 Please check this document before submitting:
-- [How to contribute](https://pythonrobotics.readthedocs.io/en/latest/how_to_contribute.html#adding-a-new-algorithm-example)
+- [How to contribute](https://atsushisakai.github.io/PythonRobotics/how_to_contribute.html#adding-a-new-algorithm-example)
 
 Note that this is my hobby project; I appreciate your
 patience during the review process.
