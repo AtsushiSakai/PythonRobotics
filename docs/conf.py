@@ -102,7 +102,7 @@ html_context = {
     'github_user': 'AtsushiSakai',
     'github_repo': 'PythonRobotics',
     'github_version': 'master',
-    "conf_py_path": "/doc/",
+    "conf_py_path": "/docs/",
     "source_suffix": source_suffix,
 }
 
