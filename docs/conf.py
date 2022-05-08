@@ -102,6 +102,8 @@ html_context = {
     'github_user': 'AtsushiSakai',
     'github_repo': 'PythonRobotics',
     'github_version': 'master',
+    "conf_py_path": "/doc/",
+    "source_suffix": source_suffix,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
