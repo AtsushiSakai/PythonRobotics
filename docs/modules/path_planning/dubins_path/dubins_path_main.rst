@@ -9,7 +9,7 @@ Dubins path
 ~~~~~~~~~~~~
 Dubins path is a analytical path planning algorithm for a simple car model.
 
-It can generates a shortest path between 2D poses (x, y, yaw) with maximum curvture comstraint and tangent(yaw angle) constraint.
+It can generates a shortest path between 2D poses (x, y, yaw) with maximum curvature constraint and tangent(yaw angle) constraint.
 
 The path consist of 3 segments of maximum curvature curves or a straight line segment.
 
