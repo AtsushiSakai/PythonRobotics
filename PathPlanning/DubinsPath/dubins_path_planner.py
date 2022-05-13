@@ -21,7 +21,7 @@ def plan_dubins_path(s_x, s_y, s_yaw,
                      curvature,
                      step_size=0.1):
     """
-    Path dubins path
+    Plan dubins path
 
     Parameters
     ----------
@@ -63,7 +63,7 @@ def plan_dubins_path(s_x, s_y, s_yaw,
     local_goal_y = le_xy[1]
     local_goal_yaw = g_yaw - s_yaw
 
-    lp_x, lp_y, lp_yaw, modes, lengths = dubins_path_planning_from_origin(
+    lp_x, lp_y, lp_yaw, modes, lengths = _dubins_path_planning_from_origin(
         local_goal_x, local_goal_y, local_goal_yaw, curvature, step_size)
 
     # Convert a local coordinate path to the global coordinate
@@ -87,48 +87,45 @@ def _LSL(alpha, beta, d):
     cb = math.cos(beta)
     c_ab = math.cos(alpha - beta)
 
-    tmp0 = d + sa - sb
-
     mode = ["L", "S", "L"]
-    p_squared = 2 + (d * d) - (2 * c_ab) + (2 * d * (sa - sb))
-    if p_squared < 0:
+    p_squared = 2 + d ** 2 - (2 * c_ab) + (2 * d * (sa - sb))
+    if p_squared < 0:  # invalid configuration
         return None, None, None, mode
-    tmp1 = math.atan2((cb - ca), tmp0)
-    t = _mod2pi(-alpha + tmp1)
-    p = math.sqrt(p_squared)
-    q = _mod2pi(beta - tmp1)
+    tmp = math.atan2((cb - ca), d + sa - sb)
+    d1 = _mod2pi(-alpha + tmp)
+    d2 = math.sqrt(p_squared)
+    d3 = _mod2pi(beta - tmp)
 
-    return t, p, q, mode
+    return d1, d2, d3, mode
 
 
-def right_straight_right(alpha, beta, d):
+def _RSR(alpha, beta, d):
     sa = math.sin(alpha)
     sb = math.sin(beta)
     ca = math.cos(alpha)
     cb = math.cos(beta)
     c_ab = math.cos(alpha - beta)
 
-    tmp0 = d - sa + sb
     mode = ["R", "S", "R"]
-    p_squared = 2 + (d * d) - (2 * c_ab) + (2 * d * (sb - sa))
+    p_squared = 2 + d ** 2 - (2 * c_ab) + (2 * d * (sb - sa))
     if p_squared < 0:
         return None, None, None, mode
-    tmp1 = math.atan2((ca - cb), tmp0)
-    t = angle_mod(alpha - tmp1, zero_2_2pi=True)
+    tmp = math.atan2((ca - cb), d - sa + sb)
+    t = _mod2pi(alpha - tmp)
     p = math.sqrt(p_squared)
-    q = _mod2pi(-beta + tmp1)
+    q = _mod2pi(-beta + tmp)
 
     return t, p, q, mode
 
 
-def left_straight_right(alpha, beta, d):
+def _LSR(alpha, beta, d):
     sa = math.sin(alpha)
     sb = math.sin(beta)
     ca = math.cos(alpha)
     cb = math.cos(beta)
     c_ab = math.cos(alpha - beta)
 
-    p_squared = -2 + (d * d) + (2 * c_ab) + (2 * d * (sa + sb))
+    p_squared = -2 + d ** 2 + (2 * c_ab) + (2 * d * (sa + sb))
     mode = ["L", "S", "R"]
     if p_squared < 0:
         return None, None, None, mode
@@ -140,7 +137,7 @@ def left_straight_right(alpha, beta, d):
     return t, p, q, mode
 
 
-def right_straight_left(alpha, beta, d):
+def _RSL(alpha, beta, d):
     sa = math.sin(alpha)
     sb = math.sin(beta)
     ca = math.cos(alpha)
@@ -159,7 +156,7 @@ def right_straight_left(alpha, beta, d):
     return t, p, q, mode
 
 
-def right_left_right(alpha, beta, d):
+def _RLR(alpha, beta, d):
     sa = math.sin(alpha)
     sb = math.sin(beta)
     ca = math.cos(alpha)
@@ -195,20 +192,20 @@ def _LRL(alpha, beta, d):
     return t, p, q, mode
 
 
-def dubins_path_planning_from_origin(end_x, end_y, end_yaw, curvature,
-                                     step_size):
+def _dubins_path_planning_from_origin(end_x, end_y, end_yaw, curvature,
+                                      step_size):
     dx = end_x
     dy = end_y
     D = math.hypot(dx, dy)
     d = D * curvature
 
     theta = _mod2pi(math.atan2(dy, dx))
-    alpha = _mod2pi(- theta)
+    alpha = _mod2pi(-theta)
     beta = _mod2pi(end_yaw - theta)
 
-    planning_funcs = [_LSL, right_straight_right,
-                      left_straight_right, right_straight_left,
-                      right_left_right, _LRL]
+    planning_funcs = [_LSL, _RSR,
+                      _LSR, _RSL,
+                      _RLR, _LRL]
 
     best_cost = float("inf")
     bt, bp, bq, best_mode = None, None, None, None
