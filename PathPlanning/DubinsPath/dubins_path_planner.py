@@ -20,7 +20,8 @@ show_animation = True
 def plan_dubins_path(s_x, s_y, s_yaw,
                      g_x, g_y, g_yaw,
                      curvature,
-                     step_size=0.1):
+                     step_size=0.1,
+                     planning_types=None):
     """
     Plan dubins path
 
@@ -42,6 +43,9 @@ def plan_dubins_path(s_x, s_y, s_yaw,
         curvature for curve [1/m]
     step_size : float (optional)
         step size between two path points [m]. Default is 0.1
+    planning_types : a list of string or None
+
+
 
     Returns
     -------
@@ -57,6 +61,11 @@ def plan_dubins_path(s_x, s_y, s_yaw,
         arrow_length list of the path segments.
 
     """
+    if planning_types is None:
+        planning_funcs = _PATH_TYPE_MAP.values()
+    else:
+        planning_funcs = [_PATH_TYPE_MAP[ptype] for ptype in planning_types]
+
     # calculate local goal x, y, yaw
     l_rot = create_2d_rotation_matrix(s_yaw)
     le_xy = np.stack([g_x - s_x, g_y - s_y]).T @ l_rot
@@ -65,7 +74,8 @@ def plan_dubins_path(s_x, s_y, s_yaw,
     local_goal_yaw = g_yaw - s_yaw
 
     lp_x, lp_y, lp_yaw, modes, lengths = _dubins_path_planning_from_origin(
-        local_goal_x, local_goal_y, local_goal_yaw, curvature, step_size)
+        local_goal_x, local_goal_y, local_goal_yaw, curvature, step_size,
+        planning_funcs)
 
     # Convert a local coordinate path to the global coordinate
     rot = create_2d_rotation_matrix(-s_yaw)
@@ -195,8 +205,18 @@ def _LRL(alpha, beta, d):
     return t, p, q, mode
 
 
+_PATH_TYPE_MAP = {
+    "LSL": _LSL,
+    "RSR": _RSR,
+    "LSR": _LSR,
+    "RSL": _RSL,
+    "RLR": _RLR,
+    "LRL": _LRL,
+}
+
+
 def _dubins_path_planning_from_origin(end_x, end_y, end_yaw,
-                                      curvature, step_size):
+                                      curvature, step_size, planning_funcs):
     dx = end_x
     dy = end_y
     d = math.hypot(dx, dy) * curvature
@@ -204,8 +224,6 @@ def _dubins_path_planning_from_origin(end_x, end_y, end_yaw,
     theta = _mod2pi(math.atan2(dy, dx))
     alpha = _mod2pi(-theta)
     beta = _mod2pi(end_yaw - theta)
-
-    planning_funcs = [_LSL, _RSR, _LSR, _RSL, _RLR, _LRL]
 
     best_cost = float("inf")
     bt, bp, bq, best_mode = None, None, None, None

@@ -6,12 +6,14 @@ import matplotlib.pyplot as plt
 
 
 def plot_arrow(x, y, yaw, arrow_length=1.0,
+               origin_point_plot_style="xr",
                head_width=0.1, fc="r", ec="k", **kwargs):
     """
     Plot an arrow or arrows based on 2D state (x, y, yaw)
 
     All optional settings of matplotlib.pyplot.arrow can be used.
-    - matplotlib.pyplot.arrow: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.arrow.html?highlight=arrow%20plot#matplotlib.pyplot.arrow
+    - matplotlib.pyplot.arrow:
+    https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.arrow.html
 
     Parameters
     ----------
@@ -23,11 +25,13 @@ def plot_arrow(x, y, yaw, arrow_length=1.0,
         a value or a list of arrow yaw angle (orientation).
     arrow_length : a float (optional)
         arrow length. default is 1.0
+    origin_point_plot_style : str (optional)
+        origin point plot style. If None, not plotting.
     head_width : a float (optional)
         arrow head width. default is 0.1
-    fc : string
+    fc : string (optional)
         face color
-    ec : string
+    ec : string (optional)
         edge color
     """
     if not isinstance(x, float):
@@ -41,4 +45,5 @@ def plot_arrow(x, y, yaw, arrow_length=1.0,
                   head_width=head_width,
                   fc=fc, ec=ec,
                   **kwargs)
-        plt.plot(x, y, "x"+fc)  # plot a cross on the arrow origin
+        if origin_point_plot_style is not None:
+            plt.plot(x, y, origin_point_plot_style)
