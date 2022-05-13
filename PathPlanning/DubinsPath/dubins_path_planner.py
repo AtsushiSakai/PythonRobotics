@@ -7,6 +7,7 @@ author Atsushi Sakai(@Atsushi_twi)
 """
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/")
 
 import math
@@ -53,7 +54,7 @@ def plan_dubins_path(s_x, s_y, s_yaw,
     modes: array
         mode list of the path
     lengths: array
-        length list of the path segments.
+        arrow_length list of the path segments.
 
     """
     # calculate local goal x, y, yaw
@@ -129,10 +130,11 @@ def _LSR(alpha, beta, d):
     mode = ["L", "S", "R"]
     if p_squared < 0:
         return None, None, None, mode
+
     p = math.sqrt(p_squared)
-    tmp2 = math.atan2((-ca - cb), (d + sa + sb)) - math.atan2(-2.0, p)
-    t = _mod2pi(-alpha + tmp2)
-    q = _mod2pi(-_mod2pi(beta) + tmp2)
+    tmp = math.atan2((-ca - cb), (d + sa + sb)) - math.atan2(-2.0, p)
+    t = _mod2pi(-alpha + tmp)
+    q = _mod2pi(-_mod2pi(beta) + tmp)
 
     return t, p, q, mode
 
@@ -144,14 +146,15 @@ def _RSL(alpha, beta, d):
     cb = math.cos(beta)
     c_ab = math.cos(alpha - beta)
 
-    p_squared = (d * d) - 2 + (2 * c_ab) - (2 * d * (sa + sb))
+    p_squared = d ** 2 - 2 + (2 * c_ab) - (2 * d * (sa + sb))
     mode = ["R", "S", "L"]
     if p_squared < 0:
         return None, None, None, mode
+
     p = math.sqrt(p_squared)
-    tmp2 = math.atan2((ca + cb), (d - sa - sb)) - math.atan2(2.0, p)
-    t = _mod2pi(alpha - tmp2)
-    q = _mod2pi(beta - tmp2)
+    tmp = math.atan2((ca + cb), (d - sa - sb)) - math.atan2(2.0, p)
+    t = _mod2pi(alpha - tmp)
+    q = _mod2pi(beta - tmp)
 
     return t, p, q, mode
 
@@ -164,11 +167,11 @@ def _RLR(alpha, beta, d):
     c_ab = math.cos(alpha - beta)
 
     mode = ["R", "L", "R"]
-    tmp_rlr = (6.0 - d * d + 2.0 * c_ab + 2.0 * d * (sa - sb)) / 8.0
-    if abs(tmp_rlr) > 1.0:
+    tmp = (6.0 - d ** 2 + 2.0 * c_ab + 2.0 * d * (sa - sb)) / 8.0
+    if abs(tmp) > 1.0:
         return None, None, None, mode
 
-    p = _mod2pi(2 * math.pi - math.acos(tmp_rlr))
+    p = _mod2pi(2 * math.pi - math.acos(tmp))
     t = _mod2pi(alpha - math.atan2(ca - cb, d - sa + sb) + _mod2pi(p / 2.0))
     q = _mod2pi(alpha - beta - t + _mod2pi(p))
     return t, p, q, mode
@@ -182,30 +185,27 @@ def _LRL(alpha, beta, d):
     c_ab = math.cos(alpha - beta)
 
     mode = ["L", "R", "L"]
-    tmp_lrl = (6.0 - d * d + 2.0 * c_ab + 2.0 * d * (- sa + sb)) / 8.0
-    if abs(tmp_lrl) > 1:
+    tmp = (6.0 - d ** 2 + 2.0 * c_ab + 2.0 * d * (- sa + sb)) / 8.0
+    if abs(tmp) > 1.0:
         return None, None, None, mode
-    p = _mod2pi(2 * math.pi - math.acos(tmp_lrl))
+    p = _mod2pi(2 * math.pi - math.acos(tmp))
     t = _mod2pi(-alpha - math.atan2(ca - cb, d + sa - sb) + p / 2.0)
     q = _mod2pi(_mod2pi(beta) - alpha - t + _mod2pi(p))
 
     return t, p, q, mode
 
 
-def _dubins_path_planning_from_origin(end_x, end_y, end_yaw, curvature,
-                                      step_size):
+def _dubins_path_planning_from_origin(end_x, end_y, end_yaw,
+                                      curvature, step_size):
     dx = end_x
     dy = end_y
-    D = math.hypot(dx, dy)
-    d = D * curvature
+    d = math.hypot(dx, dy) * curvature
 
     theta = _mod2pi(math.atan2(dy, dx))
     alpha = _mod2pi(-theta)
     beta = _mod2pi(end_yaw - theta)
 
-    planning_funcs = [_LSL, _RSR,
-                      _LSR, _RSL,
-                      _RLR, _LRL]
+    planning_funcs = [_LSL, _RSR, _LSR, _RSL, _RLR, _LRL]
 
     best_cost = float("inf")
     bt, bp, bq, best_mode = None, None, None, None
@@ -221,19 +221,20 @@ def _dubins_path_planning_from_origin(end_x, end_y, end_yaw, curvature,
             best_cost = cost
     lengths = [bt, bp, bq]
 
-    x_list, y_list, yaw_list, directions = generate_local_course(sum(lengths),
-                                                                 lengths,
-                                                                 best_mode,
-                                                                 curvature,
-                                                                 step_size)
+    x_list, y_list, yaw_list, directions = _generate_local_course(sum(lengths),
+                                                                  lengths,
+                                                                  best_mode,
+                                                                  curvature,
+                                                                  step_size)
 
     lengths = [length / curvature for length in lengths]
 
     return x_list, y_list, yaw_list, best_mode, lengths
 
 
-def interpolate(ind, length, mode, max_curvature, origin_x, origin_y,
-                origin_yaw, path_x, path_y, path_yaw, directions):
+def _interpolate(ind, length, mode, max_curvature,
+                 origin_x, origin_y, origin_yaw,
+                 path_x, path_y, path_yaw, directions):
     if mode == "S":
         path_x[ind] = origin_x + length / max_curvature * math.cos(origin_yaw)
         path_y[ind] = origin_y + length / max_curvature * math.sin(origin_yaw)
@@ -263,8 +264,8 @@ def interpolate(ind, length, mode, max_curvature, origin_x, origin_y,
     return path_x, path_y, path_yaw, directions
 
 
-def generate_local_course(total_length, lengths, modes, max_curvature,
-                          step_size):
+def _generate_local_course(total_length, lengths, modes, max_curvature,
+                           step_size):
     n_point = math.trunc(total_length / step_size) + len(lengths) + 4
 
     p_x = [0.0 for _ in range(n_point)]
@@ -299,25 +300,25 @@ def generate_local_course(total_length, lengths, modes, max_curvature,
 
         while abs(pd) <= abs(length):
             ind += 1
-            p_x, p_y, p_yaw, directions = interpolate(ind, pd, m,
-                                                      max_curvature,
-                                                      origin_x,
-                                                      origin_y,
-                                                      origin_yaw,
-                                                      p_x, p_y,
-                                                      p_yaw,
-                                                      directions)
+            p_x, p_y, p_yaw, directions = _interpolate(ind, pd, m,
+                                                       max_curvature,
+                                                       origin_x,
+                                                       origin_y,
+                                                       origin_yaw,
+                                                       p_x, p_y,
+                                                       p_yaw,
+                                                       directions)
             pd += dist
 
-        ll = length - pd - dist  # calc remain length
+        ll = length - pd - dist  # calc remain arrow_length
 
         ind += 1
-        p_x, p_y, p_yaw, directions = interpolate(ind, length, m,
-                                                  max_curvature,
-                                                  origin_x, origin_y,
-                                                  origin_yaw,
-                                                  p_x, p_y, p_yaw,
-                                                  directions)
+        p_x, p_y, p_yaw, directions = _interpolate(ind, length, m,
+                                                   max_curvature,
+                                                   origin_x, origin_y,
+                                                   origin_yaw,
+                                                   p_x, p_y, p_yaw,
+                                                   directions)
 
     if len(p_x) <= 1:
         return [], [], [], []
@@ -332,21 +333,10 @@ def generate_local_course(total_length, lengths, modes, max_curvature,
     return p_x, p_y, p_yaw, directions
 
 
-def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r",
-               ec="k"):  # pragma: no cover
-    import matplotlib.pyplot as plt
-    if not isinstance(x, float):
-        for (i_x, i_y, i_yaw) in zip(x, y, yaw):
-            plot_arrow(i_x, i_y, i_yaw)
-    else:
-        plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw), fc=fc,
-                  ec=ec, head_width=width, head_length=width)
-        plt.plot(x, y)
-
-
 def main():
     print("Dubins path planner sample start!!")
     import matplotlib.pyplot as plt
+    from utils.plot import plot_arrow
 
     start_x = 1.0  # [m]
     start_y = 1.0  # [m]
@@ -368,11 +358,8 @@ def main():
 
     if show_animation:
         plt.plot(path_x, path_y, label="final course " + "".join(mode))
-
-        # plotting
         plot_arrow(start_x, start_y, start_yaw)
         plot_arrow(end_x, end_y, end_yaw)
-
         plt.legend()
         plt.grid(True)
         plt.axis("equal")
