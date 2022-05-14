@@ -4,6 +4,12 @@ from numpy.testing import assert_allclose
 import numpy as np
 
 
+def test_rot_mat_2d():
+    assert_allclose(angle.rot_mat_2d(0.0),
+                    np.array([[1., 0.],
+                              [0., 1.]]))
+
+
 def test_angle_mod():
     assert_allclose(angle.angle_mod(-4.0), 2.28318531)
     assert(isinstance(angle.angle_mod(-4.0), float))

@@ -69,5 +69,24 @@ def test_3():
         check_path_length(px, py, lengths)
 
 
+def test_path_plannings_types():
+    dubins_path_planner.show_animation = False
+    start_x = 1.0  # [m]
+    start_y = 1.0  # [m]
+    start_yaw = np.deg2rad(45.0)  # [rad]
+
+    end_x = -3.0  # [m]
+    end_y = -3.0  # [m]
+    end_yaw = np.deg2rad(-45.0)  # [rad]
+
+    curvature = 1.0
+
+    _, _, _, mode, _ = dubins_path_planner.plan_dubins_path(
+        start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature,
+        selected_types=["RSL"])
+
+    assert mode == ["R", "S", "L"]
+
+
 if __name__ == '__main__':
     conftest.run_this_test(__file__)

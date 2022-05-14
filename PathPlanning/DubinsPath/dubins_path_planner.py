@@ -12,7 +12,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/")
 
 import math
 import numpy as np
-from utils.angle import angle_mod, create_2d_rotation_matrix
+from utils.angle import angle_mod, rot_mat_2d
 
 show_animation = True
 
@@ -21,7 +21,7 @@ def plan_dubins_path(s_x, s_y, s_yaw,
                      g_x, g_y, g_yaw,
                      curvature,
                      step_size=0.1,
-                     planning_types=None):
+                     selected_types=None):
     """
     Plan dubins path
 
@@ -43,9 +43,11 @@ def plan_dubins_path(s_x, s_y, s_yaw,
         curvature for curve [1/m]
     step_size : float (optional)
         step size between two path points [m]. Default is 0.1
-    planning_types : a list of string or None
-
-
+    selected_types : a list of string or None
+        selected path planning types. If None, all types are used for
+        path planning, and minimum path length result is returned.
+        You can select used path plannings types by a string list.
+        eg: ["RSL", "RSR"]
 
     Returns
     -------
@@ -61,13 +63,13 @@ def plan_dubins_path(s_x, s_y, s_yaw,
         arrow_length list of the path segments.
 
     """
-    if planning_types is None:
+    if selected_types is None:
         planning_funcs = _PATH_TYPE_MAP.values()
     else:
-        planning_funcs = [_PATH_TYPE_MAP[ptype] for ptype in planning_types]
+        planning_funcs = [_PATH_TYPE_MAP[ptype] for ptype in selected_types]
 
     # calculate local goal x, y, yaw
-    l_rot = create_2d_rotation_matrix(s_yaw)
+    l_rot = rot_mat_2d(s_yaw)
     le_xy = np.stack([g_x - s_x, g_y - s_y]).T @ l_rot
     local_goal_x = le_xy[0]
     local_goal_y = le_xy[1]
@@ -78,7 +80,7 @@ def plan_dubins_path(s_x, s_y, s_yaw,
         planning_funcs)
 
     # Convert a local coordinate path to the global coordinate
-    rot = create_2d_rotation_matrix(-s_yaw)
+    rot = rot_mat_2d(-s_yaw)
     converted_xy = np.stack([lp_x, lp_y]).T @ rot
     x_list = converted_xy[:, 0] + s_x
     y_list = converted_xy[:, 1] + s_y
