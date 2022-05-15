@@ -162,8 +162,8 @@ def _RLR(alpha, beta, d):
     if abs(tmp) > 1.0:
         return None, None, None, mode
     d2 = _mod2pi(2 * pi - acos(tmp))
-    d1 = _mod2pi(alpha - atan2(cos_a - cos_b, d - sin_a + sin_b)
-                 + _mod2pi(d2 / 2.0))
+    d1 = _mod2pi(alpha - atan2(cos_a - cos_b, d - sin_a + sin_b) +
+                 _mod2pi(d2 / 2.0))
     d3 = _mod2pi(alpha - beta - d1 + _mod2pi(d2))
     return d1, d2, d3, mode
 
