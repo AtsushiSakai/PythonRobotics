@@ -22,6 +22,16 @@ For example, one of RSR Dubins paths is:
 .. image:: RSR.jpg
    :width: 400px
 
+:math:`p^2 = 2 + d ^ 2 - 2cos_{ab} + 2d(sin_a - sin_b)`
+
+:math:`t = atan((cos_b - cos_a), d + sin_a - sin_b)`
+
+:math:`d1 = mod(-\alpha + t)`
+
+:math:`d2 = p`
+
+:math:`d3 = mod(\beta - t)`
+
 one of RLR Dubins paths is:
 
 .. image:: RLR.jpg
@@ -33,7 +43,7 @@ You can generate a path from these information and the maximum curvature informa
 
 In the example code, a path which is minimum course length one among 6 course type is selected and then a path is constructed.
 
-Code
+API
 ~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: PathPlanning.DubinsPath.dubins_path_planner.plan_dubins_path
