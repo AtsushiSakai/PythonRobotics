@@ -17,7 +17,7 @@ Each segment type can is categorized by 3 type: 'Right turn (R)' , 'Left turn (L
 
 Possible path will be at least one of these six types: RSR, RSL, LSR, LSL, RLR, LRL. 
 
-For example, one of RSR Dubins paths is:
+For example, a RSR Dubins path is:
 
 .. image:: RSR.jpg
    :width: 400px
@@ -32,7 +32,7 @@ For example, one of RSR Dubins paths is:
 
 :math:`d3 = mod(\beta - t)`
 
-one of RLR Dubins paths is:
+a RLR Dubins path is:
 
 .. image:: RLR.jpg
    :width: 200px
@@ -41,7 +41,8 @@ Dubins path planner can output three types and distances of each course segment.
 
 You can generate a path from these information and the maximum curvature information.
 
-In the example code, a path which is minimum course length one among 6 course type is selected and then a path is constructed.
+A path type which has minimum course length one among 6 types is selected,
+and then a path is constructed based on the selected type.
 
 API
 ~~~~~~~~~~~~~~~~~~~~
