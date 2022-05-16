@@ -61,8 +61,7 @@ def plan_dubins_path(s_x, s_y, s_yaw, g_x, g_y, g_yaw, curvature,
 
     Examples
     --------
-    See PathPlanning.DubinsPath.dubins_path_planner.main().
-
+    You can generate a dubins path.
 
     >>> start_x = 1.0  # [m]
     >>> start_y = 1.0  # [m]
@@ -71,7 +70,8 @@ def plan_dubins_path(s_x, s_y, s_yaw, g_x, g_y, g_yaw, curvature,
     >>> end_y = -3.0  # [m]
     >>> end_yaw = np.deg2rad(-45.0)  # [rad]
     >>> curvature = 1.0
-    >>> path_x, path_y, path_yaw, mode, _ = plan_dubins_path(start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature)
+    >>> path_x, path_y, path_yaw, mode, _ = plan_dubins_path(
+                start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature)
     >>> plt.plot(path_x, path_y, label="final course " + "".join(mode))
     >>> plot_arrow(start_x, start_y, start_yaw)
     >>> plot_arrow(end_x, end_y, end_yaw)
@@ -80,6 +80,7 @@ def plan_dubins_path(s_x, s_y, s_yaw, g_x, g_y, g_yaw, curvature,
     >>> plt.axis("equal")
     >>> plt.show()
 
+    .. image:: dubins_path.jpg
     """
     if selected_types is None:
         planning_funcs = _PATH_TYPE_MAP.values()
@@ -336,7 +337,7 @@ def main():
                                                                curvature)
 
     if show_animation:
-        plt.plot(path_x, path_y, label="final course " + "".join(mode))
+        plt.plot(path_x, path_y, label="".join(mode))
         plot_arrow(start_x, start_y, start_yaw)
         plot_arrow(end_x, end_y, end_yaw)
         plt.legend()
