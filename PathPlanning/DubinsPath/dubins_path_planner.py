@@ -251,10 +251,10 @@ def _interpolate(ind, length, mode, max_curvature, origin_x, origin_y,
         path_x[ind] = origin_x + gdx
         path_y[ind] = origin_y + gdy
 
-    if mode == "L":  # left turn
-        path_yaw[ind] = origin_yaw + length
-    elif mode == "R":  # right turn
-        path_yaw[ind] = origin_yaw - length
+        if mode == "L":  # left turn
+            path_yaw[ind] = origin_yaw + length
+        elif mode == "R":  # right turn
+            path_yaw[ind] = origin_yaw - length
 
     return path_x, path_y, path_yaw
 
@@ -270,13 +270,10 @@ def _generate_local_course(total_length, lengths, modes, max_curvature,
 
     ll = 0.0
 
-    for (m, length, i) in zip(modes, lengths, range(len(modes))):
+    for (mode, length, i) in zip(modes, lengths, range(len(modes))):
         if length == 0.0:
             continue
-        elif length > 0.0:
-            dist = step_size
-        else:
-            dist = -step_size
+        dist = step_size
 
         # set origin state
         origin_x, origin_y, origin_yaw = p_x[ind], p_y[ind], p_yaw[ind]
@@ -289,19 +286,16 @@ def _generate_local_course(total_length, lengths, modes, max_curvature,
 
         while abs(pd) <= abs(length):
             ind += 1
-            p_x, p_y, p_yaw = _interpolate(ind, pd, m, max_curvature, origin_x,
+            p_x, p_y, p_yaw = _interpolate(ind, pd, mode, max_curvature, origin_x,
                                            origin_y, origin_yaw, p_x, p_y,
-                                           p_yaw, )
+                                           p_yaw)
             pd += dist
 
         ll = length - pd - dist  # calc remain arrow_length
 
         ind += 1
-        p_x, p_y, p_yaw = _interpolate(ind, length, m, max_curvature, origin_x,
+        p_x, p_y, p_yaw = _interpolate(ind, length, mode, max_curvature, origin_x,
                                        origin_y, origin_yaw, p_x, p_y, p_yaw)
-
-    if len(p_x) <= 1:
-        return [], [], [], []
 
     # remove unused data
     while len(p_x) >= 1 and p_x[-1] == 0.0:
