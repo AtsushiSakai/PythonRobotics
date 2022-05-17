@@ -224,21 +224,20 @@ def _dubins_path_planning_from_origin(end_x, end_y, end_yaw, curvature,
             b_d1, b_d2, b_d3, b_mode, best_cost = d1, d2, d3, mode, cost
 
     lengths = [b_d1, b_d2, b_d3]
-    x_list, y_list, yaw_list = _generate_local_course(sum(lengths), lengths,
-                                                      b_mode, curvature,
-                                                      step_size)
+    x_list, y_list, yaw_list = _generate_local_course(lengths, b_mode,
+                                                      curvature, step_size)
 
     lengths = [length / curvature for length in lengths]
 
     return x_list, y_list, yaw_list, b_mode, lengths
 
 
-def _interpolate(ind, length, mode, max_curvature, origin_x, origin_y,
+def _interpolate(length, mode, max_curvature, origin_x, origin_y,
                  origin_yaw, path_x, path_y, path_yaw):
     if mode == "S":
-        path_x[ind] = origin_x + length / max_curvature * cos(origin_yaw)
-        path_y[ind] = origin_y + length / max_curvature * sin(origin_yaw)
-        path_yaw[ind] = origin_yaw
+        path_x.append(origin_x + length / max_curvature * cos(origin_yaw))
+        path_y.append(origin_y + length / max_curvature * sin(origin_yaw))
+        path_yaw.append(origin_yaw)
     else:  # curve
         ldx = sin(length) / max_curvature
         ldy = 0.0
@@ -248,60 +247,36 @@ def _interpolate(ind, length, mode, max_curvature, origin_x, origin_y,
             ldy = (1.0 - cos(length)) / -max_curvature
         gdx = cos(-origin_yaw) * ldx + sin(-origin_yaw) * ldy
         gdy = -sin(-origin_yaw) * ldx + cos(-origin_yaw) * ldy
-        path_x[ind] = origin_x + gdx
-        path_y[ind] = origin_y + gdy
+        path_x.append(origin_x + gdx)
+        path_y.append(origin_y + gdy)
 
         if mode == "L":  # left turn
-            path_yaw[ind] = origin_yaw + length
+            path_yaw.append(origin_yaw + length)
         elif mode == "R":  # right turn
-            path_yaw[ind] = origin_yaw - length
+            path_yaw.append(origin_yaw - length)
 
     return path_x, path_y, path_yaw
 
 
-def _generate_local_course(total_length, lengths, modes, max_curvature,
-                           step_size):
-    n_point = trunc(total_length / step_size) + len(lengths) + 4
+def _generate_local_course(lengths, modes, max_curvature, step_size):
+    p_x, p_y, p_yaw = [0.0], [0.0], [0.0]
 
-    p_x = [0.0 for _ in range(n_point)]
-    p_y = [0.0 for _ in range(n_point)]
-    p_yaw = [0.0 for _ in range(n_point)]
-    ind = 1
-
-    ll = 0.0
-
-    for (mode, length, i) in zip(modes, lengths, range(len(modes))):
+    for (mode, length) in zip(modes, lengths):
         if length == 0.0:
             continue
-        dist = step_size
 
         # set origin state
-        origin_x, origin_y, origin_yaw = p_x[ind], p_y[ind], p_yaw[ind]
+        origin_x, origin_y, origin_yaw = p_x[-1], p_y[-1], p_yaw[-1]
 
-        ind -= 1
-        if i >= 1 and (lengths[i - 1] * lengths[i]) > 0:
-            pd = - dist - ll
-        else:
-            pd = dist - ll
+        current_length = step_size
+        while abs(current_length+step_size) <= abs(length):
+            p_x, p_y, p_yaw = _interpolate(current_length, mode, max_curvature,
+                                           origin_x, origin_y, origin_yaw,
+                                           p_x, p_y, p_yaw)
+            current_length += step_size
 
-        while abs(pd) <= abs(length):
-            ind += 1
-            p_x, p_y, p_yaw = _interpolate(ind, pd, mode, max_curvature, origin_x,
-                                           origin_y, origin_yaw, p_x, p_y,
-                                           p_yaw)
-            pd += dist
-
-        ll = length - pd - dist  # calc remain arrow_length
-
-        ind += 1
-        p_x, p_y, p_yaw = _interpolate(ind, length, mode, max_curvature, origin_x,
+        p_x, p_y, p_yaw = _interpolate(length, mode, max_curvature, origin_x,
                                        origin_y, origin_yaw, p_x, p_y, p_yaw)
-
-    # remove unused data
-    while len(p_x) >= 1 and p_x[-1] == 0.0:
-        p_x.pop()
-        p_y.pop()
-        p_yaw.pop()
 
     return p_x, p_y, p_yaw
 
