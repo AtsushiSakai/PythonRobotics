@@ -7,6 +7,7 @@
   <title>Dubins path planning &mdash; PythonRobotics  documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
@@ -16,6 +17,7 @@
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -78,7 +80,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../quintic_polynomials_planner/quintic_polynomials_planner.html">Quintic polynomials planning</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Dubins path planning</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#dubins-path">Dubins path</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-PathPlanning.DubinsPath.dubins_path_planner">Code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#api">API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#reference">Reference</a></li>
 </ul>
 </li>
@@ -130,26 +132,39 @@
 <section id="dubins-path">
 <h2>Dubins path<a class="headerlink" href="#dubins-path" title="Permalink to this headline"></a></h2>
 <p>Dubins path is a analytical path planning algorithm for a simple car model.</p>
-<p>It can generates a shortest path between 2D poses (x, y, yaw) with maximum curvture comstraint and tangent(yaw angle) constraint.</p>
-<p>The path consist of 3 segments of maximum curvature curves or a straight line segment.</p>
+<p>It can generates a shortest path between two 2D poses (x, y, yaw) with maximum curvature constraint and tangent(yaw angle) constraint.</p>
+<p>Generated paths consist of 3 segments of maximum curvature curves or a straight line segment.</p>
 <p>Each segment type can is categorized by 3 type: ‘Right turn (R)’ , ‘Left turn (L)’, and ‘Straight (S).’</p>
 <p>Possible path will be at least one of these six types: RSR, RSL, LSR, LSL, RLR, LRL.</p>
-<p>For example, one of RSR Dubins paths is:</p>
+<p>Dubins path planner can output each segment type and distance of each course segment.</p>
+<p>For example, a RSR Dubins path is:</p>
 <a class="reference internal image-reference" href="../../../_images/RSR.jpg"><img alt="../../../_images/RSR.jpg" src="../../../_images/RSR.jpg" style="width: 400px;" /></a>
-<p>one of RLR Dubins paths is:</p>
+<p>Each segment distance can be calculated by:</p>
+<p><span class="math notranslate nohighlight">\(\alpha = mod(-\theta)\)</span></p>
+<p><span class="math notranslate nohighlight">\(\beta = mod(x_{e, yaw} - \theta)\)</span></p>
+<p><span class="math notranslate nohighlight">\(p^2 = 2 + d ^ 2 - 2\cos(\alpha-\beta) + 2d(\sin\alpha - \sin\beta)\)</span></p>
+<p><span class="math notranslate nohighlight">\(t = atan2(\cos\beta - \cos\alpha, d + \sin\alpha - \sin\beta)\)</span></p>
+<p><span class="math notranslate nohighlight">\(d_1 = mod(-\alpha + t)\)</span></p>
+<p><span class="math notranslate nohighlight">\(d_2 = p\)</span></p>
+<p><span class="math notranslate nohighlight">\(d_3 = mod(\beta - t)\)</span></p>
+<p>where <span class="math notranslate nohighlight">\(\theta\)</span> is tangent and d is distance from <span class="math notranslate nohighlight">\(x_s\)</span> to <span class="math notranslate nohighlight">\(x_e\)</span></p>
+<p>A RLR Dubins path is:</p>
 <a class="reference internal image-reference" href="../../../_images/RLR.jpg"><img alt="../../../_images/RLR.jpg" src="../../../_images/RLR.jpg" style="width: 200px;" /></a>
-<p>Dubins path planner can output three types and distances of each course segment.</p>
+<p>Each segment distance can be calculated by:</p>
+<p><span class="math notranslate nohighlight">\(t = (6.0 - d^2 + 2\cos(\alpha-\beta) + 2d(\sin\alpha - \sin\beta)) / 8.0\)</span></p>
+<p><span class="math notranslate nohighlight">\(d_2 = mod(2\pi - acos(t))\)</span></p>
+<p><span class="math notranslate nohighlight">\(d_1 = mod(\alpha - atan2(\cos\beta - \cos\alpha, d + \sin\alpha - \sin\beta) + d_2 / 2.0)\)</span></p>
+<p><span class="math notranslate nohighlight">\(d_3 = mod(\alpha - \beta - d_1 + d_2)\)</span></p>
 <p>You can generate a path from these information and the maximum curvature information.</p>
-<p>In the example code, a path which is minimum course length one among 6 course type is selected and then a path is constructed.</p>
+<p>A path type which has minimum course length among 6 types is selected,
+and then a path is constructed based on the selected type and its distances.</p>
 </section>
-<section id="module-PathPlanning.DubinsPath.dubins_path_planner">
-<span id="code"></span><h2>Code<a class="headerlink" href="#module-PathPlanning.DubinsPath.dubins_path_planner" title="Permalink to this headline"></a></h2>
-<p>Dubins path planner sample code</p>
-<p>author Atsushi Sakai(&#64;Atsushi_twi)</p>
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Permalink to this headline"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="PathPlanning.DubinsPath.dubins_path_planner.plan_dubins_path">
-<span class="sig-prename descclassname"><span class="pre">PathPlanning.DubinsPath.dubins_path_planner.</span></span><span class="sig-name descname"><span class="pre">plan_dubins_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s_yaw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g_yaw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curvature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/PathPlanning/DubinsPath/dubins_path_planner.html#plan_dubins_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PathPlanning.DubinsPath.dubins_path_planner.plan_dubins_path" title="Permalink to this definition"></a></dt>
-<dd><p>Path dubins path</p>
+<span class="sig-prename descclassname"><span class="pre">PathPlanning.DubinsPath.dubins_path_planner.</span></span><span class="sig-name descname"><span class="pre">plan_dubins_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s_yaw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g_yaw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curvature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/PathPlanning/DubinsPath/dubins_path_planner.html#plan_dubins_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PathPlanning.DubinsPath.dubins_path_planner.plan_dubins_path" title="Permalink to this definition"></a></dt>
+<dd><p>Plan dubins path</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -161,6 +176,10 @@
 <li><p><strong>g_yaw</strong> (<em>float</em>) – yaw angle of the end point [rad]</p></li>
 <li><p><strong>curvature</strong> (<em>float</em>) – curvature for curve [1/m]</p></li>
 <li><p><strong>step_size</strong> (<em>float</em><em> (</em><em>optional</em><em>)</em>) – step size between two path points [m]. Default is 0.1</p></li>
+<li><p><strong>selected_types</strong> (<em>a list of string</em><em> or </em><em>None</em>) – selected path planning types. If None, all types are used for
+path planning, and minimum path length result is returned.
+You can select used path plannings types by a string list.
+e.g.: [“RSL”, “RSR”]</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -169,17 +188,39 @@
 <li><p><strong>y_list</strong> (<em>array</em>) – y positions of the path</p></li>
 <li><p><strong>yaw_list</strong> (<em>array</em>) – yaw angles of the path</p></li>
 <li><p><strong>modes</strong> (<em>array</em>) – mode list of the path</p></li>
-<li><p><strong>lengths</strong> (<em>array</em>) – length list of the path segments.</p></li>
+<li><p><strong>lengths</strong> (<em>array</em>) – arrow_length list of the path segments.</p></li>
 </ul>
 </p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<p>You can generate a dubins path.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">start_x</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># [m]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">start_y</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># [m]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">start_yaw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">45.0</span><span class="p">)</span>  <span class="c1"># [rad]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">end_x</span> <span class="o">=</span> <span class="o">-</span><span class="mf">3.0</span>  <span class="c1"># [m]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">end_y</span> <span class="o">=</span> <span class="o">-</span><span class="mf">3.0</span>  <span class="c1"># [m]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">end_yaw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="o">-</span><span class="mf">45.0</span><span class="p">)</span>  <span class="c1"># [rad]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">curvature</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path_x</span><span class="p">,</span> <span class="n">path_y</span><span class="p">,</span> <span class="n">path_yaw</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">plan_dubins_path</span><span class="p">(</span>
+<span class="go">            start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">path_x</span><span class="p">,</span> <span class="n">path_y</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;final course &quot;</span> <span class="o">+</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mode</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_arrow</span><span class="p">(</span><span class="n">start_x</span><span class="p">,</span> <span class="n">start_y</span><span class="p">,</span> <span class="n">start_yaw</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_arrow</span><span class="p">(</span><span class="n">end_x</span><span class="p">,</span> <span class="n">end_y</span><span class="p">,</span> <span class="n">end_yaw</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../../_images/dubins_path.jpg" src="../../../_images/dubins_path.jpg" />
 </dd></dl>
 
 </section>
 <section id="reference">
 <h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline"></a></h2>
 <ul class="simple">
+<li><p><a class="reference external" href="https://www.jstor.org/stable/2372560?origin=crossref">On Curves of Minimal Length with a Constraint on Average Curvature, and with Prescribed Initial and Terminal Positions and Tangents</a></p></li>
 <li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Dubins_path">Dubins path - Wikipedia</a></p></li>
 <li><p><a class="reference external" href="http://planning.cs.uiuc.edu/node821.html">15.3.1 Dubins Curves</a></p></li>
 <li><p><a class="reference external" href="https://gieseanw.wordpress.com/2012/10/21/a-comprehensive-step-by-step-tutorial-to-computing-dubins-paths/">A Comprehensive, Step-by-Step Tutorial to Computing Dubin’s Paths</a></p></li>

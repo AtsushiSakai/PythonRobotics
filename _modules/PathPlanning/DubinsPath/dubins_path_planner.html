@@ -6,6 +6,7 @@
   <title>PathPlanning.DubinsPath.dubins_path_planner &mdash; PythonRobotics  documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
@@ -101,21 +102,20 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">os</span>
+
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;/../utils/&quot;</span><span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">atan2</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">acos</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="n">hypot</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">utils.angle</span> <span class="kn">import</span> <span class="n">angle_mod</span><span class="p">,</span> <span class="n">create_2d_rotation_matrix</span>
+<span class="kn">from</span> <span class="nn">utils.angle</span> <span class="kn">import</span> <span class="n">angle_mod</span><span class="p">,</span> <span class="n">rot_mat_2d</span>
 
 <span class="n">show_animation</span> <span class="o">=</span> <span class="kc">True</span>
 
 
-<div class="viewcode-block" id="plan_dubins_path"><a class="viewcode-back" href="../../../modules/path_planning/dubins_path/dubins_path.html#PathPlanning.DubinsPath.dubins_path_planner.plan_dubins_path">[docs]</a><span class="k">def</span> <span class="nf">plan_dubins_path</span><span class="p">(</span><span class="n">s_x</span><span class="p">,</span> <span class="n">s_y</span><span class="p">,</span> <span class="n">s_yaw</span><span class="p">,</span>
-                     <span class="n">g_x</span><span class="p">,</span> <span class="n">g_y</span><span class="p">,</span> <span class="n">g_yaw</span><span class="p">,</span>
-                     <span class="n">curvature</span><span class="p">,</span>
-                     <span class="n">step_size</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+<div class="viewcode-block" id="plan_dubins_path"><a class="viewcode-back" href="../../../modules/path_planning/dubins_path/dubins_path.html#PathPlanning.DubinsPath.dubins_path_planner.plan_dubins_path">[docs]</a><span class="k">def</span> <span class="nf">plan_dubins_path</span><span class="p">(</span><span class="n">s_x</span><span class="p">,</span> <span class="n">s_y</span><span class="p">,</span> <span class="n">s_yaw</span><span class="p">,</span> <span class="n">g_x</span><span class="p">,</span> <span class="n">g_y</span><span class="p">,</span> <span class="n">g_yaw</span><span class="p">,</span> <span class="n">curvature</span><span class="p">,</span>
+                     <span class="n">step_size</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">selected_types</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Path dubins path</span>
+<span class="sd">    Plan dubins path</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -135,6 +135,11 @@
 <span class="sd">        curvature for curve [1/m]</span>
 <span class="sd">    step_size : float (optional)</span>
 <span class="sd">        step size between two path points [m]. Default is 0.1</span>
+<span class="sd">    selected_types : a list of string or None</span>
+<span class="sd">        selected path planning types. If None, all types are used for</span>
+<span class="sd">        path planning, and minimum path length result is returned.</span>
+<span class="sd">        You can select used path plannings types by a string list.</span>
+<span class="sd">        e.g.: [&quot;RSL&quot;, &quot;RSR&quot;]</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -147,21 +152,49 @@
 <span class="sd">    modes: array</span>
 <span class="sd">        mode list of the path</span>
 <span class="sd">    lengths: array</span>
-<span class="sd">        length list of the path segments.</span>
+<span class="sd">        arrow_length list of the path segments.</span>
 
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    You can generate a dubins path.</span>
+
+<span class="sd">    &gt;&gt;&gt; start_x = 1.0  # [m]</span>
+<span class="sd">    &gt;&gt;&gt; start_y = 1.0  # [m]</span>
+<span class="sd">    &gt;&gt;&gt; start_yaw = np.deg2rad(45.0)  # [rad]</span>
+<span class="sd">    &gt;&gt;&gt; end_x = -3.0  # [m]</span>
+<span class="sd">    &gt;&gt;&gt; end_y = -3.0  # [m]</span>
+<span class="sd">    &gt;&gt;&gt; end_yaw = np.deg2rad(-45.0)  # [rad]</span>
+<span class="sd">    &gt;&gt;&gt; curvature = 1.0</span>
+<span class="sd">    &gt;&gt;&gt; path_x, path_y, path_yaw, mode, _ = plan_dubins_path(</span>
+<span class="sd">                start_x, start_y, start_yaw, end_x, end_y, end_yaw, curvature)</span>
+<span class="sd">    &gt;&gt;&gt; plt.plot(path_x, path_y, label=&quot;final course &quot; + &quot;&quot;.join(mode))</span>
+<span class="sd">    &gt;&gt;&gt; plot_arrow(start_x, start_y, start_yaw)</span>
+<span class="sd">    &gt;&gt;&gt; plot_arrow(end_x, end_y, end_yaw)</span>
+<span class="sd">    &gt;&gt;&gt; plt.legend()</span>
+<span class="sd">    &gt;&gt;&gt; plt.grid(True)</span>
+<span class="sd">    &gt;&gt;&gt; plt.axis(&quot;equal&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; plt.show()</span>
+
+<span class="sd">    .. image:: dubins_path.jpg</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">selected_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">planning_funcs</span> <span class="o">=</span> <span class="n">_PATH_TYPE_MAP</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">planning_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">_PATH_TYPE_MAP</span><span class="p">[</span><span class="n">ptype</span><span class="p">]</span> <span class="k">for</span> <span class="n">ptype</span> <span class="ow">in</span> <span class="n">selected_types</span><span class="p">]</span>
+
     <span class="c1"># calculate local goal x, y, yaw</span>
-    <span class="n">l_rot</span> <span class="o">=</span> <span class="n">create_2d_rotation_matrix</span><span class="p">(</span><span class="n">s_yaw</span><span class="p">)</span>
+    <span class="n">l_rot</span> <span class="o">=</span> <span class="n">rot_mat_2d</span><span class="p">(</span><span class="n">s_yaw</span><span class="p">)</span>
     <span class="n">le_xy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">g_x</span> <span class="o">-</span> <span class="n">s_x</span><span class="p">,</span> <span class="n">g_y</span> <span class="o">-</span> <span class="n">s_y</span><span class="p">])</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">l_rot</span>
     <span class="n">local_goal_x</span> <span class="o">=</span> <span class="n">le_xy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">local_goal_y</span> <span class="o">=</span> <span class="n">le_xy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">local_goal_yaw</span> <span class="o">=</span> <span class="n">g_yaw</span> <span class="o">-</span> <span class="n">s_yaw</span>
 
-    <span class="n">lp_x</span><span class="p">,</span> <span class="n">lp_y</span><span class="p">,</span> <span class="n">lp_yaw</span><span class="p">,</span> <span class="n">modes</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="n">dubins_path_planning_from_origin</span><span class="p">(</span>
-        <span class="n">local_goal_x</span><span class="p">,</span> <span class="n">local_goal_y</span><span class="p">,</span> <span class="n">local_goal_yaw</span><span class="p">,</span> <span class="n">curvature</span><span class="p">,</span> <span class="n">step_size</span><span class="p">)</span>
+    <span class="n">lp_x</span><span class="p">,</span> <span class="n">lp_y</span><span class="p">,</span> <span class="n">lp_yaw</span><span class="p">,</span> <span class="n">modes</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="n">_dubins_path_planning_from_origin</span><span class="p">(</span>
+        <span class="n">local_goal_x</span><span class="p">,</span> <span class="n">local_goal_y</span><span class="p">,</span> <span class="n">local_goal_yaw</span><span class="p">,</span> <span class="n">curvature</span><span class="p">,</span> <span class="n">step_size</span><span class="p">,</span>
+        <span class="n">planning_funcs</span><span class="p">)</span>
 
     <span class="c1"># Convert a local coordinate path to the global coordinate</span>
-    <span class="n">rot</span> <span class="o">=</span> <span class="n">create_2d_rotation_matrix</span><span class="p">(</span><span class="o">-</span><span class="n">s_yaw</span><span class="p">)</span>
+    <span class="n">rot</span> <span class="o">=</span> <span class="n">rot_mat_2d</span><span class="p">(</span><span class="o">-</span><span class="n">s_yaw</span><span class="p">)</span>
     <span class="n">converted_xy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">lp_x</span><span class="p">,</span> <span class="n">lp_y</span><span class="p">])</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">rot</span>
     <span class="n">x_list</span> <span class="o">=</span> <span class="n">converted_xy</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">s_x</span>
     <span class="n">y_list</span> <span class="o">=</span> <span class="n">converted_xy</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">s_y</span>
@@ -174,276 +207,179 @@
     <span class="k">return</span> <span class="n">angle_mod</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">zero_2_2pi</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">_calc_trig_funcs</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">):</span>
+    <span class="n">sin_a</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="n">sin_b</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+    <span class="n">cos_a</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="n">cos_b</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+    <span class="n">cos_ab</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">alpha</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sin_a</span><span class="p">,</span> <span class="n">sin_b</span><span class="p">,</span> <span class="n">cos_a</span><span class="p">,</span> <span class="n">cos_b</span><span class="p">,</span> <span class="n">cos_ab</span>
+
+
 <span class="k">def</span> <span class="nf">_LSL</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
-    <span class="n">sa</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
-    <span class="n">sb</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
-    <span class="n">ca</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
-    <span class="n">cb</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
-    <span class="n">c_ab</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span>
-
-    <span class="n">tmp0</span> <span class="o">=</span> <span class="n">d</span> <span class="o">+</span> <span class="n">sa</span> <span class="o">-</span> <span class="n">sb</span>
-
+    <span class="n">sin_a</span><span class="p">,</span> <span class="n">sin_b</span><span class="p">,</span> <span class="n">cos_a</span><span class="p">,</span> <span class="n">cos_b</span><span class="p">,</span> <span class="n">cos_ab</span> <span class="o">=</span> <span class="n">_calc_trig_funcs</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span>
     <span class="n">mode</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;L&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">]</span>
-    <span class="n">p_squared</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">d</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">c_ab</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span> <span class="o">*</span> <span class="p">(</span><span class="n">sa</span> <span class="o">-</span> <span class="n">sb</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">p_squared</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">p_squared</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">d</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">cos_ab</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span> <span class="o">*</span> <span class="p">(</span><span class="n">sin_a</span> <span class="o">-</span> <span class="n">sin_b</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">p_squared</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># invalid configuration</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mode</span>
-    <span class="n">tmp1</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">((</span><span class="n">cb</span> <span class="o">-</span> <span class="n">ca</span><span class="p">),</span> <span class="n">tmp0</span><span class="p">)</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="o">-</span><span class="n">alpha</span> <span class="o">+</span> <span class="n">tmp1</span><span class="p">)</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">p_squared</span><span class="p">)</span>
-    <span class="n">q</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">beta</span> <span class="o">-</span> <span class="n">tmp1</span><span class="p">)</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">atan2</span><span class="p">((</span><span class="n">cos_b</span> <span class="o">-</span> <span class="n">cos_a</span><span class="p">),</span> <span class="n">d</span> <span class="o">+</span> <span class="n">sin_a</span> <span class="o">-</span> <span class="n">sin_b</span><span class="p">)</span>
+    <span class="n">d1</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="o">-</span><span class="n">alpha</span> <span class="o">+</span> <span class="n">tmp</span><span class="p">)</span>
+    <span class="n">d2</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">p_squared</span><span class="p">)</span>
+    <span class="n">d3</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">beta</span> <span class="o">-</span> <span class="n">tmp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d3</span><span class="p">,</span> <span class="n">mode</span>
 
-    <span class="k">return</span> <span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">mode</span>
 
-
-<span class="k">def</span> <span class="nf">right_straight_right</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
-    <span class="n">sa</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
-    <span class="n">sb</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
-    <span class="n">ca</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
-    <span class="n">cb</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
-    <span class="n">c_ab</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span>
-
-    <span class="n">tmp0</span> <span class="o">=</span> <span class="n">d</span> <span class="o">-</span> <span class="n">sa</span> <span class="o">+</span> <span class="n">sb</span>
+<span class="k">def</span> <span class="nf">_RSR</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+    <span class="n">sin_a</span><span class="p">,</span> <span class="n">sin_b</span><span class="p">,</span> <span class="n">cos_a</span><span class="p">,</span> <span class="n">cos_b</span><span class="p">,</span> <span class="n">cos_ab</span> <span class="o">=</span> <span class="n">_calc_trig_funcs</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span>
     <span class="n">mode</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">]</span>
-    <span class="n">p_squared</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">d</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">c_ab</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span> <span class="o">*</span> <span class="p">(</span><span class="n">sb</span> <span class="o">-</span> <span class="n">sa</span><span class="p">))</span>
+    <span class="n">p_squared</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">d</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">cos_ab</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span> <span class="o">*</span> <span class="p">(</span><span class="n">sin_b</span> <span class="o">-</span> <span class="n">sin_a</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">p_squared</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mode</span>
-    <span class="n">tmp1</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">((</span><span class="n">ca</span> <span class="o">-</span> <span class="n">cb</span><span class="p">),</span> <span class="n">tmp0</span><span class="p">)</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="n">angle_mod</span><span class="p">(</span><span class="n">alpha</span> <span class="o">-</span> <span class="n">tmp1</span><span class="p">,</span> <span class="n">zero_2_2pi</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">p_squared</span><span class="p">)</span>
-    <span class="n">q</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="o">-</span><span class="n">beta</span> <span class="o">+</span> <span class="n">tmp1</span><span class="p">)</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">atan2</span><span class="p">((</span><span class="n">cos_a</span> <span class="o">-</span> <span class="n">cos_b</span><span class="p">),</span> <span class="n">d</span> <span class="o">-</span> <span class="n">sin_a</span> <span class="o">+</span> <span class="n">sin_b</span><span class="p">)</span>
+    <span class="n">d1</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">alpha</span> <span class="o">-</span> <span class="n">tmp</span><span class="p">)</span>
+    <span class="n">d2</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">p_squared</span><span class="p">)</span>
+    <span class="n">d3</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="o">-</span><span class="n">beta</span> <span class="o">+</span> <span class="n">tmp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d3</span><span class="p">,</span> <span class="n">mode</span>
 
-    <span class="k">return</span> <span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">mode</span>
 
-
-<span class="k">def</span> <span class="nf">left_straight_right</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
-    <span class="n">sa</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
-    <span class="n">sb</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
-    <span class="n">ca</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
-    <span class="n">cb</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
-    <span class="n">c_ab</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span>
-
-    <span class="n">p_squared</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">d</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">c_ab</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span> <span class="o">*</span> <span class="p">(</span><span class="n">sa</span> <span class="o">+</span> <span class="n">sb</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">_LSR</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+    <span class="n">sin_a</span><span class="p">,</span> <span class="n">sin_b</span><span class="p">,</span> <span class="n">cos_a</span><span class="p">,</span> <span class="n">cos_b</span><span class="p">,</span> <span class="n">cos_ab</span> <span class="o">=</span> <span class="n">_calc_trig_funcs</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span>
+    <span class="n">p_squared</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">+</span> <span class="n">d</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">cos_ab</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span> <span class="o">*</span> <span class="p">(</span><span class="n">sin_a</span> <span class="o">+</span> <span class="n">sin_b</span><span class="p">))</span>
     <span class="n">mode</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;L&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">p_squared</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mode</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">p_squared</span><span class="p">)</span>
-    <span class="n">tmp2</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">((</span><span class="o">-</span><span class="n">ca</span> <span class="o">-</span> <span class="n">cb</span><span class="p">),</span> <span class="p">(</span><span class="n">d</span> <span class="o">+</span> <span class="n">sa</span> <span class="o">+</span> <span class="n">sb</span><span class="p">))</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="o">-</span><span class="n">alpha</span> <span class="o">+</span> <span class="n">tmp2</span><span class="p">)</span>
-    <span class="n">q</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="o">-</span><span class="n">_mod2pi</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">+</span> <span class="n">tmp2</span><span class="p">)</span>
+    <span class="n">d1</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">p_squared</span><span class="p">)</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">atan2</span><span class="p">((</span><span class="o">-</span><span class="n">cos_a</span> <span class="o">-</span> <span class="n">cos_b</span><span class="p">),</span> <span class="p">(</span><span class="n">d</span> <span class="o">+</span> <span class="n">sin_a</span> <span class="o">+</span> <span class="n">sin_b</span><span class="p">))</span> <span class="o">-</span> <span class="n">atan2</span><span class="p">(</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+    <span class="n">d2</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="o">-</span><span class="n">alpha</span> <span class="o">+</span> <span class="n">tmp</span><span class="p">)</span>
+    <span class="n">d3</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="o">-</span><span class="n">_mod2pi</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">+</span> <span class="n">tmp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d3</span><span class="p">,</span> <span class="n">mode</span>
 
-    <span class="k">return</span> <span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">mode</span>
 
-
-<span class="k">def</span> <span class="nf">right_straight_left</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
-    <span class="n">sa</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
-    <span class="n">sb</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
-    <span class="n">ca</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
-    <span class="n">cb</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
-    <span class="n">c_ab</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span>
-
-    <span class="n">p_squared</span> <span class="o">=</span> <span class="p">(</span><span class="n">d</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">c_ab</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span> <span class="o">*</span> <span class="p">(</span><span class="n">sa</span> <span class="o">+</span> <span class="n">sb</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">_RSL</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+    <span class="n">sin_a</span><span class="p">,</span> <span class="n">sin_b</span><span class="p">,</span> <span class="n">cos_a</span><span class="p">,</span> <span class="n">cos_b</span><span class="p">,</span> <span class="n">cos_ab</span> <span class="o">=</span> <span class="n">_calc_trig_funcs</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span>
+    <span class="n">p_squared</span> <span class="o">=</span> <span class="n">d</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">cos_ab</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span> <span class="o">*</span> <span class="p">(</span><span class="n">sin_a</span> <span class="o">+</span> <span class="n">sin_b</span><span class="p">))</span>
     <span class="n">mode</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">p_squared</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mode</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">p_squared</span><span class="p">)</span>
-    <span class="n">tmp2</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">((</span><span class="n">ca</span> <span class="o">+</span> <span class="n">cb</span><span class="p">),</span> <span class="p">(</span><span class="n">d</span> <span class="o">-</span> <span class="n">sa</span> <span class="o">-</span> <span class="n">sb</span><span class="p">))</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">alpha</span> <span class="o">-</span> <span class="n">tmp2</span><span class="p">)</span>
-    <span class="n">q</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">beta</span> <span class="o">-</span> <span class="n">tmp2</span><span class="p">)</span>
+    <span class="n">d1</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">p_squared</span><span class="p">)</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">atan2</span><span class="p">((</span><span class="n">cos_a</span> <span class="o">+</span> <span class="n">cos_b</span><span class="p">),</span> <span class="p">(</span><span class="n">d</span> <span class="o">-</span> <span class="n">sin_a</span> <span class="o">-</span> <span class="n">sin_b</span><span class="p">))</span> <span class="o">-</span> <span class="n">atan2</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+    <span class="n">d2</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">alpha</span> <span class="o">-</span> <span class="n">tmp</span><span class="p">)</span>
+    <span class="n">d3</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">beta</span> <span class="o">-</span> <span class="n">tmp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d3</span><span class="p">,</span> <span class="n">mode</span>
 
-    <span class="k">return</span> <span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">mode</span>
 
-
-<span class="k">def</span> <span class="nf">right_left_right</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
-    <span class="n">sa</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
-    <span class="n">sb</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
-    <span class="n">ca</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
-    <span class="n">cb</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
-    <span class="n">c_ab</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span>
-
+<span class="k">def</span> <span class="nf">_RLR</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+    <span class="n">sin_a</span><span class="p">,</span> <span class="n">sin_b</span><span class="p">,</span> <span class="n">cos_a</span><span class="p">,</span> <span class="n">cos_b</span><span class="p">,</span> <span class="n">cos_ab</span> <span class="o">=</span> <span class="n">_calc_trig_funcs</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span>
     <span class="n">mode</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">]</span>
-    <span class="n">tmp_rlr</span> <span class="o">=</span> <span class="p">(</span><span class="mf">6.0</span> <span class="o">-</span> <span class="n">d</span> <span class="o">*</span> <span class="n">d</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">c_ab</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">d</span> <span class="o">*</span> <span class="p">(</span><span class="n">sa</span> <span class="o">-</span> <span class="n">sb</span><span class="p">))</span> <span class="o">/</span> <span class="mf">8.0</span>
-    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">tmp_rlr</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="p">(</span><span class="mf">6.0</span> <span class="o">-</span> <span class="n">d</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">cos_ab</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">d</span> <span class="o">*</span> <span class="p">(</span><span class="n">sin_a</span> <span class="o">-</span> <span class="n">sin_b</span><span class="p">))</span> <span class="o">/</span> <span class="mf">8.0</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mode</span>
-
-    <span class="n">p</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">acos</span><span class="p">(</span><span class="n">tmp_rlr</span><span class="p">))</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">alpha</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">ca</span> <span class="o">-</span> <span class="n">cb</span><span class="p">,</span> <span class="n">d</span> <span class="o">-</span> <span class="n">sa</span> <span class="o">+</span> <span class="n">sb</span><span class="p">)</span> <span class="o">+</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">p</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">))</span>
-    <span class="n">q</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">alpha</span> <span class="o">-</span> <span class="n">beta</span> <span class="o">-</span> <span class="n">t</span> <span class="o">+</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">mode</span>
+    <span class="n">d2</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">-</span> <span class="n">acos</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span>
+    <span class="n">d1</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">alpha</span> <span class="o">-</span> <span class="n">atan2</span><span class="p">(</span><span class="n">cos_a</span> <span class="o">-</span> <span class="n">cos_b</span><span class="p">,</span> <span class="n">d</span> <span class="o">-</span> <span class="n">sin_a</span> <span class="o">+</span> <span class="n">sin_b</span><span class="p">)</span> <span class="o">+</span> <span class="n">d2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="n">d3</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">alpha</span> <span class="o">-</span> <span class="n">beta</span> <span class="o">-</span> <span class="n">d1</span> <span class="o">+</span> <span class="n">d2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d3</span><span class="p">,</span> <span class="n">mode</span>
 
 
 <span class="k">def</span> <span class="nf">_LRL</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
-    <span class="n">sa</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
-    <span class="n">sb</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
-    <span class="n">ca</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
-    <span class="n">cb</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
-    <span class="n">c_ab</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span>
-
+    <span class="n">sin_a</span><span class="p">,</span> <span class="n">sin_b</span><span class="p">,</span> <span class="n">cos_a</span><span class="p">,</span> <span class="n">cos_b</span><span class="p">,</span> <span class="n">cos_ab</span> <span class="o">=</span> <span class="n">_calc_trig_funcs</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span>
     <span class="n">mode</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;L&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">]</span>
-    <span class="n">tmp_lrl</span> <span class="o">=</span> <span class="p">(</span><span class="mf">6.0</span> <span class="o">-</span> <span class="n">d</span> <span class="o">*</span> <span class="n">d</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">c_ab</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">d</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span> <span class="n">sa</span> <span class="o">+</span> <span class="n">sb</span><span class="p">))</span> <span class="o">/</span> <span class="mf">8.0</span>
-    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">tmp_lrl</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="p">(</span><span class="mf">6.0</span> <span class="o">-</span> <span class="n">d</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">cos_ab</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">d</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span> <span class="n">sin_a</span> <span class="o">+</span> <span class="n">sin_b</span><span class="p">))</span> <span class="o">/</span> <span class="mf">8.0</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mode</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">acos</span><span class="p">(</span><span class="n">tmp_lrl</span><span class="p">))</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="o">-</span><span class="n">alpha</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">ca</span> <span class="o">-</span> <span class="n">cb</span><span class="p">,</span> <span class="n">d</span> <span class="o">+</span> <span class="n">sa</span> <span class="o">-</span> <span class="n">sb</span><span class="p">)</span> <span class="o">+</span> <span class="n">p</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
-    <span class="n">q</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">_mod2pi</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">-</span> <span class="n">t</span> <span class="o">+</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+    <span class="n">d2</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">-</span> <span class="n">acos</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span>
+    <span class="n">d1</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="o">-</span><span class="n">alpha</span> <span class="o">-</span> <span class="n">atan2</span><span class="p">(</span><span class="n">cos_a</span> <span class="o">-</span> <span class="n">cos_b</span><span class="p">,</span> <span class="n">d</span> <span class="o">+</span> <span class="n">sin_a</span> <span class="o">-</span> <span class="n">sin_b</span><span class="p">)</span> <span class="o">+</span> <span class="n">d2</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="n">d3</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">_mod2pi</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">-</span> <span class="n">alpha</span> <span class="o">-</span> <span class="n">d1</span> <span class="o">+</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">d2</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d3</span><span class="p">,</span> <span class="n">mode</span>
 
-    <span class="k">return</span> <span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">mode</span>
+
+<span class="n">_PATH_TYPE_MAP</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;LSL&quot;</span><span class="p">:</span> <span class="n">_LSL</span><span class="p">,</span> <span class="s2">&quot;RSR&quot;</span><span class="p">:</span> <span class="n">_RSR</span><span class="p">,</span> <span class="s2">&quot;LSR&quot;</span><span class="p">:</span> <span class="n">_LSR</span><span class="p">,</span> <span class="s2">&quot;RSL&quot;</span><span class="p">:</span> <span class="n">_RSL</span><span class="p">,</span>
+                  <span class="s2">&quot;RLR&quot;</span><span class="p">:</span> <span class="n">_RLR</span><span class="p">,</span> <span class="s2">&quot;LRL&quot;</span><span class="p">:</span> <span class="n">_LRL</span><span class="p">,</span> <span class="p">}</span>
 
 
-<span class="k">def</span> <span class="nf">dubins_path_planning_from_origin</span><span class="p">(</span><span class="n">end_x</span><span class="p">,</span> <span class="n">end_y</span><span class="p">,</span> <span class="n">end_yaw</span><span class="p">,</span> <span class="n">curvature</span><span class="p">,</span>
-                                     <span class="n">step_size</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_dubins_path_planning_from_origin</span><span class="p">(</span><span class="n">end_x</span><span class="p">,</span> <span class="n">end_y</span><span class="p">,</span> <span class="n">end_yaw</span><span class="p">,</span> <span class="n">curvature</span><span class="p">,</span>
+                                      <span class="n">step_size</span><span class="p">,</span> <span class="n">planning_funcs</span><span class="p">):</span>
     <span class="n">dx</span> <span class="o">=</span> <span class="n">end_x</span>
     <span class="n">dy</span> <span class="o">=</span> <span class="n">end_y</span>
-    <span class="n">D</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="n">D</span> <span class="o">*</span> <span class="n">curvature</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">hypot</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span> <span class="o">*</span> <span class="n">curvature</span>
 
-    <span class="n">theta</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="n">dx</span><span class="p">))</span>
-    <span class="n">alpha</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="o">-</span> <span class="n">theta</span><span class="p">)</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">atan2</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="n">dx</span><span class="p">))</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="o">-</span><span class="n">theta</span><span class="p">)</span>
     <span class="n">beta</span> <span class="o">=</span> <span class="n">_mod2pi</span><span class="p">(</span><span class="n">end_yaw</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)</span>
 
-    <span class="n">planning_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">_LSL</span><span class="p">,</span> <span class="n">right_straight_right</span><span class="p">,</span>
-                      <span class="n">left_straight_right</span><span class="p">,</span> <span class="n">right_straight_left</span><span class="p">,</span>
-                      <span class="n">right_left_right</span><span class="p">,</span> <span class="n">_LRL</span><span class="p">]</span>
-
     <span class="n">best_cost</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
-    <span class="n">bt</span><span class="p">,</span> <span class="n">bp</span><span class="p">,</span> <span class="n">bq</span><span class="p">,</span> <span class="n">best_mode</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">b_d1</span><span class="p">,</span> <span class="n">b_d2</span><span class="p">,</span> <span class="n">b_d3</span><span class="p">,</span> <span class="n">b_mode</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
 
     <span class="k">for</span> <span class="n">planner</span> <span class="ow">in</span> <span class="n">planning_funcs</span><span class="p">:</span>
-        <span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">mode</span> <span class="o">=</span> <span class="n">planner</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d3</span><span class="p">,</span> <span class="n">mode</span> <span class="o">=</span> <span class="n">planner</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">d1</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">continue</span>
 
-        <span class="n">cost</span> <span class="o">=</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">best_cost</span> <span class="o">&gt;</span> <span class="n">cost</span><span class="p">:</span>
-            <span class="n">bt</span><span class="p">,</span> <span class="n">bp</span><span class="p">,</span> <span class="n">bq</span><span class="p">,</span> <span class="n">best_mode</span> <span class="o">=</span> <span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">mode</span>
-            <span class="n">best_cost</span> <span class="o">=</span> <span class="n">cost</span>
-    <span class="n">lengths</span> <span class="o">=</span> <span class="p">[</span><span class="n">bt</span><span class="p">,</span> <span class="n">bp</span><span class="p">,</span> <span class="n">bq</span><span class="p">]</span>
+        <span class="n">cost</span> <span class="o">=</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">d1</span><span class="p">)</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">d2</span><span class="p">)</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">d3</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">best_cost</span> <span class="o">&gt;</span> <span class="n">cost</span><span class="p">:</span>  <span class="c1"># Select minimum length one.</span>
+            <span class="n">b_d1</span><span class="p">,</span> <span class="n">b_d2</span><span class="p">,</span> <span class="n">b_d3</span><span class="p">,</span> <span class="n">b_mode</span><span class="p">,</span> <span class="n">best_cost</span> <span class="o">=</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d3</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">cost</span>
 
-    <span class="n">x_list</span><span class="p">,</span> <span class="n">y_list</span><span class="p">,</span> <span class="n">yaw_list</span><span class="p">,</span> <span class="n">directions</span> <span class="o">=</span> <span class="n">generate_local_course</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">lengths</span><span class="p">),</span>
-                                                                 <span class="n">lengths</span><span class="p">,</span>
-                                                                 <span class="n">best_mode</span><span class="p">,</span>
-                                                                 <span class="n">curvature</span><span class="p">,</span>
-                                                                 <span class="n">step_size</span><span class="p">)</span>
+    <span class="n">lengths</span> <span class="o">=</span> <span class="p">[</span><span class="n">b_d1</span><span class="p">,</span> <span class="n">b_d2</span><span class="p">,</span> <span class="n">b_d3</span><span class="p">]</span>
+    <span class="n">x_list</span><span class="p">,</span> <span class="n">y_list</span><span class="p">,</span> <span class="n">yaw_list</span> <span class="o">=</span> <span class="n">_generate_local_course</span><span class="p">(</span><span class="n">lengths</span><span class="p">,</span> <span class="n">b_mode</span><span class="p">,</span>
+                                                      <span class="n">curvature</span><span class="p">,</span> <span class="n">step_size</span><span class="p">)</span>
 
     <span class="n">lengths</span> <span class="o">=</span> <span class="p">[</span><span class="n">length</span> <span class="o">/</span> <span class="n">curvature</span> <span class="k">for</span> <span class="n">length</span> <span class="ow">in</span> <span class="n">lengths</span><span class="p">]</span>
 
-    <span class="k">return</span> <span class="n">x_list</span><span class="p">,</span> <span class="n">y_list</span><span class="p">,</span> <span class="n">yaw_list</span><span class="p">,</span> <span class="n">best_mode</span><span class="p">,</span> <span class="n">lengths</span>
+    <span class="k">return</span> <span class="n">x_list</span><span class="p">,</span> <span class="n">y_list</span><span class="p">,</span> <span class="n">yaw_list</span><span class="p">,</span> <span class="n">b_mode</span><span class="p">,</span> <span class="n">lengths</span>
 
 
-<span class="k">def</span> <span class="nf">interpolate</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">max_curvature</span><span class="p">,</span> <span class="n">origin_x</span><span class="p">,</span> <span class="n">origin_y</span><span class="p">,</span>
-                <span class="n">origin_yaw</span><span class="p">,</span> <span class="n">path_x</span><span class="p">,</span> <span class="n">path_y</span><span class="p">,</span> <span class="n">path_yaw</span><span class="p">,</span> <span class="n">directions</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_interpolate</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">max_curvature</span><span class="p">,</span> <span class="n">origin_x</span><span class="p">,</span> <span class="n">origin_y</span><span class="p">,</span>
+                 <span class="n">origin_yaw</span><span class="p">,</span> <span class="n">path_x</span><span class="p">,</span> <span class="n">path_y</span><span class="p">,</span> <span class="n">path_yaw</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;S&quot;</span><span class="p">:</span>
-        <span class="n">path_x</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin_x</span> <span class="o">+</span> <span class="n">length</span> <span class="o">/</span> <span class="n">max_curvature</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">origin_yaw</span><span class="p">)</span>
-        <span class="n">path_y</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin_y</span> <span class="o">+</span> <span class="n">length</span> <span class="o">/</span> <span class="n">max_curvature</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">origin_yaw</span><span class="p">)</span>
-        <span class="n">path_yaw</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin_yaw</span>
+        <span class="n">path_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">origin_x</span> <span class="o">+</span> <span class="n">length</span> <span class="o">/</span> <span class="n">max_curvature</span> <span class="o">*</span> <span class="n">cos</span><span class="p">(</span><span class="n">origin_yaw</span><span class="p">))</span>
+        <span class="n">path_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">origin_y</span> <span class="o">+</span> <span class="n">length</span> <span class="o">/</span> <span class="n">max_curvature</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">origin_yaw</span><span class="p">))</span>
+        <span class="n">path_yaw</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">origin_yaw</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>  <span class="c1"># curve</span>
-        <span class="n">ldx</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">length</span><span class="p">)</span> <span class="o">/</span> <span class="n">max_curvature</span>
+        <span class="n">ldx</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">length</span><span class="p">)</span> <span class="o">/</span> <span class="n">max_curvature</span>
         <span class="n">ldy</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span>  <span class="c1"># left turn</span>
-            <span class="n">ldy</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">length</span><span class="p">))</span> <span class="o">/</span> <span class="n">max_curvature</span>
+            <span class="n">ldy</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">cos</span><span class="p">(</span><span class="n">length</span><span class="p">))</span> <span class="o">/</span> <span class="n">max_curvature</span>
         <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;R&quot;</span><span class="p">:</span>  <span class="c1"># right turn</span>
-            <span class="n">ldy</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">length</span><span class="p">))</span> <span class="o">/</span> <span class="o">-</span><span class="n">max_curvature</span>
-        <span class="n">gdx</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="o">-</span><span class="n">origin_yaw</span><span class="p">)</span> <span class="o">*</span> <span class="n">ldx</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="o">-</span><span class="n">origin_yaw</span><span class="p">)</span> <span class="o">*</span> <span class="n">ldy</span>
-        <span class="n">gdy</span> <span class="o">=</span> <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="o">-</span><span class="n">origin_yaw</span><span class="p">)</span> <span class="o">*</span> <span class="n">ldx</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="o">-</span><span class="n">origin_yaw</span><span class="p">)</span> <span class="o">*</span> <span class="n">ldy</span>
-        <span class="n">path_x</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin_x</span> <span class="o">+</span> <span class="n">gdx</span>
-        <span class="n">path_y</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin_y</span> <span class="o">+</span> <span class="n">gdy</span>
+            <span class="n">ldy</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">cos</span><span class="p">(</span><span class="n">length</span><span class="p">))</span> <span class="o">/</span> <span class="o">-</span><span class="n">max_curvature</span>
+        <span class="n">gdx</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="o">-</span><span class="n">origin_yaw</span><span class="p">)</span> <span class="o">*</span> <span class="n">ldx</span> <span class="o">+</span> <span class="n">sin</span><span class="p">(</span><span class="o">-</span><span class="n">origin_yaw</span><span class="p">)</span> <span class="o">*</span> <span class="n">ldy</span>
+        <span class="n">gdy</span> <span class="o">=</span> <span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="o">-</span><span class="n">origin_yaw</span><span class="p">)</span> <span class="o">*</span> <span class="n">ldx</span> <span class="o">+</span> <span class="n">cos</span><span class="p">(</span><span class="o">-</span><span class="n">origin_yaw</span><span class="p">)</span> <span class="o">*</span> <span class="n">ldy</span>
+        <span class="n">path_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">origin_x</span> <span class="o">+</span> <span class="n">gdx</span><span class="p">)</span>
+        <span class="n">path_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">origin_y</span> <span class="o">+</span> <span class="n">gdy</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span>  <span class="c1"># left turn</span>
-        <span class="n">path_yaw</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin_yaw</span> <span class="o">+</span> <span class="n">length</span>
-    <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;R&quot;</span><span class="p">:</span>  <span class="c1"># right turn</span>
-        <span class="n">path_yaw</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin_yaw</span> <span class="o">-</span> <span class="n">length</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span>  <span class="c1"># left turn</span>
+            <span class="n">path_yaw</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">origin_yaw</span> <span class="o">+</span> <span class="n">length</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;R&quot;</span><span class="p">:</span>  <span class="c1"># right turn</span>
+            <span class="n">path_yaw</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">origin_yaw</span> <span class="o">-</span> <span class="n">length</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">length</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
-        <span class="n">directions</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">directions</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-
-    <span class="k">return</span> <span class="n">path_x</span><span class="p">,</span> <span class="n">path_y</span><span class="p">,</span> <span class="n">path_yaw</span><span class="p">,</span> <span class="n">directions</span>
+    <span class="k">return</span> <span class="n">path_x</span><span class="p">,</span> <span class="n">path_y</span><span class="p">,</span> <span class="n">path_yaw</span>
 
 
-<span class="k">def</span> <span class="nf">generate_local_course</span><span class="p">(</span><span class="n">total_length</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">modes</span><span class="p">,</span> <span class="n">max_curvature</span><span class="p">,</span>
-                          <span class="n">step_size</span><span class="p">):</span>
-    <span class="n">n_point</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">trunc</span><span class="p">(</span><span class="n">total_length</span> <span class="o">/</span> <span class="n">step_size</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span>
+<span class="k">def</span> <span class="nf">_generate_local_course</span><span class="p">(</span><span class="n">lengths</span><span class="p">,</span> <span class="n">modes</span><span class="p">,</span> <span class="n">max_curvature</span><span class="p">,</span> <span class="n">step_size</span><span class="p">):</span>
+    <span class="n">p_x</span><span class="p">,</span> <span class="n">p_y</span><span class="p">,</span> <span class="n">p_yaw</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span>
 
-    <span class="n">p_x</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_point</span><span class="p">)]</span>
-    <span class="n">p_y</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_point</span><span class="p">)]</span>
-    <span class="n">p_yaw</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_point</span><span class="p">)]</span>
-    <span class="n">directions</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_point</span><span class="p">)]</span>
-    <span class="n">ind</span> <span class="o">=</span> <span class="mi">1</span>
-
-    <span class="k">if</span> <span class="n">lengths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
-        <span class="n">directions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">directions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-
-    <span class="n">ll</span> <span class="o">=</span> <span class="mf">0.0</span>
-
-    <span class="k">for</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">modes</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">modes</span><span class="p">))):</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">modes</span><span class="p">,</span> <span class="n">lengths</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">length</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
             <span class="k">continue</span>
-        <span class="k">elif</span> <span class="n">length</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
-            <span class="n">dist</span> <span class="o">=</span> <span class="n">step_size</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">dist</span> <span class="o">=</span> <span class="o">-</span><span class="n">step_size</span>
 
         <span class="c1"># set origin state</span>
-        <span class="n">origin_x</span><span class="p">,</span> <span class="n">origin_y</span><span class="p">,</span> <span class="n">origin_yaw</span> <span class="o">=</span> <span class="n">p_x</span><span class="p">[</span><span class="n">ind</span><span class="p">],</span> <span class="n">p_y</span><span class="p">[</span><span class="n">ind</span><span class="p">],</span> <span class="n">p_yaw</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+        <span class="n">origin_x</span><span class="p">,</span> <span class="n">origin_y</span><span class="p">,</span> <span class="n">origin_yaw</span> <span class="o">=</span> <span class="n">p_x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">p_y</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">p_yaw</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-        <span class="n">ind</span> <span class="o">-=</span> <span class="mi">1</span>
-        <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span><span class="n">lengths</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">lengths</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">pd</span> <span class="o">=</span> <span class="o">-</span> <span class="n">dist</span> <span class="o">-</span> <span class="n">ll</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">pd</span> <span class="o">=</span> <span class="n">dist</span> <span class="o">-</span> <span class="n">ll</span>
+        <span class="n">current_length</span> <span class="o">=</span> <span class="n">step_size</span>
+        <span class="k">while</span> <span class="nb">abs</span><span class="p">(</span><span class="n">current_length</span> <span class="o">+</span> <span class="n">step_size</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">length</span><span class="p">):</span>
+            <span class="n">p_x</span><span class="p">,</span> <span class="n">p_y</span><span class="p">,</span> <span class="n">p_yaw</span> <span class="o">=</span> <span class="n">_interpolate</span><span class="p">(</span><span class="n">current_length</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">max_curvature</span><span class="p">,</span>
+                                           <span class="n">origin_x</span><span class="p">,</span> <span class="n">origin_y</span><span class="p">,</span> <span class="n">origin_yaw</span><span class="p">,</span>
+                                           <span class="n">p_x</span><span class="p">,</span> <span class="n">p_y</span><span class="p">,</span> <span class="n">p_yaw</span><span class="p">)</span>
+            <span class="n">current_length</span> <span class="o">+=</span> <span class="n">step_size</span>
 
-        <span class="k">while</span> <span class="nb">abs</span><span class="p">(</span><span class="n">pd</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">length</span><span class="p">):</span>
-            <span class="n">ind</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="n">p_x</span><span class="p">,</span> <span class="n">p_y</span><span class="p">,</span> <span class="n">p_yaw</span><span class="p">,</span> <span class="n">directions</span> <span class="o">=</span> <span class="n">interpolate</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">pd</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span>
-                                                      <span class="n">max_curvature</span><span class="p">,</span>
-                                                      <span class="n">origin_x</span><span class="p">,</span>
-                                                      <span class="n">origin_y</span><span class="p">,</span>
-                                                      <span class="n">origin_yaw</span><span class="p">,</span>
-                                                      <span class="n">p_x</span><span class="p">,</span> <span class="n">p_y</span><span class="p">,</span>
-                                                      <span class="n">p_yaw</span><span class="p">,</span>
-                                                      <span class="n">directions</span><span class="p">)</span>
-            <span class="n">pd</span> <span class="o">+=</span> <span class="n">dist</span>
+        <span class="n">p_x</span><span class="p">,</span> <span class="n">p_y</span><span class="p">,</span> <span class="n">p_yaw</span> <span class="o">=</span> <span class="n">_interpolate</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">max_curvature</span><span class="p">,</span> <span class="n">origin_x</span><span class="p">,</span>
+                                       <span class="n">origin_y</span><span class="p">,</span> <span class="n">origin_yaw</span><span class="p">,</span> <span class="n">p_x</span><span class="p">,</span> <span class="n">p_y</span><span class="p">,</span> <span class="n">p_yaw</span><span class="p">)</span>
 
-        <span class="n">ll</span> <span class="o">=</span> <span class="n">length</span> <span class="o">-</span> <span class="n">pd</span> <span class="o">-</span> <span class="n">dist</span>  <span class="c1"># calc remain length</span>
-
-        <span class="n">ind</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="n">p_x</span><span class="p">,</span> <span class="n">p_y</span><span class="p">,</span> <span class="n">p_yaw</span><span class="p">,</span> <span class="n">directions</span> <span class="o">=</span> <span class="n">interpolate</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span>
-                                                  <span class="n">max_curvature</span><span class="p">,</span>
-                                                  <span class="n">origin_x</span><span class="p">,</span> <span class="n">origin_y</span><span class="p">,</span>
-                                                  <span class="n">origin_yaw</span><span class="p">,</span>
-                                                  <span class="n">p_x</span><span class="p">,</span> <span class="n">p_y</span><span class="p">,</span> <span class="n">p_yaw</span><span class="p">,</span>
-                                                  <span class="n">directions</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_x</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
-
-    <span class="c1"># remove unused data</span>
-    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_x</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">p_x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
-        <span class="n">p_x</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-        <span class="n">p_y</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-        <span class="n">p_yaw</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-        <span class="n">directions</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-
-    <span class="k">return</span> <span class="n">p_x</span><span class="p">,</span> <span class="n">p_y</span><span class="p">,</span> <span class="n">p_yaw</span><span class="p">,</span> <span class="n">directions</span>
-
-
-<span class="k">def</span> <span class="nf">plot_arrow</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yaw</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span>
-               <span class="n">ec</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
-        <span class="k">for</span> <span class="p">(</span><span class="n">i_x</span><span class="p">,</span> <span class="n">i_y</span><span class="p">,</span> <span class="n">i_yaw</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yaw</span><span class="p">):</span>
-            <span class="n">plot_arrow</span><span class="p">(</span><span class="n">i_x</span><span class="p">,</span> <span class="n">i_y</span><span class="p">,</span> <span class="n">i_yaw</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">length</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">yaw</span><span class="p">),</span> <span class="n">length</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">yaw</span><span class="p">),</span> <span class="n">fc</span><span class="o">=</span><span class="n">fc</span><span class="p">,</span>
-                  <span class="n">ec</span><span class="o">=</span><span class="n">ec</span><span class="p">,</span> <span class="n">head_width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">head_length</span><span class="o">=</span><span class="n">width</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">p_x</span><span class="p">,</span> <span class="n">p_y</span><span class="p">,</span> <span class="n">p_yaw</span>
 
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dubins path planner sample start!!&quot;</span><span class="p">)</span>
     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">from</span> <span class="nn">utils.plot</span> <span class="kn">import</span> <span class="n">plot_arrow</span>
 
     <span class="n">start_x</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># [m]</span>
     <span class="n">start_y</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># [m]</span>
@@ -464,12 +400,9 @@
                                                                <span class="n">curvature</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">show_animation</span><span class="p">:</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">path_x</span><span class="p">,</span> <span class="n">path_y</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;final course &quot;</span> <span class="o">+</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mode</span><span class="p">))</span>
-
-        <span class="c1"># plotting</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">path_x</span><span class="p">,</span> <span class="n">path_y</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mode</span><span class="p">))</span>
         <span class="n">plot_arrow</span><span class="p">(</span><span class="n">start_x</span><span class="p">,</span> <span class="n">start_y</span><span class="p">,</span> <span class="n">start_yaw</span><span class="p">)</span>
         <span class="n">plot_arrow</span><span class="p">(</span><span class="n">end_x</span><span class="p">,</span> <span class="n">end_y</span><span class="p">,</span> <span class="n">end_yaw</span><span class="p">)</span>
-
         <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
