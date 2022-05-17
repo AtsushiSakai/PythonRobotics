@@ -10,7 +10,7 @@ import os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/")
 
-from math import sin, cos, atan2, sqrt, acos, pi, trunc, hypot
+from math import sin, cos, atan2, sqrt, acos, pi, hypot
 import numpy as np
 from utils.angle import angle_mod, rot_mat_2d
 
@@ -269,7 +269,7 @@ def _generate_local_course(lengths, modes, max_curvature, step_size):
         origin_x, origin_y, origin_yaw = p_x[-1], p_y[-1], p_yaw[-1]
 
         current_length = step_size
-        while abs(current_length+step_size) <= abs(length):
+        while abs(current_length + step_size) <= abs(length):
             p_x, p_y, p_yaw = _interpolate(current_length, mode, max_curvature,
                                            origin_x, origin_y, origin_yaw,
                                            p_x, p_y, p_yaw)
