@@ -10,6 +10,9 @@ Ref
 (http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)
 
 """
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/")
 
 import copy
 import itertools
@@ -63,7 +66,7 @@ def cal_observation_sigma():
     return sigma
 
 
-def calc_rotational_matrix(angle):
+def calc_3d_rotational_matrix(angle):
     return Rot.from_euler('z', angle).as_matrix()
 
 
@@ -82,8 +85,8 @@ def calc_edge(x1, y1, yaw1, x2, y2, yaw2, d1,
     edge.e[1, 0] = y2 - y1 - tmp3 + tmp4
     edge.e[2, 0] = 0
 
-    Rt1 = calc_rotational_matrix(tangle1)
-    Rt2 = calc_rotational_matrix(tangle2)
+    Rt1 = calc_3d_rotational_matrix(tangle1)
+    Rt2 = calc_3d_rotational_matrix(tangle2)
 
     sig1 = cal_observation_sigma()
     sig2 = cal_observation_sigma()

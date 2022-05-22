@@ -12,11 +12,17 @@ efficient-l-shape-fitting-for-vehicle-detection-using-laser-scanners/
 
 """
 
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/")
+
+
 import matplotlib.pyplot as plt
 import numpy as np
 import itertools
 from enum import Enum
-from scipy.spatial.transform import Rotation as Rot
+
+from utils.angle import rot_mat_2d
 
 from Mapping.rectangle_fitting.simulator \
     import VehicleSimulator, LidarSimulator
@@ -104,8 +110,7 @@ class LShapeFitting:
         min_cost = (-float('inf'), None)
         for theta in np.arange(0.0, np.pi / 2.0 - d_theta, d_theta):
 
-            rot = Rot.from_euler('z', theta).as_matrix()[0:2, 0:2]
-            c = X @ rot
+            c = X @ rot_mat_2d(theta)
             c1 = c[:, 0]
             c2 = c[:, 1]
 

@@ -4,14 +4,17 @@ Grid based sweep planner
 author: Atsushi Sakai
 """
 
-import math
-import os
 import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/")
+
+import math
 from enum import IntEnum
 
 import numpy as np
-from scipy.spatial.transform import Rotation as Rot
 import matplotlib.pyplot as plt
+
+from utils.angle import rot_mat_2d
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
                 "/../../Mapping/")
@@ -148,16 +151,14 @@ def convert_grid_coordinate(ox, oy, sweep_vec, sweep_start_position):
     tx = [ix - sweep_start_position[0] for ix in ox]
     ty = [iy - sweep_start_position[1] for iy in oy]
     th = math.atan2(sweep_vec[1], sweep_vec[0])
-    rot = Rot.from_euler('z', th).as_matrix()[0:2, 0:2]
-    converted_xy = np.stack([tx, ty]).T @ rot
+    converted_xy = np.stack([tx, ty]).T @ rot_mat_2d(th)
 
     return converted_xy[:, 0], converted_xy[:, 1]
 
 
 def convert_global_coordinate(x, y, sweep_vec, sweep_start_position):
     th = math.atan2(sweep_vec[1], sweep_vec[0])
-    rot = Rot.from_euler('z', -th).as_matrix()[0:2, 0:2]
-    converted_xy = np.stack([x, y]).T @ rot
+    converted_xy = np.stack([x, y]).T @ rot_mat_2d(-th)
     rx = [ix + sweep_start_position[0] for ix in converted_xy[:, 0]]
     ry = [iy + sweep_start_position[1] for iy in converted_xy[:, 1]]
     return rx, ry

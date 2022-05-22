@@ -6,11 +6,15 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import math
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/")
 
+import math
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.spatial.transform import Rotation as Rot
+
+from utils.angle import rot_mat_2d
 
 # Covariance for EKF simulation
 Q = np.diag([
@@ -149,8 +153,7 @@ def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
     x = [a * math.cos(it) for it in t]
     y = [b * math.sin(it) for it in t]
     angle = math.atan2(eigvec[1, bigind], eigvec[0, bigind])
-    rot = Rot.from_euler('z', angle).as_matrix()[0:2, 0:2]
-    fx = rot @ (np.array([x, y]))
+    fx = rot_mat_2d(angle) @ (np.array([x, y]))
     px = np.array(fx[0, :] + xEst[0, 0]).flatten()
     py = np.array(fx[1, :] + xEst[1, 0]).flatten()
     plt.plot(px, py, "--r")
