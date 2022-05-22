@@ -9,14 +9,18 @@ Direct Sampling of an Admissible Ellipsoidal Heuristic
 https://arxiv.org/pdf/1404.2334.pdf
 
 """
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/")
 
 import copy
 import math
 import random
 
 import matplotlib.pyplot as plt
-from scipy.spatial.transform import Rotation as Rot
 import numpy as np
+
+from utils.angle import rot_mat_2d
 
 show_animation = True
 
@@ -308,8 +312,7 @@ class InformedRRTStar:
         t = np.arange(0, 2 * math.pi + 0.1, 0.1)
         x = [a * math.cos(it) for it in t]
         y = [b * math.sin(it) for it in t]
-        rot = Rot.from_euler('z', -angle).as_matrix()[0:2, 0:2]
-        fx = rot @ np.array([x, y])
+        fx = rot_mat_2d(-angle) @ np.array([x, y])
         px = np.array(fx[0, :] + cx).flatten()
         py = np.array(fx[1, :] + cy).flatten()
         plt.plot(cx, cy, "xc")

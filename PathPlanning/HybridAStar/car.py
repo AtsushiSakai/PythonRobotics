@@ -6,11 +6,16 @@ author: Zheng Zh (@Zhengzh)
 
 """
 
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/")
+
 from math import cos, sin, tan, pi
 
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.spatial.transform import Rotation as Rot
+
+from utils.angle import rot_mat_2d
 
 WB = 3.0  # rear to front wheel
 W = 2.0  # width of car
@@ -45,7 +50,7 @@ def check_car_collision(x_list, y_list, yaw_list, ox, oy, kd_tree):
 
 def rectangle_check(x, y, yaw, ox, oy):
     # transform obstacles to base link frame
-    rot = Rot.from_euler('z', yaw).as_matrix()[0:2, 0:2]
+    rot = rot_mat_2d(yaw)
     for iox, ioy in zip(ox, oy):
         tx = iox - x
         ty = ioy - y
