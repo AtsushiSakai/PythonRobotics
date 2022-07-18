@@ -136,7 +136,7 @@ def astar_torus(grid, start_node, goal_node):
 
     Args:
         grid: An occupancy grid (ndarray)
-        start_node: Initial joint configuation (tuple)
+        start_node: Initial joint configuration (tuple)
         goal_node: Goal joint configuration (tuple)
 
     Returns:

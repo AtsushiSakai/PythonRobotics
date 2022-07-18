@@ -39,7 +39,7 @@ an array of landmark locations
 -  The blue line is the true trajectory
 -  The red line is the estimated trajectory
 -  The red dots represent the distribution of particles
--  The black line represent dead reckoning tracjectory
+-  The black line represent dead reckoning trajectory
 -  The blue x is the observed and estimated landmarks
 -  The black x is the true landmark
 
