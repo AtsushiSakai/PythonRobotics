@@ -151,7 +151,7 @@ values incorporate the error into the estimation.
 
 :math:`\begin{equation*} X_{DR} = FX + B(U + R) \end{equation*}`
 
-The implementation of the motion model prediciton code is shown in
+The implementation of the motion model prediction code is shown in
 ``motion_model``. The ``observation`` function shows how the simulation
 uses (or doesn’t use) the process noise ``Rsim`` to the find the ground
 truth and dead reckoning estimates of the pose.
