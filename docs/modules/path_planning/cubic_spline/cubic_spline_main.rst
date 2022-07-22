@@ -26,7 +26,8 @@ As the above equation, there are 4 unknown parameters :math:`(a,b,c,d)` for
 one interval, so if the number of sample point is :math:`N`, the
 interpolation has :math:`4N` unknown parameters.
 
-The following five conditions are used to determine the 4N unknown parameters:
+The following five conditions are used to determine the :math`4N`
+unknown parameters:
 
 Constraint 1: Terminal constraints
 ===================================
@@ -44,6 +45,7 @@ Constraint 2: Point continuous constraints
 :math:`S_j(x_{j+1})=S_{j+1}(x_{j+1})=y_{j+1}`
 
 This constraint is a continuity condition for the boundary of each interval.
+
 This constraint ensures that the boundary of each interval is continuous.
 
 Constraint 3: Tangent vector continuous constraints
@@ -51,10 +53,23 @@ Constraint 3: Tangent vector continuous constraints
 
 :math:`S'_j(x_{j+1})=S'_{j+1}(x_{j+1})`
 
+This constraint is a continuity condition for the first derivative of
+the boundary of each interval.
+
+This constraint makes the vectors of the boundaries of each
+interval continuous.
+
+
 Constraint 4: Curvature continuous constraints
 ==============================================
 
 :math:`S''_j(x_{j+1})=S''_{j+1}(x_{j+1})`
+
+This constraint is the continuity condition for the second derivative of
+the boundary of each interval.
+
+This constraint makes the curvature of the boundaries of each
+interval continuous.
 
 
 Constraint 5: Terminal curvature constraints
