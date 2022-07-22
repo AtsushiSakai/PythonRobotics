@@ -75,9 +75,11 @@ interval continuous.
 Constraint 5: Terminal curvature constraints
 ========================================================
 
-:math:`S''_0(0)=S''_{n+1}(x_{n})=0`
+:math:`S''_0(0)=S''_{n+1}(x_{n})=0`.
 
+The constraint is a boundary condition for the second derivative of the starting and ending points.
 
+Our sample code assumes these terminal curvatures are 0, which is well known as Natural Cubic Spline.
 
 2D spline path
 ~~~~~~~~~~~~~~~~~~~
