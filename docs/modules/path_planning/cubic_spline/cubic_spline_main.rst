@@ -11,9 +11,11 @@ The smoothness of the interpolating curve is expressed as :math:`C_0, C_1`, and 
 
 This representation represents continuity of the curve.
 For example, for a spline curve in two-dimensional space:
-* C_0 is position continuous
-* C_1 is tangent vector continuous
-* C_2 is curvature vector continuous
+
+- :math:`C_0` is position continuous
+- :math:`C_1` is tangent vector continuous
+- :math:`C_2` is curvature vector continuous
+
 as shown in the following figure:
 
 .. image:: spline_continuity.png
@@ -155,6 +157,21 @@ Step4: calculate :math:`b_j`
 Spline coefficients :math:`b_j` can be calculated by the following equation:
 
 :math:`b_{i}=\frac{1}{h_i}(a_{i+1}-a_{i})-\frac{h_i}{3}(2c_{i}+c_{i+1})`
+
+How to calculate the first and second derivatives of the spline curve
+======================================================================
+
+After we can get the coefficients of the spline curve, we can calculate
+
+the first derivative by:
+
+:math:`y^{\prime}(x)=b+2cx+3dx^2`
+
+the second derivative by:
+
+:math:`y^{\prime \prime}(x)=2c+6dx`
+
+These equations can be calculated by differentiating the cubic polynomial.
 
 API
 ===

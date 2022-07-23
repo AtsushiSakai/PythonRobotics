@@ -114,8 +114,8 @@ class CubicSpline1D:
 
         i = self.__search_index(x)
         dx = x - self.x[i]
-        result = 2.0 * self.c[i] + 6.0 * self.d[i] * dx
-        return result
+        ddy = 2.0 * self.c[i] + 6.0 * self.d[i] * dx
+        return ddy
 
     def __search_index(self, x):
         """
