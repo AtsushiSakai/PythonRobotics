@@ -144,8 +144,8 @@ class CubicSpline1D:
         """
         B = np.zeros(self.nx)
         for i in range(self.nx - 2):
-            B[i + 1] = 3.0 * (a[i + 2] - a[i + 1]) / h[i + 1] - \
-                       3.0 * (a[i + 1] - a[i]) / h[i]
+            B[i + 1] = 3.0 * (a[i + 2] - a[i + 1]) / h[i + 1]\
+                - 3.0 * (a[i + 1] - a[i]) / h[i]
         return B
 
 
