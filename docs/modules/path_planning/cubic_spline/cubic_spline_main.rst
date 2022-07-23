@@ -137,6 +137,17 @@ Spline coefficients :math:`b_j` can be calculated by the following equation:
 
 :math:`b_{i}=\frac{1}{h_{i}}(a_{i+1}-a_{i})-\frac{h_{i}}{3(2 c_{i}+c_{i+1})`
 
+API
+===
+
+.. autofunction:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D
+
+.. autofunction:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D.calc_position
+
+.. autofunction:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D.calc_first_derivative
+
+.. autofunction:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D.calc_second_derivative
+
 2D spline path
 ~~~~~~~~~~~~~~~~~~~
 
@@ -151,10 +162,8 @@ Heading angle of each point can be also calculated analytically.
 .. image:: Figure_2.png
 .. image:: Figure_3.png
 
-APIs
-~~~~
-
-.. autofunction:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D
+API
+===
 
 .. autofunction:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline2D
 

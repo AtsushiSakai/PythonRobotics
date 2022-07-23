@@ -38,7 +38,7 @@ class CubicSpline1D:
                 (self.c[i + 1] + 2.0 * self.c[i]) / 3.0
             self.b.append(tb)
 
-    def calc(self, t):
+    def calc_position(self, t):
         """
         Calc position
 
@@ -58,7 +58,7 @@ class CubicSpline1D:
 
         return result
 
-    def calcd(self, t):
+    def calc_first_derivative(self, t):
         """
         Calc first derivative
 
@@ -75,7 +75,7 @@ class CubicSpline1D:
         result = self.b[i] + 2.0 * self.c[i] * dx + 3.0 * self.d[i] * dx ** 2.0
         return result
 
-    def calcdd(self, t):
+    def calc_second_derivative(self, t):
         """
         Calc second derivative
         """
@@ -126,7 +126,7 @@ class CubicSpline1D:
 
 class CubicSpline2D:
     """
-    2D Cubic CubicSpline1D class
+    Cubic CubicSpline2D class
 
     """
 
@@ -147,8 +147,8 @@ class CubicSpline2D:
         """
         calc position
         """
-        x = self.sx.calc(s)
-        y = self.sy.calc(s)
+        x = self.sx.calc_position(s)
+        y = self.sy.calc_position(s)
 
         return x, y
 
@@ -156,10 +156,10 @@ class CubicSpline2D:
         """
         calc curvature
         """
-        dx = self.sx.calcd(s)
-        ddx = self.sx.calcdd(s)
-        dy = self.sy.calcd(s)
-        ddy = self.sy.calcdd(s)
+        dx = self.sx.calc_first_derivative(s)
+        ddx = self.sx.calc_second_derivative(s)
+        dy = self.sy.calc_first_derivative(s)
+        ddy = self.sy.calc_second_derivative(s)
         k = (ddy * dx - ddx * dy) / ((dx ** 2 + dy ** 2)**(3 / 2))
         return k
 
@@ -167,8 +167,8 @@ class CubicSpline2D:
         """
         calc yaw
         """
-        dx = self.sx.calcd(s)
-        dy = self.sy.calcd(s)
+        dx = self.sx.calc_first_derivative(s)
+        dy = self.sy.calc_first_derivative(s)
         yaw = math.atan2(dy, dx)
         return yaw
 
