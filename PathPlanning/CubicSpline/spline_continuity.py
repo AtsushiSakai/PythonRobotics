@@ -28,8 +28,6 @@ def main():
     y = [0.7, -6, -5, -3.5, 0.0, 5.0, -2.0]
     ds = 0.1  # [m] distance of each interpolated points
 
-
-
     plt.subplots(1)
     plt.plot(x, y, "xb", label="Data points")
 
