@@ -26,7 +26,7 @@ As the above equation, there are 4 unknown parameters :math:`(a,b,c,d)` for
 one interval, so if the number of data points is :math:`N`, the
 interpolation has :math:`4N` unknown parameters.
 
-The following five conditions are used to determine the :math`4N`
+The following five conditions are used to determine the :math:`4N`
 unknown parameters:
 
 Constraint 1: Terminal constraints
@@ -135,7 +135,7 @@ Step4: calculate :math:`b_j`
 
 Spline coefficients :math:`b_j` can be calculated by the following equation:
 
-:math:`b_{i}=\frac{1}{h_{i}}(a_{i+1}-a_{i})-\frac{h_{i}}{3(2 c_{i}+c_{i+1})`
+:math:`b_{i}=\frac{1}{h_i}(a_{i+1}-a_{i})-\frac{h_i}{3}(2c_{i}+c_{i+1})`
 
 API
 ===
