@@ -10,19 +10,21 @@ import bisect
 
 
 class CubicSpline1D:
+    """
+    1D Cubic Spline class
+
+    Parameters
+    ----------
+    x : list
+        x coordinates for data points. This x coordinates must be
+        sorted
+        in ascending order.
+    y : list
+        y coordinates for data points
+    """
 
     def __init__(self, x, y):
-        """
-        1D Cubic Spline class
 
-        Parameters
-        ----------
-        x : list
-            x coordinates for data points. This x coordinates must be sorted
-            in ascending order.
-        y : list
-            y coordinates for data points
-        """
         h = np.diff(x)
         if np.any(h < 0):
             raise ValueError("x coordinates must be sorted in ascending order")
