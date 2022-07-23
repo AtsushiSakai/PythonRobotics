@@ -5,12 +5,12 @@ Cubic spline planning
 ~~~~~~~~~~~~~~~~~~~
 
 Cubic spline interpolation is a method of smoothly
-interpolating between multiple sample points when given
-multiple sample points, as shown in the figure below.
+interpolating between multiple data points when given
+multiple data points, as shown in the figure below.
 
 .. image:: spline.png
 
-It separates between each interval between sample points.
+It separates between each interval between data points.
 
 The each interval part is approximated by each cubic polynomial.
 
@@ -23,7 +23,7 @@ where :math:`x_j < x < x_{j+1}`, :math:`x_j` is the j-th node of the spline,
 of the spline.
 
 As the above equation, there are 4 unknown parameters :math:`(a,b,c,d)` for
-one interval, so if the number of sample point is :math:`N`, the
+one interval, so if the number of data points is :math:`N`, the
 interpolation has :math:`4N` unknown parameters.
 
 The following five conditions are used to determine the :math`4N`
@@ -37,7 +37,7 @@ Constraint 1: Terminal constraints
 This constraint is the terminal constraint of each interval.
 
 The polynomial of each interval will pass through the x,y coordinates of
-the sample point.
+the data points.
 
 Constraint 2: Point continuous constraints
 ============================================
@@ -81,8 +81,24 @@ The constraint is a boundary condition for the second derivative of the starting
 
 Our sample code assumes these terminal curvatures are 0, which is well known as Natural Cubic Spline.
 
-How to calculate the :math:`4N` unknown parameters
-==================================================
+How to calculate the unknown parameters :math:`a_j, b_j, c_j, d_j`
+===================================================================
+
+Step1: calculate :math:`a_j`
+-----------------------------
+
+Spline coefficients :math:`a_j` can be calculated by y positions of the data points:
+
+:math:`a_j = y_i`.
+
+Step2: calculate :math:`c_j`
+-----------------------------
+
+Spline coefficients :math:`c_j` can be calculated by solving the linear equation:
+
+:math:`Ac_j = B`.
+
+The matrix :math:`A` and :math:`B` are defined as follows:
 
 .. math::
 
@@ -95,6 +111,31 @@ How to calculate the :math:`4N` unknown parameters
 	\vdots & \vdots & & & & \\
 	0 & 0 & 0 & \cdots & 0 & 1
 	\end{array}\right]
+
+.. math::
+	B=\left[\begin{array}{c}
+	0 \\
+	\frac{3}{h_{1}}\left(a_{2}-a_{1}\right)-\frac{3}{h_{0}}\left(a_{1}-a_{0}\right) \\
+	\vdots \\
+	\frac{3}{h_{n-1}}\left(a_{n}-a_{n-1}\right)-\frac{3}{h_{n-2}}\left(a_{n-1}-a_{n-2}\right) \\
+	0
+	\end{array}\right]
+
+where :math:`h_{i}` is the x position distance between the i-th and (i+1)-th data points.
+
+Step3: calculate :math:`d_j`
+-----------------------------
+
+Spline coefficients :math:`d_j` can be calculated by the following equation:
+
+:math:`d_{j}=\frac{c_{j+1}-c_{j}}{3 h_{j}}`
+
+Step4: calculate :math:`b_j`
+-----------------------------
+
+Spline coefficients :math:`b_j` can be calculated by the following equation:
+
+:math:`b_{i}=\frac{1}{h_{i}}\left(a_{i+1}-a_{i}\right)-\frac{h_{i}}{3}\left(2 c_{i}+c_{i+1})`
 
 2D spline path
 ~~~~~~~~~~~~~~~~~~~
@@ -114,6 +155,8 @@ APIs
 ~~~~
 
 .. autofunction:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D
+
+.. autofunction:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline2D
 
 References
 ~~~~~~~~~~

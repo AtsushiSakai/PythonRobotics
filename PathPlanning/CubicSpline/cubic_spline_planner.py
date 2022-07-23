@@ -15,7 +15,7 @@ class CubicSpline1D:
     """
 
     def __init__(self, x, y):
-        self.b, self.c, self.d, self.w = [], [], [], []
+        self.a, self.b, self.c, self.d = [], [], [], []
 
         self.x = x
         self.y = y
@@ -23,14 +23,13 @@ class CubicSpline1D:
         self.nx = len(x)  # dimension of x
         h = np.diff(x)
 
-        # calc coefficient c
+        # calc coefficient a
         self.a = [iy for iy in y]
 
         # calc coefficient c
         A = self.__calc_A(h)
-        B = self.__calc_B(h)
+        B = self.__calc_B(h, self.a)
         self.c = np.linalg.solve(A, B)
-        #  print(self.c1)
 
         # calc spline coefficient b and d
         for i in range(self.nx - 1):
@@ -112,17 +111,16 @@ class CubicSpline1D:
         A[0, 1] = 0.0
         A[self.nx - 1, self.nx - 2] = 0.0
         A[self.nx - 1, self.nx - 1] = 1.0
-        #  print(A)
         return A
 
-    def __calc_B(self, h):
+    def __calc_B(self, h, a):
         """
         calc matrix B for spline coefficient c
         """
         B = np.zeros(self.nx)
         for i in range(self.nx - 2):
-            B[i + 1] = 3.0 * (self.a[i + 2] - self.a[i + 1]) / \
-                h[i + 1] - 3.0 * (self.a[i + 1] - self.a[i]) / h[i]
+            B[i + 1] = 3.0 * (a[i + 2] - a[i + 1]) / h[i + 1] \
+                       - 3.0 * (a[i + 1] - a[i]) / h[i]
         return B
 
 
