@@ -143,6 +143,7 @@ API
 These are 1D cubic spline interpolation APIs:
 
 .. autoclass:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D
+	:members:
 
 .. autofunction:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D
 .. autofunction:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D.calc_position
