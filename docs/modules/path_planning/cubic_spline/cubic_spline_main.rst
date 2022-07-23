@@ -140,6 +140,8 @@ Spline coefficients :math:`b_j` can be calculated by the following equation:
 API
 ===
 
+These are 1D cubic spline interpolation APIs:
+
 .. autofunction:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D
 
 .. autofunction:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D.calc_position

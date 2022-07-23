@@ -10,18 +10,27 @@ import bisect
 
 
 class CubicSpline1D:
-    """
-    Cubic CubicSpline1D class
-    """
 
     def __init__(self, x, y):
-        self.a, self.b, self.c, self.d = [], [], [], []
+        """
+        1D Cubic Spline class
 
+        Parameters
+        ----------
+        x : list
+            x coordinates for data points. This x coordinates must be sorted
+            in ascending order.
+        y : list
+            y coordinates for data points
+        """
+        h = np.diff(x)
+        if np.any(h < 0):
+            raise ValueError("x coordinates must be sorted in ascending order")
+
+        self.a, self.b, self.c, self.d = [], [], [], []
         self.x = x
         self.y = y
-
         self.nx = len(x)  # dimension of x
-        h = np.diff(x)
 
         # calc coefficient a
         self.a = [iy for iy in y]
@@ -39,55 +48,70 @@ class CubicSpline1D:
             self.d.append(d)
             self.b.append(b)
 
-    def calc_position(self, t):
+    def calc_position(self, x):
         """
-        Calc position
+        Calc `y` position for given `x`.
 
-        if t is outside of the input x, return None
+        if `x` is outside the data point's `x` range, return None.
 
+        Returns
+        -------
+        y : float
+            y position for given x.
         """
-
-        if t < self.x[0]:
+        if x < self.x[0]:
             return None
-        elif t > self.x[-1]:
+        elif x > self.x[-1]:
             return None
 
-        i = self.__search_index(t)
-        dx = t - self.x[i]
+        i = self.__search_index(x)
+        dx = x - self.x[i]
         result = self.a[i] + self.b[i] * dx + \
             self.c[i] * dx ** 2.0 + self.d[i] * dx ** 3.0
 
         return result
 
-    def calc_first_derivative(self, t):
+    def calc_first_derivative(self, x):
         """
-        Calc first derivative
+        Calc first derivative at given x.
 
-        if t is outside of the input x, return None
-        """
+        if x is outside the input x, return None
 
-        if t < self.x[0]:
-            return None
-        elif t > self.x[-1]:
-            return None
-
-        i = self.__search_index(t)
-        dx = t - self.x[i]
-        result = self.b[i] + 2.0 * self.c[i] * dx + 3.0 * self.d[i] * dx ** 2.0
-        return result
-
-    def calc_second_derivative(self, t):
-        """
-        Calc second derivative
+        Returns
+        -------
+        dy : float
+            first derivative for given x.
         """
 
-        if t < self.x[0]:
+        if x < self.x[0]:
             return None
-        elif t > self.x[-1]:
+        elif x > self.x[-1]:
             return None
 
-        i = self.__search_index(t)
-        dx = t - self.x[i]
+        i = self.__search_index(x)
+        dx = x - self.x[i]
+        dy = self.b[i] + 2.0 * self.c[i] * dx + 3.0 * self.d[i] * dx ** 2.0
+        return dy
+
+    def calc_second_derivative(self, x):
+        """
+        Calc second derivative at given x.
+
+        if x is outside the input x, return None
+
+        Returns
+        -------
+        ddy : float
+            second derivative for given x.
+        """
+
+        if x < self.x[0]:
+            return None
+        elif x > self.x[-1]:
+            return None
+
+        i = self.__search_index(x)
+        dx = x - self.x[i]
         result = 2.0 * self.c[i] + 6.0 * self.d[i] * dx
         return result
 
