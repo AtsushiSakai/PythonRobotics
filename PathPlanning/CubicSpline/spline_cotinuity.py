@@ -1,7 +1,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from cubic_spline_planner import Spline2D
+from cubic_spline_planner import CubicSpline2D
 
 
 def main():
@@ -9,7 +9,7 @@ def main():
     y = [0.7, -6, -5, -3.5, 0.0, 5.0, -2.0]
     ds = 0.1  # [m] distance of each interpolated points
 
-    sp = Spline2D(x, y)
+    sp = CubicSpline2D(x, y)
     s = np.arange(0, sp.s[-1], ds)
 
     rx, ry = [], []

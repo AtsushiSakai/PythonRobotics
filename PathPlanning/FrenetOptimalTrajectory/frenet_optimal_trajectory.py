@@ -248,7 +248,7 @@ def frenet_optimal_planning(csp, s0, c_speed, c_d, c_d_d, c_d_dd, ob):
 
 
 def generate_target_course(x, y):
-    csp = cubic_spline_planner.Spline2D(x, y)
+    csp = cubic_spline_planner.CubicSpline2D(x, y)
     s = np.arange(0, csp.s[-1], 0.1)
 
     rx, ry, ryaw, rk = [], [], [], []

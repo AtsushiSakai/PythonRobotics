@@ -9,9 +9,9 @@ import numpy as np
 import bisect
 
 
-class Spline:
+class CubicSpline1D:
     """
-    Cubic Spline class
+    Cubic CubicSpline1D class
     """
 
     def __init__(self, x, y):
@@ -126,16 +126,16 @@ class Spline:
         return B
 
 
-class Spline2D:
+class CubicSpline2D:
     """
-    2D Cubic Spline class
+    2D Cubic CubicSpline1D class
 
     """
 
     def __init__(self, x, y):
         self.s = self.__calc_s(x, y)
-        self.sx = Spline(self.s, x)
-        self.sy = Spline(self.s, y)
+        self.sx = CubicSpline1D(self.s, x)
+        self.sy = CubicSpline1D(self.s, y)
 
     def __calc_s(self, x, y):
         dx = np.diff(x)
@@ -176,7 +176,7 @@ class Spline2D:
 
 
 def calc_spline_course(x, y, ds=0.1):
-    sp = Spline2D(x, y)
+    sp = CubicSpline2D(x, y)
     s = list(np.arange(0, sp.s[-1], ds))
 
     rx, ry, ryaw, rk = [], [], [], []
@@ -191,13 +191,13 @@ def calc_spline_course(x, y, ds=0.1):
 
 
 def main():  # pragma: no cover
-    print("Spline 2D test")
+    print("CubicSpline1D 2D test")
     import matplotlib.pyplot as plt
     x = [-2.5, 0.0, 2.5, 5.0, 7.5, 3.0, -1.0]
     y = [0.7, -6, 5, 6.5, 0.0, 5.0, -2.0]
     ds = 0.1  # [m] distance of each interpolated points
 
-    sp = Spline2D(x, y)
+    sp = CubicSpline2D(x, y)
     s = np.arange(0, sp.s[-1], ds)
 
     rx, ry, ryaw, rk = [], [], [], []

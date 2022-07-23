@@ -81,6 +81,21 @@ The constraint is a boundary condition for the second derivative of the starting
 
 Our sample code assumes these terminal curvatures are 0, which is well known as Natural Cubic Spline.
 
+How to calculate the :math:`4N` unknown parameters
+==================================================
+
+.. math::
+
+	A=\left[\begin{array}{cccccc}
+	1 & 0 & 0 & 0 & \cdots & 0 \\
+	h_{0} & 2\left(h_{0}+h_{1}\right) & h_{1} & 0 & \cdots & 0 \\
+	0 & h_{1} & 2\left(h_{1}+h_{2}\right) & h_{2} & \cdots & 0 \\
+	0 & 0 & h_{2} & 2\left(h_{2}+h_{3}\right) & \cdots & 0 \\
+	0 & 0 & 0 & h_{3} & \ddots & \\
+	\vdots & \vdots & & & & \\
+	0 & 0 & 0 & \cdots & 0 & 1
+	\end{array}\right]
+
 2D spline path
 ~~~~~~~~~~~~~~~~~~~
 
@@ -94,4 +109,13 @@ Heading angle of each point can be also calculated analytically.
 .. image:: Figure_1.png
 .. image:: Figure_2.png
 .. image:: Figure_3.png
+
+APIs
+~~~~
+
+.. autofunction:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D
+
+References
+~~~~~~~~~~
+-  `Cubic Splines James Keesling <https://people.clas.ufl.edu/kees/files/CubicSplines.pdf>`__
 
