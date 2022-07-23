@@ -176,7 +176,7 @@ These equations can be calculated by differentiating the cubic polynomial.
 API
 ===
 
-These are 1D cubic spline interpolation APIs:
+This is the 1D cubic spline class API:
 
 .. autoclass:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D
 	:members:
@@ -196,9 +196,16 @@ This code generates a curvature continuous path based on x-y waypoints with cubi
 
 .. image:: Figure_1.png
 
-Heading angle of each point can be also calculated analytically.
+Heading angle of each point can be calculated analytically by:
+
+:math:`\theta=\tan ^{-1} \frac{y’}{x’}`
 
 .. image:: Figure_2.png
+
+Curvature of each point can be also calculated analytically by:
+
+:math:`\kappa=\frac{y^{\prime \prime} x^{\prime}-x^{\prime \prime} y^{\prime}}{\left(x^{\prime2}+y^{\prime2}\right)^{\frac{2}{3}}}`
+
 .. image:: Figure_3.png
 
 API

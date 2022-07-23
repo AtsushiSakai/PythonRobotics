@@ -234,8 +234,8 @@ def main():  # pragma: no cover
         rk.append(sp.calc_curvature(i_s))
 
     plt.subplots(1)
-    plt.plot(x, y, "xb", label="input")
-    plt.plot(rx, ry, "-r", label="spline")
+    plt.plot(x, y, "xb", label="Data points")
+    plt.plot(rx, ry, "-r", label="Cubic spline path")
     plt.grid(True)
     plt.axis("equal")
     plt.xlabel("x[m]")
