@@ -85,14 +85,14 @@ How to calculate the unknown parameters :math:`a_j, b_j, c_j, d_j`
 ===================================================================
 
 Step1: calculate :math:`a_j`
------------------------------
++++++++++++++++++++++++++++++
 
 Spline coefficients :math:`a_j` can be calculated by y positions of the data points:
 
 :math:`a_j = y_i`.
 
 Step2: calculate :math:`c_j`
------------------------------
++++++++++++++++++++++++++++++
 
 Spline coefficients :math:`c_j` can be calculated by solving the linear equation:
 
@@ -124,18 +124,18 @@ The matrix :math:`A` and :math:`B` are defined as follows:
 where :math:`h_{i}` is the x position distance between the i-th and (i+1)-th data points.
 
 Step3: calculate :math:`d_j`
------------------------------
++++++++++++++++++++++++++++++
 
 Spline coefficients :math:`d_j` can be calculated by the following equation:
 
 :math:`d_{j}=\frac{c_{j+1}-c_{j}}{3 h_{j}}`
 
 Step4: calculate :math:`b_j`
------------------------------
++++++++++++++++++++++++++++++
 
 Spline coefficients :math:`b_j` can be calculated by the following equation:
 
-:math:`b_{i}=\frac{1}{h_{i}}\left(a_{i+1}-a_{i}\right)-\frac{h_{i}}{3}\left(2 c_{i}+c_{i+1})`
+:math:`b_{i}=\frac{1}{h_{i}}(a_{i+1}-a_{i})-\frac{h_{i}}{3(2 c_{i}+c_{i+1})`
 
 2D spline path
 ~~~~~~~~~~~~~~~~~~~
