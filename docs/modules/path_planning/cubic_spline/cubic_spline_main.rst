@@ -1,7 +1,26 @@
 Cubic spline planning
 ---------------------
 
-1D Cubic spline function
+Spline curve continuity
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Depending on the which kind of spline model is used,
+various interpolation curves can be generated.
+
+The smoothness of the interpolating curve is expressed as :math:`C_0, C_1`, and so on.
+
+This representation represents continuity of the curve.
+For example, for a spline curve in two-dimensional space:
+* C_0 is position continuous
+* C_1 is tangent vector continuous
+* C_2 is curvature vector continuous
+as shown in the following figure:
+
+.. image:: spline_continuity.png
+
+Cubic spline can generate a curve with :math:`C_0, C_1, C_2`.
+
+1D cubic spline
 ~~~~~~~~~~~~~~~~~~~
 
 Cubic spline interpolation is a method of smoothly
@@ -145,31 +164,35 @@ These are 1D cubic spline interpolation APIs:
 .. autoclass:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D
 	:members:
 
-.. autofunction:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D
-.. autofunction:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D.calc_position
-.. autofunction:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D.calc_first_derivative
-.. autofunction:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D.calc_second_derivative
-
-2D spline path
+2D cubic spline
 ~~~~~~~~~~~~~~~~~~~
+
+Using the 1D spline path, x positions needs to be mono-increasing.
+
+So, it cannot be used for path planning.
+
 
 A sample code for cubic path planning.
 
-This code generates a curvature continuous path based on x-y waypoints
-with cubic spline.
+This code generates a curvature continuous path based on x-y waypoints with cubic spline.
+
+
+.. image:: Figure_1.png
 
 Heading angle of each point can be also calculated analytically.
 
-.. image:: Figure_1.png
 .. image:: Figure_2.png
 .. image:: Figure_3.png
 
 API
 ===
 
-.. autofunction:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline2D
+.. autoclass:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline2D
+	:members:
 
 References
 ~~~~~~~~~~
 -  `Cubic Splines James Keesling <https://people.clas.ufl.edu/kees/files/CubicSplines.pdf>`__
+-  `Curves and Splines <http://www.cs.cmu.edu/afs/cs/academic/class/15462-s10/www/lec-slides/lec06.pdf>`__
+
 
