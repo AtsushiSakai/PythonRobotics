@@ -4,10 +4,9 @@ Cubic spline planning
 Spline curve continuity
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Depending on the which kind of spline model is used,
-various interpolation curves can be generated.
+Spline curve smoothness is depending on the which kind of spline model is used.
 
-The smoothness of the interpolating curve is expressed as :math:`C_0, C_1`, and so on.
+The smoothness of the spline curve is expressed as :math:`C_0, C_1`, and so on.
 
 This representation represents continuity of the curve.
 For example, for a spline curve in two-dimensional space:
@@ -122,7 +121,6 @@ Spline coefficients :math:`c_j` can be calculated by solving the linear equation
 The matrix :math:`A` and :math:`B` are defined as follows:
 
 .. math::
-
 	A=\left[\begin{array}{cccccc}
 	1 & 0 & 0 & 0 & \cdots & 0 \\
 	h_{0} & 2\left(h_{0}+h_{1}\right) & h_{1} & 0 & \cdots & 0 \\
@@ -184,11 +182,12 @@ This is the 1D cubic spline class API:
 2D cubic spline
 ~~~~~~~~~~~~~~~~~~~
 
-X positions needs to be mono-increasing for 1D cubic spline.
+Data x positions needs to be mono-increasing for 1D cubic spline.
 
 So, it cannot be used for 2D path planning.
 
-2D cubic spline uses two 1D cubic splines based on path distance from the start point for each dimension x and y.
+2D cubic spline uses two 1D cubic splines based on path distance from
+the start point for each dimension x and y.
 
 This can generate a curvature continuous path based on x-y waypoints.
 

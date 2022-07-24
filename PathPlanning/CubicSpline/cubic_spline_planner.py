@@ -331,7 +331,8 @@ def main_1d():
     xi = np.linspace(0.0, 5.0)
 
     plt.plot(x, y, "xb", label="Data points")
-    plt.plot(xi, [sp.calc_position(x) for x in xi], "r", label="Cubic spline interpolation")
+    plt.plot(xi, [sp.calc_position(x) for x in xi], "r",
+             label="Cubic spline interpolation")
     plt.grid(True)
     plt.legend()
     plt.show()
