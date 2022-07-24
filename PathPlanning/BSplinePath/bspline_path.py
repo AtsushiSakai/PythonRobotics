@@ -1,6 +1,6 @@
 """
 
-Path Planner with B-CubicSpline1D
+Path Planner with B-Spline
 
 author: Atsushi Sakai (@Atsushi_twi)
 
@@ -14,12 +14,12 @@ import scipy.interpolate as scipy_interpolate
 def approximate_b_spline_path(x: list, y: list, n_path_points: int,
                               degree: int = 3) -> tuple:
     """
-    approximate points with a B-CubicSpline1D path
+    approximate points with a B-Spline path
 
     :param x: x position list of approximated points
     :param y: y position list of approximated points
     :param n_path_points: number of path points
-    :param degree: (Optional) B CubicSpline1D curve degree
+    :param degree: (Optional) B Spline curve degree
     :return: x and y position list of the result path
     """
     t = range(len(x))
@@ -42,12 +42,12 @@ def approximate_b_spline_path(x: list, y: list, n_path_points: int,
 def interpolate_b_spline_path(x: list, y: list, n_path_points: int,
                               degree: int = 3) -> tuple:
     """
-    interpolate points with a B-CubicSpline1D path
+    interpolate points with a B-Spline path
 
     :param x: x positions of interpolated points
     :param y: y positions of interpolated points
     :param n_path_points: number of path points
-    :param degree: B-CubicSpline1D degree
+    :param degree: B-Spline degree
     :return: x and y position list of the result path
     """
     ipl_t = np.linspace(0.0, len(x) - 1, len(x))
@@ -72,8 +72,8 @@ def main():
 
     # show results
     plt.plot(way_point_x, way_point_y, '-og', label="way points")
-    plt.plot(rax, ray, '-r', label="Approximated B-CubicSpline1D path")
-    plt.plot(rix, riy, '-b', label="Interpolated B-CubicSpline1D path")
+    plt.plot(rax, ray, '-r', label="Approximated B-Spline path")
+    plt.plot(rix, riy, '-b', label="Interpolated B-Spline path")
     plt.grid(True)
     plt.legend()
     plt.axis("equal")

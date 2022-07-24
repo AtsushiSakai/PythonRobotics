@@ -184,14 +184,13 @@ This is the 1D cubic spline class API:
 2D cubic spline
 ~~~~~~~~~~~~~~~~~~~
 
-Using the 1D spline path, x positions needs to be mono-increasing.
+X positions needs to be mono-increasing for 1D cubic spline.
 
-So, it cannot be used for path planning.
+So, it cannot be used for 2D path planning.
 
+2D cubic spline uses two 1D cubic splines based on path distance from the start point for each dimension x and y.
 
-A sample code for cubic path planning.
-
-This code generates a curvature continuous path based on x-y waypoints with cubic spline.
+This can generate a curvature continuous path based on x-y waypoints.
 
 Heading angle of each point can be calculated analytically by:
 

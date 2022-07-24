@@ -24,7 +24,21 @@ class CubicSpline1D:
 
     Examples
     --------
-    You can interpolate a 1D data points.
+    You can interpolate 1D data points.
+
+    >>> import numpy as np
+    >>> import matplotlib.pyplot as plt
+    >>> x = np.arange(5)
+    >>> y = [1.7, -6, 5, 6.5, 0.0]
+    >>> sp = CubicSpline1D(x, y)
+    >>> xi = np.linspace(0.0, 5.0)
+    >>> plt.plot(x, y, "xb", label="Data points")
+    >>> plt.plot(xi, [sp.calc_position(x) for x in xi], "r", label="Cubic spline interpolation")
+    >>> plt.grid(True)
+    >>> plt.legend()
+    >>> plt.show()
+
+    .. image:: cubic_spline_1d.png
 
     """
 
@@ -308,7 +322,22 @@ def calc_spline_course(x, y, ds=0.1):
     return rx, ry, ryaw, rk, s
 
 
-def main():  # pragma: no cover
+def main_1d():
+    print("CubicSpline1D test")
+    import matplotlib.pyplot as plt
+    x = np.arange(5)
+    y = [1.7, -6, 5, 6.5, 0.0]
+    sp = CubicSpline1D(x, y)
+    xi = np.linspace(0.0, 5.0)
+
+    plt.plot(x, y, "xb", label="Data points")
+    plt.plot(xi, [sp.calc_position(x) for x in xi], "r", label="Cubic spline interpolation")
+    plt.grid(True)
+    plt.legend()
+    plt.show()
+
+
+def main_2d():  # pragma: no cover
     print("CubicSpline1D 2D test")
     import matplotlib.pyplot as plt
     x = [-2.5, 0.0, 2.5, 5.0, 7.5, 3.0, -1.0]
@@ -353,4 +382,5 @@ def main():  # pragma: no cover
 
 
 if __name__ == '__main__':
-    main()
+    # main_1d()
+    main_2d()
