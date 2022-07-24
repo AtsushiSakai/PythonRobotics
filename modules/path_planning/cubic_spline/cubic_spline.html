@@ -17,6 +17,7 @@
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -71,7 +72,26 @@
 <li class="toctree-l2"><a class="reference internal" href="../visibility_road_map_planner/visibility_road_map_planner.html">Visibility Road-Map planner</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../vrm_planner/vrm_planner.html">Voronoi Road-Map planning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../rrt/rrt.html">Rapidly-Exploring Random Trees (RRT)</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Cubic spline planning</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Cubic spline planning</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#spline-curve-continuity">Spline curve continuity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#d-cubic-spline">1D cubic spline</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#constraint-1-terminal-constraints">Constraint 1: Terminal constraints</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#constraint-2-point-continuous-constraints">Constraint 2: Point continuous constraints</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#constraint-3-tangent-vector-continuous-constraints">Constraint 3: Tangent vector continuous constraints</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#constraint-4-curvature-continuous-constraints">Constraint 4: Curvature continuous constraints</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#constraint-5-terminal-curvature-constraints">Constraint 5: Terminal curvature constraints</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#how-to-calculate-the-unknown-parameters-a-j-b-j-c-j-d-j">How to calculate the unknown parameters <span class="math notranslate nohighlight">\(a_j, b_j, c_j, d_j\)</span></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#how-to-calculate-the-first-and-second-derivatives-of-the-spline-curve">How to calculate the first and second derivatives of the spline curve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#api">API</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">2D cubic spline</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id2">API</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../bspline_path/bspline_path.html">B-Spline planning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../clothoid_path/clothoid_path.html">Clothoid path planning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../eta3_spline/eta3_spline.html">Eta^3 Spline path planning</a></li>
@@ -121,13 +141,345 @@
              
   <section id="cubic-spline-planning">
 <h1>Cubic spline planning<a class="headerlink" href="#cubic-spline-planning" title="Permalink to this headline"></a></h1>
-<p>A sample code for cubic path planning.</p>
-<p>This code generates a curvature continuous path based on x-y waypoints
-with cubic spline.</p>
-<p>Heading angle of each point can be also calculated analytically.</p>
-<img alt="../../../_images/Figure_12.png" src="../../../_images/Figure_12.png" />
-<img alt="../../../_images/Figure_21.png" src="../../../_images/Figure_21.png" />
-<img alt="../../../_images/Figure_3.png" src="../../../_images/Figure_3.png" />
+<section id="spline-curve-continuity">
+<h2>Spline curve continuity<a class="headerlink" href="#spline-curve-continuity" title="Permalink to this headline"></a></h2>
+<p>Spline curve smoothness is depending on the which kind of spline model is used.</p>
+<p>The smoothness of the spline curve is expressed as <span class="math notranslate nohighlight">\(C_0, C_1\)</span>, and so on.</p>
+<p>This representation represents continuity of the curve.
+For example, for a spline curve in two-dimensional space:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(C_0\)</span> is position continuous</p></li>
+<li><p><span class="math notranslate nohighlight">\(C_1\)</span> is tangent vector continuous</p></li>
+<li><p><span class="math notranslate nohighlight">\(C_2\)</span> is curvature vector continuous</p></li>
+</ul>
+<p>as shown in the following figure:</p>
+<img alt="../../../_images/spline_continuity.png" src="../../../_images/spline_continuity.png" />
+<p>Cubic spline can generate a curve with <span class="math notranslate nohighlight">\(C_0, C_1, C_2\)</span>.</p>
+</section>
+<section id="d-cubic-spline">
+<h2>1D cubic spline<a class="headerlink" href="#d-cubic-spline" title="Permalink to this headline"></a></h2>
+<p>Cubic spline interpolation is a method of smoothly
+interpolating between multiple data points when given
+multiple data points, as shown in the figure below.</p>
+<img alt="../../../_images/spline.png" src="../../../_images/spline.png" />
+<p>It separates between each interval between data points.</p>
+<p>The each interval part is approximated by each cubic polynomial.</p>
+<p>The cubic spline uses the cubic polynomial equation for interpolation:</p>
+<p><span class="math notranslate nohighlight">\(S_j(x)=a_j+b_j(x-x_j)+c_j(x-x_j)^2+d_j(x-x_j)^3\)</span></p>
+<p>where <span class="math notranslate nohighlight">\(x_j &lt; x &lt; x_{j+1}\)</span>, <span class="math notranslate nohighlight">\(x_j\)</span> is the j-th node of the spline,
+<span class="math notranslate nohighlight">\(a_j\)</span>, <span class="math notranslate nohighlight">\(b_j\)</span>, <span class="math notranslate nohighlight">\(c_j\)</span>, <span class="math notranslate nohighlight">\(d_j\)</span> are the coefficients
+of the spline.</p>
+<p>As the above equation, there are 4 unknown parameters <span class="math notranslate nohighlight">\((a,b,c,d)\)</span> for
+one interval, so if the number of data points is <span class="math notranslate nohighlight">\(N\)</span>, the
+interpolation has <span class="math notranslate nohighlight">\(4N\)</span> unknown parameters.</p>
+<p>The following five conditions are used to determine the <span class="math notranslate nohighlight">\(4N\)</span>
+unknown parameters:</p>
+<section id="constraint-1-terminal-constraints">
+<h3>Constraint 1: Terminal constraints<a class="headerlink" href="#constraint-1-terminal-constraints" title="Permalink to this headline"></a></h3>
+<p><span class="math notranslate nohighlight">\(S_j(x_j)=y_j\)</span></p>
+<p>This constraint is the terminal constraint of each interval.</p>
+<p>The polynomial of each interval will pass through the x,y coordinates of
+the data points.</p>
+</section>
+<section id="constraint-2-point-continuous-constraints">
+<h3>Constraint 2: Point continuous constraints<a class="headerlink" href="#constraint-2-point-continuous-constraints" title="Permalink to this headline"></a></h3>
+<p><span class="math notranslate nohighlight">\(S_j(x_{j+1})=S_{j+1}(x_{j+1})=y_{j+1}\)</span></p>
+<p>This constraint is a continuity condition for the boundary of each interval.</p>
+<p>This constraint ensures that the boundary of each interval is continuous.</p>
+</section>
+<section id="constraint-3-tangent-vector-continuous-constraints">
+<h3>Constraint 3: Tangent vector continuous constraints<a class="headerlink" href="#constraint-3-tangent-vector-continuous-constraints" title="Permalink to this headline"></a></h3>
+<p><span class="math notranslate nohighlight">\(S'_j(x_{j+1})=S'_{j+1}(x_{j+1})\)</span></p>
+<p>This constraint is a continuity condition for the first derivative of
+the boundary of each interval.</p>
+<p>This constraint makes the vectors of the boundaries of each
+interval continuous.</p>
+</section>
+<section id="constraint-4-curvature-continuous-constraints">
+<h3>Constraint 4: Curvature continuous constraints<a class="headerlink" href="#constraint-4-curvature-continuous-constraints" title="Permalink to this headline"></a></h3>
+<p><span class="math notranslate nohighlight">\(S''_j(x_{j+1})=S''_{j+1}(x_{j+1})\)</span></p>
+<p>This constraint is the continuity condition for the second derivative of
+the boundary of each interval.</p>
+<p>This constraint makes the curvature of the boundaries of each
+interval continuous.</p>
+</section>
+<section id="constraint-5-terminal-curvature-constraints">
+<h3>Constraint 5: Terminal curvature constraints<a class="headerlink" href="#constraint-5-terminal-curvature-constraints" title="Permalink to this headline"></a></h3>
+<p><span class="math notranslate nohighlight">\(S''_0(0)=S''_{n+1}(x_{n})=0\)</span>.</p>
+<p>The constraint is a boundary condition for the second derivative of the starting and ending points.</p>
+<p>Our sample code assumes these terminal curvatures are 0, which is well known as Natural Cubic Spline.</p>
+</section>
+<section id="how-to-calculate-the-unknown-parameters-a-j-b-j-c-j-d-j">
+<h3>How to calculate the unknown parameters <span class="math notranslate nohighlight">\(a_j, b_j, c_j, d_j\)</span><a class="headerlink" href="#how-to-calculate-the-unknown-parameters-a-j-b-j-c-j-d-j" title="Permalink to this headline"></a></h3>
+<section id="step1-calculate-a-j">
+<h4>Step1: calculate <span class="math notranslate nohighlight">\(a_j\)</span><a class="headerlink" href="#step1-calculate-a-j" title="Permalink to this headline"></a></h4>
+<p>Spline coefficients <span class="math notranslate nohighlight">\(a_j\)</span> can be calculated by y positions of the data points:</p>
+<p><span class="math notranslate nohighlight">\(a_j = y_i\)</span>.</p>
+</section>
+<section id="step2-calculate-c-j">
+<h4>Step2: calculate <span class="math notranslate nohighlight">\(c_j\)</span><a class="headerlink" href="#step2-calculate-c-j" title="Permalink to this headline"></a></h4>
+<p>Spline coefficients <span class="math notranslate nohighlight">\(c_j\)</span> can be calculated by solving the linear equation:</p>
+<p><span class="math notranslate nohighlight">\(Ac_j = B\)</span>.</p>
+<p>The matrix <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> are defined as follows:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}A=\left[\begin{array}{cccccc}
+1 &amp; 0 &amp; 0 &amp; 0 &amp; \cdots &amp; 0 \\
+h_{0} &amp; 2\left(h_{0}+h_{1}\right) &amp; h_{1} &amp; 0 &amp; \cdots &amp; 0 \\
+0 &amp; h_{1} &amp; 2\left(h_{1}+h_{2}\right) &amp; h_{2} &amp; \cdots &amp; 0 \\
+0 &amp; 0 &amp; h_{2} &amp; 2\left(h_{2}+h_{3}\right) &amp; \cdots &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; h_{3} &amp; \ddots &amp; \\
+\vdots &amp; \vdots &amp; &amp; &amp; &amp; \\
+0 &amp; 0 &amp; 0 &amp; \cdots &amp; 0 &amp; 1
+\end{array}\right]\end{split}\]</div>
+<div class="math notranslate nohighlight">
+\[\begin{split}B=\left[\begin{array}{c}
+0 \\
+\frac{3}{h_{1}}\left(a_{2}-a_{1}\right)-\frac{3}{h_{0}}\left(a_{1}-a_{0}\right) \\
+\vdots \\
+\frac{3}{h_{n-1}}\left(a_{n}-a_{n-1}\right)-\frac{3}{h_{n-2}}\left(a_{n-1}-a_{n-2}\right) \\
+0
+\end{array}\right]\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(h_{i}\)</span> is the x position distance between the i-th and (i+1)-th data points.</p>
+</section>
+<section id="step3-calculate-d-j">
+<h4>Step3: calculate <span class="math notranslate nohighlight">\(d_j\)</span><a class="headerlink" href="#step3-calculate-d-j" title="Permalink to this headline"></a></h4>
+<p>Spline coefficients <span class="math notranslate nohighlight">\(d_j\)</span> can be calculated by the following equation:</p>
+<p><span class="math notranslate nohighlight">\(d_{j}=\frac{c_{j+1}-c_{j}}{3 h_{j}}\)</span></p>
+</section>
+<section id="step4-calculate-b-j">
+<h4>Step4: calculate <span class="math notranslate nohighlight">\(b_j\)</span><a class="headerlink" href="#step4-calculate-b-j" title="Permalink to this headline"></a></h4>
+<p>Spline coefficients <span class="math notranslate nohighlight">\(b_j\)</span> can be calculated by the following equation:</p>
+<p><span class="math notranslate nohighlight">\(b_{i}=\frac{1}{h_i}(a_{i+1}-a_{i})-\frac{h_i}{3}(2c_{i}+c_{i+1})\)</span></p>
+</section>
+</section>
+<section id="how-to-calculate-the-first-and-second-derivatives-of-the-spline-curve">
+<h3>How to calculate the first and second derivatives of the spline curve<a class="headerlink" href="#how-to-calculate-the-first-and-second-derivatives-of-the-spline-curve" title="Permalink to this headline"></a></h3>
+<p>After we can get the coefficients of the spline curve, we can calculate</p>
+<p>the first derivative by:</p>
+<p><span class="math notranslate nohighlight">\(y^{\prime}(x)=b+2cx+3dx^2\)</span></p>
+<p>the second derivative by:</p>
+<p><span class="math notranslate nohighlight">\(y^{\prime \prime}(x)=2c+6dx\)</span></p>
+<p>These equations can be calculated by differentiating the cubic polynomial.</p>
+</section>
+<section id="api">
+<h3>API<a class="headerlink" href="#api" title="Permalink to this headline"></a></h3>
+<p>This is the 1D cubic spline class API:</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PathPlanning.CubicSpline.cubic_spline_planner.</span></span><span class="sig-name descname"><span class="pre">CubicSpline1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/PathPlanning/CubicSpline/cubic_spline_planner.html#CubicSpline1D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D" title="Permalink to this definition"></a></dt>
+<dd><p>1D Cubic Spline class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>list</em>) – x coordinates for data points. This x coordinates must be
+sorted
+in ascending order.</p></li>
+<li><p><strong>y</strong> (<em>list</em>) – y coordinates for data points</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>You can interpolate 1D data points.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.7</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sp</span> <span class="o">=</span> <span class="n">CubicSpline1D</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">yi</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">calc_position</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xi</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;xb&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Data points&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xi</span><span class="p">,</span> <span class="n">yi</span> <span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Cubic spline interpolation&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../../_images/cubic_spline_1d.png" src="../../../_images/cubic_spline_1d.png" />
+<dl class="py method">
+<dt class="sig sig-object py" id="PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D.calc_first_derivative">
+<span class="sig-name descname"><span class="pre">calc_first_derivative</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/PathPlanning/CubicSpline/cubic_spline_planner.html#CubicSpline1D.calc_first_derivative"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D.calc_first_derivative" title="Permalink to this definition"></a></dt>
+<dd><p>Calc first derivative at given x.</p>
+<p>if x is outside the input x, return None</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>dy</strong> – first derivative for given x.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D.calc_position">
+<span class="sig-name descname"><span class="pre">calc_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/PathPlanning/CubicSpline/cubic_spline_planner.html#CubicSpline1D.calc_position"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D.calc_position" title="Permalink to this definition"></a></dt>
+<dd><p>Calc <cite>y</cite> position for given <cite>x</cite>.</p>
+<p>if <cite>x</cite> is outside the data point’s <cite>x</cite> range, return None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>y</strong> – y position for given x.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D.calc_second_derivative">
+<span class="sig-name descname"><span class="pre">calc_second_derivative</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/PathPlanning/CubicSpline/cubic_spline_planner.html#CubicSpline1D.calc_second_derivative"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D.calc_second_derivative" title="Permalink to this definition"></a></dt>
+<dd><p>Calc second derivative at given x.</p>
+<p>if x is outside the input x, return None</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>ddy</strong> – second derivative for given x.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="id1">
+<h2>2D cubic spline<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h2>
+<p>Data x positions needs to be mono-increasing for 1D cubic spline.</p>
+<p>So, it cannot be used for 2D path planning.</p>
+<p>2D cubic spline uses two 1D cubic splines based on path distance from
+the start point for each dimension x and y.</p>
+<p>This can generate a curvature continuous path based on x-y waypoints.</p>
+<p>Heading angle of each point can be calculated analytically by:</p>
+<p><span class="math notranslate nohighlight">\(\theta=\tan ^{-1} \frac{y’}{x’}\)</span></p>
+<p>Curvature of each point can be also calculated analytically by:</p>
+<p><span class="math notranslate nohighlight">\(\kappa=\frac{y^{\prime \prime} x^{\prime}-x^{\prime \prime} y^{\prime}}{\left(x^{\prime2}+y^{\prime2}\right)^{\frac{2}{3}}}\)</span></p>
+<section id="id2">
+<h3>API<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline2D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">PathPlanning.CubicSpline.cubic_spline_planner.</span></span><span class="sig-name descname"><span class="pre">CubicSpline2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/PathPlanning/CubicSpline/cubic_spline_planner.html#CubicSpline2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline2D" title="Permalink to this definition"></a></dt>
+<dd><p>Cubic CubicSpline2D class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>list</em>) – x coordinates for data points.</p></li>
+<li><p><strong>y</strong> (<em>list</em>) – y coordinates for data points.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>You can interpolate a 2D data points.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.7</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># [m] distance of each interpolated points</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sp</span> <span class="o">=</span> <span class="n">CubicSpline2D</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">ds</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rx</span><span class="p">,</span> <span class="n">ry</span><span class="p">,</span> <span class="n">ryaw</span><span class="p">,</span> <span class="n">rk</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i_s</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">ix</span><span class="p">,</span> <span class="n">iy</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">calc_position</span><span class="p">(</span><span class="n">i_s</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">rx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ix</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">ry</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iy</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">ryaw</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">calc_yaw</span><span class="p">(</span><span class="n">i_s</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="n">rk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">calc_curvature</span><span class="p">(</span><span class="n">i_s</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;xb&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Data points&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rx</span><span class="p">,</span> <span class="n">ry</span><span class="p">,</span> <span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Cubic spline path&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;x[m]&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;y[m]&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../../../_images/cubic_spline_2d_path.png" src="../../../_images/cubic_spline_2d_path.png" />
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">iyaw</span><span class="p">)</span> <span class="k">for</span> <span class="n">iyaw</span> <span class="ow">in</span> <span class="n">ryaw</span><span class="p">],</span> <span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;yaw&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;line length[m]&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;yaw angle[deg]&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/cubic_spline_2d_yaw.png" src="../../../_images/cubic_spline_2d_yaw.png" />
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">rk</span><span class="p">,</span> <span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;curvature&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;line length[m]&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;curvature [1/m]&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../../_images/cubic_spline_2d_curvature.png" src="../../../_images/cubic_spline_2d_curvature.png" />
+<dl class="py method">
+<dt class="sig sig-object py" id="PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline2D.calc_curvature">
+<span class="sig-name descname"><span class="pre">calc_curvature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/PathPlanning/CubicSpline/cubic_spline_planner.html#CubicSpline2D.calc_curvature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline2D.calc_curvature" title="Permalink to this definition"></a></dt>
+<dd><p>calc curvature</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>s</strong> (<em>float</em>) – distance from the start point. if <cite>s</cite> is outside the data point’s
+range, return None.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>k</strong> – curvature for given s.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline2D.calc_position">
+<span class="sig-name descname"><span class="pre">calc_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/PathPlanning/CubicSpline/cubic_spline_planner.html#CubicSpline2D.calc_position"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline2D.calc_position" title="Permalink to this definition"></a></dt>
+<dd><p>calc position</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>s</strong> (<em>float</em>) – distance from the start point. if <cite>s</cite> is outside the data point’s
+range, return None.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em>) – x position for given s.</p></li>
+<li><p><strong>y</strong> (<em>float</em>) – y position for given s.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline2D.calc_yaw">
+<span class="sig-name descname"><span class="pre">calc_yaw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/PathPlanning/CubicSpline/cubic_spline_planner.html#CubicSpline2D.calc_yaw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline2D.calc_yaw" title="Permalink to this definition"></a></dt>
+<dd><p>calc yaw</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>s</strong> (<em>float</em>) – distance from the start point. if <cite>s</cite> is outside the data point’s
+range, return None.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>yaw</strong> – yaw angle (tangent vector) for given s.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://people.clas.ufl.edu/kees/files/CubicSplines.pdf">Cubic Splines James Keesling</a></p></li>
+<li><p><a class="reference external" href="http://www.cs.cmu.edu/afs/cs/academic/class/15462-s10/www/lec-slides/lec06.pdf">Curves and Splines</a></p></li>
+</ul>
+</section>
 </section>
 
 
