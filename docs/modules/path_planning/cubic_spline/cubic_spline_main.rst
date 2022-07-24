@@ -70,7 +70,7 @@ This constraint is a continuity condition for the boundary of each interval.
 This constraint ensures that the boundary of each interval is continuous.
 
 Constraint 3: Tangent vector continuous constraints
-==============================================
+====================================================
 
 :math:`S'_j(x_{j+1})=S'_{j+1}(x_{j+1})`
 
@@ -193,20 +193,13 @@ A sample code for cubic path planning.
 
 This code generates a curvature continuous path based on x-y waypoints with cubic spline.
 
-
-.. image:: Figure_1.png
-
 Heading angle of each point can be calculated analytically by:
 
 :math:`\theta=\tan ^{-1} \frac{y’}{x’}`
 
-.. image:: Figure_2.png
-
 Curvature of each point can be also calculated analytically by:
 
 :math:`\kappa=\frac{y^{\prime \prime} x^{\prime}-x^{\prime \prime} y^{\prime}}{\left(x^{\prime2}+y^{\prime2}\right)^{\frac{2}{3}}}`
-
-.. image:: Figure_3.png
 
 API
 ===
