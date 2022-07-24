@@ -32,8 +32,9 @@ class CubicSpline1D:
     >>> y = [1.7, -6, 5, 6.5, 0.0]
     >>> sp = CubicSpline1D(x, y)
     >>> xi = np.linspace(0.0, 5.0)
+    >>> yi = [sp.calc_position(x) for x in xi]
     >>> plt.plot(x, y, "xb", label="Data points")
-    >>> plt.plot(xi, [sp.calc_position(x) for x in xi], "r", label="Cubic spline interpolation")
+    >>> plt.plot(xi, yi , "r", label="Cubic spline interpolation")
     >>> plt.grid(True)
     >>> plt.legend()
     >>> plt.show()
