@@ -194,7 +194,7 @@ class GridMap:
                 min_x, max_x = x[i2], x[i1]
             else:
                 min_x, max_x = x[i1], x[i2]
-            if not min_x < iox < max_x:
+            if not min_x <= iox < max_x:
                 continue
 
             tmp1 = (y[i2] - y[i1]) / (x[i2] - x[i1])
