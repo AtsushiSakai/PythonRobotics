@@ -1,4 +1,6 @@
 # Security Policy
+# google security
+# microsoft security
 
 ## Supported Versions
 
