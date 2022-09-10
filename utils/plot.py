@@ -3,6 +3,8 @@ Matplotlib based plotting utilities
 """
 import math
 import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib import pyplot as plt
 
 
 def plot_arrow(x, y, yaw, arrow_length=1.0,
@@ -47,3 +49,28 @@ def plot_arrow(x, y, yaw, arrow_length=1.0,
                   **kwargs)
         if origin_point_plot_style is not None:
             plt.plot(x, y, origin_point_plot_style)
+
+
+def plot_curvature(x_list, y_list, heading, curvature,
+                   k=0.3, c="-c", label="Curvature"):
+    """
+    Plot curvature plot on 2D path
+
+    Parameters
+    ----------
+    x_list :
+    y_list :
+    heading :
+    curvature :
+    k :
+    c :
+    label :
+    """
+    cx = [x + d * k * np.cos(yaw - np.pi / 2.0) for x, y, yaw, d in
+          zip(x_list, y_list, heading, curvature)]
+    cy = [y + d * k * np.sin(yaw - np.pi / 2.0) for x, y, yaw, d in
+          zip(x_list, y_list, heading, curvature)]
+
+    plt.plot(cx, cy, c, label=label)
+    for ix, iy, icx, icy in zip(x_list, y_list, cx, cy):
+        plt.plot([ix, icx], [iy, icy], c)
