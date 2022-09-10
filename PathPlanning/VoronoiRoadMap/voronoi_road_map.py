@@ -9,8 +9,12 @@ author: Atsushi Sakai (@Atsushi_twi)
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from dijkstra_search import DijkstraSearch
 from scipy.spatial import cKDTree, Voronoi
+import sys
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).parent.parent))
+
+from VoronoiRoadMap.dijkstra_search import DijkstraSearch
 
 show_animation = True
 

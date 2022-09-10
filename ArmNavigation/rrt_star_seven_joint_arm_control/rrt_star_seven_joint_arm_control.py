@@ -3,18 +3,15 @@ RRT* path planner for a seven joint arm
 Author: Mahyar Abdeetedal (mahyaret)
 """
 import math
-import os
-import sys
 import random
 import numpy as np
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                "/../n_joint_arm_3d/")
-try:
-    from NLinkArm3d import NLinkArm
-except ImportError:
-    raise
+import sys
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).parent.parent))
+
+from n_joint_arm_3d.NLinkArm3d import NLinkArm
 
 show_animation = True
 verbose = False

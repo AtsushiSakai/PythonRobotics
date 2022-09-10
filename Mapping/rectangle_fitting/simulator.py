@@ -6,8 +6,8 @@ author: Atsushi Sakai
 
 """
 import sys
-import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/")
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 
 import numpy as np
 import matplotlib.pyplot as plt

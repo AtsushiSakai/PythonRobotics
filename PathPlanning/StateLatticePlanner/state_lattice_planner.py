@@ -4,11 +4,16 @@ State lattice planner with model predictive trajectory generator
 
 author: Atsushi Sakai (@Atsushi_twi)
 
-- lookuptable.csv is generated with this script: https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning/ModelPredictiveTrajectoryGenerator/lookuptable_generator.py
+- lookuptable.csv is generated with this script:
+https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning
+/ModelPredictiveTrajectoryGenerator/lookuptable_generator.py
 
 Ref:
 
-- State Space Sampling of Feasible Motions for High-Performance Mobile Robot Navigation in Complex Environments http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.187.8210&rep=rep1&type=pdf
+- State Space Sampling of Feasible Motions for High-Performance Mobile Robot
+Navigation in Complex Environments
+http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.187.8210&rep=rep1
+&type=pdf
 
 """
 import sys
@@ -17,17 +22,11 @@ from matplotlib import pyplot as plt
 import numpy as np
 import math
 import pandas as pd
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).parent.parent))
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__))
-                + "/../ModelPredictiveTrajectoryGenerator/")
-
-
-try:
-    import model_predictive_trajectory_generator as planner
-    import motion_model
-except ImportError:
-    raise
-
+import ModelPredictiveTrajectoryGenerator.trajectory_generator as planner
+import ModelPredictiveTrajectoryGenerator.motion_model as motion_model
 
 table_path = os.path.dirname(os.path.abspath(__file__)) + "/lookuptable.csv"
 

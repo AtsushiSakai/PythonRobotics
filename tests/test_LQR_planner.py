@@ -1,5 +1,5 @@
 import conftest  # Add root path to sys.path
-from PathPlanning.LQRPlanner import LQRplanner as m
+from PathPlanning.LQRPlanner import lqr_planner as m
 
 
 def test_1():

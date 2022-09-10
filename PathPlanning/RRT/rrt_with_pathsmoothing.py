@@ -7,18 +7,13 @@ Path planning Sample Code with RRT with path smoothing
 """
 
 import math
-import os
 import random
-import sys
-
 import matplotlib.pyplot as plt
+import sys
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).parent))
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-try:
-    from rrt import RRT
-except ImportError:
-    raise
+from rrt import RRT
 
 show_animation = True
 

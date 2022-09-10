@@ -7,8 +7,9 @@ author: Zheng Zh (@Zhengzh)
 """
 
 import sys
-import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/")
+import pathlib
+root_dir = pathlib.Path(__file__).parent.parent.parent
+sys.path.append(str(root_dir))
 
 from math import cos, sin, tan, pi
 
@@ -76,7 +77,7 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
 def plot_car(x, y, yaw):
     car_color = '-k'
     c, s = cos(yaw), sin(yaw)
-    rot = Rot.from_euler('z', -yaw).as_matrix()[0:2, 0:2]
+    rot = rot_mat_2d(-yaw)
     car_outline_x, car_outline_y = [], []
     for rx, ry in zip(VRX, VRY):
         converted_xy = np.stack([rx, ry]).T @ rot

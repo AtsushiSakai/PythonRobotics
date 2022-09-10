@@ -11,12 +11,11 @@ import sys
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).parent.parent))
 
-from PathPlanning.VisibilityRoadMap.geometry import Geometry
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                "/../VoronoiRoadMap/")
-from dijkstra_search import DijkstraSearch
+from VisibilityRoadMap.geometry import Geometry
+from VoronoiRoadMap.dijkstra_search import DijkstraSearch
 
 show_animation = True
 

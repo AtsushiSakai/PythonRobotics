@@ -7,11 +7,14 @@ author: Atsushi Sakai(@Atsushi_twi)
 """
 
 import math
-
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
+import pathlib
+path_planning_dir = pathlib.Path(__file__).parent.parent
+sys.path.append(str(path_planning_dir))
 
-import motion_model
+import ModelPredictiveTrajectoryGenerator.motion_model as motion_model
 
 # optimization parameter
 max_iter = 100

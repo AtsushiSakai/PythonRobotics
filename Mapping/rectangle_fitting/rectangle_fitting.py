@@ -13,9 +13,8 @@ efficient-l-shape-fitting-for-vehicle-detection-using-laser-scanners/
 """
 
 import sys
-import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/")
-
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 
 import matplotlib.pyplot as plt
 import numpy as np

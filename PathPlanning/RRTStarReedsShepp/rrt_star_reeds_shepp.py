@@ -7,23 +7,15 @@ author: AtsushiSakai(@Atsushi_twi)
 """
 import copy
 import math
-import os
 import random
 import sys
-
+import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
+sys.path.append(str(pathlib.Path(__file__).parent.parent))
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                "/../ReedsSheppPath/")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                "/../RRTStar/")
-
-try:
-    import reeds_shepp_path_planning
-    from rrt_star import RRTStar
-except ImportError:
-    raise
+from ReedsSheppPath import reeds_shepp_path_planning
+from RRTStar.rrt_star import RRTStar
 
 show_animation = True
 

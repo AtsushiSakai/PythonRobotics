@@ -5,11 +5,11 @@ Author: Daniel Ingram (daniel-s-ingram)
         Atsushi Sakai (@Atsushi_twi)
 """
 
-import numpy as np
 import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
+import numpy as np
 from ArmNavigation.n_joint_arm_to_point_control.NLinkArm import NLinkArm
 
 # Simulation parameters

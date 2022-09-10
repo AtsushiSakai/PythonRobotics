@@ -7,17 +7,12 @@ author: Atsushi Sakai(@Atsushi_twi)
 """
 
 import math
-import os
 import sys
-
 import matplotlib.pyplot as plt
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).parent.parent))
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../RRT/")
-
-try:
-    from rrt import RRT
-except ImportError:
-    raise
+from RRT.rrt import RRT
 
 show_animation = True
 
@@ -59,6 +54,7 @@ class RRTStar(RRT):
         self.connect_circle_dist = connect_circle_dist
         self.goal_node = self.Node(goal[0], goal[1])
         self.search_until_max_iter = search_until_max_iter
+        self.node_list = []
 
     def planning(self, animation=True):
         """
