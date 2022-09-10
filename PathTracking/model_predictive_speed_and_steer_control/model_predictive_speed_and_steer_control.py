@@ -10,16 +10,10 @@ import cvxpy
 import math
 import numpy as np
 import sys
-import os
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                "/../../PathPlanning/CubicSpline/")
-
-try:
-    import cubic_spline_planner
-except:
-    raise
-
+from PathPlanning.CubicSpline import cubic_spline_planner
 
 NX = 4  # x = x, y, v, yaw
 NU = 2  # a = [accel, steer]

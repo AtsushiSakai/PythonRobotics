@@ -10,7 +10,11 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
-import unicycle_model
+import sys
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).parent.parent))
+
+from ClosedLoopRRTStar import unicycle_model
 
 Kp = 2.0  # speed propotional gain
 Lf = 0.5  # look-ahead distance

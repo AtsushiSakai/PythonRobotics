@@ -7,19 +7,13 @@ author Atsushi Sakai (@Atsushi_twi)
 """
 import math
 import sys
-import os
-
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.linalg as la
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                "/../../PathPlanning/CubicSpline/")
-
-try:
-    import cubic_spline_planner
-except ImportError:
-    raise
+from PathPlanning.CubicSpline import cubic_spline_planner
 
 # === Parameters =====
 

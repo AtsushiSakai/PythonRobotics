@@ -4,25 +4,16 @@ Grid based sweep planner
 author: Atsushi Sakai
 """
 
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/")
-
 import math
 from enum import IntEnum
-
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 
 from utils.angle import rot_mat_2d
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                "/../../Mapping/")
-
-try:
-    from grid_map_lib.grid_map_lib import GridMap
-except ImportError:
-    raise
+from Mapping.grid_map_lib.grid_map_lib import GridMap
 
 do_animation = True
 

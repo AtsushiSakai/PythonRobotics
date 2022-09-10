@@ -19,18 +19,12 @@ import matplotlib.pyplot as plt
 import copy
 import math
 import sys
-import os
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).parent.parent))
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                "/../QuinticPolynomialsPlanner/")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                "/../CubicSpline/")
-
-try:
-    from quintic_polynomials_planner import QuinticPolynomial
-    import cubic_spline_planner
-except ImportError:
-    raise
+from QuinticPolynomialsPlanner.quintic_polynomials_planner import \
+    QuinticPolynomial
+from CubicSpline import cubic_spline_planner
 
 SIM_LOOP = 500
 

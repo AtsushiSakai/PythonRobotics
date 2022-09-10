@@ -6,9 +6,8 @@ author Atsushi Sakai(@Atsushi_twi)
 
 """
 import sys
-import os
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/")
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 
 from math import sin, cos, atan2, sqrt, acos, pi, hypot
 import numpy as np

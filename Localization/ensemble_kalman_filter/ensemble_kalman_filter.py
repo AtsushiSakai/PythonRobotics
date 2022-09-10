@@ -9,10 +9,9 @@ Ensemble Kalman filtering
 (https://rmets.onlinelibrary.wiley.com/doi/10.1256/qj.05.135)
 
 """
-
 import sys
-import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../utils/")
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 
 import math
 import matplotlib.pyplot as plt

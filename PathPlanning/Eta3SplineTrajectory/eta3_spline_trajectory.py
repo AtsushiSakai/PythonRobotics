@@ -16,14 +16,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 import sys
-import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
-                "/../Eta3SplinePath")
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).parent.parent))
 
-try:
-    from eta3_spline_path import Eta3Path, Eta3PathSegment
-except ImportError:
-    raise
+from Eta3SplinePath.eta3_spline_path import Eta3Path, Eta3PathSegment
 
 show_animation = True
 
