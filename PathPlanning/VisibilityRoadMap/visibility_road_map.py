@@ -6,7 +6,6 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 """
 
-import os
 import sys
 import math
 import numpy as np
