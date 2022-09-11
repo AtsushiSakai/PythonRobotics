@@ -11,7 +11,6 @@ import pathlib
 sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 
 import numpy as np
-import numpy
 import matplotlib.pyplot as plt
 import scipy.interpolate as interpolate
 
