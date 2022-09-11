@@ -4,7 +4,6 @@ Matplotlib based plotting utilities
 import math
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib import pyplot as plt
 
 
 def plot_arrow(x, y, yaw, arrow_length=1.0,
