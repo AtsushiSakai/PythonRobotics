@@ -52,7 +52,7 @@ def plot_arrow(x, y, yaw, arrow_length=1.0,
 
 
 def plot_curvature(x_list, y_list, heading, curvature,
-                   k=0.3, c="-c", label="Curvature"):
+                   k=0.01, c="-c", label="Curvature"):
     """
     Plot curvature plot on 2D path
 
