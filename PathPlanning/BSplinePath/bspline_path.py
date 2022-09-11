@@ -109,6 +109,7 @@ def main():
     rax, ray, heading, curvature = approximate_b_spline_path(
         way_point_x, way_point_y, n_course_point, s=0.5)
     plt.plot(rax, ray, '-r', label="Approximated B-Spline path")
+    plot_arrow(rax, ray, heading)
     plot_curvature(rax, ray, heading, curvature)
 
     plt.title("B-Spline approximation")
@@ -121,6 +122,7 @@ def main():
     rix, riy, heading, curvature = interpolate_b_spline_path(
         way_point_x, way_point_y, n_course_point)
     plt.plot(rix, riy, '-b', label="Interpolated B-Spline path")
+    plot_arrow(rix, riy, heading)
     plot_curvature(rix, riy, heading, curvature)
 
     plt.title("B-Spline interpolation")

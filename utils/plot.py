@@ -54,17 +54,21 @@ def plot_arrow(x, y, yaw, arrow_length=1.0,
 def plot_curvature(x_list, y_list, heading, curvature,
                    k=0.01, c="-c", label="Curvature"):
     """
-    Plot curvature plot on 2D path
+    Plot curvature on 2D path. This plot is a line from the original path,
+    the lateral distance from the original path shows curvature magnitude.
+    Left turning shows right side plot, right turning shows left side plot.
+    For straight path, the curvature plot will be on the path, because
+    curvature is 0 on the straight path.
 
     Parameters
     ----------
-    x_list :
-    y_list :
-    heading :
-    curvature :
-    k :
-    c :
-    label :
+    x_list : x position list of the path
+    y_list : y position list of the path
+    heading : heading list of the path
+    curvature : curvature list of the path
+    k : curvature scale factor to calculate distance from the original path
+    c : color of the plot
+    label : label of the plot
     """
     cx = [x + d * k * np.cos(yaw - np.pi / 2.0) for x, y, yaw, d in
           zip(x_list, y_list, heading, curvature)]
