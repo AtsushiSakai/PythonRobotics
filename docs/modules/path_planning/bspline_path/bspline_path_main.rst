@@ -9,6 +9,17 @@ If you input waypoints, it generates a smooth path with B-Spline curve.
 
 The final course should be on the first and last waypoints.
 
-Ref:
+Bspline basics
+~~~~~~~~~~~~~~
+
+Bspline interpolation planning
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Bspline approximation planning
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+References
+~~~~~~~~~~
 
 -  `B-spline - Wikipedia <https://en.wikipedia.org/wiki/B-spline>`__
