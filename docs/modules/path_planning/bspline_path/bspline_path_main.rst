@@ -1,16 +1,26 @@
 B-Spline planning
 -----------------
 
-.. image:: Figure_1.png
+.. image:: interpolation1.png
 
-This is a path planning with B-Spline curse.
+This is a B-Spline path planning routines.
 
 If you input waypoints, it generates a smooth path with B-Spline curve.
 
-The final course should be on the first and last waypoints.
+This codes provide two types of B-Spline curve generations:
+
+1. Interpolation: generate a curve that passes through all waypoints.
+
+2. Approximation: generate a curve that approximates the waypoints. (Not passing through all waypoints)
 
 Bspline basics
 ~~~~~~~~~~~~~~
+
+BSpline (Basis-Spline) is a piecewise polynomial spline curve.
+
+It is expressed by the following equation.
+
+:math:`mathbf{S}(x)=\sum_{i=k-p}^k \mathbf{c}_i B_{i, p}(x)`
 
 .. image:: basis_functions.png
 
