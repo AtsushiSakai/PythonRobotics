@@ -5,7 +5,6 @@ Path Planner with B-Spline
 author: Atsushi Sakai (@Atsushi_twi)
 
 """
-
 import sys
 import pathlib
 sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
@@ -24,7 +23,7 @@ def approximate_b_spline_path(x: list,
                               s=None,
                               ) -> tuple:
     """
-    approximate points with a B-Spline path
+    Approximate points with a B-Spline path
 
     Parameters
     ----------
@@ -35,7 +34,7 @@ def approximate_b_spline_path(x: list,
     n_path_points : int
         number of path points
     degree : int, optional
-        B Spline curve degree. Default is 3
+        B Spline curve degree. Must be 2<= k <= 5. Default: 3.
     s : int, optional
         smoothing parameter. If this value is bigger, the path will be
         smoother, but it will be less accurate. If this value is smaller,
@@ -79,7 +78,7 @@ def interpolate_b_spline_path(x, y,
     n_path_points : int
         number of path points
     degree : int, optional
-        B-Spline degree. Default: 3
+        B-Spline degree. Must be 2<= k <= 5. Default: 3
 
     Returns
     -------
