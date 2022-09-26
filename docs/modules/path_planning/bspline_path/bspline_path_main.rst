@@ -93,13 +93,13 @@ This code is for generating the upper basis function graph using `scipy <https:/
 Bspline interpolation planning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`interpolate_b_spline_path` generates a curve that passes through all waypoints.
+:meth:`PathPlanning.BSplinePath.bspline_path.interpolate_b_spline_path` generates a curve that passes through all waypoints.
 
 This is a simple example of the interpolation planning:
 
 .. image:: interpolation1.png
 
-This figure also shows curvatures of each path point using `utils.plot.plot_curvature`.
+This figure also shows curvatures of each path point using :ref:`plot_curvature`.
 
 The default spline degree is 3, so curvature changes smoothly.
 
@@ -114,8 +114,9 @@ API
 Bspline approximation planning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The function `approximate_b_spline_path` generates a curve that approximates
-the waypoints, which means that the curve might not pass through waypoints.
+:meth:`PathPlanning.BSplinePath.bspline_path.approximate_b_spline_path`
+generates a curve that approximates the waypoints, which means that
+the curve might not pass through waypoints.
 
 Users can adjust path smoothness by the smoothing parameter `s`. If this
 value is bigger, the path will be smoother, but it will be less accurate.
@@ -126,7 +127,7 @@ This is a simple example of the approximation planning:
 
 .. image:: approximation1.png
 
-This figure also shows curvatures of each path point using `utils.plot.plot_curvature`.
+This figure also shows curvatures of each path point using :ref:`plot_curvature`.
 
 The default spline degree is 3, so curvature changes smoothly.
 
