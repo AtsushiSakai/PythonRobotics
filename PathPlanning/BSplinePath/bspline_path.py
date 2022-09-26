@@ -33,10 +33,10 @@ def approximate_b_spline_path(x: list,
     n_path_points : number of path points
     degree : (Optional) B Spline curve degree. Default is 3
     s : (Optional)  smoothing parameter. If this value is bigger, the path
-    will be smoother, but it will be less accurate. If this value is smaller,
-    the path will be more accurate, but it will be less smooth. When `s` is 0,
-    it is equivalent to the interpolation. Default is None, in this case `s`
-    will be `len(x)`.
+        will be smoother, but it will be less accurate. If this value is smaller,
+        the path will be more accurate, but it will be less smooth. When `s` is 0,
+        it is equivalent to the interpolation. Default is None, in this case `s`
+        will be `len(x)`.
 
     Returns
     -------
@@ -108,7 +108,7 @@ def main():
     rax, ray, heading, curvature = approximate_b_spline_path(
         way_point_x, way_point_y, n_course_point, s=0.5)
     plt.plot(rax, ray, '-r', label="Approximated B-Spline path")
-    plot_arrow(rax, ray, heading)
+    # plot_arrow(rax, ray, heading)
     plot_curvature(rax, ray, heading, curvature)
 
     plt.title("B-Spline approximation")
@@ -121,10 +121,10 @@ def main():
     rix, riy, heading, curvature = interpolate_b_spline_path(
         way_point_x, way_point_y, n_course_point)
     plt.plot(rix, riy, '-b', label="Interpolated B-Spline path")
-    plot_arrow(rix, riy, heading)
-    plot_curvature(rix, riy, heading, curvature)
+    # plot_arrow(rix, riy, heading)
+    # plot_curvature(rix, riy, heading, curvature)
 
-    plt.title("B-Spline interpolation")
+    # plt.title("B-Spline interpolation")
     plt.plot(way_point_x, way_point_y, '-og', label="way points")
     plt.grid(True)
     plt.legend()

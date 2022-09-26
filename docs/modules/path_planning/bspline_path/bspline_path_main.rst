@@ -1,7 +1,7 @@
 B-Spline planning
 -----------------
 
-.. image:: interpolation1.png
+.. image:: bspline_path_planning.png
 
 This is a B-Spline path planning routines.
 
@@ -20,9 +20,35 @@ BSpline (Basis-Spline) is a piecewise polynomial spline curve.
 
 It is expressed by the following equation.
 
-:math:`mathbf{S}(x)=\sum_{i=k-p}^k \mathbf{c}_i B_{i, p}(x)`
+:math:`\mathbf{S}(x)=\sum_{i=k-p}^k \mathbf{c}_i B_{i, p}(x)`
+
+here:
+
+* :math:`S(x)` is the curve point on the spline at x.
+* :math:`c_i` is the representative point generating the spline, called the control point.
+* :math:`p+1` is the dimension of the BSpline.
+* :math:`k` is the number of knots.
+* :math:`B_{i,p}(x)` is a function called Basis Function.
+
+The the basis function can be calculated by the following `De Boor recursion formula <https://en.wikipedia.org/wiki/De_Boor%27s_algorithm>`_:
+
+:math:`B_{i, 0}(x):= \begin{cases}1 & \text { if } \quad t_i \leq x<t_{i+1} \\ 0 & \text { otherwise }\end{cases}`
+
+:math:`B_{i, p}(x):=\frac{x-t_i}{t_{i+p}-t_i} B_{i, p-1}(x)+\frac{t_{i+p+1}-x}{t_{i+p+1}-t_{i+1}} B_{i+1, p-1}(x)`
+
+here:
+
+* :math:`t_i` is each element of the knot vector.
+
+This figure shows the BSpline basis functions for each of :math:`i`:
 
 .. image:: basis_functions.png
+
+Note that when all the basis functions are added together, summation is 1.0 for any x value.
+
+This means that the result curve is smooth when each control point is weighted addition by this basis function,
+
+This code is for generating the upper basis function graph using `scipy <https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.BSpline.html>`_.
 
 .. code-block:: python
 
@@ -69,13 +95,29 @@ Bspline interpolation planning
 
 .. image:: interpolation1.png
 
+.. image:: interp_and_curvature.png
+
+API
+++++
+
+.. autofunction:: PathPlanning.BSplinePath.bspline_path.interpolate_b_spline_path
+
+
 Bspline approximation planning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: approximation1.png
+
+.. image:: approx_and_curvature.png
+
+API
+++++
+
+.. autofunction:: PathPlanning.BSplinePath.bspline_path.approximate_b_spline_path
 
 
 References
 ~~~~~~~~~~
 
 -  `B-spline - Wikipedia <https://en.wikipedia.org/wiki/B-spline>`__
+-  `scipy.interpolate.UnivariateSpline <https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.UnivariateSpline.html>`__
