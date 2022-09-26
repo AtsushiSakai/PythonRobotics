@@ -14,7 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.interpolate as interpolate
 
-from utils.plot import plot_arrow, plot_curvature
+from utils.plot import plot_curvature
 
 
 def approximate_b_spline_path(x: list,
@@ -28,19 +28,31 @@ def approximate_b_spline_path(x: list,
 
     Parameters
     ----------
-    x : x position list of approximated points
-    y : y position list of approximated points
-    n_path_points : number of path points
-    degree : (Optional) B Spline curve degree. Default is 3
-    s : (Optional)  smoothing parameter. If this value is bigger, the path
-        will be smoother, but it will be less accurate. If this value is smaller,
-        the path will be more accurate, but it will be less smooth. When `s` is 0,
-        it is equivalent to the interpolation. Default is None, in this case `s`
-        will be `len(x)`.
+    x : array_like
+        x position list of approximated points
+    y : array_like
+        y position list of approximated points
+    n_path_points : int
+        number of path points
+    degree : int, optional
+        B Spline curve degree. Default is 3
+    s : int, optional
+        smoothing parameter. If this value is bigger, the path will be
+        smoother, but it will be less accurate. If this value is smaller,
+        the path will be more accurate, but it will be less smooth.
+        When `s` is 0, it is equivalent to the interpolation. Default is None,
+        in this case `s` will be `len(x)`.
 
     Returns
     -------
-    x and y position list of the result path
+    x : array
+        x positions of the result path
+    y : array
+        y positions of the result path
+    heading : array
+        heading of the result path
+    curvature : array
+        curvature of the result path
 
     """
     distances = _calc_distance_vector(x, y)
@@ -49,11 +61,10 @@ def approximate_b_spline_path(x: list,
     spl_i_y = interpolate.UnivariateSpline(distances, y, k=degree, s=s)
 
     sampled = np.linspace(0.0, distances[-1], n_path_points)
-    x, y, heading, curvature = _evaluate_spline(sampled, spl_i_x, spl_i_y)
-    return x, y, heading, curvature
+    return _evaluate_spline(sampled, spl_i_x, spl_i_y)
 
 
-def interpolate_b_spline_path(x: list, y: list,
+def interpolate_b_spline_path(x, y,
                               n_path_points: int,
                               degree: int = 3) -> tuple:
     """
@@ -61,17 +72,25 @@ def interpolate_b_spline_path(x: list, y: list,
 
     Parameters
     ----------
-    x : x positions of interpolated points
-    y : y positions of interpolated points
-    n_path_points : number of path points
-    degree : (Optional) B-Spline degree. Default: 3
+    x : array_like
+        x positions of interpolated points
+    y : array_like
+        y positions of interpolated points
+    n_path_points : int
+        number of path points
+    degree : int, optional
+        B-Spline degree. Default: 3
 
     Returns
     -------
-    x : x positions of the result path
-    y : y positions of the result path
-    heading : heading of the result path
-    curvature : curvature of the result path
+    x : array
+        x positions of the result path
+    y : array
+        y positions of the result path
+    heading : array
+        heading of the result path
+    curvature : array
+        curvature of the result path
 
     """
     return approximate_b_spline_path(x, y, n_path_points, degree, s=0.0)
@@ -94,7 +113,7 @@ def _evaluate_spline(sampled, spl_i_x, spl_i_y):
     ddx = spl_i_x.derivative(2)(sampled)
     ddy = spl_i_y.derivative(2)(sampled)
     curvature = (ddy * dx - ddx * dy) / np.power(dx * dx + dy * dy, 2.0 / 3.0)
-    return x, y, heading, curvature,
+    return np.array(x), y, heading, curvature,
 
 
 def main():
@@ -108,7 +127,6 @@ def main():
     rax, ray, heading, curvature = approximate_b_spline_path(
         way_point_x, way_point_y, n_course_point, s=0.5)
     plt.plot(rax, ray, '-r', label="Approximated B-Spline path")
-    # plot_arrow(rax, ray, heading)
     plot_curvature(rax, ray, heading, curvature)
 
     plt.title("B-Spline approximation")
@@ -121,10 +139,9 @@ def main():
     rix, riy, heading, curvature = interpolate_b_spline_path(
         way_point_x, way_point_y, n_course_point)
     plt.plot(rix, riy, '-b', label="Interpolated B-Spline path")
-    # plot_arrow(rix, riy, heading)
-    # plot_curvature(rix, riy, heading, curvature)
+    plot_curvature(rix, riy, heading, curvature)
 
-    # plt.title("B-Spline interpolation")
+    plt.title("B-Spline interpolation")
     plt.plot(way_point_x, way_point_y, '-og', label="way points")
     plt.grid(True)
     plt.legend()
