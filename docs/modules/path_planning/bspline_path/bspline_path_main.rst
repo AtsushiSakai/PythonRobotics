@@ -117,13 +117,10 @@ Bspline approximation planning
 The function `approximate_b_spline_path` generates a curve that approximates
 the waypoints, which means that the curve might not pass through waypoints.
 
-Users can adjust path smoothness by the smoothing parameter `s`.
-
-If this value is bigger, the path will be smoother,
-but it will be less accurate.
-
-If this value is smaller, the path will be more accurate,
-but it will be less smooth
+Users can adjust path smoothness by the smoothing parameter `s`. If this
+value is bigger, the path will be smoother, but it will be less accurate.
+If this value is smaller, the path will be more accurate, but it will be
+less smooth.
 
 This is a simple example of the approximation planning:
 
