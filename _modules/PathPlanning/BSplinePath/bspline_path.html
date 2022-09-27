@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PathPlanning.BSplinePath.bspline_path &mdash; PythonRobotics  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+            <a href="../../../index.html" class="icon icon-home"> PythonRobotics
+            <img src="../../../_static/icon.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9612347954373886"
+     crossorigin="anonymous"></script>
+<!-- PythonRoboticsDoc -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-9612347954373886"
+     data-ad-slot="1579532132"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/localization/localization.html">Localization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/mapping/mapping.html">Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/slam/slam.html">SLAM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/path_planning/path_planning.html">Path Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/path_tracking/path_tracking.html">Path Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/arm_navigation/arm_navigation.html">Arm Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/aerial_navigation/aerial_navigation.html">Aerial Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/bipedal/bipedal.html">Bipedal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/utils/utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/appendix/appendix.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how_to_contribute.html">How To Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PythonRobotics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>PathPlanning.BSplinePath.bspline_path</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for PathPlanning.BSplinePath.bspline_path</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">Path Planner with B-Spline</span>
+
+<span class="sd">author: Atsushi Sakai (@Atsushi_twi)</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="p">))</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">scipy.interpolate</span> <span class="k">as</span> <span class="nn">interpolate</span>
+
+<span class="kn">from</span> <span class="nn">utils.plot</span> <span class="kn">import</span> <span class="n">plot_curvature</span>
+
+
+<div class="viewcode-block" id="approximate_b_spline_path"><a class="viewcode-back" href="../../../modules/path_planning/bspline_path/bspline_path.html#PathPlanning.BSplinePath.bspline_path.approximate_b_spline_path">[docs]</a><span class="k">def</span> <span class="nf">approximate_b_spline_path</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                              <span class="n">y</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                              <span class="n">n_path_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                              <span class="n">degree</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+                              <span class="n">s</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                              <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Approximate points with a B-Spline path</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : array_like</span>
+<span class="sd">        x position list of approximated points</span>
+<span class="sd">    y : array_like</span>
+<span class="sd">        y position list of approximated points</span>
+<span class="sd">    n_path_points : int</span>
+<span class="sd">        number of path points</span>
+<span class="sd">    degree : int, optional</span>
+<span class="sd">        B Spline curve degree. Must be 2&lt;= k &lt;= 5. Default: 3.</span>
+<span class="sd">    s : int, optional</span>
+<span class="sd">        smoothing parameter. If this value is bigger, the path will be</span>
+<span class="sd">        smoother, but it will be less accurate. If this value is smaller,</span>
+<span class="sd">        the path will be more accurate, but it will be less smooth.</span>
+<span class="sd">        When `s` is 0, it is equivalent to the interpolation. Default is None,</span>
+<span class="sd">        in this case `s` will be `len(x)`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    x : array</span>
+<span class="sd">        x positions of the result path</span>
+<span class="sd">    y : array</span>
+<span class="sd">        y positions of the result path</span>
+<span class="sd">    heading : array</span>
+<span class="sd">        heading of the result path</span>
+<span class="sd">    curvature : array</span>
+<span class="sd">        curvature of the result path</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">distances</span> <span class="o">=</span> <span class="n">_calc_distance_vector</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="n">spl_i_x</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">UnivariateSpline</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">degree</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">spl_i_y</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">UnivariateSpline</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">degree</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
+
+    <span class="n">sampled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">distances</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">n_path_points</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_evaluate_spline</span><span class="p">(</span><span class="n">sampled</span><span class="p">,</span> <span class="n">spl_i_x</span><span class="p">,</span> <span class="n">spl_i_y</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="interpolate_b_spline_path"><a class="viewcode-back" href="../../../modules/path_planning/bspline_path/bspline_path.html#PathPlanning.BSplinePath.bspline_path.interpolate_b_spline_path">[docs]</a><span class="k">def</span> <span class="nf">interpolate_b_spline_path</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
+                              <span class="n">n_path_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                              <span class="n">degree</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Interpolate x-y points with a B-Spline path</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : array_like</span>
+<span class="sd">        x positions of interpolated points</span>
+<span class="sd">    y : array_like</span>
+<span class="sd">        y positions of interpolated points</span>
+<span class="sd">    n_path_points : int</span>
+<span class="sd">        number of path points</span>
+<span class="sd">    degree : int, optional</span>
+<span class="sd">        B-Spline degree. Must be 2&lt;= k &lt;= 5. Default: 3</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    x : array</span>
+<span class="sd">        x positions of the result path</span>
+<span class="sd">    y : array</span>
+<span class="sd">        y positions of the result path</span>
+<span class="sd">    heading : array</span>
+<span class="sd">        heading of the result path</span>
+<span class="sd">    curvature : array</span>
+<span class="sd">        curvature of the result path</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">approximate_b_spline_path</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">n_path_points</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_calc_distance_vector</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">idy</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">idy</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)])</span>
+    <span class="n">distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(([</span><span class="mf">0.0</span><span class="p">],</span> <span class="n">distances</span><span class="p">))</span>
+    <span class="n">distances</span> <span class="o">/=</span> <span class="n">distances</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">distances</span>
+
+
+<span class="k">def</span> <span class="nf">_evaluate_spline</span><span class="p">(</span><span class="n">sampled</span><span class="p">,</span> <span class="n">spl_i_x</span><span class="p">,</span> <span class="n">spl_i_y</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">spl_i_x</span><span class="p">(</span><span class="n">sampled</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">spl_i_y</span><span class="p">(</span><span class="n">sampled</span><span class="p">)</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">spl_i_x</span><span class="o">.</span><span class="n">derivative</span><span class="p">(</span><span class="mi">1</span><span class="p">)(</span><span class="n">sampled</span><span class="p">)</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">spl_i_y</span><span class="o">.</span><span class="n">derivative</span><span class="p">(</span><span class="mi">1</span><span class="p">)(</span><span class="n">sampled</span><span class="p">)</span>
+    <span class="n">heading</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">ddx</span> <span class="o">=</span> <span class="n">spl_i_x</span><span class="o">.</span><span class="n">derivative</span><span class="p">(</span><span class="mi">2</span><span class="p">)(</span><span class="n">sampled</span><span class="p">)</span>
+    <span class="n">ddy</span> <span class="o">=</span> <span class="n">spl_i_y</span><span class="o">.</span><span class="n">derivative</span><span class="p">(</span><span class="mi">2</span><span class="p">)(</span><span class="n">sampled</span><span class="p">)</span>
+    <span class="n">curvature</span> <span class="o">=</span> <span class="p">(</span><span class="n">ddy</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">-</span> <span class="n">ddx</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">dx</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">+</span> <span class="n">dy</span> <span class="o">*</span> <span class="n">dy</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">y</span><span class="p">,</span> <span class="n">heading</span><span class="p">,</span> <span class="n">curvature</span><span class="p">,</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="vm">__file__</span> <span class="o">+</span> <span class="s2">&quot; start!!&quot;</span><span class="p">)</span>
+    <span class="c1"># way points</span>
+    <span class="n">way_point_x</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+    <span class="n">way_point_y</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]</span>
+    <span class="n">n_course_point</span> <span class="o">=</span> <span class="mi">50</span>  <span class="c1"># sampling number</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">rax</span><span class="p">,</span> <span class="n">ray</span><span class="p">,</span> <span class="n">heading</span><span class="p">,</span> <span class="n">curvature</span> <span class="o">=</span> <span class="n">approximate_b_spline_path</span><span class="p">(</span>
+        <span class="n">way_point_x</span><span class="p">,</span> <span class="n">way_point_y</span><span class="p">,</span> <span class="n">n_course_point</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rax</span><span class="p">,</span> <span class="n">ray</span><span class="p">,</span> <span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Approximated B-Spline path&quot;</span><span class="p">)</span>
+    <span class="n">plot_curvature</span><span class="p">(</span><span class="n">rax</span><span class="p">,</span> <span class="n">ray</span><span class="p">,</span> <span class="n">heading</span><span class="p">,</span> <span class="n">curvature</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;B-Spline approximation&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">way_point_x</span><span class="p">,</span> <span class="n">way_point_y</span><span class="p">,</span> <span class="s1">&#39;-og&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;way points&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">rix</span><span class="p">,</span> <span class="n">riy</span><span class="p">,</span> <span class="n">heading</span><span class="p">,</span> <span class="n">curvature</span> <span class="o">=</span> <span class="n">interpolate_b_spline_path</span><span class="p">(</span>
+        <span class="n">way_point_x</span><span class="p">,</span> <span class="n">way_point_y</span><span class="p">,</span> <span class="n">n_course_point</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rix</span><span class="p">,</span> <span class="n">riy</span><span class="p">,</span> <span class="s1">&#39;-b&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Interpolated B-Spline path&quot;</span><span class="p">)</span>
+    <span class="n">plot_curvature</span><span class="p">(</span><span class="n">rix</span><span class="p">,</span> <span class="n">riy</span><span class="p">,</span> <span class="n">heading</span><span class="p">,</span> <span class="n">curvature</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;B-Spline interpolation&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">way_point_x</span><span class="p">,</span> <span class="n">way_point_y</span><span class="p">,</span> <span class="s1">&#39;-og&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;way points&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2021, Atsushi Sakai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -17,6 +17,7 @@
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -72,7 +73,19 @@
 <li class="toctree-l2"><a class="reference internal" href="../vrm_planner/vrm_planner.html">Voronoi Road-Map planning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../rrt/rrt.html">Rapidly-Exploring Random Trees (RRT)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cubic_spline/cubic_spline.html">Cubic spline planning</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">B-Spline planning</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">B-Spline planning</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#bspline-basics">Bspline basics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bspline-interpolation-planning">Bspline interpolation planning</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#api">API</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#bspline-approximation-planning">Bspline approximation planning</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">API</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../clothoid_path/clothoid_path.html">Clothoid path planning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../eta3_spline/eta3_spline.html">Eta^3 Spline path planning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../bezier_path/bezier_path.html">Bezier path planning</a></li>
@@ -90,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../aerial_navigation/aerial_navigation.html">Aerial Navigation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../bipedal/bipedal.html">Bipedal</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utils/utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../appendix/appendix.html">Appendix</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../how_to_contribute.html">How To Contribute</a></li>
 </ul>
@@ -121,14 +135,171 @@
              
   <section id="b-spline-planning">
 <h1>B-Spline planning<a class="headerlink" href="#b-spline-planning" title="Permalink to this headline"></a></h1>
-<img alt="../../../_images/Figure_11.png" src="../../../_images/Figure_11.png" />
-<p>This is a path planning with B-Spline curse.</p>
+<img alt="../../../_images/bspline_path_planning.png" src="../../../_images/bspline_path_planning.png" />
+<p>This is a B-Spline path planning routines.</p>
 <p>If you input waypoints, it generates a smooth path with B-Spline curve.</p>
-<p>The final course should be on the first and last waypoints.</p>
-<p>Ref:</p>
+<p>This codes provide two types of B-Spline curve generations:</p>
+<ol class="arabic simple">
+<li><p>Interpolation: generate a curve that passes through all waypoints.</p></li>
+<li><p>Approximation: generate a curve that approximates the waypoints. (Not passing through all waypoints)</p></li>
+</ol>
+<section id="bspline-basics">
+<h2>Bspline basics<a class="headerlink" href="#bspline-basics" title="Permalink to this headline"></a></h2>
+<p>BSpline (Basis-Spline) is a piecewise polynomial spline curve.</p>
+<p>It is expressed by the following equation.</p>
+<p><span class="math notranslate nohighlight">\(\mathbf{S}(x)=\sum_{i=k-p}^k \mathbf{c}_i B_{i, p}(x)\)</span></p>
+<p>here:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(S(x)\)</span> is the curve point on the spline at x.</p></li>
+<li><p><span class="math notranslate nohighlight">\(c_i\)</span> is the representative point generating the spline, called the control point.</p></li>
+<li><p><span class="math notranslate nohighlight">\(p+1\)</span> is the dimension of the BSpline.</p></li>
+<li><p><span class="math notranslate nohighlight">\(k\)</span> is the number of knots.</p></li>
+<li><p><span class="math notranslate nohighlight">\(B_{i,p}(x)\)</span> is a function called Basis Function.</p></li>
+</ul>
+<p>The the basis function can be calculated by the following <a class="reference external" href="https://en.wikipedia.org/wiki/De_Boor%27s_algorithm">De Boor recursion formula</a>:</p>
+<p><span class="math notranslate nohighlight">\(B_{i, 0}(x):= \begin{cases}1 &amp; \text { if } \quad t_i \leq x&lt;t_{i+1} \\ 0 &amp; \text { otherwise }\end{cases}\)</span></p>
+<p><span class="math notranslate nohighlight">\(B_{i, p}(x):=\frac{x-t_i}{t_{i+p}-t_i} B_{i, p-1}(x)+\frac{t_{i+p+1}-x}{t_{i+p+1}-t_{i+1}} B_{i+1, p-1}(x)\)</span></p>
+<p>here:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(t_i\)</span> is each element of the knot vector.</p></li>
+</ul>
+<p>This figure shows the BSpline basis functions for each of <span class="math notranslate nohighlight">\(i\)</span>:</p>
+<img alt="../../../_images/basis_functions.png" src="../../../_images/basis_functions.png" />
+<p>Note that when all the basis functions are added together, summation is 1.0 for any x value.</p>
+<p>This means that the result curve is smooth when each control point is weighted addition by this basis function,</p>
+<p>This code is for generating the upper basis function graph using <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.BSpline.html">scipy</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">BSpline</span>
+
+<span class="k">def</span> <span class="nf">B_orig</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="k">else</span> <span class="mf">0.0</span>
+        <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">c1</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">else</span><span class="p">:</span>
+                <span class="n">c1</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">*</span> <span class="n">B</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]:</span>
+                <span class="n">c2</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">else</span><span class="p">:</span>
+                <span class="n">c2</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">B</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">c1</span> <span class="o">+</span> <span class="n">c2</span>
+
+
+<span class="k">def</span> <span class="nf">B</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">BSpline</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">k</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># degree of the spline</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>  <span class="c1"># knots vector</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">t</span><span class="p">)]</span><span class="o">*</span><span class="n">k</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">t</span><span class="p">)]</span><span class="o">*</span><span class="n">k</span><span class="p">]</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">B</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="n">x</span><span class="p">])</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;i = </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Basis functions (k = </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">, knots = </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="bspline-interpolation-planning">
+<h2>Bspline interpolation planning<a class="headerlink" href="#bspline-interpolation-planning" title="Permalink to this headline"></a></h2>
+<p><a class="reference internal" href="#PathPlanning.BSplinePath.bspline_path.interpolate_b_spline_path" title="PathPlanning.BSplinePath.bspline_path.interpolate_b_spline_path"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PathPlanning.BSplinePath.bspline_path.interpolate_b_spline_path()</span></code></a> generates a curve that passes through all waypoints.</p>
+<p>This is a simple example of the interpolation planning:</p>
+<img alt="../../../_images/interpolation1.png" src="../../../_images/interpolation1.png" />
+<p>This figure also shows curvatures of each path point using <a class="reference internal" href="../../utils/plot/plot.html#plot-curvature"><span class="std std-ref">utils.plot.plot_curvature</span></a>.</p>
+<p>The default spline degree is 3, so curvature changes smoothly.</p>
+<img alt="../../../_images/interp_and_curvature.png" src="../../../_images/interp_and_curvature.png" />
+<section id="api">
+<h3>API<a class="headerlink" href="#api" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="PathPlanning.BSplinePath.bspline_path.interpolate_b_spline_path">
+<span class="sig-prename descclassname"><span class="pre">PathPlanning.BSplinePath.bspline_path.</span></span><span class="sig-name descname"><span class="pre">interpolate_b_spline_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_path_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="reference internal" href="../../../_modules/PathPlanning/BSplinePath/bspline_path.html#interpolate_b_spline_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PathPlanning.BSplinePath.bspline_path.interpolate_b_spline_path" title="Permalink to this definition"></a></dt>
+<dd><p>Interpolate x-y points with a B-Spline path</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array_like</em>) – x positions of interpolated points</p></li>
+<li><p><strong>y</strong> (<em>array_like</em>) – y positions of interpolated points</p></li>
+<li><p><strong>n_path_points</strong> (<em>int</em>) – number of path points</p></li>
+<li><p><strong>degree</strong> (<em>int</em><em>, </em><em>optional</em>) – B-Spline degree. Must be 2&lt;= k &lt;= 5. Default: 3</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>x</strong> (<em>array</em>) – x positions of the result path</p></li>
+<li><p><strong>y</strong> (<em>array</em>) – y positions of the result path</p></li>
+<li><p><strong>heading</strong> (<em>array</em>) – heading of the result path</p></li>
+<li><p><strong>curvature</strong> (<em>array</em>) – curvature of the result path</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+<section id="bspline-approximation-planning">
+<h2>Bspline approximation planning<a class="headerlink" href="#bspline-approximation-planning" title="Permalink to this headline"></a></h2>
+<p><a class="reference internal" href="#PathPlanning.BSplinePath.bspline_path.approximate_b_spline_path" title="PathPlanning.BSplinePath.bspline_path.approximate_b_spline_path"><code class="xref py py-meth docutils literal notranslate"><span class="pre">PathPlanning.BSplinePath.bspline_path.approximate_b_spline_path()</span></code></a>
+generates a curve that approximates the waypoints, which means that
+the curve might not pass through waypoints.</p>
+<p>Users can adjust path smoothness by the smoothing parameter <cite>s</cite>. If this
+value is bigger, the path will be smoother, but it will be less accurate.
+If this value is smaller, the path will be more accurate, but it will be
+less smooth.</p>
+<p>This is a simple example of the approximation planning:</p>
+<img alt="../../../_images/approximation1.png" src="../../../_images/approximation1.png" />
+<p>This figure also shows curvatures of each path point using <a class="reference internal" href="../../utils/plot/plot.html#plot-curvature"><span class="std std-ref">utils.plot.plot_curvature</span></a>.</p>
+<p>The default spline degree is 3, so curvature changes smoothly.</p>
+<img alt="../../../_images/approx_and_curvature.png" src="../../../_images/approx_and_curvature.png" />
+<section id="id1">
+<h3>API<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="PathPlanning.BSplinePath.bspline_path.approximate_b_spline_path">
+<span class="sig-prename descclassname"><span class="pre">PathPlanning.BSplinePath.bspline_path.</span></span><span class="sig-name descname"><span class="pre">approximate_b_spline_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_path_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="reference internal" href="../../../_modules/PathPlanning/BSplinePath/bspline_path.html#approximate_b_spline_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#PathPlanning.BSplinePath.bspline_path.approximate_b_spline_path" title="Permalink to this definition"></a></dt>
+<dd><p>Approximate points with a B-Spline path</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array_like</em>) – x position list of approximated points</p></li>
+<li><p><strong>y</strong> (<em>array_like</em>) – y position list of approximated points</p></li>
+<li><p><strong>n_path_points</strong> (<em>int</em>) – number of path points</p></li>
+<li><p><strong>degree</strong> (<em>int</em><em>, </em><em>optional</em>) – B Spline curve degree. Must be 2&lt;= k &lt;= 5. Default: 3.</p></li>
+<li><p><strong>s</strong> (<em>int</em><em>, </em><em>optional</em>) – smoothing parameter. If this value is bigger, the path will be
+smoother, but it will be less accurate. If this value is smaller,
+the path will be more accurate, but it will be less smooth.
+When <cite>s</cite> is 0, it is equivalent to the interpolation. Default is None,
+in this case <cite>s</cite> will be <cite>len(x)</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>x</strong> (<em>array</em>) – x positions of the result path</p></li>
+<li><p><strong>y</strong> (<em>array</em>) – y positions of the result path</p></li>
+<li><p><strong>heading</strong> (<em>array</em>) – heading of the result path</p></li>
+<li><p><strong>curvature</strong> (<em>array</em>) – curvature of the result path</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline"></a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://en.wikipedia.org/wiki/B-spline">B-spline - Wikipedia</a></p></li>
+<li><p><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.UnivariateSpline.html">scipy.interpolate.UnivariateSpline</a></p></li>
 </ul>
+</section>
 </section>
 
 
