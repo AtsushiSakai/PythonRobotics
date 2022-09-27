@@ -44,6 +44,7 @@ See this paper for more details:
    modules/aerial_navigation/aerial_navigation
    modules/bipedal/bipedal
    modules/control/control
+   modules/utils/utils
    modules/appendix/appendix
    how_to_contribute
 
