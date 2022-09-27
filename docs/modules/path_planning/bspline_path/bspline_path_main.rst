@@ -99,7 +99,7 @@ This is a simple example of the interpolation planning:
 
 .. image:: interpolation1.png
 
-This figure also shows curvatures of each path point using :ref:`plot_curvature`.
+This figure also shows curvatures of each path point using :ref:`utils.plot.plot_curvature <plot_curvature>`.
 
 The default spline degree is 3, so curvature changes smoothly.
 
@@ -127,7 +127,7 @@ This is a simple example of the approximation planning:
 
 .. image:: approximation1.png
 
-This figure also shows curvatures of each path point using :ref:`plot_curvature`.
+This figure also shows curvatures of each path point using :ref:`utils.plot.plot_curvature <plot_curvature>`.
 
 The default spline degree is 3, so curvature changes smoothly.
 
