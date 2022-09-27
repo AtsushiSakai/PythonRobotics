@@ -1,7 +1,7 @@
 .. _utils:
 
-utils
-======
+Utilities
+==========
 
 Common utilities for PythonRobotics.
 
