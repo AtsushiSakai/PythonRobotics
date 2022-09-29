@@ -4,9 +4,9 @@ State lattice planner with model predictive trajectory generator
 
 author: Atsushi Sakai (@Atsushi_twi)
 
-- lookuptable.csv is generated with this script:
+- plookuptable.csv is generated with this script:
 https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning
-/ModelPredictiveTrajectoryGenerator/lookuptable_generator.py
+/ModelPredictiveTrajectoryGenerator/lookup_table_generator.py
 
 Ref:
 
@@ -28,7 +28,7 @@ sys.path.append(str(pathlib.Path(__file__).parent.parent))
 import ModelPredictiveTrajectoryGenerator.trajectory_generator as planner
 import ModelPredictiveTrajectoryGenerator.motion_model as motion_model
 
-table_path = os.path.dirname(os.path.abspath(__file__)) + "/lookuptable.csv"
+TABLE_PATH = os.path.dirname(os.path.abspath(__file__)) + "/lookup_table.csv"
 
 show_animation = True
 
@@ -51,7 +51,8 @@ def search_nearest_one_from_lookuptable(tx, ty, tyaw, lookup_table):
 
 
 def get_lookup_table():
-    data = pd.read_csv(table_path)
+    # data = pd.read_csv(TABLE_PATH)
+    data = np.loadtxt(TABLE_PATH, delimiter=',', skiprows=1)
 
     return np.array(data)
 

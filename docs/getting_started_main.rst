@@ -30,7 +30,6 @@ Requirements
 -  `NumPy`_
 -  `SciPy`_
 -  `Matplotlib`_
--  `pandas`_
 -  `cvxpy`_
 
 For development:
@@ -45,7 +44,6 @@ For development:
 .. _`NumPy`: https://numpy.org/
 .. _`SciPy`: https://scipy.org/
 .. _`Matplotlib`: https://matplotlib.org/
-.. _`pandas`: https://pandas.pydata.org/
 .. _`cvxpy`: https://www.cvxpy.org/
 
 

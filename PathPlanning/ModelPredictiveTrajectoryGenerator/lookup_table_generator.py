@@ -5,12 +5,17 @@ Lookup Table generation for model predictive trajectory generator
 author: Atsushi Sakai
 
 """
+import sys
+import pathlib
+path_planning_dir = pathlib.Path(__file__).parent.parent
+sys.path.append(str(path_planning_dir))
+
 from matplotlib import pyplot as plt
 import numpy as np
 import math
-import model_predictive_trajectory_generator as planner
-import motion_model
 import pandas as pd
+
+from ModelPredictiveTrajectoryGenerator import trajectory_generator, motion_model
 
 
 def calc_states_list():
@@ -30,11 +35,11 @@ def calc_states_list():
     return states
 
 
-def search_nearest_one_from_lookuptable(tx, ty, tyaw, lookuptable):
+def search_nearest_one_from_lookup_table(tx, ty, tyaw, lookup_table):
     mind = float("inf")
     minid = -1
 
-    for (i, table) in enumerate(lookuptable):
+    for (i, table) in enumerate(lookup_table):
 
         dx = tx - table[0]
         dy = ty - table[1]
@@ -46,23 +51,14 @@ def search_nearest_one_from_lookuptable(tx, ty, tyaw, lookuptable):
 
     # print(minid)
 
-    return lookuptable[minid]
+    return lookup_table[minid]
 
 
-def save_lookup_table(fname, table):
-    mt = np.array(table)
-    print(mt)
-    # save csv
-    df = pd.DataFrame()
-    df["x"] = mt[:, 0]
-    df["y"] = mt[:, 1]
-    df["yaw"] = mt[:, 2]
-    df["s"] = mt[:, 3]
-    df["km"] = mt[:, 4]
-    df["kf"] = mt[:, 5]
-    df.to_csv(fname, index=None)
+def save_lookup_table(file_name, table):
+    np.savetxt(file_name, np.array(table),
+               fmt='%s', delimiter=",", header="x,y,yaw,s,km,kf", comments="")
 
-    print("lookup table file is saved as " + fname)
+    print("lookup table file is saved as " + file_name)
 
 
 def generate_lookup_table():
@@ -73,14 +69,14 @@ def generate_lookup_table():
     lookuptable = [[1.0, 0.0, 0.0, 1.0, 0.0, 0.0]]
 
     for state in states:
-        bestp = search_nearest_one_from_lookuptable(
+        bestp = search_nearest_one_from_lookup_table(
             state[0], state[1], state[2], lookuptable)
 
         target = motion_model.State(x=state[0], y=state[1], yaw=state[2])
         init_p = np.array(
             [math.sqrt(state[0] ** 2 + state[1] ** 2), bestp[4], bestp[5]]).reshape(3, 1)
 
-        x, y, yaw, p = planner.optimize_trajectory(target, k0, init_p)
+        x, y, yaw, p = trajectory_generator.optimize_trajectory(target, k0, init_p)
 
         if x is not None:
             print("find good path")
@@ -89,7 +85,7 @@ def generate_lookup_table():
 
     print("finish lookup table generation")
 
-    save_lookup_table("lookuptable.csv", lookuptable)
+    save_lookup_table("plookuptable.csv", lookuptable)
 
     for table in lookuptable:
         xc, yc, yawc = motion_model.generate_trajectory(
