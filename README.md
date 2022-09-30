@@ -103,8 +103,6 @@ For running each sample code:
  
 - [Matplotlib](https://matplotlib.org/)
  
-- [pandas](https://pandas.pydata.org/)
-
 - [cvxpy](https://www.cvxpy.org/) 
 
 For development:

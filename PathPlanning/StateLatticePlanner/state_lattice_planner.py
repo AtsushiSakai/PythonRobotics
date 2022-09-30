@@ -4,9 +4,9 @@ State lattice planner with model predictive trajectory generator
 
 author: Atsushi Sakai (@Atsushi_twi)
 
-- lookuptable.csv is generated with this script:
+- plookuptable.csv is generated with this script:
 https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning
-/ModelPredictiveTrajectoryGenerator/lookuptable_generator.py
+/ModelPredictiveTrajectoryGenerator/lookup_table_generator.py
 
 Ref:
 
@@ -21,27 +21,25 @@ import os
 from matplotlib import pyplot as plt
 import numpy as np
 import math
-import pandas as pd
 import pathlib
 sys.path.append(str(pathlib.Path(__file__).parent.parent))
 
 import ModelPredictiveTrajectoryGenerator.trajectory_generator as planner
 import ModelPredictiveTrajectoryGenerator.motion_model as motion_model
 
-table_path = os.path.dirname(os.path.abspath(__file__)) + "/lookuptable.csv"
+TABLE_PATH = os.path.dirname(os.path.abspath(__file__)) + "/lookup_table.csv"
 
 show_animation = True
 
 
-def search_nearest_one_from_lookuptable(tx, ty, tyaw, lookup_table):
+def search_nearest_one_from_lookup_table(t_x, t_y, t_yaw, lookup_table):
     mind = float("inf")
     minid = -1
 
     for (i, table) in enumerate(lookup_table):
-
-        dx = tx - table[0]
-        dy = ty - table[1]
-        dyaw = tyaw - table[2]
+        dx = t_x - table[0]
+        dy = t_y - table[1]
+        dyaw = t_yaw - table[2]
         d = math.sqrt(dx ** 2 + dy ** 2 + dyaw ** 2)
         if d <= mind:
             minid = i
@@ -50,24 +48,22 @@ def search_nearest_one_from_lookuptable(tx, ty, tyaw, lookup_table):
     return lookup_table[minid]
 
 
-def get_lookup_table():
-    data = pd.read_csv(table_path)
-
-    return np.array(data)
+def get_lookup_table(table_path):
+    return np.loadtxt(table_path, delimiter=',', skiprows=1)
 
 
 def generate_path(target_states, k0):
     # x, y, yaw, s, km, kf
-    lookup_table = get_lookup_table()
+    lookup_table = get_lookup_table(TABLE_PATH)
     result = []
 
     for state in target_states:
-        bestp = search_nearest_one_from_lookuptable(
+        bestp = search_nearest_one_from_lookup_table(
             state[0], state[1], state[2], lookup_table)
 
         target = motion_model.State(x=state[0], y=state[1], yaw=state[2])
         init_p = np.array(
-            [math.sqrt(state[0] ** 2 + state[1] ** 2), bestp[4], bestp[5]]).reshape(3, 1)
+            [np.hypot(state[0], state[1]), bestp[4], bestp[5]]).reshape(3, 1)
 
         x, y, yaw, p = planner.optimize_trajectory(target, k0, init_p)
 
@@ -82,18 +78,28 @@ def generate_path(target_states, k0):
 
 def calc_uniform_polar_states(nxy, nh, d, a_min, a_max, p_min, p_max):
     """
-    calc uniform state
 
-    :param nxy: number of position sampling
-    :param nh: number of heading sampleing
-    :param d: distance of terminal state
-    :param a_min: position sampling min angle
-    :param a_max: position sampling max angle
-    :param p_min: heading sampling min angle
-    :param p_max: heading sampling max angle
-    :return: states list
+    Parameters
+    ----------
+    nxy :
+        number of position sampling
+    nh :
+        number of heading sampleing
+    d :
+        distance of terminal state
+    a_min :
+        position sampling min angle
+    a_max :
+        position sampling max angle
+    p_min :
+        heading sampling min angle
+    p_max :
+        heading sampling max angle
+
+    Returns
+    -------
+
     """
-
     angle_samples = [i / (nxy - 1) for i in range(nxy)]
     states = sample_states(angle_samples, a_min, a_max, d, p_max, p_min, nh)
 
@@ -312,11 +318,11 @@ def lane_state_sampling_test1():
         plt.close("all")
 
     for table in result:
-        xc, yc, yawc = motion_model.generate_trajectory(
+        x_c, y_c, yaw_c = motion_model.generate_trajectory(
             table[3], table[4], table[5], k0)
 
         if show_animation:
-            plt.plot(xc, yc, "-r")
+            plt.plot(x_c, y_c, "-r")
 
     if show_animation:
         plt.grid(True)
