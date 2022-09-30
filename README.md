@@ -632,6 +632,11 @@ If you would like to support us in some other way, please contact with creating 
 
 They are providing a free license of their IDEs for this OSS development.   
 
+### [1Password](https://github.com/1Password/1password-teams-open-source)
+
+They are providing a free license of their 1Password team license for this OSS project.   
+
+
 # Authors
 
 - [Contributors to AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/graphs/contributors)
