@@ -3,7 +3,7 @@ on: [status]
 jobs:
   circleci_artifacts_redirector_job:
     runs-on: ubuntu-latest
-    name: Run CircleCI artifacts redirector
+    name: Run CircleCI artifacts redirector!!
     steps:
       - name: run-circleci-artifacts-redirector
         uses: larsoner/circleci-artifacts-redirector-action@0.3.1
