@@ -4,5 +4,5 @@ matplotlib == 3.6.0
 cvxpy == 1.2.1
 pytest == 7.1.3 # For unit test
 pytest-xdist == 2.5.0 # For unit test
-mypy == 0.971 # For unit test
+mypy == 0.982 # For unit test
 flake8 == 5.0.4 # For unit test
