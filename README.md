@@ -70,8 +70,9 @@ Python codes for robotics algorithm.
    * [Contribution](#contribution)
    * [Citing](#citing)
    * [Support](#support)
-   * [Sponsors](#Sponsors)
+   * [Sponsors](#sponsors)
       * [JetBrains](#JetBrains)
+      * [1Password](#1password)
    * [Authors](#authors)
 
 # What is this?
@@ -614,7 +615,7 @@ If you use this project's code for your academic work, we encourage you to cite 
 
 If you use this project's code in industry, we'd love to hear from you as well; feel free to reach out to the developers directly.
 
-# Supporting this project
+# <a id="support"></a>Supporting this project
 
 If you or your company would like to support this project, please consider:
 
@@ -626,13 +627,13 @@ If you or your company would like to support this project, please consider:
 
 If you would like to support us in some other way, please contact with creating an issue.
 
-## Sponsors
+## <a id="sponsors"></a>Sponsors
 
-### [JetBrains](https://www.jetbrains.com/)
+### <a id="JetBrains"></a>[JetBrains](https://www.jetbrains.com/)
 
 They are providing a free license of their IDEs for this OSS development.   
 
-### [1Password](https://github.com/1Password/1password-teams-open-source)
+### <a id="1password"></a>[1Password](https://github.com/1Password/1password-teams-open-source)
 
 They are providing a free license of their 1Password team license for this OSS project.   
 
