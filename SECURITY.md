@@ -10,4 +10,4 @@ In this project, we are only support latest code.
 
 ## Reporting a Vulnerability
 
-If you find any sequrity related problem, let us know by creating an issue about it.
+If you find any security related problem, let us know by creating an issue about it.
