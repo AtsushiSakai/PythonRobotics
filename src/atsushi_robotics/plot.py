@@ -84,4 +84,3 @@ def plot_curvature(x_list, y_list, heading_list, curvature,
     plt.plot(cx, cy, c, label=label)
     for ix, iy, icx, icy in zip(x_list, y_list, cx, cy):
         plt.plot([ix, icx], [iy, icy], c)
-
