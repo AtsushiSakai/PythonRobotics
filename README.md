@@ -108,15 +108,15 @@ For running each sample code:
 
 For development:
   
-- pytest (for unit tests)
+- [pytest](https://pytest.org/) (for unit tests)
   
-- pytest-xdist (for parallel unit tests)
+- [pytest-xdist](https://pypi.org/project/pytest-xdist/) (for parallel unit tests)
   
-- mypy (for type check)
+- [mypy](http://mypy-lang.org/) (for type check)
   
-- sphinx (for document generation)
+- [sphinx](https://www.sphinx-doc.org/) (for document generation)
   
-- pycodestyle (for code style check)
+- [pycodestyle](https://pypi.org/project/pycodestyle/) (for code style check)
 
 # Documentation
 
@@ -132,18 +132,18 @@ All animation gifs are stored here: [AtsushiSakai/PythonRoboticsGifs: Animation 
 
 1. Clone this repo.
 
-> git clone https://github.com/AtsushiSakai/PythonRobotics.git
+   `git clone https://github.com/AtsushiSakai/PythonRobotics.git`
 
 
 2. Install the required libraries.
 
-using conda :
+- using conda :
 
-> conda env create -f requirements/environment.yml
+  `conda env create -f requirements/environment.yml`
  
-using pip :
+- using pip :
 
-> pip install -r requirements/requirements.txt
+  `pip install -r requirements/requirements.txt`
 
 
 3. Execute python script in each directory.
