@@ -132,18 +132,24 @@ All animation gifs are stored here: [AtsushiSakai/PythonRoboticsGifs: Animation 
 
 1. Clone this repo.
 
-   `git clone https://github.com/AtsushiSakai/PythonRobotics.git`
+   ```terminal
+   git clone https://github.com/AtsushiSakai/PythonRobotics.git
+   ```
 
 
 2. Install the required libraries.
 
 - using conda :
 
-  `conda env create -f requirements/environment.yml`
+  ```terminal
+  conda env create -f requirements/environment.yml
+  ```
  
 - using pip :
 
-  `pip install -r requirements/requirements.txt`
+  ```terminal
+  pip install -r requirements/requirements.txt
+  ```
 
 
 3. Execute python script in each directory.
