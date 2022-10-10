@@ -19,6 +19,6 @@ Again, thanks for contributing!
 <!--Any additional information you think is important.-->
 
 #### CheckList
--[] Did you add an unittest for your new example or defect fix?
--[] Did you add documents for your new example?
--[] All CIs are green? (You can check it after submitting)
+- [ ] Did you add an unittest for your new example or defect fix?
+- [ ] Did you add documents for your new example?
+- [ ] All CIs are green? (You can check it after submitting)
