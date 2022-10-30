@@ -35,8 +35,8 @@ install:
   # the parent CMD process).
   - SET PATH=%PYTHON_DIR%;%PYTHON_DIR%\\Scripts;%PATH%
   - SET PATH=%PYTHON%;%PYTHON%\Scripts;%PYTHON%\Library\bin;%PATH%
-  # - SET PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin
-  - SET PATH=C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin;%PATH%
+  - SET PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin
+  - ECHO %PATH%
   - "python -m pip install --upgrade pip"
   - "python -m pip install -r requirements/requirements.txt"
   - "python -m pip install pytest-xdist"
