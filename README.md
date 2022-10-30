@@ -70,8 +70,9 @@ Python codes for robotics algorithm.
    * [Contribution](#contribution)
    * [Citing](#citing)
    * [Support](#support)
-   * [Sponsors](#Sponsors)
+   * [Sponsors](#sponsors)
       * [JetBrains](#JetBrains)
+      * [1Password](#1password)
    * [Authors](#authors)
 
 # What is this?
@@ -107,15 +108,15 @@ For running each sample code:
 
 For development:
   
-- pytest (for unit tests)
+- [pytest](https://pytest.org/) (for unit tests)
   
-- pytest-xdist (for parallel unit tests)
+- [pytest-xdist](https://pypi.org/project/pytest-xdist/) (for parallel unit tests)
   
-- mypy (for type check)
+- [mypy](http://mypy-lang.org/) (for type check)
   
-- sphinx (for document generation)
+- [sphinx](https://www.sphinx-doc.org/) (for document generation)
   
-- pycodestyle (for code style check)
+- [pycodestyle](https://pypi.org/project/pycodestyle/) (for code style check)
 
 # Documentation
 
@@ -131,18 +132,24 @@ All animation gifs are stored here: [AtsushiSakai/PythonRoboticsGifs: Animation 
 
 1. Clone this repo.
 
-> git clone https://github.com/AtsushiSakai/PythonRobotics.git
+   ```terminal
+   git clone https://github.com/AtsushiSakai/PythonRobotics.git
+   ```
 
 
 2. Install the required libraries.
 
-using conda :
+- using conda :
 
-> conda env create -f requirements/environment.yml
+  ```terminal
+  conda env create -f requirements/environment.yml
+  ```
  
-using pip :
+- using pip :
 
-> pip install -r requirements/requirements.txt
+  ```terminal
+  pip install -r requirements/requirements.txt
+  ```
 
 
 3. Execute python script in each directory.
@@ -614,7 +621,7 @@ If you use this project's code for your academic work, we encourage you to cite 
 
 If you use this project's code in industry, we'd love to hear from you as well; feel free to reach out to the developers directly.
 
-# Supporting this project
+# <a id="support"></a>Supporting this project
 
 If you or your company would like to support this project, please consider:
 
@@ -626,9 +633,9 @@ If you or your company would like to support this project, please consider:
 
 If you would like to support us in some other way, please contact with creating an issue.
 
-## Sponsors
+## <a id="sponsors"></a>Sponsors
 
-### [JetBrains](https://www.jetbrains.com/)
+### <a id="JetBrains"></a>[JetBrains](https://www.jetbrains.com/)
 
 They are providing a free license of their IDEs for this OSS development.   
 
