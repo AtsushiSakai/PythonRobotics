@@ -1,6 +1,6 @@
 numpy == 1.23.4
 scipy == 1.9.3
-matplotlib == 3.6.1
+matplotlib == 3.6.2
 cvxpy == 1.2.1
 pytest == 7.2.0 # For unit test
 pytest-xdist == 3.0.2 # For unit test
