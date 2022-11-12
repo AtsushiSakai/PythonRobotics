@@ -12,7 +12,7 @@ Python codes for robotics algorithm.
 
 
 # Table of Contents
-   * [What is this?](#what-is-this)
+   * [Oque é isso??](#Oque-é-isso)
    * [Requirements](#requirements)
    * [Documentation](#documentation)
    * [How to use](#how-to-use)
@@ -620,7 +620,7 @@ Se você usar o código deste projeto para seu trabalho acadêmico, nós o encor
 
 Se você usar o código deste projeto na indústria, adoraríamos ouvir você também; sinta-se à vontade para entrar em contato diretamente com os desenvolvedores.
 
-# <a id="support"></a>Supporting this project
+# <a id="support"></a>Apoiando este projeto
 
 Se você ou sua empresa gostaria de apoiar este projeto, considere:
 
@@ -632,7 +632,7 @@ Se você ou sua empresa gostaria de apoiar este projeto, considere:
 
 Se você gostaria de nos apoiar de alguma outra forma, entre em contato com a criação de um problema.
 
-## <a id="sponsors"></a>Sponsors
+## <a id="sponsors"></a>Patrocinadores
 
 ### <a id="JetBrains"></a>[JetBrains](https://www.jetbrains.com/)
 
@@ -643,7 +643,7 @@ Eles estão fornecendo uma licença gratuita de seus IDEs para este desenvolvime
 Eles estão fornecendo uma licença gratuita de sua licença de equipe 1Password para este projeto OSS. 
 
 
-# Authors
+# Autores
 
 - [Contributors to AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/graphs/contributors)
 
