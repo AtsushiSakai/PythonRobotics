@@ -168,15 +168,15 @@ Documentação: [Notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/m
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/particle_filter/animation.gif)
 
-This is a sensor fusion localization with Particle Filter(PF).
+Essa é uma fusão de sensores com o filtro de partícula(FP).
 
-The blue line is true trajectory, the black line is dead reckoning trajectory,
+A linha azul é a trajetória verdadeira, a linha preta é a trajetória calculada morta,
 
-and the red line is an estimated trajectory with PF.
+a linha vermelha é a trajetória estimada com FP.
 
-It is assumed that the robot can measure a distance from landmarks (RFID).
+Assume-se que o robô pode medir uma distância entre pontos de referência (RFID).
 
-These measurements are used for PF localization.
+Essas medidas são utilizadas para localização de FP.
 
 Referência:
 
@@ -187,17 +187,17 @@ Referência:
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/histogram_filter/animation.gif)
 
-This is a 2D localization example with Histogram filter.
+Este é um exemplo de localização em 2D utilizando filtro de histograma.
 
-The red cross is true position, black points are RFID positions.
+A cruz vermelha é a posição verdadeira,os pontos pretos são as posições RFID.
 
-The blue grid shows a position probability of histogram filter.  
+A grade azul mostra uma probabilidade de posição do filtro de histograma.  
 
-In this simulation, x,y are unknown, yaw is known.
+Nessa simulação, x,y são desconhecidos e yaw é conhecido.
 
-The filter integrates speed input and range observations from RFID for localization.
+O filtro integra a entrada de velocidade e observações de alcance de RFID para a localização.
 
-Initial position is not needed.
+A posição inicial não é necessária.
 
 Referência:
 
@@ -205,9 +205,9 @@ Referência:
 
 # Algoritmos de Mapeamento
 
-## Gaussian grid map
+## Mapeamento de grade gaussiana
 
-This is a 2D Gaussian grid mapping example.
+Esse é um exemplo de mapeamento de grade gaussiana 2D
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/gaussian_grid_map/animation.gif)
 
@@ -217,7 +217,7 @@ This is a 2D ray casting grid mapping example.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/raycasting_grid_map/animation.gif)
 
-## Lidar to grid map
+## Lidar para mapa de grade
 
 This example shows how to convert a 2D range measurement to a grid map.
 
