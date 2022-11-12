@@ -75,26 +75,26 @@ Python codes for robotics algorithm.
       * [1Password](#1password)
    * [Authors](#authors)
 
-# What is this?
+# Oque é isso?
 
-This is a Python code collection of robotics algorithms.
+Isso é uma coleção de códigos em Python de algorítimos de robótica.
 
-Features:
+Recursos:
 
-1. Easy to read for understanding each algorithm's basic idea.
+1. Leitura de fácil compreensão da ideia básica de cada algorítimo.
 
-2. Widely used and practical algorithms are selected.
+2. Algoritmos amplamente utilizados e práticos são selecionados.
 
-3. Minimum dependency.
+3. Dependência mínima.
 
-See this paper for more details:
+Veja este documento para mais detalhes:
 
 - [\[1808\.10703\] PythonRobotics: a Python code collection of robotics algorithms](https://arxiv.org/abs/1808.10703) ([BibTeX](https://github.com/AtsushiSakai/PythonRoboticsPaper/blob/master/python_robotics.bib))
 
 
-# Requirements
+# Requerimentos
 
-For running each sample code:
+Para executar cada código de amostra:
 
 - [Python 3.10.x](https://www.python.org/)
  
@@ -106,38 +106,38 @@ For running each sample code:
  
 - [cvxpy](https://www.cvxpy.org/) 
 
-For development:
+Para desenvolvimento:
   
-- [pytest](https://pytest.org/) (for unit tests)
+- [pytest](https://pytest.org/) (para testes de unidade)
   
-- [pytest-xdist](https://pypi.org/project/pytest-xdist/) (for parallel unit tests)
+- [pytest-xdist](https://pypi.org/project/pytest-xdist/) (para testes unitários paralelos)
   
-- [mypy](http://mypy-lang.org/) (for type check)
+- [mypy](http://mypy-lang.org/) (para verificação de tipo)
   
-- [sphinx](https://www.sphinx-doc.org/) (for document generation)
+- [sphinx](https://www.sphinx-doc.org/) (para geração de documentação)
   
-- [pycodestyle](https://pypi.org/project/pycodestyle/) (for code style check)
+- [pycodestyle](https://pypi.org/project/pycodestyle/) (para verificação de estilo de código)
 
-# Documentation
+# Documentação
 
-This README only shows some examples of this project. 
+Este README mostra apenas alguns exemplos deste projeto. 
 
-If you are interested in other examples or mathematical backgrounds of each algorithm, 
+Se você estiver interessado em outros exemplos ou fundamentos matemáticos de cada algoritmo,
 
-You can check the full documentation online: [Welcome to PythonRobotics’s documentation\! — PythonRobotics documentation](https://atsushisakai.github.io/PythonRobotics/index.html)
+Você pode verificar a documentação completa online: [Welcome to PythonRobotics’s documentation\! — PythonRobotics documentation](https://atsushisakai.github.io/PythonRobotics/index.html)
 
-All animation gifs are stored here: [AtsushiSakai/PythonRoboticsGifs: Animation gifs of PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs)
+Todos os gifs de animação são armazenados aqui: [AtsushiSakai/PythonRoboticsGifs: Animation gifs of PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs)
 
-# How to use
+# Como Utilizar
 
-1. Clone this repo.
+1. Clone esse repositório.
 
    ```terminal
    git clone https://github.com/AtsushiSakai/PythonRobotics.git
    ```
 
 
-2. Install the required libraries.
+2. Instale as bibliotecas necessárias.
 
 - using conda :
 
@@ -152,99 +152,99 @@ All animation gifs are stored here: [AtsushiSakai/PythonRoboticsGifs: Animation 
   ```
 
 
-3. Execute python script in each directory.
+3. Execute o script python em cada diretório.
 
-4. Add star to this repo if you like it :smiley:. 
+4. Adicione estrela a este repositório se você gostar:smiley:. 
 
-# Localization
+# Localização
 
-## Extended Kalman Filter localization
+## Localização estendida do filtro Kalman
 
 <img src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/extended_kalman_filter/animation.gif" width="640" alt="EKF pic">
 
 Documentation: [Notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/Localization/extended_kalman_filter/extended_kalman_filter_localization.ipynb)
 
-## Particle filter localization
+## Localização do filtro de partículas
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/particle_filter/animation.gif)
 
-This is a sensor fusion localization with Particle Filter(PF).
+Esta é uma localização de fusão de sensores com Filtro de Partículas(PF).
 
-The blue line is true trajectory, the black line is dead reckoning trajectory,
+A linha azul é a trajetória verdadeira, a linha preta é a trajetória de cálculo morto,
 
-and the red line is an estimated trajectory with PF.
+e a linha vermelha é uma trajetória estimada com PF.
 
-It is assumed that the robot can measure a distance from landmarks (RFID).
+Assume-se que o robô pode medir uma distância de pontos de referência (RFID).
 
-These measurements are used for PF localization.
+Essas medidas são usadas para localização do PF.
 
 Ref:
 
 - [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
 
 
-## Histogram filter localization
+## Localização do filtro de histograma
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/histogram_filter/animation.gif)
 
-This is a 2D localization example with Histogram filter.
+Este é um exemplo de localização 2D com filtro Histograma.
 
-The red cross is true position, black points are RFID positions.
+A cruz vermelha é a posição verdadeira, os pontos pretos são as posições RFID.
 
-The blue grid shows a position probability of histogram filter.  
+A grade azul mostra uma probabilidade de posição do filtro de histograma.
 
-In this simulation, x,y are unknown, yaw is known.
+Nesta simulação, x,y são desconhecidos, yaw é conhecido.
 
-The filter integrates speed input and range observations from RFID for localization.
+O filtro integra a entrada de velocidade e observações de alcance de RFID para localização.
 
-Initial position is not needed.
+A posição inicial não é necessária.
 
 Ref:
 
 - [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
 
-# Mapping
+# Mapeamento
 
-## Gaussian grid map
+## Mapa de grade gaussiana
 
-This is a 2D Gaussian grid mapping example.
+Este é um exemplo de mapeamento de grade gaussiana 2D.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/gaussian_grid_map/animation.gif)
 
-## Ray casting grid map
+## Mapa de grade de transmissão de raios
 
-This is a 2D ray casting grid mapping example.
+Este é um exemplo de mapeamento de grade de projeção de raios 2D.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/raycasting_grid_map/animation.gif)
 
-## Lidar to grid map
+## Lidar para mapa de grade
 
-This example shows how to convert a 2D range measurement to a grid map.
+Este exemplo mostra como converter uma medição de intervalo 2D em um mapa de grade.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/lidar_to_grid_map/animation.gif)
 
-## k-means object clustering
+## agrupamento de objetos k-means
 
-This is a 2D object clustering with k-means algorithm.
+Este é um cluster de objetos 2D com algoritmo k-means.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/kmeans_clustering/animation.gif)
 
-## Rectangle fitting
+## Encaixe retangular
 
-This is a 2D rectangle fitting for vehicle detection.
+Este é um retângulo 2D adequado para detecção de veículos.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/rectangle_fitting/animation.gif)
 
 
 # SLAM
 
-Simultaneous Localization and Mapping(SLAM) examples
+Exemplos de localização e mapeamento simultâneos (SLAM)
 
-## Iterative Closest Point (ICP) Matching
+## Correspondência de ponto mais próximo iterativo (ICP)
 
-This is a 2D ICP matching example with singular value decomposition.
+Este é um exemplo de correspondência de ICP 2D com decomposição de valor singular.
 
-It can calculate a rotation matrix, and a translation vector between points and points.
+Ele pode calcular uma matriz de rotação e um vetor de translação entre pontos e pontos.
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/iterative_closest_point/animation.gif)
 
@@ -255,13 +255,13 @@ Ref:
 
 ## FastSLAM 1.0
 
-This is a feature based SLAM example using FastSLAM 1.0.
+Este é um exemplo de SLAM baseado em recursos usando FastSLAM 1.0.
 
-The blue line is ground truth, the black line is dead reckoning, the red line is the estimated trajectory with FastSLAM.
+A linha azul é a verdade do solo, a linha preta é o cálculo exato, a linha vermelha é a trajetória estimada com FastSLAM.
 
-The red points are particles of FastSLAM.
+Os pontos vermelhos são partículas de FastSLAM.
 
-Black points are landmarks, blue crosses are estimated landmark positions by FastSLAM.
+Pontos pretos são pontos de referência, cruzes azuis são posições de referência estimadas pelo FastSLAM.
 
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/FastSLAM1/animation.gif)
@@ -274,85 +274,85 @@ Ref:
 - [SLAM simulations by Tim Bailey](http://www-personal.acfr.usyd.edu.au/tbailey/software/slam_simulations.htm)
 
 
-# Path Planning
+# Planejamento de caminho
 
-## Dynamic Window Approach
+## Abordagem de janela dinâmica
 
-This is a 2D navigation sample code with Dynamic Window Approach.
+Este é um código de amostra de navegação 2D com abordagem de janela dinâmica.
 
 - [The Dynamic Window Approach to Collision Avoidance](https://www.ri.cmu.edu/pub_files/pub1/fox_dieter_1997_1/fox_dieter_1997_1.pdf)
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DynamicWindowApproach/animation.gif)
 
 
-## Grid based search
+## Pesquisa baseada em grade
 
-### Dijkstra algorithm
+### Algoritmo de Dijkstra
 
-This is a 2D grid based the shortest path planning with Dijkstra's algorithm.
+Esta é uma grade 2D baseada no planejamento do caminho mais curto com o algoritmo de Dijkstra.
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/Dijkstra/animation.gif)
 
-In the animation, cyan points are searched nodes.
+Na animação, os pontos ciano são nós pesquisados.
 
-### A\* algorithm
+### algorítimo A\*  
 
-This is a 2D grid based the shortest path planning with A star algorithm.
+Esta é uma grade 2D baseada no planejamento do caminho mais curto com um algoritmo de estrela.
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/AStar/animation.gif)
 
-In the animation, cyan points are searched nodes.
+Na animação, os pontos ciano são nós pesquisados.
 
-Its heuristic is 2D Euclid distance.
+Sua heurística é a distância Euclides 2D.
 
-### D\* algorithm
+###  Algoritmo D\* 
 
-This is a 2D grid based the shortest path planning with D star algorithm.
+Esta é uma grade 2D baseada no planejamento do caminho mais curto com o algoritmo D star.
 
 ![figure at master · nirnayroy/intelligentrobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DStar/animation.gif)
 
-The animation shows a robot finding its path avoiding an obstacle using the D* search algorithm.
+A animação mostra um robô encontrando seu caminho evitando um obstáculo usando o algoritmo de busca D*.
 
 Ref:
 
 - [D* Algorithm Wikipedia](https://en.wikipedia.org/wiki/D*)
 
-### D\* Lite algorithm
+### Algoritmo leve D\*
 
-This algorithm finds the shortest path between two points while rerouting when obstacles are discovered. It has been implemented here for a 2D grid.
+Este algoritmo encontra o caminho mais curto entre dois pontos durante o reencaminhamento quando os obstáculos são descobertos. Foi implementado aqui para uma grade 2D.
 
 ![D* Lite](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DStarLite/animation.gif)
 
-The animation shows a robot finding its path and rerouting to avoid obstacles as they are discovered using the D* Lite search algorithm.
+A animação mostra um robô encontrando seu caminho e redirecionando para evitar obstáculos à medida que são descobertos usando o algoritmo de busca D* Lite.
 
 Refs:
 
 - [D* Lite](http://idm-lab.org/bib/abstracts/papers/aaai02b.pd)
 - [Improved Fast Replanning for Robot Navigation in Unknown Terrain](http://www.cs.cmu.edu/~maxim/files/dlite_icra02.pdf)
 
-### Potential Field algorithm
+### Algoritmo de campo potencial
 
-This is a 2D grid based path planning with Potential Field algorithm.
+Este é um planejamento de caminho baseado em grade 2D com algoritmo de campo potencial.
 
 ![PotentialField](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/PotentialFieldPlanning/animation.gif)
 
-In the animation, the blue heat map shows potential value on each grid.
+Na animação, o mapa de calor azul mostra o valor potencial em cada grade.
 
 Ref:
 
 - [Robotic Motion Planning:Potential Functions](https://www.cs.cmu.edu/~motionplanning/lecture/Chap4-Potential-Field_howie.pdf)
 
-### Grid based coverage path planning
+### Planejamento de caminho de cobertura baseado em grade
 
-This is a 2D grid based coverage path planning simulation.
+Esta é uma simulação de planejamento de caminho de cobertura baseada em grade 2D.
 
 ![PotentialField](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/GridBasedSweepCPP/animation.gif)
 
-## State Lattice Planning
+## Planejamento de rede estadual
 
-This script is a path planning code with state lattice planning.
+Este script é um código de planejamento de caminho com planejamento de rede de estado.
 
-This code uses the model predictive trajectory generator to solve boundary problem.
+Este código usa o gerador de trajetória preditiva do modelo para resolver o problema de fronteira.
 
 Ref: 
 
@@ -361,26 +361,26 @@ Ref:
 - [State Space Sampling of Feasible Motions for High-Performance Mobile Robot Navigation in Complex Environments](http://www.frc.ri.cmu.edu/~alonzo/pubs/papers/JFR_08_SS_Sampling.pdf)
 
 
-### Biased polar sampling
+### Amostragem polar tendenciosa
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/StateLatticePlanner/BiasedPolarSampling.gif)
 
 
-### Lane sampling
+### Amostragem de pista
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/StateLatticePlanner/LaneSampling.gif)
 
-## Probabilistic Road-Map (PRM) planning 
+## Planejamento de roteiro probabilístico (PRM)
 
 ![PRM](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ProbabilisticRoadMap/animation.gif)
 
-This PRM planner uses Dijkstra method for graph search.
+Este planejador de PRM usa o método Dijkstra para pesquisa de gráficos.
 
-In the animation, blue points are sampled points,
+Na animação, os pontos azuis são pontos amostrados,
 
-Cyan crosses means searched points with Dijkstra method,
+Cyan crosses significa pontos pesquisados ​​com o método Dijkstra,
 
-The red line is the final path of PRM.
+A linha vermelha é o caminho final do PRM.
 
 Ref:
 
@@ -388,15 +388,15 @@ Ref:
 
 　　
 
-## Rapidly-Exploring Random Trees (RRT)
+## Árvores Aleatórias de Exploração Rápida (RRT)
 
 ### RRT\*
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTstar/animation.gif)
 
-This is a path planning code with RRT\*
+Este é um código de planejamento de caminho com RRT\*
 
-Black circles are obstacles, green line is a searched tree, red crosses are start and goal positions.
+Os círculos pretos são obstáculos, a linha verde é uma árvore pesquisada, as cruzes vermelhas são as posições inicial e final.
 
 Ref:
 
@@ -404,17 +404,17 @@ Ref:
 
 - [Sampling-based Algorithms for Optimal Motion Planning](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.419.5503&rep=rep1&type=pdf)
 
-### RRT\* with reeds-shepp path
+### RRT\* com caminho reeds-shepp
 
 ![Robotics/animation.gif at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTStarReedsShepp/animation.gif))
 
-Path planning for a car robot with RRT\* and reeds shepp path planner.
+Planejamento de caminho para um robô de carro com RRT\* e planejador de caminho de palhetas shepp.
 
 ### LQR-RRT\*
 
-This is a path planning simulation with LQR-RRT\*.
+Esta é uma simulação de planejamento de caminho com LQR-RRT\*.
 
-A double integrator motion model is used for LQR local planner.
+Um modelo de movimento integrador duplo é usado para o planejador local LQR.
 
 ![LQR_RRT](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/LQRRRTStar/animation.gif)
 
@@ -425,21 +425,20 @@ Ref:
 - [MahanFathi/LQR\-RRTstar: LQR\-RRT\* method is used for random motion planning of a simple pendulum in its phase plot](https://github.com/MahanFathi/LQR-RRTstar)
 
 
-## Quintic polynomials planning
+## Planejamento de polinômios quínticos
 
-Motion planning with quintic polynomials.
+Planejamento de movimento com polinômios quínticos.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/QuinticPolynomialsPlanner/animation.gif)
 
-It can calculate a 2D path, velocity, and acceleration profile based on quintic polynomials.
-
+Ele pode calcular um caminho 2D, velocidade e perfil de aceleração com base em polinômios quínticos.
 Ref:
 
 - [Local Path Planning And Motion Control For Agv In Positioning](http://ieeexplore.ieee.org/document/637936/)
 
-## Reeds Shepp planning
+## Planejamento de Reeds Shepp
 
-A sample code with Reeds Shepp path planning.
+Um código de exemplo com o planejamento de caminho de Reeds Shepp.
 
 ![RSPlanning](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ReedsSheppPath/animation.gif?raw=true)
 
@@ -452,22 +451,22 @@ Ref:
 - [ghliu/pyReedsShepp: Implementation of Reeds Shepp curve\.](https://github.com/ghliu/pyReedsShepp)
 
 
-## LQR based path planning
+## Planejamento de caminho baseado em LQR
 
-A sample code using LQR based path planning for double integrator model.
+Um código de amostra usando o planejamento de caminho baseado em LQR para o modelo de integrador duplo.
 
 ![RSPlanning](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/LQRPlanner/animation.gif?raw=true)
 
 
-## Optimal Trajectory in a Frenet Frame 
+## Trajetória ótima em um quadro Frenet 
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/FrenetOptimalTrajectory/animation.gif)
 
-This is optimal trajectory generation in a Frenet Frame.
+Esta é a geração de trajetória ideal em um quadro Frenet.
 
-The cyan line is the target course and black crosses are obstacles.
+A linha ciano é o curso alvo e as cruzes pretas são obstáculos.
 
-The red line is the predicted path.
+A linha vermelha é o caminho previsto.
 
 Ref:
 
@@ -476,11 +475,11 @@ Ref:
 - [Optimal trajectory generation for dynamic street scenarios in a Frenet Frame](https://www.youtube.com/watch?v=Cj6tAQe7UCY)
 
 
-# Path Tracking
+# Rastreamento de caminho
 
-## move to a pose control
+## mover para um controle de pose
 
-This is a simulation of moving to a pose control
+Esta é uma simulação de mover para um controle de pose
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/move_to_pose/animation.gif)
 
@@ -489,9 +488,9 @@ Ref:
 - [P. I. Corke, "Robotics, Vision and Control" \| SpringerLink p102](https://link.springer.com/book/10.1007/978-3-642-20144-8)
 
 
-## Stanley control
+## Controle Stanley
 
-Path tracking simulation with Stanley steering control and PID speed control.
+Simulação de rastreamento de caminho com controle de direção Stanley e controle de velocidade PID.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/stanley_controller/animation.gif)
 
@@ -503,9 +502,9 @@ Ref:
 
 
 
-## Rear wheel feedback control
+## Controle de feedback da roda traseira
 
-Path tracking simulation with rear wheel feedback steering control and PID speed control.
+Simulação de rastreamento de caminho com controle de direção de feedback da roda traseira e controle de velocidade PID.
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/rear_wheel_feedback/animation.gif)
 
@@ -514,9 +513,9 @@ Ref:
 - [A Survey of Motion Planning and Control Techniques for Self-driving Urban Vehicles](https://arxiv.org/abs/1604.07446)
 
 
-## Linear–quadratic regulator (LQR) speed and steering control
+## Controle de velocidade e direção do regulador linear-quadrático (LQR)
 
-Path tracking simulation with LQR speed and steering control.
+Simulação de rastreamento de caminho com velocidade LQR e controle de direção.
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/lqr_speed_steer_control/animation.gif)
 
@@ -525,9 +524,9 @@ Ref:
 - [Towards fully autonomous driving: Systems and algorithms \- IEEE Conference Publication](http://ieeexplore.ieee.org/document/5940562/)
 
 
-## Model predictive speed and steering control
+## Velocidade preditiva do modelo e controle de direção
 
-Path tracking simulation with iterative linear model predictive speed and steering control.
+Simulação de rastreamento de caminho com velocidade preditiva de modelo linear iterativo e controle de direção.
 
 <img src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif" width="640" alt="MPC pic">
 
@@ -537,9 +536,9 @@ Ref:
 
 - [Real\-time Model Predictive Control \(MPC\), ACADO, Python \| Work\-is\-Playing](http://grauonline.de/wordpress/?page_id=3244)
 
-## Nonlinear Model predictive control with C-GMRES
+## Controle preditivo de modelo não linear com C-GMRES
 
-A motion planning and path tracking simulation with NMPC of C-GMRES 
+Um planejamento de movimento e simulação de rastreamento de caminho com NMPC de C-GMRES
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/cgmres_nmpc/animation.gif)
 
@@ -548,38 +547,38 @@ Ref:
 - [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/cgmres_nmpc/cgmres_nmpc.ipynb)
 
 
-# Arm Navigation
+# Navegação do braço
 
-## N joint arm to point control
+## N braço articulado para controle de ponto
 
-N joint arm to a point control simulation.
+N braço articulado para uma simulação de controle de ponto.
 
-This is an interactive simulation.
+Esta é uma simulação interativa.
 
-You can set the goal position of the end effector with left-click on the plotting area. 
+Você pode definir a posição final do efetuador final com o botão esquerdo do mouse na área de plotagem.
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/ArmNavigation/n_joint_arm_to_point_control/animation.gif)
 
-In this simulation N = 10, however, you can change it.
+Nesta simulação N = 10, no entanto, você pode alterá-lo.
 
-## Arm navigation with obstacle avoidance 
+## Navegação de braço com prevenção de obstáculos 
 
-Arm navigation with obstacle avoidance simulation.
+Navegação de braço com simulação de prevenção de obstáculos.
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/ArmNavigation/arm_obstacle_navigation/animation.gif)
 
 
-# Aerial Navigation
+# Navegação Aérea
 
-## drone 3d trajectory following 
+## drone 3d trajetória seguindo
 
-This is a 3d trajectory following simulation for a quadrotor.
+Esta é uma trajetória 3d seguindo a simulação para um quadricóptero.
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/AerialNavigation/drone_3d_trajectory_following/animation.gif)
 
-## rocket powered landing
+## pouso movido a foguete
 
-This is a 3d trajectory generation simulation for a rocket powered landing.
+Esta é uma simulação de geração de trajetória 3D para um pouso movido a foguete.
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/AerialNavigation/rocket_powered_landing/animation.gif)
 
@@ -587,43 +586,43 @@ Ref:
 
 - [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/AerialNavigation/rocket_powered_landing/rocket_powered_landing.ipynb)
 
-# Bipedal
+# Bípede
 
-## bipedal planner with inverted pendulum
+## planner bípede com pêndulo invertido
 
-This is a bipedal planner for modifying footsteps for an inverted pendulum.
+Este é um planejador bípede para modificar passos para um pêndulo invertido.
 
-You can set the footsteps, and the planner will modify those automatically.
+Você pode definir os passos e o planejador os modificará automaticamente.
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Bipedal/bipedal_planner/animation.gif)
 
-# License 
+# Licença  
 
 MIT
 
 # Use-case
 
-If this project helps your robotics project, please let me know with creating an issue.
+Se este projeto ajudar seu projeto de robótica, informe-nos sobre a criação de um problema.
 
-Your robot's video, which is using PythonRobotics, is very welcome!!
+O vídeo do seu robô, que está usando PythonRobotics, é muito bem vindo!!
 
-This is a list of user's comment and references:[users\_comments](https://github.com/AtsushiSakai/PythonRobotics/blob/master/users_comments.md)
+Esta é uma lista de comentários e referências do usuário:[users\_comments](https://github.com/AtsushiSakai/PythonRobotics/blob/master/users_comments.md)
 
-# Contribution
+# Contribuição
 
-Any contribution is welcome!! 
+Qualquer contribuição é bem vinda!! 
 
-Please check this document:[How To Contribute — PythonRobotics documentation](https://atsushisakai.github.io/PythonRobotics/how_to_contribute.html)
+Por favor, verifique este documento:[How To Contribute — PythonRobotics documentation](https://atsushisakai.github.io/PythonRobotics/how_to_contribute.html)
 
-# Citing
+# Citando
 
-If you use this project's code for your academic work, we encourage you to cite [our papers](https://arxiv.org/abs/1808.10703) 
+Se você usar o código deste projeto para seu trabalho acadêmico, nós o encorajamos a citar [our papers](https://arxiv.org/abs/1808.10703) 
 
-If you use this project's code in industry, we'd love to hear from you as well; feel free to reach out to the developers directly.
+Se você usar o código deste projeto na indústria, adoraríamos ouvir você também; sinta-se à vontade para entrar em contato diretamente com os desenvolvedores.
 
 # <a id="support"></a>Supporting this project
 
-If you or your company would like to support this project, please consider:
+Se você ou sua empresa gostaria de apoiar este projeto, considere:
 
 - [Sponsor @AtsushiSakai on GitHub Sponsors](https://github.com/sponsors/AtsushiSakai)
 
@@ -631,17 +630,17 @@ If you or your company would like to support this project, please consider:
 
 - [One-time donation via PayPal](https://www.paypal.me/myenigmapay/)
 
-If you would like to support us in some other way, please contact with creating an issue.
+Se você gostaria de nos apoiar de alguma outra forma, entre em contato com a criação de um problema.
 
 ## <a id="sponsors"></a>Sponsors
 
 ### <a id="JetBrains"></a>[JetBrains](https://www.jetbrains.com/)
 
-They are providing a free license of their IDEs for this OSS development.   
+Eles estão fornecendo uma licença gratuita de seus IDEs para este desenvolvimento de OSS.  
 
 ### [1Password](https://github.com/1Password/1password-teams-open-source)
 
-They are providing a free license of their 1Password team license for this OSS project.   
+Eles estão fornecendo uma licença gratuita de sua licença de equipe 1Password para este projeto OSS. 
 
 
 # Authors
