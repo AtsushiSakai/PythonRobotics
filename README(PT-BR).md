@@ -36,7 +36,7 @@ Códigos em python para algoritmos de robótica.
          * [Algoritmo A*](#algoritmo-a)
          * [Algoritmo D*](#algoritmo-d)
          * [Algoritmo D* lite](#algoritmo-d-lite)
-         * [Algoritmo campo potencial](#algoritmo-campo-potencial)
+         * [Algoritmo potencial de campo](#algoritmo-potencial-de-campo)
          * [Planejamento de caminho baseado em grade](#planejamento-de-caminho-baseado-em-grade)
       * [Planejamento por rede de estado](#planejamento-por-rede-de-estado)
          * [Amostragem polar tendenciosa](#amostragem-polar-tendenciosa)
@@ -289,7 +289,7 @@ Código de exemplo para navegação 2D com abordagem de janela dinâmica.
 
 ### Algoritmo de Dijkstra
 
-busca em grade 2D baseada no planejamento de caminho mais curto com o algoritmo de dijkstra.
+Busca em grade 2D baseada no planejamento de caminho mais curto com o algoritmo de dijkstra.
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/Dijkstra/animation.gif)
 
@@ -297,46 +297,46 @@ Na animação, os pontos cianos são nós pesquisados.
 
 ### Algoritmo A*
 
-This is a 2D grid based the shortest path planning with A star algorithm.
+Esse é um exemplo de busca em grade 2D baseada no planejamento de caminho mais curto com o algoritmo A*(A-estrela).
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/AStar/animation.gif)
 
-In the animation, cyan points are searched nodes.
+Na animação, os pontos cianos são nós pesquisados.
 
-Its heuristic is 2D Euclid distance.
+Sua heurística é a distância Euclides 2D.
 
-### D\* algorithm
+### Algoritmo D*
 
-This is a 2D grid based the shortest path planning with D star algorithm.
+Esse é um exemplo de busca em grade 2D baseada no planejamento de caminho mais curto com o algoritmo D*(D-estrela).
 
 ![figure at master · nirnayroy/intelligentrobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DStar/animation.gif)
 
-The animation shows a robot finding its path avoiding an obstacle using the D* search algorithm.
+A animação mostra um robô encontrando seeu caminho e desviando dos obstáculos usando o algoritmo de busca D*.
 
 Referência:
 
 - [D* Algorithm Wikipedia](https://en.wikipedia.org/wiki/D*)
 
-### D\* Lite algorithm
+### Algoritmo D* Lite
 
-This algorithm finds the shortest path between two points while rerouting when obstacles are discovered. It has been implemented here for a 2D grid.
+Esse algoritmo encontra o caminho mais curto entre dois pontos enquanto também descobre obstáculos.Foi implementado para um grade 2D.
 
 ![D* Lite](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DStarLite/animation.gif)
 
-The animation shows a robot finding its path and rerouting to avoid obstacles as they are discovered using the D* Lite search algorithm.
+A animação mostra um robô encontrando seu caminho e redirecionando para evitar obstáculos à medida que são descobertos usando o algoritmo D* Lite.
 
 Referências:
 
 - [D* Lite](http://idm-lab.org/bib/abstracts/papers/aaai02b.pd)
 - [Improved Fast Replanning for Robot Navigation in Unknown Terrain](http://www.cs.cmu.edu/~maxim/files/dlite_icra02.pdf)
 
-### Potential Field algorithm
+### Algoritmo potencial de campo.
 
-This is a 2D grid based path planning with Potential Field algorithm.
+Planejamento de caminho com o algoritmo potencial de campo.
 
 ![PotentialField](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/PotentialFieldPlanning/animation.gif)
 
-In the animation, the blue heat map shows potential value on each grid.
+Na animação, o mapa de calor azul mostra o valor do potencial em cada grade.
 
 Referência:
 
@@ -601,13 +601,13 @@ You can set the footsteps, and the planner will modify those automatically.
 
 MIT
 
-# Use-case
+# Caso de Uso
 
-If this project helps your robotics project, please let me know with creating an issue.
+Se de alguma esse projeto te ajudar, seria um prazer saber como, entre em contato criando uma issue.
 
-Your robot's video, which is using PythonRobotics, is very welcome!!
+O vídeo do seu robô que está usando o PythonRobotics, é muito bem vindo!!
 
-This is a list of user's comment and references:[users\_comments](https://github.com/AtsushiSakai/PythonRobotics/blob/master/users_comments.md)
+Essa é uma lista de comentários e referências dos usuários:[users\_comments](https://github.com/AtsushiSakai/PythonRobotics/blob/master/users_comments.md)
 
 # Contribuição
 
@@ -617,19 +617,19 @@ Por favor leia esse documento:[Como contribuir: — PythonRobotics documentaçã
 
 # Citando o Projeto
 
-If you use this project's code for your academic work, we encourage you to cite [our papers](https://arxiv.org/abs/1808.10703) 
+Caso usar o código deste projeto para seu trabalho acadêmico, recomendamos que você cite [nossos artigos](https://arxiv.org/abs/1808.10703) 
 
-If you use this project's code in industry, we'd love to hear from you as well; feel free to reach out to the developers directly.
+Se usar o código deste projeto na indústria, adoraríamos ouvir você também; sinta-se à vontade para entrar em contato diretamente com os desenvolvedores.
 
-# <a id="support"></a>Supporting this project
+# <a id="support"></a>Apoiando o projeto
 
-If you or your company would like to support this project, please consider:
+Se você ou sua empresa gostaria de apoiar o projeto , por favor considere:
 
-- [Sponsor @AtsushiSakai on GitHub Sponsors](https://github.com/sponsors/AtsushiSakai)
+- [Patrocinar @AtsushiSakai no GitHub Patrocinadores](https://github.com/sponsors/AtsushiSakai)
 
-- [Become a backer or sponsor on Patreon](https://www.patreon.com/myenigma)
+- [Torne-se um apoiador ou patrocinador no Patreon](https://www.patreon.com/myenigma)
 
-- [One-time donation via PayPal](https://www.paypal.me/myenigmapay/)
+- [Doação via PayPal](https://www.paypal.me/myenigmapay/)
 
 Se você gostaria de nos apoiar de uma outra forma, por favor entre em contato criando uma issue.
 
@@ -637,11 +637,11 @@ Se você gostaria de nos apoiar de uma outra forma, por favor entre em contato c
 
 ### <a id="JetBrains"></a>[JetBrains](https://www.jetbrains.com/)
 
-They are providing a free license of their IDEs for this OSS development.   
+Eles estão fornecendo uma licença gratuita de suas IDEs para o desenvolvimento.   
 
 ### [1Password](https://github.com/1Password/1password-teams-open-source)
 
-They are providing a free license of their 1Password team license for this OSS project.   
+Eles estão fornecendo uma licença gratuita da 1Password teams para esse projeto.   
 
 
 # Autores
