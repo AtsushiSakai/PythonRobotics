@@ -64,7 +64,7 @@ Códigos em python para algoritmos de robótica.
       * [Drone se movendo em plano tridimensional(3D)](#drone-se-movendo-em-plano-tridimensional)
       * [Pouso de um foguete](#pouso-de-um-foguete)
    * [Bípedes](#bípedes)
-      * [Plajemento de movimento bípede com pêndulo invertido](#bipedal-planner-with-inverted-pendulum)
+      * [Plajemento de movimento bípede com pêndulo invertido](#planejamento-de-movimento-bípede-com-pêndulo-invertido)
    * [Licença](#licença)
    * [Caso de Uso](#caso-de-uso)
    * [Contribuição](#contribuição)
@@ -211,40 +211,40 @@ Esse é um exemplo de mapeamento de grade gaussiana 2D
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/gaussian_grid_map/animation.gif)
 
-## Ray casting grid map
+## Mapa de grade ray casting
 
-This is a 2D ray casting grid mapping example.
+Exemplo em 2D do mapeamento de grade por ray casting.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/raycasting_grid_map/animation.gif)
 
 ## Lidar para mapa de grade
 
-This example shows how to convert a 2D range measurement to a grid map.
+Esse exemplo mostra como converter um intervalo de medição 2D em um mapa de grade.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/lidar_to_grid_map/animation.gif)
 
-## k-means object clustering
+## Clusterização de objetos k-means.
 
-This is a 2D object clustering with k-means algorithm.
+Exemplo de um cluster de objetos 2D com algoritmo k-means.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/kmeans_clustering/animation.gif)
 
-## Rectangle fitting
+## Encaixe com Retângulos
 
-This is a 2D rectangle fitting for vehicle detection.
+Exemplo de um retângulo adequado para detecção de veículos.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/rectangle_fitting/animation.gif)
 
 
 # SLAM
 
-Simultaneous Localization and Mapping(SLAM) examples
+Exemplos de localização e mapeamento simultâneos(SLAM)
 
 ## Iterative Closest Point (ICP) Matching
 
-This is a 2D ICP matching example with singular value decomposition.
+Esse exemplo de corresponência de ICP 2D com decomposição de valor singular.
 
-It can calculate a rotation matrix, and a translation vector between points and points.
+O algoritmo pode calcular uma matriz de rotação e um vetor de translação entre pontos.
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/iterative_closest_point/animation.gif)
 
@@ -255,13 +255,13 @@ Referência:
 
 ## FastSLAM 1.0
 
-This is a feature based SLAM example using FastSLAM 1.0.
+Exemplo de SLAM baseado em recursos usando o FastSLAM 1.0.
 
-The blue line is ground truth, the black line is dead reckoning, the red line is the estimated trajectory with FastSLAM.
+A linha azul(ground truth) é a linha que foi fornecida diretamente por observação e medição, a linha preta é o cálculo exato, a linha vermelha é a trajetória estimada com o algoritmo FastSLAM.
 
-The red points are particles of FastSLAM.
+Os pontos vermelhos são partículas de FastSLAM.
 
-Black points are landmarks, blue crosses are estimated landmark positions by FastSLAM.
+Os pontos pretos são pontos de referência, as cruzes azuis são posições de referência estimadas pelo FastSLAM.
 
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/FastSLAM1/animation.gif)
@@ -274,28 +274,28 @@ Referências:
 - [SLAM simulations by Tim Bailey](http://www-personal.acfr.usyd.edu.au/tbailey/software/slam_simulations.htm)
 
 
-# Path Planning
+# Planejamento de caminho
 
-## Dynamic Window Approach
+## Abordagem janela dinâmica
 
-This is a 2D navigation sample code with Dynamic Window Approach.
+Código de exemplo para navegação 2D com abordagem de janela dinâmica.
 
 - [The Dynamic Window Approach to Collision Avoidance](https://www.ri.cmu.edu/pub_files/pub1/fox_dieter_1997_1/fox_dieter_1997_1.pdf)
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DynamicWindowApproach/animation.gif)
 
 
-## Grid based search
+## Busca baseada em grade
 
-### Dijkstra algorithm
+### Algoritmo de Dijkstra
 
-This is a 2D grid based the shortest path planning with Dijkstra's algorithm.
+busca em grade 2D baseada no planejamento de caminho mais curto com o algoritmo de dijkstra.
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/Dijkstra/animation.gif)
 
-In the animation, cyan points are searched nodes.
+Na animação, os pontos cianos são nós pesquisados.
 
-### A\* algorithm
+### Algoritmo A*
 
 This is a 2D grid based the shortest path planning with A star algorithm.
 
