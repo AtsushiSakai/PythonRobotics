@@ -63,7 +63,7 @@ Códigos em python para algoritmos de robótica.
    * [Navegação Aérea](#navegação-aérea)
       * [Drone se movendo em plano tridimensional(3D)](#drone-se-movendo-em-plano-tridimensional)
       * [Pouso de um foguete](#pouso-de-um-foguete)
-   * [Bípedes](#bípedes)
+   * [ Robôs Bípedes](#robôs-bípedes)
       * [Plajemento de movimento bípede com pêndulo invertido](#planejamento-de-movimento-bípede-com-pêndulo-invertido)
    * [Licença](#licença)
    * [Caso de Uso](#caso-de-uso)
@@ -491,11 +491,11 @@ Referência:
 
 ## Controle Stanley
 
-Path tracking simulation with Stanley steering control and PID speed control.
+Simulação de rastreamento de caminho com controle de direção Stanley e controle de velocidade PID.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/stanley_controller/animation.gif)
 
-Referência:
+Referências:
 
 - [Stanley: The robot that won the DARPA grand challenge](http://robots.stanford.edu/papers/thrun.stanley05.pdf)
 
@@ -505,7 +505,7 @@ Referência:
 
 ## Controle de feedback da roda traseira
 
-Path tracking simulation with rear wheel feedback steering control and PID speed control.
+Simulação de rastreamento de caminho com controle de direção de feedback da roda traseira e controle de velocidade PID.
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/rear_wheel_feedback/animation.gif)
 
@@ -514,9 +514,9 @@ Referência:
 - [A Survey of Motion Planning and Control Techniques for Self-driving Urban Vehicles](https://arxiv.org/abs/1604.07446)
 
 
-## Linear–quadratic regulator (LQR) speed and steering control
+## Controle de velocidade e direção usando LQR(linear-quadratic regulator)
 
-Path tracking simulation with LQR speed and steering control.
+Simulação de rastreamento de caminho com velocidade LQR e controle de direção.
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/lqr_speed_steer_control/animation.gif)
 
@@ -525,21 +525,21 @@ Referência:
 - [Towards fully autonomous driving: Systems and algorithms \- IEEE Conference Publication](http://ieeexplore.ieee.org/document/5940562/)
 
 
-## Model predictive speed and steering control
+## Modelo preditivo de velocidade e controle de posição
 
-Path tracking simulation with iterative linear model predictive speed and steering control.
+Simulação de rastreamento de caminho com velocidade preditiva de modelo linear iterativo e controle de direção.
 
 <img src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif" width="640" alt="MPC pic">
 
-Referência:
+Referências:
 
 - [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/Model_predictive_speed_and_steering_control.ipynb)
 
 - [Real\-time Model Predictive Control \(MPC\), ACADO, Python \| Work\-is\-Playing](http://grauonline.de/wordpress/?page_id=3244)
 
-## Nonlinear Model predictive control with C-GMRES
+## Modelo preditivo não linear de controle com C-GMRES
 
-A motion planning and path tracking simulation with NMPC of C-GMRES 
+Planejamento de movimento e rastreamento de caminho usando NMPC de C-GMRES
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/cgmres_nmpc/animation.gif)
 
@@ -548,52 +548,52 @@ Referência:
 - [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/cgmres_nmpc/cgmres_nmpc.ipynb)
 
 
-# Arm Navigation
+# Movimento de braço robótico
 
-## N joint arm to point control
+## Número N de juntas até um ponto de controle
 
-N joint arm to a point control simulation.
+ Simulação de um número N de juntas até um ponto de controle
 
-This is an interactive simulation.
+Essa é uma simulção interativa.
 
-You can set the goal position of the end effector with left-click on the plotting area. 
+Você pode definir a posição final com o botão esquerdo do mouse na área de plotagem.. 
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/ArmNavigation/n_joint_arm_to_point_control/animation.gif)
 
-In this simulation N = 10, however, you can change it.
+Nessa simulação  N = 10, no entanto você pode alterá-lo..
 
-## Arm navigation with obstacle avoidance 
+## Movimento de braço robótico com obstáculo
 
-Arm navigation with obstacle avoidance simulation.
+Simualção de movimento de braço robótico com obstáculo
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/ArmNavigation/arm_obstacle_navigation/animation.gif)
 
 
 # Navegação aérea
 
-## drone 3d trajectory following 
+## Drone se movendo em plano tridimensional(3D) 
 
-This is a 3d trajectory following simulation for a quadrotor.
+Esta é uma trajetória 3d seguindo a simulação para um quadrotor.
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/AerialNavigation/drone_3d_trajectory_following/animation.gif)
 
-## rocket powered landing
+## Pouso de um foguete
 
-This is a 3d trajectory generation simulation for a rocket powered landing.
+Essa trajetória 3D simula um pouso de um foguete.
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/AerialNavigation/rocket_powered_landing/animation.gif)
 
-Ref:
+Referência:
 
 - [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/AerialNavigation/rocket_powered_landing/rocket_powered_landing.ipynb)
 
-# Bipedal
+#  Robôs Bípedes
 
-## bipedal planner with inverted pendulum
+## Plajemento de movimento bípede com pêndulo invertido
 
-This is a bipedal planner for modifying footsteps for an inverted pendulum.
+Este é um planejador de movimento para robôs bípedes usando um modificador de  passos para um pêndulo invertido.
 
-You can set the footsteps, and the planner will modify those automatically.
+Você pode definir os passos e o planejador os modificará automaticamente.
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Bipedal/bipedal_planner/animation.gif)
 
@@ -637,7 +637,7 @@ Se você gostaria de nos apoiar de uma outra forma, por favor entre em contato c
 
 ### <a id="JetBrains"></a>[JetBrains](https://www.jetbrains.com/)
 
-Eles estão fornecendo uma licença gratuita de suas IDEs para o desenvolvimento.   
+Eles estão fornecendo uma licença gratuita de suas IDEs para o desenvolvimento do projeto.   
 
 ### [1Password](https://github.com/1Password/1password-teams-open-source)
 
