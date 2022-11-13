@@ -589,7 +589,7 @@ Referência:
 
 #  Robôs Bípedes
 
-## Plajemento de movimento bípede com pêndulo invertido
+## Planejamento de movimento bípede com pêndulo invertido
 
 Este é um planejador de movimento para robôs bípedes usando um modificador de  passos para um pêndulo invertido.
 
