@@ -37,21 +37,21 @@ Códigos em python para algoritmos de robótica.
          * [Algoritmo D*](#algoritmo-d)
          * [Algoritmo D* lite](#algoritmo-d-lite)
          * [Algoritmo potencial de campo](#algoritmo-potencial-de-campo)
-         * [Planejamento de caminho baseado em grade](#planejamento-de-caminho-baseado-em-grade)
+         * [Planejamento de caminho baseado em grade](#planejamento-de-caminhode-cobertura-baseado-em-grade)
       * [Planejamento por rede de estado](#planejamento-por-rede-de-estado)
          * [Amostragem polar tendenciosa](#amostragem-polar-tendenciosa)
          * [Amostragem de caminho](#amostragem-de-caminho)
-      * [Planejador de caminho probabilístico](#planejador-de-caminho-probabilístico)
+      * [Planejamento de caminho probabilístico](#planejamento-de-caminho-probabilístico)
       * [Árvore aleatória de exploração rápida](#árvore-aleatória-de-exploração-rápida)
          * [RRT*](#rrt)
          * [RRT* com trajetória reeds-shepp](#rrt*-com-trajetória-reeds-shepp)
          * [LQR-RRT*](#lqr-rrt)
       * [Planejamento de polinômio de quinta ordem](#planejamento-de-polinômio-de-quinta-ordem)
-      * [Planejamento de trajetória Reeds Shepp](#planejamento-de-trajetória-reeds-shepp)
-      * [Planejamento de trajetória baseado em LQR](#planejamento-de-trajetória-baseado-em-lqr)
+      * [Planejamento de caminho Reeds Shepp](#planejamento-de-caminho-reeds-shepp)
+      * [Planejamento de caminho baseado em LQR](#planejamento-de-trajetória-baseado-em-lqr)
       * [Trajetória ótima em um Frenet Frame](#trajetória-ótima-em-um-frenet-frame)
    * [Rastreamento de Caminho](#reastramento-de-caminho)
-      * [mover para uma posição de controle](#mover-para-uma-posição-de-controle)
+      * [Mover para uma posição de controle](#mover-para-uma-posição-de-controle)
       * [Controle Stanley](#controle-stanley)
       * [Controle de feedback da roda traseira](#controle-de-feedback-da-roda-traseira)
       * [Controle de velocidade e direção usando LQR(linear-quadratic regulator)](#controle-de-velocidade-e-direção-usando-lqr(linear-quadratic-regulator))
@@ -330,7 +330,7 @@ Referências:
 - [D* Lite](http://idm-lab.org/bib/abstracts/papers/aaai02b.pd)
 - [Improved Fast Replanning for Robot Navigation in Unknown Terrain](http://www.cs.cmu.edu/~maxim/files/dlite_icra02.pdf)
 
-### Algoritmo potencial de campo.
+### Algoritmo potencial de campo
 
 Planejamento de caminho com o algoritmo potencial de campo.
 
@@ -342,17 +342,17 @@ Referência:
 
 - [Robotic Motion Planning:Potential Functions](https://www.cs.cmu.edu/~motionplanning/lecture/Chap4-Potential-Field_howie.pdf)
 
-### Grid based coverage path planning
+### Planejamento de caminho de cobertura baseado em grade
 
-This is a 2D grid based coverage path planning simulation.
+Simulação de planejamento de caminho de cobertura baseada em grade.
 
 ![PotentialField](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/GridBasedSweepCPP/animation.gif)
 
-## State Lattice Planning
+## Planejamento por rede de estado
 
-This script is a path planning code with state lattice planning.
+Esse script é um código de planejamento de caminho por rede de estado.
 
-This code uses the model predictive trajectory generator to solve boundary problem.
+Esse código usa o gerador de trajetória preditiva do modelo para resolver o problema da fronteira.
 
 Referências: 
 
@@ -361,26 +361,26 @@ Referências:
 - [State Space Sampling of Feasible Motions for High-Performance Mobile Robot Navigation in Complex Environments](http://www.frc.ri.cmu.edu/~alonzo/pubs/papers/JFR_08_SS_Sampling.pdf)
 
 
-### Biased polar sampling
+### Amostragem polar tendenciosa
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/StateLatticePlanner/BiasedPolarSampling.gif)
 
 
-### Lane sampling
+### Amostragem de caminho
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/StateLatticePlanner/LaneSampling.gif)
 
-## Probabilistic Road-Map (PRM) planning 
+## Planejamento de caminho probabílistico (PRM)
 
 ![PRM](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ProbabilisticRoadMap/animation.gif)
 
-This PRM planner uses Dijkstra method for graph search.
+Esse algoritmo (PRM) usa o método dijkstra para pesquisa em grafos.
 
-In the animation, blue points are sampled points,
+Na animação os pontos azuis são pontos de amostra,
 
-Cyan crosses means searched points with Dijkstra method,
+As cruzes em ciano representam os pontos pesquisados pelo método de dijkstra,
 
-The red line is the final path of PRM.
+A linha vermelha é o caminho final do PRM.
 
 Referência:
 
@@ -388,62 +388,62 @@ Referência:
 
 　　
 
-## Rapidly-Exploring Random Trees (RRT)
+## Árvores aleatórias de exploração rápida (RRT)
 
 ### RRT\*
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTstar/animation.gif)
 
-This is a path planning code with RRT\*
+Código de planejamento de caminho usando o algoritmo RRT\*
 
-Black circles are obstacles, green line is a searched tree, red crosses are start and goal positions.
+Os círculos pretos são obstáculos, a linha verde é uma árvore pesquisada, as cruzes vermelhas são as posições inicial e final.
 
-Referência:
+Referências:
 
 - [Incremental Sampling-based Algorithms for Optimal Motion Planning](https://arxiv.org/abs/1005.0416)
 
 - [Sampling-based Algorithms for Optimal Motion Planning](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.419.5503&rep=rep1&type=pdf)
 
-### RRT\* with reeds-shepp path
+### RRT\* com trajetória reeds-shep
 
 ![Robotics/animation.gif at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTStarReedsShepp/animation.gif))
 
-Path planning for a car robot with RRT\* and reeds shepp path planner.
+Planejamento de caminho para um carro robô usando RRT* e reeds-shepp.
 
 ### LQR-RRT\*
 
-This is a path planning simulation with LQR-RRT\*.
+Simulação de planejamento de caminho usando LQR-RRT\*.
 
-A double integrator motion model is used for LQR local planner.
+Um modelo de movimento integrador duplo é usado para o planejador local LQR.
 
 ![LQR_RRT](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/LQRRRTStar/animation.gif)
 
-Referência:
+Referências:
 
 - [LQR\-RRT\*: Optimal Sampling\-Based Motion Planning with Automatically Derived Extension Heuristics](http://lis.csail.mit.edu/pubs/perez-icra12.pdf)
 
 - [MahanFathi/LQR\-RRTstar: LQR\-RRT\* method is used for random motion planning of a simple pendulum in its phase plot](https://github.com/MahanFathi/LQR-RRTstar)
 
 
-## Quintic polynomials planning
+## Planejamento de polinômio de quinta ordem
 
-Motion planning with quintic polynomials.
+Planejamento de movimento com polinômio de ordem 5.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/QuinticPolynomialsPlanner/animation.gif)
 
-It can calculate a 2D path, velocity, and acceleration profile based on quintic polynomials.
+Ele pode calcular um caminho 2D, velocidade e perfil de aceleração com base em polinômios de grau 5.
 
 Referência:
 
 - [Local Path Planning And Motion Control For Agv In Positioning](http://ieeexplore.ieee.org/document/637936/)
 
-## Reeds Shepp planning
+## Planejamento de caminho reeds-shepp
 
-A sample code with Reeds Shepp path planning.
+Código de exemplo com o algoritmo reeds-shepp.
 
 ![RSPlanning](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ReedsSheppPath/animation.gif?raw=true)
 
-Referência:
+Referências:
 
 - [15.3.2 Reeds\-Shepp Curves](http://planning.cs.uiuc.edu/node822.html) 
 
@@ -452,35 +452,35 @@ Referência:
 - [ghliu/pyReedsShepp: Implementation of Reeds Shepp curve\.](https://github.com/ghliu/pyReedsShepp)
 
 
-## LQR based path planning
+## Planejamento de caminho baseado em LQR
 
-A sample code using LQR based path planning for double integrator model.
+Um código de exemplo usando o planejamento de caminho baseado em LQR para o modelo de integrador duplo.
 
 ![RSPlanning](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/LQRPlanner/animation.gif?raw=true)
 
 
-## Optimal Trajectory in a Frenet Frame 
+## Trajetória ótima em um Frenet Frame 
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/FrenetOptimalTrajectory/animation.gif)
 
-This is optimal trajectory generation in a Frenet Frame.
+Determinação de uma trajetória ótima em um Frenet Frame.
 
-The cyan line is the target course and black crosses are obstacles.
+A linha ciano é o percurso alvo e as cruzes pretas são obstáculos.
 
-The red line is the predicted path.
+A linha vermelham é o caminho previsto.
 
-Referência:
+Referências:
 
 - [Optimal Trajectory Generation for Dynamic Street Scenarios in a Frenet Frame](https://www.researchgate.net/profile/Moritz_Werling/publication/224156269_Optimal_Trajectory_Generation_for_Dynamic_Street_Scenarios_in_a_Frenet_Frame/links/54f749df0cf210398e9277af.pdf)
 
 - [Optimal trajectory generation for dynamic street scenarios in a Frenet Frame](https://www.youtube.com/watch?v=Cj6tAQe7UCY)
 
 
-# Path Tracking
+# Rastreamento de caminho
 
-## move to a pose control
+## Mover para uma posição de controle
 
-This is a simulation of moving to a pose control
+Simulação de movimento para um ponto de controle.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/move_to_pose/animation.gif)
 
@@ -489,7 +489,7 @@ Referência:
 - [P. I. Corke, "Robotics, Vision and Control" \| SpringerLink p102](https://link.springer.com/book/10.1007/978-3-642-20144-8)
 
 
-## Stanley control
+## Controle Stanley
 
 Path tracking simulation with Stanley steering control and PID speed control.
 
@@ -503,7 +503,7 @@ Referência:
 
 
 
-## Rear wheel feedback control
+## Controle de feedback da roda traseira
 
 Path tracking simulation with rear wheel feedback steering control and PID speed control.
 
