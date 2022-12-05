@@ -3,6 +3,6 @@ scipy == 1.9.3
 matplotlib == 3.6.2
 cvxpy == 1.2.2
 pytest == 7.2.0 # For unit test
-pytest-xdist == 3.0.2 # For unit test
+pytest-xdist == 3.1.0 # For unit test
 mypy == 0.991 # For unit test
 flake8 == 5.0.4 # For unit test
