@@ -65,14 +65,22 @@ class DStarLite:
         self.y_max = int(abs(max(oy) - self.y_min_world))
         self.obstacles = [Node(x - self.x_min_world, y - self.y_min_world)
                           for x, y in zip(ox, oy)]
-        self.obstacles_xy = np.array([[obstacle.x, obstacle.y] for obstacle in self.obstacles])
+        self.obstacles_xy = np.array(
+            [[obstacle.x, obstacle.y] for obstacle in self.obstacles]
+        )
         self.start = Node(0, 0)
         self.goal = Node(0, 0)
         self.U = list()  # type: ignore
         self.km = 0.0
         self.kold = 0.0
-        self.rhs = np.full((self.x_max, self.y_max), float("inf"))  # type: ignore
-        self.g = np.full((self.x_max, self.y_max), float("inf"))  # type: ignore
+        self.rhs = np.full(
+            (self.x_max, self.y_max),
+            float("inf")  # type: ignore
+        )
+        self.g = np.full(
+            (self.x_max, self.y_max),
+            float("inf")  # type: ignore
+        )
         self.detected_obstacles = list()  # type: ignore
         self.detected_obstacles_xy = np.array([])
         if show_animation:
@@ -85,10 +93,17 @@ class DStarLite:
     def is_obstacle(self, node: Node):
         x = np.array([node.x])
         y = np.array([node.y])
-        is_in_obstacles = ((self.obstacles_xy[:, 0] == x) & (self.obstacles_xy[:, 1] == y)).any()
+        is_in_obstacles = (
+            (self.obstacles_xy[:, 0] == x)
+            & (self.obstacles_xy[:, 1] == y)
+        ).any()
         is_in_detected_obstacles = False
         if self.detected_obstacles_xy.shape[0] > 0:
-            is_in_detected_obstacles = ((self.detected_obstacles_xy[:, 0] == x) & (self.detected_obstacles_xy[:, 1] == y)).any()
+            is_in_detected_obstacles = (
+                (self.detected_obstacles_xy[:, 0] == x)
+                & (self.detected_obstacles_xy[:, 1] == y)
+            ).any()
+
         return is_in_obstacles or is_in_detected_obstacles
 
     def c(self, node1: Node, node2: Node):
@@ -172,11 +187,13 @@ class DStarLite:
 
     def compute_shortest_path(self):
         self.U.sort(key=lambda x: x[1])
-        while (len(self.U) > 0 and
-            self.compare_keys(self.U[0][1],
-                                self.calculate_key(self.start))) or \
-                (self.rhs[self.start.x, self.start.y] !=
-                self.g[self.start.x, self.start.y]).any():
+        while (
+            len(self.U) > 0
+            and self.compare_keys(self.U[0][1], self.calculate_key(self.start))
+        ) or (
+            self.rhs[self.start.x, self.start.y]
+            != self.g[self.start.x, self.start.y]
+        ).any():
             self.kold = self.U[0][1]
             u = self.U[0][0]
             self.U.pop(0)
@@ -211,7 +228,12 @@ class DStarLite:
                              self.detected_obstacles_for_plotting_y, ".k")
                     plt.pause(pause_time)
             self.spoofed_obstacles.pop(0)
-            self.detected_obstacles_xy = np.array([[obstacle.x, obstacle.y] for obstacle in self.detected_obstacles])
+            self.detected_obstacles_xy = np.array(
+                [
+                    [obstacle.x, obstacle.y]
+                    for obstacle in self.detected_obstacles
+                ]
+            )
 
         # Allows random generation of obstacles
         random.seed()
