@@ -12,6 +12,7 @@ Avoiding additional imports based on repository philosophy.
 import math
 import matplotlib.pyplot as plt
 import random
+import numpy as np
 
 show_animation = True
 pause_time = 0.001
@@ -52,6 +53,8 @@ class DStarLite:
         Node(-1, -1, math.sqrt(2))
     ]
 
+    initialized = False
+
     def __init__(self, ox: list, oy: list):
         # Ensure that within the algorithm implementation all node coordinates
         # are indices in the grid and extend
@@ -62,32 +65,31 @@ class DStarLite:
         self.y_max = int(abs(max(oy) - self.y_min_world))
         self.obstacles = [Node(x - self.x_min_world, y - self.y_min_world)
                           for x, y in zip(ox, oy)]
+        self.obstacles_xy = np.array([[obstacle.x, obstacle.y] for obstacle in self.obstacles])
         self.start = Node(0, 0)
         self.goal = Node(0, 0)
         self.U = list()  # type: ignore
         self.km = 0.0
         self.kold = 0.0
-        self.rhs = list()  # type: ignore
-        self.g = list()  # type: ignore
+        self.rhs = np.full((self.x_max, self.y_max), float("inf"))  # type: ignore
+        self.g = np.full((self.x_max, self.y_max), float("inf"))  # type: ignore
         self.detected_obstacles = list()  # type: ignore
+        self.detected_obstacles_xy = np.array([])
         if show_animation:
             self.detected_obstacles_for_plotting_x = list()  # type: ignore
             self.detected_obstacles_for_plotting_y = list()  # type: ignore
 
     def create_grid(self, val: float):
-        grid = list()
-        for _ in range(0, self.x_max):
-            grid_row = list()
-            for _ in range(0, self.y_max):
-                grid_row.append(val)
-            grid.append(grid_row)
-        return grid
+        return np.full((self.x_max, self.y_max), val)
 
     def is_obstacle(self, node: Node):
-        return any([compare_coordinates(node, obstacle)
-                    for obstacle in self.obstacles]) or \
-               any([compare_coordinates(node, obstacle)
-                    for obstacle in self.detected_obstacles])
+        x = np.array([node.x])
+        y = np.array([node.y])
+        is_in_obstacles = ((self.obstacles_xy[:, 0] == x) & (self.obstacles_xy[:, 1] == y)).any()
+        is_in_detected_obstacles = False
+        if self.detected_obstacles_xy.shape[0] > 0:
+            is_in_detected_obstacles = ((self.detected_obstacles_xy[:, 0] == x) & (self.detected_obstacles_xy[:, 1] == y)).any()
+        return is_in_obstacles or is_in_detected_obstacles
 
     def c(self, node1: Node, node2: Node):
         if self.is_obstacle(node2):
@@ -139,13 +141,16 @@ class DStarLite:
         self.start.y = start.y - self.y_min_world
         self.goal.x = goal.x - self.x_min_world
         self.goal.y = goal.y - self.y_min_world
-        self.U = list()  # Would normally be a priority queue
-        self.km = 0.0
-        self.rhs = self.create_grid(math.inf)
-        self.g = self.create_grid(math.inf)
-        self.rhs[self.goal.x][self.goal.y] = 0
-        self.U.append((self.goal, self.calculate_key(self.goal)))
-        self.detected_obstacles = list()
+        if not self.initialized:
+            self.initialized = True
+            print('Initializing')
+            self.U = list()  # Would normally be a priority queue
+            self.km = 0.0
+            self.rhs = self.create_grid(math.inf)
+            self.g = self.create_grid(math.inf)
+            self.rhs[self.goal.x][self.goal.y] = 0
+            self.U.append((self.goal, self.calculate_key(self.goal)))
+            self.detected_obstacles = list()
 
     def update_vertex(self, u: Node):
         if not compare_coordinates(u, self.goal):
@@ -168,22 +173,22 @@ class DStarLite:
     def compute_shortest_path(self):
         self.U.sort(key=lambda x: x[1])
         while (len(self.U) > 0 and
-               self.compare_keys(self.U[0][1],
-                                 self.calculate_key(self.start))) or \
-                self.rhs[self.start.x][self.start.y] != \
-                self.g[self.start.x][self.start.y]:
+            self.compare_keys(self.U[0][1],
+                                self.calculate_key(self.start))) or \
+                (self.rhs[self.start.x, self.start.y] !=
+                self.g[self.start.x, self.start.y]).any():
             self.kold = self.U[0][1]
             u = self.U[0][0]
             self.U.pop(0)
             if self.compare_keys(self.kold, self.calculate_key(u)):
                 self.U.append((u, self.calculate_key(u)))
                 self.U.sort(key=lambda x: x[1])
-            elif self.g[u.x][u.y] > self.rhs[u.x][u.y]:
-                self.g[u.x][u.y] = self.rhs[u.x][u.y]
+            elif (self.g[u.x, u.y] > self.rhs[u.x, u.y]).any():
+                self.g[u.x, u.y] = self.rhs[u.x, u.y]
                 for s in self.pred(u):
                     self.update_vertex(s)
             else:
-                self.g[u.x][u.y] = math.inf
+                self.g[u.x, u.y] = math.inf
                 for s in self.pred(u) + [u]:
                     self.update_vertex(s)
             self.U.sort(key=lambda x: x[1])
@@ -206,6 +211,7 @@ class DStarLite:
                              self.detected_obstacles_for_plotting_y, ".k")
                     plt.pause(pause_time)
             self.spoofed_obstacles.pop(0)
+            self.detected_obstacles_xy = np.array([[obstacle.x, obstacle.y] for obstacle in self.detected_obstacles])
 
         # Allows random generation of obstacles
         random.seed()
