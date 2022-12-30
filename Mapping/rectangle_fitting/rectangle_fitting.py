@@ -162,7 +162,7 @@ class LShapeFitting:
             S.append(C)
 
         # Merge cluster
-        while 1:
+        while True:
             no_change = True
             for (c1, c2) in list(itertools.permutations(range(len(S)), 2)):
                 if S[c1] & S[c2]:
