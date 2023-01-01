@@ -71,7 +71,7 @@ class AStarPlanner:
         open_set, closed_set = dict(), dict()
         open_set[self.calc_grid_index(start_node)] = start_node
 
-        while 1:
+        while True:
             if len(open_set) == 0:
                 print("Open set is empty..")
                 break

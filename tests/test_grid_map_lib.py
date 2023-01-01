@@ -1,4 +1,5 @@
 from Mapping.grid_map_lib.grid_map_lib import GridMap
+import conftest
 import numpy as np
 
 

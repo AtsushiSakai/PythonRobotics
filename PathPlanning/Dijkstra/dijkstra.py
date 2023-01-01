@@ -71,7 +71,7 @@ class Dijkstra:
         open_set, closed_set = dict(), dict()
         open_set[self.calc_index(start_node)] = start_node
 
-        while 1:
+        while True:
             c_id = min(open_set, key=lambda o: open_set[o].cost)
             current = open_set[c_id]
 
