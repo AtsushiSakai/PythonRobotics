@@ -1,7 +1,14 @@
+"""
+Point cloud sampling example codes. This code supports
+- voxel point sampling
+-
 
+"""
 import matplotlib.pyplot as plt
 import numpy as np
 from collections import defaultdict
+
+do_plot = True
 
 
 def voxel_point_sampling(original_points, voxel_size):
@@ -15,30 +22,30 @@ def voxel_point_sampling(original_points, voxel_size):
 
 
 def main():
-    np.random.seed(1234)
-    fig = plt.figure()
-    ax = fig.add_subplot(projection='3d')
-
     n_points = 1000
-    rng = np.random.default_rng()
+    rng = np.random.default_rng(1234)
 
     x = rng.normal(0.0, 10.0, n_points)
     y = rng.normal(0.0, 1.0, n_points)
     z = rng.normal(0.0, 10.0, n_points)
-    ax.scatter(x, y, z, marker=".", label="Original points")
     original_points = np.vstack((x, y, z)).T
     print(f"{original_points.shape=}")
-
     print("Voxel point sampling")
     voxel_size = 20.0
-    filtered_points = voxel_point_sampling(original_points, voxel_size)
-    print(f"{filtered_points.shape=}")
-    ax.scatter(filtered_points[:, 0], filtered_points[:, 1],
-               filtered_points[:, 2], marker="o", label="Filtered points")
-    plt.legend()
-    plt.title("Voxel point sampling")
-    plt.axis("equal")
-    plt.show()
+    voxel_sampling_points = voxel_point_sampling(original_points, voxel_size)
+    print(f"{voxel_sampling_points.shape=}")
+
+    if do_plot:
+        fig = plt.figure()
+        ax = fig.add_subplot(projection='3d')
+        ax.scatter(x, y, z, marker=".", label="Original points")
+
+        ax.scatter(voxel_sampling_points[:, 0], voxel_sampling_points[:, 1],
+                   voxel_sampling_points[:, 2], marker="o", label="Filtered points")
+        plt.legend()
+        plt.title("Voxel point sampling")
+        plt.axis("equal")
+        plt.show()
 
 
 if __name__ == '__main__':
