@@ -1,7 +1,7 @@
 """
 Point cloud sampling example codes. This code supports
-- voxel point sampling
--
+- Voxel point sampling
+- Farthest point sampling
 
 """
 import matplotlib.pyplot as plt
@@ -37,9 +37,95 @@ def voxel_point_sampling(original_points: npt.NDArray, voxel_size: float):
     return points
 
 
+def farthest_point_sampling(orig_points: npt.NDArray,
+                            n_points: int, seed: int):
+    """
+    Farthest point sampling function
+    This function sample N-dimensional points with the farthest point policy.
+
+    Parameters
+    ----------
+    orig_points :  (M, N) N-dimensional points for sampling.
+                    The number of points is M.
+    n_points : number of points for sampling
+    seed : random seed number
+
+    Returns
+    -------
+    sampled points (n_points, N)
+
+    """
+    rng = np.random.default_rng(seed)
+    first_point_id = rng.choice(range(orig_points.shape[0]))
+    selected_ids = [first_point_id]
+    while len(selected_ids) < n_points:
+        base_point = orig_points[selected_ids[-1], :]
+        distances = np.linalg.norm(orig_points[np.newaxis, :] - base_point,
+                                   axis=2).flatten()
+        distances_rank = np.argsort(-distances)  # Farthest order
+        for i in distances_rank:  # From the farthest point
+            if i not in selected_ids:  # if not selected yes, select it
+                selected_ids.append(i)
+                break
+    return orig_points[selected_ids, :]
+
+
+def poisson_disk_sampling(orig_points: npt.NDArray, n_points: int,
+                          min_distance: float, seed: int, MAX_ITER=1000):
+    """
+    Poisson disk sampling function
+    This function sample N-dimensional points randomly until the number of
+    points keeping minimum distance between selected points.
+
+    Parameters
+    ----------
+    orig_points :  (M, N) N-dimensional points for sampling.
+                    The number of points is M.
+    n_points : number of points for sampling
+    min_distance : minimum distance between selected points.
+    seed : random seed number
+    MAX_ITER : Maximum number of iteration. Default is 1000.
+
+    Returns
+    -------
+    sampled points (n_points or less, N)
+    """
+    rng = np.random.default_rng(seed)
+    selected_id = rng.choice(range(orig_points.shape[0]))
+    selected_ids = [selected_id]
+    loop = 0
+    while len(selected_ids) < n_points and loop <= MAX_ITER:
+        selected_id = rng.choice(range(orig_points.shape[0]))
+        base_point = orig_points[selected_id, :]
+        distances = np.linalg.norm(
+            orig_points[np.newaxis, selected_ids] - base_point,
+            axis=2).flatten()
+        if min(distances) >= min_distance:
+            selected_ids.append(selected_id)
+        loop += 1
+    if len(selected_ids) != n_points:
+        print("Could not find the specified number of points...")
+
+    return orig_points[selected_ids, :]
+
+
+def plot_sampled_points(original_points, sampled_points, method_name):
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')
+    ax.scatter(original_points[:, 0], original_points[:, 1],
+               original_points[:, 2], marker=".", label="Original points")
+    ax.scatter(sampled_points[:, 0], sampled_points[:, 1],
+               sampled_points[:, 2], marker="o",
+               label="Filtered points")
+    plt.legend()
+    plt.title(method_name)
+    plt.axis("equal")
+
+
 def main():
     n_points = 1000
-    rng = np.random.default_rng(1234)
+    seed = 1234
+    rng = np.random.default_rng(seed)
 
     x = rng.normal(0.0, 10.0, n_points)
     y = rng.normal(0.0, 1.0, n_points)
@@ -51,19 +137,26 @@ def main():
     voxel_sampling_points = voxel_point_sampling(original_points, voxel_size)
     print(f"{voxel_sampling_points.shape=}")
 
-    print("Far point sampling")
+    print("Farthest point sampling")
+    n_points = 20
+    farthest_sampling_points = farthest_point_sampling(original_points,
+                                                       n_points, seed)
+    print(f"{farthest_sampling_points.shape=}")
+
+    print("Poisson disk sampling")
+    n_points = 20
+    min_distance = 10.0
+    poisson_disk_points = poisson_disk_sampling(original_points, n_points,
+                                                min_distance, seed)
+    print(f"{poisson_disk_points.shape=}")
 
     if do_plot:
-        fig = plt.figure()
-        ax = fig.add_subplot(projection='3d')
-        ax.scatter(x, y, z, marker=".", label="Original points")
-
-        ax.scatter(voxel_sampling_points[:, 0], voxel_sampling_points[:, 1],
-                   voxel_sampling_points[:, 2], marker="o",
-                   label="Filtered points")
-        plt.legend()
-        plt.title("Voxel point sampling")
-        plt.axis("equal")
+        plot_sampled_points(original_points, voxel_sampling_points,
+                            "Voxel point sampling")
+        plot_sampled_points(original_points, farthest_sampling_points,
+                            "Farthest point sampling")
+        plot_sampled_points(original_points, poisson_disk_points,
+                            "poisson disk sampling")
         plt.show()
 
 

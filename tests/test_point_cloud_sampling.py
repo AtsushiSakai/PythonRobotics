@@ -7,6 +7,8 @@ def test_1(capsys):
     m.main()
     captured = capsys.readouterr()
     assert "voxel_sampling_points.shape=(27, 3)" in captured.out
+    assert "farthest_sampling_points.shape=(20, 3)" in captured.out
+    assert "poisson_disk_points.shape=(20, 3)" in captured.out
 
 
 if __name__ == '__main__':
