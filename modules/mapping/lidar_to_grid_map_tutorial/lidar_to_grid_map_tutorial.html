@@ -135,7 +135,7 @@ necessary packages.</p>
 in a <code class="docutils literal notranslate"><span class="pre">csv</span></code> (comma separated values) format. Let’s write the
 <code class="docutils literal notranslate"><span class="pre">file_read</span></code> method:</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">file_read</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reading LIDAR laser beams (angles and corresponding distance data)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">measures</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">)]</span>
@@ -198,7 +198,7 @@ algorithm checks for neighbour elements in each iteration, and stops
 expansion on obstacles and free boundaries.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
 <span class="k">def</span> <span class="nf">flood_fill</span><span class="p">(</span><span class="n">cpoint</span><span class="p">,</span> <span class="n">pmap</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    cpoint: starting point (x,y) of fill</span>
 <span class="sd">    pmap: occupancy map generated from Bresenham ray-tracing</span>
 <span class="sd">    &quot;&quot;&quot;</span>

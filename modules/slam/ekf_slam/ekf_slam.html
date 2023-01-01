@@ -194,7 +194,7 @@ versa (<span class="math notranslate nohighlight">\(\Sigma_{xm}\)</span>, <span 
 the control functions - update the belief in landmark positions based on
 the estimated state and measurements</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">ekf_slam</span><span class="p">(</span><span class="n">xEst</span><span class="p">,</span> <span class="n">PEst</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs an iteration of EKF SLAM from the available information.</span>
 
 <span class="sd">    :param xEst: the belief in last position</span>
@@ -249,7 +249,7 @@ grows by the covariance of the pose, <span class="math notranslate nohighlight">
 <p>Notice this uncertainty is only growing with respect to the pose, not
 the landmarks.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">xEst</span><span class="p">,</span> <span class="n">PEst</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs the prediction step of EKF SLAM</span>
 
 <span class="sd">    :param xEst: nx1 state vector</span>
@@ -267,7 +267,7 @@ the landmarks.</p>
 </pre></div>
 </div>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">motion_model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computes the motion model based on current state and input function.</span>
 
 <span class="sd">    :param x: 3x1 pose estimation</span>
@@ -328,7 +328,7 @@ measurement.</p>
 the changing uncertainty.</p>
 <p><span class="math notranslate nohighlight">\(P_{t} = (I-K_tH_t)\bar{P_t}\)</span></p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">xEst</span><span class="p">,</span> <span class="n">PEst</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">initP</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs the update step of EKF SLAM</span>
 
 <span class="sd">    :param xEst:  nx1 the predicted pose of the system and the pose of the landmarks</span>
@@ -364,7 +364,7 @@ the changing uncertainty.</p>
 </pre></div>
 </div>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">calc_innovation</span><span class="p">(</span><span class="n">lm</span><span class="p">,</span> <span class="n">xEst</span><span class="p">,</span> <span class="n">PEst</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">LMid</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the innovation based on expected position and landmark position</span>
 
 <span class="sd">    :param lm:   landmark position</span>
@@ -389,7 +389,7 @@ the changing uncertainty.</p>
     <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">H</span>
 
 <span class="k">def</span> <span class="nf">jacobH</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the jacobian of the measurement function</span>
 
 <span class="sd">    :param q:     the range from the system pose to the landmark</span>
@@ -426,7 +426,7 @@ measurements that are expected as a result of each measurement.</p>
 <p>Observations are based on the TRUE position of the robot. Error in dead
 reckoning and control functions are passed along here as well.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">observation</span><span class="p">(</span><span class="n">xTrue</span><span class="p">,</span> <span class="n">xd</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">RFID</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param xTrue: the true pose of the system</span>
 <span class="sd">    :param xd:    the current noisy estimate of the system</span>
 <span class="sd">    :param u:     the current control input</span>
@@ -462,7 +462,7 @@ reckoning and control functions are passed along here as well.</p>
 </pre></div>
 </div>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">calc_n_LM</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the number of landmarks currently tracked in the state</span>
 <span class="sd">    :param x: the state</span>
 <span class="sd">    :returns: the number of landmarks n</span>
@@ -472,7 +472,7 @@ reckoning and control functions are passed along here as well.</p>
 
 
 <span class="k">def</span> <span class="nf">jacob_motion</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the jacobian of motion model.</span>
 
 <span class="sd">    :param x: The state, including the estimated position of the system</span>
@@ -496,7 +496,7 @@ reckoning and control functions are passed along here as well.</p>
 </pre></div>
 </div>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">calc_LM_Pos</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the pose in the world coordinate frame of a landmark at the given measurement.</span>
 
 <span class="sd">    :param x: [x; y; theta]</span>
@@ -514,7 +514,7 @@ reckoning and control functions are passed along here as well.</p>
 
 
 <span class="k">def</span> <span class="nf">get_LM_Pos_from_state</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ind</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the position of a given landmark</span>
 
 <span class="sd">    :param x:   The state containing all landmark positions</span>
@@ -527,7 +527,7 @@ reckoning and control functions are passed along here as well.</p>
 
 
 <span class="k">def</span> <span class="nf">search_correspond_LM_ID</span><span class="p">(</span><span class="n">xAug</span><span class="p">,</span> <span class="n">PAug</span><span class="p">,</span> <span class="n">zi</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Landmark association with Mahalanobis distance.</span>
 
 <span class="sd">    If this landmark is at least M_DIST_TH units away from all known landmarks,</span>

@@ -106,7 +106,7 @@
 
 
 <div class="viewcode-block" id="CubicSpline1D"><a class="viewcode-back" href="../../../modules/path_planning/cubic_spline/cubic_spline.html#PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D">[docs]</a><span class="k">class</span> <span class="nc">CubicSpline1D</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    1D Cubic Spline class</span>
 
 <span class="sd">    Parameters</span>
@@ -167,7 +167,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CubicSpline1D.calc_position"><a class="viewcode-back" href="../../../modules/path_planning/cubic_spline/cubic_spline.html#PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D.calc_position">[docs]</a>    <span class="k">def</span> <span class="nf">calc_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calc `y` position for given `x`.</span>
 
 <span class="sd">        if `x` is outside the data point&#39;s `x` range, return None.</span>
@@ -190,7 +190,7 @@
         <span class="k">return</span> <span class="n">position</span></div>
 
 <div class="viewcode-block" id="CubicSpline1D.calc_first_derivative"><a class="viewcode-back" href="../../../modules/path_planning/cubic_spline/cubic_spline.html#PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D.calc_first_derivative">[docs]</a>    <span class="k">def</span> <span class="nf">calc_first_derivative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calc first derivative at given x.</span>
 
 <span class="sd">        if x is outside the input x, return None</span>
@@ -212,7 +212,7 @@
         <span class="k">return</span> <span class="n">dy</span></div>
 
 <div class="viewcode-block" id="CubicSpline1D.calc_second_derivative"><a class="viewcode-back" href="../../../modules/path_planning/cubic_spline/cubic_spline.html#PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline1D.calc_second_derivative">[docs]</a>    <span class="k">def</span> <span class="nf">calc_second_derivative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calc second derivative at given x.</span>
 
 <span class="sd">        if x is outside the input x, return None</span>
@@ -234,13 +234,13 @@
         <span class="k">return</span> <span class="n">ddy</span></div>
 
     <span class="k">def</span> <span class="nf">__search_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        search data segment index</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">bisect</span><span class="o">.</span><span class="n">bisect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
 
     <span class="k">def</span> <span class="nf">__calc_A</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        calc matrix A for spline coefficient c</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">))</span>
@@ -257,7 +257,7 @@
         <span class="k">return</span> <span class="n">A</span>
 
     <span class="k">def</span> <span class="nf">__calc_B</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        calc matrix B for spline coefficient c</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">)</span>
@@ -268,7 +268,7 @@
 
 
 <div class="viewcode-block" id="CubicSpline2D"><a class="viewcode-back" href="../../../modules/path_planning/cubic_spline/cubic_spline.html#PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline2D">[docs]</a><span class="k">class</span> <span class="nc">CubicSpline2D</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Cubic CubicSpline2D class</span>
 
 <span class="sd">    Parameters</span>
@@ -340,7 +340,7 @@
         <span class="k">return</span> <span class="n">s</span>
 
 <div class="viewcode-block" id="CubicSpline2D.calc_position"><a class="viewcode-back" href="../../../modules/path_planning/cubic_spline/cubic_spline.html#PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline2D.calc_position">[docs]</a>    <span class="k">def</span> <span class="nf">calc_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        calc position</span>
 
 <span class="sd">        Parameters</span>
@@ -362,7 +362,7 @@
         <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span></div>
 
 <div class="viewcode-block" id="CubicSpline2D.calc_curvature"><a class="viewcode-back" href="../../../modules/path_planning/cubic_spline/cubic_spline.html#PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline2D.calc_curvature">[docs]</a>    <span class="k">def</span> <span class="nf">calc_curvature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        calc curvature</span>
 
 <span class="sd">        Parameters</span>
@@ -384,7 +384,7 @@
         <span class="k">return</span> <span class="n">k</span></div>
 
 <div class="viewcode-block" id="CubicSpline2D.calc_yaw"><a class="viewcode-back" href="../../../modules/path_planning/cubic_spline/cubic_spline.html#PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline2D.calc_yaw">[docs]</a>    <span class="k">def</span> <span class="nf">calc_yaw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        calc yaw</span>
 
 <span class="sd">        Parameters</span>

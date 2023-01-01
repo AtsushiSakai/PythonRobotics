@@ -211,7 +211,7 @@ created based on the information of the motion and the observation.</p>
 
 <span class="c1"># Defined as a function to facilitate iteration</span>
 <span class="k">def</span> <span class="nf">get_H_b</span><span class="p">(</span><span class="n">odom</span><span class="p">,</span> <span class="n">obs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create the information matrix and information vector. This implementation is</span>
 <span class="sd">    based on the concept of virtual measurement i.e. the observations of the</span>
 <span class="sd">    landmarks are converted into constraints (edges) between the nodes that</span>
@@ -872,7 +872,7 @@ closure</em> in the Graph SLAM literature.</p></li>
 <p>We can easily parse out the two different types of edges present in this
 dataset and plot them.</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">parse_edges</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Split the graph `g` into two graphs, one with only odometry edges and the other with only scan-matching edges.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Split the graph `g` into two graphs, one with only odometry edges and the other with only scan-matching edges.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
