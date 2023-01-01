@@ -6,12 +6,28 @@ Point cloud sampling example codes. This code supports
 """
 import matplotlib.pyplot as plt
 import numpy as np
+import numpy.typing as npt
 from collections import defaultdict
 
 do_plot = True
 
 
-def voxel_point_sampling(original_points, voxel_size):
+def voxel_point_sampling(original_points: npt.NDArray, voxel_size: float):
+    """
+    Voxel Point Sampling function.
+    This function sample N-dimensional points with voxel grid.
+    Points in a same voxel grid will be merged by mean operation for sampling.
+
+    Parameters
+    ----------
+    original_points :  (M, N) N-dimensional points for sampling.
+                        The number of points is M.
+    voxel_size : voxel grid size
+
+    Returns
+    -------
+    sampled points (M', N)
+    """
     voxel_dict = defaultdict(list)
     for i in range(original_points.shape[0]):
         xyz = original_points[i, :]
@@ -35,13 +51,16 @@ def main():
     voxel_sampling_points = voxel_point_sampling(original_points, voxel_size)
     print(f"{voxel_sampling_points.shape=}")
 
+    print("Far point sampling")
+
     if do_plot:
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d')
         ax.scatter(x, y, z, marker=".", label="Original points")
 
         ax.scatter(voxel_sampling_points[:, 0], voxel_sampling_points[:, 1],
-                   voxel_sampling_points[:, 2], marker="o", label="Filtered points")
+                   voxel_sampling_points[:, 2], marker="o",
+                   label="Filtered points")
         plt.legend()
         plt.title("Voxel point sampling")
         plt.axis("equal")

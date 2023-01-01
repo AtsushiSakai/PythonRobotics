@@ -1,6 +1,5 @@
 import conftest  # Add root path to sys.path
 from Mapping.point_cloud_sampling import point_cloud_sampling as m
-import numpy as np
 
 
 def test_1(capsys):
