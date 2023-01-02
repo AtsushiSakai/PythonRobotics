@@ -3,6 +3,17 @@
 Point cloud Sampling
 ----------------------
 
-.. figure:: voxel_sampling_points.png
-.. figure:: farthest_sampling_points.png
-.. figure:: poisson_disk_points.png
+Voxel Point Sampling
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. figure:: voxel_point_sampling.png
+
+Farthest Point Sampling
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. figure:: farthest_point_sampling.png
+
+Poisson Disk Sampling
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. figure:: poisson_disk_sampling.png
