@@ -2,6 +2,7 @@
 Point cloud sampling example codes. This code supports
 - Voxel point sampling
 - Farthest point sampling
+- Poisson disk sampling
 
 """
 import matplotlib.pyplot as plt
