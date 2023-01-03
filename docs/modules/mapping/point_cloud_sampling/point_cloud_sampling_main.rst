@@ -35,19 +35,28 @@ API
 
 Farthest Point Sampling
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+.. figure:: farthest_point_sampling.png
+
+Farthest Point Sampling is a point cloud sampling method by a specified
+number of points so that the distance between points is as far apart as
+possible.
+
+This method is useful for machine learning and other situations where
+you want to obtain a specified number of points.
 
 API
 =====
 
 .. autofunction:: Mapping.point_cloud_sampling.point_cloud_sampling.farthest_point_sampling
 
-.. figure:: farthest_point_sampling.png
-
-
 Poisson Disk Sampling
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-
 .. figure:: poisson_disk_sampling.png
+
+Poisson disk sample is a point cloud sampling method by a specified
+number of points so that the algorithm selects points where the distance
+from selected points is greater than a certain distance.
+
 
 API
 =====

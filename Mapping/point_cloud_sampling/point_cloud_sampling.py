@@ -55,28 +55,18 @@ def farthest_point_sampling(orig_points: npt.NDArray,
     -------
     sampled points (n_points, N)
 
-    Notes
-    ------
-    Farthest Point Sampling is a point cloud sampling method by a specified
-    number of points so that the distance between points is as far apart as
-    possible.
-
-    This method is useful for machine learning and other situations where
-    you want to obtain a specified number of points.
-
-    Notes
-    ------
-
-
     """
     rng = np.random.default_rng(seed)
-    first_point_id = rng.choice(range(orig_points.shape[0]))
+    n_orig_points = orig_points.shape[0]
+    first_point_id = rng.choice(range(n_orig_points))
+    min_distances = np.ones(n_orig_points) * float("inf")
     selected_ids = [first_point_id]
     while len(selected_ids) < n_points:
         base_point = orig_points[selected_ids[-1], :]
         distances = np.linalg.norm(orig_points[np.newaxis, :] - base_point,
                                    axis=2).flatten()
-        distances_rank = np.argsort(-distances)  # Farthest order
+        min_distances = np.minimum(min_distances, distances)
+        distances_rank = np.argsort(-min_distances)  # Farthest order
         for i in distances_rank:  # From the farthest point
             if i not in selected_ids:  # if not selected yes, select it
                 selected_ids.append(i)
