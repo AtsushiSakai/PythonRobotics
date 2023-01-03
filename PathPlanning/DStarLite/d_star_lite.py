@@ -73,8 +73,8 @@ class DStarLite:
         self.kold = 0.0
         self.rhs = self.create_grid(float("inf"))
         self.g = self.create_grid(float("inf"))
-        self.detected_obstacles = list()  # type: ignore
-        self.detected_obstacles_xy = np.array([])
+        self.detected_obstacles_xy = np.empty((0, 2))
+        self.xy = np.empty((0, 2))
         if show_animation:
             self.detected_obstacles_for_plotting_x = list()  # type: ignore
             self.detected_obstacles_for_plotting_y = list()  # type: ignore
@@ -86,12 +86,11 @@ class DStarLite:
     def is_obstacle(self, node: Node):
         x = np.array([node.x])
         y = np.array([node.y])
-        is_in_obstacles = (
-            (self.obstacles_xy[:, 0] == x)
-            & (self.obstacles_xy[:, 1] == y)
-        ).any()
-        is_in_detected_obstacles = False
+        obstacle_x_equal = self.obstacles_xy[:, 0] == x
+        obstacle_y_equal = self.obstacles_xy[:, 1] == y
+        is_in_obstacles = (obstacle_x_equal & obstacle_y_equal).any()
 
+        is_in_detected_obstacles = False
         if self.detected_obstacles_xy.shape[0] > 0:
             is_x_equal = self.detected_obstacles_xy[:, 0] == x
             is_y_equal = self.detected_obstacles_xy[:, 1] == y
@@ -158,7 +157,7 @@ class DStarLite:
             self.g = self.create_grid(math.inf)
             self.rhs[self.goal.x][self.goal.y] = 0
             self.U.append((self.goal, self.calculate_key(self.goal)))
-            self.detected_obstacles = list()
+            self.detected_obstacles_xy = np.empty((0, 2))
 
     def update_vertex(self, u: Node):
         if not compare_coordinates(u, self.goal):
@@ -183,7 +182,7 @@ class DStarLite:
         has_elements = len(self.U) > 0
         start_key_not_updated = self.compare_keys(
             self.U[0][1], self.calculate_key(self.start)
-            )
+        )
         rhs_not_equal_to_g = self.rhs[self.start.x][self.start.y] != \
             self.g[self.start.x][self.start.y]
         while has_elements and start_key_not_updated or rhs_not_equal_to_g:
@@ -204,7 +203,7 @@ class DStarLite:
             self.U.sort(key=lambda x: x[1])
             start_key_not_updated = self.compare_keys(
                 self.U[0][1], self.calculate_key(self.start)
-                )
+            )
             rhs_not_equal_to_g = self.rhs[self.start.x][self.start.y] != \
                 self.g[self.start.x][self.start.y]
 
@@ -216,7 +215,12 @@ class DStarLite:
                    compare_coordinates(spoofed_obstacle, self.goal):
                     continue
                 changed_vertices.append(spoofed_obstacle)
-                self.detected_obstacles.append(spoofed_obstacle)
+                self.detected_obstacles_xy = np.concatenate(
+                    (
+                        self.detected_obstacles_xy,
+                        [[spoofed_obstacle.x, spoofed_obstacle.y]]
+                    )
+                )
                 if show_animation:
                     self.detected_obstacles_for_plotting_x.append(
                         spoofed_obstacle.x + self.x_min_world)
@@ -226,24 +230,23 @@ class DStarLite:
                              self.detected_obstacles_for_plotting_y, ".k")
                     plt.pause(pause_time)
             self.spoofed_obstacles.pop(0)
-            self.detected_obstacles_xy = np.array(
-                [
-                    [obstacle.x, obstacle.y]
-                    for obstacle in self.detected_obstacles
-                ]
-            )
 
         # Allows random generation of obstacles
         random.seed()
         if random.random() > 1 - p_create_random_obstacle:
-            x = random.randint(0, self.x_max)
-            y = random.randint(0, self.y_max)
+            x = random.randint(0, self.x_max-1)
+            y = random.randint(0, self.y_max-1)
             new_obs = Node(x, y)
             if compare_coordinates(new_obs, self.start) or \
                compare_coordinates(new_obs, self.goal):
                 return changed_vertices
             changed_vertices.append(Node(x, y))
-            self.detected_obstacles.append(Node(x, y))
+            self.detected_obstacles_xy = np.concatenate(
+                (
+                    self.detected_obstacles_xy,
+                    [[x, y]]
+                )
+            )
             if show_animation:
                 self.detected_obstacles_for_plotting_x.append(x +
                                                               self.x_min_world)
