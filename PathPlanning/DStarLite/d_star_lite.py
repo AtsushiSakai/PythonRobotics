@@ -234,8 +234,8 @@ class DStarLite:
         # Allows random generation of obstacles
         random.seed()
         if random.random() > 1 - p_create_random_obstacle:
-            x = random.randint(0, self.x_max-1)
-            y = random.randint(0, self.y_max-1)
+            x = random.randint(0, self.x_max - 1)
+            y = random.randint(0, self.y_max - 1)
             new_obs = Node(x, y)
             if compare_coordinates(new_obs, self.start) or \
                compare_coordinates(new_obs, self.goal):
