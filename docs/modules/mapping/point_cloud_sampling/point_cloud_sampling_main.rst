@@ -19,9 +19,9 @@ Voxel Point Sampling
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. figure:: voxel_point_sampling.png
 
-Voxel grid sampling is a method of reducing point cloud data by using
-
-Voxel grids which is regular grids in three-dimensional space.
+Voxel grid sampling is a method of reducing point cloud data by using the
+`Voxel grids <https://en.wikipedia.org/wiki/Voxel>`_ which is regular grids
+in three-dimensional space.
 
 This method determines which each point is in a grid, and replaces the point
 clouds that are in the same Voxel with their average to reduce the number of
@@ -36,11 +36,23 @@ API
 Farthest Point Sampling
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
+API
+=====
+
+.. autofunction:: Mapping.point_cloud_sampling.point_cloud_sampling.farthest_point_sampling
+
 .. figure:: farthest_point_sampling.png
+
 
 Poisson Disk Sampling
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. figure:: poisson_disk_sampling.png
+
+API
+=====
+
+.. autofunction:: Mapping.point_cloud_sampling.point_cloud_sampling.poisson_disk_sampling
+
 
 
