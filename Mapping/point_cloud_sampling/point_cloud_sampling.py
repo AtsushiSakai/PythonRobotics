@@ -44,13 +44,6 @@ def farthest_point_sampling(orig_points: npt.NDArray,
     Farthest point sampling function
     This function sample N-dimensional points with the farthest point policy.
 
-    Farthest Point Sampling is a point cloud sampling method by a specified
-    number of points so that the distance between points is as far apart as
-    possible.
-
-    This method is useful for machine learning and other situations where
-    you want to obtain a specified number of points.
-
     Parameters
     ----------
     orig_points :  (M, N) N-dimensional points for sampling.
@@ -61,6 +54,19 @@ def farthest_point_sampling(orig_points: npt.NDArray,
     Returns
     -------
     sampled points (n_points, N)
+
+    Notes
+    ------
+    Farthest Point Sampling is a point cloud sampling method by a specified
+    number of points so that the distance between points is as far apart as
+    possible.
+
+    This method is useful for machine learning and other situations where
+    you want to obtain a specified number of points.
+
+    Notes
+    ------
+
 
     """
     rng = np.random.default_rng(seed)
