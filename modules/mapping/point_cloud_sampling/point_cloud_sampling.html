@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Point cloud Sampling &mdash; PythonRobotics  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="k-means object clustering" href="../k_means_object_clustering/k_means_object_clustering.html" />
+    <link rel="prev" title="Lidar to grid map" href="../lidar_to_grid_map_tutorial/lidar_to_grid_map_tutorial.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+            <a href="../../../index.html" class="icon icon-home"> PythonRobotics
+            <img src="../../../_static/icon.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9612347954373886"
+     crossorigin="anonymous"></script>
+<!-- PythonRoboticsDoc -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-9612347954373886"
+     data-ad-slot="1579532132"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../localization/localization.html">Localization</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../mapping.html">Mapping</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../gaussian_grid_map/gaussian_grid_map.html">Gaussian grid map</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ray_casting_grid_map/ray_casting_grid_map.html">Ray casting grid map</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lidar_to_grid_map_tutorial/lidar_to_grid_map_tutorial.html">Lidar to grid map</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Point cloud Sampling</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#voxel-point-sampling">Voxel Point Sampling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#api">API</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#farthest-point-sampling">Farthest Point Sampling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id2">API</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#poisson-disk-sampling">Poisson Disk Sampling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id3">API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../k_means_object_clustering/k_means_object_clustering.html">k-means object clustering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../circle_fitting/circle_fitting.html">Object shape recognition using circle fitting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rectangle_fitting/rectangle_fitting.html">Object shape recognition using rectangle fitting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../slam/slam.html">SLAM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_planning/path_planning.html">Path Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_tracking/path_tracking.html">Path Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../arm_navigation/arm_navigation.html">Arm Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../aerial_navigation/aerial_navigation.html">Aerial Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bipedal/bipedal.html">Bipedal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utils/utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../appendix/appendix.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how_to_contribute.html">How To Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PythonRobotics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../mapping.html">Mapping</a> &raquo;</li>
+      <li>Point cloud Sampling</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/AtsushiSakai/PythonRobotics/blob/master/docs/modules/mapping/point_cloud_sampling/point_cloud_sampling_main.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="point-cloud-sampling">
+<span id="id1"></span><h1>Point cloud Sampling<a class="headerlink" href="#point-cloud-sampling" title="Permalink to this headline"></a></h1>
+<p>This sections explains point cloud sampling algorithms in PythonRobotics.</p>
+<p>Point clouds are two-dimensional and three-dimensional based data
+acquired by external sensors like LIDAR, cameras, etc.
+In general, Point Cloud data is very large in number of data.
+So, if you process all the data, computation time might become an issue.</p>
+<p>Point cloud sampling is a technique for solving this computational complexity
+issue by extracting only representative point data and thinning the point
+cloud data without compromising the performance of processing using the point
+cloud data.</p>
+<section id="voxel-point-sampling">
+<h2>Voxel Point Sampling<a class="headerlink" href="#voxel-point-sampling" title="Permalink to this headline"></a></h2>
+<figure class="align-default">
+<img alt="../../../_images/voxel_point_sampling.png" src="../../../_images/voxel_point_sampling.png" />
+</figure>
+<p>Voxel grid sampling is a method of reducing point cloud data by using the
+<a class="reference external" href="https://en.wikipedia.org/wiki/Voxel">Voxel grids</a> which is regular grids
+in three-dimensional space.</p>
+<p>This method determines which each point is in a grid, and replaces the point
+clouds that are in the same Voxel with their average to reduce the number of
+points.</p>
+<section id="api">
+<h3>API<a class="headerlink" href="#api" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="Mapping.point_cloud_sampling.point_cloud_sampling.voxel_point_sampling">
+<span class="sig-prename descclassname"><span class="pre">Mapping.point_cloud_sampling.point_cloud_sampling.</span></span><span class="sig-name descname"><span class="pre">voxel_point_sampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy._typing._generic_alias.ScalarType</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/Mapping/point_cloud_sampling/point_cloud_sampling.html#voxel_point_sampling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mapping.point_cloud_sampling.point_cloud_sampling.voxel_point_sampling" title="Permalink to this definition"></a></dt>
+<dd><p>Voxel Point Sampling function.
+This function sample N-dimensional points with voxel grid.
+Points in a same voxel grid will be merged by mean operation for sampling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>original_points</strong> (<em>(</em><em>M</em><em>, </em><em>N</em><em>) </em><em>N-dimensional points for sampling.</em>) – The number of points is M.</p></li>
+<li><p><strong>voxel_size</strong> (<em>voxel grid size</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>sampled points (M’, N)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+<section id="farthest-point-sampling">
+<h2>Farthest Point Sampling<a class="headerlink" href="#farthest-point-sampling" title="Permalink to this headline"></a></h2>
+<figure class="align-default">
+<img alt="../../../_images/farthest_point_sampling.png" src="../../../_images/farthest_point_sampling.png" />
+</figure>
+<p>Farthest Point Sampling is a point cloud sampling method by a specified
+number of points so that the distance between points is as far from as
+possible.</p>
+<p>This method is useful for machine learning and other situations where
+you want to obtain a specified number of points from point cloud.</p>
+<section id="id2">
+<h3>API<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="Mapping.point_cloud_sampling.point_cloud_sampling.farthest_point_sampling">
+<span class="sig-prename descclassname"><span class="pre">Mapping.point_cloud_sampling.point_cloud_sampling.</span></span><span class="sig-name descname"><span class="pre">farthest_point_sampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">orig_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy._typing._generic_alias.ScalarType</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/Mapping/point_cloud_sampling/point_cloud_sampling.html#farthest_point_sampling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mapping.point_cloud_sampling.point_cloud_sampling.farthest_point_sampling" title="Permalink to this definition"></a></dt>
+<dd><p>Farthest point sampling function
+This function sample N-dimensional points with the farthest point policy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>orig_points</strong> (<em>(</em><em>M</em><em>, </em><em>N</em><em>) </em><em>N-dimensional points for sampling.</em>) – The number of points is M.</p></li>
+<li><p><strong>n_points</strong> (<em>number of points for sampling</em>) – </p></li>
+<li><p><strong>seed</strong> (<em>random seed number</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>sampled points (n_points, N)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+<section id="poisson-disk-sampling">
+<h2>Poisson Disk Sampling<a class="headerlink" href="#poisson-disk-sampling" title="Permalink to this headline"></a></h2>
+<figure class="align-default">
+<img alt="../../../_images/poisson_disk_sampling.png" src="../../../_images/poisson_disk_sampling.png" />
+</figure>
+<p>Poisson disk sample is a point cloud sampling method by a specified
+number of points so that the algorithm selects points where the distance
+from selected points is greater than a certain distance.</p>
+<p>Although this method does not have good performance comparing the Farthest
+distance sample where each point is distributed farther from each other,
+this is suitable for real-time processing because of its fast computation time.</p>
+<section id="id3">
+<h3>API<a class="headerlink" href="#id3" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="Mapping.point_cloud_sampling.point_cloud_sampling.poisson_disk_sampling">
+<span class="sig-prename descclassname"><span class="pre">Mapping.point_cloud_sampling.point_cloud_sampling.</span></span><span class="sig-name descname"><span class="pre">poisson_disk_sampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">orig_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy._typing._generic_alias.ScalarType</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MAX_ITER</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/Mapping/point_cloud_sampling/point_cloud_sampling.html#poisson_disk_sampling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mapping.point_cloud_sampling.point_cloud_sampling.poisson_disk_sampling" title="Permalink to this definition"></a></dt>
+<dd><p>Poisson disk sampling function
+This function sample N-dimensional points randomly until the number of
+points keeping minimum distance between selected points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>orig_points</strong> (<em>(</em><em>M</em><em>, </em><em>N</em><em>) </em><em>N-dimensional points for sampling.</em>) – The number of points is M.</p></li>
+<li><p><strong>n_points</strong> (<em>number of points for sampling</em>) – </p></li>
+<li><p><strong>min_distance</strong> (<em>minimum distance between selected points.</em>) – </p></li>
+<li><p><strong>seed</strong> (<em>random seed number</em>) – </p></li>
+<li><p><strong>MAX_ITER</strong> (<em>Maximum number of iteration. Default is 1000.</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>sampled points (n_points or less, N)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../lidar_to_grid_map_tutorial/lidar_to_grid_map_tutorial.html" class="btn btn-neutral float-left" title="Lidar to grid map" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../k_means_object_clustering/k_means_object_clustering.html" class="btn btn-neutral float-right" title="k-means object clustering" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2021, Atsushi Sakai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

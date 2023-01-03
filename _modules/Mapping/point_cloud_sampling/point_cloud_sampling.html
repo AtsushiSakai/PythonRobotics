@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mapping.point_cloud_sampling.point_cloud_sampling &mdash; PythonRobotics  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+            <a href="../../../index.html" class="icon icon-home"> PythonRobotics
+            <img src="../../../_static/icon.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9612347954373886"
+     crossorigin="anonymous"></script>
+<!-- PythonRoboticsDoc -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-9612347954373886"
+     data-ad-slot="1579532132"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/localization/localization.html">Localization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/mapping/mapping.html">Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/slam/slam.html">SLAM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/path_planning/path_planning.html">Path Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/path_tracking/path_tracking.html">Path Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/arm_navigation/arm_navigation.html">Arm Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/aerial_navigation/aerial_navigation.html">Aerial Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/bipedal/bipedal.html">Bipedal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/utils/utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/appendix/appendix.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how_to_contribute.html">How To Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PythonRobotics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>Mapping.point_cloud_sampling.point_cloud_sampling</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for Mapping.point_cloud_sampling.point_cloud_sampling</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Point cloud sampling example codes. This code supports</span>
+<span class="sd">- Voxel point sampling</span>
+<span class="sd">- Farthest point sampling</span>
+<span class="sd">- Poisson disk sampling</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.typing</span> <span class="k">as</span> <span class="nn">npt</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="n">do_plot</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<div class="viewcode-block" id="voxel_point_sampling"><a class="viewcode-back" href="../../../modules/mapping/point_cloud_sampling/point_cloud_sampling.html#Mapping.point_cloud_sampling.point_cloud_sampling.voxel_point_sampling">[docs]</a><span class="k">def</span> <span class="nf">voxel_point_sampling</span><span class="p">(</span><span class="n">original_points</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">,</span> <span class="n">voxel_size</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Voxel Point Sampling function.</span>
+<span class="sd">    This function sample N-dimensional points with voxel grid.</span>
+<span class="sd">    Points in a same voxel grid will be merged by mean operation for sampling.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    original_points :  (M, N) N-dimensional points for sampling.</span>
+<span class="sd">                        The number of points is M.</span>
+<span class="sd">    voxel_size : voxel grid size</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sampled points (M&#39;, N)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">voxel_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">original_points</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">xyz</span> <span class="o">=</span> <span class="n">original_points</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">xyz_index</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">xyz</span> <span class="o">//</span> <span class="n">voxel_size</span><span class="p">)</span>
+        <span class="n">voxel_dict</span><span class="p">[</span><span class="n">xyz_index</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xyz</span><span class="p">)</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">voxel_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
+    <span class="k">return</span> <span class="n">points</span></div>
+
+
+<div class="viewcode-block" id="farthest_point_sampling"><a class="viewcode-back" href="../../../modules/mapping/point_cloud_sampling/point_cloud_sampling.html#Mapping.point_cloud_sampling.point_cloud_sampling.farthest_point_sampling">[docs]</a><span class="k">def</span> <span class="nf">farthest_point_sampling</span><span class="p">(</span><span class="n">orig_points</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">,</span>
+                            <span class="n">n_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Farthest point sampling function</span>
+<span class="sd">    This function sample N-dimensional points with the farthest point policy.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    orig_points :  (M, N) N-dimensional points for sampling.</span>
+<span class="sd">                    The number of points is M.</span>
+<span class="sd">    n_points : number of points for sampling</span>
+<span class="sd">    seed : random seed number</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sampled points (n_points, N)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">n_orig_points</span> <span class="o">=</span> <span class="n">orig_points</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">first_point_id</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_orig_points</span><span class="p">))</span>
+    <span class="n">min_distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_orig_points</span><span class="p">)</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+    <span class="n">selected_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">first_point_id</span><span class="p">]</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected_ids</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">n_points</span><span class="p">:</span>
+        <span class="n">base_point</span> <span class="o">=</span> <span class="n">orig_points</span><span class="p">[</span><span class="n">selected_ids</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">:]</span>
+        <span class="n">distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">orig_points</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">base_point</span><span class="p">,</span>
+                                   <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">min_distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">min_distances</span><span class="p">,</span> <span class="n">distances</span><span class="p">)</span>
+        <span class="n">distances_rank</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">min_distances</span><span class="p">)</span>  <span class="c1"># Farthest order</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">distances_rank</span><span class="p">:</span>  <span class="c1"># From the farthest point</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">selected_ids</span><span class="p">:</span>  <span class="c1"># if not selected yes, select it</span>
+                <span class="n">selected_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="k">break</span>
+    <span class="k">return</span> <span class="n">orig_points</span><span class="p">[</span><span class="n">selected_ids</span><span class="p">,</span> <span class="p">:]</span></div>
+
+
+<div class="viewcode-block" id="poisson_disk_sampling"><a class="viewcode-back" href="../../../modules/mapping/point_cloud_sampling/point_cloud_sampling.html#Mapping.point_cloud_sampling.point_cloud_sampling.poisson_disk_sampling">[docs]</a><span class="k">def</span> <span class="nf">poisson_disk_sampling</span><span class="p">(</span><span class="n">orig_points</span><span class="p">:</span> <span class="n">npt</span><span class="o">.</span><span class="n">NDArray</span><span class="p">,</span> <span class="n">n_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                          <span class="n">min_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">MAX_ITER</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Poisson disk sampling function</span>
+<span class="sd">    This function sample N-dimensional points randomly until the number of</span>
+<span class="sd">    points keeping minimum distance between selected points.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    orig_points :  (M, N) N-dimensional points for sampling.</span>
+<span class="sd">                    The number of points is M.</span>
+<span class="sd">    n_points : number of points for sampling</span>
+<span class="sd">    min_distance : minimum distance between selected points.</span>
+<span class="sd">    seed : random seed number</span>
+<span class="sd">    MAX_ITER : Maximum number of iteration. Default is 1000.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sampled points (n_points or less, N)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">selected_id</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">orig_points</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">selected_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">selected_id</span><span class="p">]</span>
+    <span class="n">loop</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected_ids</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">n_points</span> <span class="ow">and</span> <span class="n">loop</span> <span class="o">&lt;=</span> <span class="n">MAX_ITER</span><span class="p">:</span>
+        <span class="n">selected_id</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">orig_points</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">base_point</span> <span class="o">=</span> <span class="n">orig_points</span><span class="p">[</span><span class="n">selected_id</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
+            <span class="n">orig_points</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">selected_ids</span><span class="p">]</span> <span class="o">-</span> <span class="n">base_point</span><span class="p">,</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">min_distance</span><span class="p">:</span>
+            <span class="n">selected_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">selected_id</span><span class="p">)</span>
+        <span class="n">loop</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected_ids</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_points</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Could not find the specified number of points...&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">orig_points</span><span class="p">[</span><span class="n">selected_ids</span><span class="p">,</span> <span class="p">:]</span></div>
+
+
+<span class="k">def</span> <span class="nf">plot_sampled_points</span><span class="p">(</span><span class="n">original_points</span><span class="p">,</span> <span class="n">sampled_points</span><span class="p">,</span> <span class="n">method_name</span><span class="p">):</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">original_points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">original_points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+               <span class="n">original_points</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Original points&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">sampled_points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">sampled_points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+               <span class="n">sampled_points</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span>
+               <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Filtered points&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">method_name</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">n_points</span> <span class="o">=</span> <span class="mi">1000</span>
+    <span class="n">seed</span> <span class="o">=</span> <span class="mi">1234</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">n_points</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">n_points</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">n_points</span><span class="p">)</span>
+    <span class="n">original_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">original_points</span><span class="o">.</span><span class="n">shape</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Voxel point sampling&quot;</span><span class="p">)</span>
+    <span class="n">voxel_size</span> <span class="o">=</span> <span class="mf">20.0</span>
+    <span class="n">voxel_sampling_points</span> <span class="o">=</span> <span class="n">voxel_point_sampling</span><span class="p">(</span><span class="n">original_points</span><span class="p">,</span> <span class="n">voxel_size</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">voxel_sampling_points</span><span class="o">.</span><span class="n">shape</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Farthest point sampling&quot;</span><span class="p">)</span>
+    <span class="n">n_points</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">farthest_sampling_points</span> <span class="o">=</span> <span class="n">farthest_point_sampling</span><span class="p">(</span><span class="n">original_points</span><span class="p">,</span>
+                                                       <span class="n">n_points</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">farthest_sampling_points</span><span class="o">.</span><span class="n">shape</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Poisson disk sampling&quot;</span><span class="p">)</span>
+    <span class="n">n_points</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">min_distance</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">poisson_disk_points</span> <span class="o">=</span> <span class="n">poisson_disk_sampling</span><span class="p">(</span><span class="n">original_points</span><span class="p">,</span> <span class="n">n_points</span><span class="p">,</span>
+                                                <span class="n">min_distance</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">poisson_disk_points</span><span class="o">.</span><span class="n">shape</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">do_plot</span><span class="p">:</span>
+        <span class="n">plot_sampled_points</span><span class="p">(</span><span class="n">original_points</span><span class="p">,</span> <span class="n">voxel_sampling_points</span><span class="p">,</span>
+                            <span class="s2">&quot;Voxel point sampling&quot;</span><span class="p">)</span>
+        <span class="n">plot_sampled_points</span><span class="p">(</span><span class="n">original_points</span><span class="p">,</span> <span class="n">farthest_sampling_points</span><span class="p">,</span>
+                            <span class="s2">&quot;Farthest point sampling&quot;</span><span class="p">)</span>
+        <span class="n">plot_sampled_points</span><span class="p">(</span><span class="n">original_points</span><span class="p">,</span> <span class="n">poisson_disk_points</span><span class="p">,</span>
+                            <span class="s2">&quot;poisson disk sampling&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2021, Atsushi Sakai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
