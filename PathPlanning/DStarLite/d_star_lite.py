@@ -53,8 +53,6 @@ class DStarLite:
         Node(-1, -1, math.sqrt(2))
     ]
 
-    initialized = False
-
     def __init__(self, ox: list, oy: list):
         # Ensure that within the algorithm implementation all node coordinates
         # are indices in the grid and extend
@@ -73,19 +71,14 @@ class DStarLite:
         self.U = list()  # type: ignore
         self.km = 0.0
         self.kold = 0.0
-        self.rhs = np.full(
-            (self.x_max, self.y_max),
-            float("inf")  # type: ignore
-        )
-        self.g = np.full(
-            (self.x_max, self.y_max),
-            float("inf")  # type: ignore
-        )
+        self.rhs = self.create_grid(float("inf"))
+        self.g = self.create_grid(float("inf"))
         self.detected_obstacles = list()  # type: ignore
         self.detected_obstacles_xy = np.array([])
         if show_animation:
             self.detected_obstacles_for_plotting_x = list()  # type: ignore
             self.detected_obstacles_for_plotting_y = list()  # type: ignore
+        self.initialized = False
 
     def create_grid(self, val: float):
         return np.full((self.x_max, self.y_max), val)
@@ -98,11 +91,11 @@ class DStarLite:
             & (self.obstacles_xy[:, 1] == y)
         ).any()
         is_in_detected_obstacles = False
+
         if self.detected_obstacles_xy.shape[0] > 0:
-            is_in_detected_obstacles = (
-                (self.detected_obstacles_xy[:, 0] == x)
-                & (self.detected_obstacles_xy[:, 1] == y)
-            ).any()
+            is_x_equal = self.detected_obstacles_xy[:, 0] == x
+            is_y_equal = self.detected_obstacles_xy[:, 1] == y
+            is_in_detected_obstacles = (is_x_equal & is_y_equal).any()
 
         return is_in_obstacles or is_in_detected_obstacles
 
@@ -187,13 +180,13 @@ class DStarLite:
 
     def compute_shortest_path(self):
         self.U.sort(key=lambda x: x[1])
-        while (
-            len(self.U) > 0
-            and self.compare_keys(self.U[0][1], self.calculate_key(self.start))
-        ) or (
-            self.rhs[self.start.x, self.start.y]
-            != self.g[self.start.x, self.start.y]
-        ).any():
+        has_elements = len(self.U) > 0
+        start_key_not_updated = self.compare_keys(
+            self.U[0][1], self.calculate_key(self.start)
+            )
+        rhs_not_equal_to_g = self.rhs[self.start.x][self.start.y] != \
+            self.g[self.start.x][self.start.y]
+        while has_elements and start_key_not_updated or rhs_not_equal_to_g:
             self.kold = self.U[0][1]
             u = self.U[0][0]
             self.U.pop(0)
@@ -209,6 +202,11 @@ class DStarLite:
                 for s in self.pred(u) + [u]:
                     self.update_vertex(s)
             self.U.sort(key=lambda x: x[1])
+            start_key_not_updated = self.compare_keys(
+                self.U[0][1], self.calculate_key(self.start)
+                )
+            rhs_not_equal_to_g = self.rhs[self.start.x][self.start.y] != \
+                self.g[self.start.x][self.start.y]
 
     def detect_changes(self):
         changed_vertices = list()
