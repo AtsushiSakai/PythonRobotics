@@ -65,7 +65,7 @@ def calc_distance_heuristic(gx, gy, ox, oy, resolution, rr):
     open_set[calc_index(goal_node, x_w, min_x, min_y)] = goal_node
     priority_queue = [(0, calc_index(goal_node, x_w, min_x, min_y))]
 
-    while 1:
+    while True:
         if not priority_queue:
             break
         cost, c_id = heapq.heappop(priority_queue)

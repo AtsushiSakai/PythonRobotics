@@ -75,7 +75,7 @@ class BidirectionalAStarPlanner:
         current_B = goal_node
         meet_point_A, meet_point_B = None, None
 
-        while 1:
+        while True:
             if len(open_set_A) == 0:
                 print("Open set A is empty..")
                 break

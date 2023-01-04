@@ -138,7 +138,3 @@ class LidarSimulator:
                 ry.append(range_db[i] * np.sin(t))
 
         return rx, ry
-
-
-if __name__ == '__main__':
-    main()
