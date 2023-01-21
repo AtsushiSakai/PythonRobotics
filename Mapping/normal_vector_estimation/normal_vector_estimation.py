@@ -42,26 +42,27 @@ def _arrow3D(ax, x, y, z, dx, dy, dz, *args, **kwargs):
 setattr(Axes3D, 'arrow3D', _arrow3D)
 
 
-def set_equal_axis(ax, xlims, ylims, zlims):
+def set_equal_axis(ax, x_lims, y_lims, z_lims):
     """Helper function to set equal axis
 
     Args:
-        ax (Axes3DSubplot): matplotlib 3D axis, created by `ax = fig.add_subplot(projection='3d')`
-        xlims (np.array): array containing min and max value of x
-        ylims (np.array): array containing min and max value of y
-        zlims (np.array): array containing min and max value of z
+        ax (Axes3DSubplot): matplotlib 3D axis, created by
+        `ax = fig.add_subplot(projection='3d')`
+        x_lims (np.array): array containing min and max value of x
+        y_lims (np.array): array containing min and max value of y
+        z_lims (np.array): array containing min and max value of z
     """
-    xlims = np.asarray(xlims)
-    ylims = np.asarray(ylims)
-    zlims = np.asarray(zlims)
+    x_lims = np.asarray(x_lims)
+    y_lims = np.asarray(y_lims)
+    z_lims = np.asarray(z_lims)
     # compute max required range
-    max_range = np.array([xlims.max()-xlims.min(),
-                          ylims.max()-ylims.min(),
-                          zlims.max()-zlims.min()]).max() / 2.0
+    max_range = np.array([x_lims.max() - x_lims.min(),
+                          y_lims.max() - y_lims.min(),
+                          z_lims.max() - z_lims.min()]).max() / 2.0
     # compute mid-point along each axis
-    mid_x = (xlims.max() + xlims.min()) * 0.5
-    mid_y = (ylims.max() + ylims.min()) * 0.5
-    mid_z = (zlims.max() + zlims.min()) * 0.5
+    mid_x = (x_lims.max() + x_lims.min()) * 0.5
+    mid_y = (y_lims.max() + y_lims.min()) * 0.5
+    mid_z = (z_lims.max() + z_lims.min()) * 0.5
 
     # set limits to axis
     ax.set_xlim(mid_x - max_range, mid_x + max_range)
