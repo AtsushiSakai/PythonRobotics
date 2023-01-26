@@ -47,7 +47,6 @@ class BipedalPlanner(object):
             return
 
         # set up plotter
-        com_trajectory_for_plot, ax = None, None
         if plot:
             fig = plt.figure()
             ax = Axes3D(fig)

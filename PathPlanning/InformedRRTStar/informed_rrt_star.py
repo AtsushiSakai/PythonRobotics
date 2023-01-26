@@ -192,7 +192,7 @@ class InformedRRTStar:
 
     @staticmethod
     def line_cost(node1, node2):
-        return math.sqrt((node1.x - node2.x) ** 2 + (node1.y - node2.y) ** 2)
+        return math.hypot(node1.x - node2.x, node1.y - node2.y)
 
     @staticmethod
     def get_nearest_list_index(nodes, rnd):
@@ -222,8 +222,7 @@ class InformedRRTStar:
         for i in nearInds:
             nearNode = self.node_list[i]
 
-            d = math.sqrt((nearNode.x - newNode.x) ** 2
-                          + (nearNode.y - newNode.y) ** 2)
+            d = math.hypot(nearNode.x - newNode.x, nearNode.y - newNode.y)
 
             s_cost = newNode.cost + d
 
