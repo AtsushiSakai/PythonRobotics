@@ -63,9 +63,9 @@ class InformedRRTStar:
         id1_t = np.array([1.0, 0.0, 0.0]).reshape(1, 3)
         m = a1 @ id1_t
         u, s, vh = np.linalg.svd(m, True, True)
-        c = np.dot(np.dot(u, np.diag(
-            [1.0, 1.0, np.linalg.det(u) * np.linalg.det(np.transpose(vh))])),
-                   vh)
+        c = u @ np.diag(
+            [1.0, 1.0,
+             np.linalg.det(u) * np.linalg.det(np.transpose(vh))]) @ vh
 
         for i in range(self.max_iter):
             # Sample space is defined by c_best
@@ -146,9 +146,9 @@ class InformedRRTStar:
         if c_max < float('inf'):
             r = [c_max / 2.0, math.sqrt(c_max ** 2 - c_min ** 2) / 2.0,
                  math.sqrt(c_max ** 2 - c_min ** 2) / 2.0]
-            l = np.diag(r)
+            rl = np.diag(r)
             x_ball = self.sample_unit_ball()
-            rnd = np.dot(np.dot(c, l), x_ball) + x_center
+            rnd = np.dot(np.dot(c, rl), x_ball) + x_center
             rnd = [rnd[(0, 0)], rnd[(1, 0)]]
         else:
             rnd = self.sample_free_space()
