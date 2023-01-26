@@ -47,7 +47,7 @@ class LQRPlanner:
             rx.append(x[0, 0] + gx)
             ry.append(x[1, 0] + gy)
 
-            d = math.sqrt((gx - rx[-1]) ** 2 + (gy - ry[-1]) ** 2)
+            d = math.hypot(gx - rx[-1], gy - ry[-1])
             if d <= self.GOAL_DIST:
                 found_path = True
                 break

@@ -45,7 +45,7 @@ def two_joint_arm(GOAL_TH=0.0, theta1=0.0, theta2=0.0):
             if x is not None and y is not None:
                 x_prev = x
                 y_prev = y
-            if np.sqrt(x**2 + y**2) > (l1 + l2):
+            if np.hypot(x, y) > (l1 + l2):
                 theta2_goal = 0
             else:
                 theta2_goal = np.arccos(

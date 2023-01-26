@@ -150,7 +150,7 @@ def calc_obstacle_map(ox, oy, resolution, vr):
             y = iy + min_y
             #  print(x, y)
             for iox, ioy in zip(ox, oy):
-                d = math.sqrt((iox - x) ** 2 + (ioy - y) ** 2)
+                d = math.hypot(iox - x, ioy - y)
                 if d <= vr / resolution:
                     obstacle_map[ix][iy] = True
                     break
