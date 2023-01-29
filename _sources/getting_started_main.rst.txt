@@ -26,7 +26,7 @@ See this paper for more details:
 Requirements
 -------------
 
--  `Python 3.10.x`_
+-  `Python 3.11.x`_
 -  `NumPy`_
 -  `SciPy`_
 -  `Matplotlib`_
@@ -40,7 +40,7 @@ For development:
 -  sphinx (for document generation)
 -  pycodestyle (for code style check)
 
-.. _`Python 3.10.x`: https://www.python.org/
+.. _`Python 3.11.x`: https://www.python.org/
 .. _`NumPy`: https://numpy.org/
 .. _`SciPy`: https://scipy.org/
 .. _`Matplotlib`: https://matplotlib.org/
