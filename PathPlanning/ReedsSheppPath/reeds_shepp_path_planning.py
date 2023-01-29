@@ -57,13 +57,13 @@ def straight_left_straight(x, y, phi):
         xd = - y / math.tan(phi) + x
         t = xd - math.tan(phi / 2.0)
         u = phi
-        v = math.sqrt((x - xd) ** 2 + y ** 2) - math.tan(phi / 2.0)
+        v = math.hypot(x - xd, y) - math.tan(phi / 2.0)
         return True, t, u, v
     elif y < 0.0 < phi < math.pi * 0.99:
         xd = - y / math.tan(phi) + x
         t = xd - math.tan(phi / 2.0)
         u = phi
-        v = -math.sqrt((x - xd) ** 2 + y ** 2) - math.tan(phi / 2.0)
+        v = -math.hypot(x - xd, y) - math.tan(phi / 2.0)
         return True, t, u, v
 
     return False, 0.0, 0.0, 0.0
@@ -103,7 +103,7 @@ def straight_curve_straight(x, y, phi, paths, step_size):
 
 
 def polar(x, y):
-    r = math.sqrt(x ** 2 + y ** 2)
+    r = math.hypot(x, y)
     theta = math.atan2(y, x)
     return r, theta
 

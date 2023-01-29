@@ -267,7 +267,7 @@ def draw_control(org_closed, goal_closed, flag, start, end, bound, obstacle):
         if node_intersect:  # a path is find
             path = get_path(org_closed, goal_closed, node_intersect[0])
             stop_loop = 1
-            print('Path is find!')
+            print('Path found!')
             if show_animation:  # draw the path
                 plt.plot(path[:, 0], path[:, 1], '-r')
                 plt.title('Robot Arrived', size=20, loc='center')

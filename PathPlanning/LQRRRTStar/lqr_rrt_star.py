@@ -179,7 +179,7 @@ class LQRRRTStar(RRTStar):
         dx = np.diff(px)
         dy = np.diff(py)
 
-        clen = [math.sqrt(idx ** 2 + idy ** 2) for (idx, idy) in zip(dx, dy)]
+        clen = [math.hypot(idx, idy) for (idx, idy) in zip(dx, dy)]
 
         return px, py, clen
 
