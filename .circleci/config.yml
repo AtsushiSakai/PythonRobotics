@@ -6,7 +6,7 @@ orbs:
 jobs:
   build_doc:
     docker:
-      - image: cimg/python:3.10
+      - image: cimg/python:3.11
     steps:
       - checkout
       - run:

@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: MacOS_CI
+name: Windows_CI
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -13,7 +13,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: windows-latest
     strategy:
       matrix:
         python-version: [ '3.11' ]
@@ -21,9 +21,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: git fetch --prune --unshallow
-
-      - name: Update bash
-        run: brew install bash
 
       - name: Setup python
         uses: actions/setup-python@v2

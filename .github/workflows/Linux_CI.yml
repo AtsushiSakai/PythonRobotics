@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ '3.10.6' ] # For mypy error Ref: https://github.com/python/mypy/issues/13627
+        python-version: [ '3.11' ]
 
     name: Python ${{ matrix.python-version }} CI
 
