@@ -34,17 +34,22 @@ Requirements
 
 For development:
 
--  pytest (for unit tests)
--  pytest-xdist (for parallel unit tests)
--  mypy (for type check)
--  sphinx (for document generation)
--  pycodestyle (for code style check)
+-  `pytest`_ (for unit tests)
+-  `pytest-xdist`_ (for parallel unit tests)
+-  `mypy`_ (for type check)
+-  `sphinx`_ (for document generation)
+-  `ruff`_ (for code style check)
 
 .. _`Python 3.11.x`: https://www.python.org/
 .. _`NumPy`: https://numpy.org/
 .. _`SciPy`: https://scipy.org/
 .. _`Matplotlib`: https://matplotlib.org/
 .. _`cvxpy`: https://www.cvxpy.org/
+.. _`pytest`: https://docs.pytest.org/en/latest/
+.. _`pytest-xdist`: https://github.com/pytest-dev/pytest-xdist
+.. _`mypy`: https://mypy-lang.org/
+.. _`sphinx`: https://www.sphinx-doc.org/en/master/index.html
+.. _`ruff`: https://github.com/charliermarsh/ruff
 
 
 How to use
