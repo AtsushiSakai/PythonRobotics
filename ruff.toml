@@ -1,0 +1,18 @@
+line-length = 88
+
+select = ["F", "E", "W", "UP"]
+ignore = ["E501", "E741"]
+exclude = [
+]
+
+# Assume Python 3.11
+target-version = "py311"
+
+[per-file-ignores]
+
+[mccabe]
+# Unlike Flake8, default to a complexity level of 10.
+max-complexity = 10
+
+[pydocstyle]
+convention = "numpy"

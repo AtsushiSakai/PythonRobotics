@@ -1,8 +1,8 @@
 """
-Diff based code style checker with flake8
+Diff code style checker with ruff
 
 This code come from:
-https://github.com/scipy/scipy/blob/main/tools/lint_diff.py
+https://github.com/scipy/scipy/blob/main/tools/lint.py
 
 Scipy's licence: https://github.com/scipy/scipy/blob/main/LICENSE.txt
 Copyright (c) 2001-2002 Enthought, Inc. 2003-2022, SciPy Developers.
@@ -37,7 +37,28 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 import conftest
+import os
 import subprocess
+
+
+CONFIG = os.path.join(
+    os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
+    'ruff.toml',
+)
+
+ROOT_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+
+
+def run_ruff(files, fix):
+    if not files:
+        return 0, ""
+    args = ['--fix'] if fix else []
+    res = subprocess.run(
+        ['ruff', f'--config={CONFIG}'] + args + files,
+        stdout=subprocess.PIPE,
+        encoding='utf-8'
+    )
+    return res.returncode, res.stdout
 
 
 def rev_list(branch, num_commits):
@@ -89,23 +110,23 @@ def find_diff(sha):
     return res.stdout
 
 
-def run_flake8(diff):
-    """Run flake8 on the given diff."""
+def diff_files(sha):
+    """Find the diff since the given SHA."""
     res = subprocess.run(
-        ['flake8', '--diff', '--ignore',
-         'E402'  # top level import for sys.path.append
-         ],
-        input=diff,
+        ['git', 'diff', '--name-only', '--diff-filter=ACMR', '-z', sha, '--',
+         '*.py', '*.pyx', '*.pxd', '*.pxi'],
         stdout=subprocess.PIPE,
-        encoding='utf-8',
+        encoding='utf-8'
     )
-    return res.returncode, res.stdout
+    res.check_returncode()
+    return [os.path.join(ROOT_DIR, f) for f in res.stdout.split('\0') if f]
 
 
 def test():
     branch_commit = find_branch_point("origin/master")
-    diff = find_diff(branch_commit)
-    rc, errors = run_flake8(diff)
+    files = diff_files(branch_commit)
+    print(files)
+    rc, errors = run_ruff(files, fix=False)
     if errors:
         print(errors)
     else:
