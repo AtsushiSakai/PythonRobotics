@@ -34,11 +34,11 @@ Requirements
 
 For development:
 
--  `pytest` (for unit tests)
--  `pytest-xdist` (for parallel unit tests)
--  `mypy` (for type check)
--  `sphinx` (for document generation)
--  `ruff` (for code style check)
+-  `pytest`_ (for unit tests)
+-  `pytest-xdist`_ (for parallel unit tests)
+-  `mypy`_ (for type check)
+-  `sphinx`_ (for document generation)
+-  `ruff`_ (for code style check)
 
 .. _`Python 3.11.x`: https://www.python.org/
 .. _`NumPy`: https://numpy.org/
