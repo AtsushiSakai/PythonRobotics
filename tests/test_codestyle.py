@@ -38,9 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 import conftest
 import os
-import sys
 import subprocess
-from argparse import ArgumentParser
 
 
 CONFIG = os.path.join(
