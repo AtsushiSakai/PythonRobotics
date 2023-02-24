@@ -280,7 +280,7 @@ def main():
             rrt_star.draw_graph()
             plt.plot([x for (x, y) in path], [y for (x, y) in path], 'r--')
             plt.grid(True)
-    plt.show()
+            plt.show()
 
 
 if __name__ == '__main__':

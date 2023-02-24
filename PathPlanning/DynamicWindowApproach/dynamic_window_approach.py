@@ -300,8 +300,7 @@ def main(gx=10.0, gy=10.0, robot_type=RobotType.circle):
     if show_animation:
         plt.plot(trajectory[:, 0], trajectory[:, 1], "-r")
         plt.pause(0.0001)
-
-    plt.show()
+        plt.show()
 
 
 if __name__ == '__main__':

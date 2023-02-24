@@ -62,8 +62,9 @@ class VisibilityRoadMap:
             for (vx, vy) in zip(cvx_list, cvy_list):
                 nodes.append(DijkstraSearch.Node(vx, vy))
 
-        for node in nodes:
-            plt.plot(node.x, node.y, "xr")
+        if self.do_plot:
+            for node in nodes:
+                plt.plot(node.x, node.y, "xr")
 
         return nodes
 

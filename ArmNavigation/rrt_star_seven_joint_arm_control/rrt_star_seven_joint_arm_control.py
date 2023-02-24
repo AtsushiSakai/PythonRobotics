@@ -79,8 +79,9 @@ class RRTStar:
         self.obstacle_list = obstacle_list
         self.connect_circle_dist = connect_circle_dist
         self.goal_node = self.Node(goal)
-        self.ax = plt.axes(projection='3d')
         self.node_list = []
+        if show_animation:
+            self.ax = plt.axes(projection='3d')
 
     def planning(self, animation=False, search_until_max_iter=False):
         """
