@@ -5,7 +5,6 @@ Author: Mahyar Abdeetedal (mahyaret)
 import math
 import random
 import numpy as np
-from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 import sys
 import pathlib
@@ -177,7 +176,7 @@ class RRTStar:
 
     def find_near_nodes(self, new_node):
         nnode = len(self.node_list) + 1
-        r = self.connect_circle_dist * math.sqrt((math.log(nnode) / nnode))
+        r = self.connect_circle_dist * math.sqrt(math.log(nnode) / nnode)
         # if expand_dist exists, search vertices in
         # a range no more than expand_dist
         if hasattr(self, 'expand_dis'):
