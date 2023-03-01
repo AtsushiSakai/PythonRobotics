@@ -30,7 +30,7 @@ SIM_LOOP = 500
 
 # Parameter
 MAX_SPEED = 50.0 / 3.6  # maximum speed [m/s]
-MAX_ACCEL = 2.0  # maximum acceleration [m/ss]
+MAX_ACCEL = 10.0  # maximum acceleration [m/ss] # Increase this value for standing start
 MAX_CURVATURE = 1.0  # maximum curvature [1/m]
 MAX_ROAD_WIDTH = 7.0  # maximum road width [m]
 D_ROAD_W = 1.0  # road width sampling length [m]
@@ -226,6 +226,25 @@ def check_paths(fplist, ob):
 
 
 def frenet_optimal_planning(csp, s0, c_speed, c_accel, c_d, c_d_d, c_d_dd, ob):
+    """
+    Parameters
+    ----------
+    csp : CubicSpline2D
+        cubic spline planner
+    s0 : float
+        current course position
+    c_speed : float
+        current speed [m/s]
+    c_accel : float
+        current acceleration [m/ss]
+    c_d : float
+        current lateral position [m]
+    c_d_d : float
+        current lateral speed [m/s]
+    c_d_dd : float
+        corrent lateral acceleration [m/s]
+    """
+
     fplist = calc_frenet_paths(c_speed, c_accel, c_d, c_d_d, c_d_dd, s0)
     fplist = calc_global_paths(fplist, csp)
     fplist = check_paths(fplist, ob)
@@ -242,6 +261,14 @@ def frenet_optimal_planning(csp, s0, c_speed, c_accel, c_d, c_d_d, c_d_dd, ob):
 
 
 def generate_target_course(x, y):
+    """
+    Parameters
+    ----------
+    x : list
+        x coordinates of waypoints
+    y : list
+        y coordinates of waypoints
+    """
     csp = cubic_spline_planner.CubicSpline2D(x, y)
     s = np.arange(0, csp.s[-1], 0.1)
 
@@ -271,9 +298,9 @@ def main():
     tx, ty, tyaw, tc, csp = generate_target_course(wx, wy)
 
     # initial state
-    c_speed = 10.0 / 3.6  # current speed [m/s]
+    c_speed = 0.0 # 10.0 / 3.6  # current speed [m/s]
     c_accel = 0.0  # current acceleration [m/ss]
-    c_d = 2.0  # current lateral position [m]
+    c_d = 0.0  # current lateral position [m]
     c_d_d = 0.0  # current lateral speed [m/s]
     c_d_dd = 0.0  # current lateral acceleration [m/s]
     s0 = 0.0  # current course position
@@ -284,12 +311,18 @@ def main():
         path = frenet_optimal_planning(
             csp, s0, c_speed, c_accel, c_d, c_d_d, c_d_dd, ob)
 
+        # Go to next state based on path
         s0 = path.s[1]
         c_d = path.d[1]
         c_d_d = path.d_d[1]
         c_d_dd = path.d_dd[1]
         c_speed = path.s_d[1]
         c_accel = path.s_dd[1]
+
+        vesc_output = (
+            c_speed, # speed TODO: scale to our range
+            path.yaw[1], # relative yaw TODO: scale to our range
+        )
 
         if np.hypot(path.x[1] - tx[-1], path.y[1] - ty[-1]) <= 1.0:
             print("Goal")
