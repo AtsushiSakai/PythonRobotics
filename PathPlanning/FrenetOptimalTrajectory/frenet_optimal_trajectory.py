@@ -32,7 +32,7 @@ SIM_LOOP = 500
 # Parameter
 MAX_SPEED = 50.0 / 3.6  # maximum speed [m/s]
 MAX_ACCEL = 10.0  # maximum acceleration [m/ss] # Increase this value for standing start
-MAX_CURVATURE = 1.0  # maximum curvature [1/m]
+MAX_CURVATURE = 5.0  # maximum curvature [1/m]  # Increase this value to run the demo
 MAX_ROAD_WIDTH = 7.0  # maximum road width [m]
 D_ROAD_W = 1.0  # road width sampling length [m]
 DT = 0.2  # time tick [s]
@@ -229,17 +229,21 @@ def check_paths(fplist, og):
     for i, _ in enumerate(fplist):
         # t0 = time.time()
         if any([v > MAX_SPEED for v in fplist[i].s_d]):  # Max speed check
+            # print("max speed check fails")
             continue
         # t1 = time.time()
         if any([abs(a) > MAX_ACCEL for a in
                   fplist[i].s_dd]):  # Max accel check
+            # print("max accel check fails")
             continue
         # t2 = time.time()
         if any([abs(c) > MAX_CURVATURE for c in
                   fplist[i].c]):  # Max curvature check
+            # print("max curvature check fails")
             continue
         # t3 = time.time()
         if not check_collision_og(fplist[i], og):
+            # print("collision check fails")
             continue
         # t4 = time.time()
         # print(f"max speed: {(t1 - t0):3f} max accel: {(t2 - t1):3f} max curve: {(t3 - t2):3f} collision: {(t4 - t3):3f}")
@@ -330,6 +334,18 @@ def main():
         50,
         50,
         50,
+        50,
+        30,
+        10,
+        -10,
+        -30,
+        -30,
+        -30,
+        -30,
+        -30,
+        -10,
+        10,
+        # 10,
     ]
     wy = [
         10,
@@ -340,7 +356,19 @@ def main():
         10,
         10,
         30,
-        50
+        50,
+        70,
+        70,
+        70,
+        70,
+        70,
+        50,
+        30,
+        10,
+        -10,
+        -15,
+        -10,
+        # 10,
     ]
     # obstacle lists
     # set obstacle positions
@@ -374,6 +402,9 @@ def main():
         oy.append(-20)
     ob = np.stack([ox, oy], axis=-1)
 
+    # Add an obstacle in the middle of the track and path
+    ob = np.append(ob, [[30, 70], [29, 69]], axis=0)
+
     # create occupancy grid
     ob_og_x_offset, ob_og_y_offset = 40, 40
     og = np.zeros((200, 200))
@@ -391,7 +422,7 @@ def main():
     c_d_dd = 0.0  # current lateral acceleration [m/s]
     s0 = 0.0  # current course position
 
-    area = 70.0  # animation area length [m]
+    area = 60.0  # animation area length [m]
 
     for i in range(SIM_LOOP):
         path = frenet_optimal_planning(
@@ -409,7 +440,6 @@ def main():
             c_speed, # speed TODO: scale to our range
             path.yaw[1], # yaw (relative to world or starting postion) TODO: scale to our range
         )
-        print(vesc_output)
 
         if np.hypot(path.x[1] - tx[-1], path.y[1] - ty[-1]) <= 1.0:
             print("Goal")
@@ -421,13 +451,14 @@ def main():
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
+            plt.plot(wx, wy, "-og")
             plt.plot(tx, ty)
             plt.plot(ob[:, 0], ob[:, 1], "xk")
             plt.plot(path.x[1:], path.y[1:], "-or")
             plt.plot(path.x[1], path.y[1], "vc")
             plt.xlim(path.x[1] - area, path.x[1] + area)
             plt.ylim(path.y[1] - area, path.y[1] + area)
-            plt.title("v[km/h]:" + str(c_speed * 3.6)[0:4])
+            plt.title(f"v[m/s]: {c_speed:0.3f} | yaw: {path.yaw[1]:0.3f}")
             plt.grid(True)
             plt.pause(0.0001)
 
