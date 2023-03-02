@@ -20,6 +20,7 @@ import copy
 import math
 import sys
 import pathlib
+import time
 sys.path.append(str(pathlib.Path(__file__).parent.parent))
 
 from QuinticPolynomialsPlanner.quintic_polynomials_planner import \
@@ -206,26 +207,49 @@ def check_collision(fp, ob):
     return True
 
 
-def check_paths(fplist, ob):
+def check_collision_og(fp, og):
+    for ix, iy in zip(fp.x, fp.y):
+        x = int(ix) + 40
+        y = int(iy) + 40
+
+        collision = any([
+            og[x + xf, y + yf]
+            for xf in range(-int(ROBOT_RADIUS) - 1, int(ROBOT_RADIUS) + 2)
+            for yf in range(-int(ROBOT_RADIUS) - 1, int(ROBOT_RADIUS) + 2)
+        ])
+
+        if collision:
+            return False
+
+    return True
+
+
+def check_paths(fplist, og):
     ok_ind = []
     for i, _ in enumerate(fplist):
+        # t0 = time.time()
         if any([v > MAX_SPEED for v in fplist[i].s_d]):  # Max speed check
             continue
-        elif any([abs(a) > MAX_ACCEL for a in
+        # t1 = time.time()
+        if any([abs(a) > MAX_ACCEL for a in
                   fplist[i].s_dd]):  # Max accel check
             continue
-        elif any([abs(c) > MAX_CURVATURE for c in
+        # t2 = time.time()
+        if any([abs(c) > MAX_CURVATURE for c in
                   fplist[i].c]):  # Max curvature check
             continue
-        elif not check_collision(fplist[i], ob):
+        # t3 = time.time()
+        if not check_collision_og(fplist[i], og):
             continue
-
+        # t4 = time.time()
+        # print(f"max speed: {(t1 - t0):3f} max accel: {(t2 - t1):3f} max curve: {(t3 - t2):3f} collision: {(t4 - t3):3f}")
         ok_ind.append(i)
+
 
     return [fplist[i] for i in ok_ind]
 
 
-def frenet_optimal_planning(csp, s0, c_speed, c_accel, c_d, c_d_d, c_d_dd, ob):
+def frenet_optimal_planning(csp, s0, c_speed, c_accel, c_d, c_d_d, c_d_dd, og):
     """
     Parameters
     ----------
@@ -244,10 +268,13 @@ def frenet_optimal_planning(csp, s0, c_speed, c_accel, c_d, c_d_d, c_d_dd, ob):
     c_d_dd : float
         corrent lateral acceleration [m/s]
     """
-
+    # t0 = time.time()
     fplist = calc_frenet_paths(c_speed, c_accel, c_d, c_d_d, c_d_dd, s0)
+    # t1 = time.time()
     fplist = calc_global_paths(fplist, csp)
-    fplist = check_paths(fplist, ob)
+    # t2 = time.time()
+    fplist = check_paths(fplist, og)
+    # t3 = time.time()
 
     # find minimum cost path
     min_cost = float("inf")
@@ -256,6 +283,9 @@ def frenet_optimal_planning(csp, s0, c_speed, c_accel, c_d, c_d_d, c_d_dd, ob):
         if min_cost >= fp.cf:
             min_cost = fp.cf
             best_path = fp
+    # t4 = time.time()
+
+    # print(f"calc_frenet_paths: {(t1 - t0):3f} calc_global_paths: {(t2 - t1):3f} check_paths: {(t3 - t2):3f} min_cost_path: {(t4 - t3):3f}")
 
     return best_path
 
@@ -286,14 +316,70 @@ def generate_target_course(x, y):
 def main():
     print(__file__ + " start!!")
 
-    # way points (from AStar)
-    wx = [140.0, 140.0, 130.0, 130.0, 120.0, 120.0, 120.0, 120.0, 120.0, 120.0][::-1]
-    wy = [210.0, 200.0, 190.0, 180.0, 170.0, 160.0, 150.0, 140.0, 130.0, 120.0][::-1]
+    # # way points (from AStar)
+    # wx = [140.0, 140.0, 130.0, 130.0, 120.0, 120.0, 120.0, 120.0, 120.0, 120.0][::-1]
+    # wy = [210.0, 200.0, 190.0, 180.0, 170.0, 160.0, 150.0, 140.0, 130.0, 120.0][::-1]
+    # way points
+    wx = [
+        10,
+        10,
+        10,
+        30,
+        30,
+        30,
+        50,
+        50,
+        50,
+    ]
+    wy = [
+        10,
+        30,
+        50,
+        50,
+        30,
+        10,
+        10,
+        30,
+        50
+    ]
     # obstacle lists
-    ob = np.array([
-        [120.0, 160.0],
-        [129.5, 189.5],
-    ])
+    # set obstacle positions
+    ox, oy = [], []
+    for i in range(20, 60, 2):
+        ox.append(i)
+        oy.append(-10.0)
+    for i in range(-10, 80, 2):
+        ox.append(60.0)
+        oy.append(i)
+    for i in range(-10, 40, 2):
+        ox.append(i)
+        oy.append(60.0)
+    for i in range(-10, 61, 2):
+        ox.append(-10.0)
+        oy.append(i)
+    for i in range(-20, 40, 2):
+        ox.append(20.0)
+        oy.append(i)
+    for i in range(0, 40, 2):
+        ox.append(40.0)
+        oy.append(60.0 - i)
+    for i in range(-20, 80, 2):
+        ox.append(-40)
+        oy.append(i)
+    for i in range(-40, 61, 2):
+        ox.append(i)
+        oy.append(80)
+    for i in range(-40, 20, 2):
+        ox.append(i)
+        oy.append(-20)
+    ob = np.stack([ox, oy], axis=-1)
+
+    # create occupancy grid
+    ob_og_x_offset, ob_og_y_offset = 40, 40
+    og = np.zeros((200, 200))
+    for i in range(len(ob)):
+        xi, yi = ob[i]
+        og[int(xi + ob_og_x_offset), int(yi + ob_og_y_offset)] = 1.0
 
     tx, ty, tyaw, tc, csp = generate_target_course(wx, wy)
 
@@ -305,11 +391,11 @@ def main():
     c_d_dd = 0.0  # current lateral acceleration [m/s]
     s0 = 0.0  # current course position
 
-    area = 20.0  # animation area length [m]
+    area = 70.0  # animation area length [m]
 
     for i in range(SIM_LOOP):
         path = frenet_optimal_planning(
-            csp, s0, c_speed, c_accel, c_d, c_d_d, c_d_dd, ob)
+            csp, s0, c_speed, c_accel, c_d, c_d_d, c_d_dd, og)
 
         # Go to next state based on path
         s0 = path.s[1]
@@ -321,8 +407,9 @@ def main():
 
         vesc_output = (
             c_speed, # speed TODO: scale to our range
-            path.yaw[1], # relative yaw TODO: scale to our range
+            path.yaw[1], # yaw (relative to world or starting postion) TODO: scale to our range
         )
+        print(vesc_output)
 
         if np.hypot(path.x[1] - tx[-1], path.y[1] - ty[-1]) <= 1.0:
             print("Goal")
