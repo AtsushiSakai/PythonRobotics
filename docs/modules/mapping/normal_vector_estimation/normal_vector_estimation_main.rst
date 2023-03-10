@@ -22,8 +22,20 @@ where
 .. math:: v2 = p3 - p1
 
 
+.. figure:: normal_vector_calc.png
+
+API
+=====
+
+.. autofunction:: Mapping.normal_vector_estimation.normal_vector_estimation.calc_normal_vector
 
 Normal vector estimation with RANdam SAmpling Consensus(RANSAC)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. figure:: ransac_normal_vector_estimation.png
+
+API
+=====
+
+.. autofunction:: Mapping.normal_vector_estimation.normal_vector_estimation.ransac_normal_vector_estimation
 
