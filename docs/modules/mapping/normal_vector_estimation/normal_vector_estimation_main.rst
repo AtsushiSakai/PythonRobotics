@@ -11,9 +11,15 @@ A 3D point is as a vector:
 
 When there are 3 points in 3D space, p1, p2, p3,
 
-we can calculate a normal vector n of a 3D triangle which is consisted of p1, p2, p3.
+we can calculate a normal vector n of a 3D triangle which is consisted of the points.
 
+.. math:: n = v1 \times v2
 
+where
+
+.. math:: v1 = p2 - p1
+
+.. math:: v2 = p3 - p1
 
 
 
