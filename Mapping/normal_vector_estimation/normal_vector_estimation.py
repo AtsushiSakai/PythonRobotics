@@ -8,12 +8,16 @@ def calc_normal_vector(p1, p2, p3):
     """Calculate normal vector of triangle
 
     Args:
-        p1 (np.array): 3D point
-        p2 (np.array): 3D point
-        p3 (np.array): 3D point
+        p1: np.array
+            3D point
+        p2: np.array
+            3D point
+        p3: np.array
+            3D point
 
     Returns:
-        np.array: normal vector (3,)
+        normal_vector: np.array
+            normal vector (3,)
     """
     # calculate two vectors of triangle
     v1 = p2 - p1
@@ -61,19 +65,23 @@ def ransac_normal_vector_estimation(points_3d, inlier_radio_th=0.7,
 
     Parameters
     ----------
-    points_3d (np.array) : 3D points (N, 3)
-    inlier_radio_th : Inlier ratio threshold. If inlier ratio is larger
-                       than this value, the iteration is stopped. Default is
-                       0.7.
-    inlier_dist: Inlier distance threshold. If distance between points and
-                   estimated plane is smaller than this value, the point is
-                   inlier. Default is 0.1.
-    max_iter: Number of maximum iteration. Default is 1000.
+    points_3d: np.array
+        3D points (N, 3)
+    inlier_radio_th: float
+        Inlier ratio threshold. If inlier ratio is larger than this value,
+        the iteration is stopped. Default is 0.7.
+    inlier_dist: float
+        Inlier distance threshold. If distance between points and estimated
+        plane is smaller than this value, the point is inlier. Default is 0.1.
+    max_iter: int
+        Number of maximum iteration. Default is 1000.
 
     Returns
     -------
-    np.array : center vector Center of estimated plane. (3,)
-    np.array : normal_vector Normal vector of estimated plane. (3,)
+    center_vector: np.array
+        Center of estimated plane. (3,)
+    normal_vector: np.array
+        Normal vector of estimated plane. (3,)
 
     """
     center = np.mean(points_3d, axis=0)
