@@ -16,7 +16,7 @@ def calc_normal_vector(p1, p2, p3):
             3D point
 
     Returns:
-        normal_vector: np.array
+        normal_vector : np.array
             normal vector (3,)
     """
     # calculate two vectors of triangle
