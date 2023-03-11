@@ -33,6 +33,30 @@ API
 Normal vector estimation with RANdam SAmpling Consensus(RANSAC)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Consider the problem of estimating the normal vector of a plane based on a
+set of N 3D points where a plane can be observed.
+
+There is a way that uses all point cloud data to estimate a plane and
+a normal vector using the `least-squares method <https://stackoverflow.com/a/44315221/8387766>`_
+
+However, this method is vulnerable to noise of the point cloud.
+
+In this document, we will use a method that uses
+`RANdam SAmpling Consensus(RANSAC) <https://en.wikipedia.org/wiki/Random_sample_consensus>`_
+to estimate a plane and a normal vector.
+
+This method is as follows:
+
+#. Select 3 points randomly from the point cloud.
+
+#. Calculate a normal vector of a plane which is consists of the sampled 3 points.
+
+#. Calculate the distance between the calculated plane and the all point cloud.
+
+#. If the distance is less than a threshold, the point is considered to be an inlier.
+
+#. Repeat the above steps until the inlier ratio is greater than a threshold.
+
 
 
 This is an example of RANSAC based normal vector estimation:

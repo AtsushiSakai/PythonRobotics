@@ -13,7 +13,7 @@ def calc_normal_vector(p1, p2, p3):
         p3 (np.array): 3D point
 
     Returns:
-        np.array: normal vector
+        np.array: normal vector (3,)
     """
     # calculate two vectors of triangle
     v1 = p2 - p1
@@ -54,26 +54,26 @@ def distance_to_plane(point, normal, origin):
         return distance
 
 
-def ransac_normal_vector_estimation(points_3d, inliner_radio_th=0.7,
-                                    inliner_dist=0.1, max_iter=1000):
+def ransac_normal_vector_estimation(points_3d, inlier_radio_th=0.7,
+                                    inlier_dist=0.1, max_iter=1000):
     """
     RANSAC based normal vector estimation
 
     Parameters
     ----------
     points_3d (np.array) : 3D points (N, 3)
-    inliner_radio_th : Inliner ratio threshold. If inliner ratio is larger
+    inlier_radio_th : Inlier ratio threshold. If inlier ratio is larger
                        than this value, the iteration is stopped. Default is
                        0.7.
-    inliner_dist : Inliner distance threshold. If distance between points and
+    inlier_dist: Inlier distance threshold. If distance between points and
                    estimated plane is smaller than this value, the point is
-                   inliner. Default is 0.1.
-    max_iter : Number of maximum iteration. Default is 1000.
+                   inlier. Default is 0.1.
+    max_iter: Number of maximum iteration. Default is 1000.
 
     Returns
     -------
-    center (np.array) : Center of estimated plane. (3,)
-    normal_vector (np.array) : Normal vector of estimated plane. (3,)
+    np.array : center vector Center of estimated plane. (3,)
+    np.array : normal_vector Normal vector of estimated plane. (3,)
 
     """
     center = np.mean(points_3d, axis=0)
@@ -88,15 +88,15 @@ def ransac_normal_vector_estimation(points_3d, inliner_radio_th=0.7,
         p3 = sampled_points[2, :]
         normal_vector = calc_normal_vector(p1, p2, p3)
 
-        # calc inliner ratio
+        # calc inlier ratio
         n_inliner = 0
         for i in range(points_3d.shape[0]):
             p = points_3d[i, :]
-            if distance_to_plane(p, normal_vector, center) <= inliner_dist:
+            if distance_to_plane(p, normal_vector, center) <= inlier_dist:
                 n_inliner += 1
-        inliner_ratio = n_inliner / points_3d.shape[0]
-        print(f"Iter:{ite}, {inliner_ratio=}")
-        if inliner_ratio > inliner_radio_th:
+        inlier_ratio = n_inliner / points_3d.shape[0]
+        print(f"Iter:{ite}, {inlier_ratio=}")
+        if inlier_ratio > inlier_radio_th:
             return center, normal_vector
 
     return center, None
@@ -137,7 +137,7 @@ def main2():
     print(f"{points_3d.shape=}")
 
     center, estimated_normal = ransac_normal_vector_estimation(
-        points_3d, inliner_dist=noise_scale)
+        points_3d, inlier_dist=noise_scale)
 
     if estimated_normal is None:
         print("Failed to estimate normal vector")
