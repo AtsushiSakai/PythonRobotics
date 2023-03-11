@@ -55,11 +55,30 @@ def distance_to_plane(point, normal, origin):
 
 
 def ransac_normal_vector_estimation(points_3d, inliner_radio_th=0.7,
-                                    inliner_dist=0.1, n_iter=1000):
+                                    inliner_dist=0.1, max_iter=1000):
+    """
+    RANSAC based normal vector estimation
 
+    Parameters
+    ----------
+    points_3d (np.array) : 3D points (N, 3)
+    inliner_radio_th : Inliner ratio threshold. If inliner ratio is larger
+                       than this value, the iteration is stopped. Default is
+                       0.7.
+    inliner_dist : Inliner distance threshold. If distance between points and
+                   estimated plane is smaller than this value, the point is
+                   inliner. Default is 0.1.
+    max_iter : Number of maximum iteration. Default is 1000.
+
+    Returns
+    -------
+    center (np.array) : Center of estimated plane. (3,)
+    normal_vector (np.array) : Normal vector of estimated plane. (3,)
+
+    """
     center = np.mean(points_3d, axis=0)
 
-    for ite in range(n_iter):
+    for ite in range(max_iter):
         # Random sampling
         sampled_ids = np.random.choice(points_3d.shape[0], size=3,
                                        replace=False)
@@ -114,6 +133,8 @@ def main2():
     points_3d = sample_3d_points_from_a_plane(num_samples, true_normal)
     # add random noise
     points_3d += np.random.normal(size=points_3d.shape, scale=noise_scale)
+
+    print(f"{points_3d.shape=}")
 
     center, estimated_normal = ransac_normal_vector_estimation(
         points_3d, inliner_dist=noise_scale)

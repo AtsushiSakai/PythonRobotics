@@ -21,6 +21,7 @@ where
 
 .. math:: v2 = p3 - p1
 
+This is an example of normal vector calculation:
 
 .. figure:: normal_vector_calc.png
 
@@ -31,6 +32,10 @@ API
 
 Normal vector estimation with RANdam SAmpling Consensus(RANSAC)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+This is an example of RANSAC based normal vector estimation:
 
 .. figure:: ransac_normal_vector_estimation.png
 
