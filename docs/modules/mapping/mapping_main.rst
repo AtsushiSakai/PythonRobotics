@@ -13,4 +13,4 @@ Mapping
    k_means_object_clustering/k_means_object_clustering
    circle_fitting/circle_fitting
    rectangle_fitting/rectangle_fitting
-
+   normal_vector_estimation/normal_vector_estimation

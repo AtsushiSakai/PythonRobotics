@@ -186,7 +186,7 @@ class RRTStar(RRT):
                     radius r
         """
         nnode = len(self.node_list) + 1
-        r = self.connect_circle_dist * math.sqrt((math.log(nnode) / nnode))
+        r = self.connect_circle_dist * math.sqrt(math.log(nnode) / nnode)
         # if expand_dist exists, search vertices in a range no more than
         # expand_dist
         if hasattr(self, 'expand_dis'):
@@ -280,7 +280,7 @@ def main():
             rrt_star.draw_graph()
             plt.plot([x for (x, y) in path], [y for (x, y) in path], 'r--')
             plt.grid(True)
-    plt.show()
+            plt.show()
 
 
 if __name__ == '__main__':
