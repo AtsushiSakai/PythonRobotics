@@ -45,7 +45,11 @@ In this document, we will use a method that uses
 `RANdam SAmpling Consensus(RANSAC) <https://en.wikipedia.org/wiki/Random_sample_consensus>`_
 to estimate a plane and a normal vector.
 
-This method is as follows:
+RANSAC is a robust estimation methods for data set with outliers.
+
+
+
+This RANSAC based normal vector estimation method is as follows:
 
 #. Select 3 points randomly from the point cloud.
 

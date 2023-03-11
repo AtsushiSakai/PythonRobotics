@@ -62,7 +62,7 @@ def distance_to_plane(point, normal, origin):
 
 
 def ransac_normal_vector_estimation(points_3d, inlier_radio_th=0.7,
-                                    inlier_dist=0.1, max_iter=1000):
+                                    inlier_dist=0.1, p=0.99):
     """
     RANSAC based normal vector estimation
 
@@ -76,8 +76,10 @@ def ransac_normal_vector_estimation(points_3d, inlier_radio_th=0.7,
     inlier_dist : float
         Inlier distance threshold. If distance between points and estimated
         plane is smaller than this value, the point is inlier. Default is 0.1.
-    max_iter : int
-        Number of maximum iteration. Default is 1000.
+    p : float
+         Probability that at least one of the sets of random samples does not
+         include an outlier. If this probability is near 1, the iteration
+         number is large. Default is 0.99.
 
     Returns
     -------
@@ -88,6 +90,8 @@ def ransac_normal_vector_estimation(points_3d, inlier_radio_th=0.7,
 
     """
     center = np.mean(points_3d, axis=0)
+
+    max_iter = np.log(1.0-p)/np.log(1.0-(1.0-inlier_radio_th)**3)
 
     for ite in range(max_iter):
         # Random sampling
