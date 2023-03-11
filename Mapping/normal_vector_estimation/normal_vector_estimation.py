@@ -3,6 +3,8 @@ from matplotlib import pyplot as plt
 
 from utils.plot import plot_3d_vector_arrow, plot_triangle, set_equal_3d_axis
 
+show_animation = True
+
 
 def calc_normal_vector(p1, p2, p3):
     """Calculate normal vector of triangle
@@ -91,7 +93,7 @@ def ransac_normal_vector_estimation(points_3d, inlier_radio_th=0.7,
     """
     center = np.mean(points_3d, axis=0)
 
-    max_iter = np.log(1.0-p)/np.log(1.0-(1.0-inlier_radio_th)**3)
+    max_iter = int(np.floor(np.log(1.0-p)/np.log(1.0-(1.0-inlier_radio_th)**3)))
 
     for ite in range(max_iter):
         # Random sampling
@@ -122,24 +124,22 @@ def main1():
     p2 = np.array([1.0, 1.0, 0.0])
     p3 = np.array([0.0, 1.0, 0.0])
 
-    fig = plt.figure()
-    ax = fig.add_subplot(projection='3d')
-
-    set_equal_3d_axis(ax, [0.0, 2.5], [0.0, 2.5], [0.0, 3.0])
-
-    plot_triangle(p1, p2, p3, ax)
     center = np.mean([p1, p2, p3], axis=0)
-    ax.plot(center[0], center[1], center[2], "ro")
-
     normal_vector = calc_normal_vector(p1, p2, p3)
     print(f"{center=}")
     print(f"{normal_vector=}")
-    plot_3d_vector_arrow(ax, center, center + normal_vector)
 
-    plt.show()
+    if show_animation:
+        fig = plt.figure()
+        ax = fig.add_subplot(projection='3d')
+        set_equal_3d_axis(ax, [0.0, 2.5], [0.0, 2.5], [0.0, 3.0])
+        plot_triangle(p1, p2, p3, ax)
+        ax.plot(center[0], center[1], center[2], "ro")
+        plot_3d_vector_arrow(ax, center, center + normal_vector)
+        plt.show()
 
 
-def main2():
+def main2(rng=None):
     true_normal = np.array([0, 1, 1])
     true_normal = true_normal / np.linalg.norm(true_normal)
     num_samples = 100
@@ -161,15 +161,15 @@ def main2():
     print(f"{true_normal=}")
     print(f"{estimated_normal=}")
 
-    fig = plt.figure()
-    ax = fig.add_subplot(projection='3d')
-    ax.plot(points_3d[:, 0], points_3d[:, 1], points_3d[:, 2], ".r")
-    plot_3d_vector_arrow(ax, center, center + true_normal)
-    plot_3d_vector_arrow(ax, center, center + estimated_normal)
-    set_equal_3d_axis(ax, [-3.0, 3.0], [-3.0, 3.0], [-3.0, 3.0])
-    plt.title("RANSAC based Normal vector estimation")
-
-    plt.show()
+    if show_animation:
+        fig = plt.figure()
+        ax = fig.add_subplot(projection='3d')
+        ax.plot(points_3d[:, 0], points_3d[:, 1], points_3d[:, 2], ".r")
+        plot_3d_vector_arrow(ax, center, center + true_normal)
+        plot_3d_vector_arrow(ax, center, center + estimated_normal)
+        set_equal_3d_axis(ax, [-3.0, 3.0], [-3.0, 3.0], [-3.0, 3.0])
+        plt.title("RANSAC based Normal vector estimation")
+        plt.show()
 
 
 if __name__ == '__main__':
