@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Normal vector estimation &mdash; PythonRobotics  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="SLAM" href="../../slam/slam.html" />
+    <link rel="prev" title="Object shape recognition using rectangle fitting" href="../rectangle_fitting/rectangle_fitting.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+            <a href="../../../index.html" class="icon icon-home"> PythonRobotics
+            <img src="../../../_static/icon.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9612347954373886"
+     crossorigin="anonymous"></script>
+<!-- PythonRoboticsDoc -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-9612347954373886"
+     data-ad-slot="1579532132"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../localization/localization.html">Localization</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../mapping.html">Mapping</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../gaussian_grid_map/gaussian_grid_map.html">Gaussian grid map</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ray_casting_grid_map/ray_casting_grid_map.html">Ray casting grid map</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lidar_to_grid_map_tutorial/lidar_to_grid_map_tutorial.html">Lidar to grid map</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../point_cloud_sampling/point_cloud_sampling.html">Point cloud Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../k_means_object_clustering/k_means_object_clustering.html">k-means object clustering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../circle_fitting/circle_fitting.html">Object shape recognition using circle fitting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rectangle_fitting/rectangle_fitting.html">Object shape recognition using rectangle fitting</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Normal vector estimation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#normal-vector-calculation-of-a-3d-triangle">Normal vector calculation of a 3D triangle</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#api">API</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#normal-vector-estimation-with-randam-sampling-consensus-ransac">Normal vector estimation with RANdam SAmpling Consensus(RANSAC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../slam/slam.html">SLAM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_planning/path_planning.html">Path Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_tracking/path_tracking.html">Path Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../arm_navigation/arm_navigation.html">Arm Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../aerial_navigation/aerial_navigation.html">Aerial Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bipedal/bipedal.html">Bipedal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utils/utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../appendix/appendix.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how_to_contribute.html">How To Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PythonRobotics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../mapping.html">Mapping</a> &raquo;</li>
+      <li>Normal vector estimation</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/AtsushiSakai/PythonRobotics/blob/master/docs/modules/mapping/normal_vector_estimation/normal_vector_estimation_main.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="normal-vector-estimation">
+<h1>Normal vector estimation<a class="headerlink" href="#normal-vector-estimation" title="Permalink to this headline"></a></h1>
+<section id="normal-vector-calculation-of-a-3d-triangle">
+<h2>Normal vector calculation of a 3D triangle<a class="headerlink" href="#normal-vector-calculation-of-a-3d-triangle" title="Permalink to this headline"></a></h2>
+<p>A 3D point is as a vector:</p>
+<div class="math notranslate nohighlight">
+\[p = [x, y, z]\]</div>
+<p>When there are 3 points in 3D space, <span class="math notranslate nohighlight">\(p_1, p_2, p_3\)</span>,</p>
+<p>we can calculate a normal vector n of a 3D triangle which is consisted of the points.</p>
+<div class="math notranslate nohighlight">
+\[n = \frac{v1 \times v2}{|v1 \times v2|}\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[v1 = p2 - p1\]</div>
+<div class="math notranslate nohighlight">
+\[v2 = p3 - p1\]</div>
+<p>This is an example of normal vector calculation:</p>
+<figure class="align-default">
+<img alt="../../../_images/normal_vector_calc.png" src="../../../_images/normal_vector_calc.png" />
+</figure>
+<section id="api">
+<h3>API<a class="headerlink" href="#api" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="Mapping.normal_vector_estimation.normal_vector_estimation.calc_normal_vector">
+<span class="sig-prename descclassname"><span class="pre">Mapping.normal_vector_estimation.normal_vector_estimation.</span></span><span class="sig-name descname"><span class="pre">calc_normal_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/Mapping/normal_vector_estimation/normal_vector_estimation.html#calc_normal_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mapping.normal_vector_estimation.normal_vector_estimation.calc_normal_vector" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate normal vector of triangle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p1</strong> (<em>np.array</em>) – 3D point</p></li>
+<li><p><strong>p2</strong> (<em>np.array</em>) – 3D point</p></li>
+<li><p><strong>p3</strong> (<em>np.array</em>) – 3D point</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>normal_vector</strong> – normal vector (3,)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+<section id="normal-vector-estimation-with-randam-sampling-consensus-ransac">
+<h2>Normal vector estimation with RANdam SAmpling Consensus(RANSAC)<a class="headerlink" href="#normal-vector-estimation-with-randam-sampling-consensus-ransac" title="Permalink to this headline"></a></h2>
+<p>Consider the problem of estimating the normal vector of a plane based on a
+set of N 3D points where a plane can be observed.</p>
+<p>There is a way that uses all point cloud data to estimate a plane and
+a normal vector using the <a class="reference external" href="https://stackoverflow.com/a/44315221/8387766">least-squares method</a></p>
+<p>However, this method is vulnerable to noise of the point cloud.</p>
+<p>In this document, we will use a method that uses
+<a class="reference external" href="https://en.wikipedia.org/wiki/Random_sample_consensus">RANdam SAmpling Consensus(RANSAC)</a>
+to estimate a plane and a normal vector.</p>
+<p>RANSAC is a robust estimation methods for data set with outliers.</p>
+<p>This RANSAC based normal vector estimation method is as follows:</p>
+<ol class="arabic simple">
+<li><p>Select 3 points randomly from the point cloud.</p></li>
+<li><p>Calculate a normal vector of a plane which is consists of the sampled 3 points.</p></li>
+<li><p>Calculate the distance between the calculated plane and the all point cloud.</p></li>
+<li><p>If the distance is less than a threshold, the point is considered to be an inlier.</p></li>
+<li><p>Repeat the above steps until the inlier ratio is greater than a threshold.</p></li>
+</ol>
+<p>This is an example of RANSAC based normal vector estimation:</p>
+<figure class="align-default">
+<img alt="../../../_images/ransac_normal_vector_estimation.png" src="../../../_images/ransac_normal_vector_estimation.png" />
+</figure>
+<section id="id1">
+<h3>API<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="Mapping.normal_vector_estimation.normal_vector_estimation.ransac_normal_vector_estimation">
+<span class="sig-prename descclassname"><span class="pre">Mapping.normal_vector_estimation.normal_vector_estimation.</span></span><span class="sig-name descname"><span class="pre">ransac_normal_vector_estimation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points_3d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inlier_radio_th</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inlier_dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.99</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/Mapping/normal_vector_estimation/normal_vector_estimation.html#ransac_normal_vector_estimation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mapping.normal_vector_estimation.normal_vector_estimation.ransac_normal_vector_estimation" title="Permalink to this definition"></a></dt>
+<dd><p>RANSAC based normal vector estimation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>points_3d</strong> (<em>np.array</em>) – 3D points (N, 3)</p></li>
+<li><p><strong>inlier_radio_th</strong> (<em>float</em>) – Inlier ratio threshold. If inlier ratio is larger than this value,
+the iteration is stopped. Default is 0.7.</p></li>
+<li><p><strong>inlier_dist</strong> (<em>float</em>) – Inlier distance threshold. If distance between points and estimated
+plane is smaller than this value, the point is inlier. Default is 0.1.</p></li>
+<li><p><strong>p</strong> (<em>float</em>) – Probability that at least one of the sets of random samples does not
+include an outlier. If this probability is near 1, the iteration
+number is large. Default is 0.99.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>center_vector</strong> (<em>np.array</em>) – Center of estimated plane. (3,)</p></li>
+<li><p><strong>normal_vector</strong> (<em>np.array</em>) – Normal vector of estimated plane. (3,)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../rectangle_fitting/rectangle_fitting.html" class="btn btn-neutral float-left" title="Object shape recognition using rectangle fitting" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../slam/slam.html" class="btn btn-neutral float-right" title="SLAM" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2021, Atsushi Sakai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
