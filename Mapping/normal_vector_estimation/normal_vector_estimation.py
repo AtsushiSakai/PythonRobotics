@@ -7,17 +7,20 @@ from utils.plot import plot_3d_vector_arrow, plot_triangle, set_equal_3d_axis
 def calc_normal_vector(p1, p2, p3):
     """Calculate normal vector of triangle
 
-    Args:
-        p1 : np.array
-            3D point
-        p2 : np.array
-            3D point
-        p3 : np.array
-            3D point
+    Parameters
+    ----------
+    p1 : np.array
+        3D point
+    p2 : np.array
+        3D point
+    p3 : np.array
+        3D point
 
-    Returns:
-        normal_vector : np.array
-            normal vector (3,)
+    Returns
+    -------
+    normal_vector : np.array
+        normal vector (3,)
+
     """
     # calculate two vectors of triangle
     v1 = p2 - p1
