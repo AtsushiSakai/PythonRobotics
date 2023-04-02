@@ -6,6 +6,10 @@ def test1():
     m.show_animation = False
     m.main(max_iter=5)
 
+def test2():
+    m.show_animation = False
+    m.main(max_iter=30, random_seed=8)
+    
 
 if __name__ == '__main__':
     conftest.run_this_test(__file__)
