@@ -165,7 +165,7 @@ class RRTStarReedsShepp(RRTStar):
         new_node.parent = from_node
 
         return new_node
-    
+
     def rewire(self, new_node, near_inds):
         for i in near_inds:
             near_node = self.node_list[i]
