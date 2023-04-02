@@ -3,6 +3,7 @@
 Path planning Sample Code with RRT with Reeds-Shepp path
 
 author: AtsushiSakai(@Atsushi_twi)
+        RyderCRD (SUSTech EEE5058)
 
 """
 import copy

@@ -2,7 +2,8 @@
 
 Reeds Shepp path planner sample code
 
-author Atsushi Sakai(@Atsushi_twi)
+author: Atsushi Sakai(@Atsushi_twi)
+        RyderCRD (SUSTech EEE5058)
 
 """
 import math
