@@ -165,6 +165,28 @@ class RRTStarReedsShepp(RRTStar):
         new_node.parent = from_node
 
         return new_node
+    
+    def rewire(self, new_node, near_inds):
+        for i in near_inds:
+            near_node = self.node_list[i]
+            edge_node = self.steer(new_node, near_node)
+            if not edge_node:
+                continue
+            edge_node.cost = self.calc_new_cost(new_node, near_node)
+
+            no_collision = self.check_collision(
+                edge_node, self.obstacle_list, self.robot_radius)
+            improved_cost = near_node.cost > edge_node.cost
+
+            if no_collision and improved_cost:
+                near_node.x = edge_node.x
+                near_node.y = edge_node.y
+                near_node.cost = edge_node.cost
+                near_node.path_x = edge_node.path_x
+                near_node.path_y = edge_node.path_y
+                near_node.path_yaw = edge_node.path_yaw
+                near_node.parent = edge_node.parent
+                self.propagate_cost_to_leaves(new_node)
 
     def calc_new_cost(self, from_node, to_node):
 
