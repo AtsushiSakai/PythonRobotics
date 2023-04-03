@@ -244,10 +244,7 @@ class RRTStarReedsShepp(RRTStar):
         return path
 
 
-def main(max_iter=100, random_seed=None):
-    if random_seed:
-        random.seed(random_seed)
-
+def main(max_iter=100):
     print("Start " + __file__)
 
     # ====Search Path with RRT====
