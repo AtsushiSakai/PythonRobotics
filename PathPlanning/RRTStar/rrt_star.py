@@ -226,6 +226,9 @@ class RRTStar(RRT):
             improved_cost = near_node.cost > edge_node.cost
 
             if no_collision and improved_cost:
+                for node in self.node_list:
+                    if node.parent == self.node_list[i]:
+                        node.parent = edge_node
                 self.node_list[i] = edge_node
                 self.node_list[i].cost = self.calc_new_cost(new_node, self.node_list[i])
                 self.propagate_cost_to_leaves(self.node_list[i])
