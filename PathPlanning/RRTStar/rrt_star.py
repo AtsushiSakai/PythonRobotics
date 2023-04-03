@@ -227,7 +227,8 @@ class RRTStar(RRT):
 
             if no_collision and improved_cost:
                 self.node_list[i] = edge_node
-        self.propagate_cost_to_leaves(new_node)
+                self.node_list[i].cost = self.calc_new_cost(new_node, self.node_list[i])
+                self.propagate_cost_to_leaves(self.node_list[i])
 
     def calc_new_cost(self, from_node, to_node):
         d, _ = self.calc_distance_and_angle(from_node, to_node)
