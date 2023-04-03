@@ -3,6 +3,7 @@
 Path planning Sample Code with RRT*
 
 author: Atsushi Sakai(@Atsushi_twi)
+        RyderCRD (SUSTech EEE5058)
 
 """
 
