@@ -171,23 +171,6 @@ class RRTStarReedsShepp(RRTStar):
 
         return new_node
 
-    def rewire(self, new_node, near_inds):
-        for i in near_inds:
-            near_node = self.node_list[i]
-            edge_node = self.steer(new_node, near_node)
-            if not edge_node:
-                continue
-            edge_node.cost = self.calc_new_cost(new_node, near_node)
-
-            no_collision = self.check_collision(
-                edge_node, self.obstacle_list, self.robot_radius)
-            improved_cost = near_node.cost > edge_node.cost
-
-            if no_collision and improved_cost:
-                self.node_list[i] = edge_node
-                self.node_list[i].cost = self.calc_new_cost(new_node, self.node_list[i])
-                self.propagate_cost_to_leaves(self.node_list[i])
-
     def calc_new_cost(self, from_node, to_node):
 
         _, _, _, _, course_lengths = reeds_shepp_path_planning.reeds_shepp_path_planning(
