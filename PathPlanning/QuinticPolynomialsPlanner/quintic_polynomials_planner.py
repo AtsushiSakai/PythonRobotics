@@ -27,6 +27,16 @@ class QuinticPolynomial:
     def __init__(self, xs, vxs, axs, xe, vxe, axe, time):
         # calc coefficient of quintic polynomial
         # See jupyter notebook document for derivation of this equation.
+        '''
+        xs: start x位置
+        vxs: start dx/dt, 即start速度
+        axs: start 加速度
+        xe: end 位置
+        vxe: end 速度
+        axe: end 加速度
+        start_time: 0
+        end_time: time
+        '''
         self.a0 = xs
         self.a1 = vxs
         self.a2 = axs / 2.0
@@ -44,23 +54,35 @@ class QuinticPolynomial:
         self.a5 = x[2]
 
     def calc_point(self, t):
+        '''
+        计算位置
+        '''
         xt = self.a0 + self.a1 * t + self.a2 * t ** 2 + \
              self.a3 * t ** 3 + self.a4 * t ** 4 + self.a5 * t ** 5
 
         return xt
 
     def calc_first_derivative(self, t):
+        '''
+        计算一次导数，即速度
+        '''
         xt = self.a1 + 2 * self.a2 * t + \
              3 * self.a3 * t ** 2 + 4 * self.a4 * t ** 3 + 5 * self.a5 * t ** 4
 
         return xt
 
     def calc_second_derivative(self, t):
+        '''
+        计算二次倒数，即加速度
+        '''
         xt = 2 * self.a2 + 6 * self.a3 * t + 12 * self.a4 * t ** 2 + 20 * self.a5 * t ** 3
 
         return xt
 
     def calc_third_derivative(self, t):
+        '''
+        计算三次倒数，即jerk
+        '''
         xt = 6 * self.a3 + 24 * self.a4 * t + 60 * self.a5 * t ** 2
 
         return xt
@@ -74,7 +96,8 @@ def quintic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_
         s_x: start x position [m]
         s_y: start y position [m]
         s_yaw: start yaw angle [rad]
-        sa: start accel [m/ss]
+        sv: start v
+        sa: start accel [m/ss] 加速度
         gx: goal x position [m]
         gy: goal y position [m]
         gyaw: goal yaw angle [rad]
