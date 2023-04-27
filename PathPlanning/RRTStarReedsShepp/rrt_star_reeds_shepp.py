@@ -36,7 +36,7 @@ class RRTStarReedsShepp(RRTStar):
             self.path_yaw = []
 
     def __init__(self, start, goal, obstacle_list, rand_area,
-                 max_iter=200,
+                 max_iter=200, step_size=0.2,
                  connect_circle_dist=50.0,
                  robot_radius=0.0
                  ):
@@ -55,6 +55,7 @@ class RRTStarReedsShepp(RRTStar):
         self.min_rand = rand_area[0]
         self.max_rand = rand_area[1]
         self.max_iter = max_iter
+        self.step_size = step_size
         self.obstacle_list = obstacle_list
         self.connect_circle_dist = connect_circle_dist
         self.robot_radius = robot_radius
@@ -62,6 +63,9 @@ class RRTStarReedsShepp(RRTStar):
         self.curvature = 1.0
         self.goal_yaw_th = np.deg2rad(1.0)
         self.goal_xy_th = 0.5
+
+    def set_random_seed(self, seed):
+        random.seed(seed)
 
     def planning(self, animation=True, search_until_max_iter=True):
         """
@@ -147,8 +151,8 @@ class RRTStarReedsShepp(RRTStar):
     def steer(self, from_node, to_node):
 
         px, py, pyaw, mode, course_lengths = reeds_shepp_path_planning.reeds_shepp_path_planning(
-            from_node.x, from_node.y, from_node.yaw,
-            to_node.x, to_node.y, to_node.yaw, self.curvature)
+            from_node.x, from_node.y, from_node.yaw, to_node.x,
+            to_node.y, to_node.yaw, self.curvature, self.step_size)
 
         if not px:
             return None
@@ -169,8 +173,8 @@ class RRTStarReedsShepp(RRTStar):
     def calc_new_cost(self, from_node, to_node):
 
         _, _, _, _, course_lengths = reeds_shepp_path_planning.reeds_shepp_path_planning(
-            from_node.x, from_node.y, from_node.yaw,
-            to_node.x, to_node.y, to_node.yaw, self.curvature)
+            from_node.x, from_node.y, from_node.yaw, to_node.x,
+            to_node.y, to_node.yaw, self.curvature, self.step_size)
         if not course_lengths:
             return float("inf")
 

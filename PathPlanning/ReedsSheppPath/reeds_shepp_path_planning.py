@@ -53,17 +53,14 @@ def mod2pi(x):
 
 def straight_left_straight(x, y, phi):
     phi = mod2pi(phi)
-    if y > 0.0 and 0.0 < phi < math.pi * 0.99:
+    # only take phi in (0.01*math.pi, 0.99*math.pi) for the sake of speed.
+    # phi in (0, 0.01*math.pi) will make test2() in test_rrt_star_reeds_shepp.py
+    # extremely time-consuming, since the value of xd, t will be very large.
+    if math.pi * 0.01 < phi < math.pi * 0.99 and y != 0:
         xd = - y / math.tan(phi) + x
         t = xd - math.tan(phi / 2.0)
         u = phi
-        v = math.hypot(x - xd, y) - math.tan(phi / 2.0)
-        return True, t, u, v
-    elif y < 0.0 < phi < math.pi * 0.99:
-        xd = - y / math.tan(phi) + x
-        t = xd - math.tan(phi / 2.0)
-        u = phi
-        v = -math.hypot(x - xd, y) - math.tan(phi / 2.0)
+        v = np.sign(y) * math.hypot(x - xd, y) - math.tan(phi / 2.0)
         return True, t, u, v
 
     return False, 0.0, 0.0, 0.0
