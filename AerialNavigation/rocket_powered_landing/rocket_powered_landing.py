@@ -12,13 +12,12 @@ by Michael Szmuk and Behcet Acıkmese.
 - EmbersArc/SuccessiveConvexificationFreeFinalTime: Implementation of "Successive Convexification for 6-DoF Mars Rocket Powered Landing with Free-Final-Time" https://github.com/EmbersArc/SuccessiveConvexificationFreeFinalTime
 
 """
-
+import warnings
 from time import time
 import numpy as np
 from scipy.integrate import odeint
 import cvxpy
 import matplotlib.pyplot as plt
-from mpl_toolkits import mplot3d
 
 # Trajectory points
 K = 50
@@ -123,7 +122,7 @@ class Rocket_Model_6DoF:
                                     rng.uniform(-20, 20)))
 
     def f_func(self, x, u):
-        m, rx, ry, rz, vx, vy, vz, q0, q1, q2, q3, wx, wy, wz = x[0], x[1], x[
+        m, _, _, _, vx, vy, vz, q0, q1, q2, q3, wx, wy, wz = x[0], x[1], x[
             2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10], x[11], x[12], x[13]
         ux, uy, uz = u[0], u[1], u[2]
 
@@ -148,7 +147,7 @@ class Rocket_Model_6DoF:
         ])
 
     def A_func(self, x, u):
-        m, rx, ry, rz, vx, vy, vz, q0, q1, q2, q3, wx, wy, wz = x[0], x[1], x[
+        m, _, _, _, _, _, _, q0, q1, q2, q3, wx, wy, wz = x[0], x[1], x[
             2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10], x[11], x[12], x[13]
         ux, uy, uz = u[0], u[1], u[2]
 
@@ -176,7 +175,7 @@ class Rocket_Model_6DoF:
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
 
     def B_func(self, x, u):
-        m, rx, ry, rz, vx, vy, vz, q0, q1, q2, q3, wx, wy, wz = x[0], x[1], x[
+        m, _, _, _, _, _, _, q0, q1, q2, q3, _, _, _ = x[0], x[1], x[
             2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10], x[11], x[12], x[13]
         ux, uy, uz = u[0], u[1], u[2]
 
@@ -534,7 +533,9 @@ class SCProblem:
     def solve(self, **kwargs):
         error = False
         try:
-            self.prob.solve(verbose=verbose_solver,
+            with warnings.catch_warnings():  # For User warning from solver
+                warnings.simplefilter('ignore')
+                self.prob.solve(verbose=verbose_solver,
                             solver=solver)
         except cvxpy.SolverError:
             error = True
@@ -569,10 +570,10 @@ def axis3d_equal(X, Y, Z, ax):
 def plot_animation(X, U):  # pragma: no cover
 
     fig = plt.figure()
-    ax = fig.gca(projection='3d')
+    ax = fig.add_subplot(projection='3d')
     # for stopping simulation with the esc key.
     fig.canvas.mpl_connect('key_release_event',
-            lambda event: [exit(0) if event.key == 'escape' else None])
+                           lambda event: [exit(0) if event.key == 'escape' else None])
 
     for k in range(K):
         plt.cla()

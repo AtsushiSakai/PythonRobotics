@@ -225,8 +225,9 @@ def predict_motion(x0, oa, od, xref):
 
 def iterative_linear_mpc_control(xref, x0, dref, oa, od):
     """
-    MPC contorl with updating operational point iteraitvely
+    MPC control with updating operational point iteratively
     """
+    ox, oy, oyaw, ov = None, None, None, None
 
     if oa is None or od is None:
         oa = [0.0] * T
@@ -406,10 +407,11 @@ def do_simulation(cx, cy, cyaw, ck, sp, dl, initial_state):
         oa, odelta, ox, oy, oyaw, ov = iterative_linear_mpc_control(
             xref, x0, dref, oa, odelta)
 
+        di, ai = 0.0, 0.0
         if odelta is not None:
             di, ai = odelta[0], oa[0]
+            state = update_state(state, ai, di)
 
-        state = update_state(state, ai, di)
         time = time + DT
 
         x.append(state.x)
