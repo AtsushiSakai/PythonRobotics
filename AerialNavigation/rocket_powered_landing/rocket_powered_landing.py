@@ -122,7 +122,7 @@ class Rocket_Model_6DoF:
                                     rng.uniform(-20, 20)))
 
     def f_func(self, x, u):
-        m, rx, ry, rz, vx, vy, vz, q0, q1, q2, q3, wx, wy, wz = x[0], x[1], x[
+        m, _, _, _, _, _, _, q0, q1, q2, q3, wx, wy, wz = x[0], x[1], x[
             2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10], x[11], x[12], x[13]
         ux, uy, uz = u[0], u[1], u[2]
 
@@ -147,7 +147,7 @@ class Rocket_Model_6DoF:
         ])
 
     def A_func(self, x, u):
-        m, rx, ry, rz, vx, vy, vz, q0, q1, q2, q3, wx, wy, wz = x[0], x[1], x[
+        m, _, _, _, _, _, _, q0, q1, q2, q3, wx, wy, wz = x[0], x[1], x[
             2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10], x[11], x[12], x[13]
         ux, uy, uz = u[0], u[1], u[2]
 
@@ -175,7 +175,7 @@ class Rocket_Model_6DoF:
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
 
     def B_func(self, x, u):
-        m, rx, ry, rz, vx, vy, vz, q0, q1, q2, q3, wx, wy, wz = x[0], x[1], x[
+        m, _, _, _, _, _, _, q0, q1, q2, q3, wx, wy, wz = x[0], x[1], x[
             2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10], x[11], x[12], x[13]
         ux, uy, uz = u[0], u[1], u[2]
 
