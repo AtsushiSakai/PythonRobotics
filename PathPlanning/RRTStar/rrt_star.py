@@ -163,7 +163,7 @@ class RRTStar(RRT):
         if not safe_goal_inds:
             return None
 
-        safe_goal_costs = [self.node_list[i].cost + 
+        safe_goal_costs = [self.node_list[i].cost +
                            self.calc_dist_to_goal(self.node_list[i].x, self.node_list[i].y)
                            for i in safe_goal_inds]
 
