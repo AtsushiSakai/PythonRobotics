@@ -311,7 +311,7 @@ def hybrid_a_star_planning(start, goal, ox, oy, xy_resolution, yaw_resolution):
             neighbor_index = calc_index(neighbor, config)
             if neighbor_index in closedList:
                 continue
-            if neighbor not in openList \
+            if neighbor_index not in openList \
                     or openList[neighbor_index].cost > neighbor.cost:
                 heapq.heappush(
                     pq, (calc_cost(neighbor, h_dp, config),
