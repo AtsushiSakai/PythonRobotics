@@ -3,6 +3,6 @@ scipy == 1.10.1
 matplotlib == 3.7.1
 cvxpy == 1.3.1
 pytest == 7.3.1 # For unit test
-pytest-xdist == 3.3.0 # For unit test
+pytest-xdist == 3.3.1 # For unit test
 mypy == 1.3.0 # For unit test
 ruff == 0.0.267 # For unit test
