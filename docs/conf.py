@@ -45,6 +45,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.imgconverter',
     'IPython.sphinxext.ipython_console_highlighting',
+    'sphinx_copybutton',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
