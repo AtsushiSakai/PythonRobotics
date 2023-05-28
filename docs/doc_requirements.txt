@@ -3,3 +3,4 @@ sphinx_rtd_theme == 1.0.0
 IPython == 8.10.0 # For sphinx documentation
 sphinxcontrib-napoleon == 0.7 # For auto doc
 sphinx-copybutton
+sphinx-rtd-dark-mode
