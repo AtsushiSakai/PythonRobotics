@@ -19,7 +19,7 @@ With its intuitive animations, PythonRobotics simplifies complex concepts, makin
 
 
 Based on the principles of collaboration and knowledge sharing, PythonRobotics is an open source software (OSS). 
-This project includes a selection of practical algorithms that are widely adopted across academic and industrial domains, keeping you on the cutting edge of robotics development.
+This project includes a selection of practical algorithms that are widely adopted across academic and industrial domains.
 
 
 Each algorithm in PythonRobotics is coded in Python 3, one of the most popular and powerful programming languages in the world. 
