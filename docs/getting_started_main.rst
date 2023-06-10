@@ -23,7 +23,6 @@ This project includes a selection of practical algorithms that are widely adopte
 
 
 Each algorithm in PythonRobotics is coded in Python 3, one of the most popular and powerful programming languages in the world. 
-PythonRobotics is your go-to solution for effective and efficient robotic algorithm development, whether you're an amateur or an experienced professional.
 We invite you to explore, learn, and contribute to our open source community, and look forward to being part of your exciting journey in the world of robotics.
 
 
