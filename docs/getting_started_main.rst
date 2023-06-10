@@ -8,7 +8,6 @@ Welcome to the PythonRobotics Documentation 👋
 ==============================================
 
 Welcome to PythonRobotics's official documentation, an open source collection of robotics algorithms designed to easily understand the basic ideas behind each algorithm for beginners. 
-PythonRobotics aims to make robot development an enjoyable experience by easing the tedious process of algorithm creation.
 
 
 Introduction to PythonRobotics
