@@ -65,7 +65,7 @@ represent the initial uncertainty. At each time step we do:
 
 The following equations and code snippets we can see how the particles
 distribution evolves in case we provide only the control :math:`(v,w)`,
-which are the linear and angular velocity repsectively.
+which are the linear and angular velocity respectively.
 
 :math:`\begin{equation*} F= \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix} \end{equation*}`
 
