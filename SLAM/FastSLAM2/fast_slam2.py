@@ -405,8 +405,8 @@ def main():
 
             for iz in range(len(z[:, 0])):
                 landmark_id = int(z[2, iz])
-                plt.plot([xEst[0], RFID[landmark_id, 0]], [
-                    xEst[1], RFID[landmark_id, 1]], "-k")
+                plt.plot([xEst[0][0], RFID[landmark_id, 0]], [
+                    xEst[1][0], RFID[landmark_id, 1]], "-k")
 
             for i in range(N_PARTICLE):
                 plt.plot(particles[i].x, particles[i].y, ".r")
