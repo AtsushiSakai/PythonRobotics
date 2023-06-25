@@ -64,6 +64,11 @@ Calculating the squared error is the same as calculating the variance.
 
 The smaller this variance, the more it signifies that the points fit within the rectangle.
 
+API
+~~~~~~
+
+.. autofunction:: Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting
+
 References
 ~~~~~~~~~~
 
