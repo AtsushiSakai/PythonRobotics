@@ -67,7 +67,7 @@ The smaller this variance, the more it signifies that the points fit within the 
 API
 ~~~~~~
 
-.. autofunction:: Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting
+.. autoclass:: Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting
 
 References
 ~~~~~~~~~~
