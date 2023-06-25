@@ -23,13 +23,13 @@ This is taking advantage of the general model of distance sensors, which tends t
 
 The threshold range is calculated by:
 
-$r_{th} = R_0 + R_d * r_{origin}$
+.. math:: r_{th} = R_0 + R_d * r_{origin}
 
 where
 
-- $r_{th}$: Threashold range
-- $R_0, R_d$: Constant parameters
-- $r_{origin}$: Distance from the sensor for a range data.
+- :math:`r_{th}`: Threashold range
+- :math:`R_0, R_d`: Constant parameters
+- :math:`r_{origin}`: Distance from the sensor for a range data.
 
 Step2: Rectangle search
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
