@@ -38,9 +38,7 @@ In the second step, for each cluster calculated in the previous step, rectangula
 
 In this rectangular fitting, each cluster's distance data is rotated at certain angle intervals.
 
-It is evaluated by one of the three evaluation functions below. 
-
-If the evaluation value is under a certain threshold, it is recognized as a rectangle shape.
+It is evaluated by one of the three evaluation functions below, then best angle parameter one is selected as the rectangle shape.
 
 1. Rectangle Area Minimization criteria
 =========================================
@@ -53,11 +51,18 @@ This allows for fitting a rectangle in a direction that encompasses as much of t
 2. Closeness criteria
 ======================
 
+This evaluation function uses the distances between the top and bottom vertices on the right side of the rectangle and each point in the distance data as evaluation values. 
 
+If there are points on the rectangle edges, this evaluation value decreases.
 
 3. Variance criteria
 =======================
 
+This evaluation function uses the squreed distances between the edges of the rectangle (horizontal and vertical) and each point. 
+
+Calculating the squared error is the same as calculating the variance.
+
+The smaller this variance, the more it signifies that the points fit within the rectangle.
 
 References
 ~~~~~~~~~~
