@@ -42,11 +42,18 @@ It is evaluated by one of the three evaluation functions below.
 
 If the evaluation value is under a certain threshold, it is recognized as a rectangle shape.
 
-1. Area criteria
-==================
+1. Rectangle Area Minimization criteria
+=========================================
+
+This evaluation function calculates the area of the smallest rectangle that includes all the points, derived from the difference between the maximum and minimum values on the x-y axis for all distance data points. 
+
+This allows for fitting a rectangle in a direction that encompasses as much of the smallest rectangular shape as possible.
+
 
 2. Closeness criteria
 ======================
+
+
 
 3. Variance criteria
 =======================
