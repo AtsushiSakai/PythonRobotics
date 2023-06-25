@@ -34,6 +34,14 @@ where
 Step2: Rectangle search
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+In the second step, for each cluster calculated in the previous step, rectangular fittings will be applied.
+
+In this rectangular fitting, each cluster's distance data is rotated at certain angle intervals.
+
+It is evaluated by one of the three evaluation functions below. 
+
+If the evaluation value is under a certain threshold, it is recognized as a rectangle shape.
+
 1. Area criteria
 ==================
 
