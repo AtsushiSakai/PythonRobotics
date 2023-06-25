@@ -68,6 +68,7 @@ API
 ~~~~~~
 
 .. autoclass:: Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting
+    :members:
 
 References
 ~~~~~~~~~~
