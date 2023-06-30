@@ -161,7 +161,9 @@ All animation gifs are stored here: [AtsushiSakai/PythonRoboticsGifs: Animation 
 
 <img src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/extended_kalman_filter/animation.gif" width="640" alt="EKF pic">
 
-Documentation: [Notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/Localization/extended_kalman_filter/extended_kalman_filter_localization.ipynb)
+Ref:
+
+- [documentation](https://atsushisakai.github.io/PythonRobotics/modules/localization/extended_kalman_filter_localization_files/extended_kalman_filter_localization.html)
 
 ## Particle filter localization
 
@@ -532,7 +534,7 @@ Path tracking simulation with iterative linear model predictive speed and steeri
 
 Ref:
 
-- [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/Model_predictive_speed_and_steering_control.ipynb)
+- [documentation](https://atsushisakai.github.io/PythonRobotics/modules/path_tracking/model_predictive_speed_and_steering_control/model_predictive_speed_and_steering_control.html)
 
 - [Real\-time Model Predictive Control \(MPC\), ACADO, Python \| Work\-is\-Playing](http://grauonline.de/wordpress/?page_id=3244)
 
@@ -544,7 +546,7 @@ A motion planning and path tracking simulation with NMPC of C-GMRES
 
 Ref:
 
-- [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/cgmres_nmpc/cgmres_nmpc.ipynb)
+- [documentation](https://atsushisakai.github.io/PythonRobotics/modules/path_tracking/cgmres_nmpc/cgmres_nmpc.html)
 
 
 # Arm Navigation
@@ -584,7 +586,7 @@ This is a 3d trajectory generation simulation for a rocket powered landing.
 
 Ref:
 
-- [notebook](https://github.com/AtsushiSakai/PythonRobotics/blob/master/AerialNavigation/rocket_powered_landing/rocket_powered_landing.ipynb)
+- [documentation](https://atsushisakai.github.io/PythonRobotics/modules/aerial_navigation/rocket_powered_landing/rocket_powered_landing.html)
 
 # Bipedal
 
