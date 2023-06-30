@@ -30,6 +30,11 @@ show_animation = True
 
 
 class LShapeFitting:
+    """
+    LShapeFitting class. You can use this class by initializing the class and
+    changing the parameters, and then calling the fitting method.
+
+    """
 
     class Criteria(Enum):
         AREA = 1
@@ -37,15 +42,35 @@ class LShapeFitting:
         VARIANCE = 3
 
     def __init__(self):
-        # Parameters
+        """
+        Default parameter settings
+        """
+        #: Fitting criteria parameter
         self.criteria = self.Criteria.VARIANCE
-        self.min_dist_of_closeness_criteria = 0.01  # [m]
-        self.d_theta_deg_for_search = 1.0  # [deg]
-        self.R0 = 3.0  # [m] range segmentation param
-        self.Rd = 0.001  # [m] range segmentation param
+        #: Minimum distance for closeness criteria parameter [m]
+        self.min_dist_of_closeness_criteria = 0.01
+        #: Angle difference parameter [deg]
+        self.d_theta_deg_for_search = 1.0
+        #: Range segmentation parameter [m]
+        self.R0 = 3.0
+        #: Range segmentation parameter [m]
+        self.Rd = 0.001
 
     def fitting(self, ox, oy):
+        """
+        Fitting L-shape model to object points
 
+        Parameters
+        ----------
+        ox : x positions of range points from an object
+        oy : y positions of range points from an object
+
+        Returns
+        -------
+        rects: Fitting rectangles
+        id_sets: id sets of each cluster
+
+        """
         # step1: Adaptive Range Segmentation
         id_sets = self._adoptive_range_segmentation(ox, oy)
 
