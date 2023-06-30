@@ -22,6 +22,7 @@
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/clipboard.min.js"></script>
         <script src="../../../_static/copybutton.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
         <script src="../../../_static/dark_mode_js/default_dark.js"></script>
         <script src="../../../_static/dark_mode_js/theme_switcher.js"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -73,7 +74,18 @@
 <li class="toctree-l2"><a class="reference internal" href="../point_cloud_sampling/point_cloud_sampling.html">Point cloud Sampling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../k_means_object_clustering/k_means_object_clustering.html">k-means object clustering</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../circle_fitting/circle_fitting.html">Object shape recognition using circle fitting</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Object shape recognition using rectangle fitting</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Object shape recognition using rectangle fitting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#step1-adaptive-range-segmentation">Step1: Adaptive range segmentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step2-rectangle-search">Step2: Rectangle search</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rectangle-area-minimization-criteria">1. Rectangle Area Minimization criteria</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#closeness-criteria">2. Closeness criteria</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#variance-criteria">3. Variance criteria</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#api">API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../normal_vector_estimation/normal_vector_estimation.html">Normal vector estimation</a></li>
 </ul>
 </li>
@@ -118,6 +130,121 @@
 <h1>Object shape recognition using rectangle fitting<a class="headerlink" href="#object-shape-recognition-using-rectangle-fitting" title="Permalink to this headline"></a></h1>
 <p>This is an object shape recognition using rectangle fitting.</p>
 <img alt="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/rectangle_fitting/animation.gif" src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/rectangle_fitting/animation.gif" />
+<p>This example code is based on this paper algorithm:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.ri.cmu.edu/publications/efficient-l-shape-fitting-for-vehicle-detection-using-laser-scanners">Efficient L-Shape Fitting for Vehicle Detection Using Laser Scanners - The Robotics Institute Carnegie Mellon University</a></p></li>
+</ul>
+<p>The algorithm consists of 2 steps as below.</p>
+<section id="step1-adaptive-range-segmentation">
+<h2>Step1: Adaptive range segmentation<a class="headerlink" href="#step1-adaptive-range-segmentation" title="Permalink to this headline"></a></h2>
+<p>In the first step, all range data points are segmented into some clusters.</p>
+<p>We calculate the distance between each range data and the nearest range data, and if this distance is below a certain threshold, it is judged to be in the same cluster.
+This distance threshold is determined in proportion to the distance from the sensor.
+This is taking advantage of the general model of distance sensors, which tends to have sparser data distribution as the distance from the sensor increases.</p>
+<p>The threshold range is calculated by:</p>
+<div class="math notranslate nohighlight">
+\[r_{th} = R_0 + R_d * r_{origin}\]</div>
+<p>where</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(r_{th}\)</span>: Threashold range</p></li>
+<li><p><span class="math notranslate nohighlight">\(R_0, R_d\)</span>: Constant parameters</p></li>
+<li><p><span class="math notranslate nohighlight">\(r_{origin}\)</span>: Distance from the sensor for a range data.</p></li>
+</ul>
+</section>
+<section id="step2-rectangle-search">
+<h2>Step2: Rectangle search<a class="headerlink" href="#step2-rectangle-search" title="Permalink to this headline"></a></h2>
+<p>In the second step, for each cluster calculated in the previous step, rectangular fittings will be applied.
+In this rectangular fitting, each cluster’s distance data is rotated at certain angle intervals.
+It is evaluated by one of the three evaluation functions below, then best angle parameter one is selected as the rectangle shape.</p>
+<section id="rectangle-area-minimization-criteria">
+<h3>1. Rectangle Area Minimization criteria<a class="headerlink" href="#rectangle-area-minimization-criteria" title="Permalink to this headline"></a></h3>
+<p>This evaluation function calculates the area of the smallest rectangle that includes all the points, derived from the difference between the maximum and minimum values on the x-y axis for all distance data points.
+This allows for fitting a rectangle in a direction that encompasses as much of the smallest rectangular shape as possible.</p>
+</section>
+<section id="closeness-criteria">
+<h3>2. Closeness criteria<a class="headerlink" href="#closeness-criteria" title="Permalink to this headline"></a></h3>
+<p>This evaluation function uses the distances between the top and bottom vertices on the right side of the rectangle and each point in the distance data as evaluation values.
+If there are points on the rectangle edges, this evaluation value decreases.</p>
+</section>
+<section id="variance-criteria">
+<h3>3. Variance criteria<a class="headerlink" href="#variance-criteria" title="Permalink to this headline"></a></h3>
+<p>This evaluation function uses the squreed distances between the edges of the rectangle (horizontal and vertical) and each point.
+Calculating the squared error is the same as calculating the variance.
+The smaller this variance, the more it signifies that the points fit within the rectangle.</p>
+</section>
+</section>
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Mapping.rectangle_fitting.rectangle_fitting.</span></span><span class="sig-name descname"><span class="pre">LShapeFitting</span></span><a class="reference internal" href="../../../_modules/Mapping/rectangle_fitting/rectangle_fitting.html#LShapeFitting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting" title="Permalink to this definition"></a></dt>
+<dd><p>LShapeFitting class. You can use this class by initializing the class and
+changing the parameters, and then calling the fitting method.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting.Criteria">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Criteria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/Mapping/rectangle_fitting/rectangle_fitting.html#LShapeFitting.Criteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting.Criteria" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting.R0">
+<span class="sig-name descname"><span class="pre">R0</span></span><a class="headerlink" href="#Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting.R0" title="Permalink to this definition"></a></dt>
+<dd><p>Range segmentation parameter [m]</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting.Rd">
+<span class="sig-name descname"><span class="pre">Rd</span></span><a class="headerlink" href="#Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting.Rd" title="Permalink to this definition"></a></dt>
+<dd><p>Range segmentation parameter [m]</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting.criteria">
+<span class="sig-name descname"><span class="pre">criteria</span></span><a class="headerlink" href="#Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting.criteria" title="Permalink to this definition"></a></dt>
+<dd><p>Fitting criteria parameter</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting.d_theta_deg_for_search">
+<span class="sig-name descname"><span class="pre">d_theta_deg_for_search</span></span><a class="headerlink" href="#Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting.d_theta_deg_for_search" title="Permalink to this definition"></a></dt>
+<dd><p>Angle difference parameter [deg]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting.fitting">
+<span class="sig-name descname"><span class="pre">fitting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ox</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/Mapping/rectangle_fitting/rectangle_fitting.html#LShapeFitting.fitting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting.fitting" title="Permalink to this definition"></a></dt>
+<dd><p>Fitting L-shape model to object points</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ox</strong> (<em>x positions of range points from an object</em>) – </p></li>
+<li><p><strong>oy</strong> (<em>y positions of range points from an object</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>rects</strong> (<em>Fitting rectangles</em>)</p></li>
+<li><p><strong>id_sets</strong> (<em>id sets of each cluster</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting.min_dist_of_closeness_criteria">
+<span class="sig-name descname"><span class="pre">min_dist_of_closeness_criteria</span></span><a class="headerlink" href="#Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting.min_dist_of_closeness_criteria" title="Permalink to this definition"></a></dt>
+<dd><p>Minimum distance for closeness criteria parameter [m]</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.ri.cmu.edu/publications/efficient-l-shape-fitting-for-vehicle-detection-using-laser-scanners">Efficient L-Shape Fitting for Vehicle Detection Using Laser Scanners - The Robotics Institute Carnegie Mellon University</a></p></li>
+</ul>
+</section>
 </section>
 
 
