@@ -30,6 +30,11 @@ show_animation = True
 
 
 class LShapeFitting:
+    """
+    LShapeFitting class. You can use this class by initializing the class and
+    changing the parameters, and then calling the fitting method.
+
+    """
 
     class Criteria(Enum):
         AREA = 1
@@ -37,15 +42,35 @@ class LShapeFitting:
         VARIANCE = 3
 
     def __init__(self):
-        # Parameters
+        """
+        Default parameter settings
+        """
+        #: Fitting criteria parameter
         self.criteria = self.Criteria.VARIANCE
-        self.min_dist_of_closeness_criteria = 0.01  # [m]
-        self.d_theta_deg_for_search = 1.0  # [deg]
-        self.R0 = 3.0  # [m] range segmentation param
-        self.Rd = 0.001  # [m] range segmentation param
+        #: Minimum distance for closeness criteria parameter [m]
+        self.min_dist_of_closeness_criteria = 0.01
+        #: Angle difference parameter [deg]
+        self.d_theta_deg_for_search = 1.0
+        #: Range segmentation parameter [m]
+        self.R0 = 3.0
+        #: Range segmentation parameter [m]
+        self.Rd = 0.001
 
     def fitting(self, ox, oy):
+        """
+        Fitting L-shape model to object points
 
+        Parameters
+        ----------
+        ox : x positions of range points from an object
+        oy : y positions of range points from an object
+
+        Returns
+        -------
+        rects: Fitting rectangles
+        id_sets: id sets of each cluster
+
+        """
         # step1: Adaptive Range Segmentation
         id_sets = self._adoptive_range_segmentation(ox, oy)
 
@@ -60,56 +85,53 @@ class LShapeFitting:
 
     @staticmethod
     def _calc_area_criterion(c1, c2):
-        c1_max = max(c1)
-        c2_max = max(c2)
-        c1_min = min(c1)
-        c2_min = min(c2)
-
+        c1_max, c1_min, c2_max, c2_min = LShapeFitting._find_min_max(c1, c2)
         alpha = -(c1_max - c1_min) * (c2_max - c2_min)
-
         return alpha
 
     def _calc_closeness_criterion(self, c1, c2):
-        c1_max = max(c1)
-        c2_max = max(c2)
-        c1_min = min(c1)
-        c2_min = min(c2)
+        c1_max, c1_min, c2_max, c2_min = LShapeFitting._find_min_max(c1, c2)
 
         # Vectorization
-        D1 = np.minimum(c1_max - c1, c1 - c1_min)
-        D2 = np.minimum(c2_max - c2, c2 - c2_min)
-        d = np.maximum(np.minimum(D1, D2), self.min_dist_of_closeness_criteria)
+        d1 = np.minimum(c1_max - c1, c1 - c1_min)
+        d2 = np.minimum(c2_max - c2, c2 - c2_min)
+        d = np.maximum(np.minimum(d1, d2), self.min_dist_of_closeness_criteria)
         beta = (1.0 / d).sum()
 
         return beta
 
     @staticmethod
     def _calc_variance_criterion(c1, c2):
+        c1_max, c1_min, c2_max, c2_min = LShapeFitting._find_min_max(c1, c2)
+
+        # Vectorization
+        d1 = np.minimum(c1_max - c1, c1 - c1_min)
+        d2 = np.minimum(c2_max - c2, c2 - c2_min)
+        e1 = d1[d1 < d2]
+        e2 = d2[d1 >= d2]
+        v1 = - np.var(e1) if len(e1) > 0 else 0.
+        v2 = - np.var(e2) if len(e2) > 0 else 0.
+        gamma = v1 + v2
+
+        return gamma
+
+    @staticmethod
+    def _find_min_max(c1, c2):
         c1_max = max(c1)
         c2_max = max(c2)
         c1_min = min(c1)
         c2_min = min(c2)
-
-        # Vectorization
-        D1 = np.minimum(c1_max - c1, c1 - c1_min)
-        D2 = np.minimum(c2_max - c2, c2 - c2_min)
-        E1 = D1[D1 < D2]
-        E2 = D2[D1 >= D2]
-        V1 = - np.var(E1) if len(E1) > 0 else 0.
-        V2 = - np.var(E2) if len(E2) > 0 else 0.
-        gamma = V1 + V2
-
-        return gamma
+        return c1_max, c1_min, c2_max, c2_min
 
     def _rectangle_search(self, x, y):
 
-        X = np.array([x, y]).T
+        xy = np.array([x, y]).T
 
         d_theta = np.deg2rad(self.d_theta_deg_for_search)
         min_cost = (-float('inf'), None)
         for theta in np.arange(0.0, np.pi / 2.0 - d_theta, d_theta):
 
-            c = X @ rot_mat_2d(theta)
+            c = xy @ rot_mat_2d(theta)
             c1 = c[:, 0]
             c2 = c[:, 1]
 
@@ -129,8 +151,8 @@ class LShapeFitting:
         sin_s = np.sin(min_cost[1])
         cos_s = np.cos(min_cost[1])
 
-        c1_s = X @ np.array([cos_s, sin_s]).T
-        c2_s = X @ np.array([-sin_s, cos_s]).T
+        c1_s = xy @ np.array([cos_s, sin_s]).T
+        c2_s = xy @ np.array([-sin_s, cos_s]).T
 
         rect = RectangleData()
         rect.a[0] = cos_s
@@ -151,28 +173,28 @@ class LShapeFitting:
     def _adoptive_range_segmentation(self, ox, oy):
 
         # Setup initial cluster
-        S = []
+        segment_list = []
         for i, _ in enumerate(ox):
-            C = set()
-            R = self.R0 + self.Rd * np.linalg.norm([ox[i], oy[i]])
+            c = set()
+            r = self.R0 + self.Rd * np.linalg.norm([ox[i], oy[i]])
             for j, _ in enumerate(ox):
                 d = np.hypot(ox[i] - ox[j], oy[i] - oy[j])
-                if d <= R:
-                    C.add(j)
-            S.append(C)
+                if d <= r:
+                    c.add(j)
+            segment_list.append(c)
 
         # Merge cluster
         while True:
             no_change = True
-            for (c1, c2) in list(itertools.permutations(range(len(S)), 2)):
-                if S[c1] & S[c2]:
-                    S[c1] = (S[c1] | S.pop(c2))
+            for (c1, c2) in list(itertools.permutations(range(len(segment_list)), 2)):
+                if segment_list[c1] & segment_list[c2]:
+                    segment_list[c1] = (segment_list[c1] | segment_list.pop(c2))
                     no_change = False
                     break
             if no_change:
                 break
 
-        return S
+        return segment_list
 
 
 class RectangleData:
