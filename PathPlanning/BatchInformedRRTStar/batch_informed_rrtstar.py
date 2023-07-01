@@ -23,7 +23,7 @@ import numpy as np
 show_animation = True
 
 
-class RTree(object):
+class RTree:
     # Class to represent the explicit tree created
     # while sampling through the state space
 
@@ -132,7 +132,7 @@ class RTree(object):
             self.node_id_to_grid_coord(nid))
 
 
-class BITStar(object):
+class BITStar:
 
     def __init__(self, start, goal,
                  obstacleList, randArea, eta=2.0,
@@ -189,7 +189,7 @@ class BITStar(object):
                             [(self.start[1] + self.goal[1]) / 2.0], [0]])
         a1 = np.array([[(self.goal[0] - self.start[0]) / cMin],
                        [(self.goal[1] - self.start[1]) / cMin], [0]])
-        eTheta = math.atan2(a1[1], a1[0])
+        eTheta = math.atan2(a1[1, 0], a1[0, 0])
         # first column of identity matrix transposed
         id1_t = np.array([1.0, 0.0, 0.0]).reshape(1, 3)
         M = np.dot(a1, id1_t)

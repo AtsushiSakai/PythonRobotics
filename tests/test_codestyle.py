@@ -126,7 +126,7 @@ def test():
     branch_commit = find_branch_point("origin/master")
     files = diff_files(branch_commit)
     print(files)
-    rc, errors = run_ruff(files, fix=False)
+    rc, errors = run_ruff(files, fix=True)
     if errors:
         print(errors)
     else:

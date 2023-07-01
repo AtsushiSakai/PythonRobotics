@@ -58,7 +58,7 @@ class InformedRRTStar:
         a1 = np.array([[(self.goal.x - self.start.x) / c_min],
                        [(self.goal.y - self.start.y) / c_min], [0]])
 
-        e_theta = math.atan2(a1[1], a1[0])
+        e_theta = math.atan2(a1[1, 0], a1[0, 0])
         # first column of identity matrix transposed
         id1_t = np.array([1.0, 0.0, 0.0]).reshape(1, 3)
         m = a1 @ id1_t
@@ -136,7 +136,7 @@ class InformedRRTStar:
 
     def find_near_nodes(self, new_node):
         n_node = len(self.node_list)
-        r = 50.0 * math.sqrt((math.log(n_node) / n_node))
+        r = 50.0 * math.sqrt(math.log(n_node) / n_node)
         d_list = [(node.x - new_node.x) ** 2 + (node.y - new_node.y) ** 2 for
                   node in self.node_list]
         near_inds = [d_list.index(i) for i in d_list if i <= r ** 2]

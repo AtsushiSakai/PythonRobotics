@@ -15,6 +15,7 @@ import copy
 import math
 
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import numpy as np
 from scipy.ndimage import gaussian_filter
 from scipy.stats import norm
@@ -114,7 +115,7 @@ def motion_model(x, u):
 def draw_heat_map(data, mx, my):
     max_value = max([max(i_data) for i_data in data])
     plt.grid(False)
-    plt.pcolor(mx, my, data, vmax=max_value, cmap=plt.cm.get_cmap("Blues"))
+    plt.pcolor(mx, my, data, vmax=max_value, cmap=mpl.colormaps["Blues"])
     plt.axis("equal")
 
 
@@ -194,7 +195,7 @@ def motion_update(grid_map, u, yaw):
     y_shift = grid_map.dy // grid_map.xy_resolution
 
     if abs(x_shift) >= 1.0 or abs(y_shift) >= 1.0:  # map should be shifted
-        grid_map = map_shift(grid_map, int(x_shift), int(y_shift))
+        grid_map = map_shift(grid_map, int(x_shift[0]), int(y_shift[0]))
         grid_map.dx -= x_shift * grid_map.xy_resolution
         grid_map.dy -= y_shift * grid_map.xy_resolution
 

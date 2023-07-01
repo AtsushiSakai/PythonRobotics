@@ -50,14 +50,14 @@ def main():
 
         if show_animation:
             plt.clf()
-            px = float(x[0])
-            theta = float(x[2])
+            px = float(x[0, 0])
+            theta = float(x[2, 0])
             plot_cart(px, theta)
             plt.xlim([-5.0, 2.0])
             plt.pause(0.001)
 
     print("Finish")
-    print(f"x={float(x[0]):.2f} [m] , theta={math.degrees(x[2]):.2f} [deg]")
+    print(f"x={float(x[0, 0]):.2f} [m] , theta={math.degrees(x[2, 0]):.2f} [deg]")
     if show_animation:
         plt.show()
 

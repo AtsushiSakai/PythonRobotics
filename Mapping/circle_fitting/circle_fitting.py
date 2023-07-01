@@ -40,9 +40,9 @@ def circle_fitting(x, y):
 
     T = np.linalg.inv(F).dot(G)
 
-    cxe = float(T[0] / -2)
-    cye = float(T[1] / -2)
-    re = math.sqrt(cxe**2 + cye**2 - T[2])
+    cxe = float(T[0, 0] / -2)
+    cye = float(T[1, 0] / -2)
+    re = math.sqrt(cxe**2 + cye**2 - T[2, 0])
 
     error = sum([np.hypot(cxe - ix, cye - iy) - re for (ix, iy) in zip(x, y)])
 

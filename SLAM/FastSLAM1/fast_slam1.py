@@ -194,7 +194,7 @@ def compute_weight(particle, z, Q_cov):
         print("singular")
         return 1.0
 
-    num = math.exp(-0.5 * dx.T @ invS @ dx)
+    num = np.exp(-0.5 * (dx.T @ invS @ dx))[0, 0]
     den = 2.0 * math.pi * math.sqrt(np.linalg.det(Sf))
 
     w = num / den
