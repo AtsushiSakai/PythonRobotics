@@ -193,7 +193,7 @@ def compute_weight(particle, z, Q_cov):
     except np.linalg.linalg.LinAlgError:
         return 1.0
 
-    num = math.exp(-0.5 * dz.T @ invS @ dz)
+    num = np.exp(-0.5 * dz.T @ invS @ dz)[0, 0]
     den = 2.0 * math.pi * math.sqrt(np.linalg.det(Sf))
 
     w = num / den

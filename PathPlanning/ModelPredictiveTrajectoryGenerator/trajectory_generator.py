@@ -106,7 +106,7 @@ def show_trajectory(target, xc, yc):  # pragma: no cover
 
 def optimize_trajectory(target, k0, p):
     for i in range(max_iter):
-        xc, yc, yawc = motion_model.generate_trajectory(p[0], p[1], p[2], k0)
+        xc, yc, yawc = motion_model.generate_trajectory(p[0, 0], p[1, 0], p[2, 0], k0)
         dc = np.array(calc_diff(target, xc, yc, yawc)).reshape(3, 1)
 
         cost = np.linalg.norm(dc)
@@ -135,7 +135,7 @@ def optimize_trajectory(target, k0, p):
     return xc, yc, yawc, p
 
 
-def test_optimize_trajectory():  # pragma: no cover
+def optimize_trajectory_demo():  # pragma: no cover
 
     #  target = motion_model.State(x=5.0, y=2.0, yaw=np.deg2rad(00.0))
     target = motion_model.State(x=5.0, y=2.0, yaw=np.deg2rad(90.0))
@@ -155,7 +155,7 @@ def test_optimize_trajectory():  # pragma: no cover
 
 def main():  # pragma: no cover
     print(__file__ + " start!!")
-    test_optimize_trajectory()
+    optimize_trajectory_demo()
 
 
 if __name__ == '__main__':

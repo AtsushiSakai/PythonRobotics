@@ -117,9 +117,9 @@ def calc_edges(x_list, z_list):
             for iz2 in range(len(z_list[t2][:, 0])):
                 if z_list[t1][iz1, 3] == z_list[t2][iz2, 3]:
                     d1 = z_list[t1][iz1, 0]
-                    angle1, phi1 = z_list[t1][iz1, 1], z_list[t1][iz1, 2]
+                    angle1, _ = z_list[t1][iz1, 1], z_list[t1][iz1, 2]
                     d2 = z_list[t2][iz2, 0]
-                    angle2, phi2 = z_list[t2][iz2, 1], z_list[t2][iz2, 2]
+                    angle2, _ = z_list[t2][iz2, 1], z_list[t2][iz2, 2]
 
                     edge = calc_edge(x1, y1, yaw1, x2, y2, yaw2, d1,
                                      angle1, d2, angle2, t1, t2)
@@ -188,7 +188,7 @@ def graph_based_slam(x_init, hz):
         for i in range(nt):
             x_opt[0:3, i] += dx[i * 3:i * 3 + 3, 0]
 
-        diff = dx.T @ dx
+        diff = (dx.T @ dx)[0, 0]
         print("iteration: %d, diff: %f" % (itr + 1, diff))
         if diff < 1.0e-5:
             break

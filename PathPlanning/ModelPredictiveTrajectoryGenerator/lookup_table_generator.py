@@ -81,7 +81,7 @@ def generate_lookup_table():
         if x is not None:
             print("find good path")
             lookup_table.append(
-                [x[-1], y[-1], yaw[-1], float(p[0]), float(p[1]), float(p[2])])
+                [x[-1], y[-1], yaw[-1], float(p[0, 0]), float(p[1, 0]), float(p[2, 0])])
 
     print("finish lookup table generation")
 
