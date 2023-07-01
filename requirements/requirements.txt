@@ -1,7 +1,7 @@
 numpy == 1.25.0
-scipy == 1.10.1
+scipy == 1.11.1
 matplotlib == 3.7.1
-cvxpy == 1.3.1
+cvxpy == 1.3.2
 pytest == 7.4.0 # For unit test
 pytest-xdist == 3.3.1 # For unit test
 mypy == 1.4.1 # For unit test
