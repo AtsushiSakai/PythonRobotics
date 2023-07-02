@@ -31,7 +31,7 @@ def create_dummy_observation_data():
     # right corridor 3
     for x in range(20, 50):
         ox.append(x)
-        oy.append(20.0)
+        oy.append(x/2.0+10)
     # right corridor 4
     for y in range(20, 50):
         ox.append(20)

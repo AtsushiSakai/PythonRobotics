@@ -1,4 +1,4 @@
-.. _ndt_mapping:
+.. _ndt_mapp:
 
 Normal Distance Transform(NDT) map
 -------------------------------
