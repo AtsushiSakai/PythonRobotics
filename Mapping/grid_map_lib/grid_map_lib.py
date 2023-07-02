@@ -35,8 +35,8 @@ class GridMap:
         self.left_lower_x = self.center_x - self.width / 2.0 * self.resolution
         self.left_lower_y = self.center_y - self.height / 2.0 * self.resolution
 
-        self.ndata = self.width * self.height
-        self.data = [init_val] * self.ndata
+        self.n_data = self.width * self.height
+        self.data = [init_val] * self.n_data
 
     def get_value_from_xy_index(self, x_ind, y_ind):
         """get_value_from_xy_index
@@ -49,7 +49,7 @@ class GridMap:
 
         grid_ind = self.calc_grid_index_from_xy_index(x_ind, y_ind)
 
-        if 0 <= grid_ind < self.ndata:
+        if 0 <= grid_ind < self.n_data:
             return self.data[grid_ind]
         else:
             return None
@@ -101,7 +101,7 @@ class GridMap:
 
         grid_ind = int(y_ind * self.width + x_ind)
 
-        if 0 <= grid_ind < self.ndata:
+        if 0 <= grid_ind < self.n_data:
             self.data[grid_ind] = val
             return True  # OK
         else:
@@ -211,7 +211,7 @@ class GridMap:
         print("center_y:", self.center_y)
         print("left_lower_x:", self.left_lower_x)
         print("left_lower_y:", self.left_lower_y)
-        print("ndata:", self.ndata)
+        print("n_data:", self.n_data)
 
     def plot_grid_map(self, ax=None):
 
