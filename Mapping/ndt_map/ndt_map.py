@@ -6,6 +6,7 @@ import numpy as np
 from collections import defaultdict
 
 from Mapping.grid_map_lib.grid_map_lib import GridMap
+from utils.plot import plot_covariance_ellipse
 
 
 class NDTMap:
@@ -69,9 +70,10 @@ def main():
     plt.plot(ox, oy, ".r")
 
     # grid clustering
-    [plt.plot(ox[inds], oy[inds], "x") for inds in ndt_map.grid_index_map.values()]
+    #[plt.plot(ox[inds], oy[inds], "x") for inds in ndt_map.grid_index_map.values()]
 
-    [plt.plot(ndt.mean_x, ndt.mean_y, "o") for ndt in ndt_map.grid_map.data if ndt.n_points > 0]
+    # [plt.plot(ndt.mean_x, ndt.mean_y, "o") for ndt in ndt_map.grid_map.data if ndt.n_points > 0]
+    [plot_covariance_ellipse(ndt.mean_x, ndt.mean_y, ndt.covariance, color="-k") for ndt in ndt_map.grid_map.data if ndt.n_points > 0]
 
     plt.axis("equal")
     plt.show()
