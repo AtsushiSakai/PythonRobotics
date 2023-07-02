@@ -132,7 +132,6 @@ def plot_3d_vector_arrow(ax, p1, p2):
                )
 
 
-
 def plot_triangle(p1, p2, p3, ax):
     ax.add_collection3d(art3d.Poly3DCollection([[p1, p2, p3]], color='b'))
 

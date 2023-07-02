@@ -1,4 +1,6 @@
+"""
 
+"""
 import matplotlib.pyplot as plt
 import numpy as np
 from collections import defaultdict
@@ -11,7 +13,14 @@ class NDTMap:
     class NDT:
 
         def __init__(self):
-            self.x = 0
+            self.n_points = 0
+            self.mean_x = None
+            self.mean_y = None
+            self.center_grid_x = None
+            self.center_grid_y = None
+            self.covariance = None
+            self.eig_vec = None
+            self.eig_values = None
 
     def __init__(self, ox, oy, resolution):
         """
@@ -28,11 +37,25 @@ class NDTMap:
 
         self.grid_map = GridMap(width, height, resolution, center_x, center_y, self.NDT())
 
-        self.grid_index_map = defaultdict(list)
+        self.grid_index_map = self._create_grid_index_map(ox, oy)
+
+        for grid_index, inds in self.grid_index_map.items():
+            ndt = self.NDT()
+            ndt.n_points = len(inds)
+            if ndt.n_points >= 3:
+                ndt.mean_x = np.mean(ox[inds])
+                ndt.mean_y = np.mean(oy[inds])
+                #ndt.center_grid_x, center_grid_y = self.grid_map.calc_grid_central_xy_position_from_index(grid_index)
+                ndt.covariance = np.cov(ox[inds], oy[inds])
+                ndt.eig_values, eig_vec = np.linalg.eig(ndt.covariance)
+                self.grid_map.data[grid_index] = ndt
+
+    def _create_grid_index_map(self, ox, oy):
+        grid_index_map = defaultdict(list)
         for i in range(len(ox)):
             grid_index = self.grid_map.calc_grid_index_from_xy_pos(ox[i], oy[i])
-            self.grid_index_map[grid_index].append(i)
-
+            grid_index_map[grid_index].append(i)
+        return grid_index_map
 
 
 def main():
@@ -47,6 +70,8 @@ def main():
 
     # grid clustering
     [plt.plot(ox[inds], oy[inds], "x") for inds in ndt_map.grid_index_map.values()]
+
+    [plt.plot(ndt.mean_x, ndt.mean_y, "o") for ndt in ndt_map.grid_map.data if ndt.n_points > 0]
 
     plt.axis("equal")
     plt.show()
