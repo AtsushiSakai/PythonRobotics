@@ -1,14 +1,53 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+from collections import defaultdict
+
+from Mapping.grid_map_lib.grid_map_lib import GridMap
+
+
+class NDTMap:
+
+    class NDT:
+
+        def __init__(self):
+            self.x = 0
+
+    def __init__(self, ox, oy, resolution):
+        """
+        :param ox
+        :param oy
+        :param resolution: grid resolution [m]
+        """
+        width = int((max(ox) - min(ox))/resolution) + 3
+        height = int((max(oy) - min(oy))/resolution) + 3
+        center_x = np.mean(ox)
+        center_y = np.mean(oy)
+        self.ox = ox
+        self.oy = oy
+
+        self.grid_map = GridMap(width, height, resolution, center_x, center_y, self.NDT())
+
+        self.grid_index_map = defaultdict(list)
+        for i in range(len(ox)):
+            grid_index = self.grid_map.calc_grid_index_from_xy_pos(ox[i], oy[i])
+            self.grid_index_map[grid_index].append(i)
+
 
 
 def main():
     print(__file__ + " start!!")
 
     ox, oy = create_dummy_observation_data()
+    grid_resolution = 10.0
+    ndt_map = NDTMap(ox, oy, grid_resolution)
 
+    # plot raw observation
     plt.plot(ox, oy, ".r")
+
+    # grid clustering
+    [plt.plot(ox[inds], oy[inds], "x") for inds in ndt_map.grid_index_map.values()]
+
     plt.axis("equal")
     plt.show()
 

@@ -159,6 +159,19 @@ class GridMap:
         grid_ind = int(y_ind * self.width + x_ind)
         return grid_ind
 
+    def calc_grid_index_from_xy_pos(self, x_pos, y_pos):
+        """get_xy_index_from_xy_pos
+
+        :param x_pos: x position [m]
+        :param y_pos: y position [m]
+        """
+        x_ind = self.calc_xy_index_from_position(
+            x_pos, self.left_lower_x, self.width)
+        y_ind = self.calc_xy_index_from_position(
+            y_pos, self.left_lower_y, self.height)
+
+        return self.calc_grid_index_from_xy_index(x_ind, y_ind)
+
     def calc_grid_central_xy_position_from_xy_index(self, x_ind, y_ind):
         x_pos = self.calc_grid_central_xy_position_from_index(
             x_ind, self.left_lower_x)
