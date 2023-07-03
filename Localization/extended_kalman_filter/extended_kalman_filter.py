@@ -136,13 +136,6 @@ def ekf_estimation(xEst, PEst, z, u):
     return xEst, PEst
 
 
-def plot_covariance_ellipse(x_est, p_est):  # pragma: no cover
-    p_xy = p_est[0:2, 0:2]
-    x = x_est[0, 0]
-    y = x_est[1, 0]
-    plot_covariance_ellipse(x, y, p_xy)
-
-
 def main():
     print(__file__ + " start!!")
 
@@ -187,7 +180,7 @@ def main():
                      hxDR[1, :].flatten(), "-k")
             plt.plot(hxEst[0, :].flatten(),
                      hxEst[1, :].flatten(), "-r")
-            plot_covariance_ellipse(xEst, PEst)
+            plot_covariance_ellipse(xEst[0, 0], xEst[1, 0], PEst)
             plt.axis("equal")
             plt.grid(True)
             plt.pause(0.001)

@@ -46,9 +46,10 @@ class NDTMap:
             if ndt.n_points >= 3:
                 ndt.mean_x = np.mean(ox[inds])
                 ndt.mean_y = np.mean(oy[inds])
-                #ndt.center_grid_x, center_grid_y = self.grid_map.calc_grid_central_xy_position_from_index(grid_index)
+                ndt.center_grid_x, ndt.center_grid_y = \
+                    self.grid_map.calc_grid_central_xy_position_from_grid_index(grid_index)
                 ndt.covariance = np.cov(ox[inds], oy[inds])
-                ndt.eig_values, eig_vec = np.linalg.eig(ndt.covariance)
+                ndt.eig_values, ndt.eig_vec = np.linalg.eig(ndt.covariance)
                 self.grid_map.data[grid_index] = ndt
 
     def _create_grid_index_map(self, ox, oy):
@@ -72,7 +73,8 @@ def main():
     # grid clustering
     #[plt.plot(ox[inds], oy[inds], "x") for inds in ndt_map.grid_index_map.values()]
 
-    # [plt.plot(ndt.mean_x, ndt.mean_y, "o") for ndt in ndt_map.grid_map.data if ndt.n_points > 0]
+    #[plt.plot(ndt.mean_x, ndt.mean_y, "o") for ndt in ndt_map.grid_map.data if ndt.n_points > 0]
+    [plt.plot(ndt.center_grid_x, ndt.center_grid_y, "x") for ndt in ndt_map.grid_map.data if ndt.n_points > 0]
     [plot_covariance_ellipse(ndt.mean_x, ndt.mean_y, ndt.covariance, color="-k") for ndt in ndt_map.grid_map.data if ndt.n_points > 0]
 
     plt.axis("equal")
