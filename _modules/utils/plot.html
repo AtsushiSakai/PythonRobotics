@@ -112,6 +112,69 @@
 <span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d.proj3d</span> <span class="kn">import</span> <span class="n">proj_transform</span>
 <span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">Axes3D</span>
 
+<span class="kn">from</span> <span class="nn">utils.angle</span> <span class="kn">import</span> <span class="n">rot_mat_2d</span>
+
+
+<span class="k">def</span> <span class="nf">plot_covariance_ellipse</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">chi2</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function plots an ellipse that represents a covariance matrix. The ellipse is centered at (x, y) and its shape, size and rotation are determined by the covariance matrix.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    x : (float) The x-coordinate of the center of the ellipse.</span>
+<span class="sd">    y : (float) The y-coordinate of the center of the ellipse.</span>
+<span class="sd">    cov : (numpy.ndarray) A 2x2 covariance matrix that determines the shape, size, and rotation of the ellipse.</span>
+<span class="sd">    chi2 : (float, optional) A scalar value that scales the ellipse size. This value is typically set based on chi-squared distribution quantiles to achieve certain confidence levels (e.g., 3.0 corresponds to ~95% confidence for a 2D Gaussian). Defaults to 3.0.</span>
+<span class="sd">    color : (str, optional) The color and line style of the ellipse plot, following matplotlib conventions. Defaults to &quot;-r&quot; (a red solid line).</span>
+<span class="sd">    ax : (matplotlib.axes.Axes, optional) The Axes object to draw the ellipse on. If None (default), a new figure and axes are created.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    None. This function plots the covariance ellipse on the specified axes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">eig_val</span><span class="p">,</span> <span class="n">eig_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">cov</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">eig_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">eig_val</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">big_ind</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">small_ind</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">big_ind</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">small_ind</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">chi2</span> <span class="o">*</span> <span class="n">eig_val</span><span class="p">[</span><span class="n">big_ind</span><span class="p">])</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">chi2</span> <span class="o">*</span> <span class="n">eig_val</span><span class="p">[</span><span class="n">small_ind</span><span class="p">])</span>
+    <span class="n">angle</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">eig_vec</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">big_ind</span><span class="p">],</span> <span class="n">eig_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">big_ind</span><span class="p">])</span>
+    <span class="n">plot_ellipse</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">plot_ellipse</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function plots an ellipse based on the given parameters.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : (float) The x-coordinate of the center of the ellipse.</span>
+<span class="sd">    y : (float) The y-coordinate of the center of the ellipse.</span>
+<span class="sd">    a : (float) The length of the semi-major axis of the ellipse.</span>
+<span class="sd">    b : (float) The length of the semi-minor axis of the ellipse.</span>
+<span class="sd">    angle : (float) The rotation angle of the ellipse, in radians.</span>
+<span class="sd">    color : (str, optional) The color and line style of the ellipse plot, following matplotlib conventions. Defaults to &quot;-r&quot; (a red solid line).</span>
+<span class="sd">    ax : (matplotlib.axes.Axes, optional) The Axes object to draw the ellipse on. If None (default), a new figure and axes are created.</span>
+<span class="sd">    **kwargs: Additional keyword arguments to pass to plt.plot or ax.plot.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ---------</span>
+<span class="sd">    None. This function plots the ellipse based on the specified parameters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">+</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">px</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">t</span><span class="p">]</span>
+    <span class="n">py</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">t</span><span class="p">]</span>
+    <span class="n">fx</span> <span class="o">=</span> <span class="n">rot_mat_2d</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">@</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">]))</span>
+    <span class="n">px</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">py</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fx</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
 
 <span class="k">def</span> <span class="nf">plot_arrow</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yaw</span><span class="p">,</span> <span class="n">arrow_length</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
                <span class="n">origin_point_plot_style</span><span class="o">=</span><span class="s2">&quot;xr&quot;</span><span class="p">,</span>
@@ -235,7 +298,6 @@
                <span class="p">)</span>
 
 
-
 <span class="k">def</span> <span class="nf">plot_triangle</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">add_collection3d</span><span class="p">(</span><span class="n">art3d</span><span class="o">.</span><span class="n">Poly3DCollection</span><span class="p">([[</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">]],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">))</span>
 
@@ -266,6 +328,13 @@
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">mid_x</span> <span class="o">-</span> <span class="n">max_range</span><span class="p">,</span> <span class="n">mid_x</span> <span class="o">+</span> <span class="n">max_range</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">mid_y</span> <span class="o">-</span> <span class="n">max_range</span><span class="p">,</span> <span class="n">mid_y</span> <span class="o">+</span> <span class="n">max_range</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_zlim</span><span class="p">(</span><span class="n">mid_z</span> <span class="o">-</span> <span class="n">max_range</span><span class="p">,</span> <span class="n">mid_z</span> <span class="o">+</span> <span class="n">max_range</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">plot_ellipse</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mi">15</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
 </pre></div>
 
            </div>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Normal Distance Transform (NDT) map &mdash; PythonRobotics  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/dark_mode_css/general.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/dark_mode_css/dark.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/clipboard.min.js"></script>
+        <script src="../../../_static/copybutton.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="../../../_static/dark_mode_js/default_dark.js"></script>
+        <script src="../../../_static/dark_mode_js/theme_switcher.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Ray casting grid map" href="../ray_casting_grid_map/ray_casting_grid_map.html" />
+    <link rel="prev" title="Gaussian grid map" href="../gaussian_grid_map/gaussian_grid_map.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+            <a href="../../../index.html" class="icon icon-home"> PythonRobotics
+            <img src="../../../_static/icon.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9612347954373886"
+     crossorigin="anonymous"></script>
+<!-- PythonRoboticsDoc -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-9612347954373886"
+     data-ad-slot="1579532132"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../localization/localization.html">Localization</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../mapping.html">Mapping</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../gaussian_grid_map/gaussian_grid_map.html">Gaussian grid map</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Normal Distance Transform (NDT) map</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#normal-distribution">Normal Distribution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#normal-distance-transform-mapping-steps">Normal Distance Transform mapping steps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#api">API</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../ray_casting_grid_map/ray_casting_grid_map.html">Ray casting grid map</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lidar_to_grid_map_tutorial/lidar_to_grid_map_tutorial.html">Lidar to grid map</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../point_cloud_sampling/point_cloud_sampling.html">Point cloud Sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../k_means_object_clustering/k_means_object_clustering.html">k-means object clustering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../circle_fitting/circle_fitting.html">Object shape recognition using circle fitting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rectangle_fitting/rectangle_fitting.html">Object shape recognition using rectangle fitting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../normal_vector_estimation/normal_vector_estimation.html">Normal vector estimation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../slam/slam.html">SLAM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_planning/path_planning.html">Path Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../path_tracking/path_tracking.html">Path Tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../arm_navigation/arm_navigation.html">Arm Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../aerial_navigation/aerial_navigation.html">Aerial Navigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bipedal/bipedal.html">Bipedal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../control/control.html">Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utils/utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../appendix/appendix.html">Appendix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../how_to_contribute.html">How To Contribute</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PythonRobotics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../mapping.html">Mapping</a> &raquo;</li>
+      <li>Normal Distance Transform (NDT) map</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/AtsushiSakai/PythonRobotics/blob/master/docs/modules/mapping/ndt_map/ndt_map_main.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="normal-distance-transform-ndt-map">
+<span id="ndt-map"></span><h1>Normal Distance Transform (NDT) map<a class="headerlink" href="#normal-distance-transform-ndt-map" title="Permalink to this headline"></a></h1>
+<p>This is a NDT mapping example.</p>
+<p>Normal Distribution Transform (NDT) is a map representation that uses normal distribution for observation point modeling.</p>
+<section id="normal-distribution">
+<h2>Normal Distribution<a class="headerlink" href="#normal-distribution" title="Permalink to this headline"></a></h2>
+<p>Normal distribution consists of two parameters: mean <span class="math notranslate nohighlight">\(\mu\)</span> and covariance <span class="math notranslate nohighlight">\(\Sigma\)</span>.</p>
+<p><span class="math notranslate nohighlight">\(\mathbf{X} \sim \mathcal{N}(\boldsymbol{\mu}, \boldsymbol{\Sigma})\)</span></p>
+<p>In the 2D case, <span class="math notranslate nohighlight">\(\boldsymbol{\mu}\)</span> is a 2D vector and <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span> is a 2x2 matrix.</p>
+<p>In the matrix form, the probability density function of thr normal distribution is:</p>
+<p><span class="math notranslate nohighlight">\(X=\frac{1}{\sqrt{(2 \pi)^2|\Sigma|}} \exp \left\{-\frac{1}{2}^t(x-\mu) \sum^{-1}(x-\mu)\right\}\)</span></p>
+</section>
+<section id="normal-distance-transform-mapping-steps">
+<h2>Normal Distance Transform mapping steps<a class="headerlink" href="#normal-distance-transform-mapping-steps" title="Permalink to this headline"></a></h2>
+<p>NDT mapping consists of two steps:</p>
+<p>When we have a new observation like this:</p>
+<figure class="align-default">
+<img alt="../../../_images/raw_observations.png" src="../../../_images/raw_observations.png" />
+</figure>
+<p>First, we need to cluster the observation points.
+This is done by using a grid based clustering algorithm.</p>
+<p>The result is:</p>
+<figure class="align-default">
+<img alt="../../../_images/grid_clustering.png" src="../../../_images/grid_clustering.png" />
+</figure>
+<p>Then, we need to fit a normal distribution to each grid cluster.</p>
+<p>Black ellipse shows each NDT grid like this:</p>
+<figure class="align-default">
+<img alt="../../../_images/ndt_map1.png" src="../../../_images/ndt_map1.png" />
+</figure>
+<figure class="align-default">
+<img alt="../../../_images/ndt_map2.png" src="../../../_images/ndt_map2.png" />
+</figure>
+</section>
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="Mapping.ndt_map.ndt_map.NDTMap">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Mapping.ndt_map.ndt_map.</span></span><span class="sig-name descname"><span class="pre">NDTMap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ox</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/Mapping/ndt_map/ndt_map.html#NDTMap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mapping.ndt_map.ndt_map.NDTMap" title="Permalink to this definition"></a></dt>
+<dd><p>Normal Distribution Transform (NDT) map class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ox</strong> – obstacle x position list</p></li>
+<li><p><strong>oy</strong> – obstacle y position list</p></li>
+<li><p><strong>resolution</strong> – grid resolution [m]</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="Mapping.ndt_map.ndt_map.NDTMap.NDTGrid">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NDTGrid</span></span><a class="reference internal" href="../../../_modules/Mapping/ndt_map/ndt_map.html#NDTMap.NDTGrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mapping.ndt_map.ndt_map.NDTMap.NDTGrid" title="Permalink to this definition"></a></dt>
+<dd><p>NDT grid</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Mapping.ndt_map.ndt_map.NDTMap.NDTGrid.center_grid_x">
+<span class="sig-name descname"><span class="pre">center_grid_x</span></span><a class="headerlink" href="#Mapping.ndt_map.ndt_map.NDTMap.NDTGrid.center_grid_x" title="Permalink to this definition"></a></dt>
+<dd><p>Center x position of the NDT grid</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Mapping.ndt_map.ndt_map.NDTMap.NDTGrid.center_grid_y">
+<span class="sig-name descname"><span class="pre">center_grid_y</span></span><a class="headerlink" href="#Mapping.ndt_map.ndt_map.NDTMap.NDTGrid.center_grid_y" title="Permalink to this definition"></a></dt>
+<dd><p>Center y position of the NDT grid</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Mapping.ndt_map.ndt_map.NDTMap.NDTGrid.covariance">
+<span class="sig-name descname"><span class="pre">covariance</span></span><a class="headerlink" href="#Mapping.ndt_map.ndt_map.NDTMap.NDTGrid.covariance" title="Permalink to this definition"></a></dt>
+<dd><p>Covariance matrix of the NDT grid</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Mapping.ndt_map.ndt_map.NDTMap.NDTGrid.eig_values">
+<span class="sig-name descname"><span class="pre">eig_values</span></span><a class="headerlink" href="#Mapping.ndt_map.ndt_map.NDTMap.NDTGrid.eig_values" title="Permalink to this definition"></a></dt>
+<dd><p>Eigen values of the NDT grid</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Mapping.ndt_map.ndt_map.NDTMap.NDTGrid.eig_vec">
+<span class="sig-name descname"><span class="pre">eig_vec</span></span><a class="headerlink" href="#Mapping.ndt_map.ndt_map.NDTMap.NDTGrid.eig_vec" title="Permalink to this definition"></a></dt>
+<dd><p>Eigen vectors of the NDT grid</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Mapping.ndt_map.ndt_map.NDTMap.NDTGrid.mean_x">
+<span class="sig-name descname"><span class="pre">mean_x</span></span><a class="headerlink" href="#Mapping.ndt_map.ndt_map.NDTMap.NDTGrid.mean_x" title="Permalink to this definition"></a></dt>
+<dd><p>Mean x position of points in the NDTGrid cell</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Mapping.ndt_map.ndt_map.NDTMap.NDTGrid.mean_y">
+<span class="sig-name descname"><span class="pre">mean_y</span></span><a class="headerlink" href="#Mapping.ndt_map.ndt_map.NDTMap.NDTGrid.mean_y" title="Permalink to this definition"></a></dt>
+<dd><p>Mean y position of points in the NDTGrid cell</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Mapping.ndt_map.ndt_map.NDTMap.NDTGrid.n_points">
+<span class="sig-name descname"><span class="pre">n_points</span></span><a class="headerlink" href="#Mapping.ndt_map.ndt_map.NDTMap.NDTGrid.n_points" title="Permalink to this definition"></a></dt>
+<dd><p>Number of points in the NDTGrid grid</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Mapping.ndt_map.ndt_map.NDTMap.grid_index_map">
+<span class="sig-name descname"><span class="pre">grid_index_map</span></span><a class="headerlink" href="#Mapping.ndt_map.ndt_map.NDTMap.grid_index_map" title="Permalink to this definition"></a></dt>
+<dd><p>NDT grid index map</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Mapping.ndt_map.ndt_map.NDTMap.min_n_points">
+<span class="sig-name descname"><span class="pre">min_n_points</span></span><a class="headerlink" href="#Mapping.ndt_map.ndt_map.NDTMap.min_n_points" title="Permalink to this definition"></a></dt>
+<dd><p>Minimum number of points in the NDT grid</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="Mapping.ndt_map.ndt_map.NDTMap.resolution">
+<span class="sig-name descname"><span class="pre">resolution</span></span><a class="headerlink" href="#Mapping.ndt_map.ndt_map.NDTMap.resolution" title="Permalink to this definition"></a></dt>
+<dd><p>Resolution of the NDT grid [m]</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../gaussian_grid_map/gaussian_grid_map.html" class="btn btn-neutral float-left" title="Gaussian grid map" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../ray_casting_grid_map/ray_casting_grid_map.html" class="btn btn-neutral float-right" title="Ray casting grid map" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2021, Atsushi Sakai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
