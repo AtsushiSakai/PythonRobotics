@@ -19,7 +19,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install -r requirements/requirements.txt
     - name: Build and Commit
-      uses: sphinx-notes/pages@v2
+      uses: sphinx-notes/pages@v3
       with:
         requirements_path: ./docs/doc_requirements.txt
     - name: Push changes
