@@ -11,6 +11,8 @@ import math
 
 from sys import maxsize
 
+import time
+
 import matplotlib.pyplot as plt
 
 show_animation = True
@@ -55,7 +57,7 @@ class Map:
         self.map = self.init_map()
 
     def init_map(self):
-        map_list = []
+        map_list:list[State] = []
         for i in range(self.row):
             tmp = []
             for j in range(self.col):
@@ -86,7 +88,7 @@ class Map:
 
 class Dstar:
     def __init__(self, maps):
-        self.map = maps
+        self.map:Map = maps
         self.open_list = set()
 
     def process_state(self):
@@ -172,6 +174,8 @@ class Dstar:
         s = s.parent
         s.set_state("e")
         tmp = start
+        
+        return tmp
 
         while tmp != end:
             tmp.set_state("*")
@@ -194,6 +198,17 @@ class Dstar:
             k_min = self.process_state()
             if k_min >= state.h:
                 break
+            
+
+
+def AddObstacle(map:Map):
+    ox, oy = [], []
+    for i in range(15, 21):
+        ox.append(i)
+        oy.append(40)
+    map.set_obstacle([(i, j) for i, j in zip(ox, oy)])
+    plt.pause(0.001)
+    plt.plot(ox, oy, ".k")
 
 
 def main():
@@ -231,7 +246,41 @@ def main():
     start = m.map[start[0]][start[1]]
     end = m.map[goal[0]][goal[1]]
     dstar = Dstar(m)
-    rx, ry = dstar.run(start, end)
+    tmp = dstar.run(start, end)
+ 
+    # m2 is clone of m
+    m2 = Map(100, 100) 
+    m2.set_obstacle([(i, j) for i, j in zip(ox, oy)])
+    
+    
+    rx,ry = [],[]
+    while tmp != end:
+        tmp.set_state("*")
+        rx.append(tmp.x)
+        ry.append(tmp.y)
+        
+        # add obstacle when step is 20
+        if len(rx) == 20:
+            AddObstacle(m)
+            AddObstacle(m2)
+        
+        if show_animation:
+            plt.plot(rx, ry, "-r")
+            plt.pause(0.1)
+        if tmp.parent.state == "#":
+            # when meet obstacle , d* again
+            s_2 = m2.map[tmp.x][tmp.y]
+            end = m2.map[goal[0]][goal[1]]
+            dstar2 = Dstar(m2)
+            tmp = dstar2.run(s_2, end)
+            
+            time.sleep(1) # wait
+
+            continue
+        tmp = tmp.parent
+    tmp.set_state("e")
+    
+    
 
     if show_animation:
         plt.plot(rx, ry, "-r")
