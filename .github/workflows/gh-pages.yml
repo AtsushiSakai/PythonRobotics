@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
+      pages: write
     steps:
     - name: Setup python
       uses: actions/setup-python@v4
