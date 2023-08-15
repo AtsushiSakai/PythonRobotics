@@ -57,7 +57,7 @@ class Map:
         self.map = self.init_map()
 
     def init_map(self):
-        map_list:list[State] = []
+        map_list = []
         for i in range(self.row):
             tmp = []
             for j in range(self.col):
@@ -88,7 +88,7 @@ class Map:
 
 class Dstar:
     def __init__(self, maps):
-        self.map:Map = maps
+        self.map = maps
         self.open_list = set()
 
     def process_state(self):
@@ -176,21 +176,6 @@ class Dstar:
         tmp = start
         
         return tmp
-
-        while tmp != end:
-            tmp.set_state("*")
-            rx.append(tmp.x)
-            ry.append(tmp.y)
-            if show_animation:
-                plt.plot(rx, ry, "-r")
-                plt.pause(0.01)
-            if tmp.parent.state == "#":
-                self.modify(tmp)
-                continue
-            tmp = tmp.parent
-        tmp.set_state("e")
-
-        return rx, ry
 
     def modify(self, state):
         self.modify_cost(state)
