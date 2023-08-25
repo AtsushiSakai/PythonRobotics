@@ -121,7 +121,7 @@ class LPA:
         
         """
             I don't understand why the second search takes so long, 
-            even though the number of nodes extended by both searches is about the same
+            even though the number of nodes extended by both searches are about the same
         """
         self.count_expend = 0
         start_time = time.time()
