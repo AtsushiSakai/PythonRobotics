@@ -1,3 +1,14 @@
+"""
+Lifelong Planning A*
+author: flyingmars (github.com/2892510130)
+Link to papers:
+LPA* (Link: https://papers.nips.cc/paper/2003-incremental-a.pdf)
+Link to c code Sven Koenig wrote
+(Link: http://idm-lab.org/project-a.html)
+
+My code basically copied his c code
+"""
+
 import math
 import time
 from sys import maxsize
@@ -18,7 +29,8 @@ class State:
         self.rhs = maxsize
         self.h = 0
         self.k = []
-        self.black_list = []
+        # I dont know whether this is necessary, see the c code lpstar2 line 464 and 465
+        self.black_list = [] 
 
     def cost(self, state):
         if self.state == "#" or state.state == "#":
@@ -30,18 +42,6 @@ class State:
     def calculate_key(self):
         self.k = [min(self.g, self.rhs) + self.h, min(self.g, self.rhs)]
         return self.k
-
-    def set_state(self, state):
-        """
-        .: new
-        #: obstacle
-        e: oparent of current state
-        *: closed state
-        s: current state
-        """
-        if state not in ["s", ".", "#", "e", "*"]:
-            return
-        self.state = state
     
     def init_state(self):
         if self.iteration != max_iteration:
@@ -92,7 +92,7 @@ class Map:
             if x < 0 or x >= self.row or y < 0 or y >= self.col:
                 continue
 
-            self.map[x][y].set_state("#")
+            self.map[x][y].state = "#"
 
 class LPA:
     def __init__(self, maps, start, goal, add_obstacle_first):
@@ -111,18 +111,18 @@ class LPA:
         self.count_expend = 0
 
     def run(self):
-        if self.add_obstacle_first:
-            self.AddNewObstacle()
         start_time = time.time()
         self.compute_shortest_path()
         end_time = time.time()
-        print("first_search: ", end_time - start_time, self.count_expend)
+        print("first search: ", end_time - start_time, self.count_expend)
 
         if not self.add_obstacle_first:
             self.AddNewObstacle()
         
-        global show_process
-        show_process = False
+        """
+            I don't understand why the second search takes so long, 
+            even though the number of nodes extended by both searches is about the same
+        """
         self.count_expend = 0
         start_time = time.time()
         self.compute_shortest_path()
@@ -161,20 +161,21 @@ class LPA:
 
     def AddNewObstacle(self):
         ox, oy = [], []
-        for i in range(10, 21):
+        for i in range(15, 21):
             ox.append(i)
-            oy.append(12)
-        # for i in range(41, 51):
-        #     ox.append(5)
-        #     oy.append(i)
-        # for i in range(5, 21):
-        #     ox.append(i)
-        #     oy.append(50)
+            oy.append(40)
+        for i in range(41, 51):
+            ox.append(15)
+            oy.append(i)
+        for i in range(15, 21):
+            ox.append(i)
+            oy.append(50)
         self.map.set_obstacle([(i, j) for i, j in zip(ox, oy)])
         if show_animation:
             plt.pause(0.001)
             plt.plot(ox, oy, ".g")
         
+        # Update the vertex affected by the changed edge
         for i, j in zip(ox, oy):
             change = self.map.map[i][j]
             change.init_state()
@@ -212,12 +213,6 @@ class LPA:
         self.UpdateVertex(state)
 
     def UpdateVertex(self, state):
-        # if state != self.start:
-        #     state.rhs = min([y.g + state.cost(y) for y in self.map.get_neighbors(state)])
-        # if state in self.open_list:
-        #     self.remove(state)
-        # if state.g != state.rhs:
-        #     self.insert(state)
         if state.g != state.rhs:
             self.insert(state)
         else:
@@ -226,11 +221,7 @@ class LPA:
     
 
     def compare_key(self, a, b):
-        if a[0] < b[0]:
-            return True
-        if a[0] == b[0] and a[1] < b[1]:
-            return True
-        return False
+        return a[0] < b[0] or (a[0] == b[0] and a[1] < b[1])
 
     def insert(self, state):
         state.calculate_key()
