@@ -9,6 +9,7 @@ See Wikipedia article (https://en.wikipedia.org/wiki/D*)
 """
 import math
 
+
 from sys import maxsize
 
 import matplotlib.pyplot as plt
@@ -103,7 +104,7 @@ class Dstar:
                 if y.h <= k_old and x.h > y.h + x.cost(y):
                     x.parent = y
                     x.h = y.h + x.cost(y)
-        elif k_old == x.h:
+        if k_old == x.h:
             for y in self.map.get_neighbors(x):
                 if y.t == "new" or y.parent == x and y.h != x.h + x.cost(y) \
                         or y.parent != x and y.h > x.h + x.cost(y):
@@ -116,7 +117,7 @@ class Dstar:
                     self.insert(y, x.h + x.cost(y))
                 else:
                     if y.parent != x and y.h > x.h + x.cost(y):
-                        self.insert(y, x.h)
+                        self.insert(x, x.h)
                     else:
                         if y.parent != x and x.h > y.h + x.cost(y) \
                                 and y.t == "close" and y.h > k_old:
@@ -173,6 +174,8 @@ class Dstar:
         s.set_state("e")
         tmp = start
 
+        AddNewObstacle(self.map) # add new obstacle after the first search finished
+
         while tmp != end:
             tmp.set_state("*")
             rx.append(tmp.x)
@@ -195,6 +198,15 @@ class Dstar:
             if k_min >= state.h:
                 break
 
+def AddNewObstacle(map:Map):
+    ox, oy = [], []
+    for i in range(5, 21):
+        ox.append(i)
+        oy.append(40)
+    map.set_obstacle([(i, j) for i, j in zip(ox, oy)])
+    if show_animation:
+        plt.pause(0.001)
+        plt.plot(ox, oy, ".g")
 
 def main():
     m = Map(100, 100)
@@ -217,7 +229,6 @@ def main():
     for i in range(0, 40):
         ox.append(40)
         oy.append(60 - i)
-    print([(i, j) for i, j in zip(ox, oy)])
     m.set_obstacle([(i, j) for i, j in zip(ox, oy)])
 
     start = [10, 10]
@@ -234,7 +245,7 @@ def main():
     rx, ry = dstar.run(start, end)
 
     if show_animation:
-        plt.plot(rx, ry, "-r")
+        # plt.plot(rx, ry, "-r")
         plt.show()
 
 
