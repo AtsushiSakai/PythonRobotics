@@ -267,7 +267,7 @@ def reflect(steering_directions):
             return 'R'
         elif dirn == 'R':
             return 'L'
-        elif dirn == 'S':
+        else:
             return 'S'
     return[switch_dir(dirn) for dirn in steering_directions]
 
