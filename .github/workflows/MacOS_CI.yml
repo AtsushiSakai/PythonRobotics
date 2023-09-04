@@ -19,7 +19,7 @@ jobs:
         python-version: [ '3.11' ]
     name: Python ${{ matrix.python-version }} CI
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: git fetch --prune --unshallow
 
       - name: Update bash
