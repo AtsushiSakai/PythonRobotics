@@ -27,6 +27,9 @@ class Node:
 
 
 def add_coordinates(node1: Node, node2: Node):
+    """
+    Add coordinates of two nodes.
+    """
     new_node = Node()
     new_node.x = node1.x + node2.x
     new_node.y = node1.y + node2.y
@@ -35,11 +38,13 @@ def add_coordinates(node1: Node, node2: Node):
 
 
 def compare_coordinates(node1: Node, node2: Node):
+    """
+    Compare coordinates of two nodes.
+    """
     return node1.x == node2.x and node1.y == node2.y
 
 
 class DStarLite:
-
     # Please adjust the heuristic function (h) if you change the list of
     # possible motions
     motions = [
@@ -81,9 +86,15 @@ class DStarLite:
         self.initialized = False
 
     def create_grid(self, val: float):
+        """
+        Create a grid with given initial values.
+        """
         return np.full((self.x_max, self.y_max), val)
 
     def is_obstacle(self, node: Node):
+        """
+        Check if a node is an obstacle.
+        """
         x = np.array([node.x])
         y = np.array([node.y])
         obstacle_x_equal = self.obstacles_xy[:, 0] == x
@@ -99,6 +110,9 @@ class DStarLite:
         return is_in_obstacles or is_in_detected_obstacles
 
     def c(self, node1: Node, node2: Node):
+        """
+        Calculate cost between two nodes.
+        """
         if self.is_obstacle(node2):
             # Attempting to move from or to an obstacle
             return math.inf
@@ -109,41 +123,51 @@ class DStarLite:
         return detected_motion[0].cost
 
     def h(self, s: Node):
-        # Cannot use the 2nd euclidean norm as this might sometimes generate
-        # heuristics that overestimate the cost, making them inadmissible,
-        # due to rounding errors etc (when combined with calculate_key)
-        # To be admissible heuristic should
-        # never overestimate the cost of a move
-        # hence not using the line below
-        # return math.hypot(self.start.x - s.x, self.start.y - s.y)
-
-        # Below is the same as 1; modify if you modify the cost of each move in
-        # motion
-        # return max(abs(self.start.x - s.x), abs(self.start.y - s.y))
+        """
+        Calculate heuristic value for a node.
+        """
         return 1
 
     def calculate_key(self, s: Node):
+        """
+        Calculate the key for a node.
+        """
         return (min(self.g[s.x][s.y], self.rhs[s.x][s.y]) + self.h(s)
                 + self.km, min(self.g[s.x][s.y], self.rhs[s.x][s.y]))
 
     def is_valid(self, node: Node):
+        """
+        Check if a node is valid within the grid.
+        """
         if 0 <= node.x < self.x_max and 0 <= node.y < self.y_max:
             return True
         return False
 
     def get_neighbours(self, u: Node):
+        """
+        Get neighboring nodes for a given node.
+        """
         return [add_coordinates(u, motion) for motion in self.motions
                 if self.is_valid(add_coordinates(u, motion))]
 
     def pred(self, u: Node):
+        """
+        Define predecessors for a node in a grid.
+        """
         # Grid, so each vertex is connected to the ones around it
         return self.get_neighbours(u)
 
     def succ(self, u: Node):
+        """
+        Define successors for a node in a grid.
+        """
         # Grid, so each vertex is connected to the ones around it
         return self.get_neighbours(u)
 
     def initialize(self, start: Node, goal: Node):
+        """
+        Initialize the D* Lite algorithm with start and goal nodes.
+        """
         self.start.x = start.x - self.x_min_world
         self.start.y = start.y - self.y_min_world
         self.goal.x = goal.x - self.x_min_world
@@ -160,6 +184,9 @@ class DStarLite:
             self.detected_obstacles_xy = np.empty((0, 2))
 
     def update_vertex(self, u: Node):
+        """
+        Update the vertex and its neighbors in the grid.
+        """
         if not compare_coordinates(u, self.goal):
             self.rhs[u.x][u.y] = min([self.c(u, sprime) +
                                       self.g[sprime.x][sprime.y]
@@ -174,10 +201,16 @@ class DStarLite:
 
     def compare_keys(self, key_pair1: tuple[float, float],
                      key_pair2: tuple[float, float]):
+        """
+        Compare two key pairs.
+        """
         return key_pair1[0] < key_pair2[0] or \
                (key_pair1[0] == key_pair2[0] and key_pair1[1] < key_pair2[1])
 
     def compute_shortest_path(self):
+        """
+        Compute the shortest path using the D* Lite algorithm.
+        """
         self.U.sort(key=lambda x: x[1])
         has_elements = len(self.U) > 0
         start_key_not_updated = self.compare_keys(
@@ -208,6 +241,9 @@ class DStarLite:
                 self.g[self.start.x][self.start.y]
 
     def detect_changes(self):
+        """
+        Detect changes in the environment.
+        """
         changed_vertices = list()
         if len(self.spoofed_obstacles) > 0:
             for spoofed_obstacle in self.spoofed_obstacles[0]:
@@ -258,6 +294,9 @@ class DStarLite:
         return changed_vertices
 
     def compute_current_path(self):
+        """
+        Compute the current path using the D* Lite algorithm.
+        """
         path = list()
         current_point = Node(self.start.x, self.start.y)
         while not compare_coordinates(current_point, self.goal):
@@ -270,6 +309,9 @@ class DStarLite:
         return path
 
     def compare_paths(self, path1: list, path2: list):
+        """
+        Compare two paths.
+        """
         if len(path1) != len(path2):
             return False
         for node1, node2 in zip(path1, path2):
@@ -278,6 +320,9 @@ class DStarLite:
         return True
 
     def display_path(self, path: list, colour: str, alpha: float = 1.0):
+        """
+        Display a path on the grid.
+        """
         px = [(node.x + self.x_min_world) for node in path]
         py = [(node.y + self.y_min_world) for node in path]
         drawing = plt.plot(px, py, colour, alpha=alpha)
@@ -351,7 +396,6 @@ class DStarLite:
 
 
 def main():
-
     # start and goal position
     sx = 10  # [m]
     sy = 10  # [m]
@@ -362,66 +406,38 @@ def main():
     ox, oy = [], []
     for i in range(-10, 60):
         ox.append(i)
-        oy.append(-10.0)
+        oy.append(-10)
     for i in range(-10, 60):
-        ox.append(60.0)
-        oy.append(i)
-    for i in range(-10, 61):
         ox.append(i)
-        oy.append(60.0)
-    for i in range(-10, 61):
-        ox.append(-10.0)
+        oy.append(60)
+    for i in range(-10, 0):
+        ox.append(-10)
         oy.append(i)
-    for i in range(-10, 40):
-        ox.append(20.0)
+    for i in range(50, 60):
+        ox.append(60)
         oy.append(i)
-    for i in range(0, 40):
-        ox.append(40.0)
-        oy.append(60.0 - i)
+    for i in range(20, 40):
+        ox.append(30)
+        oy.append(i)
+    for i in range(0, 20):
+        ox.append(40)
+        oy.append(i)
 
+    print("start " + str(sx) + " [m] " + str(sy) + " [m]")
+    print("goal " + str(gx) + " [m] " + str(gy) + " [m]")
     if show_animation:
         plt.plot(ox, oy, ".k")
         plt.plot(sx, sy, "og")
         plt.plot(gx, gy, "xb")
         plt.grid(True)
         plt.axis("equal")
-        label_column = ['Start', 'Goal', 'Path taken',
-                        'Current computed path', 'Previous computed path',
-                        'Obstacles']
-        columns = [plt.plot([], [], symbol, color=colour, alpha=alpha)[0]
-                   for symbol, colour, alpha in [['o', 'g', 1],
-                                                 ['x', 'b', 1],
-                                                 ['-', 'r', 1],
-                                                 ['.', 'c', 1],
-                                                 ['.', 'c', 0.3],
-                                                 ['.', 'k', 1]]]
-        plt.legend(columns, label_column, bbox_to_anchor=(1, 1), title="Key:",
-                   fontsize="xx-small")
-        plt.plot()
-        plt.pause(pause_time)
-
-    # Obstacles discovered at time = row
-    # time = 1, obstacles discovered at (0, 2), (9, 2), (4, 0)
-    # time = 2, obstacles discovered at (0, 1), (7, 7)
-    # ...
-    # when the spoofed obstacles are:
-    # spoofed_ox = [[0, 9, 4], [0, 7], [], [], [], [], [], [5]]
-    # spoofed_oy = [[2, 2, 0], [1, 7], [], [], [], [], [], [4]]
-
-    # Reroute
-    # spoofed_ox = [[], [], [], [], [], [], [], [40 for _ in range(10, 21)]]
-    # spoofed_oy = [[], [], [], [], [], [], [], [i for i in range(10, 21)]]
-
-    # Obstacles that demostrate large rerouting
-    spoofed_ox = [[], [], [],
-                  [i for i in range(0, 21)] + [0 for _ in range(0, 20)]]
-    spoofed_oy = [[], [], [],
-                  [20 for _ in range(0, 21)] + [i for i in range(0, 20)]]
 
     dstarlite = DStarLite(ox, oy)
-    dstarlite.main(Node(x=sx, y=sy), Node(x=gx, y=gy),
-                   spoofed_ox=spoofed_ox, spoofed_oy=spoofed_oy)
+    if dstarlite.main(Node(sx, sy), Node(gx, gy), spoofed_ox=[[]],
+                      spoofed_oy=[[]]):
+        if show_animation:
+            plt.show()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
