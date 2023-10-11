@@ -50,7 +50,7 @@ class SweepSearcher:
                 # moving backward
                 next_c_x_index = -self.moving_direction + c_x_index
                 next_c_y_index = c_y_index
-                if self.check_occupied(next_c_x_index, next_c_y_index, grid_map):
+                if self.check_occupied(next_c_x_index, next_c_y_index, grid_map, FloatGrid(1.0)):
                     # moved backward, but the grid is occupied by obstacle
                     return None, None
             else:
@@ -61,8 +61,8 @@ class SweepSearcher:
             return next_c_x_index, next_c_y_index
 
     @staticmethod
-    def check_occupied(c_x_index, c_y_index, grid_map):
-        return grid_map.check_occupied_from_xy_index(c_x_index, c_y_index, FloatGrid(0.5))
+    def check_occupied(c_x_index, c_y_index, grid_map, occupied_val=FloatGrid(0.5)):
+        return grid_map.check_occupied_from_xy_index(c_x_index, c_y_index, occupied_val)
 
     def find_safe_turning_grid(self, c_x_index, c_y_index, grid_map):
 
