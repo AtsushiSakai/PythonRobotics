@@ -136,8 +136,8 @@ class PoseSE2(np.ndarray):
 
         """
         return PoseSE2([-self[0] * np.cos(self[2]) - self[1] * np.sin(self[2]),
-                        self[0] * np.sin(self[2]) - self[1] * np.cos(
-                            [self[2]])], -self[2])
+                        self[0] * np.sin(self[2]) - self[1] * np.cos(self[2])],
+                        -self[2])
 
     # ======================================================================= #
     #                                                                         #
