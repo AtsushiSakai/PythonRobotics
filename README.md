@@ -634,7 +634,7 @@ If you or your company would like to support this project, please consider:
 
 If you would like to support us in some other way, please contact with creating an issue.
 
-## <a id="sponsors"></a>Sponsors
+### <a id="sponsors"></a>Sponsors
 
 ### <a id="JetBrains"></a>[JetBrains](https://www.jetbrains.com/)
 
