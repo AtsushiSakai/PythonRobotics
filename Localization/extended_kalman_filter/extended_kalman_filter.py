@@ -94,6 +94,7 @@ def jacob_f(x, u):
     y_{t+1} = y_t+v*s*dt*sin(yaw)
     yaw_{t+1} = yaw_t+omega*dt
     v_{t+1} = v{t}
+    s_{t+1} = s{t}
     so
     dx/dyaw = -v*dt*sin(yaw)
     dx/dv = dt*cos(yaw)
