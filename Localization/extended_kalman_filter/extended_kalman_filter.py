@@ -98,9 +98,9 @@ def jacob_f(x, u):
     so
     dx/dyaw = -v*dt*sin(yaw)
     dx/dv = dt*cos(yaw)
+    dx/ds = dt*v*cos(yaw)
     dy/dyaw = v*dt*cos(yaw)
     dy/dv = dt*sin(yaw)
-    dx/ds = dt*v*cos(yaw)
     dy/ds = dt*v*sin(yaw)
     """
     yaw = x[2, 0]
