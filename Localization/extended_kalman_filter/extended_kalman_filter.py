@@ -76,8 +76,10 @@ def motion_model(x, u):
 
 
 def observation_model(x):
-    H = np.array([[1, 0, 0, 0, 0],
-                  [0, 1, 0, 0, 0]])
+    H = np.array([
+        [1, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0]
+    ])
     z = H @ x
 
     return z
