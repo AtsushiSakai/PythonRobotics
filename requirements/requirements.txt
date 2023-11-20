@@ -5,4 +5,4 @@ cvxpy == 1.4.1
 pytest == 7.4.3 # For unit test
 pytest-xdist == 3.4.0 # For unit test
 mypy == 1.7.0 # For unit test
-ruff == 0.1.5 # For unit test
+ruff == 0.1.6 # For unit test
