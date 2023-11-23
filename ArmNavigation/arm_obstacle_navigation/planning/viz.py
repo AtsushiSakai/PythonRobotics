@@ -1,7 +1,7 @@
-import torch
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
+import torch
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 from planning.kinematics import forward_kinematics
 
 
@@ -22,24 +22,25 @@ def generate_figs(
     init_joint_angles: torch.Tensor,
     target: torch.Tensor,
     obstacles_tensor: torch.Tensor,
+    expert_trajectory: torch.Tensor,
 ) -> list[Figure]:
     figs: list[Figure] = []
     batch_size = link_lengths.shape[0]
     for i in range(batch_size):
         fig, axs = plt.subplots(1, 1)
 
-        # draw robot
         joints_pose = forward_kinematics(link_lengths[i], init_joint_angles[i])
         draw_robot(axs, joints_pose)
 
-        # draw target
+        for trajectory in expert_trajectory[i]:
+            joints_pose = forward_kinematics(link_lengths[i], trajectory)
+            draw_robot(axs, joints_pose)
+
         axs.plot(target[i, 0], target[i, 1], "go")
 
-        # draw obstacles
         for obstacle in obstacles_tensor[i]:
             axs.plot(obstacle[:, 0], obstacle[:, 1], "k-")
 
-        # set axes
         lim_val = torch.sum(link_lengths[i]) * 1.5
         axs.set(xlim=(-lim_val, lim_val), ylim=(-lim_val, lim_val))
         axs.grid(visible=True)

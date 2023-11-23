@@ -41,9 +41,7 @@ def create_2dmap_data(
     )  # inverse occupancy seems like theseus' map_tensor format
 
     origin_x, origin_y = origin
-    obstacles_tensor = torch.zeros(
-        (len(obstacles), 5, 2)
-    )
+    obstacles_tensor = torch.zeros((len(obstacles), 5, 2))
     for i, obstacle in enumerate(obstacles):
         center_x, center_y = obstacle.center
         half_width = obstacle.width / 2
@@ -75,14 +73,14 @@ def create_2dmap_data(
     }
 
 
-class SquigglesDataset(torch.utils.data.Dataset):
+class LinkArmDataset(torch.utils.data.Dataset):
     dataset_length = 1000
 
     def __init__(
         self,
         link_lengths: torch.Tensor,
         create_varying_vars: Callable[
-            [int], tuple[torch.Tensor, torch.Tensor, list[Obstacle]]
+            [int], tuple[torch.Tensor, torch.Tensor, list[Obstacle], torch.Tensor]
         ],
         map_origin: tuple[float, float],
         map_num_rows: int,
@@ -97,15 +95,12 @@ class SquigglesDataset(torch.utils.data.Dataset):
         self.map_cell_size_ = map_cell_size
 
     def __getitem__(self, idx: int) -> dict:
-        init_joint_angles, target, obstacles = self.create_varying_vars_(idx)
-        if idx % 2 == 0:
-            init_joint_angles = torch.tensor([-1.0, -1.0, -1.0])
-            target = torch.tensor([4.0, 0.0])
-            obstacles = [Obstacle((1.5, -0.5), 1.0, 1.0)]
-        else:
-            init_joint_angles = torch.tensor([-2.0, 1.0, 1.0])
-            target = torch.tensor([-5.0, 0.0])
-            obstacles = [Obstacle((-1.5, -0.5), 1.0, 1.0)]
+        (
+            init_joint_angles,
+            target,
+            obstacles,
+            expert_trajectory,
+        ) = self.create_varying_vars_(idx)
 
         data = create_2dmap_data(
             self.map_origin_,
@@ -116,11 +111,12 @@ class SquigglesDataset(torch.utils.data.Dataset):
         )
 
         return {
+            **data,
             "id": idx,
             "link_lengths": self.link_lengths_,
             "init_joint_angles": init_joint_angles,
             "target": target,
-            **data,
+            "expert_trajectory": expert_trajectory,
         }
 
     def __len__(self) -> int:
