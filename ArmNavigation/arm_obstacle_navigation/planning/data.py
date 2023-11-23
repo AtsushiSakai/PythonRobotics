@@ -40,21 +40,38 @@ def create_2dmap_data(
         num_rows, num_cols
     )  # inverse occupancy seems like theseus' map_tensor format
 
-    for obstacle in obstacles:
-        center_ri = int((obstacle.center[1] - origin[1]) / cell_size)
-        center_ci = int((obstacle.center[0] - origin[0]) / cell_size)
-        half_width_rows = int((obstacle.width / cell_size) / 2)
-        half_height_cols = int((obstacle.height / cell_size) / 2)
+    origin_x, origin_y = origin
+    obstacles_tensor = torch.zeros(
+        (len(obstacles), 5, 2)
+    )
+    for i, obstacle in enumerate(obstacles):
+        center_x, center_y = obstacle.center
+        half_width = obstacle.width / 2
+        half_height = obstacle.height / 2
+
+        center_ri = int((center_x - origin_x) / cell_size)
+        center_ci = int((center_y - origin_y) / cell_size)
+        half_width_rows = int(half_width / cell_size)
+        half_height_cols = int(half_height / cell_size)
         the_map[
             center_ri - half_width_rows - 1 : center_ri + half_width_rows,
             center_ci - half_height_cols - 1 : center_ci + half_height_cols,
         ] = 0.0
+
+        top_left = ((center_x - half_width), (center_y - half_height))
+        top_right = ((center_x + half_width), (center_y - half_height))
+        bottom_right = ((center_x + half_width), (center_y + half_height))
+        bottom_left = ((center_x - half_width), (center_y + half_height))
+        obstacles_tensor[i] = torch.tensor(
+            [top_left, top_right, bottom_right, bottom_left, top_left]
+        )
 
     return {
         "map_tensor": the_map,
         "sdf_origin": torch.tensor(origin).double(),
         "cell_size": torch.tensor(cell_size).view(1),
         "sdf_data": get_precomputed_sdf(the_map, cell_size),
+        "obstacles_tensor": obstacles_tensor,
     }
 
 

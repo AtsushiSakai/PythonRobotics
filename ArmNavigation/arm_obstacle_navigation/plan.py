@@ -3,6 +3,7 @@ import sys
 import torch
 import torch.utils.data
 from planning.data import Obstacle, SquigglesDataset
+from planning.viz import generate_figs
 
 
 def create_dataset(batch_size: int = 2) -> dict[str, torch.Tensor]:
@@ -42,3 +43,13 @@ if __name__ == "__main__":
         for k, v in batch.items():
             if k != "id":
                 print(f"{k:20s}: {v.shape}", type(v))
+
+        figs = generate_figs(
+            link_lengths=batch["link_lengths"],
+            init_joint_angles=batch["init_joint_angles"],
+            target=batch["target"],
+            obstacles_tensor=batch["obstacles_tensor"],
+        )
+        figs[0].savefig("trajectory0.png")
+
+    print("Done")
