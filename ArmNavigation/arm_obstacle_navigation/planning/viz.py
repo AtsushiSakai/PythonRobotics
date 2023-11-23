@@ -32,7 +32,8 @@ def generate_figs(
         joints_pose = forward_kinematics(link_lengths[i], init_joint_angles[i])
         draw_robot(axs, joints_pose)
 
-        for trajectory in expert_trajectory[i]:
+        for j in range(expert_trajectory.shape[2]):
+            trajectory = expert_trajectory[i,:,j]
             joints_pose = forward_kinematics(link_lengths[i], trajectory)
             draw_robot(axs, joints_pose)
 

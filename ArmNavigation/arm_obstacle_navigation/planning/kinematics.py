@@ -54,7 +54,7 @@ def inverse_kinematics(
 ) -> tuple[torch.Tensor, bool]:
     iter = 0
     cur_joint_angles = joint_angles.clone()
-    rate = torch.tensor(0.1)
+    damping = torch.tensor(0.1)
     while iter < max_iteration:
         cur_pose = forward_kinematics(link_lengths, cur_joint_angles)[-1, :]
         delta_pose = target - cur_pose
@@ -66,7 +66,7 @@ def inverse_kinematics(
         delta_angles = (
             torch.pinverse(jacobian(link_lengths, cur_joint_angles))
             @ (target - cur_pose)
-            * rate
+            * damping
         )
         cur_joint_angles = cur_joint_angles + delta_angles
         iter += 1
@@ -74,18 +74,25 @@ def inverse_kinematics(
     return cur_joint_angles, False
 
 
-def resample_trajectory(trajectory: torch.Tensor, num_points: int) -> np.ndarray:
+def resample_trajectory(trajectory: torch.Tensor, num_points: int) -> torch.Tensor:
     """
     Resamples a trajectory to have a specific number of points using linear interpolation.
+
+    Args:
+        trajectory: A D by N tensor where D is the dimensionality and N is the number of points.
+        num_points: The number of points in the resampled trajectory.
+
+    Returns:
+        A D by num_points tensor representing the resampled trajectory.
     """
-    # Create an array of indices for the current trajectory
-    current_indices = np.linspace(0, 1, len(trajectory))
+    if trajectory.size(1) <= 1:
+        raise ValueError("Trajectory must have more than one point.")
 
-    # Create an array of indices for the desired number of points
+    trajectory_np = trajectory.numpy()
+    current_indices = np.linspace(0, 1, trajectory_np.shape[1])
     new_indices = np.linspace(0, 1, num_points)
+    interpolator = interp1d(current_indices, trajectory_np, axis=1, kind="linear")
+    new_trajectory_np = interpolator(new_indices)
 
-    # Perform linear interpolation
-    interpolator = interp1d(current_indices, trajectory, axis=0, kind="linear")
-    new_trajectory = interpolator(new_indices)
-
+    new_trajectory = torch.from_numpy(new_trajectory_np)
     return new_trajectory
