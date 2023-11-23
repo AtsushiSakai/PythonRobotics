@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import torch
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
-from planning.kinematics import forward_kinematics
+from .kinematics import forward_kinematics
 
 
 def draw_robot(

@@ -3,10 +3,10 @@ import sys
 import theseus as th
 import torch
 import torch.utils.data
-from planning.collision import CollisionArm
-from planning.data import LinkArmDataset, Obstacle
-from planning.kinematics import inverse_kinematics, resample_trajectory
-from planning.viz import generate_figs
+from utils.collision import CollisionArm
+from utils.data import LinkArmDataset, Obstacle
+from utils.kinematics import inverse_kinematics, resample_trajectory
+from utils.viz import generate_figs
 from theseus.optimizer import OptimizerInfo
 
 torch.set_default_dtype(torch.double)
