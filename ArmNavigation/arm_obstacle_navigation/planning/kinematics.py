@@ -9,9 +9,9 @@ def forward_kinematics(
 ) -> torch.Tensor:
     """
     Returns:
-        joints_pose: N x 2 matrix of joint X,Y coorindates
+        joints_xy: N x 2 matrix of joint X,Y coorindates
     """
-    joints_pose = torch.zeros((len(joint_angles) + 1, 2))
+    joints_xy = torch.zeros((len(joint_angles) + 1, 2))
     theta_sum = torch.tensor(0.0)
     for i, theta in enumerate(joint_angles):
         theta_sum += theta
@@ -21,22 +21,22 @@ def forward_kinematics(
                 torch.sin(theta_sum) * link_lengths[i],
             ]
         )
-        joints_pose[i + 1, :] = joints_pose[i, :] + xy
+        joints_xy[i + 1, :] = joints_xy[i, :] + xy
 
-    return joints_pose
+    return joints_xy
 
 
 def jacobian(
     link_lengths: torch.Tensor,
     joint_angles: torch.Tensor,
 ) -> torch.Tensor:
-    joints_pose = forward_kinematics(link_lengths, joint_angles)
-    ee_pose = joints_pose[-1, :]
+    joints_xy = forward_kinematics(link_lengths, joint_angles)
+    ee_xy = joints_xy[-1, :]
     jac = torch.zeros((2, len(joint_angles)))
-    for i, joint_pose in enumerate(joints_pose[:-1]):
-        ee_from_joint_pose = ee_pose - joint_pose
-        ee_from_joint_ang = torch.atan2(ee_from_joint_pose[1], ee_from_joint_pose[0])
-        ee_from_joint_norm = torch.norm(ee_from_joint_pose)
+    for i, joint_xy in enumerate(joints_xy[:-1]):
+        ee_from_joint_xy = ee_xy - joint_xy
+        ee_from_joint_ang = torch.atan2(ee_from_joint_xy[1], ee_from_joint_xy[0])
+        ee_from_joint_norm = torch.norm(ee_from_joint_xy)
 
         dx = -torch.sin(ee_from_joint_ang) * ee_from_joint_norm
         dy = torch.cos(ee_from_joint_ang) * ee_from_joint_norm
@@ -56,16 +56,15 @@ def inverse_kinematics(
     cur_joint_angles = joint_angles.clone()
     damping = torch.tensor(0.1)
     while iter < max_iteration:
-        cur_pose = forward_kinematics(link_lengths, cur_joint_angles)[-1, :]
-        delta_pose = target - cur_pose
-        dist = torch.norm(delta_pose)
+        cur_xy = forward_kinematics(link_lengths, cur_joint_angles)[-1, :]
+        delta_xy = target - cur_xy
+        dist = torch.norm(delta_xy)
         if dist.item() < 0.01:
             return cur_joint_angles, True
 
-        # Calculate the difference using the pseudo-inverse of the Jacobian
         delta_angles = (
             torch.pinverse(jacobian(link_lengths, cur_joint_angles))
-            @ (target - cur_pose)
+            @ (target - cur_xy)
             * damping
         )
         cur_joint_angles = cur_joint_angles + delta_angles

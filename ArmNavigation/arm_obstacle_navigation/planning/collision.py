@@ -9,7 +9,7 @@ from .kinematics import forward_kinematics, jacobian
 class CollisionArm(CostFunction):
     def __init__(
         self,
-        joint: Vector,
+        pose: Vector,
         link_lengths: Vector,
         init_joint_angles: Vector,
         sdf_origin: Point2 | torch.Tensor,
@@ -20,7 +20,7 @@ class CollisionArm(CostFunction):
         name: str | None = None,
     ):
         super().__init__(cost_weight, name=name)
-        self.joint = joint
+        self.pose = pose
         self.link_lengths = link_lengths
         self.init_joint_angles = init_joint_angles
         self.sdf_origin = SignedDistanceField2D.convert_origin(sdf_origin)
@@ -29,7 +29,7 @@ class CollisionArm(CostFunction):
         self.cost_eps = as_variable(cost_eps)
         self.cost_eps.tensor = self.cost_eps.tensor.view(-1, 1)
 
-        self.register_optim_vars(["joint"])
+        self.register_optim_vars(["pose"])
         self.register_aux_vars(
             [
                 "link_lengths",
@@ -47,15 +47,14 @@ class CollisionArm(CostFunction):
     def _compute_distances_and_jacobians(
         self,
     ) -> tuple[torch.Tensor, torch.Tensor]:
-        print("----_compute_distances_and_jacobians")
         robot_state = torch.zeros_like(self.sdf_origin.tensor)
-        jac_xy = torch.zeros(
+        jac_pose = torch.zeros(
             self.sdf_origin.tensor.shape[0],
             self.sdf_origin.tensor.shape[1],
             self.init_joint_angles.tensor.shape[1],
         )
 
-        for i in range(self.joint.shape[0]):
+        for i in range(self.pose.shape[0]):
             pose = forward_kinematics(
                 link_lengths=self.link_lengths[i],
                 joint_angles=self.init_joint_angles[i],
@@ -65,11 +64,11 @@ class CollisionArm(CostFunction):
                 link_lengths=self.link_lengths[i],
                 joint_angles=self.init_joint_angles[i],
             )
-            jac_xy[i] = j
+            jac_pose[i] = j
 
         dist, jac = self.sdf.signed_distance(robot_state.view(-1, 2, 1))
-        if jac_xy is not None:
-            jac = jac.matmul(jac_xy)
+        if jac_pose is not None:
+            jac = jac.matmul(jac_pose)
         return dist, jac
 
     def _error_from_distances(self, distances: torch.Tensor):
@@ -86,10 +85,9 @@ class CollisionArm(CostFunction):
         jacobian[faraway_idx] = 0.0
         return [-jacobian], error
 
-    # TODO: update with more vairables
     def _copy_impl(self, new_name: str | None = None) -> "CollisionArm":
         return CollisionArm(
-            self.joint.copy(),
+            self.pose.copy(),
             self.link_lengths.copy(),
             self.init_joint_angles.copy(),
             self.sdf_origin.copy(),

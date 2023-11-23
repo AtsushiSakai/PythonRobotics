@@ -1,25 +1,23 @@
 import sys
-import warnings
 
 import theseus as th
 import torch
 import torch.utils.data
-from theseus.optimizer import OptimizerInfo
+from planning.collision import CollisionArm
 from planning.data import LinkArmDataset, Obstacle
 from planning.kinematics import inverse_kinematics, resample_trajectory
 from planning.viz import generate_figs
-from planning.collision import CollisionArm
+from theseus.optimizer import OptimizerInfo
 
 torch.set_default_dtype(torch.double)
 
 
-def create_dataset() -> LinkArmDataset:
+def create_dataset(expert_trajectory_len: int) -> LinkArmDataset:
     link_lengths = torch.tensor([3.0, 2.0, 1.0])
 
     def create_varying_vars(
         idx: int
     ) -> tuple[torch.Tensor, torch.Tensor, list[Obstacle], torch.Tensor]:
-        trajectory_len = 10
         if idx % 2 == 0:
             init_joint_angles = torch.tensor([-1.0, -1.0, -1.0])
             target = torch.tensor([4.0, 0.0])
@@ -31,15 +29,16 @@ def create_dataset() -> LinkArmDataset:
             obstacles = [Obstacle((-2.75, -0.5), 1.0, 1.0)]
             midpoint_joint_angles = torch.tensor([-2.0, -0.5, -0.5])
 
+        # Create expert_trajectory
         target_joint_angles, success = inverse_kinematics(
             link_lengths, midpoint_joint_angles, target
         )
         if not success:
-            warnings.warn("IK failed!")
+            raise RuntimeError("IK failed!")
         trajectory = torch.stack(
             [init_joint_angles, midpoint_joint_angles, target_joint_angles]
         ).T
-        expert_trajectory = resample_trajectory(trajectory, trajectory_len)
+        expert_trajectory = resample_trajectory(trajectory, expert_trajectory_len)
 
         return init_joint_angles, target, obstacles, expert_trajectory
 
@@ -73,13 +72,13 @@ def model_problem(
     # =========================
 
     # Create optimization variables
-    joints: list[th.Vector] = []
+    poses: list[th.Vector] = []
     velocities: list[th.Vector] = []
     for i in range(trajectory_len):
-        joints.append(th.Vector(num_links, name=f"joint_{i}", dtype=torch.double))
+        poses.append(th.Vector(num_links, name=f"pose_{i}", dtype=torch.double))
         velocities.append(th.Vector(num_links, name=f"vel_{i}", dtype=torch.double))
 
-    # Targets for joint boundary cost functions
+    # Targets for boundary cost functions
     start = th.Vector(num_links, name="start")
     goal = th.Vector(num_links, name="goal")
 
@@ -121,7 +120,7 @@ def model_problem(
     # -----------------------
 
     # Fixed starting position
-    objective.add(th.Difference(joints[0], start, boundary_cost_weight, name="joint_0"))
+    objective.add(th.Difference(poses[0], start, boundary_cost_weight, name="pose_0"))
 
     # Fixed initial velocity
     objective.add(
@@ -132,7 +131,11 @@ def model_problem(
             name="vel_0",
         )
     )
-    objective.add(th.Difference(joints[-1], goal, boundary_cost_weight, name="joint_N"))
+
+    # Fixed goal position
+    objective.add(th.Difference(poses[-1], goal, boundary_cost_weight, name="pose_N"))
+
+    # Fixed final velocity
     objective.add(
         th.Difference(
             velocities[-1],
@@ -148,7 +151,7 @@ def model_problem(
     for i in range(1, trajectory_len - 1):
         objective.add(
             CollisionArm(
-                joints[i],
+                poses[i],
                 link_lengths,
                 init_joint_angles,
                 sdf_origin,
@@ -166,9 +169,9 @@ def model_problem(
     for i in range(1, trajectory_len):
         objective.add(
             th.eb.GPMotionModel(
-                joints[i - 1],
+                poses[i - 1],
                 velocities[i - 1],
-                joints[i],
+                poses[i],
                 velocities[i],
                 dt,
                 gp_cost_weight,
@@ -182,14 +185,16 @@ def model_problem(
 def get_straight_line_inputs(
     start: torch.Tensor, goal: torch.Tensor, total_time: float, trajectory_len: int
 ) -> dict:
-    # Returns a dictionary with pose and velocity variable names associated to a
-    # straight line trajectory between start and goal
+    """
+    Returns:
+        A dictionary with pose and velocity variable names associated to a straight line trajectory between start and goal
+    """
     start_goal_dist = goal - start
     avg_vel = start_goal_dist / total_time
     unit_trajectory_len = start_goal_dist / (trajectory_len - 1)
     input_dict = {}
     for i in range(trajectory_len):
-        input_dict[f"joint_{i}"] = start + unit_trajectory_len * i
+        input_dict[f"pose_{i}"] = start + unit_trajectory_len * i
         if i == 0 or i == trajectory_len - 1:
             input_dict[f"vel_{i}"] = torch.zeros_like(avg_vel)
         else:
@@ -197,33 +202,96 @@ def get_straight_line_inputs(
     return input_dict
 
 
+def run_optimizer(
+    batch: dict,
+    objective: th.Objective,
+    total_time: float,
+    trajectory_len: int,
+    device: str = "cpu",
+) -> tuple[dict[str, torch.Tensor], OptimizerInfo]:
+    optimizer = th.LevenbergMarquardt(
+        objective,
+        th.CholeskyDenseSolver,
+        max_iterations=50,
+        step_size=1.0,
+    )
+    motion_planner = th.TheseusLayer(optimizer)
+    motion_planner.to(device=device, dtype=torch.double)
+
+    start = batch["expert_trajectory"][:, :, 0].to(device)
+    goal = batch["expert_trajectory"][:, :, -1].to(device)
+
+    planner_inputs = {
+        "sdf_origin": batch["sdf_origin"].to(device),
+        "start": start.to(device),
+        "goal": goal.to(device),
+        "cell_size": batch["cell_size"].to(device),
+        "sdf_data": batch["sdf_data"].to(device),
+        "link_lengths": batch["link_lengths"].to(device),
+        "init_joint_angles": batch["init_joint_angles"].to(device),
+    }
+    input_dict = get_straight_line_inputs(start, goal, total_time, trajectory_len)
+    planner_inputs.update(input_dict)
+    with torch.no_grad():
+        final_values, info = motion_planner.forward(
+            planner_inputs,
+            optimizer_kwargs={
+                "track_best_solution": True,
+                "verbose": True,
+                "damping": 0.1,
+            },
+        )
+
+    return final_values, info
+
+
+def get_trajectory(
+    values_dict: dict, trajectory_len: int, device: str = "cpu"
+) -> torch.Tensor:
+    trajectory = torch.empty(
+        values_dict["pose_0"].shape[0],  # batch_size
+        values_dict["pose_0"].shape[1],  # ndim
+        trajectory_len,
+        device=device,
+    )
+    for i in range(trajectory_len):
+        trajectory[:, :, i] = values_dict[f"pose_{i}"]
+    return trajectory
+
+
 if __name__ == "__main__":
+    print(__file__ + " start!!")
+
     debug = "-d" in sys.argv[1:]
 
-    # Create a dataset and read the first one
-    dataset = create_dataset()
+    print("Creating a dataset...")
+    expert_trajectory_len = 10
+    dataset = create_dataset(expert_trajectory_len)
     batch_size = 2
     data_loader = torch.utils.data.DataLoader(dataset, batch_size)
+
+    print("Loading a batch...")
     batch = next(iter(data_loader))
     if debug:
         for k, v in batch.items():
             if k != "id":
                 print(f"{k:20s}: {v.shape}", type(v))
 
+        print("Saving figures...")
         figs = generate_figs(
             link_lengths=batch["link_lengths"],
             init_joint_angles=batch["init_joint_angles"],
             target=batch["target"],
             obstacles_tensor=batch["obstacles_tensor"],
-            expert_trajectory=batch["expert_trajectory"],
+            trajectory=batch["expert_trajectory"],
         )
-        figs[0].savefig("trajectory0.png")
-        figs[1].savefig("trajectory1.png")
+        for i, fig in enumerate(figs):
+            fig.savefig(f"expert_trajectory_{0}.png".format(i))
+            fig.savefig(f"expert_trajectory_{0}.png".format(i))
 
-    # Set up the problem
+    print("Setting up an objective...")
     num_links = batch["link_lengths"].shape[1]
     trajectory_len = batch["expert_trajectory"].shape[2]
-    print("trajectory_len", trajectory_len)
     map_size = batch["map_tensor"].shape[1]
     robot_radius = 0.4
     total_time = 10.0
@@ -238,6 +306,22 @@ if __name__ == "__main__":
         collision_w=20.0,
         boundary_w=100.0,
     )
-    print("objective=", objective)
 
-    print("Done!")
+    print("Start running optimizer...")
+    final_values, info = run_optimizer(batch, objective, total_time, trajectory_len)
+    if info.best_solution is None:
+        raise ValueError("Error!")
+
+    print("Saving result trajectories...")
+    result_trajectory = get_trajectory(info.best_solution, trajectory_len)
+    figs = generate_figs(
+        link_lengths=batch["link_lengths"],
+        init_joint_angles=batch["init_joint_angles"],
+        target=batch["target"],
+        obstacles_tensor=batch["obstacles_tensor"],
+        trajectory=result_trajectory,
+    )
+    figs[0].savefig("restrajectory0.png")
+    figs[1].savefig("restrajectory1.png")
+
+    print(__file__ + " done!!")
