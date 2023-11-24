@@ -11,7 +11,6 @@ class CollisionArm(CostFunction):
         self,
         pose: Vector,
         link_lengths: Vector,
-        init_joint_angles: Vector,
         sdf_origin: Point2 | torch.Tensor,
         sdf_data: torch.Tensor | Variable,
         sdf_cell_size: float | torch.Tensor | Variable,
@@ -22,7 +21,6 @@ class CollisionArm(CostFunction):
         super().__init__(cost_weight, name=name)
         self.pose = pose
         self.link_lengths = link_lengths
-        self.init_joint_angles = init_joint_angles
         self.sdf_origin = SignedDistanceField2D.convert_origin(sdf_origin)
         self.sdf_data = SignedDistanceField2D.convert_sdf_data(sdf_data)
         self.sdf_cell_size = SignedDistanceField2D.convert_cell_size(sdf_cell_size)
@@ -33,7 +31,6 @@ class CollisionArm(CostFunction):
         self.register_aux_vars(
             [
                 "link_lengths",
-                "init_joint_angles",
                 "sdf_origin",
                 "sdf_data",
                 "sdf_cell_size",
@@ -47,30 +44,23 @@ class CollisionArm(CostFunction):
     def _compute_distances_and_jacobians(
         self,
     ) -> tuple[torch.Tensor, torch.Tensor]:
-        poses = torch.zeros_like(self.sdf_origin.tensor)
-        jac_pose = torch.zeros(
-            self.sdf_origin.tensor.shape[0],
-            self.sdf_origin.tensor.shape[1],
-            self.pose.tensor.shape[1],
-        )
-
-        for i in range(self.pose.shape[0]):
-            pose = forward_kinematics(
+        batch_size, ndim = self.sdf_origin.tensor.shape
+        nlinks = self.link_lengths.shape[1]
+        poses = torch.zeros(batch_size, ndim)
+        jac_pose = torch.zeros(batch_size, ndim, nlinks)
+        for i in range(batch_size):
+            poses[i] = forward_kinematics(
                 link_lengths=self.link_lengths.tensor[i],
                 joint_angles=self.pose.tensor[i],
             )[-1]
-            poses[i] = pose
-            j = jacobian(
+            jac_pose[i] = jacobian(
                 link_lengths=self.link_lengths.tensor[i],
                 joint_angles=self.pose.tensor[i],
             )
-            jac_pose[i] = j
 
-        # TODO: un-hardcode 2
-        dist, jac = self.sdf.signed_distance(poses.view(-1, 2, 1))
-        if jac_pose is not None:
-            jac = jac.matmul(jac_pose)
-        return dist, jac
+        dist, jac = self.sdf.signed_distance(poses.view(-1, ndim, 1))
+        jac_out = jac.matmul(jac_pose)
+        return dist, jac_out
 
     def _error_from_distances(self, distances: torch.Tensor):
         return (self.cost_eps.tensor - distances).clamp(min=0)
@@ -90,7 +80,6 @@ class CollisionArm(CostFunction):
         return CollisionArm(
             self.pose.copy(),
             self.link_lengths.copy(),
-            self.init_joint_angles.copy(),
             self.sdf_origin.copy(),
             self.sdf_data.copy(),
             self.sdf_cell_size.copy(),

@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from math import floor
 from typing import NamedTuple
 
 import torch
@@ -15,8 +16,8 @@ def get_precomputed_sdf(map_tensor: torch.Tensor, cell_size: float) -> torch.Ten
         field = torch.ones(the_map.shape) * max_map_size
         return field
 
-    map_dist = torch.tensor(ndimage.distance_transform_edt(the_map))
-    inv_map_dist = torch.tensor(ndimage.distance_transform_edt(inv_map))
+    map_dist = torch.tensor(ndimage.distance_transform_edt(inv_map))
+    inv_map_dist = torch.tensor(ndimage.distance_transform_edt(the_map))
 
     field = map_dist - inv_map_dist
     field = field * cell_size
@@ -36,7 +37,7 @@ def create_2dmap_data(
     cell_size: float,
     obstacles: list[Obstacle],
 ) -> dict[str, torch.Tensor]:
-    the_map = torch.ones(
+    the_map = torch.zeros(
         nrows, ncols
     )  # inverse occupancy seems like theseus' map_tensor format
 
@@ -47,14 +48,14 @@ def create_2dmap_data(
         half_width = obstacle.width / 2
         half_height = obstacle.height / 2
 
-        center_ri = int((center_x - origin_x) / cell_size)
-        center_ci = int((center_y - origin_y) / cell_size)
-        half_width_rows = int(half_width / cell_size)
-        half_height_cols = int(half_height / cell_size)
+        center_ri = floor((center_x - origin_x) / cell_size)
+        center_ci = floor((center_y - origin_y) / cell_size)
+        half_rows = floor(half_width / cell_size)
+        half_cols = floor(half_height / cell_size)
         the_map[
-            center_ri - half_width_rows - 1 : center_ri + half_width_rows,
-            center_ci - half_height_cols - 1 : center_ci + half_height_cols,
-        ] = 0.0
+            center_ri - half_rows : center_ri + half_rows + 1,
+            center_ci - half_cols : center_ci + half_cols + 1,
+        ] = 1.0
 
         top_left = ((center_x - half_width), (center_y - half_height))
         top_right = ((center_x + half_width), (center_y - half_height))
@@ -68,7 +69,7 @@ def create_2dmap_data(
         "map_tensor": the_map,
         "sdf_origin": torch.tensor(origin).double(),
         "cell_size": torch.tensor(cell_size).view(1),
-        "sdf_data": get_precomputed_sdf(the_map, cell_size),
+        "sdf_data": get_precomputed_sdf(the_map, cell_size).T,
         "obstacles_tensor": obstacles_tensor,
     }
 
