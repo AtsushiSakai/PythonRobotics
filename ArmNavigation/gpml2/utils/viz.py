@@ -8,18 +8,19 @@ from .kinematics import forward_kinematics
 def draw_robot(
     ax: Axes,
     joints_xy: torch.Tensor,
+    alpha: float = 1.0
 ) -> None:
-    ax.plot(joints_xy[:, 0], joints_xy[:, 1], "r-")
+    ax.plot(joints_xy[:, 0], joints_xy[:, 1], "r-", alpha=alpha)
     ax.plot(
         joints_xy[:, 0],
         joints_xy[:, 1],
         "ko",
+        alpha=alpha,
     )
 
 
 def generate_figs(
     link_lengths: torch.Tensor,
-    init_joint_angles: torch.Tensor,
     target: torch.Tensor,
     obstacles_tensor: torch.Tensor,
     trajectory: torch.Tensor,
@@ -29,13 +30,11 @@ def generate_figs(
     for i in range(batch_size):
         fig, axs = plt.subplots(1, 1)
 
-        joints_xy = forward_kinematics(link_lengths[i], init_joint_angles[i])
-        draw_robot(axs, joints_xy)
-
         for j in range(trajectory.shape[2]):
             cur_trajectory = trajectory[i, :, j]
             joints_xy = forward_kinematics(link_lengths[i], cur_trajectory)
-            draw_robot(axs, joints_xy)
+            alpha = j / (trajectory.shape[2] - 1)
+            draw_robot(axs, joints_xy, alpha)
 
         axs.plot(target[i, 0], target[i, 1], "go")
 

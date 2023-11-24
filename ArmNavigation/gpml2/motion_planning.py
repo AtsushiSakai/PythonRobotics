@@ -3,11 +3,12 @@ import sys
 import theseus as th
 import torch
 import torch.utils.data
+from theseus.optimizer import OptimizerInfo
+
 from utils.collision import CollisionArm
 from utils.data import LinkArmDataset, Obstacle
-from utils.kinematics import inverse_kinematics, resample_trajectory
+from utils.kinematics import forward_kinematics, inverse_kinematics, resample_trajectory
 from utils.viz import generate_figs
-from theseus.optimizer import OptimizerInfo
 
 torch.set_default_dtype(torch.double)
 
@@ -21,7 +22,7 @@ def create_dataset(expert_trajectory_len: int) -> LinkArmDataset:
         if idx % 2 == 0:
             init_joint_angles = torch.tensor([-1.0, -1.0, -1.0])
             target = torch.tensor([4.0, 0.0])
-            obstacles = [Obstacle((2.25, -0.5), 1.0, 1.0)]
+            obstacles = [Obstacle((2.0, -5.5), 1.0, 1.0)]
             midpoint_joint_angles = torch.tensor([-1.0, 0.5, 0.5])
         else:
             init_joint_angles = torch.tensor([-2.0, 1.0, 1.0])
@@ -46,15 +47,15 @@ def create_dataset(expert_trajectory_len: int) -> LinkArmDataset:
         link_lengths=torch.tensor([3.0, 2.0, 1.0]),
         create_varying_vars=create_varying_vars,
         map_origin=(-9.0, -9.0),
-        map_num_rows=180,
-        map_num_cols=180,
+        map_nrows=180,
+        map_ncols=180,
         map_cell_size=0.1,
     )
     return dataset
 
 
 def model_problem(
-    num_links: int,
+    nlinks: int,
     trajectory_len: int,
     map_size: int,
     safety_distance: float,
@@ -75,12 +76,13 @@ def model_problem(
     poses: list[th.Vector] = []
     velocities: list[th.Vector] = []
     for i in range(trajectory_len):
-        poses.append(th.Vector(num_links, name=f"pose_{i}", dtype=torch.double))
-        velocities.append(th.Vector(num_links, name=f"vel_{i}", dtype=torch.double))
+        poses.append(th.Vector(nlinks, name=f"pose_{i}", dtype=torch.double))
+        velocities.append(th.Vector(nlinks, name=f"vel_{i}", dtype=torch.double))
 
     # Targets for boundary cost functions
-    start = th.Vector(num_links, name="start")
-    goal = th.Vector(num_links, name="goal")
+    start = th.Vector(nlinks, name="start")
+    # goal = th.Vector(nlinks, name="goal")
+    goal = th.Point2(name="goal")
 
     # For collision avoidance cost function
     sdf_origin = th.Point2(name="sdf_origin")
@@ -89,8 +91,8 @@ def model_problem(
     cost_eps = th.Variable(
         torch.tensor(robot_radius + safety_distance).view(1, 1), name="cost_eps"
     )
-    link_lengths = th.Vector(num_links, name="link_lengths")
-    init_joint_angles = th.Vector(num_links, name="init_joint_angles")
+    link_lengths = th.Vector(nlinks, name="link_lengths")
+    init_joint_angles = th.Vector(nlinks, name="init_joint_angles")
 
     # For GP dynamics cost function
     dt = th.Variable(torch.tensor(dt_val).view(1, 1), name="dt")
@@ -126,20 +128,45 @@ def model_problem(
     objective.add(
         th.Difference(
             velocities[0],
-            th.Vector(tensor=torch.zeros(1, num_links)),
+            th.Vector(tensor=torch.zeros(1, nlinks)),
             boundary_cost_weight,
             name="vel_0",
         )
     )
 
     # Fixed goal position
-    objective.add(th.Difference(poses[-1], goal, boundary_cost_weight, name="pose_N"))
+    # IK can also be solved as an optimization problem:
+    #      min \|log(pose^-1 * targeted_pose)\|^2
+    # as the following
+    def targeted_pose_error(optim_vars, aux_vars):
+        (theta,) = optim_vars
+        (targeted_pose, link_lengths) = aux_vars
+        poses = []
+        batch_size = theta.shape[0]
+        for i in range(batch_size):
+            poses.append(
+                forward_kinematics(link_lengths.tensor[i, :], theta.tensor[i, :])[-1]
+            )
+        pose = th.Point2(tensor=torch.stack(poses))
+        return pose.local(targeted_pose)
+
+    objective.add(
+        th.AutoDiffCostFunction(
+            (poses[-1],),
+            targeted_pose_error,
+            2,  # TODO: un-hardcode 2
+            aux_vars=(goal, link_lengths),
+            name="targeted_pose_error",  # name="pose_N",
+            cost_weight=th.ScaleCostWeight(boundary_w),
+            autograd_mode="vmap",
+        )
+    )
 
     # Fixed final velocity
     objective.add(
         th.Difference(
             velocities[-1],
-            th.Vector(tensor=torch.zeros(1, num_links)),
+            th.Vector(tensor=torch.zeros(1, nlinks)),
             boundary_cost_weight,
             name="vel_N",
         )
@@ -219,7 +246,8 @@ def run_optimizer(
     motion_planner.to(device=device, dtype=torch.double)
 
     start = batch["expert_trajectory"][:, :, 0].to(device)
-    goal = batch["expert_trajectory"][:, :, -1].to(device)
+    # goal = batch["expert_trajectory"][:, :, -1].to(device)
+    goal = batch["target"].to(device)
 
     planner_inputs = {
         "sdf_origin": batch["sdf_origin"].to(device),
@@ -230,7 +258,8 @@ def run_optimizer(
         "link_lengths": batch["link_lengths"].to(device),
         "init_joint_angles": batch["init_joint_angles"].to(device),
     }
-    input_dict = get_straight_line_inputs(start, goal, total_time, trajectory_len)
+    target = batch["expert_trajectory"][:, :, -1].to(device)
+    input_dict = get_straight_line_inputs(start, target, total_time, trajectory_len)
     planner_inputs.update(input_dict)
     with torch.no_grad():
         final_values, info = motion_planner.forward(
@@ -280,26 +309,27 @@ if __name__ == "__main__":
         print("Saving figures...")
         figs = generate_figs(
             link_lengths=batch["link_lengths"],
-            init_joint_angles=batch["init_joint_angles"],
             target=batch["target"],
             obstacles_tensor=batch["obstacles_tensor"],
             trajectory=batch["expert_trajectory"],
         )
         for i, fig in enumerate(figs):
+            # TODO: change the location of the files
             fig.savefig(f"expert_trajectory_{0}.png".format(i))
             fig.savefig(f"expert_trajectory_{0}.png".format(i))
 
     print("Setting up an objective...")
-    num_links = batch["link_lengths"].shape[1]
+    nlinks = batch["link_lengths"].shape[1]
     trajectory_len = batch["expert_trajectory"].shape[2]
     map_size = batch["map_tensor"].shape[1]
-    robot_radius = 0.4
+    safety_distance = 0.2
+    robot_radius = 0.2
     total_time = 10.0
     objective = model_problem(
-        num_links=num_links,
+        nlinks=nlinks,
         trajectory_len=trajectory_len,
         map_size=map_size,
-        safety_distance=0.4,
+        safety_distance=safety_distance,
         robot_radius=robot_radius,
         total_time=total_time,
         Qc_inv=[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
@@ -316,12 +346,12 @@ if __name__ == "__main__":
     result_trajectory = get_trajectory(info.best_solution, trajectory_len)
     figs = generate_figs(
         link_lengths=batch["link_lengths"],
-        init_joint_angles=batch["init_joint_angles"],
         target=batch["target"],
         obstacles_tensor=batch["obstacles_tensor"],
         trajectory=result_trajectory,
     )
-    figs[0].savefig("restrajectory0.png")
-    figs[1].savefig("restrajectory1.png")
+    # TODO: change the location of the files
+    figs[0].savefig("result0.png")
+    figs[1].savefig("result1.png")
 
     print(__file__ + " done!!")

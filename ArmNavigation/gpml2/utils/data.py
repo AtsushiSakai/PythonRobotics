@@ -31,13 +31,13 @@ class Obstacle(NamedTuple):
 
 def create_2dmap_data(
     origin: tuple[float, float],
-    num_rows: int,
-    num_cols: int,
+    nrows: int,
+    ncols: int,
     cell_size: float,
     obstacles: list[Obstacle],
 ) -> dict[str, torch.Tensor]:
     the_map = torch.ones(
-        num_rows, num_cols
+        nrows, ncols
     )  # inverse occupancy seems like theseus' map_tensor format
 
     origin_x, origin_y = origin
@@ -83,15 +83,15 @@ class LinkArmDataset(torch.utils.data.Dataset):
             [int], tuple[torch.Tensor, torch.Tensor, list[Obstacle], torch.Tensor]
         ],
         map_origin: tuple[float, float],
-        map_num_rows: int,
-        map_num_cols: int,
+        map_nrows: int,
+        map_ncols: int,
         map_cell_size: float,
     ) -> None:
         self.link_lengths_ = link_lengths
         self.create_varying_vars_ = create_varying_vars
         self.map_origin_ = map_origin
-        self.map_num_rows_ = map_num_rows
-        self.map_num_cols_ = map_num_cols
+        self.map_nrows_ = map_nrows
+        self.map_ncols_ = map_ncols
         self.map_cell_size_ = map_cell_size
 
     def __getitem__(self, idx: int) -> dict:
@@ -104,8 +104,8 @@ class LinkArmDataset(torch.utils.data.Dataset):
 
         data = create_2dmap_data(
             self.map_origin_,
-            self.map_num_rows_,
-            self.map_num_cols_,
+            self.map_nrows_,
+            self.map_ncols_,
             self.map_cell_size_,
             obstacles,
         )

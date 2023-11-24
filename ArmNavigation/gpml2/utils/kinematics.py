@@ -4,26 +4,64 @@ from scipy.interpolate import interp1d
 
 
 def forward_kinematics(
-    link_lengths,
-    joint_angles,
+    link_lengths: torch.Tensor,
+    joint_angles: torch.Tensor,
+    device: str = "cpu",
+    dtype: torch.dtype = torch.double,
 ) -> torch.Tensor:
     """
+    Computes the forward kinematics for a chain of links and joints.
+
+    Args:
+        link_lengths (torch.Tensor): Lengths of each link in the robot.
+        joint_angles (torch.Tensor): Angles of each joint in the robot.
+
     Returns:
-        joints_xy: N x 2 matrix of joint X,Y coorindates
+        torch.Tensor: An N x 2 tensor of the X, Y coordinates of each joint.
     """
-    joints_xy = torch.zeros((len(joint_angles) + 1, 2))
-    theta_sum = torch.tensor(0.0)
+    joints_xy = torch.zeros(len(joint_angles) + 1, 2)
+    joints_xy.to(device, dtype)
+
+    theta_sum = torch.zeros_like(joint_angles[0])
     for i, theta in enumerate(joint_angles):
-        theta_sum += theta
-        xy = torch.tensor(
+        theta_sum = theta_sum + theta  # Avoid in-place modification
+        xy = torch.stack(
             [
                 torch.cos(theta_sum) * link_lengths[i],
                 torch.sin(theta_sum) * link_lengths[i],
             ]
         )
-        joints_xy[i + 1, :] = joints_xy[i, :] + xy
+        joints_xy = torch.cat(
+            [joints_xy[: i + 1, :], (joints_xy[i, :] + xy).unsqueeze(0)], dim=0
+        )
+    
+    # if joint_angles.requires_grad:
+    #     import ipdb; ipdb.set_trace()
 
     return joints_xy
+
+
+# def forward_kinematics(
+#     link_lengths,
+#     joint_angles,
+# ) -> torch.Tensor:
+#     """
+#     Returns:
+#         joints_xy: N x 2 matrix of joint X,Y coorindates
+#     """
+#     joints_xy = torch.zeros((len(joint_angles) + 1, 2))
+#     theta_sum = torch.tensor(0.0)
+#     for i, theta in enumerate(joint_angles):
+#         theta_sum += theta
+#         xy = torch.tensor(
+#             [
+#                 torch.cos(theta_sum) * link_lengths[i],
+#                 torch.sin(theta_sum) * link_lengths[i],
+#             ]
+#         )
+#         joints_xy[i + 1, :] = joints_xy[i, :] + xy
+
+#     return joints_xy
 
 
 def jacobian(

@@ -47,26 +47,27 @@ class CollisionArm(CostFunction):
     def _compute_distances_and_jacobians(
         self,
     ) -> tuple[torch.Tensor, torch.Tensor]:
-        robot_state = torch.zeros_like(self.sdf_origin.tensor)
+        poses = torch.zeros_like(self.sdf_origin.tensor)
         jac_pose = torch.zeros(
             self.sdf_origin.tensor.shape[0],
             self.sdf_origin.tensor.shape[1],
-            self.init_joint_angles.tensor.shape[1],
+            self.pose.tensor.shape[1],
         )
 
         for i in range(self.pose.shape[0]):
             pose = forward_kinematics(
-                link_lengths=self.link_lengths[i],
-                joint_angles=self.init_joint_angles[i],
+                link_lengths=self.link_lengths.tensor[i],
+                joint_angles=self.pose.tensor[i],
             )[-1]
-            robot_state[i] = pose
+            poses[i] = pose
             j = jacobian(
-                link_lengths=self.link_lengths[i],
-                joint_angles=self.init_joint_angles[i],
+                link_lengths=self.link_lengths.tensor[i],
+                joint_angles=self.pose.tensor[i],
             )
             jac_pose[i] = j
 
-        dist, jac = self.sdf.signed_distance(robot_state.view(-1, 2, 1))
+        # TODO: un-hardcode 2
+        dist, jac = self.sdf.signed_distance(poses.view(-1, 2, 1))
         if jac_pose is not None:
             jac = jac.matmul(jac_pose)
         return dist, jac
