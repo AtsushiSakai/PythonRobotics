@@ -1,3 +1,4 @@
+import os.path
 import sys
 
 import theseus as th
@@ -353,9 +354,10 @@ if __name__ == "__main__":
             sdf_data=batch["sdf_data"],
         )
         for i, fig in enumerate(figs):
-            print(i, f"expert_trajectory_{i}.png")
-            # TODO: change the location of the files
-            fig.savefig(f"expert_trajectory_{i}.png")
+            print(f"expert_trajectory_{i}.png")
+            fig.savefig(
+                os.path.join(os.path.dirname(__file__), f"expert_trajectory_{i}.png")
+            )
 
     print("Setting up an objective...")
     nlinks = batch["link_lengths"].shape[1]
@@ -389,8 +391,8 @@ if __name__ == "__main__":
         obstacles_tensor=batch["obstacles_tensor"],
         trajectory=result_trajectory,
     )
-    # TODO: change the location of the files
-    figs[0].savefig("result0.png")
-    figs[1].savefig("result1.png")
+    for i, fig in enumerate(figs):
+        print(i, f"result{i}.png")
+        fig.savefig(os.path.join(os.path.dirname(__file__), f"result_{i}.png"))
 
     print(__file__ + " done!!")
