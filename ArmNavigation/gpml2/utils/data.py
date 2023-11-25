@@ -8,6 +8,16 @@ from scipy import ndimage
 
 
 def get_precomputed_sdf(map_tensor: torch.Tensor, cell_size: float) -> torch.Tensor:
+    """
+    Compute the signed distance field (SDF) for a given occupancy map.
+
+    Args:
+        map_tensor (torch.Tensor): The occupancy map tensor.
+        cell_size (float): The size of each cell in the map.
+
+    Returns:
+        torch.Tensor: The computed signed distance field.
+    """
     the_map = map_tensor
     inv_map = 1.0 - the_map
 
@@ -24,7 +34,12 @@ def get_precomputed_sdf(map_tensor: torch.Tensor, cell_size: float) -> torch.Ten
     return field
 
 
+from typing import NamedTuple
+
+
 class Obstacle(NamedTuple):
+    """Represents an obstacle in a 2D space."""
+
     center: tuple[float, float]
     width: float
     height: float
@@ -37,6 +52,24 @@ def create_2dmap_data(
     cell_size: float,
     obstacles: list[Obstacle],
 ) -> dict[str, torch.Tensor]:
+    """
+    Create 2D map data for arm navigation.
+
+    Args:
+        origin (tuple[float, float]): The origin coordinates of the map.
+        nrows (int): The number of rows in the map.
+        ncols (int): The number of columns in the map.
+        cell_size (float): The size of each cell in the map.
+        obstacles (list[Obstacle]): List of obstacles in the map.
+
+    Returns:
+        dict[str, torch.Tensor]: A dictionary containing the following map data:
+            - "map_tensor": The map tensor representing the occupancy of each cell.
+            - "sdf_origin": The origin coordinates of the signed distance field.
+            - "cell_size": The size of each cell in the signed distance field.
+            - "sdf_data": The precomputed signed distance field data.
+            - "obstacles_tensor": The tensor representing the obstacles in the map.
+    """
     the_map = torch.zeros(
         nrows, ncols
     )  # inverse occupancy seems like theseus' map_tensor format
@@ -75,6 +108,21 @@ def create_2dmap_data(
 
 
 class LinkArmDataset(torch.utils.data.Dataset):
+    """
+    Dataset class for link arm data.
+
+    Args:
+        link_lengths (torch.Tensor): Tensor containing the lengths of the arm links.
+        create_varying_vars (Callable): Function that creates varying variables for each data sample.
+        map_origin (tuple[float, float]): Origin coordinates of the map.
+        map_nrows (int): Number of rows in the map.
+        map_ncols (int): Number of columns in the map.
+        map_cell_size (float): Size of each cell in the map.
+
+    Attributes:
+        dataset_length (int): Length of the dataset.
+    """
+
     dataset_length = 1000
 
     def __init__(
@@ -96,6 +144,15 @@ class LinkArmDataset(torch.utils.data.Dataset):
         self.map_cell_size_ = map_cell_size
 
     def __getitem__(self, idx: int) -> dict:
+        """
+        Get a specific item from the dataset.
+
+        Args:
+            idx (int): Index of the item to retrieve.
+
+        Returns:
+            dict: Dictionary containing the data for the item.
+        """
         (
             init_joint_angles,
             target,
@@ -121,4 +178,10 @@ class LinkArmDataset(torch.utils.data.Dataset):
         }
 
     def __len__(self) -> int:
+        """
+        Get the length of the dataset.
+
+        Returns:
+            int: Length of the dataset.
+        """
         return self.dataset_length

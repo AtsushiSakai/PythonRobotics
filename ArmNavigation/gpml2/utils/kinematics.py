@@ -2,6 +2,8 @@ import numpy as np
 import torch
 from scipy.interpolate import interp1d
 
+xy_ndim = 2  # pose space ndim
+
 
 def forward_kinematics(
     link_lengths: torch.Tensor,
@@ -10,14 +12,16 @@ def forward_kinematics(
     dtype: torch.dtype = torch.double,
 ) -> torch.Tensor:
     """
-    Computes the forward kinematics for a chain of links and joints.
+    Calculates the forward kinematics of a chain of links and joints.
 
     Args:
-        link_lengths (torch.Tensor): Lengths of each link in the robot.
-        joint_angles (torch.Tensor): Angles of each joint in the robot.
+        link_lengths (torch.Tensor): A tensor containing the lengths of each arm link.
+        joint_angles (torch.Tensor): A tensor containing the angles of each joint.
+        device (str, optional): The device to perform the calculations on. Defaults to "cpu".
+        dtype (torch.dtype, optional): The data type to use for the calculations. Defaults to torch.double.
 
     Returns:
-        torch.Tensor: An N x 2 tensor of the X, Y coordinates of each joint.
+        torch.Tensor: A tensor containing the x, y coordinates of each joint.
     """
     joints_xy = torch.zeros(len(joint_angles) + 1, 2)
     joints_xy.to(device, dtype)
@@ -42,16 +46,25 @@ def jacobian(
     link_lengths: torch.Tensor,
     joint_angles: torch.Tensor,
 ) -> torch.Tensor:
+    """Compute the Jacobian matrix for a robotic arm.
+
+    Args:
+        link_lengths (torch.Tensor): Tensor containing the lengths of the arm links.
+        joint_angles (torch.Tensor): Tensor containing the joint angles of the arm.
+
+    Returns:
+        torch.Tensor: The Jacobian matrix.
+    """
     joints_xy = forward_kinematics(link_lengths, joint_angles)
     ee_xy = joints_xy[-1, :]
     jac = torch.zeros((2, len(joint_angles)))
     for i, joint_xy in enumerate(joints_xy[:-1]):
-        ee_from_joint_xy = ee_xy - joint_xy
-        ee_from_joint_ang = torch.atan2(ee_from_joint_xy[1], ee_from_joint_xy[0])
-        ee_from_joint_norm = torch.norm(ee_from_joint_xy)
+        delta_xy = ee_xy - joint_xy
+        delta_ang = torch.atan2(delta_xy[1], delta_xy[0])
+        delta_dist = torch.norm(delta_xy)
 
-        dx = -torch.sin(ee_from_joint_ang) * ee_from_joint_norm
-        dy = torch.cos(ee_from_joint_ang) * ee_from_joint_norm
+        dx = -torch.sin(delta_ang) * delta_dist
+        dy = torch.cos(delta_ang) * delta_dist
         jac[0, i] = dx
         jac[1, i] = dy
 
@@ -63,38 +76,56 @@ def inverse_kinematics(
     joint_angles: torch.Tensor,
     target: torch.Tensor,
     max_iteration: int = 1000,
+    damping: float = 0.1,
 ) -> tuple[torch.Tensor, bool]:
+    """
+    Calculates the inverse kinematics of a robotic arm.
+
+    Args:
+        link_lengths (torch.Tensor): Tensor containing the lengths of each link in the arm.
+        joint_angles (torch.Tensor): Tensor containing the initial joint angles of the arm.
+        target (torch.Tensor): Tensor containing the target position for the end effector.
+        max_iteration (int, optional): Maximum number of iterations for the inverse kinematics solver. Defaults to 1000.
+        damping (float, optional): Damping factor for the solver. Defaults to 0.1.
+
+    Returns:
+        tuple[torch.Tensor, bool]: A tuple containing the final joint angles and a boolean indicating whether the solver converged.
+    """
+    damping_tensor = torch.tensor(damping)
+
+    cur_joint_ang = joint_angles.clone()
     iter = 0
-    cur_joint_angles = joint_angles.clone()
-    damping = torch.tensor(0.1)
     while iter < max_iteration:
-        cur_xy = forward_kinematics(link_lengths, cur_joint_angles)[-1, :]
+        cur_xy = forward_kinematics(link_lengths, cur_joint_ang)[-1, :]
         delta_xy = target - cur_xy
         dist = torch.norm(delta_xy)
         if dist.item() < 0.01:
-            return cur_joint_angles, True
+            return cur_joint_ang, True
 
-        delta_angles = (
-            torch.pinverse(jacobian(link_lengths, cur_joint_angles))
+        delta_ang = (
+            torch.pinverse(jacobian(link_lengths, cur_joint_ang))
             @ (target - cur_xy)
-            * damping
+            * damping_tensor
         )
-        cur_joint_angles = cur_joint_angles + delta_angles
+        cur_joint_ang = cur_joint_ang + delta_ang
         iter += 1
 
-    return cur_joint_angles, False
+    return cur_joint_ang, False
 
 
 def resample_trajectory(trajectory: torch.Tensor, num_points: int) -> torch.Tensor:
     """
-    Resamples a trajectory to have a specific number of points using linear interpolation.
+    Resamples a trajectory to have a specified number of points.
 
     Args:
-        trajectory: A D by N tensor where D is the dimensionality and N is the number of points.
-        num_points: The number of points in the resampled trajectory.
+        trajectory (torch.Tensor): The input trajectory tensor.
+        num_points (int): The desired number of points in the resampled trajectory.
 
     Returns:
-        A D by num_points tensor representing the resampled trajectory.
+        torch.Tensor: The resampled trajectory tensor.
+
+    Raises:
+        ValueError: If the input trajectory has less than or equal to one point.
     """
     if trajectory.size(1) <= 1:
         raise ValueError("Trajectory must have more than one point.")

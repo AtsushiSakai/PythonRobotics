@@ -1,6 +1,7 @@
 import os.path
 import sys
 
+import matplotlib.pyplot as plt
 import theseus as th
 import torch
 import torch.utils.data
@@ -13,13 +14,28 @@ from utils.viz import generate_figs
 
 torch.set_default_dtype(torch.double)
 
+show_figure = True  # if False, save figures as files
+
 
 def create_dataset(expert_trajectory_len: int) -> LinkArmDataset:
+    """
+    Create a dataset for link arm motion planning.
+
+    Args:
+        expert_trajectory_len (int): Length of the expert trajectory.
+
+    Returns:
+        LinkArmDataset: The created dataset.
+
+    Raises:
+        RuntimeError: If inverse kinematics fails to find a solution.
+    """
     link_lengths = torch.tensor([3.0, 2.0, 1.0])
 
     def create_varying_vars(
         idx: int
     ) -> tuple[torch.Tensor, torch.Tensor, list[Obstacle], torch.Tensor]:
+        # Create 2 kinds of data
         if idx % 2 == 0:
             init_joint_angles = torch.tensor([-1.0, -1.0, -1.0])
             target = torch.tensor([4.0, 0.0])
@@ -66,6 +82,23 @@ def model_problem(
     collision_w: float,
     boundary_w: float,
 ) -> th.Objective:
+    """
+    Creates an optimization problem for arm motion planning.
+
+    Args:
+        nlinks (int): Number of links in the arm.
+        trajectory_len (int): Length of the trajectory.
+        map_size (int): Size of the map.
+        safety_distance (float): Safety distance to avoid collisions.
+        robot_radius (float): Radius of the robot.
+        total_time (float): Total time for the trajectory.
+        Qc_inv (list[list[float]]): Inverse of the covariance matrix for GP dynamics cost.
+        collision_w (float): Weight for collision avoidance cost.
+        boundary_w (float): Weight for boundary cost.
+
+    Returns:
+        th.Objective: The optimization objective for arm motion planning.
+    """
     num_time_steps = trajectory_len - 1
     dt_val = total_time / num_time_steps
 
@@ -76,11 +109,12 @@ def model_problem(
     # Create optimization variables
     poses: list[th.Vector] = []
     velocities: list[th.Vector] = []
-    poses_xy: list[th.Point2] = []
+    poses_xy: dict[int, th.Point2] = {}
     for i in range(trajectory_len):
         poses.append(th.Vector(nlinks, name=f"pose_{i}", dtype=torch.double))
         velocities.append(th.Vector(nlinks, name=f"vel_{i}", dtype=torch.double))
-        poses_xy.append(th.Point2(name=f"pose_xy_{i}"))
+        if i != 0 and i != trajectory_len - 1:
+            poses_xy[i] = th.Point2(name=f"pose_xy_{i}")
 
     # Targets for boundary cost functions
     start = th.Vector(nlinks, name="start")
@@ -136,10 +170,8 @@ def model_problem(
     )
 
     # Fixed goal position
-    # IK can also be solved as an optimization problem:
-    #      min \|log(pose^-1 * targeted_pose)\|^2
-    # as the following
-    def targeted_pose_error(optim_vars, aux_vars):
+    def pose_N_error(optim_vars, aux_vars):
+        """The inverse kinematics error of the final pose in trajectory"""
         (theta,) = optim_vars
         (targeted_pose, link_lengths) = aux_vars
         poses = []
@@ -154,7 +186,7 @@ def model_problem(
     objective.add(
         th.AutoDiffCostFunction(
             (poses[-1],),
-            targeted_pose_error,
+            pose_N_error,
             2,  # xy_dim
             aux_vars=(goal, link_lengths),
             name="targeted_pose_error_N",
@@ -176,7 +208,8 @@ def model_problem(
     # ------------------------
     # Collision cost functions
     # ------------------------
-    def targeted_pose_error2(optim_vars, aux_vars):
+    def pose_i_error(optim_vars, aux_vars):
+        """The inverse kinematics error of the i^th pose in trajectory"""
         (theta, targeted_pose) = optim_vars
         (link_lengths,) = aux_vars
         poses = []
@@ -189,20 +222,22 @@ def model_problem(
         return pose.local(targeted_pose)
 
     for i in range(1, trajectory_len - 1):
+        # IK constraints of poses[i] (joint_angles) and poses_xy[i] (target)
         objective.add(
             th.AutoDiffCostFunction(
                 (
                     poses[i],
                     poses_xy[i],
                 ),
-                targeted_pose_error2,
+                pose_i_error,
                 2,  # xy_dim
                 aux_vars=(link_lengths,),
                 name=f"targeted_pose_error_{i}",
                 cost_weight=th.ScaleCostWeight(boundary_w),
                 autograd_mode="vmap",
-            )  # associate poses with poses_xy
+            )
         )
+        # And associated collision costs
         objective.add(
             CollisionArm(
                 poses[i],
@@ -257,12 +292,13 @@ def get_straight_line_inputs(
         else:
             input_dict[f"vel_{i}"] = avg_vel
 
-        batch_size = start.shape[0]
-        input_dict[f"pose_xy_{i}"] = torch.zeros(batch_size, 2)  # 2 is xy_dim
-        for j in range(batch_size):
-            input_dict[f"pose_xy_{i}"][j] = forward_kinematics(
-                link_lengths[j], input_dict[f"pose_{i}"][j]
-            )[-1]
+        if i != 0 and i != trajectory_len - 1:
+            batch_size = start.shape[0]
+            input_dict[f"pose_xy_{i}"] = torch.zeros(batch_size, 2)  # 2 is xy_dim
+            for j in range(batch_size):
+                input_dict[f"pose_xy_{i}"][j] = forward_kinematics(
+                    link_lengths[j], input_dict[f"pose_{i}"][j]
+                )[-1]
 
     return input_dict
 
@@ -274,6 +310,19 @@ def run_optimizer(
     trajectory_len: int,
     device: str = "cpu",
 ) -> tuple[dict[str, torch.Tensor], OptimizerInfo]:
+    """
+    Runs the optimizer for motion planning.
+
+    Args:
+        batch (dict): The input batch containing necessary data for planning.
+        objective (th.Objective): The objective function to optimize.
+        total_time (float): The total time for the trajectory.
+        trajectory_len (int): The length of the trajectory.
+        device (str, optional): The device to run the optimizer on. Defaults to "cpu".
+
+    Returns:
+        tuple[dict[str, torch.Tensor], OptimizerInfo]: A tuple containing the final values and optimizer information.
+    """
     optimizer = th.LevenbergMarquardt(
         objective,
         th.CholeskyDenseSolver,
@@ -342,22 +391,27 @@ if __name__ == "__main__":
             if k != "id":
                 print(f"{k:20s}: {v.shape}", type(v))
 
-        print("Saving figures...")
+        print("Showing/Saving figures...")
         figs = generate_figs(
             link_lengths=batch["link_lengths"],
             target=batch["target"],
             obstacles_tensor=batch["obstacles_tensor"],
-            trajectory=batch["expert_trajectory"],
+            init_joint_angles=batch["init_joint_angles"],
+            trajectory=None,
             plot_sdf=True,
             sdf_origin=batch["sdf_origin"],
             sdf_cell_size=batch["cell_size"],
             sdf_data=batch["sdf_data"],
         )
         for i, fig in enumerate(figs):
-            print(f"expert_trajectory_{i}.png")
-            fig.savefig(
-                os.path.join(os.path.dirname(__file__), f"expert_trajectory_{i}.png")
-            )
+            fig.suptitle(f"Collision Cost Map {i+1}")
+            if show_figure:
+                fig.show()
+            else:
+                print(f"collision_map_{i}.png")
+                fig.savefig(
+                    os.path.join(os.path.dirname(__file__), f"collision_map_{i}.png")
+                )
 
     print("Setting up an objective...")
     nlinks = batch["link_lengths"].shape[1]
@@ -383,7 +437,7 @@ if __name__ == "__main__":
     if info.best_solution is None:
         raise ValueError("Error!")
 
-    print("Saving result trajectories...")
+    print("Showing/Saving result trajectories...")
     result_trajectory = get_trajectory(info.best_solution, trajectory_len)
     figs = generate_figs(
         link_lengths=batch["link_lengths"],
@@ -392,7 +446,13 @@ if __name__ == "__main__":
         trajectory=result_trajectory,
     )
     for i, fig in enumerate(figs):
-        print(i, f"result{i}.png")
-        fig.savefig(os.path.join(os.path.dirname(__file__), f"result_{i}.png"))
+        fig.suptitle(f"Planned Trajectory {i+1}")
+        if show_figure:
+            fig.show()
+        else:
+            print(i, f"result{i}.png")
+            fig.savefig(os.path.join(os.path.dirname(__file__), f"result_{i}.png"))
+    if show_figure:
+        input("Press Enter to continue...")
 
     print(__file__ + " done!!")
