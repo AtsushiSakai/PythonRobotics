@@ -1,7 +1,16 @@
+"""
+
+GPML2 motion planning for a N-link arm.
+
+This script uses theseus. For installation instructions, visit https://github.com/facebookresearch/theseus#getting-started
+
+This script is based on one of the theseus tutorials: https://github.com/facebookresearch/theseus/blob/main/tutorials/04_motion_planning.ipynb
+
+"""
+
 import os.path
 import sys
 
-import matplotlib.pyplot as plt
 import theseus as th
 import torch
 import torch.utils.data
@@ -13,8 +22,6 @@ from utils.kinematics import forward_kinematics, inverse_kinematics, resample_tr
 from utils.viz import generate_figs
 
 torch.set_default_dtype(torch.double)
-
-show_figure = True  # if False, save figures as files
 
 
 def create_dataset(expert_trajectory_len: int) -> LinkArmDataset:
@@ -376,7 +383,7 @@ def get_trajectory(values_dict: dict, trajectory_len: int) -> torch.Tensor:
 if __name__ == "__main__":
     print(__file__ + " start!!")
 
-    debug = "-d" in sys.argv[1:]
+    save_figure = "-s" in sys.argv[1:]
 
     print("Creating a dataset...")
     expert_trajectory_len = 20
@@ -386,32 +393,31 @@ if __name__ == "__main__":
 
     print("Loading a batch...")
     batch = next(iter(data_loader))
-    if debug:
-        for k, v in batch.items():
-            if k != "id":
-                print(f"{k:20s}: {v.shape}", type(v))
+    for k, v in batch.items():
+        if k != "id":
+            print(f"{k:20s}: {v.shape}", type(v))
 
-        print("Showing/Saving figures...")
-        figs = generate_figs(
-            link_lengths=batch["link_lengths"],
-            target=batch["target"],
-            obstacles_tensor=batch["obstacles_tensor"],
-            init_joint_angles=batch["init_joint_angles"],
-            trajectory=None,
-            plot_sdf=True,
-            sdf_origin=batch["sdf_origin"],
-            sdf_cell_size=batch["cell_size"],
-            sdf_data=batch["sdf_data"],
-        )
-        for i, fig in enumerate(figs):
-            fig.suptitle(f"Collision Cost Map {i+1}")
-            if show_figure:
-                fig.show()
-            else:
-                print(f"collision_map_{i}.png")
-                fig.savefig(
-                    os.path.join(os.path.dirname(__file__), f"collision_map_{i}.png")
-                )
+    print("Showing/Saving figures...")
+    figs = generate_figs(
+        link_lengths=batch["link_lengths"],
+        target=batch["target"],
+        obstacles_tensor=batch["obstacles_tensor"],
+        init_joint_angles=batch["init_joint_angles"],
+        trajectory=None,
+        plot_sdf=True,
+        sdf_origin=batch["sdf_origin"],
+        sdf_cell_size=batch["cell_size"],
+        sdf_data=batch["sdf_data"],
+    )
+    for i, fig in enumerate(figs):
+        fig.suptitle(f"Initial Joint Configuration and Collision Map {i+1}")
+        if save_figure:
+            print(f"collision_map_{i}.png")
+            fig.savefig(
+                os.path.join(os.path.dirname(__file__), f"collision_map_{i}.png")
+            )
+        else:
+            fig.show()
 
     print("Setting up an objective...")
     nlinks = batch["link_lengths"].shape[1]
@@ -447,12 +453,12 @@ if __name__ == "__main__":
     )
     for i, fig in enumerate(figs):
         fig.suptitle(f"Planned Trajectory {i+1}")
-        if show_figure:
-            fig.show()
-        else:
+        if save_figure:
             print(i, f"result{i}.png")
             fig.savefig(os.path.join(os.path.dirname(__file__), f"result_{i}.png"))
-    if show_figure:
-        input("Press Enter to continue...")
+        else:
+            fig.show()
+    if not save_figure:
+        input("Press Enter to exit...")
 
     print(__file__ + " done!!")

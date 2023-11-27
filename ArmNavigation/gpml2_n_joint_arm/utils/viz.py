@@ -65,7 +65,7 @@ def generate_figs(
         for obstacle in obstacles_tensor[i]:
             path_ax.plot(obstacle[:, 0], obstacle[:, 1], "k-")
 
-        path_ax.plot(target[i, 0], target[i, 1], "go")
+        path_ax.plot(target[i, 0], target[i, 1], "go", zorder=3)
 
         if trajectory is not None:
             for j in range(trajectory.shape[2]):
