@@ -41,13 +41,13 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
         plt.plot(x, y)
 
 
-def mod2pi(x):
+def pi_2_pi(x):
     # Be consistent with fmod in cplusplus here.
     return angle_mod(x)
 
 
 def straight_left_straight(x, y, phi):
-    phi = mod2pi(phi)
+    phi = pi_2_pi(phi)
     # only take phi in (0.01*math.pi, 0.99*math.pi) for the sake of speed.
     # phi in (0, 0.01*math.pi) will make test2() in test_rrt_star_reeds_shepp.py
     # extremely time-consuming, since the value of xd, t will be very large.
@@ -103,7 +103,7 @@ def polar(x, y):
 def left_straight_left(x, y, phi):
     u, t = polar(x - math.sin(phi), y - 1.0 + math.cos(phi))
     if t >= 0.0:
-        v = mod2pi(phi - t)
+        v = pi_2_pi(phi - t)
         if v >= 0.0:
             return True, t, u, v
 
@@ -115,8 +115,8 @@ def left_right_left(x, y, phi):
 
     if u1 <= 4.0:
         u = -2.0 * math.asin(0.25 * u1)
-        t = mod2pi(t1 + 0.5 * u + math.pi)
-        v = mod2pi(phi - t + u)
+        t = pi_2_pi(t1 + 0.5 * u + math.pi)
+        v = pi_2_pi(phi - t + u)
 
         if t >= 0.0 >= u:
             return True, t, u, v
@@ -206,8 +206,8 @@ def left_straight_right(x, y, phi):
     if u1 >= 4.0:
         u = math.sqrt(u1 - 4.0)
         theta = math.atan2(2.0, u)
-        t = mod2pi(t1 + theta)
-        v = mod2pi(t - phi)
+        t = pi_2_pi(t1 + theta)
+        v = pi_2_pi(t - phi)
 
         if t >= 0.0 and v >= 0.0:
             return True, t, u, v
@@ -306,7 +306,7 @@ def calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size):
                   (ix, iy) in zip(xs, ys)]
         path.y = [-math.sin(-q0[2]) * ix + math.cos(-q0[2]) * iy + q0[1] for
                   (ix, iy) in zip(xs, ys)]
-        path.yaw = [mod2pi(yaw + q0[2]) for yaw in yaws]
+        path.yaw = [pi_2_pi(yaw + q0[2]) for yaw in yaws]
         path.directions = directions
         path.lengths = [length / maxc for length in path.lengths]
         path.L = path.L / maxc
