@@ -13,7 +13,7 @@ P. I. Corke, "Robotics, Vision & Control", Springer 2017, ISBN 978-3-319-54413-7
 import matplotlib.pyplot as plt
 import numpy as np
 from random import random
-
+from utils.angle import angle_mod
 
 class PathFinderController:
     """
@@ -71,9 +71,8 @@ class PathFinderController:
         # from 0 rad to 2*pi rad with slight turn
 
         rho = np.hypot(x_diff, y_diff)
-        alpha = (np.arctan2(y_diff, x_diff)
-                 - theta + np.pi) % (2 * np.pi) - np.pi
-        beta = (theta_goal - theta - alpha + np.pi) % (2 * np.pi) - np.pi
+        alpha = angle_mod(np.arctan2(y_diff, x_diff) - theta)
+        beta = angle_mod(theta_goal - theta - alpha)
         v = self.Kp_rho * rho
         w = self.Kp_alpha * alpha - controller.Kp_beta * beta
 

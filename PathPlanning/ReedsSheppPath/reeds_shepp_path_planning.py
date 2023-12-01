@@ -9,6 +9,7 @@ import math
 
 import matplotlib.pyplot as plt
 import numpy as np
+from utils.angle import angle_mod
 
 show_animation = True
 
@@ -42,13 +43,7 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
 
 def mod2pi(x):
     # Be consistent with fmod in cplusplus here.
-    v = np.mod(x, np.copysign(2.0 * math.pi, x))
-    if v < -math.pi:
-        v += 2.0 * math.pi
-    else:
-        if v > math.pi:
-            v -= 2.0 * math.pi
-    return v
+    return angle_mod(x)
 
 
 def straight_left_straight(x, y, phi):
