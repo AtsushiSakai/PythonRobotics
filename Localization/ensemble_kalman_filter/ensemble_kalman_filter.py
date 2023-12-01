@@ -16,6 +16,7 @@ sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 import math
 import matplotlib.pyplot as plt
 import numpy as np
+from utils.angle import angle_mod
 
 from utils.angle import rot_mat_2d
 
@@ -179,7 +180,7 @@ def plot_covariance_ellipse(xEst, PEst):  # pragma: no cover
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2 * math.pi) - math.pi
+    return angle_mod(angle)
 
 
 def main():
