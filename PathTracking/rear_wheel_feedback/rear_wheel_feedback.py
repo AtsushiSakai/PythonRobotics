@@ -8,6 +8,7 @@ author: Atsushi Sakai(@Atsushi_twi)
 import matplotlib.pyplot as plt
 import math
 import numpy as np
+from utils.angle import angle_mod
 
 from scipy import interpolate
 from scipy import optimize
@@ -96,13 +97,7 @@ def pid_control(target, current):
     return a
 
 def pi_2_pi(angle):
-    while(angle > math.pi):
-        angle = angle - 2.0 * math.pi
-
-    while(angle < -math.pi):
-        angle = angle + 2.0 * math.pi
-
-    return angle
+    return angle_mod(angle)
 
 def rear_wheel_feedback_control(state, e, k, yaw_ref):
     v = state.v

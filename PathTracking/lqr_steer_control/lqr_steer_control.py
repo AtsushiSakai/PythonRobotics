@@ -11,6 +11,7 @@ import math
 import numpy as np
 import sys
 import pathlib
+from utils.angle import angle_mod
 sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 
 from PathPlanning.CubicSpline import cubic_spline_planner
@@ -61,7 +62,7 @@ def PIDControl(target, current):
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2 * math.pi) - math.pi
+    return angle_mod(angle)
 
 
 def solve_DARE(A, B, Q, R):

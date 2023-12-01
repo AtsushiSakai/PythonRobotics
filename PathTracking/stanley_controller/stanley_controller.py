@@ -13,6 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 import pathlib
+from utils.angle import angle_mod
 sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 
 from PathPlanning.CubicSpline import cubic_spline_planner
@@ -106,13 +107,7 @@ def normalize_angle(angle):
     :param angle: (float)
     :return: (float) Angle in radian in [-pi, pi]
     """
-    while angle > np.pi:
-        angle -= 2.0 * np.pi
-
-    while angle < -np.pi:
-        angle += 2.0 * np.pi
-
-    return angle
+    return angle_mod(angle)
 
 
 def calc_target_index(state, cx, cy):

@@ -291,10 +291,6 @@ def interpolate(dist, length, mode, max_curvature, origin_x, origin_y,
     return x, y, yaw, 1 if length > 0.0 else -1
 
 
-def pi_2_pi(angle):
-    return (angle + math.pi) % (2 * math.pi) - math.pi
-
-
 def calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size):
     q0 = [sx, sy, syaw]
     q1 = [gx, gy, gyaw]
@@ -310,7 +306,7 @@ def calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size):
                   (ix, iy) in zip(xs, ys)]
         path.y = [-math.sin(-q0[2]) * ix + math.cos(-q0[2]) * iy + q0[1] for
                   (ix, iy) in zip(xs, ys)]
-        path.yaw = [pi_2_pi(yaw + q0[2]) for yaw in yaws]
+        path.yaw = [mod2pi(yaw + q0[2]) for yaw in yaws]
         path.directions = directions
         path.lengths = [length / maxc for length in path.lengths]
         path.L = path.L / maxc
