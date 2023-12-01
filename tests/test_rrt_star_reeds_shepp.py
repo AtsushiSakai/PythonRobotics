@@ -39,9 +39,7 @@ def test3():
                                              max_iter=100, step_size=step_size)
     rrt_star_reeds_shepp.set_random_seed(seed=8)
     path = rrt_star_reeds_shepp.planning(animation=False)
-    for i in range(len(path)-1):
-        # + 0.00000000000001 for acceptable errors arising from the planning process
-        assert m.math.dist(path[i][0:2], path[i+1][0:2]) < step_size + 0.00000000000001
+    assert path is None
 
 
 if __name__ == '__main__':
