@@ -1,11 +1,11 @@
 
-Velocity Scale Factor estimation with Extended Kalman Filter Localization
+Extended kalman filter (EKF) localization with velocity correction
 -----------------------------------
 
 .. image:: ekf_with_velocity_correction_1_0.png
    :width: 600px
 
-This is a velocity scale factor estimation with Extended Kalman Filter(EKF) Localization.
+This is a Extended kalman filter (EKF) localization with velocity correction.
 
 This is for correcting the vehicle speed measured with scale factor errors due to factors such as wheel wear.
 
