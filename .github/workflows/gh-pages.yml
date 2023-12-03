@@ -6,6 +6,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     permissions:
       id-token: write
       pages: write
@@ -25,7 +28,9 @@ jobs:
       uses: sphinx-notes/pages@v3
       with:
         requirements_path: ./docs/doc_requirements.txt
-    - name: Deploy GitHub Pages site
-      id: deployment
-      uses: actions/deploy-pages@main
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: gh-pages
             
