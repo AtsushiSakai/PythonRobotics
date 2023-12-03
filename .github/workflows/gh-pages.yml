@@ -25,8 +25,7 @@ jobs:
       uses: sphinx-notes/pages@v3
       with:
         requirements_path: ./docs/doc_requirements.txt
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: gh-pages
+    - name: Deploy GitHub Pages site
+      id: deployment
+      uses: actions/deploy-pages@main
+            
