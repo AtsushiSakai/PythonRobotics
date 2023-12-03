@@ -24,13 +24,7 @@ jobs:
         python --version
         python -m pip install --upgrade pip
         python -m pip install -r requirements/requirements.txt
-    - name: Build and Commit
+    - name: Build and Deploy
       uses: sphinx-notes/pages@v3
       with:
-        requirements_path: ./docs/doc_requirements.txt
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: gh-pages
-            
+        requirements_path: ./docs/doc_requirements.txt            
