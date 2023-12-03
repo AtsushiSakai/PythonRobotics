@@ -1,6 +1,6 @@
 """
 
-Velocity Scale Factor estimation with Extended Kalman Filter Localization sample
+Extended kalman filter (EKF) localization with velocity correction sample
 
 author: Atsushi Sakai (@Atsushi_twi)
 modified by: Ryohei Sasaki (@rsasaki0109)
