@@ -12,7 +12,7 @@ This is for correcting the vehicle speed measured with scale factor errors due t
 The blue line is true trajectory, the black line is dead reckoning
 trajectory,
 
-the green point is positioning observation (ex. RTK FIX GPS), and the red line
+The green point is positioning observation (ex. RTK FIX GPS), and the red line
 is estimated trajectory with EKF.
 
 The red ellipse is estimated covariance ellipse with EKF.
