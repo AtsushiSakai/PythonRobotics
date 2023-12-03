@@ -97,11 +97,11 @@ def jacob_f(x, u):
     v_{t+1} = v{t}
     s_{t+1} = s{t}
     so
-    dx/dyaw = -v*dt*sin(yaw)
-    dx/dv = dt*cos(yaw)
+    dx/dyaw = -v*s*dt*sin(yaw)
+    dx/dv = dt*s*cos(yaw)
     dx/ds = dt*v*cos(yaw)
-    dy/dyaw = v*dt*cos(yaw)
-    dy/dv = dt*sin(yaw)
+    dy/dyaw = v*s*dt*cos(yaw)
+    dy/dv = dt*s*sin(yaw)
     dy/ds = dt*v*sin(yaw)
     """
     yaw = x[2, 0]
