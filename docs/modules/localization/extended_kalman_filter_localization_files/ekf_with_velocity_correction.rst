@@ -1,21 +1,23 @@
 
-Extended Kalman Filter Localization
+Velocity Scale Factor estimation with Extended Kalman Filter Localization
 -----------------------------------
 
 .. image:: ekf_with_velocity_correction_1_0.png
    :width: 600px
 
-This is a velocity scale factor estimation using Extended Kalman Filter(EKF).
+This is a velocity scale factor estimation with Extended Kalman Filter(EKF) Localization.
 
 This is for correcting the vehicle speed measured with scale factor errors due to factors such as wheel wear.
 
 The blue line is true trajectory, the black line is dead reckoning
 trajectory,
 
-the green point is positioning observation (ex. GPS), and the red line
+the green point is positioning observation (ex. RTK FIX GPS), and the red line
 is estimated trajectory with EKF.
 
 The red ellipse is estimated covariance ellipse with EKF.
+
+The true scale factor and the estimated scale factor are displayed in the upper right corner of the figure
 
 Code: `PythonRobotics/extended_kalman_ekf_with_velocity_correctionfilter.py at master ·
 AtsushiSakai/PythonRobotics <https://github.com/AtsushiSakai/PythonRobotics/blob/master/Localization/extended_kalman_filter/extended_kalman_ekf_with_velocity_correctionfilter.py>`__
