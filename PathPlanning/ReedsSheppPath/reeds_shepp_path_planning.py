@@ -297,23 +297,23 @@ def generate_path(q0, q1, max_curvature, step_size):
         flag, travel_distances, steering_dirns = path_func(x, y, dth)
         if flag:
             paths = set_path(paths, travel_distances, steering_dirns, step_size)
-        
+
         flag, travel_distances, steering_dirns = path_func(-x, y, -dth)
         if flag:
             travel_distances = timeflip(travel_distances)
             paths = set_path(paths, travel_distances, steering_dirns, step_size)
-        
+
         flag, travel_distances, steering_dirns = path_func(x, -y, -dth)
         if flag:
             steering_dirns = reflect(steering_dirns)
             paths = set_path(paths, travel_distances, steering_dirns, step_size)
-        
+
         flag, travel_distances, steering_dirns = path_func(-x, -y, dth)
         if flag:
             travel_distances = timeflip(travel_distances)
             steering_dirns = reflect(steering_dirns)
             paths = set_path(paths, travel_distances, steering_dirns, step_size)
-        
+
     return paths
 
 
