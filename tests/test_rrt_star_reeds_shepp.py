@@ -45,5 +45,4 @@ def test3():
 
 
 if __name__ == '__main__':
-    # conftest.run_this_test(__file__)
-    test3()
+    conftest.run_this_test(__file__)
