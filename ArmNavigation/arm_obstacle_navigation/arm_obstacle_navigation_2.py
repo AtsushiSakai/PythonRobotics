@@ -34,7 +34,7 @@ def main():
     goal = (58, 56)
     grid = get_occupancy_grid(arm, obstacles)
     route = astar_torus(grid, start, goal)
-    if len(route) >= 0:
+    if route:
         animate(grid, arm, route)
 
 
