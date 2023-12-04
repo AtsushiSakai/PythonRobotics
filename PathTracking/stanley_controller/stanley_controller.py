@@ -27,7 +27,7 @@ max_steer = np.radians(30.0)  # [rad] max steering angle
 show_animation = True
 
 
-class State(object):
+class State:
     """
     Class representing the state of a vehicle.
 
@@ -39,7 +39,7 @@ class State(object):
 
     def __init__(self, x=0.0, y=0.0, yaw=0.0, v=0.0):
         """Instantiate the object."""
-        super(State, self).__init__()
+        super().__init__()
         self.x = x
         self.y = y
         self.yaw = yaw
