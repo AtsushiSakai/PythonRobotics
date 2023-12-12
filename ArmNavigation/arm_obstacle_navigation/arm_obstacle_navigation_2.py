@@ -19,7 +19,7 @@ obstacles = [[1.75, 0.75, 0.6], [0.55, 1.5, 0.5], [0, -1, 0.7]]
 
 def press(event):
     """Exit from the simulation."""
-    if event.key == 'q' or event.key == 'Q':
+    if event.key in ['q', 'Q']:
         print('Quitting upon request.')
         sys.exit(0)
 
@@ -33,8 +33,7 @@ def main():
     start = (10, 50)
     goal = (58, 56)
     grid = get_occupancy_grid(arm, obstacles)
-    route = astar_torus(grid, start, goal)
-    if route:
+    if route := astar_torus(grid, start, goal):
         animate(grid, arm, route)
 
 
@@ -44,7 +43,7 @@ def animate(grid, arm, route):
     colors = ['white', 'black', 'red', 'pink', 'yellow', 'green', 'orange']
     levels = [0, 1, 2, 3, 4, 5, 6, 7]
     cmap, norm = from_levels_and_colors(levels, colors)
-    for i, node in enumerate(route):
+    for node in route:
         plt.subplot(1, 2, 1)
         grid[node] = 6
         plt.cla()
@@ -90,9 +89,7 @@ def detect_collision(line_seg, circle):
         closest_point = b_vec
     else:
         closest_point = a_vec + line_vec * proj / line_mag
-    if np.linalg.norm(closest_point - c_vec) > radius:
-        return False
-    return True
+    return np.linalg.norm(closest_point - c_vec) <= radius
 
 
 def get_occupancy_grid(arm, obstacles):
@@ -175,7 +172,7 @@ def astar_torus(grid, start_node, goal_node):
         neighbors = find_neighbors(i, j)
 
         for neighbor in neighbors:
-            if grid[neighbor] == 0 or grid[neighbor] == 5:
+            if grid[neighbor] in [0, 5]:
                 distance_map[neighbor] = distance_map[current_node] + 1
                 explored_heuristic_map[neighbor] = heuristic_map[neighbor]
                 parent_map[neighbor[0]][neighbor[1]] = current_node
@@ -205,7 +202,7 @@ def astar_torus(grid, start_node, goal_node):
 
 def find_neighbors(i, j):
     neighbors = []
-    if i - 1 >= 0:
+    if i >= 1:
         neighbors.append((i - 1, j))
     else:
         neighbors.append((M - 1, j))
@@ -215,7 +212,7 @@ def find_neighbors(i, j):
     else:
         neighbors.append((0, j))
 
-    if j - 1 >= 0:
+    if j >= 1:
         neighbors.append((i, j - 1))
     else:
         neighbors.append((i, M - 1))
@@ -229,7 +226,7 @@ def find_neighbors(i, j):
 
 
 def calc_heuristic_map(M, goal_node):
-    X, Y = np.meshgrid([i for i in range(M)], [i for i in range(M)])
+    X, Y = np.meshgrid(list(range(M)), list(range(M)))
     heuristic_map = np.abs(X - goal_node[1]) + np.abs(Y - goal_node[0])
     for i in range(heuristic_map.shape[0]):
         for j in range(heuristic_map.shape[1]):

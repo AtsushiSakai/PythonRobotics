@@ -16,6 +16,7 @@ http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.187.8210&rep=rep1
 &type=pdf
 
 """
+
 import sys
 import os
 from matplotlib import pyplot as plt
@@ -27,7 +28,7 @@ sys.path.append(str(pathlib.Path(__file__).parent.parent))
 import ModelPredictiveTrajectoryGenerator.trajectory_generator as planner
 import ModelPredictiveTrajectoryGenerator.motion_model as motion_model
 
-TABLE_PATH = os.path.dirname(os.path.abspath(__file__)) + "/lookup_table.csv"
+TABLE_PATH = f"{os.path.dirname(os.path.abspath(__file__))}/lookup_table.csv"
 
 show_animation = True
 
@@ -101,9 +102,7 @@ def calc_uniform_polar_states(nxy, nh, d, a_min, a_max, p_min, p_max):
 
     """
     angle_samples = [i / (nxy - 1) for i in range(nxy)]
-    states = sample_states(angle_samples, a_min, a_max, d, p_max, p_min, nh)
-
-    return states
+    return sample_states(angle_samples, a_min, a_max, d, p_max, p_min, nh)
 
 
 def calc_biased_polar_states(goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_max):
@@ -143,9 +142,7 @@ def calc_biased_polar_states(goal_angle, ns, nxy, nh, d, a_min, a_max, p_min, p_
                 li = ii - 1
                 break
 
-    states = sample_states(di, a_min, a_max, d, p_max, p_min, nh)
-
-    return states
+    return sample_states(di, a_min, a_max, d, p_max, p_min, nh)
 
 
 def calc_lane_states(l_center, l_heading, l_width, v_width, d, nxy):

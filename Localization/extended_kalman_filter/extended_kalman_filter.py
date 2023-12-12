@@ -38,8 +38,7 @@ show_animation = True
 def calc_input():
     v = 1.0  # [m/s]
     yawrate = 0.1  # [rad/s]
-    u = np.array([[v], [yawrate]])
-    return u
+    return np.array([[v], [yawrate]])
 
 
 def observation(xTrue, xd, u):
@@ -78,9 +77,7 @@ def observation_model(x):
         [0, 1, 0, 0]
     ])
 
-    z = H @ x
-
-    return z
+    return H @ x
 
 
 def jacob_f(x, u):
@@ -100,23 +97,18 @@ def jacob_f(x, u):
     """
     yaw = x[2, 0]
     v = u[0, 0]
-    jF = np.array([
-        [1.0, 0.0, -DT * v * math.sin(yaw), DT * math.cos(yaw)],
-        [0.0, 1.0, DT * v * math.cos(yaw), DT * math.sin(yaw)],
-        [0.0, 0.0, 1.0, 0.0],
-        [0.0, 0.0, 0.0, 1.0]])
-
-    return jF
+    return np.array(
+        [
+            [1.0, 0.0, -DT * v * math.sin(yaw), DT * math.cos(yaw)],
+            [0.0, 1.0, DT * v * math.cos(yaw), DT * math.sin(yaw)],
+            [0.0, 0.0, 1.0, 0.0],
+            [0.0, 0.0, 0.0, 1.0],
+        ]
+    )
 
 
 def jacob_h():
-    # Jacobian of Observation Model
-    jH = np.array([
-        [1, 0, 0, 0],
-        [0, 1, 0, 0]
-    ])
-
-    return jH
+    return np.array([[1, 0, 0, 0], [0, 1, 0, 0]])
 
 
 def ekf_estimation(xEst, PEst, z, u):
@@ -137,7 +129,7 @@ def ekf_estimation(xEst, PEst, z, u):
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     time = 0.0
 

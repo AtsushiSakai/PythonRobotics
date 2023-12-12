@@ -430,9 +430,7 @@ def i4_sobol(dim_num, seed):
 
     seed = int(math.floor(seed))
 
-    if (seed < 0):
-        seed = 0
-
+    seed = max(seed, 0)
     if (seed == 0):
         l_var = 1
         lastq = np.zeros(dim_num)
@@ -448,7 +446,7 @@ def i4_sobol(dim_num, seed):
         seed_save = 0
         lastq = np.zeros(dim_num)
 
-        for seed_temp in range(int(seed_save), int(seed)):
+        for seed_temp in range(seed_save, int(seed)):
             l_var = i4_bit_lo0(seed_temp)
             for i in range(1, dim_num + 1):
                 lastq[i - 1] = np.bitwise_xor(
@@ -486,7 +484,7 @@ def i4_sobol(dim_num, seed):
             int(lastq[i - 1]), int(v[i - 1, l_var - 1]))
 
     seed_save = seed
-    seed = seed + 1
+    seed += 1
 
     return [quasi, seed]
 
@@ -559,10 +557,10 @@ def i4_uniform_ab(a, b, seed):
 
     seed = int(seed)
 
-    seed = (seed % i4_huge)
+    seed %= i4_huge
 
     if seed < 0:
-        seed = seed + i4_huge
+        seed += i4_huge
 
     if seed == 0:
         print('')
@@ -575,7 +573,7 @@ def i4_uniform_ab(a, b, seed):
     seed = 167 * (seed - k * 127773) - k * 2836
 
     if seed < 0:
-        seed = seed + i4_huge
+        seed += i4_huge
 
     r = seed * 4.656612875E-10
     #
@@ -903,9 +901,4 @@ def tau_sobol(dim_num):
 
     tau_table = [0, 0, 1, 3, 5, 8, 11, 15, 19, 23, 27, 31, 35]
 
-    if 1 <= dim_num <= dim_max:
-        tau = tau_table[dim_num]
-    else:
-        tau = -1
-
-    return tau
+    return tau_table[dim_num] if 1 <= dim_num <= dim_max else -1

@@ -166,8 +166,7 @@ def cubature_update(x_pred, p_pred, z):
 
 def generate_measurement(x_true):
     gz = hx @ x_true
-    z = gz + z_noise @ np.random.randn(4, 1)
-    return z
+    return gz + z_noise @ np.random.randn(4, 1)
 
 
 def plot_animation(i, x_true_cat, x_est_cat, z):
@@ -215,7 +214,7 @@ def plot_final(x_true_cat, x_est_cat, z_cat):
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
     x_est = x_0
     p_est = p_0
     x_true = x_0
@@ -225,20 +224,17 @@ def main():
     for i in range(N):
         x_true = f(x_true)
         z = generate_measurement(x_true)
-        if i == (N - 1) and show_final == 1:
-            show_final_flag = 1
-        else:
-            show_final_flag = 0
+        show_final_flag = 1 if i == (N - 1) and show_final == 1 else 0
         if show_animation == 1:
             plot_animation(i, x_true_cat, x_est_cat, z)
         if show_ellipse == 1:
-            plot_ellipse(x_est[0:2], p_est)
+            plot_ellipse(x_est[:2], p_est)
         if show_final_flag == 1:
             plot_final(x_true_cat, x_est_cat, z_cat)
         x_est, p_est = cubature_kalman_filter(x_est, p_est, z)
-        x_true_cat = np.vstack((x_true_cat, x_true[0:2].T))
-        x_est_cat = np.vstack((x_est_cat, x_est[0:2].T))
-        z_cat = np.vstack((z_cat, z[0:2].T))
+        x_true_cat = np.vstack((x_true_cat, x_true[:2].T))
+        x_est_cat = np.vstack((x_est_cat, x_est[:2].T))
+        z_cat = np.vstack((z_cat, z[:2].T))
     print('CKF Over')
 
 

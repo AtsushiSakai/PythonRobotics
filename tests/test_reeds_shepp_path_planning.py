@@ -33,7 +33,7 @@ def test2():
     N_TEST = 10
     np.random.seed(1234)
 
-    for i in range(N_TEST):
+    for _ in range(N_TEST):
         start_x = (np.random.rand() - 0.5) * 10.0  # [m]
         start_y = (np.random.rand() - 0.5) * 10.0  # [m]
         start_yaw = np.deg2rad((np.random.rand() - 0.5) * 180.0)  # [rad]

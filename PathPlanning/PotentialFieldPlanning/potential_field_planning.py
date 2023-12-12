@@ -32,7 +32,7 @@ def calc_potential_field(gx, gy, ox, oy, reso, rr, sx, sy):
     yw = int(round((maxy - miny) / reso))
 
     # calc each potential
-    pmap = [[0.0 for i in range(yw)] for i in range(xw)]
+    pmap = [[0.0 for _ in range(yw)] for _ in range(xw)]
 
     for ix in range(xw):
         x = ix * reso + minx
@@ -65,26 +65,23 @@ def calc_repulsive_potential(x, y, ox, oy, rr):
     dq = np.hypot(x - ox[minid], y - oy[minid])
 
     if dq <= rr:
-        if dq <= 0.1:
-            dq = 0.1
-
+        dq = max(dq, 0.1)
         return 0.5 * ETA * (1.0 / dq - 1.0 / rr) ** 2
     else:
         return 0.0
 
 
 def get_motion_model():
-    # dx, dy
-    motion = [[1, 0],
-              [0, 1],
-              [-1, 0],
-              [0, -1],
-              [-1, -1],
-              [-1, 1],
-              [1, -1],
-              [1, 1]]
-
-    return motion
+    return [
+        [1, 0],
+        [0, 1],
+        [-1, 0],
+        [0, -1],
+        [-1, -1],
+        [-1, 1],
+        [1, -1],
+        [1, 1],
+    ]
 
 
 def oscillations_detection(previous_ids, ix, iy):
@@ -151,7 +148,7 @@ def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
         ry.append(yp)
 
         if (oscillations_detection(previous_ids, ix, iy)):
-            print("Oscillation detected at ({},{})!".format(ix, iy))
+            print(f"Oscillation detected at ({ix},{iy})!")
             break
 
         if show_animation:
@@ -194,6 +191,6 @@ def main():
 
 
 if __name__ == '__main__':
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
     main()
-    print(__file__ + " Done!!")
+    print(f"{__file__} Done!!")

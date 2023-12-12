@@ -59,8 +59,7 @@ def distance_to_plane(point, normal, origin):
     if np.isclose(dot_product, 0):
         return 0.0
     else:
-        distance = abs(dot_product) / np.linalg.norm(normal)
-        return distance
+        return abs(dot_product) / np.linalg.norm(normal)
 
 
 def ransac_normal_vector_estimation(points_3d, inlier_radio_th=0.7,

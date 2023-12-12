@@ -44,8 +44,7 @@ class BidirectionalBreadthFirstSearchPlanner:
             self.parent = parent
 
         def __str__(self):
-            return str(self.x) + "," + str(self.y) + "," + str(
-                self.cost) + "," + str(self.parent_index)
+            return f"{str(self.x)},{str(self.y)},{str(self.cost)},{str(self.parent_index)}"
 
     def planning(self, sx, sy, gx, gy):
         """
@@ -77,11 +76,11 @@ class BidirectionalBreadthFirstSearchPlanner:
         meet_point_A, meet_point_B = None, None
 
         while True:
-            if len(open_set_A) == 0:
+            if not open_set_A:
                 print("Open set A is empty..")
                 break
 
-            if len(open_set_B) == 0:
+            if not open_set_B:
                 print("Open set B is empty")
                 break
 
@@ -146,12 +145,12 @@ class BidirectionalBreadthFirstSearchPlanner:
                     breakB = True
 
                 if (n_id_A not in closed_set_A) and \
-                        (n_id_A not in open_set_A) and (not breakA):
+                            (n_id_A not in open_set_A) and (not breakA):
                     node_A.parent = current_A
                     open_set_A[n_id_A] = node_A
 
                 if (n_id_B not in closed_set_B) and \
-                        (n_id_B not in open_set_B) and (not breakB):
+                            (n_id_B not in open_set_B) and (not breakB):
                     node_B.parent = current_B
                     open_set_B[n_id_B] = node_B
 
@@ -192,8 +191,7 @@ class BidirectionalBreadthFirstSearchPlanner:
         :param min_position:
         :return:
         """
-        pos = index * self.resolution + min_position
-        return pos
+        return index * self.resolution + min_position
 
     def calc_xy_index(self, position, min_pos):
         return round((position - min_pos) / self.resolution)
@@ -205,20 +203,15 @@ class BidirectionalBreadthFirstSearchPlanner:
         px = self.calc_grid_position(node.x, self.min_x)
         py = self.calc_grid_position(node.y, self.min_y)
 
-        if px < self.min_x:
+        if (
+            px < self.min_x
+            or py < self.min_y
+            or px >= self.max_x
+            or py >= self.max_y
+        ):
             return False
-        elif py < self.min_y:
-            return False
-        elif px >= self.max_x:
-            return False
-        elif py >= self.max_y:
-            return False
-
         # collision check
-        if self.obstacle_map[node.x][node.y]:
-            return False
-
-        return True
+        return not self.obstacle_map[node.x][node.y]
 
     def calc_obstacle_map(self, ox, oy):
 
@@ -251,21 +244,20 @@ class BidirectionalBreadthFirstSearchPlanner:
 
     @staticmethod
     def get_motion_model():
-        # dx, dy, cost
-        motion = [[1, 0, 1],
-                  [0, 1, 1],
-                  [-1, 0, 1],
-                  [0, -1, 1],
-                  [-1, -1, math.sqrt(2)],
-                  [-1, 1, math.sqrt(2)],
-                  [1, -1, math.sqrt(2)],
-                  [1, 1, math.sqrt(2)]]
-
-        return motion
+        return [
+            [1, 0, 1],
+            [0, 1, 1],
+            [-1, 0, 1],
+            [0, -1, 1],
+            [-1, -1, math.sqrt(2)],
+            [-1, 1, math.sqrt(2)],
+            [1, -1, math.sqrt(2)],
+            [1, 1, math.sqrt(2)],
+        ]
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     # start and goal position
     sx = 10.0  # [m]

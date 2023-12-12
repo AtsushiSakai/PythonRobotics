@@ -24,11 +24,9 @@ class BugPlanner:
             for add_x, add_y in zip([1, 0, -1, -1, -1, 0, 1, 1],
                                     [1, 1, 1, 0, -1, -1, -1, 0]):
                 cand_x, cand_y = o_x+add_x, o_y+add_y
-                valid_point = True
-                for _x, _y in zip(obs_x, obs_y):
-                    if cand_x == _x and cand_y == _y:
-                        valid_point = False
-                        break
+                valid_point = not any(
+                    cand_x == _x and cand_y == _y for _x, _y in zip(obs_x, obs_y)
+                )
                 if valid_point:
                     self.out_x.append(cand_x), self.out_y.append(cand_y)
 
@@ -59,7 +57,6 @@ class BugPlanner:
         (pick an arbitrary direction), until it is possible
         for you to start moving towards goal in a greedy manner again
         """
-        mov_dir = 'normal'
         cand_x, cand_y = -np.inf, -np.inf
         if show_animation:
             plt.plot(self.obs_x, self.obs_y, ".k")
@@ -69,19 +66,22 @@ class BugPlanner:
             plt.grid(True)
             plt.title('BUG 0')
 
-        for x_ob, y_ob in zip(self.out_x, self.out_y):
-            if self.r_x[-1] == x_ob and self.r_y[-1] == y_ob:
-                mov_dir = 'obs'
-                break
-
+        mov_dir = next(
+            (
+                'obs'
+                for x_ob, y_ob in zip(self.out_x, self.out_y)
+                if self.r_x[-1] == x_ob and self.r_y[-1] == y_ob
+            ),
+            'normal',
+        )
         visited_x, visited_y = [], []
         while True:
             if self.r_x[-1] == self.goal_x and \
-                    self.r_y[-1] == self.goal_y:
+                        self.r_y[-1] == self.goal_y:
                 break
             if mov_dir == 'normal':
                 cand_x, cand_y = self.mov_normal()
-            if mov_dir == 'obs':
+            elif mov_dir == 'obs':
                 cand_x, cand_y, _ = self.mov_to_next_obs(visited_x, visited_y)
             if mov_dir == 'normal':
                 found_boundary = False
@@ -96,12 +96,10 @@ class BugPlanner:
                 if not found_boundary:
                     self.r_x.append(cand_x), self.r_y.append(cand_y)
             elif mov_dir == 'obs':
-                can_go_normal = True
-                for x_ob, y_ob in zip(self.obs_x, self.obs_y):
-                    if self.mov_normal()[0] == x_ob and \
-                            self.mov_normal()[1] == y_ob:
-                        can_go_normal = False
-                        break
+                can_go_normal = not any(
+                    self.mov_normal()[0] == x_ob and self.mov_normal()[1] == y_ob
+                    for x_ob, y_ob in zip(self.obs_x, self.obs_y)
+                )
                 if can_go_normal:
                     mov_dir = 'normal'
                 else:
@@ -122,7 +120,6 @@ class BugPlanner:
         closest to your goal and you start moving towards
         goal in a greedy manner from that new point.
         """
-        mov_dir = 'normal'
         cand_x, cand_y = -np.inf, -np.inf
         exit_x, exit_y = -np.inf, -np.inf
         dist = np.inf
@@ -136,21 +133,24 @@ class BugPlanner:
             plt.grid(True)
             plt.title('BUG 1')
 
-        for xob, yob in zip(self.out_x, self.out_y):
-            if self.r_x[-1] == xob and self.r_y[-1] == yob:
-                mov_dir = 'obs'
-                break
-
+        mov_dir = next(
+            (
+                'obs'
+                for xob, yob in zip(self.out_x, self.out_y)
+                if self.r_x[-1] == xob and self.r_y[-1] == yob
+            ),
+            'normal',
+        )
         visited_x, visited_y = [], []
         while True:
             if self.r_x[-1] == self.goal_x and \
-                    self.r_y[-1] == self.goal_y:
+                        self.r_y[-1] == self.goal_y:
                 break
             if mov_dir == 'normal':
                 cand_x, cand_y = self.mov_normal()
-            if mov_dir == 'obs':
+            elif mov_dir == 'obs':
                 cand_x, cand_y, back_to_start = \
-                    self.mov_to_next_obs(visited_x, visited_y)
+                        self.mov_to_next_obs(visited_x, visited_y)
             if mov_dir == 'normal':
                 found_boundary = False
                 for x_ob, y_ob in zip(self.out_x, self.out_y):
@@ -181,8 +181,8 @@ class BugPlanner:
                 self.r_x.append(cand_x), self.r_y.append(cand_y)
                 visited_x.append(cand_x), visited_y.append(cand_y)
                 if cand_x == exit_x and \
-                        cand_y == exit_y and \
-                        second_round:
+                            cand_y == exit_y and \
+                            second_round:
                     mov_dir = 'normal'
             if show_animation:
                 plt.plot(self.r_x, self.r_y, "-r")
@@ -203,7 +203,6 @@ class BugPlanner:
         So, you depart from this point and continue towards the
         goal in a greedy manner
         """
-        mov_dir = 'normal'
         cand_x, cand_y = -np.inf, -np.inf
         if show_animation:
             plt.plot(self.obs_x, self.obs_y, ".k")
@@ -215,7 +214,7 @@ class BugPlanner:
         hit_x, hit_y = [], []
         while True:
             if straight_x[-1] == self.goal_x and \
-                    straight_y[-1] == self.goal_y:
+                        straight_y[-1] == self.goal_y:
                 break
             c_x = straight_x[-1] + np.sign(self.goal_x - straight_x[-1])
             c_y = straight_y[-1] + np.sign(self.goal_y - straight_y[-1])
@@ -230,19 +229,22 @@ class BugPlanner:
             plt.grid(True)
             plt.title('BUG 2')
 
-        for x_ob, y_ob in zip(self.out_x, self.out_y):
-            if self.r_x[-1] == x_ob and self.r_y[-1] == y_ob:
-                mov_dir = 'obs'
-                break
-
+        mov_dir = next(
+            (
+                'obs'
+                for x_ob, y_ob in zip(self.out_x, self.out_y)
+                if self.r_x[-1] == x_ob and self.r_y[-1] == y_ob
+            ),
+            'normal',
+        )
         visited_x, visited_y = [], []
         while True:
             if self.r_x[-1] == self.goal_x \
-                    and self.r_y[-1] == self.goal_y:
+                        and self.r_y[-1] == self.goal_y:
                 break
             if mov_dir == 'normal':
                 cand_x, cand_y = self.mov_normal()
-            if mov_dir == 'obs':
+            elif mov_dir == 'obs':
                 cand_x, cand_y, _ = self.mov_to_next_obs(visited_x, visited_y)
             if mov_dir == 'normal':
                 found_boundary = False

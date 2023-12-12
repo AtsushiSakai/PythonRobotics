@@ -58,7 +58,7 @@ def rectangle_check(x, y, yaw, ox, oy):
         converted_xy = np.stack([tx, ty]).T @ rot
         rx, ry = converted_xy[0], converted_xy[1]
 
-        if not (rx > LF or rx < -LB or ry > W / 2.0 or ry < -W / 2.0):
+        if rx <= LF and rx >= -LB and ry <= W / 2.0 and ry >= -W / 2.0:
             return False  # no collision
 
     return True  # collision

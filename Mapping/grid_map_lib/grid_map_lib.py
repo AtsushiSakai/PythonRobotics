@@ -70,10 +70,7 @@ class GridMap:
 
         grid_ind = self.calc_grid_index_from_xy_index(x_ind, y_ind)
 
-        if 0 <= grid_ind < self.n_data:
-            return self.data[grid_ind]
-        else:
-            return None
+        return self.data[grid_ind] if 0 <= grid_ind < self.n_data else None
 
     def get_xy_index_from_xy_pos(self, x_pos, y_pos):
         """get_xy_index_from_xy_pos
@@ -103,9 +100,7 @@ class GridMap:
         if (not x_ind) or (not y_ind):
             return False  # NG
 
-        flag = self.set_value_from_xy_index(x_ind, y_ind, val)
-
-        return flag
+        return self.set_value_from_xy_index(x_ind, y_ind, val)
 
     def set_value_from_xy_index(self, x_ind, y_ind, val):
         """set_value_from_xy_index
@@ -156,8 +151,7 @@ class GridMap:
                     self.set_value_from_xy_index(x_ind, y_ind, val)
 
     def calc_grid_index_from_xy_index(self, x_ind, y_ind):
-        grid_ind = int(y_ind * self.width + x_ind)
-        return grid_ind
+        return int(y_ind * self.width + x_ind)
 
     def calc_xy_index_from_grid_index(self, grid_ind):
         y_ind, x_ind = divmod(grid_ind, self.width)
@@ -193,19 +187,13 @@ class GridMap:
 
     def calc_xy_index_from_position(self, pos, lower_pos, max_index):
         ind = int(np.floor((pos - lower_pos) / self.resolution))
-        if 0 <= ind <= max_index:
-            return ind
-        else:
-            return None
+        return ind if 0 <= ind <= max_index else None
 
     def check_occupied_from_xy_index(self, x_ind, y_ind, occupied_val):
 
         val = self.get_value_from_xy_index(x_ind, y_ind)
 
-        if val is None or val >= occupied_val:
-            return True
-        else:
-            return False
+        return val is None or val >= occupied_val
 
     def expand_grid(self, occupied_val=FloatGrid(1.0)):
         x_inds, y_inds, values = [], [], []
@@ -233,10 +221,7 @@ class GridMap:
         for i1 in range(n_point):
             i2 = (i1 + 1) % (n_point + 1)
 
-            if x[i1] >= x[i2]:
-                min_x, max_x = x[i2], x[i1]
-            else:
-                min_x, max_x = x[i1], x[i2]
+            min_x, max_x = (x[i2], x[i1]) if x[i1] >= x[i2] else (x[i1], x[i2])
             if not min_x <= iox < max_x:
                 continue
 

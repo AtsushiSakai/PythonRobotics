@@ -60,11 +60,7 @@ def angle_mod(x, zero_2_2pi=False, degree=False):
     array([300.])
 
     """
-    if isinstance(x, float):
-        is_float = True
-    else:
-        is_float = False
-
+    is_float = isinstance(x, float)
     x = np.asarray(x).flatten()
     if degree:
         x = np.deg2rad(x)
@@ -77,7 +73,4 @@ def angle_mod(x, zero_2_2pi=False, degree=False):
     if degree:
         mod_angle = np.rad2deg(mod_angle)
 
-    if is_float:
-        return mod_angle.item()
-    else:
-        return mod_angle
+    return mod_angle.item() if is_float else mod_angle

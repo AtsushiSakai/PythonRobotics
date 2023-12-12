@@ -75,7 +75,7 @@ def solve_DARE(A, B, Q, R, maxiter=150, eps=0.01):
     """
     P = Q
 
-    for i in range(maxiter):
+    for _ in range(maxiter):
         Pn = A.T @ P @ A - A.T @ P @ B @ \
             inv(R + B.T @ P @ B) @ B.T @ P @ A + Q
         if (abs(Pn - P)).max() < eps:

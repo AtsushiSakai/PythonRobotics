@@ -20,15 +20,11 @@ class RobotArm(NLinkArm):
     def get_points(self, joint_angle_list):
         self.set_joint_angles(joint_angle_list)
 
-        x_list = []
-        y_list = []
-        z_list = []
-
         trans = np.identity(4)
 
-        x_list.append(trans[0, 3])
-        y_list.append(trans[1, 3])
-        z_list.append(trans[2, 3])
+        x_list = [trans[0, 3]]
+        y_list = [trans[1, 3]]
+        z_list = [trans[2, 3]]
         for i in range(len(self.link_list)):
             trans = np.dot(trans, self.link_list[i].transformation_matrix())
             x_list.append(trans[0, 3])
@@ -119,10 +115,7 @@ class RRTStar:
             print("reached max iteration")
 
         last_index = self.search_best_goal_node()
-        if last_index is not None:
-            return self.generate_final_course(last_index)
-
-        return None
+        return None if last_index is None else self.generate_final_course(last_index)
 
     def choose_parent(self, new_node, near_inds):
         if not near_inds:
@@ -167,12 +160,10 @@ class RRTStar:
         if not safe_goal_inds:
             return None
 
-        min_cost = min([self.node_list[i].cost for i in safe_goal_inds])
-        for i in safe_goal_inds:
-            if self.node_list[i].cost == min_cost:
-                return i
-
-        return None
+        min_cost = min(self.node_list[i].cost for i in safe_goal_inds)
+        return next(
+            (i for i in safe_goal_inds if self.node_list[i].cost == min_cost), None
+        )
 
     def find_near_nodes(self, new_node):
         nnode = len(self.node_list) + 1
@@ -183,8 +174,7 @@ class RRTStar:
             r = min(r, self.expand_dis)
         dist_list = [np.sum((np.array(node.x) - np.array(new_node.x)) ** 2)
                      for node in self.node_list]
-        near_inds = [dist_list.index(i) for i in dist_list if i <= r ** 2]
-        return near_inds
+        return [dist_list.index(i) for i in dist_list if i <= r ** 2]
 
     def rewire(self, new_node, near_inds):
         for i in near_inds:
@@ -225,17 +215,16 @@ class RRTStar:
         return path
 
     def calc_dist_to_goal(self, x):
-        distance = np.linalg.norm(np.array(x) - np.array(self.end.x))
-        return distance
+        return np.linalg.norm(np.array(x) - np.array(self.end.x))
 
     def get_random_node(self):
-        if random.randint(0, 100) > self.goal_sample_rate:
-            rnd = self.Node(np.random.uniform(self.min_rand,
-                                              self.max_rand,
-                                              self.dimension))
-        else:  # goal point sampling
-            rnd = self.Node(self.end.x)
-        return rnd
+        return (
+            self.Node(
+                np.random.uniform(self.min_rand, self.max_rand, self.dimension)
+            )
+            if random.randint(0, 100) > self.goal_sample_rate
+            else self.Node(self.end.x)
+        )
 
     def steer(self, from_node, to_node, extend_length=float("inf")):
         new_node = self.Node(list(from_node.x))
@@ -243,9 +232,7 @@ class RRTStar:
 
         new_node.path_x = [list(new_node.x)]
 
-        if extend_length > d:
-            extend_length = d
-
+        extend_length = min(extend_length, d)
         n_expand = math.floor(extend_length / self.path_resolution)
 
         start, end = np.array(from_node.x), np.array(to_node.x)
@@ -288,9 +275,7 @@ class RRTStar:
     def get_nearest_node_index(node_list, rnd_node):
         dlist = [np.sum((np.array(node.x) - np.array(rnd_node.x))**2)
                  for node in node_list]
-        minind = dlist.index(min(dlist))
-
-        return minind
+        return dlist.index(min(dlist))
 
     @staticmethod
     def plot_sphere(ax, x, y, z, size=1, color="k"):
@@ -344,7 +329,7 @@ class RRTStar:
 
 
 def main():
-    print("Start " + __file__)
+    print(f"Start {__file__}")
 
     # init NLinkArm with Denavit-Hartenberg parameters of panda
     # https://frankaemika.github.io/docs/control_parameters.html
@@ -385,17 +370,27 @@ def main():
 
             # Plot final configuration
             x_points, y_points, z_points = seven_joint_arm.get_points(path[-1])
-            ax.plot([x for x in x_points],
-                    [y for y in y_points],
-                    [z for z in z_points],
-                    "o-", color="red", ms=5, mew=0.5)
+            ax.plot(
+                list(x_points),
+                list(y_points),
+                list(z_points),
+                "o-",
+                color="red",
+                ms=5,
+                mew=0.5,
+            )
 
-            for i, q in enumerate(path):
+            for q in path:
                 x_points, y_points, z_points = seven_joint_arm.get_points(q)
-                ax.plot([x for x in x_points],
-                        [y for y in y_points],
-                        [z for z in z_points],
-                        "o-", color="grey",  ms=4, mew=0.5)
+                ax.plot(
+                    list(x_points),
+                    list(y_points),
+                    list(z_points),
+                    "o-",
+                    color="grey",
+                    ms=4,
+                    mew=0.5,
+                )
                 plt.pause(0.01)
 
             plt.show()

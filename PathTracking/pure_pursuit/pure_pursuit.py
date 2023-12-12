@@ -62,9 +62,7 @@ class States:
 
 
 def proportional_control(target, current):
-    a = Kp * (target - current)
-
-    return a
+    return Kp * (target - current)
 
 
 class TargetCourse:
@@ -83,7 +81,6 @@ class TargetCourse:
             dy = [state.rear_y - icy for icy in self.cy]
             d = np.hypot(dx, dy)
             ind = np.argmin(d)
-            self.old_nearest_point_index = ind
         else:
             ind = self.old_nearest_point_index
             distance_this_index = state.calc_distance(self.cx[ind],
@@ -95,8 +92,7 @@ class TargetCourse:
                     break
                 ind = ind + 1 if (ind + 1) < len(self.cx) else ind
                 distance_this_index = distance_next_index
-            self.old_nearest_point_index = ind
-
+        self.old_nearest_point_index = ind
         Lf = k * state.v + Lfc  # update look ahead distance
 
         # search look ahead target point index
@@ -186,7 +182,7 @@ def main():
             plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")
             plt.axis("equal")
             plt.grid(True)
-            plt.title("Speed[km/h]:" + str(state.v * 3.6)[:4])
+            plt.title(f"Speed[km/h]:{str(state.v * 3.6)[:4]}")
             plt.pause(0.001)
 
     # Test

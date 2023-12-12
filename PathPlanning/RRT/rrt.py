@@ -68,10 +68,7 @@ class RRT:
         self.end = self.Node(goal[0], goal[1])
         self.min_rand = rand_area[0]
         self.max_rand = rand_area[1]
-        if play_area is not None:
-            self.play_area = self.AreaBounds(play_area)
-        else:
-            self.play_area = None
+        self.play_area = self.AreaBounds(play_area) if play_area is not None else None
         self.expand_dis = expand_dis
         self.path_resolution = path_resolution
         self.goal_sample_rate = goal_sample_rate
@@ -124,9 +121,7 @@ class RRT:
         new_node.path_x = [new_node.x]
         new_node.path_y = [new_node.y]
 
-        if extend_length > d:
-            extend_length = d
-
+        extend_length = min(extend_length, d)
         n_expand = math.floor(extend_length / self.path_resolution)
 
         for _ in range(n_expand):
@@ -162,13 +157,14 @@ class RRT:
         return math.hypot(dx, dy)
 
     def get_random_node(self):
-        if random.randint(0, 100) > self.goal_sample_rate:
-            rnd = self.Node(
+        return (
+            self.Node(
                 random.uniform(self.min_rand, self.max_rand),
-                random.uniform(self.min_rand, self.max_rand))
-        else:  # goal point sampling
-            rnd = self.Node(self.end.x, self.end.y)
-        return rnd
+                random.uniform(self.min_rand, self.max_rand),
+            )
+            if random.randint(0, 100) > self.goal_sample_rate
+            else self.Node(self.end.x, self.end.y)
+        )
 
     def draw_graph(self, rnd=None):
         plt.clf()
@@ -215,9 +211,7 @@ class RRT:
     def get_nearest_node_index(node_list, rnd_node):
         dlist = [(node.x - rnd_node.x)**2 + (node.y - rnd_node.y)**2
                  for node in node_list]
-        minind = dlist.index(min(dlist))
-
-        return minind
+        return dlist.index(min(dlist))
 
     @staticmethod
     def check_if_outside_play_area(node, play_area):
@@ -225,11 +219,12 @@ class RRT:
         if play_area is None:
             return True  # no play_area was defined, every pos should be ok
 
-        if node.x < play_area.xmin or node.x > play_area.xmax or \
-           node.y < play_area.ymin or node.y > play_area.ymax:
-            return False  # outside - bad
-        else:
-            return True  # inside - ok
+        return (
+            node.x >= play_area.xmin
+            and node.x <= play_area.xmax
+            and node.y >= play_area.ymin
+            and node.y <= play_area.ymax
+        )
 
     @staticmethod
     def check_collision(node, obstacleList, robot_radius):
@@ -257,7 +252,7 @@ class RRT:
 
 
 def main(gx=6.0, gy=10.0):
-    print("start " + __file__)
+    print(f"start {__file__}")
 
     # ====Search Path with RRT====
     obstacleList = [(5, 5, 1), (3, 6, 2), (3, 8, 2), (3, 10, 2), (7, 5, 2),

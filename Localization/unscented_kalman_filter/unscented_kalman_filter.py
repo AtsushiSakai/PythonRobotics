@@ -45,8 +45,7 @@ show_animation = True
 def calc_input():
     v = 1.0  # [m/s]
     yawRate = 0.1  # [rad/s]
-    u = np.array([[v, yawRate]]).T
-    return u
+    return np.array([[v, yawRate]]).T
 
 
 def observation(xTrue, xd, u):
@@ -85,9 +84,7 @@ def observation_model(x):
         [0, 1, 0, 0]
     ])
 
-    z = H @ x
-
-    return z
+    return H @ x
 
 
 def generate_sigma_points(xEst, PEst, gamma):
@@ -129,7 +126,7 @@ def predict_sigma_observation(sigma):
 
 def calc_sigma_covariance(x, sigma, wc, Pi):
     nSigma = sigma.shape[1]
-    d = sigma - x[0:sigma.shape[0]]
+    d = sigma - x[:sigma.shape[0]]
     P = Pi
     for i in range(nSigma):
         P = P + wc[0, i] * d[:, i:i + 1] @ d[:, i:i + 1].T
@@ -139,7 +136,7 @@ def calc_sigma_covariance(x, sigma, wc, Pi):
 def calc_pxz(sigma, x, z_sigma, zb, wc):
     nSigma = sigma.shape[1]
     dx = sigma - x
-    dz = z_sigma - zb[0:2]
+    dz = z_sigma - zb[:2]
     P = np.zeros((dx.shape[0], dz.shape[0]))
 
     for i in range(nSigma):
@@ -198,7 +195,7 @@ def setup_ukf(nx):
     # calculate weights
     wm = [lamb / (lamb + nx)]
     wc = [(lamb / (lamb + nx)) + (1 - ALPHA ** 2 + BETA)]
-    for i in range(2 * nx):
+    for _ in range(2 * nx):
         wm.append(1.0 / (2 * (nx + lamb)))
         wc.append(1.0 / (2 * (nx + lamb)))
     gamma = math.sqrt(nx + lamb)
@@ -210,7 +207,7 @@ def setup_ukf(nx):
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     nx = 4  # State Vector [x y yaw v]'
     xEst = np.zeros((nx, 1))

@@ -55,9 +55,7 @@ def update(state, a, delta):
 
 
 def PIDControl(target, current):
-    a = Kp * (target - current)
-
-    return a
+    return Kp * (target - current)
 
 
 def pi_2_pi(angle):
@@ -72,7 +70,7 @@ def solve_DARE(A, B, Q, R):
     maxiter = 150
     eps = 0.01
 
-    for i in range(maxiter):
+    for _ in range(maxiter):
         Xn = A.T @ X @ A - A.T @ X @ B @ \
             la.inv(R + B.T @ X @ B) @ B.T @ X @ A + Q
         if (abs(Xn - X)).max() < eps:
@@ -183,7 +181,7 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
         if abs(state.v) <= stop_speed:
             target_ind += 1
 
-        time = time + dt
+        time += dt
 
         # check goal
         dx = state.x - goal[0]
@@ -208,8 +206,9 @@ def closed_loop_prediction(cx, cy, cyaw, ck, speed_profile, goal):
             plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")
             plt.axis("equal")
             plt.grid(True)
-            plt.title("speed[km/h]:" + str(round(state.v * 3.6, 2))
-                      + ",target index:" + str(target_ind))
+            plt.title(
+                f"speed[km/h]:{str(round(state.v * 3.6, 2))},target index:{str(target_ind)}"
+            )
             plt.pause(0.0001)
 
     return t, x, y, yaw, v
@@ -228,11 +227,7 @@ def calc_speed_profile(cx, cy, cyaw, target_speed):
         if switch:
             direction *= -1
 
-        if direction != 1.0:
-            speed_profile[i] = - target_speed
-        else:
-            speed_profile[i] = target_speed
-
+        speed_profile[i] = - target_speed if direction != 1.0 else target_speed
         if switch:
             speed_profile[i] = 0.0
 

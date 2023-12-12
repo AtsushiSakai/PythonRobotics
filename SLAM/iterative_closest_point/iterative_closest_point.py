@@ -81,10 +81,7 @@ def update_homogeneous_matrix(Hin, R, T):
     H[0:r_size, r_size] = T
     H[r_size, r_size] = 1.0
 
-    if Hin is None:
-        return H
-    else:
-        return Hin @ H
+    return H if Hin is None else Hin @ H
 
 
 def nearest_neighbor_association(previous_points, current_points):
@@ -141,7 +138,7 @@ def plot_points(previous_points, current_points, figure):
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     # simulation parameters
     nPoint = 1000
@@ -170,7 +167,7 @@ def main():
 
 
 def main_3d_points():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     # simulation parameters for 3d point set
     nPoint = 1000

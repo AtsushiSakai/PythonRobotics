@@ -57,9 +57,7 @@ class Map:
     def init_map(self):
         map_list = []
         for i in range(self.row):
-            tmp = []
-            for j in range(self.col):
-                tmp.append(State(i, j))
+            tmp = [State(i, j) for j in range(self.col)]
             map_list.append(tmp)
         return map_list
 
@@ -106,7 +104,7 @@ class Dstar:
         elif k_old == x.h:
             for y in self.map.get_neighbors(x):
                 if y.t == "new" or y.parent == x and y.h != x.h + x.cost(y) \
-                        or y.parent != x and y.h > x.h + x.cost(y):
+                            or y.parent != x and y.h > x.h + x.cost(y):
                     y.parent = x
                     self.insert(y, x.h + x.cost(y))
         else:
@@ -114,26 +112,18 @@ class Dstar:
                 if y.t == "new" or y.parent == x and y.h != x.h + x.cost(y):
                     y.parent = x
                     self.insert(y, x.h + x.cost(y))
-                else:
-                    if y.parent != x and y.h > x.h + x.cost(y):
-                        self.insert(y, x.h)
-                    else:
-                        if y.parent != x and x.h > y.h + x.cost(y) \
-                                and y.t == "close" and y.h > k_old:
-                            self.insert(y, y.h)
+                elif y.parent != x and y.h > x.h + x.cost(y):
+                    self.insert(y, x.h)
+                elif y.parent != x and x.h > y.h + x.cost(y) \
+                                    and y.t == "close" and y.h > k_old:
+                    self.insert(y, y.h)
         return self.get_kmin()
 
     def min_state(self):
-        if not self.open_list:
-            return None
-        min_state = min(self.open_list, key=lambda x: x.k)
-        return min_state
+        return None if not self.open_list else min(self.open_list, key=lambda x: x.k)
 
     def get_kmin(self):
-        if not self.open_list:
-            return -1
-        k_min = min([x.k for x in self.open_list])
-        return k_min
+        return -1 if not self.open_list else min(x.k for x in self.open_list)
 
     def insert(self, state, h_new):
         if state.t == "new":
@@ -217,8 +207,8 @@ def main():
     for i in range(0, 40):
         ox.append(40)
         oy.append(60 - i)
-    print([(i, j) for i, j in zip(ox, oy)])
-    m.set_obstacle([(i, j) for i, j in zip(ox, oy)])
+    print(list(zip(ox, oy)))
+    m.set_obstacle(list(zip(ox, oy)))
 
     start = [10, 10]
     goal = [50, 50]

@@ -128,10 +128,7 @@ def run_simulation(robots):
     global all_robots_are_at_target
     global simulation_running
 
-    robot_names = []
-    for instance in robots:
-        robot_names.append(instance.name)
-
+    robot_names = [instance.name for instance in robots]
     time = 0
     while simulation_running and time < TIME_DURATION:
         time += TIME_STEP
@@ -159,10 +156,12 @@ def run_simulation(robots):
                      'Time: {:.2f}'.format(time),
                      fontsize=PLOT_FONT_SIZE)
 
-            plt.text(0.3, PLOT_WINDOW_SIZE_Y - 2,
-                     'Reached target: {} = '.format(robot_names)
-                     + str(robots_are_at_target),
-                     fontsize=PLOT_FONT_SIZE)
+            plt.text(
+                0.3,
+                PLOT_WINDOW_SIZE_Y - 2,
+                f'Reached target: {robot_names} = {robots_are_at_target}',
+                fontsize=PLOT_FONT_SIZE,
+            )
 
             for instance in robots:
                 plt.arrow(instance.pose_start.x,
@@ -197,11 +196,11 @@ def plot_vehicle(x, y, theta, x_traj, y_traj, color):
     p2 = T @ p2_i
     p3 = T @ p3_i
 
-    plt.plot([p1[0], p2[0]], [p1[1], p2[1]], color+'-')
-    plt.plot([p2[0], p3[0]], [p2[1], p3[1]], color+'-')
-    plt.plot([p3[0], p1[0]], [p3[1], p1[1]], color+'-')
+    plt.plot([p1[0], p2[0]], [p1[1], p2[1]], f'{color}-')
+    plt.plot([p2[0], p3[0]], [p2[1], p3[1]], f'{color}-')
+    plt.plot([p3[0], p1[0]], [p3[1], p1[1]], f'{color}-')
 
-    plt.plot(x_traj, y_traj, color+'--')
+    plt.plot(x_traj, y_traj, f'{color}--')
 
 
 def transformation_matrix(x, y, theta):

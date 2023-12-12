@@ -121,11 +121,12 @@ def calc_dynamic_window(x, config):
           x[4] - config.max_delta_yaw_rate * config.dt,
           x[4] + config.max_delta_yaw_rate * config.dt]
 
-    #  [v_min, v_max, yaw_rate_min, yaw_rate_max]
-    dw = [max(Vs[0], Vd[0]), min(Vs[1], Vd[1]),
-          max(Vs[2], Vd[2]), min(Vs[3], Vd[3])]
-
-    return dw
+    return [
+        max(Vs[0], Vd[0]),
+        min(Vs[1], Vd[1]),
+        max(Vs[2], Vd[2]),
+        min(Vs[3], Vd[3]),
+    ]
 
 
 def predict_trajectory(x_init, v, y, config):
@@ -223,9 +224,7 @@ def calc_to_goal_cost(trajectory, goal):
     dy = goal[1] - trajectory[-1, 1]
     error_angle = math.atan2(dy, dx)
     cost_angle = error_angle - trajectory[-1, 2]
-    cost = abs(math.atan2(math.sin(cost_angle), math.cos(cost_angle)))
-
-    return cost
+    return abs(math.atan2(math.sin(cost_angle), math.cos(cost_angle)))
 
 
 def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
@@ -258,7 +257,7 @@ def plot_robot(x, y, yaw, config):  # pragma: no cover
 
 
 def main(gx=10.0, gy=10.0, robot_type=RobotType.circle):
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
     # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
     x = np.array([0.0, 0.0, math.pi / 8.0, 0.0, 0.0])
     # goal position [x(m), y(m)]

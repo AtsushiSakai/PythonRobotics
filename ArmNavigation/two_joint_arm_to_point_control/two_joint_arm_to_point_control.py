@@ -64,7 +64,7 @@ def two_joint_arm(GOAL_TH=0.0, theta1=0.0, theta2=0.0):
             theta1 = theta1 + Kp * ang_diff(theta1_goal, theta1) * dt
             theta2 = theta2 + Kp * ang_diff(theta2_goal, theta2) * dt
         except ValueError as e:
-            print("Unreachable goal"+e)
+            print(f"Unreachable goal{e}")
         except TypeError:
             x = x_prev
             y = y_prev
@@ -123,7 +123,7 @@ def animation():
     from random import random
     global x, y
     theta1 = theta2 = 0.0
-    for i in range(5):
+    for _ in range(5):
         x = 2.0 * random() - 1.0
         y = 2.0 * random() - 1.0
         theta1, theta2 = two_joint_arm(

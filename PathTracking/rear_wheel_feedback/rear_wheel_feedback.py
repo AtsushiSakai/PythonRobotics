@@ -92,8 +92,7 @@ class CubicSplinePath:
         return e, k, yaw, s
 
 def pid_control(target, current):
-    a = Kp * (target - current)
-    return a
+    return Kp * (target - current)
 
 def pi_2_pi(angle):
     while(angle > math.pi):
@@ -111,12 +110,7 @@ def rear_wheel_feedback_control(state, e, k, yaw_ref):
     omega = v * k * math.cos(th_e) / (1.0 - k * e) - \
         KTH * abs(v) * th_e - KE * v * math.sin(th_e) * e / th_e
 
-    if th_e == 0.0 or omega == 0.0:
-        return 0.0
-
-    delta = math.atan2(L * omega / v, 1.0)
-
-    return delta
+    return 0.0 if th_e == 0.0 or omega == 0.0 else math.atan2(L * omega / v, 1.0)
 
 
 def simulate(path_ref, goal):
@@ -144,7 +138,7 @@ def simulate(path_ref, goal):
         ai = pid_control(speed_ref, state.v)
         state.update(ai, di, dt)
 
-        time = time + dt
+        time += dt
 
         # check goal
         dx = state.x - goal[0]
@@ -184,11 +178,8 @@ def calc_target_speed(state, yaw_ref):
     if switch:
         state.direction *= -1
         return 0.0
-    
-    if state.direction != 1:
-        return -target_speed
 
-    return target_speed
+    return -target_speed if state.direction != 1 else target_speed
 
 def main():
     print("rear wheel feedback tracking start!!")

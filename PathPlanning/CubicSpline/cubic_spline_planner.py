@@ -55,7 +55,7 @@ class CubicSpline1D:
         self.nx = len(x)  # dimension of x
 
         # calc coefficient a
-        self.a = [iy for iy in y]
+        self.a = list(y)
 
         # calc coefficient c
         A = self.__calc_A(h)
@@ -66,7 +66,7 @@ class CubicSpline1D:
         for i in range(self.nx - 1):
             d = (self.c[i + 1] - self.c[i]) / (3.0 * h[i])
             b = 1.0 / h[i] * (self.a[i + 1] - self.a[i]) \
-                - h[i] / 3.0 * (2.0 * self.c[i] + self.c[i + 1])
+                    - h[i] / 3.0 * (2.0 * self.c[i] + self.c[i + 1])
             self.d.append(d)
             self.b.append(b)
 
@@ -81,17 +81,16 @@ class CubicSpline1D:
         y : float
             y position for given x.
         """
-        if x < self.x[0]:
+        if x < self.x[0] or x > self.x[-1]:
             return None
-        elif x > self.x[-1]:
-            return None
-
         i = self.__search_index(x)
         dx = x - self.x[i]
-        position = self.a[i] + self.b[i] * dx + \
-            self.c[i] * dx ** 2.0 + self.d[i] * dx ** 3.0
-
-        return position
+        return (
+            self.a[i]
+            + self.b[i] * dx
+            + self.c[i] * dx**2.0
+            + self.d[i] * dx**3.0
+        )
 
     def calc_first_derivative(self, x):
         """
@@ -105,15 +104,11 @@ class CubicSpline1D:
             first derivative for given x.
         """
 
-        if x < self.x[0]:
+        if x < self.x[0] or x > self.x[-1]:
             return None
-        elif x > self.x[-1]:
-            return None
-
         i = self.__search_index(x)
         dx = x - self.x[i]
-        dy = self.b[i] + 2.0 * self.c[i] * dx + 3.0 * self.d[i] * dx ** 2.0
-        return dy
+        return self.b[i] + 2.0 * self.c[i] * dx + 3.0 * self.d[i] * dx ** 2.0
 
     def calc_second_derivative(self, x):
         """
@@ -127,15 +122,11 @@ class CubicSpline1D:
             second derivative for given x.
         """
 
-        if x < self.x[0]:
+        if x < self.x[0] or x > self.x[-1]:
             return None
-        elif x > self.x[-1]:
-            return None
-
         i = self.__search_index(x)
         dx = x - self.x[i]
-        ddy = 2.0 * self.c[i] + 6.0 * self.d[i] * dx
-        return ddy
+        return 2.0 * self.c[i] + 6.0 * self.d[i] * dx
 
     def __search_index(self, x):
         """
@@ -284,8 +275,7 @@ class CubicSpline2D:
         ddx = self.sx.calc_second_derivative(s)
         dy = self.sy.calc_first_derivative(s)
         ddy = self.sy.calc_second_derivative(s)
-        k = (ddy * dx - ddx * dy) / ((dx ** 2 + dy ** 2)**(3 / 2))
-        return k
+        return (ddy * dx - ddx * dy) / ((dx ** 2 + dy ** 2)**(3 / 2))
 
     def calc_yaw(self, s):
         """
@@ -304,8 +294,7 @@ class CubicSpline2D:
         """
         dx = self.sx.calc_first_derivative(s)
         dy = self.sy.calc_first_derivative(s)
-        yaw = math.atan2(dy, dx)
-        return yaw
+        return math.atan2(dy, dx)
 
 
 def calc_spline_course(x, y, ds=0.1):

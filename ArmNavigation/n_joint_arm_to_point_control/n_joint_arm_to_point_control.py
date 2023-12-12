@@ -25,7 +25,7 @@ MOVING_TO_GOAL = 2
 show_animation = True
 
 
-def main():  # pragma: no cover
+def main():    # pragma: no cover
     """
     Creates an arm using the NLinkArm class and uses its inverse kinematics
     to move it to the desired position.
@@ -51,7 +51,7 @@ def main():  # pragma: no cover
                     print("Solution could not be found.")
                     state = WAIT_FOR_NEW_GOAL
                     arm.goal = end_effector
-                elif solution_found:
+                else:
                     state = MOVING_TO_GOAL
         elif state is MOVING_TO_GOAL:
             if distance > 0.1 and all(old_goal == goal_pos):
@@ -111,7 +111,7 @@ def animation():
                     print("Solution could not be found.")
                     state = WAIT_FOR_NEW_GOAL
                     arm.goal = get_random_goal()
-                elif solution_found:
+                else:
                     state = MOVING_TO_GOAL
         elif state is MOVING_TO_GOAL:
             if distance > 0.1 and all(old_goal == goal_pos):

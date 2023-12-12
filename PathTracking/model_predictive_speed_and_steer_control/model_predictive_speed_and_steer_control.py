@@ -288,7 +288,7 @@ def linear_mpc_control(xref, xbar, x0, dref):
     prob = cvxpy.Problem(cvxpy.Minimize(cost), constraints)
     prob.solve(solver=cvxpy.ECOS, verbose=False)
 
-    if prob.status == cvxpy.OPTIMAL or prob.status == cvxpy.OPTIMAL_INACCURATE:
+    if prob.status in [cvxpy.OPTIMAL, cvxpy.OPTIMAL_INACCURATE]:
         ox = get_nparray_from_matrix(x.value[0, :])
         oy = get_nparray_from_matrix(x.value[1, :])
         ov = get_nparray_from_matrix(x.value[2, :])
@@ -330,14 +330,12 @@ def calc_ref_trajectory(state, cx, cy, cyaw, ck, sp, dl, pind):
             xref[1, i] = cy[ind + dind]
             xref[2, i] = sp[ind + dind]
             xref[3, i] = cyaw[ind + dind]
-            dref[0, i] = 0.0
         else:
             xref[0, i] = cx[ncourse - 1]
             xref[1, i] = cy[ncourse - 1]
             xref[2, i] = sp[ncourse - 1]
             xref[3, i] = cyaw[ncourse - 1]
-            dref[0, i] = 0.0
-
+        dref[0, i] = 0.0
     return xref, ind, dref
 
 
@@ -348,17 +346,10 @@ def check_goal(state, goal, tind, nind):
     dy = state.y - goal[1]
     d = math.hypot(dx, dy)
 
-    isgoal = (d <= GOAL_DIS)
-
-    if abs(tind - nind) >= 5:
-        isgoal = False
-
+    isgoal = False if abs(tind - nind) >= 5 else (d <= GOAL_DIS)
     isstop = (abs(state.v) <= STOP_SPEED)
 
-    if isgoal and isstop:
-        return True
-
-    return False
+    return isgoal and isstop
 
 
 def do_simulation(cx, cy, cyaw, ck, sp, dl, initial_state):
@@ -412,7 +403,7 @@ def do_simulation(cx, cy, cyaw, ck, sp, dl, initial_state):
             di, ai = odelta[0], oa[0]
             state = update_state(state, ai, di)
 
-        time = time + DT
+        time += DT
 
         x.append(state.x)
         y.append(state.y)
@@ -440,8 +431,9 @@ def do_simulation(cx, cy, cyaw, ck, sp, dl, initial_state):
             plot_car(state.x, state.y, state.yaw, steer=di)
             plt.axis("equal")
             plt.grid(True)
-            plt.title("Time[s]:" + str(round(time, 2))
-                      + ", speed[km/h]:" + str(round(state.v * 3.6, 2)))
+            plt.title(
+                f"Time[s]:{str(round(time, 2))}, speed[km/h]:{str(round(state.v * 3.6, 2))}"
+            )
             plt.pause(0.0001)
 
     return t, x, y, yaw, v, d, a
@@ -461,16 +453,8 @@ def calc_speed_profile(cx, cy, cyaw, target_speed):
 
         if dx != 0.0 and dy != 0.0:
             dangle = abs(pi_2_pi(move_direction - cyaw[i]))
-            if dangle >= math.pi / 4.0:
-                direction = -1.0
-            else:
-                direction = 1.0
-
-        if direction != 1.0:
-            speed_profile[i] = - target_speed
-        else:
-            speed_profile[i] = target_speed
-
+            direction = -1.0 if dangle >= math.pi / 4.0 else 1.0
+        speed_profile[i] = - target_speed if direction != 1.0 else target_speed
     speed_profile[-1] = 0.0
 
     return speed_profile
@@ -549,7 +533,7 @@ def get_switch_back_course(dl):
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     dl = 1.0  # course tick
     # cx, cy, cyaw, ck = get_straight_course(dl)
@@ -586,7 +570,7 @@ def main():
 
 
 def main2():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     dl = 1.0  # course tick
     cx, cy, cyaw, ck = get_straight_course3(dl)

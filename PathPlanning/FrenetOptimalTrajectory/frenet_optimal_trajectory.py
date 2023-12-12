@@ -71,26 +71,24 @@ class QuarticPolynomial:
         self.a4 = x[1]
 
     def calc_point(self, t):
-        xt = self.a0 + self.a1 * t + self.a2 * t ** 2 + \
-             self.a3 * t ** 3 + self.a4 * t ** 4
-
-        return xt
+        return (
+            self.a0
+            + self.a1 * t
+            + self.a2 * t**2
+            + self.a3 * t**3
+            + self.a4 * t**4
+        )
 
     def calc_first_derivative(self, t):
-        xt = self.a1 + 2 * self.a2 * t + \
-             3 * self.a3 * t ** 2 + 4 * self.a4 * t ** 3
-
-        return xt
+        return (
+            self.a1 + 2 * self.a2 * t + 3 * self.a3 * t**2 + 4 * self.a4 * t**3
+        )
 
     def calc_second_derivative(self, t):
-        xt = 2 * self.a2 + 6 * self.a3 * t + 12 * self.a4 * t ** 2
-
-        return xt
+        return 2 * self.a2 + 6 * self.a3 * t + 12 * self.a4 * t ** 2
 
     def calc_third_derivative(self, t):
-        xt = 6 * self.a3 + 24 * self.a4 * t
-
-        return xt
+        return 6 * self.a3 + 24 * self.a4 * t
 
 
 class FrenetPath:
@@ -129,7 +127,7 @@ def calc_frenet_paths(c_speed, c_accel, c_d, c_d_d, c_d_dd, s0):
             # lat_qp = quintic_polynomial(c_d, c_d_d, c_d_dd, di, 0.0, 0.0, Ti)
             lat_qp = QuinticPolynomial(c_d, c_d_d, c_d_dd, di, 0.0, 0.0, Ti)
 
-            fp.t = [t for t in np.arange(0.0, Ti, DT)]
+            fp.t = list(np.arange(0.0, Ti, DT))
             fp.d = [lat_qp.calc_point(t) for t in fp.t]
             fp.d_d = [lat_qp.calc_first_derivative(t) for t in fp.t]
             fp.d_dd = [lat_qp.calc_second_derivative(t) for t in fp.t]
@@ -198,7 +196,7 @@ def check_collision(fp, ob):
         d = [((ix - ob[i, 0]) ** 2 + (iy - ob[i, 1]) ** 2)
              for (ix, iy) in zip(fp.x, fp.y)]
 
-        collision = any([di <= ROBOT_RADIUS ** 2 for di in d])
+        collision = any(di <= ROBOT_RADIUS ** 2 for di in d)
 
         if collision:
             return False
@@ -209,13 +207,11 @@ def check_collision(fp, ob):
 def check_paths(fplist, ob):
     ok_ind = []
     for i, _ in enumerate(fplist):
-        if any([v > MAX_SPEED for v in fplist[i].s_d]):  # Max speed check
+        if any(v > MAX_SPEED for v in fplist[i].s_d):  # Max speed check
             continue
-        elif any([abs(a) > MAX_ACCEL for a in
-                  fplist[i].s_dd]):  # Max accel check
+        elif any(abs(a) > MAX_ACCEL for a in fplist[i].s_dd):  # Max accel check
             continue
-        elif any([abs(c) > MAX_CURVATURE for c in
-                  fplist[i].c]):  # Max curvature check
+        elif any(abs(c) > MAX_CURVATURE for c in fplist[i].c):  # Max curvature check
             continue
         elif not check_collision(fplist[i], ob):
             continue
@@ -257,7 +253,7 @@ def generate_target_course(x, y):
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     # way points
     wx = [0.0, 10.0, 20.5, 35.0, 70.5]
@@ -282,7 +278,7 @@ def main():
 
     area = 20.0  # animation area length [m]
 
-    for i in range(SIM_LOOP):
+    for _ in range(SIM_LOOP):
         path = frenet_optimal_planning(
             csp, s0, c_speed, c_accel, c_d, c_d_d, c_d_dd, ob)
 
@@ -309,7 +305,7 @@ def main():
             plt.plot(path.x[1], path.y[1], "vc")
             plt.xlim(path.x[1] - area, path.x[1] + area)
             plt.ylim(path.y[1] - area, path.y[1] + area)
-            plt.title("v[km/h]:" + str(c_speed * 3.6)[0:4])
+            plt.title(f"v[km/h]:{str(c_speed * 3.6)[:4]}")
             plt.grid(True)
             plt.pause(0.0001)
 

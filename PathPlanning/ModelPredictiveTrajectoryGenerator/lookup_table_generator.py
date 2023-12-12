@@ -27,8 +27,7 @@ def calc_states_list(max_yaw=np.deg2rad(-30.0)):
     states = []
     for iyaw in yaw:
         for iy in y:
-            for ix in x:
-                states.append([ix, iy, iyaw])
+            states.extend([ix, iy, iyaw] for ix in x)
     print("n_state:", len(states))
 
     return states
@@ -57,7 +56,7 @@ def save_lookup_table(file_name, table):
     np.savetxt(file_name, np.array(table),
                fmt='%s', delimiter=",", header="x,y,yaw,s,km,kf", comments="")
 
-    print("lookup table file is saved as " + file_name)
+    print(f"lookup table file is saved as {file_name}")
 
 
 def generate_lookup_table():

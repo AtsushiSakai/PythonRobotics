@@ -29,16 +29,14 @@ class Node:
 def hcost(node_coordinate, goal):
     dx = abs(node_coordinate[0] - goal[0])
     dy = abs(node_coordinate[1] - goal[1])
-    hcost = dx + dy
-    return hcost
+    return dx + dy
 
 
 def gcost(fixed_node, update_node_coordinate):
     dx = abs(fixed_node.coordinate[0] - update_node_coordinate[0])
     dy = abs(fixed_node.coordinate[1] - update_node_coordinate[1])
     gc = math.hypot(dx, dy)  # gc = move from fixed_node to update_node
-    gcost = fixed_node.G + gc  # gcost = move from start point to update_node
-    return gcost
+    return fixed_node.G + gc
 
 
 def boundary_and_obstacles(start, goal, top_vertex, bottom_vertex, obs_number):
@@ -70,7 +68,7 @@ def boundary_and_obstacles(start, goal, top_vertex, bottom_vertex, obs_number):
     y = ay + by + cy + dy
     obstacle = np.vstack((ob_x, ob_y)).T.tolist()
     # remove start and goal coordinate in obstacle list
-    obstacle = [coor for coor in obstacle if coor != start and coor != goal]
+    obstacle = [coor for coor in obstacle if coor not in [start, goal]]
     obs_array = np.array(obstacle)
     bound = np.vstack((x, y)).T
     bound_obs = np.vstack((bound, obs_array))
@@ -82,10 +80,11 @@ def find_neighbor(node, ob, closed):
     ob_list = ob.tolist()
     neighbor: list = []
     for x in range(node.coordinate[0] - 1, node.coordinate[0] + 2):
-        for y in range(node.coordinate[1] - 1, node.coordinate[1] + 2):
-            if [x, y] not in ob_list:
-                # find all possible neighbor nodes
-                neighbor.append([x, y])
+        neighbor.extend(
+            [x, y]
+            for y in range(node.coordinate[1] - 1, node.coordinate[1] + 2)
+            if [x, y] not in ob_list
+        )
     # remove node violate the motion rule
     # 1. remove node.coordinate itself
     neighbor.remove(node.coordinate)
@@ -113,8 +112,7 @@ def find_neighbor(node, ob, closed):
         neighbor.remove(lb_nei)
     if bottom_nei and right_nei in ob_list and rb_nei in neighbor:
         neighbor.remove(rb_nei)
-    neighbor = [x for x in neighbor if x not in closed]
-    return neighbor
+    return [x for x in neighbor if x not in closed]
 
 
 def find_node_index(coordinate, node_list):
@@ -132,7 +130,7 @@ def find_path(open_list, closed_list, goal, obstacle):
     # searching for the path, update open and closed list
     # obstacle = obstacle and boundary
     flag = len(open_list)
-    for i in range(flag):
+    for _ in range(flag):
         node = open_list[0]
         open_coordinate_list = [node.coordinate for node in open_list]
         closed_coordinate_list = [node.coordinate for node in closed_list]
@@ -159,9 +157,7 @@ def find_path(open_list, closed_list, goal, obstacle):
 
 
 def node_to_coordinate(node_list):
-    # convert node list into coordinate list and array
-    coordinate_list = [node.coordinate for node in node_list]
-    return coordinate_list
+    return [node.coordinate for node in node_list]
 
 
 def check_node_coincide(close_ls1, closed_ls2):
@@ -173,17 +169,18 @@ def check_node_coincide(close_ls1, closed_ls2):
     # check if node in close_ls1 intersect with node in closed_ls2
     cl1 = node_to_coordinate(close_ls1)
     cl2 = node_to_coordinate(closed_ls2)
-    intersect_ls = [node for node in cl1 if node in cl2]
-    return intersect_ls
+    return [node for node in cl1 if node in cl2]
 
 
 def find_surrounding(coordinate, obstacle):
     # find obstacles around node, help to draw the borderline
     boundary: list = []
     for x in range(coordinate[0] - 1, coordinate[0] + 2):
-        for y in range(coordinate[1] - 1, coordinate[1] + 2):
-            if [x, y] in obstacle:
-                boundary.append([x, y])
+        boundary.extend(
+            [x, y]
+            for y in range(coordinate[1] - 1, coordinate[1] + 2)
+            if [x, y] in obstacle
+        )
     return boundary
 
 
@@ -194,8 +191,7 @@ def get_border_line(node_closed_ls, obstacle):
     for coordinate in coordinate_closed_ls:
         temp = find_surrounding(coordinate, obstacle)
         border = border + temp
-    border_ary = np.array(border)
-    return border_ary
+    return np.array(border)
 
 
 def get_path(org_list, goal_list, coordinate):
@@ -216,15 +212,14 @@ def get_path(org_list, goal_list, coordinate):
     path_goal.append(goal_list[0].coordinate)
     path_org.reverse()
     path = path_org + path_goal
-    path = np.array(path)
-    return path
+    return np.array(path)
 
 
 def random_coordinate(bottom_vertex, top_vertex):
-    # generate random coordinates inside maze
-    coordinate = [np.random.randint(bottom_vertex[0] + 1, top_vertex[0]),
-                  np.random.randint(bottom_vertex[1] + 1, top_vertex[1])]
-    return coordinate
+    return [
+        np.random.randint(bottom_vertex[0] + 1, top_vertex[0]),
+        np.random.randint(bottom_vertex[1] + 1, top_vertex[1]),
+    ]
 
 
 def draw(close_origin, close_goal, start, end, bound):
@@ -263,8 +258,7 @@ def draw_control(org_closed, goal_closed, flag, start, end, bound, obstacle):
     if show_animation:  # draw the searching process
         draw(org_array, goal_array, start, end, bound)
     if flag == 0:
-        node_intersect = check_node_coincide(org_closed, goal_closed)
-        if node_intersect:  # a path is find
+        if node_intersect := check_node_coincide(org_closed, goal_closed):
             path = get_path(org_closed, goal_closed, node_intersect[0])
             stop_loop = 1
             print('Path found!')
@@ -346,7 +340,7 @@ def searching_control(start, end, bound, obstacle):
 
 
 def main(obstacle_number=1500):
-    print(__file__ + ' start!')
+    print(f'{__file__} start!')
 
     top_vertex = [60, 60]  # top right vertex of boundary
     bottom_vertex = [0, 0]  # bottom left vertex of boundary

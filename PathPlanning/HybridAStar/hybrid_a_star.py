@@ -133,20 +133,27 @@ def calc_next_node(current, steer, direction, config, ox, oy, kd_tree):
 
     cost = current.cost + added_cost + arc_l
 
-    node = Node(x_ind, y_ind, yaw_ind, d, x_list,
-                y_list, yaw_list, [d],
-                parent_index=calc_index(current, config),
-                cost=cost, steer=steer)
-
-    return node
+    return Node(
+        x_ind,
+        y_ind,
+        yaw_ind,
+        d,
+        x_list,
+        y_list,
+        yaw_list,
+        [d],
+        parent_index=calc_index(current, config),
+        cost=cost,
+        steer=steer,
+    )
 
 
 def is_same_grid(n1, n2):
-    if n1.x_index == n2.x_index \
-            and n1.y_index == n2.y_index \
-            and n1.yaw_index == n2.yaw_index:
-        return True
-    return False
+    return (
+        n1.x_index == n2.x_index
+        and n1.y_index == n2.y_index
+        and n1.yaw_index == n2.yaw_index
+    )
 
 
 def analytic_expansion(current, goal, ox, oy, kd_tree):
@@ -180,39 +187,29 @@ def analytic_expansion(current, goal, ox, oy, kd_tree):
 
 def update_node_with_analytic_expansion(current, goal,
                                         c, ox, oy, kd_tree):
-    path = analytic_expansion(current, goal, ox, oy, kd_tree)
+    if not (path := analytic_expansion(current, goal, ox, oy, kd_tree)):
+        return False, None
+    if show_animation:
+        plt.plot(path.x, path.y)
+    f_x = path.x[1:]
+    f_y = path.y[1:]
+    f_yaw = path.yaw[1:]
 
-    if path:
-        if show_animation:
-            plt.plot(path.x, path.y)
-        f_x = path.x[1:]
-        f_y = path.y[1:]
-        f_yaw = path.yaw[1:]
+    f_cost = current.cost + calc_rs_path_cost(path)
+    f_parent_index = calc_index(current, c)
 
-        f_cost = current.cost + calc_rs_path_cost(path)
-        f_parent_index = calc_index(current, c)
-
-        fd = []
-        for d in path.directions[1:]:
-            fd.append(d >= 0)
-
-        f_steer = 0.0
-        f_path = Node(current.x_index, current.y_index, current.yaw_index,
-                      current.direction, f_x, f_y, f_yaw, fd,
-                      cost=f_cost, parent_index=f_parent_index, steer=f_steer)
-        return True, f_path
-
-    return False, None
+    fd = [d >= 0 for d in path.directions[1:]]
+    f_steer = 0.0
+    f_path = Node(current.x_index, current.y_index, current.yaw_index,
+                  current.direction, f_x, f_y, f_yaw, fd,
+                  cost=f_cost, parent_index=f_parent_index, steer=f_steer)
+    return True, f_path
 
 
 def calc_rs_path_cost(reed_shepp_path):
     cost = 0.0
     for length in reed_shepp_path.lengths:
-        if length >= 0:  # forward
-            cost += length
-        else:  # back
-            cost += abs(length) * BACK_COST
-
+        cost += length if length >= 0 else abs(length) * BACK_COST
     # switch back penalty
     for i in range(len(reed_shepp_path.lengths) - 1):
         # switch back
@@ -284,12 +281,11 @@ def hybrid_a_star_planning(start, goal, ox, oy, xy_resolution, yaw_resolution):
             return [], [], []
 
         cost, c_id = heapq.heappop(pq)
-        if c_id in openList:
-            current = openList.pop(c_id)
-            closedList[c_id] = current
-        else:
+        if c_id not in openList:
             continue
 
+        current = openList.pop(c_id)
+        closedList[c_id] = current
         if show_animation:  # pragma: no cover
             plt.plot(current.x_list[-1], current.y_list[-1], "xc")
             # for stopping simulation with the esc key.
@@ -318,15 +314,12 @@ def hybrid_a_star_planning(start, goal, ox, oy, xy_resolution, yaw_resolution):
                          neighbor_index))
                 openList[neighbor_index] = neighbor
 
-    path = get_final_path(closedList, final_path)
-    return path
+    return get_final_path(closedList, final_path)
 
 
 def calc_cost(n, h_dp, c):
     ind = (n.y_index - c.min_y) * c.x_w + (n.x_index - c.min_x)
-    if ind not in h_dp:
-        return n.cost + 999999999  # collision cost
-    return n.cost + H_COST * h_dp[ind].cost
+    return n.cost + H_COST * h_dp[ind].cost if ind in h_dp else n.cost + 999999999
 
 
 def get_final_path(closed, goal_node):
@@ -354,17 +347,12 @@ def get_final_path(closed, goal_node):
     # adjust first direction
     direction[0] = direction[1]
 
-    path = Path(reversed_x, reversed_y, reversed_yaw, direction, final_cost)
-
-    return path
+    return Path(reversed_x, reversed_y, reversed_yaw, direction, final_cost)
 
 
 def verify_index(node, c):
     x_ind, y_ind = node.x_index, node.y_index
-    if c.min_x <= x_ind <= c.max_x and c.min_y <= y_ind <= c.max_y:
-        return True
-
-    return False
+    return c.min_x <= x_ind <= c.max_x and c.min_y <= y_ind <= c.max_y
 
 
 def calc_index(node, c):
@@ -419,11 +407,11 @@ def main():
     path = hybrid_a_star_planning(
         start, goal, ox, oy, XY_GRID_RESOLUTION, YAW_GRID_RESOLUTION)
 
-    x = path.x_list
-    y = path.y_list
-    yaw = path.yaw_list
-
     if show_animation:
+        x = path.x_list
+        y = path.y_list
+        yaw = path.yaw_list
+
         for i_x, i_y, i_yaw in zip(x, y, yaw):
             plt.cla()
             plt.plot(ox, oy, ".k")
@@ -433,7 +421,7 @@ def main():
             plot_car(i_x, i_y, i_yaw)
             plt.pause(0.0001)
 
-    print(__file__ + " done!!")
+    print(f"{__file__} done!!")
 
 
 if __name__ == '__main__':

@@ -112,7 +112,7 @@ def create_dummy_observation_data():
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     ox, oy = create_dummy_observation_data()
     grid_resolution = 10.0

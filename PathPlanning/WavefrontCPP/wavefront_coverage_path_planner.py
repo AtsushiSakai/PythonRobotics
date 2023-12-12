@@ -158,10 +158,9 @@ def wavefront(transform_matrix, start, goal):
 
         if i_max == (-1, -1):
             break
-        else:
-            current_node = i_max
-            if i_last != 0:
-                print('backtracing to', current_node)
+        current_node = i_max
+        if i_last != 0:
+            print('backtracing to', current_node)
     path.append(goal)
 
     return path

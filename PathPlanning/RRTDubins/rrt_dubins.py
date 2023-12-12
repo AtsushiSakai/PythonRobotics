@@ -88,14 +88,12 @@ class RRTDubins(RRT):
                 self.draw_graph(rnd)
 
             if (not search_until_max_iter) and new_node:  # check reaching the goal
-                last_index = self.search_best_goal_node()
-                if last_index:
+                if last_index := self.search_best_goal_node():
                     return self.generate_final_course(last_index)
 
         print("reached max iteration")
 
-        last_index = self.search_best_goal_node()
-        if last_index:
+        if last_index := self.search_best_goal_node():
             return self.generate_final_course(last_index)
         else:
             print("Cannot find path")
@@ -130,7 +128,7 @@ class RRTDubins(RRT):
     def steer(self, from_node, to_node):
 
         px, py, pyaw, mode, course_lengths = \
-            dubins_path_planner.plan_dubins_path(
+                dubins_path_planner.plan_dubins_path(
                 from_node.x, from_node.y, from_node.yaw,
                 to_node.x, to_node.y, to_node.yaw, self.curvature)
 
@@ -145,7 +143,7 @@ class RRTDubins(RRT):
         new_node.path_x = px
         new_node.path_y = py
         new_node.path_yaw = pyaw
-        new_node.cost += sum([abs(c) for c in course_lengths])
+        new_node.cost += sum(abs(c) for c in course_lengths)
         new_node.parent = from_node
 
         return new_node
@@ -160,46 +158,46 @@ class RRTDubins(RRT):
 
     def get_random_node(self):
 
-        if random.randint(0, 100) > self.goal_sample_rate:
-            rnd = self.Node(random.uniform(self.min_rand, self.max_rand),
-                            random.uniform(self.min_rand, self.max_rand),
-                            random.uniform(-math.pi, math.pi)
-                            )
-        else:  # goal point sampling
-            rnd = self.Node(self.end.x, self.end.y, self.end.yaw)
-
-        return rnd
+        return (
+            self.Node(
+                random.uniform(self.min_rand, self.max_rand),
+                random.uniform(self.min_rand, self.max_rand),
+                random.uniform(-math.pi, math.pi),
+            )
+            if random.randint(0, 100) > self.goal_sample_rate
+            else self.Node(self.end.x, self.end.y, self.end.yaw)
+        )
 
     def search_best_goal_node(self):
 
-        goal_indexes = []
-        for (i, node) in enumerate(self.node_list):
-            if self.calc_dist_to_goal(node.x, node.y) <= self.goal_xy_th:
-                goal_indexes.append(i)
-
-        # angle check
-        final_goal_indexes = []
-        for i in goal_indexes:
-            if abs(self.node_list[i].yaw - self.end.yaw) <= self.goal_yaw_th:
-                final_goal_indexes.append(i)
-
+        goal_indexes = [
+            i
+            for i, node in enumerate(self.node_list)
+            if self.calc_dist_to_goal(node.x, node.y) <= self.goal_xy_th
+        ]
+        final_goal_indexes = [
+            i
+            for i in goal_indexes
+            if abs(self.node_list[i].yaw - self.end.yaw) <= self.goal_yaw_th
+        ]
         if not final_goal_indexes:
             return None
 
-        min_cost = min([self.node_list[i].cost for i in final_goal_indexes])
-        for i in final_goal_indexes:
-            if self.node_list[i].cost == min_cost:
-                return i
-
-        return None
+        min_cost = min(self.node_list[i].cost for i in final_goal_indexes)
+        return next(
+            (i for i in final_goal_indexes if self.node_list[i].cost == min_cost),
+            None,
+        )
 
     def generate_final_course(self, goal_index):
         print("final")
         path = [[self.end.x, self.end.y]]
         node = self.node_list[goal_index]
         while node.parent:
-            for (ix, iy) in zip(reversed(node.path_x), reversed(node.path_y)):
-                path.append([ix, iy])
+            path.extend(
+                [ix, iy]
+                for ix, iy in zip(reversed(node.path_x), reversed(node.path_y))
+            )
             node = node.parent
         path.append([self.start.x, self.start.y])
         return path
@@ -207,7 +205,7 @@ class RRTDubins(RRT):
 
 def main():
 
-    print("Start " + __file__)
+    print(f"Start {__file__}")
     # ====Search Path with RRT====
     obstacleList = [
         (5, 5, 1),

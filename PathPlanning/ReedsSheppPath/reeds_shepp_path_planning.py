@@ -45,9 +45,8 @@ def mod2pi(x):
     v = np.mod(x, np.copysign(2.0 * math.pi, x))
     if v < -math.pi:
         v += 2.0 * math.pi
-    else:
-        if v > math.pi:
-            v -= 2.0 * math.pi
+    elif v > math.pi:
+        v -= 2.0 * math.pi
     return v
 
 
@@ -357,7 +356,7 @@ def main():
 
     if show_animation:  # pragma: no cover
         plt.cla()
-        plt.plot(xs, ys, label="final course " + str(modes))
+        plt.plot(xs, ys, label=f"final course {str(modes)}")
         print(f"{lengths=}")
 
         # plotting

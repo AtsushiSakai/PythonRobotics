@@ -53,24 +53,20 @@ class VehicleSimulator:
 
     def _calc_vehicle_contour(self):
 
-        self.vc_x = []
-        self.vc_y = []
-
-        self.vc_x.append(self.L / 2.0)
-        self.vc_y.append(self.W / 2.0)
-
-        self.vc_x.append(self.L / 2.0)
-        self.vc_y.append(-self.W / 2.0)
-
-        self.vc_x.append(-self.L / 2.0)
-        self.vc_y.append(-self.W / 2.0)
-
-        self.vc_x.append(-self.L / 2.0)
-        self.vc_y.append(self.W / 2.0)
-
-        self.vc_x.append(self.L / 2.0)
-        self.vc_y.append(self.W / 2.0)
-
+        self.vc_x = [
+            self.L / 2.0,
+            self.L / 2.0,
+            -self.L / 2.0,
+            -self.L / 2.0,
+            self.L / 2.0,
+        ]
+        self.vc_y = [
+            self.W / 2.0,
+            -self.W / 2.0,
+            -self.W / 2.0,
+            self.W / 2.0,
+            self.W / 2.0,
+        ]
         self.vc_x, self.vc_y = self._interpolate(self.vc_x, self.vc_y)
 
     @staticmethod
@@ -128,9 +124,7 @@ class LidarSimulator:
         for i in range(len(theta_l)):
             angle_id = int(round(theta_l[i] / angle_resolution))
 
-            if range_db[angle_id] > range_l[i]:
-                range_db[angle_id] = range_l[i]
-
+            range_db[angle_id] = min(range_db[angle_id], range_l[i])
         for i in range(len(range_db)):
             t = i * angle_resolution
             if range_db[i] != float("inf"):

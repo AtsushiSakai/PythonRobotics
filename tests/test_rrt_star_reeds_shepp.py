@@ -30,7 +30,7 @@ def test2():
     path = rrt_star_reeds_shepp.planning(animation=False)
     for i in range(len(path)-1):
         # + 0.00000000000001 for acceptable errors arising from the planning process
-        assert m.math.dist(path[i][0:2], path[i+1][0:2]) < step_size + 0.00000000000001
+        assert m.math.dist(path[i][:2], path[i+1][:2]) < step_size + 0.00000000000001
 
 def test3():
     step_size = 20
@@ -41,7 +41,7 @@ def test3():
     path = rrt_star_reeds_shepp.planning(animation=False)
     for i in range(len(path)-1):
         # + 0.00000000000001 for acceptable errors arising from the planning process
-        assert m.math.dist(path[i][0:2], path[i+1][0:2]) < step_size + 0.00000000000001
+        assert m.math.dist(path[i][:2], path[i+1][:2]) < step_size + 0.00000000000001
 
 
 if __name__ == '__main__':

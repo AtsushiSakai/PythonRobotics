@@ -72,8 +72,7 @@ def bresenham(start, end):
             error += dx
     if swapped:  # reverse the list if the coordinates were swapped
         points.reverse()
-    points = np.array(points)
-    return points
+    return np.array(points)
 
 
 def calc_grid_map_config(ox, oy, xy_resolution):

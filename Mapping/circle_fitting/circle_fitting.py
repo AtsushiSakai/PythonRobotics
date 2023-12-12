@@ -26,17 +26,21 @@ def circle_fitting(x, y):
 
     sumx = sum(x)
     sumy = sum(y)
-    sumx2 = sum([ix ** 2 for ix in x])
-    sumy2 = sum([iy ** 2 for iy in y])
-    sumxy = sum([ix * iy for (ix, iy) in zip(x, y)])
+    sumx2 = sum(ix ** 2 for ix in x)
+    sumy2 = sum(iy ** 2 for iy in y)
+    sumxy = sum(ix * iy for (ix, iy) in zip(x, y))
 
     F = np.array([[sumx2, sumxy, sumx],
                   [sumxy, sumy2, sumy],
                   [sumx, sumy, len(x)]])
 
-    G = np.array([[-sum([ix ** 3 + ix * iy ** 2 for (ix, iy) in zip(x, y)])],
-                  [-sum([ix ** 2 * iy + iy ** 3 for (ix, iy) in zip(x, y)])],
-                  [-sum([ix ** 2 + iy ** 2 for (ix, iy) in zip(x, y)])]])
+    G = np.array(
+        [
+            [-sum(ix**3 + ix * iy**2 for (ix, iy) in zip(x, y))],
+            [-sum(ix**2 * iy + iy**3 for (ix, iy) in zip(x, y))],
+            [-sum(ix**2 + iy**2 for (ix, iy) in zip(x, y))],
+        ]
+    )
 
     T = np.linalg.inv(F).dot(G)
 
@@ -44,7 +48,7 @@ def circle_fitting(x, y):
     cye = float(T[1, 0] / -2)
     re = math.sqrt(cxe**2 + cye**2 - T[2, 0])
 
-    error = sum([np.hypot(cxe - ix, cye - iy) - re for (ix, iy) in zip(x, y)])
+    error = sum(np.hypot(cxe - ix, cye - iy) - re for (ix, iy) in zip(x, y))
 
     return (cxe, cye, re, error)
 
@@ -78,9 +82,7 @@ def ray_casting_filter(xl, yl, thetal, rangel, angle_reso):
     for i, _ in enumerate(thetal):
         angleid = math.floor(thetal[i] / angle_reso)
 
-        if rangedb[angleid] > rangel[i]:
-            rangedb[angleid] = rangel[i]
-
+        rangedb[angleid] = min(rangedb[angleid], rangel[i])
     for i, _ in enumerate(rangedb):
         t = i * angle_reso
         if rangedb[i] != float("inf"):

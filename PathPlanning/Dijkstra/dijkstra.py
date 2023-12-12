@@ -45,8 +45,7 @@ class Dijkstra:
             self.parent_index = parent_index  # index of previous Node
 
         def __str__(self):
-            return str(self.x) + "," + str(self.y) + "," + str(
-                self.cost) + "," + str(self.parent_index)
+            return f"{str(self.x)},{str(self.y)},{str(self.cost)},{str(self.parent_index)}"
 
     def planning(self, sx, sy, gx, gy):
         """
@@ -113,10 +112,9 @@ class Dijkstra:
 
                 if n_id not in open_set:
                     open_set[n_id] = node  # Discover a new node
-                else:
-                    if open_set[n_id].cost >= node.cost:
-                        # This path is the best until now. record it!
-                        open_set[n_id] = node
+                elif open_set[n_id].cost >= node.cost:
+                    # This path is the best until now. record it!
+                    open_set[n_id] = node
 
         rx, ry = self.calc_final_path(goal_node, closed_set)
 
@@ -136,8 +134,7 @@ class Dijkstra:
         return rx, ry
 
     def calc_position(self, index, minp):
-        pos = index * self.resolution + minp
-        return pos
+        return index * self.resolution + minp
 
     def calc_xy_index(self, position, minp):
         return round((position - minp) / self.resolution)
@@ -155,13 +152,7 @@ class Dijkstra:
             return False
         if px >= self.max_x:
             return False
-        if py >= self.max_y:
-            return False
-
-        if self.obstacle_map[node.x][node.y]:
-            return False
-
-        return True
+        return False if py >= self.max_y else not self.obstacle_map[node.x][node.y]
 
     def calc_obstacle_map(self, ox, oy):
 
@@ -194,21 +185,20 @@ class Dijkstra:
 
     @staticmethod
     def get_motion_model():
-        # dx, dy, cost
-        motion = [[1, 0, 1],
-                  [0, 1, 1],
-                  [-1, 0, 1],
-                  [0, -1, 1],
-                  [-1, -1, math.sqrt(2)],
-                  [-1, 1, math.sqrt(2)],
-                  [1, -1, math.sqrt(2)],
-                  [1, 1, math.sqrt(2)]]
-
-        return motion
+        return [
+            [1, 0, 1],
+            [0, 1, 1],
+            [-1, 0, 1],
+            [0, -1, 1],
+            [-1, -1, math.sqrt(2)],
+            [-1, 1, math.sqrt(2)],
+            [1, -1, math.sqrt(2)],
+            [1, 1, math.sqrt(2)],
+        ]
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     # start and goal position
     sx = -5.0  # [m]

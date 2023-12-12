@@ -190,7 +190,7 @@ def main():
             plt.plot(cx[target_idx], cy[target_idx], "xg", label="target")
             plt.axis("equal")
             plt.grid(True)
-            plt.title("Speed[km/h]:" + str(state.v * 3.6)[:4])
+            plt.title(f"Speed[km/h]:{str(state.v * 3.6)[:4]}")
             plt.pause(0.001)
 
     # Test

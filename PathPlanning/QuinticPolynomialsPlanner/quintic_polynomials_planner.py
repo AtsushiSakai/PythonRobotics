@@ -44,26 +44,34 @@ class QuinticPolynomial:
         self.a5 = x[2]
 
     def calc_point(self, t):
-        xt = self.a0 + self.a1 * t + self.a2 * t ** 2 + \
-             self.a3 * t ** 3 + self.a4 * t ** 4 + self.a5 * t ** 5
-
-        return xt
+        return (
+            self.a0
+            + self.a1 * t
+            + self.a2 * t**2
+            + self.a3 * t**3
+            + self.a4 * t**4
+            + self.a5 * t**5
+        )
 
     def calc_first_derivative(self, t):
-        xt = self.a1 + 2 * self.a2 * t + \
-             3 * self.a3 * t ** 2 + 4 * self.a4 * t ** 3 + 5 * self.a5 * t ** 4
-
-        return xt
+        return (
+            self.a1
+            + 2 * self.a2 * t
+            + 3 * self.a3 * t**2
+            + 4 * self.a4 * t**3
+            + 5 * self.a5 * t**4
+        )
 
     def calc_second_derivative(self, t):
-        xt = 2 * self.a2 + 6 * self.a3 * t + 12 * self.a4 * t ** 2 + 20 * self.a5 * t ** 3
-
-        return xt
+        return (
+            2 * self.a2
+            + 6 * self.a3 * t
+            + 12 * self.a4 * t**2
+            + 20 * self.a5 * t**3
+        )
 
     def calc_third_derivative(self, t):
-        xt = 6 * self.a3 + 24 * self.a4 * t + 60 * self.a5 * t ** 2
-
-        return xt
+        return 6 * self.a3 + 24 * self.a4 * t + 60 * self.a5 * t ** 2
 
 
 def quintic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_accel, max_jerk, dt):
@@ -137,7 +145,10 @@ def quintic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_
                 j *= -1
             rj.append(j)
 
-        if max([abs(i) for i in ra]) <= max_accel and max([abs(i) for i in rj]) <= max_jerk:
+        if (
+            max(abs(i) for i in ra) <= max_accel
+            and max(abs(i) for i in rj) <= max_jerk
+        ):
             print("find path!!")
             break
 
@@ -152,11 +163,9 @@ def quintic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_
             plot_arrow(sx, sy, syaw)
             plot_arrow(gx, gy, gyaw)
             plot_arrow(rx[i], ry[i], ryaw[i])
-            plt.title("Time[s]:" + str(time[i])[0:4] +
-                      " v[m/s]:" + str(rv[i])[0:4] +
-                      " a[m/ss]:" + str(ra[i])[0:4] +
-                      " jerk[m/sss]:" + str(rj[i])[0:4],
-                      )
+            plt.title(
+                f"Time[s]:{str(time[i])[:4]} v[m/s]:{str(rv[i])[:4]} a[m/ss]:{str(ra[i])[:4]} jerk[m/sss]:{str(rj[i])[:4]}"
+            )
             plt.pause(0.001)
 
     return time, rx, ry, ryaw, rv, ra, rj
@@ -177,7 +186,7 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no 
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     sx = 10.0  # start x position [m]
     sy = 10.0  # start y position [m]

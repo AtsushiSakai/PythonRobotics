@@ -221,16 +221,17 @@ class Eta3PathSegment(object):
 def test1():
 
     for i in range(10):
-        path_segments = []
         # segment 1: lane-change curve
         start_pose = [0, 0, 0]
         end_pose = [4, 3.0, 0]
         # NOTE: The ordering on kappa is [kappa_A, kappad_A, kappa_B, kappad_B], with kappad_* being the curvature derivative
         kappa = [0, 0, 0, 0]
         eta = [i, i, 0, 0, 0, 0]
-        path_segments.append(Eta3PathSegment(
-            start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
-
+        path_segments = [
+            Eta3PathSegment(
+                start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa
+            )
+        ]
         path = Eta3Path(path_segments)
 
         # interpolate at several points along the path
@@ -255,16 +256,17 @@ def test1():
 def test2():
 
     for i in range(10):
-        path_segments = []
         # segment 1: lane-change curve
         start_pose = [0, 0, 0]
         end_pose = [4, 3.0, 0]
         # NOTE: The ordering on kappa is [kappa_A, kappad_A, kappa_B, kappad_B], with kappad_* being the curvature derivative
         kappa = [0, 0, 0, 0]
         eta = [0, 0, (i - 5) * 20, (5 - i) * 20, 0, 0]
-        path_segments.append(Eta3PathSegment(
-            start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
-
+        path_segments = [
+            Eta3PathSegment(
+                start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa
+            )
+        ]
         path = Eta3Path(path_segments)
 
         # interpolate at several points along the path
@@ -283,17 +285,17 @@ def test2():
 
 
 def test3():
-    path_segments = []
-
     # segment 1: lane-change curve
     start_pose = [0, 0, 0]
     end_pose = [4, 1.5, 0]
     # NOTE: The ordering on kappa is [kappa_A, kappad_A, kappa_B, kappad_B], with kappad_* being the curvature derivative
     kappa = [0, 0, 0, 0]
     eta = [4.27, 4.27, 0, 0, 0, 0]
-    path_segments.append(Eta3PathSegment(
-        start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
-
+    path_segments = [
+        Eta3PathSegment(
+            start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa
+        )
+    ]
     # segment 2: line segment
     start_pose = [4, 1.5, 0]
     end_pose = [5.5, 1.5, 0]

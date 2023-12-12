@@ -34,8 +34,7 @@ def voxel_point_sampling(original_points: npt.NDArray, voxel_size: float):
         xyz = original_points[i, :]
         xyz_index = tuple(xyz // voxel_size)
         voxel_dict[xyz_index].append(xyz)
-    points = np.vstack([np.mean(v, axis=0) for v in voxel_dict.values()])
-    return points
+    return np.vstack([np.mean(v, axis=0) for v in voxel_dict.values()])
 
 
 def farthest_point_sampling(orig_points: npt.NDArray,

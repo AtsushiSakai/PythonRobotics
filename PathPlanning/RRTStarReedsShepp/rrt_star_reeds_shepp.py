@@ -95,14 +95,12 @@ class RRTStarReedsShepp(RRTStar):
                 self.draw_graph(rnd)
 
             if (not search_until_max_iter) and new_node:  # check reaching the goal
-                last_index = self.search_best_goal_node()
-                if last_index:
+                if last_index := self.search_best_goal_node():
                     return self.generate_final_course(last_index)
 
         print("reached max iteration")
 
-        last_index = self.search_best_goal_node()
-        if last_index:
+        if last_index := self.search_best_goal_node():
             return self.generate_final_course(last_index)
         else:
             print("Cannot find path")
@@ -165,7 +163,7 @@ class RRTStarReedsShepp(RRTStar):
         new_node.path_x = px
         new_node.path_y = py
         new_node.path_yaw = pyaw
-        new_node.cost += sum([abs(l) for l in course_lengths])
+        new_node.cost += sum(abs(l) for l in course_lengths)
         new_node.parent = from_node
 
         return new_node
@@ -178,57 +176,61 @@ class RRTStarReedsShepp(RRTStar):
         if not course_lengths:
             return float("inf")
 
-        return from_node.cost + sum([abs(l) for l in course_lengths])
+        return from_node.cost + sum(abs(l) for l in course_lengths)
 
     def get_random_node(self):
 
-        rnd = self.Node(random.uniform(self.min_rand, self.max_rand),
-                        random.uniform(self.min_rand, self.max_rand),
-                        random.uniform(-math.pi, math.pi)
-                        )
-
-        return rnd
+        return self.Node(
+            random.uniform(self.min_rand, self.max_rand),
+            random.uniform(self.min_rand, self.max_rand),
+            random.uniform(-math.pi, math.pi),
+        )
 
     def search_best_goal_node(self):
 
-        goal_indexes = []
-        for (i, node) in enumerate(self.node_list):
-            if self.calc_dist_to_goal(node.x, node.y) <= self.goal_xy_th:
-                goal_indexes.append(i)
+        goal_indexes = [
+            i
+            for i, node in enumerate(self.node_list)
+            if self.calc_dist_to_goal(node.x, node.y) <= self.goal_xy_th
+        ]
         print("goal_indexes:", len(goal_indexes))
 
-        # angle check
-        final_goal_indexes = []
-        for i in goal_indexes:
-            if abs(self.node_list[i].yaw - self.end.yaw) <= self.goal_yaw_th:
-                final_goal_indexes.append(i)
-
+        final_goal_indexes = [
+            i
+            for i in goal_indexes
+            if abs(self.node_list[i].yaw - self.end.yaw) <= self.goal_yaw_th
+        ]
         print("final_goal_indexes:", len(final_goal_indexes))
 
         if not final_goal_indexes:
             return None
 
-        min_cost = min([self.node_list[i].cost for i in final_goal_indexes])
+        min_cost = min(self.node_list[i].cost for i in final_goal_indexes)
         print("min_cost:", min_cost)
-        for i in final_goal_indexes:
-            if self.node_list[i].cost == min_cost:
-                return i
-
-        return None
+        return next(
+            (i for i in final_goal_indexes if self.node_list[i].cost == min_cost),
+            None,
+        )
 
     def generate_final_course(self, goal_index):
         path = [[self.end.x, self.end.y, self.end.yaw]]
         node = self.node_list[goal_index]
         while node.parent:
-            for (ix, iy, iyaw) in zip(reversed(node.path_x), reversed(node.path_y), reversed(node.path_yaw)):
-                path.append([ix, iy, iyaw])
+            path.extend(
+                [ix, iy, iyaw]
+                for ix, iy, iyaw in zip(
+                    reversed(node.path_x),
+                    reversed(node.path_y),
+                    reversed(node.path_yaw),
+                )
+            )
             node = node.parent
         path.append([self.start.x, self.start.y, self.start.yaw])
         return path
 
 
 def main(max_iter=100):
-    print("Start " + __file__)
+    print(f"Start {__file__}")
 
     # ====Search Path with RRT====
     obstacleList = [

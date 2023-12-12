@@ -37,7 +37,7 @@ class precastDB:
         self.iy = 0
 
     def __str__(self):
-        return str(self.px) + "," + str(self.py) + "," + str(self.d) + "," + str(self.angle)
+        return f"{str(self.px)},{str(self.py)},{str(self.d)},{str(self.angle)}"
 
 
 def atan_zero_to_twopi(y, x):
@@ -50,7 +50,7 @@ def atan_zero_to_twopi(y, x):
 
 def precasting(minx, miny, xw, yw, xyreso, yawreso):
 
-    precast = [[] for i in range(int(round((math.pi * 2.0) / yawreso)) + 1)]
+    precast = [[] for _ in range(int(round((math.pi * 2.0) / yawreso)) + 1)]
 
     for ix in range(xw):
         for iy in range(yw):
@@ -79,7 +79,7 @@ def generate_ray_casting_grid_map(ox, oy, xyreso, yawreso):
 
     minx, miny, maxx, maxy, xw, yw = calc_grid_map_config(ox, oy, xyreso)
 
-    pmap = [[0.0 for i in range(yw)] for i in range(xw)]
+    pmap = [[0.0 for _ in range(yw)] for _ in range(xw)]
 
     precast = precasting(minx, miny, xw, yw, xyreso, yawreso)
 
@@ -111,12 +111,12 @@ def draw_heatmap(data, minx, maxx, miny, maxy, xyreso):
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     xyreso = 0.25  # x-y grid resolution [m]
     yawreso = np.deg2rad(10.0)  # yaw angle resolution [rad]
 
-    for i in range(5):
+    for _ in range(5):
         ox = (np.random.rand(4) - 0.5) * 10.0
         oy = (np.random.rand(4) - 0.5) * 10.0
         pmap, minx, maxx, miny, maxy, xyreso = generate_ray_casting_grid_map(

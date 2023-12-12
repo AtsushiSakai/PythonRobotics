@@ -38,8 +38,7 @@ show_animation = True
 def calc_input():
     v = 1.0  # [m/s]
     yaw_rate = 0.1  # [rad/s]
-    u = np.array([[v, yaw_rate]]).T
-    return u
+    return np.array([[v, yaw_rate]]).T
 
 
 def observation(x_true, xd, u, rf_id):
@@ -85,10 +84,11 @@ def motion_model(x, u):
 
 
 def gauss_likelihood(x, sigma):
-    p = 1.0 / math.sqrt(2.0 * math.pi * sigma ** 2) * \
-        math.exp(-x ** 2 / (2 * sigma ** 2))
-
-    return p
+    return (
+        1.0
+        / math.sqrt(2.0 * math.pi * sigma**2)
+        * math.exp(-(x**2) / (2 * sigma**2))
+    )
 
 
 def calc_covariance(x_est, px, pw):
@@ -99,7 +99,7 @@ def calc_covariance(x_est, px, pw):
     cov = np.zeros((3, 3))
     n_particle = px.shape[1]
     for i in range(n_particle):
-        dx = (px[:, i:i + 1] - x_est)[0:3]
+        dx = (px[:, i:i + 1] - x_est)[:3]
         cov += pw[0, i] * dx @ dx.T
     cov *= 1.0 / (1.0 - pw @ pw.T)
 
@@ -200,7 +200,7 @@ def plot_covariance_ellipse(x_est, p_est):  # pragma: no cover
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     time = 0.0
 
