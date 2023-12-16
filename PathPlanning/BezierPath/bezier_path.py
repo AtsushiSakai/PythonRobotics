@@ -46,10 +46,7 @@ def calc_bezier_path(control_points, n_points=100):
     :param n_points: (int) number of points in the trajectory
     :return: (numpy array)
     """
-    traj = []
-    for t in np.linspace(0, 1, n_points):
-        traj.append(bezier(t, control_points))
-
+    traj = [bezier(t, control_points) for t in np.linspace(0, 1, n_points)]
     return np.array(traj)
 
 
@@ -199,7 +196,7 @@ def main2():
         assert path.T[1][-1] == end_y, "path is invalid"
 
         if show_animation:  # pragma: no cover
-            plt.plot(path.T[0], path.T[1], label="Offset=" + str(offset))
+            plt.plot(path.T[0], path.T[1], label=f"Offset={str(offset)}")
 
     if show_animation:  # pragma: no cover
         plot_arrow(start_x, start_y, start_yaw)

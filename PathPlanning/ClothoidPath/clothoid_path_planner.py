@@ -173,16 +173,16 @@ def draw_clothoids(start, goal, num_steps, clothoidal_paths,
 
 
 def main():
-    start_point = Point(0, 0)
-    start_orientation_list = [0.0]
-    goal_point = Point(10, 0)
-    goal_orientation_list = np.linspace(-pi, pi, 75)
-    num_path_points = 100
-    clothoid_paths = generate_clothoid_paths(
-        start_point, start_orientation_list,
-        goal_point, goal_orientation_list,
-        num_path_points)
     if show_animation:
+        start_orientation_list = [0.0]
+        start_point = Point(0, 0)
+        goal_point = Point(10, 0)
+        goal_orientation_list = np.linspace(-pi, pi, 75)
+        num_path_points = 100
+        clothoid_paths = generate_clothoid_paths(
+            start_point, start_orientation_list,
+            goal_point, goal_orientation_list,
+            num_path_points)
         draw_clothoids(start_point, goal_point,
                        num_path_points, clothoid_paths,
                        save_animation=False)

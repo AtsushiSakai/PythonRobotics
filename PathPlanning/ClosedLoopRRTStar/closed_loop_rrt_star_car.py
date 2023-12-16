@@ -130,18 +130,19 @@ class ClosedLoopRRTStar(RRTStarReedsShepp):
         return find_goal, x, y, yaw, v, t, a, d
 
     def get_goal_indexes(self):
-        goalinds = []
-        for (i, node) in enumerate(self.node_list):
-            if self.calc_dist_to_goal(node.x, node.y) <= self.xy_th:
-                goalinds.append(i)
+        goalinds = [
+            i
+            for i, node in enumerate(self.node_list)
+            if self.calc_dist_to_goal(node.x, node.y) <= self.xy_th
+        ]
         print("OK XY TH num is")
         print(len(goalinds))
 
-        # angle check
-        fgoalinds = []
-        for i in goalinds:
-            if abs(self.node_list[i].yaw - self.end.yaw) <= self.yaw_th:
-                fgoalinds.append(i)
+        fgoalinds = [
+            i
+            for i in goalinds
+            if abs(self.node_list[i].yaw - self.end.yaw) <= self.yaw_th
+        ]
         print("OK YAW TH num is")
         print(len(fgoalinds))
 
@@ -149,7 +150,7 @@ class ClosedLoopRRTStar(RRTStarReedsShepp):
 
 
 def main(gx=6.0, gy=7.0, gyaw=np.deg2rad(90.0), max_iter=100):
-    print("Start" + __file__)
+    print(f"Start{__file__}")
     # ====Search Path with RRT====
     obstacle_list = [
         (5, 5, 1),

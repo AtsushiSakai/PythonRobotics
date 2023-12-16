@@ -40,25 +40,23 @@ class SweepSearcher:
         n_x_index = self.moving_direction + c_x_index
         n_y_index = c_y_index
 
-        # found safe grid
         if not self.check_occupied(n_x_index, n_y_index, grid_map):
             return n_x_index, n_y_index
-        else:  # occupied
-            next_c_x_index, next_c_y_index = self.find_safe_turning_grid(
-                c_x_index, c_y_index, grid_map)
-            if (next_c_x_index is None) and (next_c_y_index is None):
-                # moving backward
-                next_c_x_index = -self.moving_direction + c_x_index
-                next_c_y_index = c_y_index
-                if self.check_occupied(next_c_x_index, next_c_y_index, grid_map, FloatGrid(1.0)):
-                    # moved backward, but the grid is occupied by obstacle
-                    return None, None
-            else:
-                # keep moving until end
-                while not self.check_occupied(next_c_x_index + self.moving_direction, next_c_y_index, grid_map):
-                    next_c_x_index += self.moving_direction
-                self.swap_moving_direction()
-            return next_c_x_index, next_c_y_index
+        next_c_x_index, next_c_y_index = self.find_safe_turning_grid(
+            c_x_index, c_y_index, grid_map)
+        if (next_c_x_index is None) and (next_c_y_index is None):
+            # moving backward
+            next_c_x_index = -self.moving_direction + c_x_index
+            next_c_y_index = c_y_index
+            if self.check_occupied(next_c_x_index, next_c_y_index, grid_map, FloatGrid(1.0)):
+                # moved backward, but the grid is occupied by obstacle
+                return None, None
+        else:
+            # keep moving until end
+            while not self.check_occupied(next_c_x_index + self.moving_direction, next_c_y_index, grid_map):
+                next_c_x_index += self.moving_direction
+            self.swap_moving_direction()
+        return next_c_x_index, next_c_y_index
 
     @staticmethod
     def check_occupied(c_x_index, c_y_index, grid_map, occupied_val=FloatGrid(0.5)):
@@ -78,12 +76,10 @@ class SweepSearcher:
         return None, None
 
     def is_search_done(self, grid_map):
-        for ix in self.x_indexes_goal_y:
-            if not self.check_occupied(ix, self.goal_y, grid_map):
-                return False
-
-        # all lower grid is occupied
-        return True
+        return all(
+            self.check_occupied(ix, self.goal_y, grid_map)
+            for ix in self.x_indexes_goal_y
+        )
 
     def update_turning_window(self):
         # turning window definition

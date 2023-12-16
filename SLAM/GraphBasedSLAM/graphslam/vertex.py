@@ -48,7 +48,7 @@ class Vertex:
             The vertex in .g2o format
 
         """
-        return "VERTEX_SE2 {} {} {} {}\n".format(self.id, self.pose[0], self.pose[1], self.pose[2])
+        return f"VERTEX_SE2 {self.id} {self.pose[0]} {self.pose[1]} {self.pose[2]}\n"
 
     def plot(self, color='r', marker='o', markersize=3):
         """Plot the vertex.

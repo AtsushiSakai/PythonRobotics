@@ -17,8 +17,7 @@ def check_edge_condition(px, py, pyaw, start_x, start_y, start_yaw, end_x,
 
 
 def check_path_length(px, py, lengths):
-    path_len = sum(
-        [np.hypot(dx, dy) for (dx, dy) in zip(np.diff(px), np.diff(py))])
+    path_len = sum(np.hypot(dx, dy) for (dx, dy) in zip(np.diff(px), np.diff(py)))
     assert (abs(path_len - sum(lengths)) <= 0.1)
 
 
@@ -49,7 +48,7 @@ def test_2():
 def test_3():
     N_TEST = 10
 
-    for i in range(N_TEST):
+    for _ in range(N_TEST):
         start_x = (np.random.rand() - 0.5) * 10.0  # [m]
         start_y = (np.random.rand() - 0.5) * 10.0  # [m]
         start_yaw = np.deg2rad((np.random.rand() - 0.5) * 180.0)  # [rad]

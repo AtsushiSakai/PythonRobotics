@@ -85,7 +85,7 @@ class DMP(object):
 
                 phi = [np.exp(-0.5 * ((i * dt / data_period) - c)**2 / H)
                        for c in C]
-                phi = phi/np.sum(phi)
+                phi /= np.sum(phi)
 
                 qdd = (qd - qd_last)/dt
 
@@ -129,7 +129,7 @@ class DMP(object):
         qd = np.zeros(dimensions)
 
         positions = np.array([])
-        for k in range(self.timesteps):
+        for _ in range(self.timesteps):
             time = time + self.dt
 
             qdd = np.zeros(dimensions)
@@ -138,7 +138,7 @@ class DMP(object):
 
                 if time <= T:
                     phi = [np.exp(-0.5 * ((time / T) - c)**2 / H) for c in C]
-                    phi = phi / np.sum(phi)
+                    phi /= np.sum(phi)
                     f = np.dot(phi, self.weights[dim])
                 else:
                     f = 0
@@ -151,11 +151,7 @@ class DMP(object):
             qd = qd + qdd * self.dt
             q = q + qd * self.dt
 
-            if positions.size == 0:
-                positions = q
-            else:
-                positions = np.vstack([positions, q])
-
+            positions = q if positions.size == 0 else np.vstack([positions, q])
         t = np.arange(0, self.timesteps * self.dt, self.dt)
         return t, positions
 
@@ -215,21 +211,19 @@ class DMP(object):
         T_vals = np.linspace(T_orig, 2*T_orig, 20)
 
         for new_q0_value in q0_vals:
-            plot_title = "Initial Position = [%s, %s]" % \
-                         (round(new_q0_value[0], 2), round(new_q0_value[1], 2))
+            plot_title = f"Initial Position = [{round(new_q0_value[0], 2)}, {round(new_q0_value[1], 2)}]"
 
             _, path = self.recreate_trajectory(new_q0_value, g_orig, T_orig)
             self.view_trajectory(path, title=plot_title, demo=True)
 
         for new_g_value in g_vals:
-            plot_title = "Goal Position = [%s, %s]" % \
-                         (round(new_g_value[0], 2), round(new_g_value[1], 2))
+            plot_title = f"Goal Position = [{round(new_g_value[0], 2)}, {round(new_g_value[1], 2)}]"
 
             _, path = self.recreate_trajectory(q0_orig, new_g_value, T_orig)
             self.view_trajectory(path, title=plot_title, demo=True)
 
         for new_T_value in T_vals:
-            plot_title = "Period = %s [sec]" % round(new_T_value, 2)
+            plot_title = f"Period = {round(new_T_value, 2)} [sec]"
 
             _, path = self.recreate_trajectory(q0_orig, g_orig, new_T_value)
             self.view_trajectory(path, title=plot_title, demo=True)

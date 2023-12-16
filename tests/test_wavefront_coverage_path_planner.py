@@ -24,38 +24,35 @@ def wavefront_cpp(img, start, goal):
 
 
 def test_wavefront_CPP_1():
-    img_dir = os.path.dirname(
-        os.path.abspath(__file__)) + "/../PathPlanning/WavefrontCPP"
+    img_dir = f"{os.path.dirname(os.path.abspath(__file__))}/../PathPlanning/WavefrontCPP"
     img = plt.imread(os.path.join(img_dir, 'map', 'test.png'))
     img = 1 - img
 
-    start = (43, 0)
     goal = (0, 0)
 
+    start = (43, 0)
     wavefront_cpp(img, start, goal)
 
 
 def test_wavefront_CPP_2():
-    img_dir = os.path.dirname(
-        os.path.abspath(__file__)) + "/../PathPlanning/WavefrontCPP"
+    img_dir = f"{os.path.dirname(os.path.abspath(__file__))}/../PathPlanning/WavefrontCPP"
     img = plt.imread(os.path.join(img_dir, 'map', 'test_2.png'))
     img = 1 - img
 
-    start = (10, 0)
     goal = (10, 40)
 
+    start = (10, 0)
     wavefront_cpp(img, start, goal)
 
 
 def test_wavefront_CPP_3():
-    img_dir = os.path.dirname(
-        os.path.abspath(__file__)) + "/../PathPlanning/WavefrontCPP"
+    img_dir = f"{os.path.dirname(os.path.abspath(__file__))}/../PathPlanning/WavefrontCPP"
     img = plt.imread(os.path.join(img_dir, 'map', 'test_3.png'))
     img = 1 - img
 
-    start = (0, 0)
     goal = (30, 30)
 
+    start = (0, 0)
     wavefront_cpp(img, start, goal)
 
 

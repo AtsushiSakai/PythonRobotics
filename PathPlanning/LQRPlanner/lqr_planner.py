@@ -75,9 +75,9 @@ class LQRPlanner:
         """
         X, Xn = Q, Q
 
-        for i in range(self.MAX_ITER):
+        for _ in range(self.MAX_ITER):
             Xn = A.T * X * A - A.T * X * B * \
-                 la.inv(R + B.T * X * B) * B.T * X * A + Q
+                     la.inv(R + B.T * X * B) * B.T * X * A + Q
             if (abs(Xn - X)).max() < self.EPS:
                 break
             X = Xn
@@ -113,20 +113,18 @@ class LQRPlanner:
 
         Kopt, X, ev = self.dlqr(A, B, np.eye(2), np.eye(1))
 
-        u = -Kopt @ x
-
-        return u
+        return -Kopt @ x
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     ntest = 10  # number of goal
     area = 100.0  # sampling area
 
     lqr_planner = LQRPlanner()
 
-    for i in range(ntest):
+    for _ in range(ntest):
         sx = 6.0
         sy = 6.0
         gx = random.uniform(-area, area)

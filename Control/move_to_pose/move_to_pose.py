@@ -172,7 +172,7 @@ def transformation_matrix(x, y, theta):
 
 def main():
 
-    for i in range(5):
+    for _ in range(5):
         x_start = 20 * random()
         y_start = 20 * random()
         theta_start = 2 * np.pi * random() - np.pi

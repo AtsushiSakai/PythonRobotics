@@ -35,11 +35,13 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):  # pragma: no 
 
 
 def calc_diff(target, x, y, yaw):
-    d = np.array([target.x - x[-1],
-                  target.y - y[-1],
-                  motion_model.pi_2_pi(target.yaw - yaw[-1])])
-
-    return d
+    return np.array(
+        [
+            target.x - x[-1],
+            target.y - y[-1],
+            motion_model.pi_2_pi(target.yaw - yaw[-1]),
+        ]
+    )
 
 
 def calc_j(target, p, h, k0):
@@ -67,9 +69,7 @@ def calc_j(target, p, h, k0):
     dn = calc_diff(target, [xn], [yn], [yawn])
     d3 = np.array((dp - dn) / (2.0 * h[2])).reshape(3, 1)
 
-    J = np.hstack((d1, d2, d3))
-
-    return J
+    return np.hstack((d1, d2, d3))
 
 
 def selection_learning_param(dp, p, k0, target):
@@ -111,7 +111,7 @@ def optimize_trajectory(target, k0, p):
 
         cost = np.linalg.norm(dc)
         if cost <= cost_th:
-            print("path is ok cost is:" + str(cost))
+            print(f"path is ok cost is:{str(cost)}")
             break
 
         J = calc_j(target, p, h, k0)
@@ -154,7 +154,7 @@ def optimize_trajectory_demo():  # pragma: no cover
 
 
 def main():  # pragma: no cover
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
     optimize_trajectory_demo()
 
 

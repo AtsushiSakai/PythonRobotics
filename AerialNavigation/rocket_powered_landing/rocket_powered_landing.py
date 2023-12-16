@@ -526,9 +526,8 @@ class SCProblem:
     def get_variable(self, name):
         if name in self.var:
             return self.var[name].value
-        else:
-            print(f'Variable \'{name}\' does not exist.')
-            return None
+        print(f'Variable \'{name}\' does not exist.')
+        return None
 
     def solve(self, **kwargs):
         error = False
@@ -542,14 +541,12 @@ class SCProblem:
 
         stats = self.prob.solver_stats
 
-        info = {
+        return {
             'setup_time': stats.setup_time,
             'solver_time': stats.solve_time,
             'iterations': stats.num_iters,
-            'solver_error': error
+            'solver_error': error,
         }
-
-        return info
 
 
 def axis3d_equal(X, Y, Z, ax):

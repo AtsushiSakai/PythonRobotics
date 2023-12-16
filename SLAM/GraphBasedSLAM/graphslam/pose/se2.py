@@ -27,9 +27,9 @@ class PoseSE2(np.ndarray):
     """
 
     def __new__(cls, position, orientation):
-        obj = np.array([position[0], position[1], neg_pi_to_pi(orientation)],
-                       dtype=float).view(cls)
-        return obj
+        return np.array(
+            [position[0], position[1], neg_pi_to_pi(orientation)], dtype=float
+        ).view(cls)
 
     # pylint: disable=arguments-differ
     def copy(self):

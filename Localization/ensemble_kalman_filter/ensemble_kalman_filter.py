@@ -36,8 +36,7 @@ show_animation = True
 def calc_input():
     v = 1.0  # [m/s]
     yaw_rate = 0.1  # [rad/s]
-    u = np.array([[v, yaw_rate]]).T
-    return u
+    return np.array([[v, yaw_rate]]).T
 
 
 def observation(xTrue, xd, u, RFID):
@@ -97,7 +96,7 @@ def calc_covariance(xEst, px):
     cov = np.zeros((3, 3))
 
     for i in range(px.shape[1]):
-        dx = (px[:, i] - xEst)[0:3]
+        dx = (px[:, i] - xEst)[:3]
         cov += dx.dot(dx.T)
     cov /= NP
 
@@ -183,7 +182,7 @@ def pi_2_pi(angle):
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     time = 0.0
 

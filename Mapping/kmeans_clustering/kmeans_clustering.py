@@ -109,7 +109,7 @@ def update_positions(cx, cy):
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     cx = [0.0, 8.0]
     cy = [0.0, 8.0]

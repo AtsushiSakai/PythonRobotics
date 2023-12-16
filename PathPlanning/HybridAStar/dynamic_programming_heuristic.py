@@ -25,8 +25,7 @@ class Node:
         self.parent_index = parent_index
 
     def __str__(self):
-        return str(self.x) + "," + str(self.y) + "," + str(
-            self.cost) + "," + str(self.parent_index)
+        return f"{str(self.x)},{str(self.y)},{str(self.cost)},{str(self.parent_index)}"
 
 
 def calc_final_path(goal_node, closed_node_set, resolution):
@@ -69,13 +68,12 @@ def calc_distance_heuristic(gx, gy, ox, oy, resolution, rr):
         if not priority_queue:
             break
         cost, c_id = heapq.heappop(priority_queue)
-        if c_id in open_set:
-            current = open_set[c_id]
-            closed_set[c_id] = current
-            open_set.pop(c_id)
-        else:
+        if c_id not in open_set:
             continue
 
+        current = open_set[c_id]
+        closed_set[c_id] = current
+        open_set.pop(c_id)
         # show graph
         if show_animation:  # pragma: no cover
             plt.plot(current.x * resolution, current.y * resolution, "xc")
@@ -106,31 +104,20 @@ def calc_distance_heuristic(gx, gy, ox, oy, resolution, rr):
                 heapq.heappush(
                     priority_queue,
                     (node.cost, calc_index(node, x_w, min_x, min_y)))
-            else:
-                if open_set[n_id].cost >= node.cost:
-                    # This path is the best until now. record it!
-                    open_set[n_id] = node
-                    heapq.heappush(
-                        priority_queue,
-                        (node.cost, calc_index(node, x_w, min_x, min_y)))
+            elif open_set[n_id].cost >= node.cost:
+                # This path is the best until now. record it!
+                open_set[n_id] = node
+                heapq.heappush(
+                    priority_queue,
+                    (node.cost, calc_index(node, x_w, min_x, min_y)))
 
     return closed_set
 
 
 def verify_node(node, obstacle_map, min_x, min_y, max_x, max_y):
-    if node.x < min_x:
+    if node.x < min_x or node.y < min_y or node.x >= max_x or node.y >= max_y:
         return False
-    elif node.y < min_y:
-        return False
-    elif node.x >= max_x:
-        return False
-    elif node.y >= max_y:
-        return False
-
-    if obstacle_map[node.x][node.y]:
-        return False
-
-    return True
+    return not obstacle_map[node.x][node.y]
 
 
 def calc_obstacle_map(ox, oy, resolution, vr):
@@ -163,14 +150,13 @@ def calc_index(node, x_width, x_min, y_min):
 
 
 def get_motion_model():
-    # dx, dy, cost
-    motion = [[1, 0, 1],
-              [0, 1, 1],
-              [-1, 0, 1],
-              [0, -1, 1],
-              [-1, -1, math.sqrt(2)],
-              [-1, 1, math.sqrt(2)],
-              [1, -1, math.sqrt(2)],
-              [1, 1, math.sqrt(2)]]
-
-    return motion
+    return [
+        [1, 0, 1],
+        [0, 1, 1],
+        [-1, 0, 1],
+        [0, -1, 1],
+        [-1, -1, math.sqrt(2)],
+        [-1, 1, math.sqrt(2)],
+        [1, -1, math.sqrt(2)],
+        [1, 1, math.sqrt(2)],
+    ]

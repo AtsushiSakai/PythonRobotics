@@ -72,15 +72,15 @@ class RRTStar(RRT):
                                   self.expand_dis)
             near_node = self.node_list[nearest_ind]
             new_node.cost = near_node.cost + \
-                math.hypot(new_node.x-near_node.x,
+                    math.hypot(new_node.x-near_node.x,
                            new_node.y-near_node.y)
 
             if self.check_collision(
                     new_node, self.obstacle_list, self.robot_radius):
                 near_inds = self.find_near_nodes(new_node)
-                node_with_updated_parent = self.choose_parent(
-                    new_node, near_inds)
-                if node_with_updated_parent:
+                if node_with_updated_parent := self.choose_parent(
+                    new_node, near_inds
+                ):
                     self.rewire(node_with_updated_parent, near_inds)
                     self.node_list.append(node_with_updated_parent)
                 else:
@@ -98,10 +98,7 @@ class RRTStar(RRT):
         print("reached max iteration")
 
         last_index = self.search_best_goal_node()
-        if last_index is not None:
-            return self.generate_final_course(last_index)
-
-        return None
+        return None if last_index is None else self.generate_final_course(last_index)
 
     def choose_parent(self, new_node, near_inds):
         """
@@ -168,11 +165,14 @@ class RRTStar(RRT):
                            for i in safe_goal_inds]
 
         min_cost = min(safe_goal_costs)
-        for i, cost in zip(safe_goal_inds, safe_goal_costs):
-            if cost == min_cost:
-                return i
-
-        return None
+        return next(
+            (
+                i
+                for i, cost in zip(safe_goal_inds, safe_goal_costs)
+                if cost == min_cost
+            ),
+            None,
+        )
 
     def find_near_nodes(self, new_node):
         """
@@ -197,8 +197,7 @@ class RRTStar(RRT):
             r = min(r, self.expand_dis)
         dist_list = [(node.x - new_node.x)**2 + (node.y - new_node.y)**2
                      for node in self.node_list]
-        near_inds = [dist_list.index(i) for i in dist_list if i <= r**2]
-        return near_inds
+        return [dist_list.index(i) for i in dist_list if i <= r**2]
 
     def rewire(self, new_node, near_inds):
         """
@@ -248,7 +247,7 @@ class RRTStar(RRT):
 
 
 def main():
-    print("Start " + __file__)
+    print(f"Start {__file__}")
 
     # ====Search Path with RRT====
     obstacle_list = [

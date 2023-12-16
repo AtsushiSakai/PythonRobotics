@@ -165,7 +165,11 @@ class EdgeOdometry:
             The edge in .g2o format
 
         """
-        return "EDGE_SE2 {} {} {} {} {} ".format(self.vertex_ids[0], self.vertex_ids[1], self.estimate[0], self.estimate[1], self.estimate[2]) + " ".join([str(x) for x in self.information[np.triu_indices(3, 0)]]) + "\n"
+        return (
+            f"EDGE_SE2 {self.vertex_ids[0]} {self.vertex_ids[1]} {self.estimate[0]} {self.estimate[1]} {self.estimate[2]} "
+            + " ".join([str(x) for x in self.information[np.triu_indices(3, 0)]])
+            + "\n"
+        )
 
     def plot(self, color='b'):
         """Plot the edge.

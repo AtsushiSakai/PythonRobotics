@@ -92,10 +92,7 @@ class FlowField:
                     x, y = curr_x + i, curr_y + j
                     if self.obs_grid[(x, y)] == 'obs':
                         continue
-                    if (i, j) in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
-                        e_cost = 10
-                    else:
-                        e_cost = 14
+                    e_cost = 10 if (i, j) in [(1, 0), (0, 1), (-1, 0), (0, -1)] else 14
                     neighbor_energy = self.cost_field[(x, y)]
                     neighbor_old_cost = self.integration_field[(x, y)]
                     neighbor_new_cost = curr_cost + neighbor_energy + e_cost

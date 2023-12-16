@@ -199,8 +199,7 @@ def graph_based_slam(x_init, hz):
 def calc_input():
     v = 1.0  # [m/s]
     yaw_rate = 0.1  # [rad/s]
-    u = np.array([[v, yaw_rate]]).T
-    return u
+    return np.array([[v, yaw_rate]]).T
 
 
 def observation(xTrue, xd, u, RFID):
@@ -253,7 +252,7 @@ def pi_2_pi(angle):
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     time = 0.0
 
@@ -313,7 +312,7 @@ def main():
                          x_opt[1, :].flatten(), "-r")
                 plt.axis("equal")
                 plt.grid(True)
-                plt.title("Time" + str(time)[0:5])
+                plt.title(f"Time{str(time)[:5]}")
                 plt.pause(1.0)
 
 

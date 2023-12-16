@@ -373,17 +373,18 @@ class NMPCControllerCGMRES:
 
         F = []
         for i in range(N):
-            # ∂H/∂u(xi, ui, λi)
-            F.append(u_1s[i] + lam_4s[i] + 2.0 * raw_1s[i] * u_1s[i])
-            F.append(u_2s[i] + lam_3s[i] * v_s[i] /
-                     WB * cos(u_2s[i]) ** 2 + 2.0 * raw_2s[i] * u_2s[i])
-            F.append(-PHI_V + 2.0 * raw_1s[i] * dummy_u_1s[i])
-            F.append(-PHI_OMEGA + 2.0 * raw_2s[i] * dummy_u_2s[i])
-
-            # C(xi, ui, λi)
-            F.append(u_1s[i] ** 2 + dummy_u_1s[i] ** 2 - U_A_MAX ** 2)
-            F.append(u_2s[i] ** 2 + dummy_u_2s[i] ** 2 - U_OMEGA_MAX ** 2)
-
+            F.extend(
+                (
+                    u_1s[i] + lam_4s[i] + 2.0 * raw_1s[i] * u_1s[i],
+                    u_2s[i]
+                    + lam_3s[i] * v_s[i] / WB * cos(u_2s[i]) ** 2
+                    + 2.0 * raw_2s[i] * u_2s[i],
+                    -PHI_V + 2.0 * raw_1s[i] * dummy_u_1s[i],
+                    -PHI_OMEGA + 2.0 * raw_2s[i] * dummy_u_2s[i],
+                    u_1s[i] ** 2 + dummy_u_1s[i] ** 2 - U_A_MAX**2,
+                    u_2s[i] ** 2 + dummy_u_2s[i] ** 2 - U_OMEGA_MAX**2,
+                )
+            )
         return np.array(F)
 
 
@@ -572,9 +573,9 @@ def animation(plant, controller, dt):
         plot_car(x, y, yaw, steer=steer)
         plt.axis("equal")
         plt.grid(True)
-        plt.title("Time[s]:" + str(round(time, 2)) +
-                  ", accel[m/s]:" + str(round(accel, 2)) +
-                  ", speed[km/h]:" + str(round(v * 3.6, 2)))
+        plt.title(
+            f"Time[s]:{str(round(time, 2))}, accel[m/s]:{str(round(accel, 2))}, speed[km/h]:{str(round(v * 3.6, 2))}"
+        )
         plt.pause(0.0001)
 
     plt.close("all")

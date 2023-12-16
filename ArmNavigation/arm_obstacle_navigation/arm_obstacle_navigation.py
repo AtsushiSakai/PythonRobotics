@@ -58,10 +58,7 @@ def detect_collision(line_seg, circle):
         closest_point = b_vec
     else:
         closest_point = a_vec + line_vec * proj / line_mag
-    if np.linalg.norm(closest_point - c_vec) > radius:
-        return False
-
-    return True
+    return np.linalg.norm(closest_point - c_vec) <= radius
 
 
 def get_occupancy_grid(arm, obstacles):
@@ -144,7 +141,7 @@ def astar_torus(grid, start_node, goal_node):
         neighbors = find_neighbors(i, j)
 
         for neighbor in neighbors:
-            if grid[neighbor] == 0 or grid[neighbor] == 5:
+            if grid[neighbor] in [0, 5]:
                 distance_map[neighbor] = distance_map[current_node] + 1
                 explored_heuristic_map[neighbor] = heuristic_map[neighbor]
                 parent_map[neighbor[0]][neighbor[1]] = current_node
@@ -174,7 +171,7 @@ def astar_torus(grid, start_node, goal_node):
 
 def find_neighbors(i, j):
     neighbors = []
-    if i - 1 >= 0:
+    if i >= 1:
         neighbors.append((i - 1, j))
     else:
         neighbors.append((M - 1, j))
@@ -184,7 +181,7 @@ def find_neighbors(i, j):
     else:
         neighbors.append((0, j))
 
-    if j - 1 >= 0:
+    if j >= 1:
         neighbors.append((i, j - 1))
     else:
         neighbors.append((i, M - 1))
@@ -198,7 +195,7 @@ def find_neighbors(i, j):
 
 
 def calc_heuristic_map(M, goal_node):
-    X, Y = np.meshgrid([i for i in range(M)], [i for i in range(M)])
+    X, Y = np.meshgrid(list(range(M)), list(range(M)))
     heuristic_map = np.abs(X - goal_node[1]) + np.abs(Y - goal_node[0])
     for i in range(heuristic_map.shape[0]):
         for j in range(heuristic_map.shape[1]):

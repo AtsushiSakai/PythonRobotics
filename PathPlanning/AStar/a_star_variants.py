@@ -87,7 +87,7 @@ def key_points(o_dict):
                 obs_count += 1
             if o_dict[(x + i3, y + j3)]:
                 obs_count += 1
-            if obs_count == 3 or obs_count == 1:
+            if obs_count in {3, 1}:
                 c_list.append((x, y))
                 if show_animation:
                     plt.plot(x, y, ".y")
@@ -154,10 +154,7 @@ class SearchAlgo:
         x, y = x1, y1
         val = 0
         while x != x2 or y != y2:
-            if x != x2 and y != y2:
-                val += 14
-            else:
-                val += 10
+            val += 14 if x != x2 and y != y2 else 10
             x, y = x + np.sign(x2 - x), y + np.sign(y2 - y)
         return val
 
@@ -281,17 +278,20 @@ class SearchAlgo:
         one neighbor at a time. In fact, you can look for the
         next node as far out as you can as long as there is a
         clear line of sight from your current node to that node."""
-        if show_animation:
-            if use_beam_search:
+        if use_beam_search:
+            if show_animation:
                 plt.title('A* with beam search')
-            elif use_iterative_deepening:
+        elif use_iterative_deepening:
+            if show_animation:
                 plt.title('A* with iterative deepening')
-            elif use_dynamic_weighting:
+        elif use_dynamic_weighting:
+            if show_animation:
                 plt.title('A* with dynamic weighting')
-            elif use_theta_star:
+        elif use_theta_star:
+            if show_animation:
                 plt.title('Theta*')
-            else:
-                plt.title('A*')
+        elif show_animation:
+            plt.title('A*')
 
         goal_found = False
         curr_f_thresh = np.inf
@@ -306,12 +306,12 @@ class SearchAlgo:
             p = 0
             for p_n in self.open_set[1:]:
                 if p_n['fcost'] == lowest_f and \
-                        p_n['gcost'] < lowest_g:
+                            p_n['gcost'] < lowest_g:
                     lowest_g = p_n['gcost']
                     p += 1
                 elif p_n['fcost'] == lowest_f and \
-                        p_n['gcost'] == lowest_g and \
-                        p_n['hcost'] < lowest_h:
+                            p_n['gcost'] == lowest_g and \
+                            p_n['hcost'] < lowest_h:
                     lowest_h = p_n['hcost']
                     p += 1
                 else:
@@ -328,16 +328,13 @@ class SearchAlgo:
                 for j in range(-1, 2):
                     x, y = current_node['pos']
                     if (i == 0 and j == 0) or \
-                            ((x + i, y + j) not in self.obs_grid.keys()):
+                                ((x + i, y + j) not in self.obs_grid.keys()):
                         continue
-                    if (i, j) in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
-                        offset = 10
-                    else:
-                        offset = 14
+                    offset = 10 if (i, j) in [(1, 0), (0, 1), (-1, 0), (0, -1)] else 14
                     if use_theta_star:
                         new_i, new_j, counter, goal_found = \
-                            self.get_farthest_point(x, y, i, j)
-                        offset = offset * counter
+                                self.get_farthest_point(x, y, i, j)
+                        offset *= counter
                         cand_pt = [current_node['pos'][0] + new_i,
                                    current_node['pos'][1] + new_j]
                     else:
@@ -348,13 +345,13 @@ class SearchAlgo:
                         current_node['open'] = False
                         cand_pt = self.goal_pt
                         self.all_nodes[tuple(cand_pt)]['pred'] = \
-                            current_node['pos']
+                                current_node['pos']
                         break
 
                     if cand_pt == self.goal_pt:
                         current_node['open'] = False
                         self.all_nodes[tuple(cand_pt)]['pred'] = \
-                            current_node['pos']
+                                current_node['pos']
                         goal_found = True
                         break
 
@@ -374,13 +371,12 @@ class SearchAlgo:
                     break
                 if use_theta_star or use_jump_point:
                     x, y = [current_node['pos'][0], current_node['pred'][0]], \
-                             [current_node['pos'][1], current_node['pred'][1]]
+                                 [current_node['pos'][1], current_node['pred'][1]]
                     if show_animation:
                         plt.plot(x, y, "b")
-                else:
-                    if show_animation:
-                        plt.plot(current_node['pred'][0],
-                                 current_node['pred'][1], "b*")
+                elif show_animation:
+                    plt.plot(current_node['pred'][0],
+                             current_node['pred'][1], "b*")
                 current_node = self.all_nodes[tuple(current_node['pred'])]
             if goal_found:
                 break

@@ -20,7 +20,7 @@ def generate_gaussian_grid_map(ox, oy, xyreso, std):
 
     minx, miny, maxx, maxy, xw, yw = calc_grid_map_config(ox, oy, xyreso)
 
-    gmap = [[0.0 for i in range(yw)] for i in range(xw)]
+    gmap = [[0.0 for _ in range(yw)] for _ in range(xw)]
 
     for ix in range(xw):
         for iy in range(yw):
@@ -60,12 +60,12 @@ def draw_heatmap(data, minx, maxx, miny, maxy, xyreso):
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     xyreso = 0.5  # xy grid resolution
     STD = 5.0  # standard diviation for gaussian distribution
 
-    for i in range(5):
+    for _ in range(5):
         ox = (np.random.rand(4) - 0.5) * 10.0
         oy = (np.random.rand(4) - 0.5) * 10.0
         gmap, minx, maxx, miny, maxy = generate_gaussian_grid_map(

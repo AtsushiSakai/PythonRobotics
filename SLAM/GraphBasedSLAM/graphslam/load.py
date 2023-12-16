@@ -39,7 +39,7 @@ def load_g2o_se2(infile):
     vertices = []
 
     with open(infile) as f:
-        for line in f.readlines():
+        for line in f:
             if line.startswith("VERTEX_SE2"):
                 numbers = line[10:].split()
                 arr = np.array([float(number) for number in numbers[1:]],

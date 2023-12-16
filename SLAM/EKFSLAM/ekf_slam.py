@@ -29,8 +29,8 @@ show_animation = True
 def ekf_slam(xEst, PEst, u, z):
     # Predict
     S = STATE_SIZE
-    G, Fx = jacob_motion(xEst[0:S], u)
-    xEst[0:S] = motion_model(xEst[0:S], u)
+    G, Fx = jacob_motion(xEst[:S], u)
+    xEst[:S] = motion_model(xEst[:S], u)
     PEst[0:S, 0:S] = G.T @ PEst[0:S, 0:S] @ G + Fx.T @ Cx @ Fx
     initP = np.eye(2)
 
@@ -62,8 +62,7 @@ def ekf_slam(xEst, PEst, u, z):
 def calc_input():
     v = 1.0  # [m/s]
     yaw_rate = 0.1  # [rad/s]
-    u = np.array([[v, yaw_rate]]).T
-    return u
+    return np.array([[v, yaw_rate]]).T
 
 
 def observation(xTrue, xd, u, RFID):
@@ -107,8 +106,7 @@ def motion_model(x, u):
 
 
 def calc_n_lm(x):
-    n = int((len(x) - STATE_SIZE) / LM_SIZE)
-    return n
+    return int((len(x) - STATE_SIZE) / LM_SIZE)
 
 
 def jacob_motion(x, u):
@@ -134,9 +132,7 @@ def calc_landmark_position(x, z):
 
 
 def get_landmark_position_from_state(x, ind):
-    lm = x[STATE_SIZE + LM_SIZE * ind: STATE_SIZE + LM_SIZE * (ind + 1), :]
-
-    return lm
+    return x[STATE_SIZE + LM_SIZE * ind: STATE_SIZE + LM_SIZE * (ind + 1), :]
 
 
 def search_correspond_landmark_id(xAug, PAug, zi):
@@ -155,13 +151,11 @@ def search_correspond_landmark_id(xAug, PAug, zi):
 
     min_dist.append(M_DIST_TH)  # new landmark
 
-    min_id = min_dist.index(min(min_dist))
-
-    return min_id
+    return min_dist.index(min(min_dist))
 
 
 def calc_innovation(lm, xEst, PEst, z, LMid):
-    delta = lm - xEst[0:2]
+    delta = lm - xEst[:2]
     q = (delta.T @ delta)[0, 0]
     z_angle = math.atan2(delta[1, 0], delta[0, 0]) - xEst[2, 0]
     zp = np.array([[math.sqrt(q), pi_2_pi(z_angle)]])
@@ -186,9 +180,7 @@ def jacob_h(q, delta, x, i):
 
     F = np.vstack((F1, F2))
 
-    H = G @ F
-
-    return H
+    return G @ F
 
 
 def pi_2_pi(angle):
@@ -196,7 +188,7 @@ def pi_2_pi(angle):
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     time = 0.0
 
@@ -226,7 +218,7 @@ def main():
 
         xEst, PEst = ekf_slam(xEst, PEst, ud, z)
 
-        x_state = xEst[0:STATE_SIZE]
+        x_state = xEst[:STATE_SIZE]
 
         # store data history
         hxEst = np.hstack((hxEst, x_state))

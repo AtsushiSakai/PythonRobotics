@@ -116,7 +116,7 @@ def _evaluate_spline(sampled, spl_i_x, spl_i_y):
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
     # way points
     way_point_x = [-1.0, 3.0, 4.0, 2.0, 1.0]
     way_point_y = [0.0, -3.0, 1.0, 1.0, 3.0]

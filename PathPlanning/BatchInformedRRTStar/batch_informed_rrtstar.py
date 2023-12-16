@@ -244,7 +244,7 @@ class BITStar:
             # this is done because the vertex cost represents the lower bound
             # on the edge cost
             while self.best_vertex_queue_value() <= \
-                    self.best_edge_queue_value():
+                        self.best_edge_queue_value():
                 self.expand_vertex(self.best_in_vertex_queue())
 
             # add the best edge to the tree
@@ -284,16 +284,15 @@ class BITStar:
                 bestEdge = (bestEdge[0], nextCoordPathId)
                 if bestEdge[1] in self.tree.vertices.keys():
                     continue
-                else:
-                    try:
-                        del self.samples[bestEdge[1]]
-                    except KeyError:
-                        # invalid sample key
-                        pass
-                    eid = self.tree.add_vertex(nextCoord)
-                    self.vertex_queue.append(eid)
+                try:
+                    del self.samples[bestEdge[1]]
+                except KeyError:
+                    # invalid sample key
+                    pass
+                eid = self.tree.add_vertex(nextCoord)
+                self.vertex_queue.append(eid)
                 if eid == self.goalId or bestEdge[0] == self.goalId or \
-                        bestEdge[1] == self.goalId:
+                            bestEdge[1] == self.goalId:
                     print("Goal found")
                     foundGoal = True
 
@@ -339,9 +338,7 @@ class BITStar:
                 return []
 
         plan.append(self.start)
-        plan = plan[::-1]  # reverse the plan
-
-        return plan
+        return plan[::-1]
 
     def remove_queue(self, lastEdge, bestEdge):
         for edge in self.edge_queue:
@@ -363,11 +360,7 @@ class BITStar:
         y = np.linspace(start[1], end[1], num=steps)
         for i in range(len(x)):
             if self._collision_check(x[i], y[i]):
-                if i == 0:
-                    return None
-                # if collision, send path until collision
-                return np.vstack((x[0:i], y[0:i])).transpose()
-
+                return None if i == 0 else np.vstack((x[:i], y[:i])).transpose()
         return np.vstack((x, y)).transpose()
 
     def _collision_check(self, x, y):
@@ -397,7 +390,7 @@ class BITStar:
     def informed_sample(self, m, cMax, cMin, xCenter, C):
         samples = dict()
         print("g_Score goal id: ", self.g_scores[self.goalId])
-        for i in range(m + 1):
+        for _ in range(m + 1):
             if cMax < float('inf'):
                 r = [cMax / 2.0,
                      math.sqrt(cMax ** 2 - cMin ** 2) / 2.0,
@@ -406,12 +399,10 @@ class BITStar:
                 xBall = self.sample_unit_ball()
                 rnd = np.dot(np.dot(C, L), xBall) + xCenter
                 rnd = [rnd[(0, 0)], rnd[(1, 0)]]
-                random_id = self.tree.real_world_to_node_id(rnd)
-                samples[random_id] = rnd
             else:
                 rnd = self.sample_free_space()
-                random_id = self.tree.real_world_to_node_id(rnd)
-                samples[random_id] = rnd
+            random_id = self.tree.real_world_to_node_id(rnd)
+            samples[random_id] = rnd
         return samples
 
     # Sample point in a unit ball
@@ -428,10 +419,10 @@ class BITStar:
         return np.array([[sample[0]], [sample[1]], [0]])
 
     def sample_free_space(self):
-        rnd = [random.uniform(self.min_rand, self.max_rand),
-               random.uniform(self.min_rand, self.max_rand)]
-
-        return rnd
+        return [
+            random.uniform(self.min_rand, self.max_rand),
+            random.uniform(self.min_rand, self.max_rand),
+        ]
 
     def best_vertex_queue_value(self):
         if len(self.vertex_queue) == 0:
@@ -498,33 +489,32 @@ class BITStar:
         self.add_vertex_to_edge_queue(vid, currCoord)
 
     def add_vertex_to_edge_queue(self, vid, currCoord):
-        if vid not in self.old_vertices:
-            neighbors = []
-            for v, edges in self.tree.vertices.items():
-                if v != vid and (v, vid) not in self.edge_queue and \
+        if vid in self.old_vertices:
+            return
+        neighbors = []
+        for v, edges in self.tree.vertices.items():
+            if v != vid and (v, vid) not in self.edge_queue and \
                         (vid, v) not in self.edge_queue:
-                    v_coord = self.tree.node_id_to_real_world_coord(v)
-                    if np.linalg.norm(currCoord - v_coord, 2) <= self.r:
-                        neighbors.append((vid, v_coord))
+                v_coord = self.tree.node_id_to_real_world_coord(v)
+                if np.linalg.norm(currCoord - v_coord, 2) <= self.r:
+                    neighbors.append((vid, v_coord))
 
-            for neighbor in neighbors:
-                sid = neighbor[0]
-                estimated_f_score = self.compute_distance_cost(
-                    self.startId, vid) + self.compute_distance_cost(
-                    vid, sid) + self.compute_heuristic_cost(sid, self.goalId)
-                if estimated_f_score < self.g_scores[self.goalId] and (
-                        self.g_scores[vid] +
-                        self.compute_distance_cost(vid, sid)) < \
+        for neighbor in neighbors:
+            sid = neighbor[0]
+            estimated_f_score = self.compute_distance_cost(
+                self.startId, vid) + self.compute_distance_cost(
+                vid, sid) + self.compute_heuristic_cost(sid, self.goalId)
+            if estimated_f_score < self.g_scores[self.goalId] and (
+                    self.g_scores[vid] +
+                    self.compute_distance_cost(vid, sid)) < \
                         self.g_scores[sid]:
-                    self.edge_queue.append((vid, sid))
+                self.edge_queue.append((vid, sid))
 
     def update_graph(self):
         closedSet = []
-        openSet = []
         currId = self.startId
-        openSet.append(currId)
-
-        while len(openSet) != 0:
+        openSet = [currId]
+        while openSet:
             # get the element with lowest f_score
             currId = min(openSet, key=lambda x: self.f_scores[x])
 
@@ -543,24 +533,23 @@ class BITStar:
             for successor in successors:
                 if successor in closedSet:
                     continue
-                else:
-                    # calculate tentative g score
-                    g_score = self.g_scores[currId] + \
+                # calculate tentative g score
+                g_score = self.g_scores[currId] + \
                               self.compute_distance_cost(currId, successor)
-                    if successor not in openSet:
-                        # add the successor to open set
-                        openSet.append(successor)
-                    elif g_score >= self.g_scores[successor]:
-                        continue
+                if successor not in openSet:
+                    # add the successor to open set
+                    openSet.append(successor)
+                elif g_score >= self.g_scores[successor]:
+                    continue
 
-                    # update g and f scores
-                    self.g_scores[successor] = g_score
-                    self.f_scores[
-                        successor] = g_score + self.compute_heuristic_cost(
-                        successor, self.goalId)
+                # update g and f scores
+                self.g_scores[successor] = g_score
+                self.f_scores[
+                    successor] = g_score + self.compute_heuristic_cost(
+                    successor, self.goalId)
 
-                    # store the parent and child
-                    self.nodes[successor] = currId
+                # store the parent and child
+                self.nodes[successor] = currId
 
     def draw_graph(self, xCenter=None, cBest=None, cMin=None, eTheta=None,
                    samples=None, start=None, end=None):

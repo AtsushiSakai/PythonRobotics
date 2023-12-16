@@ -57,7 +57,7 @@ def fast_slam2(particles, u, z):
 
 
 def normalize_weight(particles):
-    sum_w = sum([p.w for p in particles])
+    sum_w = sum(p.w for p in particles)
 
     try:
         for i in range(N_PARTICLE):
@@ -168,7 +168,7 @@ def update_landmark(particle, z, Q_cov):
 
     zp, Hv, Hf, Sf = compute_jacobians(particle, xf, Pf, Q_cov)
 
-    dz = z[0:2].reshape(2, 1) - zp
+    dz = z[:2].reshape(2, 1) - zp
     dz[1, 0] = pi_2_pi(dz[1, 0])
 
     xf, Pf = update_kf_with_cholesky(xf, Pf, dz, Q, Hf)
@@ -185,7 +185,7 @@ def compute_weight(particle, z, Q_cov):
     Pf = np.array(particle.lmP[2 * lm_id:2 * lm_id + 2])
     zp, Hv, Hf, Sf = compute_jacobians(particle, xf, Pf, Q_cov)
 
-    dz = z[0:2].reshape(2, 1) - zp
+    dz = z[:2].reshape(2, 1) - zp
     dz[1, 0] = pi_2_pi(dz[1, 0])
 
     try:
@@ -196,9 +196,7 @@ def compute_weight(particle, z, Q_cov):
     num = np.exp(-0.5 * dz.T @ invS @ dz)[0, 0]
     den = 2.0 * math.pi * math.sqrt(np.linalg.det(Sf))
 
-    w = num / den
-
-    return w
+    return num / den
 
 
 def proposal_sampling(particle, z, Q_cov):
@@ -211,7 +209,7 @@ def proposal_sampling(particle, z, Q_cov):
     zp, Hv, Hf, Sf = compute_jacobians(particle, xf, Pf, Q_cov)
 
     Sfi = np.linalg.inv(Sf)
-    dz = z[0:2].reshape(2, 1) - zp
+    dz = z[:2].reshape(2, 1) - zp
     dz[1] = pi_2_pi(dz[1])
 
     Pi = np.linalg.inv(P)
@@ -252,10 +250,7 @@ def resampling(particles):
 
     particles = normalize_weight(particles)
 
-    pw = []
-    for i in range(N_PARTICLE):
-        pw.append(particles[i].w)
-
+    pw = [particles[i].w for i in range(N_PARTICLE)]
     pw = np.array(pw)
 
     n_eff = 1.0 / (pw @ pw.T)  # Effective particle number
@@ -293,9 +288,7 @@ def calc_input(time):
         v = 1.0  # [m/s]
         yaw_rate = 0.1  # [rad/s]
 
-    u = np.array([v, yaw_rate]).reshape(2, 1)
-
-    return u
+    return np.array([v, yaw_rate]).reshape(2, 1)
 
 
 def observation(xTrue, xd, u, RFID):
@@ -350,7 +343,7 @@ def pi_2_pi(angle):
 
 
 def main():
-    print(__file__ + " start!!")
+    print(f"{__file__} start!!")
 
     time = 0.0
 
@@ -388,7 +381,7 @@ def main():
 
         xEst = calc_final_state(particles)
 
-        x_state = xEst[0: STATE_SIZE]
+        x_state = xEst[:STATE_SIZE]
 
         # store data history
         hxEst = np.hstack((hxEst, x_state))

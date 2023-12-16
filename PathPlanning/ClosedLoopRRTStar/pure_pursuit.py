@@ -120,7 +120,7 @@ def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
         if abs(state.v) <= stop_speed and target_ind <= len(cx) - 2:
             target_ind += 1
 
-        time = time + unicycle_model.dt
+        time += unicycle_model.dt
 
         # check goal
         dx = state.x - goal[0]
@@ -147,8 +147,7 @@ def closed_loop_prediction(cx, cy, cyaw, speed_profile, goal):
             plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")
             plt.axis("equal")
             plt.grid(True)
-            plt.title("speed:" + str(round(state.v, 2))
-                      + "tind:" + str(target_ind))
+            plt.title(f"speed:{str(round(state.v, 2))}tind:{str(target_ind)}")
             plt.pause(0.0001)
 
     else:
@@ -176,11 +175,7 @@ def set_stop_point(target_speed, cx, cy, cyaw):
         if dx == 0.0 and dy == 0.0:
             continue
 
-        if is_back:
-            speed_profile[i] = - target_speed
-        else:
-            speed_profile[i] = target_speed
-
+        speed_profile[i] = - target_speed if is_back else target_speed
         if is_back and forward:
             speed_profile[i] = 0.0
             forward = False
@@ -192,11 +187,7 @@ def set_stop_point(target_speed, cx, cy, cyaw):
             #  plt.plot(cx[i], cy[i], "xb")
             #  print(i_yaw, move_direction, dx, dy)
     speed_profile[0] = 0.0
-    if is_back:
-        speed_profile[-1] = -stop_speed
-    else:
-        speed_profile[-1] = stop_speed
-
+    speed_profile[-1] = -stop_speed if is_back else stop_speed
     d.append(d[-1])
 
     return speed_profile, d
@@ -261,7 +252,7 @@ def main():  # pragma: no cover
         di, target_ind, _ = pure_pursuit_control(state, cx, cy, target_ind)
         state = unicycle_model.update(state, ai, di)
 
-        time = time + unicycle_model.dt
+        time += unicycle_model.dt
 
         x.append(state.x)
         y.append(state.y)
@@ -269,14 +260,14 @@ def main():  # pragma: no cover
         v.append(state.v)
         t.append(time)
 
-        #  plt.cla()
-        #  plt.plot(cx, cy, ".r", label="course")
-        #  plt.plot(x, y, "-b", label="trajectory")
-        #  plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")
-        #  plt.axis("equal")
-        #  plt.grid(True)
-        #  plt.pause(0.1)
-        #  input()
+            #  plt.cla()
+            #  plt.plot(cx, cy, ".r", label="course")
+            #  plt.plot(x, y, "-b", label="trajectory")
+            #  plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")
+            #  plt.axis("equal")
+            #  plt.grid(True)
+            #  plt.pause(0.1)
+            #  input()
 
     plt.subplots(1)
     plt.plot(cx, cy, ".r", label="course")
