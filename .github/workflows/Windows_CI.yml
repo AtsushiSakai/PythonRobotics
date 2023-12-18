@@ -16,7 +16,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        python-version: [ '3.11' ]
+        python-version: [ '3.12' ]
     name: Python ${{ matrix.python-version }} CI
     steps:
       - uses: actions/checkout@v4
