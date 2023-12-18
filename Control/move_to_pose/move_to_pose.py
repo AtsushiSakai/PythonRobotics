@@ -172,14 +172,14 @@ def transformation_matrix(x, y, theta):
 def main():
 
     for i in range(5):
-        x_start: float = 20 * random()
-        y_start: float = 20 * random()
+        x_start = 20.0 * random()
+        y_start = 20.0 * random()
         theta_start: float = 2 * np.pi * random() - np.pi
         x_goal = 20 * random()
         y_goal = 20 * random()
         theta_goal = 2 * np.pi * random() - np.pi
-        print(f"Initial x: {round(x_start)} m\nInitial y: {round(y_start)} m\nInitial theta: {round(theta_start)} rad\n")
-        print(f"Goal x: {round(x_goal)} m\nGoal y: {round(y_goal)} m\nGoal theta: {round(theta_goal)} rad\n")
+        print(f"Initial x: {round(x_start, 2)} m\nInitial y: {round(y_start, 2)} m\nInitial theta: {round(theta_start, 2)} rad\n")
+        print(f"Goal x: {round(x_goal, 2)} m\nGoal y: {round(y_goal, 2)} m\nGoal theta: {round(theta_goal, 2)} rad\n")
         move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal)
 
 
