@@ -59,9 +59,9 @@ def rectangle_check(x, y, yaw, ox, oy):
         rx, ry = converted_xy[0], converted_xy[1]
 
         if not (rx > LF or rx < -LB or ry > W / 2.0 or ry < -W / 2.0):
-            return False  # no collision
+            return False  # collision
 
-    return True  # collision
+    return True  # no collision
 
 
 def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
