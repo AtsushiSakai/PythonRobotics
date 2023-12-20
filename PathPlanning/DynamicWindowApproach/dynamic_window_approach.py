@@ -230,7 +230,7 @@ def calc_to_goal_cost(trajectory, goal):
 
 def plot_arrow(x, y, yaw, length=0.5, width=0.1):  # pragma: no cover
     plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),
-              head_length=width, head_width=width)
+              head_length=length, head_width=width)
     plt.plot(x, y)
 
 
