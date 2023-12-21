@@ -245,7 +245,7 @@ def main():
     rx, ry = dstar.run(start, end)
 
     if show_animation:
-        # plt.plot(rx, ry, "-r")
+        plt.plot(rx, ry, "-r")
         plt.show()
 
 
