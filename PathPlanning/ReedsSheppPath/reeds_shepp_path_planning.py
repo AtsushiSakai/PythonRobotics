@@ -42,12 +42,20 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
 
 
 def pi_2_pi(x):
-    # Be consistent with fmod in cplusplus here.
     return angle_mod(x)
 
+def mod2pi(x):
+    # Be consistent with fmod in cplusplus here.
+    v = np.mod(x, np.copysign(2.0 * math.pi, x))
+    if v < -math.pi:
+        v += 2.0 * math.pi
+    else:
+        if v > math.pi:
+            v -= 2.0 * math.pi
+    return v
 
 def straight_left_straight(x, y, phi):
-    phi = pi_2_pi(phi)
+    phi = mod2pi(phi)
     # only take phi in (0.01*math.pi, 0.99*math.pi) for the sake of speed.
     # phi in (0, 0.01*math.pi) will make test2() in test_rrt_star_reeds_shepp.py
     # extremely time-consuming, since the value of xd, t will be very large.
@@ -103,7 +111,7 @@ def polar(x, y):
 def left_straight_left(x, y, phi):
     u, t = polar(x - math.sin(phi), y - 1.0 + math.cos(phi))
     if t >= 0.0:
-        v = pi_2_pi(phi - t)
+        v = mod2pi(phi - t)
         if v >= 0.0:
             return True, t, u, v
 
@@ -115,8 +123,8 @@ def left_right_left(x, y, phi):
 
     if u1 <= 4.0:
         u = -2.0 * math.asin(0.25 * u1)
-        t = pi_2_pi(t1 + 0.5 * u + math.pi)
-        v = pi_2_pi(phi - t + u)
+        t = mod2pi(t1 + 0.5 * u + math.pi)
+        v = mod2pi(phi - t + u)
 
         if t >= 0.0 >= u:
             return True, t, u, v
@@ -206,8 +214,8 @@ def left_straight_right(x, y, phi):
     if u1 >= 4.0:
         u = math.sqrt(u1 - 4.0)
         theta = math.atan2(2.0, u)
-        t = pi_2_pi(t1 + theta)
-        v = pi_2_pi(t - phi)
+        t = mod2pi(t1 + theta)
+        v = mod2pi(t - phi)
 
         if t >= 0.0 and v >= 0.0:
             return True, t, u, v
