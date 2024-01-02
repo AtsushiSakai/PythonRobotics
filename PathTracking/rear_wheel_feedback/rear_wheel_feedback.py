@@ -8,6 +8,7 @@ author: Atsushi Sakai(@Atsushi_twi)
 import matplotlib.pyplot as plt
 import math
 import numpy as np
+from utils.angle import angle_mod
 
 from scipy import interpolate
 from scipy import optimize
@@ -51,21 +52,21 @@ class CubicSplinePath:
         self.ddY = self.Y.derivative(2)
 
         self.length = s[-1]
-    
+
     def calc_yaw(self, s):
         dx, dy = self.dX(s), self.dY(s)
         return np.arctan2(dy, dx)
-    
+
     def calc_curvature(self, s):
         dx, dy   = self.dX(s), self.dY(s)
         ddx, ddy   = self.ddX(s), self.ddY(s)
         return (ddy * dx - ddx * dy) / ((dx ** 2 + dy ** 2)**(3 / 2))
-    
+
     def __find_nearest_point(self, s0, x, y):
         def calc_distance(_s, *args):
             _x, _y= self.X(_s), self.Y(_s)
             return (_x - args[0])**2 + (_y - args[1])**2
-        
+
         def calc_distance_jacobian(_s, *args):
             _x, _y = self.X(_s), self.Y(_s)
             _dx, _dy = self.dX(_s), self.dY(_s)
@@ -76,7 +77,7 @@ class CubicSplinePath:
 
     def calc_track_error(self, x, y, s0):
         ret = self.__find_nearest_point(s0, x, y)
-        
+
         s = ret[0][0]
         e = ret[1]
 
@@ -96,13 +97,7 @@ def pid_control(target, current):
     return a
 
 def pi_2_pi(angle):
-    while(angle > math.pi):
-        angle = angle - 2.0 * math.pi
-
-    while(angle < -math.pi):
-        angle = angle + 2.0 * math.pi
-
-    return angle
+    return angle_mod(angle)
 
 def rear_wheel_feedback_control(state, e, k, yaw_ref):
     v = state.v
@@ -170,7 +165,7 @@ def simulate(path_ref, goal):
             plt.plot(path_ref.X(s0), path_ref.Y(s0), "xg", label="target")
             plt.axis("equal")
             plt.grid(True)
-            plt.title("speed[km/h]:{:.2f}, target s-param:{:.2f}".format(round(state.v * 3.6, 2), s0))
+            plt.title(f"speed[km/h]:{round(state.v * 3.6, 2):.2f}, target s-param:{s0:.2f}")
             plt.pause(0.0001)
 
     return t, x, y, yaw, v, goal_flag
@@ -184,7 +179,7 @@ def calc_target_speed(state, yaw_ref):
     if switch:
         state.direction *= -1
         return 0.0
-    
+
     if state.direction != 1:
         return -target_speed
 

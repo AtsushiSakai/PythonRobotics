@@ -13,7 +13,7 @@ P. I. Corke, "Robotics, Vision & Control", Springer 2017, ISBN 978-3-319-54413-7
 import matplotlib.pyplot as plt
 import numpy as np
 from random import random
-
+from utils.angle import angle_mod
 
 class PathFinderController:
     """
@@ -71,9 +71,8 @@ class PathFinderController:
         # from 0 rad to 2*pi rad with slight turn
 
         rho = np.hypot(x_diff, y_diff)
-        alpha = (np.arctan2(y_diff, x_diff)
-                 - theta + np.pi) % (2 * np.pi) - np.pi
-        beta = (theta_goal - theta - alpha + np.pi) % (2 * np.pi) - np.pi
+        alpha = angle_mod(np.arctan2(y_diff, x_diff) - theta)
+        beta = angle_mod(theta_goal - theta - alpha)
         v = self.Kp_rho * rho
         w = self.Kp_alpha * alpha - controller.Kp_beta * beta
 
@@ -173,16 +172,14 @@ def transformation_matrix(x, y, theta):
 def main():
 
     for i in range(5):
-        x_start = 20 * random()
-        y_start = 20 * random()
-        theta_start = 2 * np.pi * random() - np.pi
+        x_start = 20.0 * random()
+        y_start = 20.0 * random()
+        theta_start: float = 2 * np.pi * random() - np.pi
         x_goal = 20 * random()
         y_goal = 20 * random()
         theta_goal = 2 * np.pi * random() - np.pi
-        print("Initial x: %.2f m\nInitial y: %.2f m\nInitial theta: %.2f rad\n" %
-              (x_start, y_start, theta_start))
-        print("Goal x: %.2f m\nGoal y: %.2f m\nGoal theta: %.2f rad\n" %
-              (x_goal, y_goal, theta_goal))
+        print(f"Initial x: {round(x_start, 2)} m\nInitial y: {round(y_start, 2)} m\nInitial theta: {round(theta_start, 2)} rad\n")
+        print(f"Goal x: {round(x_goal, 2)} m\nGoal y: {round(y_goal, 2)} m\nGoal theta: {round(theta_goal, 2)} rad\n")
         move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal)
 
 

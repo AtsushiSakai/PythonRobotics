@@ -9,6 +9,7 @@ import math
 
 import matplotlib.pyplot as plt
 import numpy as np
+from utils.angle import angle_mod
 
 show_animation = True
 
@@ -40,6 +41,9 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
         plt.plot(x, y)
 
 
+def pi_2_pi(x):
+    return angle_mod(x)
+
 def mod2pi(x):
     # Be consistent with fmod in cplusplus here.
     v = np.mod(x, np.copysign(2.0 * math.pi, x))
@@ -49,7 +53,6 @@ def mod2pi(x):
         if v > math.pi:
             v -= 2.0 * math.pi
     return v
-
 
 def straight_left_straight(x, y, phi):
     phi = mod2pi(phi)
@@ -294,10 +297,6 @@ def interpolate(dist, length, mode, max_curvature, origin_x, origin_y,
         y = origin_y + gdy
 
     return x, y, yaw, 1 if length > 0.0 else -1
-
-
-def pi_2_pi(angle):
-    return (angle + math.pi) % (2 * math.pi) - math.pi
 
 
 def calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size):
