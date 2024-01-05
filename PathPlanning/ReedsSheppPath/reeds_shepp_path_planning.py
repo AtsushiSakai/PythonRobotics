@@ -84,9 +84,9 @@ def polar(x, y):
 
 def left_straight_left(x, y, phi):
     u, t = polar(x - math.sin(phi), y - 1.0 + math.cos(phi))
-    if t >= 0.0:
+    if 0.0 <= t <= math.pi:
         v = mod2pi(phi - t)
-        if v >= 0.0:
+        if 0.0 <= v <= math.pi:
             return True, [t, u, v], ['L', 'S', 'L']
 
     return False, [], []
@@ -101,7 +101,7 @@ def left_straight_right(x, y, phi):
         t = mod2pi(t1 + theta)
         v = mod2pi(t - phi)
 
-        if t >= 0.0 and v >= 0.0:
+        if (t >= 0.0) and (v >= 0.0):
             return True, [t, u, v], ['L', 'S', 'R']
 
     return False, [], []
@@ -157,17 +157,15 @@ def left_right_x_left_right(x, y, phi):
     eeta = y - 1 - math.cos(phi)
     u1, theta = polar(zeta, eeta)
 
-    if u1 <= 4.0:
-        if u1 <= 2:
-            A = math.acos((u1 + 2) * 0.25)
-            t = mod2pi(theta + A + math.pi/2)
-            u = mod2pi(A)
-        else:
-            A = math.acos((u1 - 2) * 0.25)
-            t = mod2pi(theta - A + math.pi/2)
-            u = mod2pi(math.pi - A)
+    # Solutions refering to (2 < u1 <= 4) are considered sub-optimal in paper
+    # Solutions do not exist for u1 > 4
+    if u1 <= 2:
+        A = math.acos((u1 + 2) * 0.25)
+        t = mod2pi(theta + A + math.pi/2)
+        u = mod2pi(A)
         v = mod2pi(phi - t + 2*u)
-        return True, [t, u, -u, -v], ['L', 'R', 'L', 'R']
+        if ((t >= 0) and (u >= 0) and (v >= 0)):
+            return True, [t, u, -u, -v], ['L', 'R', 'L', 'R']
 
     return False, [], []
 
@@ -178,12 +176,13 @@ def left_x_right_left_x_right(x, y, phi):
     u1, theta = polar(zeta, eeta)
     u2 = (20 - u1**2) / 16
 
-    if (u1 <= 6.0) and (0 <= u2 <= 1):
+    if (0 <= u2 <= 1):
         u = math.acos(u2)
         A = math.asin(2 * math.sin(u) / u1)
         t = mod2pi(theta + A + math.pi/2)
         v = mod2pi(t - phi)
-        return True, [t, -u, -u, v], ['L', 'R', 'L', 'R']
+        if (t >= 0) and (v >= 0):
+            return True, [t, -u, -u, v], ['L', 'R', 'L', 'R']
 
     return False, [], []
 
@@ -198,7 +197,8 @@ def left_x_right90_straight_left(x, y, phi):
         A = math.atan2(2, math.sqrt(u1**2 - 4))
         t = mod2pi(theta + A + math.pi/2)
         v = mod2pi(t - phi + math.pi/2)
-        return True, [t, -math.pi/2, -u, -v], ['L', 'R', 'S', 'L']
+        if (t >= 0) and (v >= 0):
+           return True, [t, -math.pi/2, -u, -v], ['L', 'R', 'S', 'L']
 
     return False, [], []
 
@@ -213,7 +213,8 @@ def left_straight_right90_x_left(x, y, phi):
         A = math.atan2(math.sqrt(u1**2 - 4), 2)
         t = mod2pi(theta - A + math.pi/2)
         v = mod2pi(t - phi - math.pi/2)
-        return True, [t, u, math.pi/2, -v], ['L', 'S', 'R', 'L']
+        if (t >= 0) and (v >= 0):
+            return True, [t, u, math.pi/2, -v], ['L', 'S', 'R', 'L']
 
     return False, [], []
 
@@ -227,7 +228,8 @@ def left_x_right90_straight_right(x, y, phi):
         t = mod2pi(theta + math.pi/2)
         u = u1 - 2
         v = mod2pi(phi - t - math.pi/2)
-        return True, [t, -math.pi/2, -u, -v], ['L', 'R', 'S', 'R']
+        if (t >= 0) and (v >= 0):
+            return True, [t, -math.pi/2, -u, -v], ['L', 'R', 'S', 'R']
 
     return False, [], []
 
@@ -241,7 +243,8 @@ def left_straight_left90_x_right(x, y, phi):
         t = mod2pi(theta)
         u = u1 - 2
         v = mod2pi(phi - t - math.pi/2)
-        return True, [t, u, math.pi/2, -v], ['L', 'S', 'L', 'R']
+        if (t >= 0) and (v >= 0):
+            return True, [t, u, math.pi/2, -v], ['L', 'S', 'L', 'R']
 
     return False, [], []
 
@@ -256,7 +259,8 @@ def left_x_right90_straight_left90_x_right(x, y, phi):
         A = math.atan2(2, math.sqrt(u1**2 - 4))
         t = mod2pi(theta + A + math.pi/2)
         v = mod2pi(t - phi)
-        return True, [t, -math.pi/2, -u, -math.pi/2, v], ['L', 'R', 'S', 'L', 'R']
+        if (t >= 0) and (v >= 0):
+            return True, [t, -math.pi/2, -u, -math.pi/2, v], ['L', 'R', 'S', 'L', 'R']
 
     return False, [], []
 
@@ -293,6 +297,7 @@ def generate_path(q0, q1, max_curvature, step_size):
                       left_straight_right90_x_left, left_straight_left90_x_right,       # CSCC
                       left_x_right90_straight_left90_x_right]                           # CCSCC
 
+    path_functions = [left_right_x_left_right]
     for path_func in path_functions:
         flag, travel_distances, steering_dirns = path_func(x, y, dth)
         if flag:
@@ -314,6 +319,7 @@ def generate_path(q0, q1, max_curvature, step_size):
             steering_dirns = reflect(steering_dirns)
             paths = set_path(paths, travel_distances, steering_dirns, step_size)
 
+    print(paths)
     return paths
 
 
@@ -414,15 +420,15 @@ def reeds_shepp_path_planning(sx, sy, syaw, gx, gy, gyaw, maxc, step_size=0.2):
 def main():
     print("Reeds Shepp path planner sample start!!")
 
-    start_x = -1.0  # [m]
-    start_y = -4.0  # [m]
-    start_yaw = np.deg2rad(-20.0)  # [rad]
+    start_x = 0.0  # [m]
+    start_y = 0.0  # [m]
+    start_yaw = np.deg2rad(0.0)  # [rad]
 
-    end_x = 5.0  # [m]
-    end_y = 5.0  # [m]
-    end_yaw = np.deg2rad(25.0)  # [rad]
+    end_x = 1.5  # [m]
+    end_y = 0.8  # [m]
+    end_yaw = np.deg2rad(180.0)  # [rad]
 
-    curvature = 0.1
+    curvature = 1
     step_size = 0.05
 
     xs, ys, yaws, modes, lengths = reeds_shepp_path_planning(start_x, start_y,
