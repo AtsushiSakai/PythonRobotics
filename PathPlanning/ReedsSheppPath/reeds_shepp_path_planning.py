@@ -297,7 +297,6 @@ def generate_path(q0, q1, max_curvature, step_size):
                       left_straight_right90_x_left, left_straight_left90_x_right,       # CSCC
                       left_x_right90_straight_left90_x_right]                           # CCSCC
 
-    path_functions = [left_right_x_left_right]
     for path_func in path_functions:
         flag, travel_distances, steering_dirns = path_func(x, y, dth)
         if flag:
@@ -319,7 +318,6 @@ def generate_path(q0, q1, max_curvature, step_size):
             steering_dirns = reflect(steering_dirns)
             paths = set_path(paths, travel_distances, steering_dirns, step_size)
 
-    print(paths)
     return paths
 
 
@@ -420,15 +418,15 @@ def reeds_shepp_path_planning(sx, sy, syaw, gx, gy, gyaw, maxc, step_size=0.2):
 def main():
     print("Reeds Shepp path planner sample start!!")
 
-    start_x = 0.0  # [m]
-    start_y = 0.0  # [m]
-    start_yaw = np.deg2rad(0.0)  # [rad]
+    start_x = -1.0  # [m]
+    start_y = -4.0  # [m]
+    start_yaw = np.deg2rad(-20.0)  # [rad]
 
-    end_x = 1.5  # [m]
-    end_y = 0.8  # [m]
-    end_yaw = np.deg2rad(180.0)  # [rad]
+    end_x = 5.0  # [m]
+    end_y = 5.0  # [m]
+    end_yaw = np.deg2rad(25.0)  # [rad]
 
-    curvature = 1
+    curvature = 0.1
     step_size = 0.05
 
     xs, ys, yaws, modes, lengths = reeds_shepp_path_planning(start_x, start_y,
