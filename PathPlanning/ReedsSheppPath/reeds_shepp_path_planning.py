@@ -3,6 +3,7 @@
 Reeds Shepp path planner sample code
 
 author Atsushi Sakai(@Atsushi_twi)
+co-author Videh Patel(@videh25) : Added the missing RS paths
 
 """
 import math
@@ -54,21 +55,6 @@ def mod2pi(x):
             v -= 2.0 * math.pi
     return v
 
-def straight_left_straight(x, y, phi):
-    phi = mod2pi(phi)
-    # only take phi in (0.01*math.pi, 0.99*math.pi) for the sake of speed.
-    # phi in (0, 0.01*math.pi) will make test2() in test_rrt_star_reeds_shepp.py
-    # extremely time-consuming, since the value of xd, t will be very large.
-    if math.pi * 0.01 < phi < math.pi * 0.99 and y != 0:
-        xd = - y / math.tan(phi) + x
-        t = xd - math.tan(phi / 2.0)
-        u = phi
-        v = np.sign(y) * math.hypot(x - xd, y) - math.tan(phi / 2.0)
-        return True, t, u, v
-
-    return False, 0.0, 0.0, 0.0
-
-
 def set_path(paths, lengths, ctypes, step_size):
     path = Path()
     path.ctypes = ctypes
@@ -90,18 +76,6 @@ def set_path(paths, lengths, ctypes, step_size):
     return paths
 
 
-def straight_curve_straight(x, y, phi, paths, step_size):
-    flag, t, u, v = straight_left_straight(x, y, phi)
-    if flag:
-        paths = set_path(paths, [t, u, v], ["S", "L", "S"], step_size)
-
-    flag, t, u, v = straight_left_straight(x, -y, -phi)
-    if flag:
-        paths = set_path(paths, [t, u, v], ["S", "R", "S"], step_size)
-
-    return paths
-
-
 def polar(x, y):
     r = math.hypot(x, y)
     theta = math.atan2(y, x)
@@ -110,102 +84,12 @@ def polar(x, y):
 
 def left_straight_left(x, y, phi):
     u, t = polar(x - math.sin(phi), y - 1.0 + math.cos(phi))
-    if t >= 0.0:
+    if 0.0 <= t <= math.pi:
         v = mod2pi(phi - t)
-        if v >= 0.0:
-            return True, t, u, v
+        if 0.0 <= v <= math.pi:
+            return True, [t, u, v], ['L', 'S', 'L']
 
-    return False, 0.0, 0.0, 0.0
-
-
-def left_right_left(x, y, phi):
-    u1, t1 = polar(x - math.sin(phi), y - 1.0 + math.cos(phi))
-
-    if u1 <= 4.0:
-        u = -2.0 * math.asin(0.25 * u1)
-        t = mod2pi(t1 + 0.5 * u + math.pi)
-        v = mod2pi(phi - t + u)
-
-        if t >= 0.0 >= u:
-            return True, t, u, v
-
-    return False, 0.0, 0.0, 0.0
-
-
-def curve_curve_curve(x, y, phi, paths, step_size):
-    flag, t, u, v = left_right_left(x, y, phi)
-    if flag:
-        paths = set_path(paths, [t, u, v], ["L", "R", "L"], step_size)
-
-    flag, t, u, v = left_right_left(-x, y, -phi)
-    if flag:
-        paths = set_path(paths, [-t, -u, -v], ["L", "R", "L"], step_size)
-
-    flag, t, u, v = left_right_left(x, -y, -phi)
-    if flag:
-        paths = set_path(paths, [t, u, v], ["R", "L", "R"], step_size)
-
-    flag, t, u, v = left_right_left(-x, -y, phi)
-    if flag:
-        paths = set_path(paths, [-t, -u, -v], ["R", "L", "R"], step_size)
-
-    # backwards
-    xb = x * math.cos(phi) + y * math.sin(phi)
-    yb = x * math.sin(phi) - y * math.cos(phi)
-
-    flag, t, u, v = left_right_left(xb, yb, phi)
-    if flag:
-        paths = set_path(paths, [v, u, t], ["L", "R", "L"], step_size)
-
-    flag, t, u, v = left_right_left(-xb, yb, -phi)
-    if flag:
-        paths = set_path(paths, [-v, -u, -t], ["L", "R", "L"], step_size)
-
-    flag, t, u, v = left_right_left(xb, -yb, -phi)
-    if flag:
-        paths = set_path(paths, [v, u, t], ["R", "L", "R"], step_size)
-
-    flag, t, u, v = left_right_left(-xb, -yb, phi)
-    if flag:
-        paths = set_path(paths, [-v, -u, -t], ["R", "L", "R"], step_size)
-
-    return paths
-
-
-def curve_straight_curve(x, y, phi, paths, step_size):
-    flag, t, u, v = left_straight_left(x, y, phi)
-    if flag:
-        paths = set_path(paths, [t, u, v], ["L", "S", "L"], step_size)
-
-    flag, t, u, v = left_straight_left(-x, y, -phi)
-    if flag:
-        paths = set_path(paths, [-t, -u, -v], ["L", "S", "L"], step_size)
-
-    flag, t, u, v = left_straight_left(x, -y, -phi)
-    if flag:
-        paths = set_path(paths, [t, u, v], ["R", "S", "R"], step_size)
-
-    flag, t, u, v = left_straight_left(-x, -y, phi)
-    if flag:
-        paths = set_path(paths, [-t, -u, -v], ["R", "S", "R"], step_size)
-
-    flag, t, u, v = left_straight_right(x, y, phi)
-    if flag:
-        paths = set_path(paths, [t, u, v], ["L", "S", "R"], step_size)
-
-    flag, t, u, v = left_straight_right(-x, y, -phi)
-    if flag:
-        paths = set_path(paths, [-t, -u, -v], ["L", "S", "R"], step_size)
-
-    flag, t, u, v = left_straight_right(x, -y, -phi)
-    if flag:
-        paths = set_path(paths, [t, u, v], ["R", "S", "L"], step_size)
-
-    flag, t, u, v = left_straight_right(-x, -y, phi)
-    if flag:
-        paths = set_path(paths, [-t, -u, -v], ["R", "S", "L"], step_size)
-
-    return paths
+    return False, [], []
 
 
 def left_straight_right(x, y, phi):
@@ -217,10 +101,183 @@ def left_straight_right(x, y, phi):
         t = mod2pi(t1 + theta)
         v = mod2pi(t - phi)
 
-        if t >= 0.0 and v >= 0.0:
-            return True, t, u, v
+        if (t >= 0.0) and (v >= 0.0):
+            return True, [t, u, v], ['L', 'S', 'R']
 
-    return False, 0.0, 0.0, 0.0
+    return False, [], []
+
+
+def left_x_right_x_left(x, y, phi):
+    zeta = x - math.sin(phi)
+    eeta = y - 1 + math.cos(phi)
+    u1, theta = polar(zeta, eeta)
+
+    if u1 <= 4.0:
+        A = math.acos(0.25 * u1)
+        t = mod2pi(A + theta + math.pi/2)
+        u = mod2pi(math.pi - 2 * A)
+        v = mod2pi(phi - t - u)
+        return True, [t, -u, v], ['L', 'R', 'L']
+
+    return False, [], []
+
+
+def left_x_right_left(x, y, phi):
+    zeta = x - math.sin(phi)
+    eeta = y - 1 + math.cos(phi)
+    u1, theta = polar(zeta, eeta)
+
+    if u1 <= 4.0:
+        A = math.acos(0.25 * u1)
+        t = mod2pi(A + theta + math.pi/2)
+        u = mod2pi(math.pi - 2*A)
+        v = mod2pi(-phi + t + u)
+        return True, [t, -u, -v], ['L', 'R', 'L']
+
+    return False, [], []
+
+
+def left_right_x_left(x, y, phi):
+    zeta = x - math.sin(phi)
+    eeta = y - 1 + math.cos(phi)
+    u1, theta = polar(zeta, eeta)
+
+    if u1 <= 4.0:
+        u = math.acos(1 - u1**2 * 0.125)
+        A = math.asin(2 * math.sin(u) / u1)
+        t = mod2pi(-A + theta + math.pi/2)
+        v = mod2pi(t - u - phi)
+        return True, [t, u, -v], ['L', 'R', 'L']
+
+    return False, [], []
+
+
+def left_right_x_left_right(x, y, phi):
+    zeta = x + math.sin(phi)
+    eeta = y - 1 - math.cos(phi)
+    u1, theta = polar(zeta, eeta)
+
+    # Solutions refering to (2 < u1 <= 4) are considered sub-optimal in paper
+    # Solutions do not exist for u1 > 4
+    if u1 <= 2:
+        A = math.acos((u1 + 2) * 0.25)
+        t = mod2pi(theta + A + math.pi/2)
+        u = mod2pi(A)
+        v = mod2pi(phi - t + 2*u)
+        if ((t >= 0) and (u >= 0) and (v >= 0)):
+            return True, [t, u, -u, -v], ['L', 'R', 'L', 'R']
+
+    return False, [], []
+
+
+def left_x_right_left_x_right(x, y, phi):
+    zeta = x + math.sin(phi)
+    eeta = y - 1 - math.cos(phi)
+    u1, theta = polar(zeta, eeta)
+    u2 = (20 - u1**2) / 16
+
+    if (0 <= u2 <= 1):
+        u = math.acos(u2)
+        A = math.asin(2 * math.sin(u) / u1)
+        t = mod2pi(theta + A + math.pi/2)
+        v = mod2pi(t - phi)
+        if (t >= 0) and (v >= 0):
+            return True, [t, -u, -u, v], ['L', 'R', 'L', 'R']
+
+    return False, [], []
+
+
+def left_x_right90_straight_left(x, y, phi):
+    zeta = x - math.sin(phi)
+    eeta = y - 1 + math.cos(phi)
+    u1, theta = polar(zeta, eeta)
+
+    if u1 >= 2.0:
+        u = math.sqrt(u1**2 - 4) - 2
+        A = math.atan2(2, math.sqrt(u1**2 - 4))
+        t = mod2pi(theta + A + math.pi/2)
+        v = mod2pi(t - phi + math.pi/2)
+        if (t >= 0) and (v >= 0):
+           return True, [t, -math.pi/2, -u, -v], ['L', 'R', 'S', 'L']
+
+    return False, [], []
+
+
+def left_straight_right90_x_left(x, y, phi):
+    zeta = x - math.sin(phi)
+    eeta = y - 1 + math.cos(phi)
+    u1, theta = polar(zeta, eeta)
+
+    if u1 >= 2.0:
+        u = math.sqrt(u1**2 - 4) - 2
+        A = math.atan2(math.sqrt(u1**2 - 4), 2)
+        t = mod2pi(theta - A + math.pi/2)
+        v = mod2pi(t - phi - math.pi/2)
+        if (t >= 0) and (v >= 0):
+            return True, [t, u, math.pi/2, -v], ['L', 'S', 'R', 'L']
+
+    return False, [], []
+
+
+def left_x_right90_straight_right(x, y, phi):
+    zeta = x + math.sin(phi)
+    eeta = y - 1 - math.cos(phi)
+    u1, theta = polar(zeta, eeta)
+
+    if u1 >= 2.0:
+        t = mod2pi(theta + math.pi/2)
+        u = u1 - 2
+        v = mod2pi(phi - t - math.pi/2)
+        if (t >= 0) and (v >= 0):
+            return True, [t, -math.pi/2, -u, -v], ['L', 'R', 'S', 'R']
+
+    return False, [], []
+
+
+def left_straight_left90_x_right(x, y, phi):
+    zeta = x + math.sin(phi)
+    eeta = y - 1 - math.cos(phi)
+    u1, theta = polar(zeta, eeta)
+
+    if u1 >= 2.0:
+        t = mod2pi(theta)
+        u = u1 - 2
+        v = mod2pi(phi - t - math.pi/2)
+        if (t >= 0) and (v >= 0):
+            return True, [t, u, math.pi/2, -v], ['L', 'S', 'L', 'R']
+
+    return False, [], []
+
+
+def left_x_right90_straight_left90_x_right(x, y, phi):
+    zeta = x + math.sin(phi)
+    eeta = y - 1 - math.cos(phi)
+    u1, theta = polar(zeta, eeta)
+
+    if u1 >= 4.0:
+        u = math.sqrt(u1**2 - 4) - 4
+        A = math.atan2(2, math.sqrt(u1**2 - 4))
+        t = mod2pi(theta + A + math.pi/2)
+        v = mod2pi(t - phi)
+        if (t >= 0) and (v >= 0):
+            return True, [t, -math.pi/2, -u, -math.pi/2, v], ['L', 'R', 'S', 'L', 'R']
+
+    return False, [], []
+
+
+def timeflip(travel_distances):
+    return [-x for x in travel_distances]
+
+
+def reflect(steering_directions):
+    def switch_dir(dirn):
+        if dirn == 'L':
+            return 'R'
+        elif dirn == 'R':
+            return 'L'
+        else:
+            return 'S'
+    return[switch_dir(dirn) for dirn in steering_directions]
 
 
 def generate_path(q0, q1, max_curvature, step_size):
@@ -231,11 +288,52 @@ def generate_path(q0, q1, max_curvature, step_size):
     s = math.sin(q0[2])
     x = (c * dx + s * dy) * max_curvature
     y = (-s * dx + c * dy) * max_curvature
+    step_size *= max_curvature
 
     paths = []
-    paths = straight_curve_straight(x, y, dth, paths, step_size)
-    paths = curve_straight_curve(x, y, dth, paths, step_size)
-    paths = curve_curve_curve(x, y, dth, paths, step_size)
+    path_functions = [left_straight_left, left_straight_right,                          # CSC
+                      left_x_right_x_left, left_x_right_left, left_right_x_left,        # CCC
+                      left_right_x_left_right, left_x_right_left_x_right,               # CCCC
+                      left_x_right90_straight_left, left_x_right90_straight_right,      # CCSC
+                      left_straight_right90_x_left, left_straight_left90_x_right,       # CSCC
+                      left_x_right90_straight_left90_x_right]                           # CCSCC
+
+    for path_func in path_functions:
+        flag, travel_distances, steering_dirns = path_func(x, y, dth)
+        if flag:
+            for distance in travel_distances:
+                if (0.1*sum([abs(d) for d in travel_distances]) < abs(distance) < step_size):
+                    print("Step size too large for Reeds-Shepp paths.")
+                    return []
+            paths = set_path(paths, travel_distances, steering_dirns, step_size)
+
+        flag, travel_distances, steering_dirns = path_func(-x, y, -dth)
+        if flag:
+            for distance in travel_distances:
+                if (0.1*sum([abs(d) for d in travel_distances]) < abs(distance) < step_size):
+                    print("Step size too large for Reeds-Shepp paths.")
+                    return []
+            travel_distances = timeflip(travel_distances)
+            paths = set_path(paths, travel_distances, steering_dirns, step_size)
+
+        flag, travel_distances, steering_dirns = path_func(x, -y, -dth)
+        if flag:
+            for distance in travel_distances:
+                if (0.1*sum([abs(d) for d in travel_distances]) < abs(distance) < step_size):
+                    print("Step size too large for Reeds-Shepp paths.")
+                    return []
+            steering_dirns = reflect(steering_dirns)
+            paths = set_path(paths, travel_distances, steering_dirns, step_size)
+
+        flag, travel_distances, steering_dirns = path_func(-x, -y, dth)
+        if flag:
+            for distance in travel_distances:
+                if (0.1*sum([abs(d) for d in travel_distances]) < abs(distance) < step_size):
+                    print("Step size too large for Reeds-Shepp paths.")
+                    return []
+            travel_distances = timeflip(travel_distances)
+            steering_dirns = reflect(steering_dirns)
+            paths = set_path(paths, travel_distances, steering_dirns, step_size)
 
     return paths
 
@@ -252,7 +350,7 @@ def calc_interpolate_dists_list(lengths, step_size):
 
 
 def generate_local_course(lengths, modes, max_curvature, step_size):
-    interpolate_dists_list = calc_interpolate_dists_list(lengths, step_size)
+    interpolate_dists_list = calc_interpolate_dists_list(lengths, step_size * max_curvature)
 
     origin_x, origin_y, origin_yaw = 0.0, 0.0, 0.0
 
@@ -307,7 +405,7 @@ def calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size):
     for path in paths:
         xs, ys, yaws, directions = generate_local_course(path.lengths,
                                                          path.ctypes, maxc,
-                                                         step_size * maxc)
+                                                         step_size)
 
         # convert global coordinate
         path.x = [math.cos(-q0[2]) * ix + math.sin(-q0[2]) * iy + q0[0] for
@@ -354,6 +452,9 @@ def main():
                                                              curvature,
                                                              step_size)
 
+    if not xs:
+        assert False, "No path"
+
     if show_animation:  # pragma: no cover
         plt.cla()
         plt.plot(xs, ys, label="final course " + str(modes))
@@ -367,9 +468,6 @@ def main():
         plt.grid(True)
         plt.axis("equal")
         plt.show()
-
-    if not xs:
-        assert False, "No path"
 
 
 if __name__ == '__main__':
