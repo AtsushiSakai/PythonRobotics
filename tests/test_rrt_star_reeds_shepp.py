@@ -32,7 +32,7 @@ def test2():
         # + 0.00000000000001 for acceptable errors arising from the planning process
         assert m.math.dist(path[i][0:2], path[i+1][0:2]) < step_size + 0.00000000000001
 
-def test3():
+def test_too_big_step_size():
     step_size = 20
     rrt_star_reeds_shepp = m.RRTStarReedsShepp(start, goal,
                                              obstacleList, [-2.0, 15.0],
