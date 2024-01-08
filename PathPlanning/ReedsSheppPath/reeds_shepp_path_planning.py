@@ -288,6 +288,7 @@ def generate_path(q0, q1, max_curvature, step_size):
     s = math.sin(q0[2])
     x = (c * dx + s * dy) * max_curvature
     y = (-s * dx + c * dy) * max_curvature
+    step_size *= max_curvature
 
     paths = []
     path_functions = [left_straight_left, left_straight_right,                          # CSC
@@ -300,20 +301,36 @@ def generate_path(q0, q1, max_curvature, step_size):
     for path_func in path_functions:
         flag, travel_distances, steering_dirns = path_func(x, y, dth)
         if flag:
+            for distance in travel_distances:
+                if (0.1*sum([abs(d) for d in travel_distances]) < abs(distance) < step_size):
+                    print("Step size too large for Reeds-Shepp paths.")
+                    return []
             paths = set_path(paths, travel_distances, steering_dirns, step_size)
 
         flag, travel_distances, steering_dirns = path_func(-x, y, -dth)
         if flag:
+            for distance in travel_distances:
+                if (0.1*sum([abs(d) for d in travel_distances]) < abs(distance) < step_size):
+                    print("Step size too large for Reeds-Shepp paths.")
+                    return []
             travel_distances = timeflip(travel_distances)
             paths = set_path(paths, travel_distances, steering_dirns, step_size)
 
         flag, travel_distances, steering_dirns = path_func(x, -y, -dth)
         if flag:
+            for distance in travel_distances:
+                if (0.1*sum([abs(d) for d in travel_distances]) < abs(distance) < step_size):
+                    print("Step size too large for Reeds-Shepp paths.")
+                    return []
             steering_dirns = reflect(steering_dirns)
             paths = set_path(paths, travel_distances, steering_dirns, step_size)
 
         flag, travel_distances, steering_dirns = path_func(-x, -y, dth)
         if flag:
+            for distance in travel_distances:
+                if (0.1*sum([abs(d) for d in travel_distances]) < abs(distance) < step_size):
+                    print("Step size too large for Reeds-Shepp paths.")
+                    return []
             travel_distances = timeflip(travel_distances)
             steering_dirns = reflect(steering_dirns)
             paths = set_path(paths, travel_distances, steering_dirns, step_size)
@@ -333,7 +350,7 @@ def calc_interpolate_dists_list(lengths, step_size):
 
 
 def generate_local_course(lengths, modes, max_curvature, step_size):
-    interpolate_dists_list = calc_interpolate_dists_list(lengths, step_size)
+    interpolate_dists_list = calc_interpolate_dists_list(lengths, step_size * max_curvature)
 
     origin_x, origin_y, origin_yaw = 0.0, 0.0, 0.0
 
@@ -388,7 +405,7 @@ def calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size):
     for path in paths:
         xs, ys, yaws, directions = generate_local_course(path.lengths,
                                                          path.ctypes, maxc,
-                                                         step_size * maxc)
+                                                         step_size)
 
         # convert global coordinate
         path.x = [math.cos(-q0[2]) * ix + math.sin(-q0[2]) * iy + q0[0] for
@@ -435,6 +452,9 @@ def main():
                                                              curvature,
                                                              step_size)
 
+    if not xs:
+        assert False, "No path"
+
     if show_animation:  # pragma: no cover
         plt.cla()
         plt.plot(xs, ys, label="final course " + str(modes))
@@ -448,9 +468,6 @@ def main():
         plt.grid(True)
         plt.axis("equal")
         plt.show()
-
-    if not xs:
-        assert False, "No path"
 
 
 if __name__ == '__main__':
