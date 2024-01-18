@@ -1,5 +1,5 @@
 sphinx == 7.2.6 # For sphinx documentation
-sphinx_rtd_theme == 1.0.0
+sphinx_rtd_theme == 2.0.0
 IPython == 8.10.0 # For sphinx documentation
 sphinxcontrib-napoleon == 0.7 # For auto doc
 sphinx-copybutton
