@@ -11,6 +11,7 @@ import math
 import numpy as np
 import sys
 import pathlib
+from utils.angle import angle_mod
 sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 
 from PathPlanning.CubicSpline import cubic_spline_planner
@@ -69,13 +70,7 @@ class State:
 
 
 def pi_2_pi(angle):
-    while(angle > math.pi):
-        angle = angle - 2.0 * math.pi
-
-    while(angle < -math.pi):
-        angle = angle + 2.0 * math.pi
-
-    return angle
+    return angle_mod(angle)
 
 
 def get_linear_model_matrix(v, phi, delta):
