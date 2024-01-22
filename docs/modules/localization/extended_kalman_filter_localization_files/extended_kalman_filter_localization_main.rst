@@ -37,7 +37,7 @@ This is a Extended kalman filter (EKF) localization with velocity correction.
 
 This is for correcting the vehicle speed measured with scale factor errors due to factors such as wheel wear.
 
-Code: `PythonRobotics/extended_kalman_ekf_with_velocity_correctionfilter.py at master ﾂｷ
+Code: `PythonRobotics/extended_kalman_ekf_with_velocity_correctionfilter.py
 AtsushiSakai/PythonRobotics <https://github.com/AtsushiSakai/PythonRobotics/blob/master/Localization/extended_kalman_filter/extended_kalman_ekf_with_velocity_correctionfilter.py>`__
 
 Filter design
