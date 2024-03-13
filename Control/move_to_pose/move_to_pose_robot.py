@@ -79,9 +79,9 @@ class Robot:
         Parameters
         ----------
         pose_start : (Pose)
-            Start postion of the robot (see the Pose class)
+            Start position of the robot (see the Pose class)
         pose_target : (Pose)
-            Target postion of the robot (see the Pose class)
+            Target position of the robot (see the Pose class)
         """
         self.pose_start = copy.copy(pose_start)
         self.pose_target = pose_target
