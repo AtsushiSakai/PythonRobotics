@@ -6,7 +6,7 @@ exclude = [
 ]
 
 # Assume Python 3.11
-target-version = "py311"
+target-version = "py312"
 
 [per-file-ignores]
 

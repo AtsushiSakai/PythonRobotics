@@ -95,7 +95,7 @@ See this paper for more details:
 
 For running each sample code:
 
-- [Python 3.11.x](https://www.python.org/)
+- [Python 3.12.x](https://www.python.org/)
  
 - [NumPy](https://numpy.org/)
  
