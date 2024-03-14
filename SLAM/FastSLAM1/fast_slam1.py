@@ -10,6 +10,7 @@ import math
 
 import matplotlib.pyplot as plt
 import numpy as np
+from utils.angle import angle_mod
 
 # Fast SLAM covariance
 Q = np.diag([3.0, np.deg2rad(10.0)]) ** 2
@@ -321,7 +322,7 @@ def motion_model(x, u):
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2 * math.pi) - math.pi
+    return angle_mod(angle)
 
 
 def main():

@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from scipy.interpolate import interp1d
+from utils.angle import angle_mod
 
 # motion parameter
 L = 1.0  # wheel base
@@ -18,7 +19,7 @@ class State:
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2 * math.pi) - math.pi
+    return angle_mod(angle)
 
 
 def update(state, v, delta, dt, L):

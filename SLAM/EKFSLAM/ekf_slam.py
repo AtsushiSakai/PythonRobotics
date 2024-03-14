@@ -8,6 +8,7 @@ import math
 
 import matplotlib.pyplot as plt
 import numpy as np
+from utils.angle import angle_mod
 
 # EKF state covariance
 Cx = np.diag([0.5, 0.5, np.deg2rad(30.0)]) ** 2
@@ -28,10 +29,9 @@ show_animation = True
 
 def ekf_slam(xEst, PEst, u, z):
     # Predict
-    S = STATE_SIZE
-    G, Fx = jacob_motion(xEst[0:S], u)
-    xEst[0:S] = motion_model(xEst[0:S], u)
-    PEst[0:S, 0:S] = G.T @ PEst[0:S, 0:S] @ G + Fx.T @ Cx @ Fx
+    G, Fx = jacob_motion(xEst, u)
+    xEst[0:STATE_SIZE] = motion_model(xEst[0:STATE_SIZE], u)
+    PEst = G.T @ PEst @ G + Fx.T @ Cx @ Fx
     initP = np.eye(2)
 
     # Update
@@ -119,7 +119,7 @@ def jacob_motion(x, u):
                    [0.0, 0.0, DT * u[0, 0] * math.cos(x[2, 0])],
                    [0.0, 0.0, 0.0]], dtype=float)
 
-    G = np.eye(STATE_SIZE) + Fx.T @ jF @ Fx
+    G = np.eye(len(x)) + Fx.T @ jF @ Fx
 
     return G, Fx,
 
@@ -192,7 +192,7 @@ def jacob_h(q, delta, x, i):
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2 * math.pi) - math.pi
+    return angle_mod(angle)
 
 
 def main():

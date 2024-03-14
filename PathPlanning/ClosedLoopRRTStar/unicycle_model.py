@@ -8,6 +8,7 @@ author Atsushi Sakai
 
 import math
 import numpy as np
+from utils.angle import angle_mod
 
 dt = 0.05  # [s]
 L = 0.9  # [m]
@@ -39,7 +40,7 @@ def update(state, a, delta):
 
 
 def pi_2_pi(angle):
-    return (angle + math.pi) % (2 * math.pi) - math.pi
+    return angle_mod(angle)
 
 
 if __name__ == '__main__':  # pragma: no cover

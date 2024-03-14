@@ -15,6 +15,7 @@ Ref: P. I. Corke, "Robotics, Vision & Control", Springer 2017,
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+from utils.angle import angle_mod
 
 
 # Simulation parameters
@@ -110,7 +111,7 @@ def plot_arm(theta1, theta2, target_x, target_y):  # pragma: no cover
 
 def ang_diff(theta1, theta2):
     # Returns the difference between two angles in the range -pi to +pi
-    return (theta1 - theta2 + np.pi) % (2 * np.pi) - np.pi
+    return angle_mod(theta1 - theta2)
 
 
 def click(event):  # pragma: no cover
