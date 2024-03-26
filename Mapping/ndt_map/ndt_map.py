@@ -52,6 +52,8 @@ class NDTMap:
         center_y = np.mean(oy)
         self.ox = ox
         self.oy = oy
+        # init grid_map
+        self.grid_map = GridMap(width, height, resolution, center_x, center_y, self.NDTGrid())
         #: NDT grid index map
         self.grid_index_map = self._create_grid_index_map(ox, oy)
 
@@ -59,7 +61,6 @@ class NDTMap:
         self._construct_grid_map(center_x, center_y, height, ox, oy, resolution, width)
 
     def _construct_grid_map(self, center_x, center_y, height, ox, oy, resolution, width):
-        self.grid_map = GridMap(width, height, resolution, center_x, center_y, self.NDTGrid())
         for grid_index, inds in self.grid_index_map.items():
             ndt = self.NDTGrid()
             ndt.n_points = len(inds)
