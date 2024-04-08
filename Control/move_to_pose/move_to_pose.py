@@ -74,7 +74,7 @@ class PathFinderController:
         alpha = angle_mod(np.arctan2(y_diff, x_diff) - theta)
         beta = angle_mod(theta_goal - theta - alpha)
         v = self.Kp_rho * rho
-        w = self.Kp_alpha * alpha - controller.Kp_beta * beta
+        w = self.Kp_alpha * alpha - self.Kp_beta * beta
 
         if alpha > np.pi / 2 or alpha < -np.pi / 2:
             v = -v
