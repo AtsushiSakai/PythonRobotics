@@ -17,8 +17,8 @@ Q = np.diag([3.0, np.deg2rad(10.0)]) ** 2
 R = np.diag([1.0, np.deg2rad(20.0)]) ** 2
 
 #  Simulation parameter
-Q_sim = np.diag([0.3, np.deg2rad(2.0)]) ** 2
-R_sim = np.diag([0.5, np.deg2rad(10.0)]) ** 2
+Q_SIM = np.diag([0.3, np.deg2rad(2.0)]) ** 2
+R_SIM = np.diag([0.5, np.deg2rad(10.0)]) ** 2
 OFFSET_YAW_RATE_NOISE = 0.01
 
 DT = 0.1  # time tick [s]
@@ -35,16 +35,16 @@ show_animation = True
 
 class Particle:
 
-    def __init__(self, N_LM):
+    def __init__(self, n_landmark):
         self.w = 1.0 / N_PARTICLE
         self.x = 0.0
         self.y = 0.0
         self.yaw = 0.0
         self.P = np.eye(3)
         # landmark x-y positions
-        self.lm = np.zeros((N_LM, LM_SIZE))
+        self.lm = np.zeros((n_landmark, LM_SIZE))
         # landmark position covariance
-        self.lmP = np.zeros((N_LM * LM_SIZE, LM_SIZE))
+        self.lmP = np.zeros((n_landmark * LM_SIZE, LM_SIZE))
 
 
 def fast_slam2(particles, u, z):
@@ -266,21 +266,21 @@ def resampling(particles):
         base = np.cumsum(pw * 0.0 + 1 / N_PARTICLE) - 1 / N_PARTICLE
         resample_id = base + np.random.rand(base.shape[0]) / N_PARTICLE
 
-        inds = []
-        ind = 0
+        indexes = []
+        index = 0
         for ip in range(N_PARTICLE):
-            while (ind < w_cum.shape[0] - 1) \
-                    and (resample_id[ip] > w_cum[ind]):
-                ind += 1
-            inds.append(ind)
+            while (index < w_cum.shape[0] - 1) \
+                    and (resample_id[ip] > w_cum[index]):
+                index += 1
+            indexes.append(index)
 
         tmp_particles = particles[:]
-        for i in range(len(inds)):
-            particles[i].x = tmp_particles[inds[i]].x
-            particles[i].y = tmp_particles[inds[i]].y
-            particles[i].yaw = tmp_particles[inds[i]].yaw
-            particles[i].lm = tmp_particles[inds[i]].lm[:, :]
-            particles[i].lmP = tmp_particles[inds[i]].lmP[:, :]
+        for i in range(len(indexes)):
+            particles[i].x = tmp_particles[indexes[i]].x
+            particles[i].y = tmp_particles[indexes[i]].y
+            particles[i].yaw = tmp_particles[indexes[i]].yaw
+            particles[i].lm = tmp_particles[indexes[i]].lm[:, :]
+            particles[i].lmP = tmp_particles[indexes[i]].lmP[:, :]
             particles[i].w = 1.0 / N_PARTICLE
 
     return particles
@@ -299,29 +299,29 @@ def calc_input(time):
     return u
 
 
-def observation(xTrue, xd, u, RFID):
+def observation(xTrue, xd, u, rfid):
     # calc true state
     xTrue = motion_model(xTrue, u)
 
     # add noise to range observation
     z = np.zeros((3, 0))
 
-    for i in range(len(RFID[:, 0])):
+    for i in range(len(rfid[:, 0])):
 
-        dx = RFID[i, 0] - xTrue[0, 0]
-        dy = RFID[i, 1] - xTrue[1, 0]
+        dx = rfid[i, 0] - xTrue[0, 0]
+        dy = rfid[i, 1] - xTrue[1, 0]
         d = math.hypot(dx, dy)
         angle = pi_2_pi(math.atan2(dy, dx) - xTrue[2, 0])
         if d <= MAX_RANGE:
-            dn = d + np.random.randn() * Q_sim[0, 0] ** 0.5  # add noise
-            angle_noise = np.random.randn() * Q_sim[1, 1] ** 0.5
+            dn = d + np.random.randn() * Q_SIM[0, 0] ** 0.5  # add noise
+            angle_noise = np.random.randn() * Q_SIM[1, 1] ** 0.5
             angle_with_noise = angle + angle_noise  # add noise
             zi = np.array([dn, pi_2_pi(angle_with_noise), i]).reshape(3, 1)
             z = np.hstack((z, zi))
 
     # add noise to input
-    ud1 = u[0, 0] + np.random.randn() * R_sim[0, 0] ** 0.5
-    ud2 = u[1, 0] + np.random.randn() * R_sim[
+    ud1 = u[0, 0] + np.random.randn() * R_SIM[0, 0] ** 0.5
+    ud2 = u[1, 0] + np.random.randn() * R_SIM[
         1, 1] ** 0.5 + OFFSET_YAW_RATE_NOISE
     ud = np.array([ud1, ud2]).reshape(2, 1)
 
@@ -356,7 +356,7 @@ def main():
     time = 0.0
 
     # RFID positions [x, y]
-    RFID = np.array([[10.0, -2.0],
+    rfid = np.array([[10.0, -2.0],
                      [15.0, 10.0],
                      [15.0, 15.0],
                      [10.0, 20.0],
@@ -365,7 +365,7 @@ def main():
                      [-5.0, 5.0],
                      [-10.0, 15.0]
                      ])
-    n_landmark = RFID.shape[0]
+    n_landmark = rfid.shape[0]
 
     # State Vector [x y yaw v]'
     xEst = np.zeros((STATE_SIZE, 1))  # SLAM estimation
@@ -383,7 +383,7 @@ def main():
         time += DT
         u = calc_input(time)
 
-        xTrue, z, xDR, ud = observation(xTrue, xDR, u, RFID)
+        xTrue, z, xDR, ud = observation(xTrue, xDR, u, rfid)
 
         particles = fast_slam2(particles, ud, z)
 
@@ -402,12 +402,12 @@ def main():
             plt.gcf().canvas.mpl_connect(
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
-            plt.plot(RFID[:, 0], RFID[:, 1], "*k")
+            plt.plot(rfid[:, 0], rfid[:, 1], "*k")
 
             for iz in range(len(z[:, 0])):
                 landmark_id = int(z[2, iz])
-                plt.plot([xEst[0][0], RFID[landmark_id, 0]], [
-                    xEst[1][0], RFID[landmark_id, 1]], "-k")
+                plt.plot([xEst[0][0], rfid[landmark_id, 0]], [
+                    xEst[1][0], rfid[landmark_id, 1]], "-k")
 
             for i in range(N_PARTICLE):
                 plt.plot(particles[i].x, particles[i].y, ".r")
