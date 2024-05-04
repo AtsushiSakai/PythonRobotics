@@ -234,7 +234,6 @@ def resampling(particles):
     pw = np.array(pw)
 
     n_eff = 1.0 / (pw @ pw.T)  # Effective particle number
-    # print(n_eff)
 
     if n_eff < NTH:  # resampling
         w_cum = np.cumsum(pw)
@@ -274,18 +273,18 @@ def calc_input(time):
     return u
 
 
-def observation(xTrue, xd, u, rfid):
+def observation(x_true, xd, u, rfid):
     # calc true state
-    xTrue = motion_model(xTrue, u)
+    x_true = motion_model(x_true, u)
 
     # add noise to range observation
     z = np.zeros((3, 0))
     for i in range(len(rfid[:, 0])):
 
-        dx = rfid[i, 0] - xTrue[0, 0]
-        dy = rfid[i, 1] - xTrue[1, 0]
+        dx = rfid[i, 0] - x_true[0, 0]
+        dy = rfid[i, 1] - x_true[1, 0]
         d = math.hypot(dx, dy)
-        angle = pi_2_pi(math.atan2(dy, dx) - xTrue[2, 0])
+        angle = pi_2_pi(math.atan2(dy, dx) - x_true[2, 0])
         if d <= MAX_RANGE:
             dn = d + np.random.randn() * Q_SIM[0, 0] ** 0.5  # add noise
             angle_with_noize = angle + np.random.randn() * Q_SIM[
@@ -301,7 +300,7 @@ def observation(xTrue, xd, u, rfid):
 
     xd = motion_model(xd, ud)
 
-    return xTrue, z, xd, ud
+    return x_true, z, xd, ud
 
 
 def motion_model(x, u):
@@ -330,7 +329,7 @@ def main():
     time = 0.0
 
     # RFID positions [x, y]
-    RFID = np.array([[10.0, -2.0],
+    rfid = np.array([[10.0, -2.0],
                      [15.0, 10.0],
                      [15.0, 15.0],
                      [10.0, 20.0],
@@ -339,17 +338,17 @@ def main():
                      [-5.0, 5.0],
                      [-10.0, 15.0]
                      ])
-    n_landmark = RFID.shape[0]
+    n_landmark = rfid.shape[0]
 
     # State Vector [x y yaw v]'
-    xEst = np.zeros((STATE_SIZE, 1))  # SLAM estimation
-    xTrue = np.zeros((STATE_SIZE, 1))  # True state
-    xDR = np.zeros((STATE_SIZE, 1))  # Dead reckoning
+    x_est = np.zeros((STATE_SIZE, 1))  # SLAM estimation
+    x_true = np.zeros((STATE_SIZE, 1))  # True state
+    x_dr = np.zeros((STATE_SIZE, 1))  # Dead reckoning
 
     # history
-    hxEst = xEst
-    hxTrue = xTrue
-    hxDR = xTrue
+    hist_x_est = x_est
+    hist_x_true = x_true
+    hist_x_dr = x_dr
 
     particles = [Particle(n_landmark) for _ in range(N_PARTICLE)]
 
@@ -357,18 +356,18 @@ def main():
         time += DT
         u = calc_input(time)
 
-        xTrue, z, xDR, ud = observation(xTrue, xDR, u, RFID)
+        x_true, z, x_dr, ud = observation(x_true, x_dr, u, rfid)
 
         particles = fast_slam1(particles, ud, z)
 
-        xEst = calc_final_state(particles)
+        x_est = calc_final_state(particles)
 
-        x_state = xEst[0: STATE_SIZE]
+        x_state = x_est[0: STATE_SIZE]
 
         # store data history
-        hxEst = np.hstack((hxEst, x_state))
-        hxDR = np.hstack((hxDR, xDR))
-        hxTrue = np.hstack((hxTrue, xTrue))
+        hist_x_est = np.hstack((hist_x_est, x_state))
+        hist_x_dr = np.hstack((hist_x_dr, x_dr))
+        hist_x_true = np.hstack((hist_x_true, x_true))
 
         if show_animation:  # pragma: no cover
             plt.cla()
@@ -376,16 +375,16 @@ def main():
             plt.gcf().canvas.mpl_connect(
                 'key_release_event', lambda event:
                 [exit(0) if event.key == 'escape' else None])
-            plt.plot(RFID[:, 0], RFID[:, 1], "*k")
+            plt.plot(rfid[:, 0], rfid[:, 1], "*k")
 
             for i in range(N_PARTICLE):
                 plt.plot(particles[i].x, particles[i].y, ".r")
                 plt.plot(particles[i].lm[:, 0], particles[i].lm[:, 1], "xb")
 
-            plt.plot(hxTrue[0, :], hxTrue[1, :], "-b")
-            plt.plot(hxDR[0, :], hxDR[1, :], "-k")
-            plt.plot(hxEst[0, :], hxEst[1, :], "-r")
-            plt.plot(xEst[0], xEst[1], "xk")
+            plt.plot(hist_x_true[0, :], hist_x_true[1, :], "-b")
+            plt.plot(hist_x_dr[0, :], hist_x_dr[1, :], "-k")
+            plt.plot(hist_x_est[0, :], hist_x_est[1, :], "-r")
+            plt.plot(x_est[0], x_est[1], "xk")
             plt.axis("equal")
             plt.grid(True)
             plt.pause(0.001)
