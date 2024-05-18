@@ -27,6 +27,41 @@ The control inputs to the system are the acceleration a and steering angle delta
 Motion Model
 ~~~~~~~~~~~~
 
+.. math:: e_t = e_{t-1} + \dot{e} dt
+
+.. math:: \theta_t = \theta_{t-1} + \dot{\theta} dt
+
+.. math:: \dot{e}_t = v \sin(\theta_{t-1})
+
+.. math:: \sin(\theta) = \theta
+
+when
+
+.. math:: \theta \approx 0
+
+
+.. math:: \dot{\theta}_t = \frac{v}{L} \tan(\delta)
+
+.. math:: \tan(\delta) = \delta
+
+when
+
+.. math:: \delta \approx 0
+
+.. math:: \dot{\theta}_t = \frac{v}{L} \delta
+
+.. math:: x_t = [e_t, \dot{e}_t, \phi_t, \dot{\phi}_t]^T
+
+.. math:: u_t = \delta_t
+
+.. math:: x_{t+1} = A x_t + B u_t
+
+where:
+
+:math:`\begin{equation*} A = \begin{bmatrix} 1 & dt & 0 & 0\\ 0 & 0 & v & 0\\ 0 & 0 & 1 & dt\\ 0 & 0 & 0 & 0 \\ \end{bmatrix} \end{equation*}`
+
+:math:`\begin{equation*} B = \begin{bmatrix} 0\\ 0\\ 0\\ \frac{v}{L} \\ \end{bmatrix} \end{equation*}`
+
 
 
 Model Parameters:
