@@ -11,51 +11,75 @@ control.
 Overview
 ~~~~~~~~
 
-The LQR (Linear Quadratic Regulator) steering control model implemented in lqr_steer_control.py provides a method for autonomous vehicles to track a desired trajectory by adjusting steering angle based on feedback from the current state and the desired trajectory. This model utilizes a combination of PID speed control and LQR steering control to achieve smooth and accurate trajectory tracking.
+The LQR (Linear Quadratic Regulator) steering control model implemented in lqr_steer_control.py provides a simulation
+for an autonomous vehicle to track a desired trajectory by adjusting steering angle based on feedback from the current state and the desired trajectory.
+This model utilizes a combination of PID speed control and LQR steering control to achieve smooth and accurate trajectory tracking.
 
+Vehicle motion Model
+~~~~~~~~~~~~~~~~~~~~~
 
-State Representation
-~~~~~~~~~~~~~~~~~~~~
-
-The state of the vehicle is represented by its position (x, y), orientation yaw, and velocity v.
-
-Control Inputs
-~~~~~~~~~~~~~~
-
-The control inputs to the system are the acceleration a and steering angle delta.
-
-Motion Model
-~~~~~~~~~~~~
+The below figure shows the geometric model of the vehicle used in this simulation:
 
 .. image:: lqr_steering_control_model.png
    :width: 600px
 
-.. math:: e_t = e_{t-1} + \dot{e} dt
+The `e` and `theta` represent the lateral error and orientation error, respectively, with respect to the desired trajectory.
+And :math:`\dot{e}` and :math:`\dot{\theta}` represent the rates of change of these errors.
 
-.. math:: \theta_t = \theta_{t-1} + \dot{\theta} dt
+The :math:`e_t` and :math:`theta_t` are the updated values of `e` and `theta` at time `t`, respectively, and can be calculated using the following kinematic equations:
 
-.. math:: \dot{e}_t = v \sin(\theta_{t-1})
+.. math:: e_t = e_{t-1} + \dot{e}_{t-1} dt
 
-.. math:: \sin(\theta) = \theta
+.. math:: \theta_t = \theta_{t-1} + \dot{\theta}_{t-1} dt
 
-when
+Where `dt` is the time difference.
+
+The change rate of the `e` can be calculated as:
+
+.. math:: \dot{e}_t = V \sin(\theta_{t-1})
+
+Where `V` is the vehicle speed.
+
+If the :math:`theta` is small,
 
 .. math:: \theta \approx 0
 
+the :math:`\sin(\theta)` can be approximated as :math:`\theta`:
 
-.. math:: \dot{\theta}_t = \frac{v}{L} \tan(\delta)
+.. math:: \sin(\theta) = \theta
 
-.. math:: \tan(\delta) = \delta
+So, the change rate of the `e` can be approximated as:
 
-when
+.. math:: \dot{e}_t = V \theta_{t-1}
+
+The change rate of the :math:`\theta` can be calculated as:
+
+.. math:: \dot{\theta}_t = \frac{V}{L} \tan(\delta)
+
+where `L` is the wheelbase of the vehicle and :math:`\delta` is the steering angle.
+
+If the :math:`\delta` is small,
 
 .. math:: \delta \approx 0
 
-.. math:: \dot{\theta}_t = \frac{v}{L} \delta
+the :math:`\tan(\delta)` can be approximated as :math:`\delta`:
+
+.. math:: \tan(\delta) = \delta
+
+So, the change rate of the :math:`\theta` can be approximated as:
+
+.. math:: \dot{\theta}_t = \frac{V}{L} \delta
+
+The above equations can be used to update the state of the vehicle at each time step.
+
+To formulate the state-space representation of the vehicle dynamics as a linear model,
+the state vector `x` and control input vector `u` are defined as follows:
 
 .. math:: x_t = [e_t, \dot{e}_t, \phi_t, \dot{\phi}_t]^T
 
 .. math:: u_t = \delta_t
+
+The state transition equation can be represented as:
 
 .. math:: x_{t+1} = A x_t + B u_t
 
@@ -65,52 +89,28 @@ where:
 
 :math:`\begin{equation*} B = \begin{bmatrix} 0\\ 0\\ 0\\ \frac{v}{L} \\ \end{bmatrix} \end{equation*}`
 
+LQR controller
+~~~~~~~~~~~~~~~
 
+The Linear Quadratic Regulator (LQR) controller is used to calculate the optimal control input `u` that minimizes the quadratic cost function:
 
-Model Parameters:
+:math:`J = \sum_{t=0}^{N} (x_t^T Q x_t + u_t^T R u_t)`
 
-Various parameters are used in the model, including the wheelbase L of the vehicle, the maximum steering angle max_steer, time step dt, and speed proportional gain Kp.
-LQR Parameters:
+where `Q` and `R` are the weighting matrices for the state and control input, respectively.
 
-The LQR controller is parameterized by the matrices Q and R, which define the cost function for the state and control inputs, respectively.
-Implementation Details:
-The model calculates the optimal steering angle delta using LQR control based on the current state and the desired trajectory.
-It linearizes the dynamics of the system around the current state to obtain the state-space representation.
-The discrete-time Algebraic Riccati equation (DARE) is solved to obtain the optimal control gain.
-The control input delta is determined by a combination of feedforward and feedback components.
-Additionally, a PID controller is used to adjust the vehicle's speed to match the desired speed profile along the trajectory.
-Usage:
-The model can be integrated into autonomous vehicle control systems for path tracking applications.
-Input parameters include the desired trajectory (cx, cy, cyaw, ck), speed profile, and simulation parameters.
-The main() function demonstrates the usage of the model by simulating the vehicle's trajectory tracking behavior.
-Derivation Steps for the Linearized A, B Matrix
-The linearized A, B matrix is derived to represent the state-space model of the vehicle dynamics. Here are the steps involved:
+for the linear model:
 
-State Space Representation:
+:math:`x_{t+1} = A x_t + B u_t`
 
-Define the state vector x comprising position, orientation, and velocity.
-Define the control input vector u comprising acceleration and steering angle.
-State Transition Model:
+The optimal control input `u` can be calculated as:
 
-Formulate the state transition equation x_next = A * x + B * u to represent the dynamics of the system.
-Linearization:
+:math:`u_t = -K x_t`
 
-Linearize the state transition equation around the current state using Taylor series expansion.
-Obtain the Jacobian matrices A and B, representing the partial derivatives of the state transition equation with respect to the state and control inputs, respectively.
-Discretization:
-
-Convert the continuous-time state-space model to discrete-time by discretizing the dynamics using appropriate integration methods.
-LQR Control Design:
-
-Apply the LQR control design methodology to obtain the optimal control gain matrix K by solving the discrete-time Algebraic Riccati equation (DARE).
-Implementation:
-
-Utilize the obtained matrices A, B, and K in the control algorithm to compute the optimal control input for the given state and desired trajectory.
-
-By following these steps, the linearized A, B matrix can be derived and integrated into the control algorithm to achieve effective trajectory tracking performance.
-
+where `K` is the feedback gain matrix obtained by solving the Riccati equation.
 
 References:
 ~~~~~~~~~~~
 -  `ApolloAuto/apollo: An open autonomous driving platform <https://github.com/ApolloAuto/apollo>`_
+
+- `Linear Quadratic Regulator (LQR) <https://en.wikipedia.org/wiki/Linear%E2%80%93quadratic_regulator>`_
 
