@@ -27,6 +27,9 @@ The control inputs to the system are the acceleration a and steering angle delta
 Motion Model
 ~~~~~~~~~~~~
 
+.. image:: lqr_steering_control_model.png
+   :width: 600px
+
 .. math:: e_t = e_{t-1} + \dot{e} dt
 
 .. math:: \theta_t = \theta_{t-1} + \dot{\theta} dt
