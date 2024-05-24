@@ -265,10 +265,6 @@ class RRTStar:
 
     def draw_graph(self, rnd=None):
         plt.cla()
-        for artist in self.ax.lines + self.ax.collections:
-            artist.remove()
-
-
         self.ax.axis([-1, 1, -1, 1, -1, 1])
         self.ax.set_zlim(0, 1)
         self.ax.grid(True)
