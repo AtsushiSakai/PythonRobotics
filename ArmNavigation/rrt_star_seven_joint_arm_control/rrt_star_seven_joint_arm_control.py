@@ -374,38 +374,31 @@ def main():
     path = rrt_star.planning(animation=show_animation,
                              search_until_max_iter=False)
 
-    plt.ion()
-    while True:
-        if path is None:
-            print("Cannot find path")
-        else:
-            print("Found path!!")
+    if path is None:
+        print("Cannot find path.")
+    else:
+        print("Found path!")
 
-            # Draw final path
-            if show_animation:
-                ax = rrt_star.draw_graph()
+        # Draw final path
+        if show_animation:
+            ax = rrt_star.draw_graph()
 
-                # Plot final configuration
-                x_points, y_points, z_points = seven_joint_arm.get_points(path[-1])
+            # Plot final configuration
+            x_points, y_points, z_points = seven_joint_arm.get_points(path[-1])
+            ax.plot([x for x in x_points],
+                    [y for y in y_points],
+                    [z for z in z_points],
+                    "o-", color="red", ms=5, mew=0.5)
+
+            for i, q in enumerate(path):
+                x_points, y_points, z_points = seven_joint_arm.get_points(q)
                 ax.plot([x for x in x_points],
                         [y for y in y_points],
                         [z for z in z_points],
-                        "o-", color="red", ms=5, mew=0.5)
+                        "o-", color="grey",  ms=4, mew=0.5)
+                plt.pause(0.1)
 
-                for q in path:
-                    x_points, y_points, z_points = seven_joint_arm.get_points(q)
-                    ax.plot([x for x in x_points],
-                            [y for y in y_points],
-                            [z for z in z_points],
-                            "o-", color="grey",  ms=4, mew=0.5)
-                    plt.pause(0.1)
-
-                plt.draw()
-
-        # Wait for user input to continue or break the loop
-        user_input = input("Press Enter to render the animation again or type 'q' to quit: ")
-        if user_input.lower() == 'q':
-            break
+            plt.show()
 
 
 if __name__ == '__main__':
