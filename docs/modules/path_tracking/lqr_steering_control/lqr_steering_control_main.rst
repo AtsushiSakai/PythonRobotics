@@ -75,7 +75,7 @@ The above equations can be used to update the state of the vehicle at each time 
 To formulate the state-space representation of the vehicle dynamics as a linear model,
 the state vector `x` and control input vector `u` are defined as follows:
 
-.. math:: x_t = [e_t, \dot{e}_t, \phi_t, \dot{\phi}_t]^T
+.. math:: x_t = [e_t, \dot{e}_t, \theta_t, \dot{\theta}_t]^T
 
 .. math:: u_t = \delta_t
 
