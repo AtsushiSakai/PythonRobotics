@@ -8,7 +8,7 @@ This folder contains documentation for the Python Robotics project.
 #### Install Sphinx and Theme
 
 ```
-pip install sphinx sphinx-autobuild sphinx-rtd-theme
+pip install sphinx sphinx-autobuild sphinx-rtd-theme sphinx_rtd_dark_mode sphinx_copybutton sphinx_rtd_dark_mode
 ```
 
 #### Building the Docs
