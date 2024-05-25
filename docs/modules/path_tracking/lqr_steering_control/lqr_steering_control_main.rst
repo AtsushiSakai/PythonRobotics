@@ -20,7 +20,7 @@ Vehicle motion Model
 
 The below figure shows the geometric model of the vehicle used in this simulation:
 
-.. image:: lqr_steering_control_model.png
+.. image:: lqr_steering_control_model.jpg
    :width: 600px
 
 The `e` and `theta` represent the lateral error and orientation error, respectively, with respect to the desired trajectory.
