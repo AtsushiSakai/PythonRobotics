@@ -2,7 +2,7 @@
 D* Lite grid planning
 author: vss2sn (28676655+vss2sn@users.noreply.github.com)
 Link to papers:
-D* Lite (Link: http://idm-lab.org/bib/abstracts/papers/aaai02b.pd)
+D* Lite (Link: http://idm-lab.org/bib/abstracts/papers/aaai02b.pdf)
 Improved Fast Replanning for Robot Navigation in Unknown Terrain
 (Link: http://www.cs.cmu.edu/~maxim/files/dlite_icra02.pdf)
 Implemented maintaining similarity with the pseudocode for understanding.
