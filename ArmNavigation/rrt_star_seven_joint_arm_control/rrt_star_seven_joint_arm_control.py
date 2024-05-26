@@ -265,7 +265,7 @@ class RRTStar:
 
     def draw_graph(self, rnd=None):
         plt.cla()
-        self.ax.axis([-1, 1, -1, 1])
+        self.ax.axis([-1, 1, -1, 1, -1, 1])
         self.ax.set_zlim(0, 1)
         self.ax.grid(True)
         for (ox, oy, oz, size) in self.obstacle_list:
@@ -375,9 +375,9 @@ def main():
                              search_until_max_iter=False)
 
     if path is None:
-        print("Cannot find path")
+        print("Cannot find path.")
     else:
-        print("found path!!")
+        print("Found path!")
 
         # Draw final path
         if show_animation:
@@ -396,7 +396,7 @@ def main():
                         [y for y in y_points],
                         [z for z in z_points],
                         "o-", color="grey",  ms=4, mew=0.5)
-                plt.pause(0.01)
+                plt.pause(0.1)
 
             plt.show()
 
