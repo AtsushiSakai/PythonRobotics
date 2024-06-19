@@ -10,6 +10,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
+from coverageTracker import branch_coverage
 
 EXTEND_AREA = 10.0  # [m] grid map extention length
 

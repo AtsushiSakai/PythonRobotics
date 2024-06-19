@@ -1,6 +1,6 @@
 branch_coverage = {
-    "gaussian_grid_map_1": False,
-    "gaussian_grid_map_2": False,
-    "circle_fitting_1": False,
-    "circle_fitting_2": False
+    "dijkstra_1": False, # if-branch 
+    "dijkstra_2": False, #
+    "rrt_star_dubins_1": False, #
+    "rrt_star_dubins__2": False #
 }
