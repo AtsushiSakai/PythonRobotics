@@ -105,7 +105,7 @@ def get_occupancy_grid(arm, obstacles):
     Args:
         arm: An instance of NLinkArm
         obstacles: A list of obstacles, with each obstacle defined as a list
-                   of xy coordinates and a radius. 
+                   of xy coordinates and a radius.
 
     Returns:
         Occupancy grid in joint space
