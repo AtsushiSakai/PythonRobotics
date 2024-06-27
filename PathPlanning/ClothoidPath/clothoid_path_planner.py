@@ -5,7 +5,6 @@ Author: Daniel Ingram (daniel-s-ingram)
 Reference paper: Fast and accurate G1 fitting of clothoid curves
 https://www.researchgate.net/publication/237062806
 """
-
 from collections import namedtuple
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,9 +14,12 @@ from math import atan2, cos, hypot, pi, sin
 from matplotlib import animation
 
 Point = namedtuple("Point", ["x", "y"])
-
 show_animation = True
 
+import logging
+
+logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+logger = logging.getLogger()
 
 def generate_clothoid_paths(start_point, start_yaw_list,
                             goal_point, goal_yaw_list,
@@ -26,7 +28,6 @@ def generate_clothoid_paths(start_point, start_yaw_list,
     Generate clothoid path list. This function generate multiple clothoid paths
     from multiple orientations(yaw) at start points to multiple orientations
     (yaw) at goal point.
-
     :param start_point: Start point of the path
     :param start_yaw_list: Orientation list at start point in radian
     :param goal_point: Goal point of the path
@@ -43,12 +44,10 @@ def generate_clothoid_paths(start_point, start_yaw_list,
             clothoids.append(clothoid)
     return clothoids
 
-
 def generate_clothoid_path(start_point, start_yaw,
                            goal_point, goal_yaw, n_path_points):
     """
     Generate a clothoid path list.
-
     :param start_point: Start point of the path
     :param start_yaw: Orientation at start point in radian
     :param goal_point: Goal point of the path
@@ -59,16 +58,13 @@ def generate_clothoid_path(start_point, start_yaw,
     dx = goal_point.x - start_point.x
     dy = goal_point.y - start_point.y
     r = hypot(dx, dy)
-
     phi = atan2(dy, dx)
     phi1 = normalize_angle(start_yaw - phi)
     phi2 = normalize_angle(goal_yaw - phi)
     delta = phi2 - phi1
-
     try:
         # Step1: Solve g function
         A = solve_g_for_root(phi1, phi2, delta)
-
         # Step2: Calculate path parameters
         L = compute_path_length(r, phi1, delta, A)
         curvature = compute_curvature(delta, A, L)
@@ -76,7 +72,6 @@ def generate_clothoid_path(start_point, start_yaw,
     except Exception as e:
         print(f"Failed to generate clothoid points: {e}")
         return None
-
     # Step3: Construct a path with Fresnel integral
     points = []
     for s in np.linspace(0, L, n_path_points):
@@ -88,61 +83,49 @@ def generate_clothoid_path(start_point, start_yaw,
             points.append(Point(x, y))
         except Exception as e:
             print(f"Skipping failed clothoid point: {e}")
-
     return points
-
 
 def X(a, b, c):
     return integrate.quad(lambda t: cos((a/2)*t**2 + b*t + c), 0, 1)[0]
 
-
 def Y(a, b, c):
     return integrate.quad(lambda t: sin((a/2)*t**2 + b*t + c), 0, 1)[0]
-
 
 def solve_g_for_root(theta1, theta2, delta):
     initial_guess = 3*(theta1 + theta2)
     return fsolve(lambda A: Y(2*A, delta - A, theta1), [initial_guess])
 
-
 def compute_path_length(r, theta1, delta, A):
     return r / X(2*A, delta - A, theta1)
-
 
 def compute_curvature(delta, A, L):
     return (delta - A) / L
 
-
 def compute_curvature_rate(A, L):
     return 2 * A / (L**2)
-
 
 def normalize_angle(angle_rad):
     return (angle_rad + pi) % (2 * pi) - pi
 
-
 def get_axes_limits(clothoids):
     x_vals = [p.x for clothoid in clothoids for p in clothoid]
     y_vals = [p.y for clothoid in clothoids for p in clothoid]
-
     x_min = min(x_vals)
     x_max = max(x_vals)
     y_min = min(y_vals)
     y_max = max(y_vals)
-
     x_offset = 0.1*(x_max - x_min)
     y_offset = 0.1*(y_max - y_min)
-
     x_min = x_min - x_offset
     x_max = x_max + x_offset
     y_min = y_min - y_offset
     y_max = y_max + y_offset
-
     return x_min, x_max, y_min, y_max
-
 
 def draw_clothoids(start, goal, num_steps, clothoidal_paths,
                    save_animation=False):
+    logger.debug("draw_clothoids called with start=%s, goal=%s, num_steps=%d, save_animation=%s",
+                 start, goal, num_steps, save_animation)
 
     fig = plt.figure(figsize=(10, 10))
     x_min, x_max, y_min, y_max = get_axes_limits(clothoidal_paths)
@@ -157,7 +140,6 @@ def draw_clothoids(start, goal, num_steps, clothoidal_paths,
             x = [p.x for p in clothoid_path[:i]]
             y = [p.y for p in clothoid_path[:i]]
             line.set_data(x, y)
-
         return lines
 
     anim = animation.FuncAnimation(
@@ -167,10 +149,13 @@ def draw_clothoids(start, goal, num_steps, clothoidal_paths,
         interval=25,
         blit=True
     )
-    if save_animation:
-        anim.save('clothoid.gif', fps=30, writer="imagemagick")
-    plt.show()
 
+    if save_animation:
+        logger.debug("Saving animation as clothoid.gif")
+        anim.save('clothoid.gif', fps=30, writer="imagemagick")
+
+    logger.debug("Displaying the plot")
+    plt.show()
 
 def main():
     start_point = Point(0, 0)
@@ -186,7 +171,6 @@ def main():
         draw_clothoids(start_point, goal_point,
                        num_path_points, clothoid_paths,
                        save_animation=False)
-
 
 if __name__ == "__main__":
     main()
