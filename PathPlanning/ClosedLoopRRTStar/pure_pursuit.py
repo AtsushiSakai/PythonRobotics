@@ -9,7 +9,7 @@ import math
 
 import matplotlib.pyplot as plt
 import numpy as np
-from coverageTracker import branch_coverage
+from coverageTracker import branch_coverage_pid
 import sys
 import pathlib
 sys.path.append(str(pathlib.Path(__file__).parent.parent))
@@ -30,10 +30,10 @@ def PIDControl(target, current):
     a = Kp * (target - current)
 
     if a > unicycle_model.accel_max:
-        branch_coverage["pure_pursuit_1"] = True
+        branch_coverage_pid["pure_pursuit_1"] = True
         a = unicycle_model.accel_max
     elif a < -unicycle_model.accel_max:
-        branch_coverage["pure_pursuit_2"] = True
+        branch_coverage_pid["pure_pursuit_2"] = True
         a = -unicycle_model.accel_max
 
     return a

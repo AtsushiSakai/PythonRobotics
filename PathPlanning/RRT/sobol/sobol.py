@@ -25,7 +25,7 @@
 import math
 import sys
 import numpy as np
-from coverageTracker import branch_coverage
+from coverageTracker import branch_coverage_sobol
 
 atmost = None
 dim_max = None
@@ -905,10 +905,10 @@ def tau_sobol(dim_num):
     tau_table = [0, 0, 1, 3, 5, 8, 11, 15, 19, 23, 27, 31, 35]
 
     if 1 <= dim_num <= dim_max:
-        branch_coverage["sobol_1"] = True
+        branch_coverage_sobol["sobol_1"] = True
         tau = tau_table[dim_num]
     else:
-        branch_coverage["sobol_2"] = True
+        branch_coverage_sobol["sobol_2"] = True
         tau = -1
 
     return tau

@@ -6,8 +6,17 @@ from PathPlanning.ClosedLoopRRTStar import pure_pursuit as p
 from PathPlanning.ClosedLoopRRTStar import unicycle_model as u
 
 def print_coverage():
-    for branch, hit in branch_coverage.items(): 
-        print(f"{branch} was {'hit' if hit else 'not hit'}")
+    hits = 0
+    for branch, hit in branch_coverage.items():
+        if hit:
+            hits += 1  
+        print(f"\n{branch} was {'hit' if hit else 'not hit'}")
+    
+    if len(branch_coverage) > 0:
+        coverage_percentage = hits / len(branch_coverage) * 100
+    else:
+        coverage_percentage = 0.0
+    print(f"Total function coverage: {coverage_percentage:.2f}%")
     
 
 def test_tau_sobol_dimNum_bigger_than_dimMax():
@@ -36,6 +45,7 @@ def test_PIDControl_a_smaller():
 def test_PIDControl_a_equal():
     a = p.Kp * (1 - 0)
     assert p.PIDControl(1, 0) == a
+    print_coverage()
 
 if __name__ == '__main__':
     conftest.run_this_test(__file__)
