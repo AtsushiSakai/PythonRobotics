@@ -74,7 +74,9 @@ Python codes for robotics algorithm.
       * [1Password](#1password)
    * [Authors](#authors)
 
-# How to use it with Ardupilot, AirSim and Unreal 4.7
+# How to use it with repository: Ardupilot, AirSim and Unreal 4.7
+
+git clone https://github.com/ss48/PythonRobotics_AirSim_Unreal.git
 1. Install the AirSim and Unreal 4.7
 2. Copy the settings.json file in this repository into your Documents/AirSim folder.
 3. Run the Blocks.uproject located in the Unreal folder of Airsim.
