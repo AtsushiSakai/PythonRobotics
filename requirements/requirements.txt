@@ -1,5 +1,5 @@
 numpy == 2.0.0
-scipy == 1.13.1
+scipy == 1.14.0
 matplotlib == 3.9.0
 cvxpy == 1.5.2
 pytest == 8.2.2 # For unit test
