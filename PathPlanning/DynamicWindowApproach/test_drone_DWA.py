@@ -110,7 +110,7 @@ def main():
     start_position = LocationGlobalRelative(51.73, 0.483, 45)  # Starting point for visualization
 
     destinations = [
-        [51.75376, 0.48471, 45],  # Springfield Hospital
+        [51.95376, 0.48471, 45],  # Springfield Hospital
         [51.73112, 0.4711, 56],  # Chelmsford & Essex Hospital
         [51.73602, 0.47358, 33],  # Fitzroy Surgery Chelmsford
         [51.743516, 0.47556, 45],  # Priory Hospital Chelmsford
