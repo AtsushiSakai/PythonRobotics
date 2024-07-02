@@ -56,15 +56,36 @@ def arm_and_takeoff(vehicle, aTargetAltitude):
     time.sleep(3)
 
 
+# Set WPNAV_SPEED_UP parameter to 1000 
+
+set_parameter_value(vehicle1, 'WPNAV_SPEED_UP', 1000) 
+
+set_parameter_value(vehicle2, 'WPNAV_SPEED_UP', 1000) 
+
+  
+
+# Wait for the parameter to be set (optional) 
+
+time.sleep(1) 
+
+  
+
+# Example: Reading back the parameter to verify 
+
+current_value1 = vehicle1.parameters['WPNAV_SPEED_UP'] 
+
+current_value2 = vehicle2.parameters['WPNAV_SPEED_UP'] 
+
+print(f"WPNAV_SPEED_UP parameter set to: {current_value1} for vehicle 1") 
+
+print(f"WPNAV_SPEED_UP parameter set to: {current_value2} for vehicle 2")
+
 
 # Arm and take off to altitude of 5 meters for both vehicles
 arm_and_takeoff(vehicle1, 5)
 time.sleep(10)  # Wait for some time to ensure vehicle1 has taken off
 arm_and_takeoff(vehicle2, 5)
 time.sleep(12)
-print("Both vehicles are in the air.")
-current_value1 = vehicle1.parameters['WPNAV_SPEED_UP']
-current_value2 = vehicle2.parameters['WPNAV_SPEED_UP']
-print(f"WPNAV_SPEED_UP parameter set to: {current_value1} for vehicle 1")
-print(f"WPNAV_SPEED_UP parameter set to: {current_value2} for vehicle 2")
+
+
 
