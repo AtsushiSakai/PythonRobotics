@@ -103,34 +103,9 @@ def plot_update(frame, plot_queue, ax, start_position, destinations, fences, con
         ax.set_ylim(51.68, 51.75)  # Set y-axis limits to match the area
         ax.legend()
 
-def arm_and_takeoff(vehicle, target_altitude):
-    while not vehicle.is_armable:
-        print("Waiting for vehicle to initialize...")
-        time.sleep(1)
-
-    print("Arming motors")
-    vehicle.mode = VehicleMode("GUIDED")
-    vehicle.armed = True
-
-    while not vehicle.armed:
-        print("Waiting for arming...")
-        time.sleep(1)
-
-    print("Taking off!")
-    vehicle.simple_takeoff(target_altitude)
-
-    while True:
-        print(f"Altitude: {vehicle.location.global_relative_frame.alt}")
-        if vehicle.location.global_relative_frame.alt >= target_altitude * 0.95:
-            print("Reached target altitude")
-            break
-        time.sleep(1)
 
 def main():
-    arm_and_takeoff(vehicle1, 5)
-    time.sleep(10)  # Wait for some time to ensure vehicle1 has taken off
-    arm_and_takeoff(vehicle2, 5)
-    time.sleep(10)  # Wait for some time to ensure vehicle2 has taken off
+
 
     start_position = LocationGlobalRelative(51.73, 0.483, 45)  # Starting point for visualization
 
