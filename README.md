@@ -74,7 +74,29 @@ Python codes for robotics algorithm.
       * [1Password](#1password)
    * [Authors](#authors)
 
+# How to use it with repository: Ardupilot, AirSim and Unreal 4.7
+
+git clone https://github.com/ss48/PythonRobotics_AirSim_Unreal.git
+1. Install the AirSim and Unreal 4.7
+2. Copy the settings.json file in this repository into your Documents/AirSim folder.
+3. Run the Blocks.uproject located in the Unreal folder of Airsim.
+
+  
+4. Install the following:
+
+sudo pip install shapely 
+
+sudo pip install dronekit 
+
+pip install dronekit-sitl 
+
+
+5. Run the ./libraries/SITL/examples/Airsim/follow-1-copter.sh in the Terminal
+6. Download the Takeoff_arm.py in this repository. Run the script to make the drones go into Guided mode, Arm, and Takeoff, and make sure MavProxy for both drones is running.
+
+
 # What is this?
+
 
 This is a Python code collection of robotics algorithms.
 
