@@ -238,6 +238,8 @@ To enhance error handling and robustness in the MPC implementation, the followin
 ### Testing and Performance
 
 Thorough testing and performance profiling are crucial to ensure the reliability and efficiency of the MPC implementation:
+![image](https://github.com/Esmail-ibraheem/Robotics/assets/113830751/d7195029-9899-47a4-a895-f17d0bdc3e1e)
+
 
 1. **Unit Tests**: Develop unit tests for individual functions, particularly those involved in state updates (e.g., `update_state`). This helps in identifying and fixing issues at the function level.
 
