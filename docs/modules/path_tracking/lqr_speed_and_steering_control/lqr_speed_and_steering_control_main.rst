@@ -106,6 +106,20 @@ The optimal control input `u` can be calculated as:
 
 where `K` is the feedback gain matrix obtained by solving the Riccati equation.
 
+Simulation results
+~~~~~~~~~~~~~~~~~~~
+
+
+.. image:: x-y.png
+   :width: 600px
+
+.. image:: yaw.png
+   :width: 600px
+
+.. image:: speed.png
+   :width: 600px
+
+
 
 References:
 ~~~~~~~~~~~

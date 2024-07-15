@@ -292,6 +292,13 @@ def main():
         plt.xlabel("x[m]")
         plt.ylabel("y[m]")
         plt.legend()
+        plt.subplots(1)
+
+        plt.plot(t, np.array(v)*3.6, label="speed")
+        plt.grid(True)
+        plt.xlabel("Time [sec]")
+        plt.ylabel("Speed [m/s]")
+        plt.legend()
 
         plt.subplots(1)
         plt.plot(s, [np.rad2deg(iyaw) for iyaw in cyaw], "-r", label="yaw")
