@@ -6,12 +6,15 @@ Linear–quadratic regulator (LQR) speed and steering control
 Path tracking simulation with LQR speed and steering control.
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/lqr_speed_steer_control/animation.gif
+
 Overview
 ~~~~~~~~
 
-The LQR (Linear Quadratic Regulator) steering control model implemented in lqr_steer_control.py provides a simulation
-for an autonomous vehicle to track a desired trajectory by adjusting steering angle based on feedback from the current state and the desired trajectory.
-This model utilizes a combination of PID speed control and LQR steering control to achieve smooth and accurate trajectory tracking.
+The LQR (Linear Quadratic Regulator) speed and steering control model implemented in `lqr_speed_steer_control.py` provides a simulation
+for an autonomous vehicle to track
+1. a desired speed by adjusting acceleration based on feedback from the current state and the desired speed.
+2. a desired trajectory by adjusting steering angle based on feedback from the current state and the desired trajectory.
+by only using one LQT controller.
 
 Vehicle motion Model
 ~~~~~~~~~~~~~~~~~~~~~
@@ -21,16 +24,18 @@ The below figure shows the geometric model of the vehicle used in this simulatio
 .. image:: lqr_steering_control_model.jpg
    :width: 600px
 
-The `e` and `theta` represent the lateral error and orientation error, respectively, with respect to the desired trajectory.
+The `e`, :math:`{\theta}`, and :math:`\upsilon` represent the lateral error, orientation error, and velocity error, respectively, with respect to the desired trajectory and speed.
 And :math:`\dot{e}` and :math:`\dot{\theta}` represent the rates of change of these errors.
 
-The :math:`e_t` and :math:`theta_t` are the updated values of `e` and `theta` at time `t`, respectively, and can be calculated using the following kinematic equations:
+The :math:`e_t` and :math:`\theta_t`, and :math:`\upsilon` are the updated values of `e`, :math:`\theta`, :math:`\upsilon` and at time `t`, respectively, and can be calculated using the following kinematic equations:
 
 .. math:: e_t = e_{t-1} + \dot{e}_{t-1} dt
 
 .. math:: \theta_t = \theta_{t-1} + \dot{\theta}_{t-1} dt
 
-Where `dt` is the time difference.
+.. math:: \upsilon_t = \upsilon_{t-1} + a_{t-1} dt
+
+Where `dt` is the time difference and `a_t` is the acceleration at the time `t`.
 
 The change rate of the `e` can be calculated as:
 
@@ -73,9 +78,9 @@ The above equations can be used to update the state of the vehicle at each time 
 To formulate the state-space representation of the vehicle dynamics as a linear model,
 the state vector `x` and control input vector `u` are defined as follows:
 
-.. math:: x_t = [e_t, \dot{e}_t, \theta_t, \dot{\theta}_t]^T
+.. math:: x_t = [e_t, \dot{e}_t, \theta_t, \dot{\theta}_t, \upsilon]^T
 
-.. math:: u_t = \delta_t
+.. math:: u_t = [\delta_t, a_t]^T
 
 The state transition equation can be represented as:
 
@@ -83,9 +88,9 @@ The state transition equation can be represented as:
 
 where:
 
-:math:`\begin{equation*} A = \begin{bmatrix} 1 & dt & 0 & 0\\ 0 & 0 & v & 0\\ 0 & 0 & 1 & dt\\ 0 & 0 & 0 & 0 \\ \end{bmatrix} \end{equation*}`
+:math:`\begin{equation*} A = \begin{bmatrix} 1 & dt & 0 & 0 & 0\\ 0 & 0 & v & 0 & 0\\ 0 & 0 & 1 & dt & 0\\ 0 & 0 & 0 & 0 & 0\\ 0 & 0 & 0 & 0 & 1\\\end{bmatrix} \end{equation*}`
 
-:math:`\begin{equation*} B = \begin{bmatrix} 0\\ 0\\ 0\\ \frac{v}{L} \\ \end{bmatrix} \end{equation*}`
+:math:`\begin{equation*} B = \begin{bmatrix} 0 & 0\\ 0 & 0\\ 0 & 0\\ \frac{v}{L} & 0\\ 0 & dt \\ \end{bmatrix} \end{equation*}`
 
 LQR controller
 ~~~~~~~~~~~~~~~
