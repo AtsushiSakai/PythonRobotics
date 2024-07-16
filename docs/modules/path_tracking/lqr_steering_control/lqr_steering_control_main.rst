@@ -8,6 +8,8 @@ control.
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/lqr_steer_control/animation.gif
 
+`[Code Link] <https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/lqr_steer_control/lqr_steer_control.py>`_
+
 Overview
 ~~~~~~~~
 
@@ -23,10 +25,10 @@ The below figure shows the geometric model of the vehicle used in this simulatio
 .. image:: lqr_steering_control_model.jpg
    :width: 600px
 
-The `e` and `theta` represent the lateral error and orientation error, respectively, with respect to the desired trajectory.
+The `e` and :math:`\theta` represent the lateral error and orientation error, respectively, with respect to the desired trajectory.
 And :math:`\dot{e}` and :math:`\dot{\theta}` represent the rates of change of these errors.
 
-The :math:`e_t` and :math:`theta_t` are the updated values of `e` and `theta` at time `t`, respectively, and can be calculated using the following kinematic equations:
+The :math:`e_t` and :math:`\theta_t` are the updated values of `e` and :math:`\theta` at time `t`, respectively, and can be calculated using the following kinematic equations:
 
 .. math:: e_t = e_{t-1} + \dot{e}_{t-1} dt
 
@@ -38,9 +40,9 @@ The change rate of the `e` can be calculated as:
 
 .. math:: \dot{e}_t = V \sin(\theta_{t-1})
 
-Where `V` is the vehicle speed.
+Where `V` is the current vehicle speed.
 
-If the :math:`theta` is small,
+If the :math:`\theta` is small,
 
 .. math:: \theta \approx 0
 
@@ -72,6 +74,9 @@ So, the change rate of the :math:`\theta` can be approximated as:
 
 The above equations can be used to update the state of the vehicle at each time step.
 
+Control Model
+~~~~~~~~~~~~~~
+
 To formulate the state-space representation of the vehicle dynamics as a linear model,
 the state vector `x` and control input vector `u` are defined as follows:
 
@@ -79,7 +84,7 @@ the state vector `x` and control input vector `u` are defined as follows:
 
 .. math:: u_t = \delta_t
 
-The state transition equation can be represented as:
+The linear state transition equation can be represented as:
 
 .. math:: x_{t+1} = A x_t + B u_t
 
