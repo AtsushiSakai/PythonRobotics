@@ -11,9 +11,12 @@ Overview
 ~~~~~~~~
 
 The LQR (Linear Quadratic Regulator) speed and steering control model implemented in `lqr_speed_steer_control.py` provides a simulation
-for an autonomous vehicle to track
-1. a desired speed by adjusting acceleration based on feedback from the current state and the desired speed.
-2. a desired trajectory by adjusting steering angle based on feedback from the current state and the desired trajectory.
+for an autonomous vehicle to track:
+
+1. A desired speed by adjusting acceleration based on feedback from the current state and the desired speed.
+
+2. A desired trajectory by adjusting steering angle based on feedback from the current state and the desired trajectory.
+
 by only using one LQT controller.
 
 Vehicle motion Model
@@ -35,15 +38,15 @@ The :math:`e_t` and :math:`\theta_t`, and :math:`\upsilon` are the updated value
 
 .. math:: \upsilon_t = \upsilon_{t-1} + a_{t-1} dt
 
-Where `dt` is the time difference and `a_t` is the acceleration at the time `t`.
+Where `dt` is the time difference and :math:`a_t` is the acceleration at the time `t`.
 
 The change rate of the `e` can be calculated as:
 
 .. math:: \dot{e}_t = V \sin(\theta_{t-1})
 
-Where `V` is the vehicle speed.
+Where `V` is the current vehicle speed.
 
-If the :math:`theta` is small,
+If the :math:`\theta` is small,
 
 .. math:: \theta \approx 0
 
@@ -75,14 +78,17 @@ So, the change rate of the :math:`\theta` can be approximated as:
 
 The above equations can be used to update the state of the vehicle at each time step.
 
+Control Model
+~~~~~~~~~~~~~~
+
 To formulate the state-space representation of the vehicle dynamics as a linear model,
 the state vector `x` and control input vector `u` are defined as follows:
 
-.. math:: x_t = [e_t, \dot{e}_t, \theta_t, \dot{\theta}_t, \upsilon]^T
+.. math:: x_t = [e_t, \dot{e}_t, \theta_t, \dot{\theta}_t, \upsilon_t]^T
 
 .. math:: u_t = [\delta_t, a_t]^T
 
-The state transition equation can be represented as:
+The linear state transition equation can be represented as:
 
 .. math:: x_{t+1} = A x_t + B u_t
 
