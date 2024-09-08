@@ -16,7 +16,7 @@ which is the distance between the rear wheel center and the front wheel center,
 and the assumption that the turning radius circle passes through the center of
 the rear wheels in the diagram above.
 
-:math:`R = WB / tan(θ)`
+:math:`R = \frac{WB}{tan(θ)}`
 
 Turning radius calculation by 2 consecutive positions of the robot trajectory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
