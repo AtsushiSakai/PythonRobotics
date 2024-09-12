@@ -64,7 +64,7 @@ def transform(
     is_visited = np.zeros_like(transform_matrix, dtype=bool)
     is_visited[src[0], src[1]] = True
     traversal_queue = [src]
-    calculated = [(src[0] - 1) * n_cols + src[1]]
+    calculated = set([(src[0] - 1) * n_cols + src[1]])
 
     def is_valid_neighbor(g_i, g_j):
         return 0 <= g_i < n_rows and 0 <= g_j < n_cols \
@@ -86,7 +86,7 @@ def transform(
                 if not is_visited[ni][nj] \
                         and ((ni - 1) * n_cols + nj) not in calculated:
                     traversal_queue.append((ni, nj))
-                    calculated.append((ni - 1) * n_cols + nj)
+                    calculated.add((ni - 1) * n_cols + nj)
 
     return transform_matrix
 
