@@ -70,7 +70,7 @@ So, the curvature can be calculated as follows.
 
 :math:`\kappa = \frac{2sin\frac{\theta}{2}}{d}`
 
- curvatur4d)neT[BtQVp2Ue change by maximum steering speed
+Target speed by maximum steering speed
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If the maximum steering speed is given as :math:`\dot{\delta}_{max}`,
@@ -86,7 +86,7 @@ the maximum curvature change rate :math:`\dot{\kappa}_{max}` can be calculated a
 
 If we can assume that the vehicle will not exceed the maximum curvature change rate,
 
-the velocity :math:`v_{min}` can be calculated as follows:
+the target minimum velocity :math:`v_{min}` can be calculated as follows:
 
 :math:`v_{min} = \frac{d_{t+1}+d_{t}}{\Delta t} = \frac{d_{t+1}+d_{t}}{(\kappa_{t+1}-\kappa_{t})}\frac{tan\dot{\delta}_{max}}{WB}`
 
