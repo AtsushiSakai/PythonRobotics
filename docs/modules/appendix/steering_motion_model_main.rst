@@ -9,14 +9,38 @@ The turning Radius represents the radius of the circle when the robot turns, as 
 
 .. image:: steering_motion_model/steering_model.png
 
-When the steering angle is tilted by :math:`θ`,
+When the steering angle is tilted by :math:`\delta`,
 the turning radius :math:`R` can be calculated using the following equation,
 based on the geometric relationship between the wheelbase (WB),
 which is the distance between the rear wheel center and the front wheel center,
 and the assumption that the turning radius circle passes through the center of
 the rear wheels in the diagram above.
 
-:math:`R = \frac{WB}{tan(θ)}`
+:math:`R = \frac{WB}{tan\delta}`
+
+The curvature :math:`\kappa` is the reciprocal of the turning radius:
+
+:math:`\kappa = \frac{tan\delta}{WB}`
+
+In the diagram above, the angular difference :math:`\Delta \theta` in the vehicle’s heading between two points on the turning radius :math:`R`
+is the same as the angle of the vector connecting the two points from the center of the turn.
+
+From the formula for the length of an arc and the radius,
+
+:math:`\Delta \theta = \frac{s}{R}`
+
+Here, :math:`s` is the distance between two points on the turning radius.
+
+So, yaw rate :math:`\omega` can be calculated as follows.
+
+:math:`\omega = \frac{v}{R}`
+
+and
+
+:math:`\omega = v\kappa`
+
+here, :math:`v` is the velocity of the vehicle.
+
 
 Turning radius calculation by 2 consecutive positions of the robot trajectory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,6 +69,27 @@ The curvature :math:`\kappa` is the reciprocal of the turning radius.
 So, the curvature can be calculated as follows.
 
 :math:`\kappa = \frac{2sin\frac{\theta}{2}}{d}`
+
+ curvatur4d)neT[BtQVp2Ue change by maximum steering speed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If the maximum steering speed is given as :math:`\dot{\delta}_{max}`,
+the maximum curvature change rate :math:`\dot{\kappa}_{max}` can be calculated as follows:
+
+:math:`\dot{\kappa}_{max} = \frac{tan\dot{\delta}_{max}}{WB}`
+
+From the curvature calculation by 2 consecutive positions of the robot trajectory,
+
+the maximum curvature change rate :math:`\dot{\kappa}_{max}` can be calculated as follows:
+
+:math:`\dot{\kappa}_{max} = \frac{\kappa_{t+1}-\kappa_{t}}{\Delta t}`
+
+If we can assume that the vehicle will not exceed the maximum curvature change rate,
+
+the velocity :math:`v_{min}` can be calculated as follows:
+
+:math:`v_{min} = \frac{d_{t+1}+d_{t}}{\Delta t} = \frac{d_{t+1}+d_{t}}{(\kappa_{t+1}-\kappa_{t})}\frac{tan\dot{\delta}_{max}}{WB}`
+
 
 References:
 ~~~~~~~~~~~
