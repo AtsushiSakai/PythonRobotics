@@ -263,33 +263,33 @@ def main(rng=None):
     print(__file__ + " start!!")
 
     # start and goal position
-    sx = 10.0  # [m]
-    sy = 10.0  # [m]
-    gx = 50.0  # [m]
-    gy = 50.0  # [m]
-    robot_size = 5.0  # [m]
+    sx = 10  # [m]
+    sy = 10  # [m]
+    gx = 50  # [m]
+    gy = 50  # [m]
+    robot_size = 5  # [m]
 
     ox = []
     oy = []
 
     for i in range(60):
         ox.append(i)
-        oy.append(0.0)
+        oy.append(0)
     for i in range(60):
-        ox.append(60.0)
+        ox.append(60)
         oy.append(i)
     for i in range(61):
         ox.append(i)
-        oy.append(60.0)
+        oy.append(60)
     for i in range(61):
-        ox.append(0.0)
+        ox.append(0)
         oy.append(i)
     for i in range(40):
-        ox.append(20.0)
+        ox.append(20)
         oy.append(i)
     for i in range(40):
-        ox.append(40.0)
-        oy.append(60.0 - i)
+        ox.append(40)
+        oy.append(60 - i)
 
     if show_animation:
         plt.plot(ox, oy, ".k")
