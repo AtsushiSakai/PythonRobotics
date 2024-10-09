@@ -203,10 +203,10 @@ def calc_heuristic_map(M, goal_node):
     for i in range(heuristic_map.shape[0]):
         for j in range(heuristic_map.shape[1]):
             heuristic_map[i, j] = min(heuristic_map[i, j],
-                                      i + 1 + heuristic_map[M - 1, j],
-                                      M - i + heuristic_map[0, j],
-                                      j + 1 + heuristic_map[i, M - 1],
-                                      M - j + heuristic_map[i, 0]
+                                      M - i - 1 + heuristic_map[M - 1, j],
+                                      i + heuristic_map[0, j],
+                                      M - j - 1 + heuristic_map[i, M - 1],
+                                      j + heuristic_map[i, 0]
                                       )
 
     return heuristic_map
