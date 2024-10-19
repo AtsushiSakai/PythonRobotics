@@ -105,12 +105,13 @@ def calc_next_node(current, steer, direction, config, ox, oy, kd_tree):
     x, y, yaw = current.x_list[-1], current.y_list[-1], current.yaw_list[-1]
 
     arc_l = XY_GRID_RESOLUTION * 1.5
-    x_list, y_list, yaw_list = [], [], []
+    x_list, y_list, yaw_list, direction_list = [], [], [], []
     for _ in np.arange(0, arc_l, MOTION_RESOLUTION):
         x, y, yaw = move(x, y, yaw, MOTION_RESOLUTION * direction, steer)
         x_list.append(x)
         y_list.append(y)
         yaw_list.append(yaw)
+        direction_list.append(direction == 1)
 
     if not check_car_collision(x_list, y_list, yaw_list, ox, oy, kd_tree):
         return None
@@ -134,7 +135,7 @@ def calc_next_node(current, steer, direction, config, ox, oy, kd_tree):
     cost = current.cost + added_cost + arc_l
 
     node = Node(x_ind, y_ind, yaw_ind, d, x_list,
-                y_list, yaw_list, [d],
+                y_list, yaw_list, direction_list,
                 parent_index=calc_index(current, config),
                 cost=cost, steer=steer)
 
