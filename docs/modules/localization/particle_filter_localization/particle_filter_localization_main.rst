@@ -34,4 +34,4 @@ References:
 ~~~~~~~~~~~
 
 - `_PROBABILISTIC ROBOTICS: <http://www.probabilistic-robotics.org>`_
-- `Improving the particle filter in high dimensions using conjugate artificial process noise <https://arxiv.org/pdf/1801.07000.pdf>`_
+- `Improving the particle filter in high dimensions using conjugate artificial process noise <https://arxiv.org/pdf/1801.07000>`_

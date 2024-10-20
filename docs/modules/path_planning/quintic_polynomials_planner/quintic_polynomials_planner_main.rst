@@ -101,6 +101,6 @@ References:
 ~~~~~~~~~~~
 
 -  `Local Path Planning And Motion Control For Agv In
-   Positioning <http://ieeexplore.ieee.org/document/637936/>`__
+   Positioning <https://ieeexplore.ieee.org/document/637936/>`__
 
 

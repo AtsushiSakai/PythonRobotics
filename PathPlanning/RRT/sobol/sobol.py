@@ -13,7 +13,7 @@
     PYTHON versions by Corrado Chisari
 
     Original code is available at
-    http://people.sc.fsu.edu/~jburkardt/py_src/sobol/sobol.html
+    https://people.sc.fsu.edu/~jburkardt/py_src/sobol/sobol.html
 
     Note: the i4 prefix means that the function takes a numeric argument or
           returns a number which is interpreted inside the function as a 4

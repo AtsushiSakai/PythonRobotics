@@ -159,6 +159,6 @@ Sponsors
 .. _`JetBrains`: https://www.jetbrains.com/
 .. _`Sponsor @AtsushiSakai on GitHub Sponsors`: https://github.com/sponsors/AtsushiSakai
 .. _`Become a backer or sponsor on Patreon`: https://www.patreon.com/myenigma
-.. _`One-time donation via PayPal`: https://www.paypal.me/myenigmapay/
+.. _`One-time donation via PayPal`: https://www.paypal.com/paypalme/myenigmapay/
 
 

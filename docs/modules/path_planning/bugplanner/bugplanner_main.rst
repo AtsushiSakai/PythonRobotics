@@ -5,4 +5,4 @@ This is a 2D planning with Bug algorithm.
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/BugPlanner/animation.gif
 
-- `ECE452 Bug Algorithms <https://sites.google.com/site/ece452bugalgorithms/>`_
+- `ECE452 Bug Algorithms <https://web.archive.org/web/20201103052224/https://sites.google.com/site/ece452bugalgorithms/>`_

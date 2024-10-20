@@ -6,7 +6,7 @@ author Atsushi Sakai (@Atsushi_twi)
 
 Ref:
 Shunichi09/nonlinear_control: Implementing the nonlinear model predictive
-control, sliding mode control https://github.com/Shunichi09/nonlinear_control
+control, sliding mode control https://github.com/Shunichi09/PythonLinearNonlinearControl
 
 """
 

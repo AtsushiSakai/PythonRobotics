@@ -134,4 +134,4 @@ Reference
    Springer <http://www.springer.com/us/book/9781461414322>`__
 
 -  `MPC Course Material - MPC Lab @
-   UC-Berkeley <http://www.mpc.berkeley.edu/mpc-course-material>`__
+   UC-Berkeley <http://www.mpc.berkeley.edu/mpc-course-material/>`__
