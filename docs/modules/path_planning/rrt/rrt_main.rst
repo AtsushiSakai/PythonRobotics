@@ -57,7 +57,7 @@ Ref:
 
 -  `Informed RRT\*: Optimal Sampling-based Path Planning Focused via
    Direct Sampling of an Admissible Ellipsoidal
-   Heuristic <https://arxiv.org/pdf/1404.2334.pdf>`__
+   Heuristic <https://arxiv.org/pdf/1404.2334>`__
 
 .. _batch-informed-rrt*:
 
@@ -90,10 +90,10 @@ PID is used for speed control.
 Ref:
 
 -  `Motion Planning in Complex Environments using Closed-loop
-   Prediction <http://acl.mit.edu/papers/KuwataGNC08.pdf>`__
+   Prediction <https://acl.mit.edu/papers/KuwataGNC08.pdf>`__
 
 -  `Real-time Motion Planning with Applications to Autonomous Urban
-   Driving <http://acl.mit.edu/papers/KuwataTCST09.pdf>`__
+   Driving <https://acl.mit.edu/papers/KuwataTCST09.pdf>`__
 
 -  `[1601.06326] Sampling-based Algorithms for Optimal Motion Planning
    Using Closed-loop Prediction <https://arxiv.org/abs/1601.06326>`__
@@ -113,6 +113,6 @@ Ref:
 
 -  `LQR-RRT\*: Optimal Sampling-Based Motion Planning with Automatically
    Derived Extension
-   Heuristics <http://lis.csail.mit.edu/pubs/perez-icra12.pdf>`__
+   Heuristics <https://lis.csail.mit.edu/pubs/perez-icra12.pdf>`__
 
 -  `MahanFathi/LQR-RRTstar: LQR-RRT\* method is used for random motion planning of a simple pendulum in its phase plot <https://github.com/MahanFathi/LQR-RRTstar>`__

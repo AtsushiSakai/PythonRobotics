@@ -29,6 +29,6 @@ This is a 2D grid based wavefront coverage path planner simulation:
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/WavefrontCPP/animation2.gif
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/WavefrontCPP/animation3.gif
 
-- `Planning paths of complete coverage of an unstructured environment by a mobile robot <http://pinkwink.kr/attachment/cfile3.uf@1354654A4E8945BD13FE77.pdf>`_
+- `Planning paths of complete coverage of an unstructured environment by a mobile robot <https://pinkwink.kr/attachment/cfile3.uf@1354654A4E8945BD13FE77.pdf>`_
 
 
