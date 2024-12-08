@@ -6,7 +6,7 @@ author: Karan Chawla
 
 Reference: Informed RRT*: Optimal Sampling-based Path planning Focused via
 Direct Sampling of an Admissible Ellipsoidal Heuristic
-https://arxiv.org/pdf/1404.2334.pdf
+https://arxiv.org/pdf/1404.2334
 
 """
 import sys

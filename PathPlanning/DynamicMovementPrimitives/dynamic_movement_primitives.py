@@ -9,7 +9,7 @@ stretch a curve by adjusting its start and end points.
 
 More information on Dynamic Movement Primitives available at:
 https://arxiv.org/abs/2102.03861
-https://www.frontiersin.org/articles/10.3389/fncom.2013.00138/full
+https://www.frontiersin.org/journals/computational-neuroscience/articles/10.3389/fncom.2013.00138/full
 
 """
 

@@ -66,7 +66,7 @@ def detect_collision(line_seg, circle):
     """
     Determines whether a line segment (arm link) is in contact
     with a circle (obstacle).
-    Credit to: http://doswa.com/2009/07/13/circle-segment-intersectioncollision.html
+    Credit to: https://web.archive.org/web/20200130224918/http://doswa.com/2009/07/13/circle-segment-intersectioncollision.html
     Args:
         line_seg: List of coordinates of line segment endpoints e.g. [[1, 1], [2, 2]]
         circle: List of circle coordinates and radius e.g. [0, 0, 0.5] is a circle centered
