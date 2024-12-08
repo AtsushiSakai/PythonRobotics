@@ -6,6 +6,10 @@ author Atsushi Sakai(@Atsushi_twi)
 co-author Videh Patel(@videh25) : Added the missing RS paths
 
 """
+import sys
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
+
 import math
 
 import matplotlib.pyplot as plt
