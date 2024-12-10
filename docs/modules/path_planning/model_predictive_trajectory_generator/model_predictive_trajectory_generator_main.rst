@@ -19,4 +19,4 @@ Lookup table generation sample
 Ref:
 
 -  `Optimal rough terrain trajectory generation for wheeled mobile
-   robots <http://journals.sagepub.com/doi/pdf/10.1177/0278364906075328>`__
+   robots <https://journals.sagepub.com/doi/pdf/10.1177/0278364906075328>`__

@@ -16,6 +16,6 @@ Simulation
 
 Ref
 ^^^
--  `Sampling-based Algorithms for Optimal Motion Planning <https://arxiv.org/pdf/1105.1186.pdf>`__
+-  `Sampling-based Algorithms for Optimal Motion Planning <https://arxiv.org/pdf/1105.1186>`__
 -  `Incremental Sampling-based Algorithms for Optimal Motion Planning <https://arxiv.org/abs/1005.0416>`__
 
