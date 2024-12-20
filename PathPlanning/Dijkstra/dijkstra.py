@@ -211,11 +211,11 @@ def main():
     print(__file__ + " start!!")
 
     # start and goal position
-    sx = -5.0  # [m]
-    sy = -5.0  # [m]
-    gx = 50.0  # [m]
-    gy = 50.0  # [m]
-    grid_size = 2.0  # [m]
+    sx = -5  # [m]
+    sy = -5  # [m]
+    gx = 50  # [m]
+    gy = 50  # [m]
+    grid_size = 2  # [m]
     robot_radius = 1.0  # [m]
 
     # set obstacle positions
@@ -236,8 +236,8 @@ def main():
         ox.append(20.0)
         oy.append(float(i))
     for i in range(0, 40):
-        ox.append(40.0)
-        oy.append(60.0 - i)
+        ox.append(40)
+        oy.append(60 - i)
 
     if show_animation:  # pragma: no cover
         plt.plot(ox, oy, ".k")
