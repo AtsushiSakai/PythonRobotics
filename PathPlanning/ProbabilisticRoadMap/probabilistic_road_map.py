@@ -273,20 +273,20 @@ def main(rng=None):
     oy = []
 
     for i in range(60):
-        ox.append(i)
+        ox.append(float(i))
         oy.append(0.0)
     for i in range(60):
         ox.append(60.0)
-        oy.append(i)
+        oy.append(float(i))
     for i in range(61):
-        ox.append(i)
+        ox.append(float(i))
         oy.append(60.0)
     for i in range(61):
         ox.append(0.0)
-        oy.append(i)
+        oy.append(float(i))
     for i in range(40):
         ox.append(20.0)
-        oy.append(i)
+        oy.append(float(i))
     for i in range(40):
         ox.append(40.0)
         oy.append(60.0 - i)
