@@ -282,7 +282,7 @@ def hybrid_a_star_planning(start, goal, ox, oy, xy_resolution, yaw_resolution):
     while True:
         if not openList:
             print("Error: Cannot find path, No open set")
-            return [], [], []
+            return Path([], [], [], [], 0)
 
         cost, c_id = heapq.heappop(pq)
         if c_id in openList:

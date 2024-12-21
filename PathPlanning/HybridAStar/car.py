@@ -97,7 +97,7 @@ def pi_2_pi(angle):
 def move(x, y, yaw, distance, steer, L=WB):
     x += distance * cos(yaw)
     y += distance * sin(yaw)
-    yaw += pi_2_pi(distance * tan(steer) / L)  # distance/2
+    yaw = pi_2_pi(yaw + distance * tan(steer) / L)  # distance/2
 
     return x, y, yaw
 
