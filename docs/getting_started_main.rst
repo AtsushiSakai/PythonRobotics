@@ -49,7 +49,7 @@ For development:
 .. _`pytest-xdist`: https://github.com/pytest-dev/pytest-xdist
 .. _`mypy`: https://mypy-lang.org/
 .. _`sphinx`: https://www.sphinx-doc.org/en/master/index.html
-.. _`ruff`: https://github.com/charliermarsh/ruff
+.. _`ruff`: https://github.com/astral-sh/ruff
 
 
 How to use

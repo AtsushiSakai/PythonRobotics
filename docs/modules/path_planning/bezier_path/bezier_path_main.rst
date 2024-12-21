@@ -17,4 +17,4 @@ Ref:
 
 -  `Continuous Curvature Path Generation Based on Bezier Curves for
    Autonomous
-   Vehicles <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.294.6438&rep=rep1&type=pdf>`__
+   Vehicles <https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=b00b657c3e0e828c589132a14825e7119772003d>`

@@ -60,7 +60,7 @@ Ref
 
 -  `Shunichi09/nonlinear_control: Implementing the nonlinear model
    predictive control, sliding mode
-   control <https://github.com/Shunichi09/nonlinear_control>`__
+   control <https://github.com/Shunichi09/PythonLinearNonlinearControl>`__
 
 -  `非線形モデル予測制御におけるCGMRES法をpythonで実装する -
    Qiita <https://qiita.com/MENDY/items/4108190a579395053924>`__
