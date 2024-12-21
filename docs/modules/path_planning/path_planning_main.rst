@@ -18,6 +18,7 @@ Path Planning
    rrt/rrt
    cubic_spline/cubic_spline
    bspline_path/bspline_path
+   catmull_rom_spline/catmull_rom_spline
    clothoid_path/clothoid_path
    eta3_spline/eta3_spline
    bezier_path/bezier_path
