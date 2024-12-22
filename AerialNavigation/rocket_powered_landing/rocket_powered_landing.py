@@ -536,7 +536,7 @@ class SCProblem:
             with warnings.catch_warnings():  # For User warning from solver
                 warnings.simplefilter('ignore')
                 self.prob.solve(verbose=verbose_solver,
-                            solver=solver)
+                            solver=cvxpy.ECOS)
         except cvxpy.SolverError:
             error = True
 
