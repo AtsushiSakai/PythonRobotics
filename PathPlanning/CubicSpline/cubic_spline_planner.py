@@ -137,6 +137,27 @@ class CubicSpline1D:
         ddy = 2.0 * self.c[i] + 6.0 * self.d[i] * dx
         return ddy
 
+    def calc_third_derivative(self, x):
+        """
+        Calc third derivative at given x.
+
+        if x is outside the input x, return None
+
+        Returns
+        -------
+        dddy : float
+            third derivative for given x.
+        """
+        if x < self.x[0]:
+            return None
+        elif x > self.x[-1]:
+            return None
+
+        i = self.__search_index(x)
+        dx = x - self.x[i]
+        dddy = 6.0 * self.d[i]
+        return dddy
+
     def __search_index(self, x):
         """
         search data segment index
@@ -286,6 +307,33 @@ class CubicSpline2D:
         ddy = self.sy.calc_second_derivative(s)
         k = (ddy * dx - ddx * dy) / ((dx ** 2 + dy ** 2)**(3 / 2))
         return k
+
+    def calc_curvature_rate(self, s):
+        """
+        calc curvature rate
+
+        Parameters
+        ----------
+        s : float
+            distance from the start point. if `s` is outside the data point's
+            range, return None.
+
+        Returns
+        -------
+        k : float
+            curvature rate for given s.
+        """
+        dx = self.sx.calc_first_derivative(s)
+        dy = self.sy.calc_first_derivative(s)
+        ddx = self.sx.calc_second_derivative(s)
+        ddy = self.sy.calc_second_derivative(s)
+        dddx = self.sx.calc_third_derivative(s)
+        dddy = self.sy.calc_third_derivative(s)
+        a = dx * ddy - dy * ddx
+        b = dx * dddy - dy * dddx
+        c = dx * ddx + dy * ddy
+        d = dx * dx + dy * dy
+        return (b * d - 3.0 * a * c) / (d * d * d)
 
     def calc_yaw(self, s):
         """
