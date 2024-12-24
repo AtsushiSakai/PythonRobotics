@@ -310,6 +310,8 @@ class MergingAndStoppingLongitudinalMovementStrategy(LongitudinalMovementStrateg
         ds = (STOP_S - fp.s[-1]) ** 2
         return K_S * ds
 
+LATERAL_MOVEMENT_STRATEGY: LateralMovementStrategy
+LONGITUDINAL_MOVEMENT_STRATEGY: LongitudinalMovementStrategy
 
 if LATERAL_MOVEMENT == LateralMovement.HighSpeed:
     LATERAL_MOVEMENT_STRATEGY = HighSpeedLateralMovementStrategy()
