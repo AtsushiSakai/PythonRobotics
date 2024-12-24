@@ -154,7 +154,6 @@ class CubicSpline1D:
             return None
 
         i = self.__search_index(x)
-        dx = x - self.x[i]
         dddy = 6.0 * self.d[i]
         return dddy
 
