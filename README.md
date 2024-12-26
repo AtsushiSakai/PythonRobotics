@@ -5,7 +5,6 @@
 ![GitHub_Action_MacOS_CI](https://github.com/AtsushiSakai/PythonRobotics/workflows/MacOS_CI/badge.svg)
 ![GitHub_Action_Windows_CI](https://github.com/AtsushiSakai/PythonRobotics/workflows/Windows_CI/badge.svg)
 [![Build status](https://ci.appveyor.com/api/projects/status/sb279kxuv1be391g?svg=true)](https://ci.appveyor.com/project/AtsushiSakai/pythonrobotics)
-[![codecov](https://codecov.io/gh/AtsushiSakai/PythonRobotics/branch/master/graph/badge.svg)](https://codecov.io/gh/AtsushiSakai/PythonRobotics)
 
 Python codes for robotics algorithm.
 

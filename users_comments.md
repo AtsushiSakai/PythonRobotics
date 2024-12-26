@@ -17,13 +17,7 @@ Ref:
 
 # Educational users
 
-This is a list of users who are using PythonRobotics for education.
-
-If you found other users, please make an issue to let me know.
-
-- [CSCI/ARTI 4530/6530: Introduction to Robotics (Fall 2018),  University of Georgia ](http://cobweb.cs.uga.edu/~ramviyas/csci_x530.html)
-
-- [CIT Modules & Programmes \- COMP9073 \- Automation with Python](https://courses.cit.ie/index.cfm/page/module/moduleId/14416)
+If you found users who are using PythonRobotics for education, please make an issue to let me know.
 
 # Stargazers location map
 
