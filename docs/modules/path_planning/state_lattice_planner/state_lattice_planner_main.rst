@@ -25,9 +25,9 @@ Lane sampling
 Ref:
 
 -  `Optimal rough terrain trajectory generation for wheeled mobile
-   robots <http://journals.sagepub.com/doi/pdf/10.1177/0278364906075328>`__
+   robots <https://journals.sagepub.com/doi/pdf/10.1177/0278364906075328>`__
 
 -  `State Space Sampling of Feasible Motions for High-Performance Mobile
    Robot Navigation in Complex
-   Environments <http://www.frc.ri.cmu.edu/~alonzo/pubs/papers/JFR_08_SS_Sampling.pdf>`__
+   Environments <https://www.frc.ri.cmu.edu/~alonzo/pubs/papers/JFR_08_SS_Sampling.pdf>`__
 

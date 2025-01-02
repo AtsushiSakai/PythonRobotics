@@ -12,8 +12,8 @@ Ref:
 
 - State Space Sampling of Feasible Motions for High-Performance Mobile Robot
 Navigation in Complex Environments
-http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.187.8210&rep=rep1
-&type=pdf
+https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf
+&doi=e2256b5b24137f89e473f01df288cb3aa72e56a0
 
 """
 import sys
