@@ -263,11 +263,11 @@ def main(rng=None):
     print(__file__ + " start!!")
 
     # start and goal position
-    sx = 10  # [m]
-    sy = 10  # [m]
-    gx = 50  # [m]
-    gy = 50  # [m]
-    robot_size = 5  # [m]
+    sx = 10.0  # [m]
+    sy = 10.0  # [m]
+    gx = 50.0  # [m]
+    gy = 50.0  # [m]
+    robot_size = 5.0  # [m]
 
     ox = []
     oy = []

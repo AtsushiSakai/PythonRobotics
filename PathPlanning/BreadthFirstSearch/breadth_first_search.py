@@ -210,12 +210,12 @@ def main():
     print(__file__ + " start!!")
 
     # start and goal position
-    sx = 10  # [m]
-    sy = 10  # [m]
-    gx = 50  # [m]
-    gy = 50  # [m]
-    grid_size = 2  # [m]
-    robot_radius = 1  # [m]
+    sx = 10.0  # [m]
+    sy = 10.0  # [m]
+    gx = 50.0  # [m]
+    gy = 50.0  # [m]
+    grid_size = 2.0  # [m]
+    robot_radius = 1.0  # [m]
 
     # set obstacle positions
     ox, oy = [], []
