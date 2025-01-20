@@ -78,43 +78,43 @@ def boundary_and_obstacles(start, goal, top_vertex, bottom_vertex, obs_number):
 
 
 def find_neighbor(node, ob, closed):
-    # generate neighbors in certain condition
-    ob_list = ob.tolist()
-    neighbor: list = []
+    # Convert obstacles to a set for faster lookup
+    ob_set = set(map(tuple, ob.tolist()))  
+    neighbor_set = set()
+
+    # Generate neighbors within the 3x3 grid around the node
     for x in range(node.coordinate[0] - 1, node.coordinate[0] + 2):
         for y in range(node.coordinate[1] - 1, node.coordinate[1] + 2):
-            if [x, y] not in ob_list:
-                # find all possible neighbor nodes
-                neighbor.append([x, y])
-    # remove node violate the motion rule
-    # 1. remove node.coordinate itself
-    neighbor.remove(node.coordinate)
-    # 2. remove neighbor nodes who cross through two diagonal
-    # positioned obstacles since there is no enough space for
-    # robot to go through two diagonal positioned obstacles
+            coord = (x, y)
+            if coord not in ob_set and coord != tuple(node.coordinate):
+                neighbor_set.add(coord)
 
-    # top bottom left right neighbors of node
-    top_nei = [node.coordinate[0], node.coordinate[1] + 1]
-    bottom_nei = [node.coordinate[0], node.coordinate[1] - 1]
-    left_nei = [node.coordinate[0] - 1, node.coordinate[1]]
-    right_nei = [node.coordinate[0] + 1, node.coordinate[1]]
-    # neighbors in four vertex
-    lt_nei = [node.coordinate[0] - 1, node.coordinate[1] + 1]
-    rt_nei = [node.coordinate[0] + 1, node.coordinate[1] + 1]
-    lb_nei = [node.coordinate[0] - 1, node.coordinate[1] - 1]
-    rb_nei = [node.coordinate[0] + 1, node.coordinate[1] - 1]
+    # Define neighbors in cardinal and diagonal directions
+    top_nei = (node.coordinate[0], node.coordinate[1] + 1)
+    bottom_nei = (node.coordinate[0], node.coordinate[1] - 1)
+    left_nei = (node.coordinate[0] - 1, node.coordinate[1])
+    right_nei = (node.coordinate[0] + 1, node.coordinate[1])
+    lt_nei = (node.coordinate[0] - 1, node.coordinate[1] + 1)
+    rt_nei = (node.coordinate[0] + 1, node.coordinate[1] + 1)
+    lb_nei = (node.coordinate[0] - 1, node.coordinate[1] - 1)
+    rb_nei = (node.coordinate[0] + 1, node.coordinate[1] - 1)
 
-    # remove the unnecessary neighbors
-    if top_nei and left_nei in ob_list and lt_nei in neighbor:
-        neighbor.remove(lt_nei)
-    if top_nei and right_nei in ob_list and rt_nei in neighbor:
-        neighbor.remove(rt_nei)
-    if bottom_nei and left_nei in ob_list and lb_nei in neighbor:
-        neighbor.remove(lb_nei)
-    if bottom_nei and right_nei in ob_list and rb_nei in neighbor:
-        neighbor.remove(rb_nei)
-    neighbor = [x for x in neighbor if x not in closed]
-    return neighbor
+    # Remove neighbors that violate diagonal motion rules
+    if top_nei in ob_set and left_nei in ob_set:
+        neighbor_set.discard(lt_nei)
+    if top_nei in ob_set and right_nei in ob_set:
+        neighbor_set.discard(rt_nei)
+    if bottom_nei in ob_set and left_nei in ob_set:
+        neighbor_set.discard(lb_nei)
+    if bottom_nei in ob_set and right_nei in ob_set:
+        neighbor_set.discard(rb_nei)
+
+    # Filter out neighbors that are in the closed set
+    closed_set = set(map(tuple, closed))
+    neighbor_set -= closed_set
+
+    return list(neighbor_set)
+
 
 
 def find_node_index(coordinate, node_list):
