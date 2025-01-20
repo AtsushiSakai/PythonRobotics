@@ -288,8 +288,8 @@ def main(rng=None):
         ox.append(20.0)
         oy.append(float(i))
     for i in range(40):
-        ox.append(40)
-        oy.append(60 - i)
+        ox.append(40.0)
+        oy.append(60.0 - i)
 
     if show_animation:
         plt.plot(ox, oy, ".k")
