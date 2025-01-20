@@ -76,6 +76,11 @@ class CubicSpline1D:
 
         if `x` is outside the data point's `x` range, return None.
 
+        Parameters
+        ----------
+        x : float
+            x position to calculate y.
+
         Returns
         -------
         y : float
@@ -99,6 +104,11 @@ class CubicSpline1D:
 
         if x is outside the input x, return None
 
+        Parameters
+        ----------
+        x : float
+            x position to calculate first derivative.
+
         Returns
         -------
         dy : float
@@ -121,6 +131,11 @@ class CubicSpline1D:
 
         if x is outside the input x, return None
 
+        Parameters
+        ----------
+        x : float
+            x position to calculate second derivative.
+
         Returns
         -------
         ddy : float
@@ -142,6 +157,11 @@ class CubicSpline1D:
         Calc third derivative at given x.
 
         if x is outside the input x, return None
+
+        Parameters
+        ----------
+        x : float
+            x position to calculate third derivative.
 
         Returns
         -------

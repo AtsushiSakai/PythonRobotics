@@ -549,16 +549,6 @@ def main():
             )
             plt.plot(tx, ty)
             plt.plot(OBSTACLES[:, 0], OBSTACLES[:, 1], "xk")
-            # for fp in fpdict["max_speed_error"]:
-            #     plt.plot(fp.x[1:], fp.y[1:], "-m")
-            # for fp in fpdict["max_accel_error"]:
-            #     plt.plot(fp.x[1:], fp.y[1:], "-y")
-            # for fp in fpdict["max_curvature_error"]:
-            #     plt.plot(fp.x[1:], fp.y[1:], "-k")
-            # for fp in fpdict["collision_error"]:
-            #     plt.plot(fp.x[1:], fp.y[1:], "-b")
-            # for fp in fpdict["ok"]:
-            #     plt.plot(fp.x[1:], fp.y[1:], "-g")
             plt.plot(path.x[1:], path.y[1:], "-or")
             plt.plot(path.x[1], path.y[1], "vc")
             plt.xlim(path.x[1] - area, path.x[1] + area)

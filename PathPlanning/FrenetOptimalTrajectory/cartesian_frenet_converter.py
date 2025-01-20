@@ -49,7 +49,7 @@ class CartesianFrenetConverter:
         sin_theta_r = math.sin(rtheta)
 
         cross_rd_nd = cos_theta_r * dy - sin_theta_r * dx
-        d = math.copysign(math.sqrt(dx * dx + dy * dy), cross_rd_nd)
+        d = math.copysign(math.hypot(dx, dy), cross_rd_nd)
 
         delta_theta = theta - rtheta
         tan_delta_theta = math.tan(delta_theta)
