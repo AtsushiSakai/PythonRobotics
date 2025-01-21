@@ -32,19 +32,19 @@ from FrenetOptimalTrajectory.cartesian_frenet_converter import (
 
 
 class LateralMovement(Enum):
-    HighSpeed = auto()
-    LowSpeed = auto()
+    HIGH_SPEED = auto()
+    LOW_SPEED = auto()
 
 
 class LongitudinalMovement(Enum):
-    MergingAndStopping = auto()
-    VelocityKeeping = auto()
+    MERGING_AND_STOPPING = auto()
+    VELOCITY_KEEPING = auto()
 
 
 # Parameter
 
-LATERAL_MOVEMENT = LateralMovement.HighSpeed
-LONGITUDINAL_MOVEMENT = LongitudinalMovement.VelocityKeeping
+LATERAL_MOVEMENT = LateralMovement.HIGH_SPEED
+LONGITUDINAL_MOVEMENT = LongitudinalMovement.VELOCITY_KEEPING
 
 MAX_SPEED = 50.0 / 3.6  # maximum speed [m/s]
 MAX_ACCEL = 5.0  # maximum acceleration [m/ss]
