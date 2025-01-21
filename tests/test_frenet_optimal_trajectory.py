@@ -14,32 +14,32 @@ def test1():
 
 def test2():
     m.show_animation = False
-    m.LATERAL_MOVEMENT = LateralMovement.HighSpeed
-    m.LONGITUDINAL_MOVEMENT = LongitudinalMovement.MergingAndStopping
+    m.LATERAL_MOVEMENT = LateralMovement.HIGH_SPEED
+    m.LONGITUDINAL_MOVEMENT = LongitudinalMovement.MERGING_AND_STOPPING
     m.SIM_LOOP = 5
     m.main()
 
 
 def test3():
     m.show_animation = False
-    m.LATERAL_MOVEMENT = LateralMovement.HighSpeed
-    m.LONGITUDINAL_MOVEMENT = LongitudinalMovement.VelocityKeeping
+    m.LATERAL_MOVEMENT = LateralMovement.HIGH_SPEED
+    m.LONGITUDINAL_MOVEMENT = LongitudinalMovement.VELOCITY_KEEPING
     m.SIM_LOOP = 5
     m.main()
 
 
 def test4():
     m.show_animation = False
-    m.LATERAL_MOVEMENT = LateralMovement.HighSpeed
-    m.LONGITUDINAL_MOVEMENT = LongitudinalMovement.VelocityKeeping
+    m.LATERAL_MOVEMENT = LateralMovement.HIGH_SPEED
+    m.LONGITUDINAL_MOVEMENT = LongitudinalMovement.VELOCITY_KEEPING
     m.SIM_LOOP = 5
     m.main()
 
 
 def test5():
     m.show_animation = False
-    m.LATERAL_MOVEMENT = LateralMovement.HighSpeed
-    m.LONGITUDINAL_MOVEMENT = LongitudinalMovement.MergingAndStopping
+    m.LATERAL_MOVEMENT = LateralMovement.HIGH_SPEED
+    m.LONGITUDINAL_MOVEMENT = LongitudinalMovement.MERGING_AND_STOPPING
     m.SIM_LOOP = 5
     m.main()
 

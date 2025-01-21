@@ -67,7 +67,7 @@ SIM_LOOP = 500
 show_animation = True
 
 
-if LATERAL_MOVEMENT == LateralMovement.LowSpeed:
+if LATERAL_MOVEMENT == LateralMovement.LOW_SPEED:
     MAX_ROAD_WIDTH = 1.0  # maximum road width [m]
     D_ROAD_W = 0.2  # road width sampling length [m]
     TARGET_SPEED = 3.0 / 3.6  # maximum speed [m/s]
@@ -313,12 +313,12 @@ class MergingAndStoppingLongitudinalMovementStrategy(LongitudinalMovementStrateg
 LATERAL_MOVEMENT_STRATEGY: LateralMovementStrategy
 LONGITUDINAL_MOVEMENT_STRATEGY: LongitudinalMovementStrategy
 
-if LATERAL_MOVEMENT == LateralMovement.HighSpeed:
+if LATERAL_MOVEMENT == LateralMovement.HIGH_SPEED:
     LATERAL_MOVEMENT_STRATEGY = HighSpeedLateralMovementStrategy()
 else:
     LATERAL_MOVEMENT_STRATEGY = LowSpeedLateralMovementStrategy()
 
-if LONGITUDINAL_MOVEMENT == LongitudinalMovement.VelocityKeeping:
+if LONGITUDINAL_MOVEMENT == LongitudinalMovement.VELOCITY_KEEPING:
     LONGITUDINAL_MOVEMENT_STRATEGY = VelocityKeepingLongitudinalMovementStrategy()
 else:
     LONGITUDINAL_MOVEMENT_STRATEGY = MergingAndStoppingLongitudinalMovementStrategy()
