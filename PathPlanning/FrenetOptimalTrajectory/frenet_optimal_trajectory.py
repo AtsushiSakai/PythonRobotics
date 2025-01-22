@@ -41,7 +41,7 @@ class LongitudinalMovement(Enum):
     VELOCITY_KEEPING = auto()
 
 
-# Parameter
+# Default Parameters
 
 LATERAL_MOVEMENT = LateralMovement.HIGH_SPEED
 LONGITUDINAL_MOVEMENT = LongitudinalMovement.VELOCITY_KEEPING

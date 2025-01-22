@@ -6,13 +6,13 @@ from PathPlanning.FrenetOptimalTrajectory.frenet_optimal_trajectory import (
 )
 
 
-def test1():
+def default_scenario_test():
     m.show_animation = False
     m.SIM_LOOP = 5
     m.main()
 
 
-def test2():
+def high_speed_and_merging_and_stopping_scenario_test():
     m.show_animation = False
     m.LATERAL_MOVEMENT = LateralMovement.HIGH_SPEED
     m.LONGITUDINAL_MOVEMENT = LongitudinalMovement.MERGING_AND_STOPPING
@@ -20,7 +20,7 @@ def test2():
     m.main()
 
 
-def test3():
+def high_speed_and_velocity_keeping_scenario_test():
     m.show_animation = False
     m.LATERAL_MOVEMENT = LateralMovement.HIGH_SPEED
     m.LONGITUDINAL_MOVEMENT = LongitudinalMovement.VELOCITY_KEEPING
@@ -28,17 +28,17 @@ def test3():
     m.main()
 
 
-def test4():
+def low_speed_and_velocity_keeping_scenario_test():
     m.show_animation = False
-    m.LATERAL_MOVEMENT = LateralMovement.HIGH_SPEED
+    m.LATERAL_MOVEMENT = LateralMovement.LOW_SPEED
     m.LONGITUDINAL_MOVEMENT = LongitudinalMovement.VELOCITY_KEEPING
     m.SIM_LOOP = 5
     m.main()
 
 
-def test5():
+def low_speed_and_merging_and_stopping_scenario_test():
     m.show_animation = False
-    m.LATERAL_MOVEMENT = LateralMovement.HIGH_SPEED
+    m.LATERAL_MOVEMENT = LateralMovement.LOW_SPEED
     m.LONGITUDINAL_MOVEMENT = LongitudinalMovement.MERGING_AND_STOPPING
     m.SIM_LOOP = 5
     m.main()
