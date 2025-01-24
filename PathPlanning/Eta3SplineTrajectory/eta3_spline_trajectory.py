@@ -26,8 +26,7 @@ show_animation = True
 
 class MaxVelocityNotReached(Exception):
     def __init__(self, actual_vel, max_vel):
-        self.message = 'Actual velocity {} does not equal desired max velocity {}!'.format(
-            actual_vel, max_vel)
+        self.message = f'Actual velocity {actual_vel} does not equal desired max velocity {max_vel}!'
 
 
 class eta3_trajectory(Eta3Path):
@@ -42,7 +41,7 @@ class eta3_trajectory(Eta3Path):
         # ensure that all inputs obey the assumptions of the model
         assert max_vel > 0 and v0 >= 0 and a0 >= 0 and max_accel > 0 and max_jerk > 0 \
             and a0 <= max_accel and v0 <= max_vel
-        super(eta3_trajectory, self).__init__(segments=segments)
+        super(__class__, self).__init__(segments=segments)
         self.total_length = sum([s.segment_length for s in self.segments])
         self.max_vel = float(max_vel)
         self.v0 = float(v0)
@@ -166,7 +165,7 @@ class eta3_trajectory(Eta3Path):
         try:
             assert np.isclose(self.vels[index], 0)
         except AssertionError as e:
-            print('The final velocity {} is not zero'.format(self.vels[index]))
+            print(f'The final velocity {self.vels[index]} is not zero')
             raise e
 
         self.seg_lengths[index] = s_sf

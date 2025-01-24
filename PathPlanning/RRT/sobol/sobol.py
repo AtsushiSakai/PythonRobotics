@@ -370,8 +370,8 @@ def i4_sobol(dim_num, seed):
         if (dim_num < 1 or dim_max < dim_num):
             print('I4_SOBOL - Fatal error!')
             print('    The spatial dimension DIM_NUM should satisfy:')
-            print('        1 <= DIM_NUM <= %d' % dim_max)
-            print('    But this input value is DIM_NUM = %d' % dim_num)
+            print(f'        1 <= DIM_NUM <= {dim_max:d}')
+            print(f'    But this input value is DIM_NUM = {dim_num:d}')
             return None
 
         dim_num_save = dim_num
@@ -443,7 +443,7 @@ def i4_sobol(dim_num, seed):
         #
         l_var = i4_bit_lo0(seed)
 
-    elif (seed <= seed_save):
+    elif seed <= seed_save:
 
         seed_save = 0
         lastq = np.zeros(dim_num)
@@ -471,8 +471,8 @@ def i4_sobol(dim_num, seed):
     if maxcol < l_var:
         print('I4_SOBOL - Fatal error!')
         print('    Too many calls!')
-        print('    MAXCOL = %d\n' % maxcol)
-        print('    L =            %d\n' % l_var)
+        print(f'    MAXCOL = {maxcol:d}\n')
+        print(f'    L =            {l_var:d}\n')
         return None
 
 
@@ -819,7 +819,7 @@ def r8mat_write(filename, m, n, a):
     with open(filename, 'w') as output:
         for i in range(0, m):
             for j in range(0, n):
-                s = '  %g' % (a[i, j])
+                s = f'  {a[i, j]:g}'
                 output.write(s)
             output.write('\n')
 
