@@ -17,13 +17,7 @@ Ref:
 
 # Educational users
 
-This is a list of users who are using PythonRobotics for education.
-
-If you found other users, please make an issue to let me know.
-
-- [CSCI/ARTI 4530/6530: Introduction to Robotics (Fall 2018),  University of Georgia ](http://cobweb.cs.uga.edu/~ramviyas/csci_x530.html)
-
-- [CIT Modules & Programmes \- COMP9073 \- Automation with Python](https://courses.cit.ie/index.cfm/page/module/moduleId/14416)
+If you found users who are using PythonRobotics for education, please make an issue to let me know.
 
 # Stargazers location map
 
@@ -386,14 +380,14 @@ Dear Atsushi Sakai, <br>Thank you so much for creating PythonRobotics and docume
 1. B. Blaga, M. Deac, R. W. Y. Al-doori, M. Negru and R. Dǎnescu, "Miniature Autonomous Vehicle Development on Raspberry Pi," 2018 IEEE 14th International Conference on Intelligent Computer Communication and Processing (ICCP), Cluj-Napoca, Romania, 2018, pp. 229-236.
 doi: 10.1109/ICCP.2018.8516589
 keywords: {Automobiles;Task analysis;Autonomous vehicles;Path planning;Global Positioning System;Cameras;miniature autonomous vehicle;path planning;navigation;parking assist;lane detection and tracking;traffic sign recognition},
-URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8516589&isnumber=8516425
+URL: https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8516589&isnumber=8516425
 
 2. Peggy (Yuchun) Wang and Caitlin Hogan, "Path Planning with Dynamic Obstacle Avoidance for a Jumping-Enabled Robot", AA228/CS238 class report, Department of Computer Science, Stanford University, URL: https://web.stanford.edu/class/aa228/reports/2018/final113.pdf
 
-3. Welburn, E, Hakim Khalili, H, Gupta, A, Watson, S & Carrasco, J 2019, A Navigational System for Quadcopter Remote Inspection of Offshore Substations. in The Fifteenth International Conference on Autonomic and Autonomous Systems 2019. URL:https://www.research.manchester.ac.uk/portal/files/107169964/ICAS19_A_Navigational_System_for_Quadcopter_Remote_Inspection_of_Offshore_Substations.pdf
+3. Welburn, E, Hakim Khalili, H, Gupta, A, Watson, S & Carrasco, J 2019, A Navigational System for Quadcopter Remote Inspection of Offshore Substations. in The Fifteenth International Conference on Autonomic and Autonomous Systems 2019. URL:https://research.manchester.ac.uk/portal/files/107169964/ICAS19_A_Navigational_System_for_Quadcopter_Remote_Inspection_of_Offshore_Substations.pdf
 
 4. E. Horváth, C. Hajdu, C. Radu and Á. Ballagi, "Range Sensor-based Occupancy Grid Mapping with Signatures," 2019 20th International Carpathian Control Conference (ICCC), Krakow-Wieliczka, Poland, 2019, pp. 1-5.
-URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8765684&isnumber=8765679
+URL: https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8765684&isnumber=8765679
 
 5. Josie Hughes, Masaru Shimizu, and Arnoud Visser, "A Review of Robot Rescue Simulation Platforms for Robotics Education"
 URL: https://2019.robocup.org/downloads/program/HughesEtAl2019.pdf
@@ -408,7 +402,7 @@ URL: https://arxiv.org/abs/1910.01557
 URL: https://pdfs.semanticscholar.org/5c06/f3cb9542a51e1bf1a32523c1bc7fea6cecc5.pdf
 
 9. Brijen Thananjeyan, et al. "ABC-LMPC: Safe Sample-Based Learning MPC for Stochastic Nonlinear Dynamical Systems with Adjustable Boundary Conditions"
-URL: https://arxiv.org/pdf/2003.01410.pdf
+URL: https://arxiv.org/pdf/2003.01410
 
 # Others
 

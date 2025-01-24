@@ -133,5 +133,5 @@ Reference
 -  `Vehicle Dynamics and Control \| Rajesh Rajamani \|
    Springer <http://www.springer.com/us/book/9781461414322>`__
 
--  `MPC Course Material - MPC Lab @
-   UC-Berkeley <http://www.mpc.berkeley.edu/mpc-course-material>`__
+-  `MPC Book - MPC Lab @
+   UC-Berkeley <https://sites.google.com/berkeley.edu/mpc-lab/mpc-course-material>`__

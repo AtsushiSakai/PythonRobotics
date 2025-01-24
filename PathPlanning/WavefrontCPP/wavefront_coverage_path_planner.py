@@ -4,7 +4,7 @@ Distance/Path Transform Wavefront Coverage Path Planner
 author: Todd Tang
 paper: Planning paths of complete coverage of an unstructured environment
          by a mobile robot - Zelinsky et.al.
-link: http://pinkwink.kr/attachment/cfile3.uf@1354654A4E8945BD13FE77.pdf
+link: https://pinkwink.kr/attachment/cfile3.uf@1354654A4E8945BD13FE77.pdf
 """
 
 import os

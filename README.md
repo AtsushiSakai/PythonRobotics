@@ -5,7 +5,6 @@
 ![GitHub_Action_MacOS_CI](https://github.com/AtsushiSakai/PythonRobotics/workflows/MacOS_CI/badge.svg)
 ![GitHub_Action_Windows_CI](https://github.com/AtsushiSakai/PythonRobotics/workflows/Windows_CI/badge.svg)
 [![Build status](https://ci.appveyor.com/api/projects/status/sb279kxuv1be391g?svg=true)](https://ci.appveyor.com/project/AtsushiSakai/pythonrobotics)
-[![codecov](https://codecov.io/gh/AtsushiSakai/PythonRobotics/branch/master/graph/badge.svg)](https://codecov.io/gh/AtsushiSakai/PythonRobotics)
 
 Python codes for robotics algorithm.
 
@@ -111,7 +110,7 @@ For development:
   
 - [pytest-xdist](https://pypi.org/project/pytest-xdist/) (for parallel unit tests)
   
-- [mypy](http://mypy-lang.org/) (for type check)
+- [mypy](https://mypy-lang.org/) (for type check)
   
 - [sphinx](https://www.sphinx-doc.org/) (for document generation)
   
@@ -328,7 +327,7 @@ The animation shows a robot finding its path and rerouting to avoid obstacles as
 
 Refs:
 
-- [D* Lite](http://idm-lab.org/bib/abstracts/papers/aaai02b.pd)
+- [D* Lite](http://idm-lab.org/bib/abstracts/papers/aaai02b.pdf)
 - [Improved Fast Replanning for Robot Navigation in Unknown Terrain](http://www.cs.cmu.edu/~maxim/files/dlite_icra02.pdf)
 
 ### Potential Field algorithm
@@ -357,9 +356,9 @@ This code uses the model predictive trajectory generator to solve boundary probl
 
 Ref: 
 
-- [Optimal rough terrain trajectory generation for wheeled mobile robots](http://journals.sagepub.com/doi/pdf/10.1177/0278364906075328)
+- [Optimal rough terrain trajectory generation for wheeled mobile robots](https://journals.sagepub.com/doi/pdf/10.1177/0278364906075328)
 
-- [State Space Sampling of Feasible Motions for High-Performance Mobile Robot Navigation in Complex Environments](http://www.frc.ri.cmu.edu/~alonzo/pubs/papers/JFR_08_SS_Sampling.pdf)
+- [State Space Sampling of Feasible Motions for High-Performance Mobile Robot Navigation in Complex Environments](https://www.frc.ri.cmu.edu/~alonzo/pubs/papers/JFR_08_SS_Sampling.pdf)
 
 
 ### Biased polar sampling
@@ -403,7 +402,7 @@ Ref:
 
 - [Incremental Sampling-based Algorithms for Optimal Motion Planning](https://arxiv.org/abs/1005.0416)
 
-- [Sampling-based Algorithms for Optimal Motion Planning](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.419.5503&rep=rep1&type=pdf)
+- [Sampling-based Algorithms for Optimal Motion Planning](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=bddbc99f97173430aa49a0ada53ab5bade5902fa)
 
 ### RRT\* with reeds-shepp path
 
@@ -421,7 +420,7 @@ A double integrator motion model is used for LQR local planner.
 
 Ref:
 
-- [LQR\-RRT\*: Optimal Sampling\-Based Motion Planning with Automatically Derived Extension Heuristics](http://lis.csail.mit.edu/pubs/perez-icra12.pdf)
+- [LQR\-RRT\*: Optimal Sampling\-Based Motion Planning with Automatically Derived Extension Heuristics](https://lis.csail.mit.edu/pubs/perez-icra12.pdf)
 
 - [MahanFathi/LQR\-RRTstar: LQR\-RRT\* method is used for random motion planning of a simple pendulum in its phase plot](https://github.com/MahanFathi/LQR-RRTstar)
 
@@ -436,7 +435,7 @@ It can calculate a 2D path, velocity, and acceleration profile based on quintic 
 
 Ref:
 
-- [Local Path Planning And Motion Control For Agv In Positioning](http://ieeexplore.ieee.org/document/637936/)
+- [Local Path Planning And Motion Control For Agv In Positioning](https://ieeexplore.ieee.org/document/637936/)
 
 ## Reeds Shepp planning
 
@@ -523,7 +522,7 @@ Path tracking simulation with LQR speed and steering control.
 
 Ref:
 
-- [Towards fully autonomous driving: Systems and algorithms \- IEEE Conference Publication](http://ieeexplore.ieee.org/document/5940562/)
+- [Towards fully autonomous driving: Systems and algorithms \- IEEE Conference Publication](https://ieeexplore.ieee.org/document/5940562/)
 
 
 ## Model predictive speed and steering control
@@ -630,7 +629,7 @@ If you or your company would like to support this project, please consider:
 
 - [Become a backer or sponsor on Patreon](https://www.patreon.com/myenigma)
 
-- [One-time donation via PayPal](https://www.paypal.me/myenigmapay/)
+- [One-time donation via PayPal](https://www.paypal.com/paypalme/myenigmapay/)
 
 If you would like to support us in some other way, please contact with creating an issue.
 
@@ -640,7 +639,7 @@ If you would like to support us in some other way, please contact with creating 
 
 They are providing a free license of their IDEs for this OSS development.   
 
-### [1Password](https://github.com/1Password/1password-teams-open-source)
+### [1Password](https://github.com/1Password/for-open-source)
 
 They are providing a free license of their 1Password team license for this OSS project.   
 

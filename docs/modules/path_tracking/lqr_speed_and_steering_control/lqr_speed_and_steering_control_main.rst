@@ -137,4 +137,4 @@ Simulation results
 References:
 ~~~~~~~~~~~
 
--  `Towards fully autonomous driving: Systems and algorithms <http://ieeexplore.ieee.org/document/5940562/>`__
+-  `Towards fully autonomous driving: Systems and algorithms <https://ieeexplore.ieee.org/document/5940562/>`__

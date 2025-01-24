@@ -6,7 +6,7 @@ author: Joe Dinius, Ph.D (https://jwdinius.github.io)
         Atsushi Sakai (@Atsushi_twi)
 
 Refs:
-- https://jwdinius.github.io/blog/2018/eta3traj
+- https://jwdinius.github.io/blog/2018/eta3traj/
 - [eta^3-Splines for the Smooth Path Generation of Wheeled Mobile Robots]
 (https://ieeexplore.ieee.org/document/4339545/)
 
