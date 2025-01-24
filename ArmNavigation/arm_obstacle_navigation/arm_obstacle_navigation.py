@@ -158,7 +158,7 @@ def astar_torus(grid, start_node, goal_node):
         while parent_map[route[0][0]][route[0][1]] != ():
             route.insert(0, parent_map[route[0][0]][route[0][1]])
 
-        print("The route found covers %d grid cells." % len(route))
+        print(f"The route found covers {len(route)} grid cells.")
         for i in range(1, len(route)):
             grid[route[i]] = 6
             plt.cla()
@@ -212,7 +212,7 @@ def calc_heuristic_map(M, goal_node):
     return heuristic_map
 
 
-class NLinkArm(object):
+class NLinkArm:
     """
     Class for controlling and plotting a planar arm with an arbitrary number of links.
     """

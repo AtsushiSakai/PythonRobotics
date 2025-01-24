@@ -18,7 +18,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 
-class DMP(object):
+class DMP:
 
     def __init__(self, training_data, data_period, K=156.25, B=25):
         """
@@ -215,21 +215,21 @@ class DMP(object):
         T_vals = np.linspace(T_orig, 2*T_orig, 20)
 
         for new_q0_value in q0_vals:
-            plot_title = "Initial Position = [%s, %s]" % \
-                         (round(new_q0_value[0], 2), round(new_q0_value[1], 2))
+            plot_title = (f"Initial Position = [{round(new_q0_value[0], 2)},"
+                          f" {round(new_q0_value[1], 2)}]")
 
             _, path = self.recreate_trajectory(new_q0_value, g_orig, T_orig)
             self.view_trajectory(path, title=plot_title, demo=True)
 
         for new_g_value in g_vals:
-            plot_title = "Goal Position = [%s, %s]" % \
-                         (round(new_g_value[0], 2), round(new_g_value[1], 2))
+            plot_title = (f"Goal Position = [{round(new_g_value[0], 2)},"
+                          f" {round(new_g_value[1], 2)}]")
 
             _, path = self.recreate_trajectory(q0_orig, new_g_value, T_orig)
             self.view_trajectory(path, title=plot_title, demo=True)
 
         for new_T_value in T_vals:
-            plot_title = "Period = %s [sec]" % round(new_T_value, 2)
+            plot_title = f"Period = {round(new_T_value, 2)} [sec]"
 
             _, path = self.recreate_trajectory(q0_orig, g_orig, new_T_value)
             self.view_trajectory(path, title=plot_title, demo=True)
@@ -257,5 +257,4 @@ def example_DMP():
 
 
 if __name__ == '__main__':
-
     example_DMP()
