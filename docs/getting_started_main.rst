@@ -40,7 +40,7 @@ For development:
 -  `sphinx`_ (for document generation)
 -  `ruff`_ (for code style check)
 
-.. _`Python 3.11.x`: https://www.python.org/
+.. _`Python 3.12.x`: https://www.python.org/
 .. _`NumPy`: https://numpy.org/
 .. _`SciPy`: https://scipy.org/
 .. _`Matplotlib`: https://matplotlib.org/
