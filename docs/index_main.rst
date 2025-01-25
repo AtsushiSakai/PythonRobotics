@@ -34,18 +34,18 @@ See this paper for more details:
    :caption: Contents
 
    getting_started
-   modules/introduction
-   modules/localization/localization
-   modules/mapping/mapping
-   modules/slam/slam
-   modules/path_planning/path_planning
-   modules/path_tracking/path_tracking
-   modules/arm_navigation/arm_navigation
-   modules/aerial_navigation/aerial_navigation
-   modules/bipedal/bipedal
-   modules/control/control
-   modules/utils/utils
-   modules/appendix/appendix
+   modules/1_introduction/introduction
+   modules/2_localization/localization
+   modules/3_mapping/mapping
+   modules/4_slam/slam
+   modules/5_path_planning/path_planning
+   modules/6_path_tracking/path_tracking
+   modules/7_arm_navigation/arm_navigation
+   modules/8_aerial_navigation/aerial_navigation
+   modules/9_bipedal/bipedal
+   modules/10_control/control
+   modules/11_utils/utils
+   modules/12_appendix/appendix
    how_to_contribute
 
 
