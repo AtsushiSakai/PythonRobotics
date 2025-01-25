@@ -1,5 +1,5 @@
 Catmull-Rom Spline Planning
------------------
+----------------------------
 
 .. image:: catmull_rom_path_planning.png
 
@@ -10,7 +10,7 @@ exhibits local control, and maintains 𝐶1 continuity.
 
 
 Catmull-Rom Spline Fundamentals
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Catmull-Rom splines are a type of cubic spline that passes through a given set of points, known as control points. 
 
@@ -24,7 +24,7 @@ Where:
 * :math:`P_0, P_1, P_2, P_3` are the control points surrounding the parameter :math:`t`.
 
 Types of Catmull-Rom Splines
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There are different types of Catmull-Rom splines based on the choice of the **tau** parameter, which influences how the curve 
 behaves in relation to the control points:
@@ -51,7 +51,7 @@ behaves in relation to the control points:
 
 
 Blending Functions
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 In Catmull-Rom spline interpolation, blending functions are used to calculate the influence of each control point on the spline at a 
 given parameter :math:`t`. The blending functions ensure that the spline is smooth and passes through the control points while 
@@ -97,7 +97,7 @@ API
 
 
 References
-~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 -  `Catmull-Rom Spline - Wikipedia <https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline>`__
 -  `Catmull-Rom Splines <http://graphics.cs.cmu.edu/nsp/course/15-462/Fall04/assts/catmullRom.pdf>`__
