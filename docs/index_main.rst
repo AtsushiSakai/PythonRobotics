@@ -6,24 +6,28 @@
 Welcome to PythonRobotics's documentation!
 ==========================================
 
-"PythonRobotics" is a Python code collections and html based text book (This document) for robotics algorithm.
-This is an open source software under `MIT license`_ and developed on `GitHub`_.
+"PythonRobotics" is a Python code collections and html based text book
+(This document) for robotics algorithm, which is developed on `GitHub`_.
 
 See this section (:ref:`What is PythonRobotics?`) for more details of this project.
 
 This project  is `the one of the most popular open-source software (OSS) in
 the field of robotics on GitHub`_.
-This graph shows star history of this project:
+This is `user comments about this project`_, and
+this graph shows GitHub star history of this project:
 
 .. image:: https://api.star-history.com/svg?repos=AtsushiSakai/PythonRobotics&type=Date
    :alt: Star History
+   :width: 80%
    :align: center
 
 
 .. _GitHub: https://github.com/AtsushiSakai/PythonRobotics
+.. _`user comments about this project`: https://github.com/AtsushiSakai/PythonRobotics/blob/master/users_comments.md
 .. _`MIT license`: https://github.com/AtsushiSakai/PythonRobotics/blob/master/LICENSE
 .. _`the one of the most popular open-source software (OSS) in the field of robotics on GitHub`: https://github.com/topics/robotics
 
+----------------------------------
 
 .. toctree::
    :maxdepth: 2
