@@ -3,8 +3,10 @@
 Getting Started
 ===============
 
-What is this?
--------------
+.. _`What is PythonRobotics?`:
+
+What is PythonRobotics?
+------------------------
 
 This is an Open Source Software (OSS) project: PythonRobotics, which is a Python code collection of robotics algorithms.
 
@@ -15,6 +17,15 @@ In this project, the algorithms which are practical and widely used in both acad
 Each sample code is written in Python3 and only depends on some standard modules for readability and ease of use. 
 
 It includes intuitive animations to understand the behavior of the simulation.
+
+
+Features:
+
+1. Easy to read for understanding each algorithm's basic idea.
+
+2. Widely used and practical algorithms are selected.
+
+3. Minimum dependency.
 
 
 See this paper for more details:
