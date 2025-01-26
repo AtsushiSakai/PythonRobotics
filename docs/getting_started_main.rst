@@ -3,10 +3,14 @@
 Getting Started
 ===============
 
-What is this?
--------------
+.. _`What is PythonRobotics?`:
+
+What is PythonRobotics?
+------------------------
 
 This is an Open Source Software (OSS) project: PythonRobotics, which is a Python code collection of robotics algorithms.
+
+This is developped under `MIT license`_ and on `GitHub`_.
 
 The focus of the project is on autonomous navigation, and the goal is for beginners in robotics to understand the basic ideas behind each algorithm.
 
@@ -15,6 +19,17 @@ In this project, the algorithms which are practical and widely used in both acad
 Each sample code is written in Python3 and only depends on some standard modules for readability and ease of use. 
 
 It includes intuitive animations to understand the behavior of the simulation.
+
+.. _GitHub: https://github.com/AtsushiSakai/PythonRobotics
+.. _`MIT license`: https://github.com/AtsushiSakai/PythonRobotics/blob/master/LICENSE
+
+Features:
+
+1. Easy to read for understanding each algorithm's basic idea.
+
+2. Widely used and practical algorithms are selected.
+
+3. Minimum dependency.
 
 
 See this paper for more details:

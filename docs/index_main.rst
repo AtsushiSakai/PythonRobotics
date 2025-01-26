@@ -6,32 +6,32 @@
 Welcome to PythonRobotics's documentation!
 ==========================================
 
-Python codes for robotics algorithm. The project is on `GitHub`_.
+"PythonRobotics" is a Python code collections and html based text book
+(This document) for robotics algorithm, which is developed on `GitHub`_.
 
-This is a Python code collection of robotics algorithms.
+See this section (:ref:`What is PythonRobotics?`) for more details of this project.
 
-Features:
+This project  is `the one of the most popular open-source software (OSS) in
+the field of robotics on GitHub`_.
+This is `user comments about this project`_, and
+this graph shows GitHub star history of this project:
 
-1. Easy to read for understanding each algorithm's basic idea.
-
-2. Widely used and practical algorithms are selected.
-
-3. Minimum dependency.
-
-See this paper for more details:
-
--  `[1808.10703] PythonRobotics: a Python code collection of robotics
-   algorithms`_ (`BibTeX`_)
+.. image:: https://api.star-history.com/svg?repos=AtsushiSakai/PythonRobotics&type=Date
+   :alt: Star History
+   :width: 80%
+   :align: center
 
 
-.. _`[1808.10703] PythonRobotics: a Python code collection of robotics algorithms`: https://arxiv.org/abs/1808.10703
-.. _BibTeX: https://github.com/AtsushiSakai/PythonRoboticsPaper/blob/master/python_robotics.bib
 .. _GitHub: https://github.com/AtsushiSakai/PythonRobotics
+.. _`user comments about this project`: https://github.com/AtsushiSakai/PythonRobotics/blob/master/users_comments.md
+.. _`MIT license`: https://github.com/AtsushiSakai/PythonRobotics/blob/master/LICENSE
+.. _`the one of the most popular open-source software (OSS) in the field of robotics on GitHub`: https://github.com/topics/robotics
 
+----------------------------------
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents
+   :caption: Table of Contents
 
    getting_started
    modules/1_introduction/introduction
