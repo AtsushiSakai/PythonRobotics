@@ -6,7 +6,7 @@
 ![GitHub_Action_Windows_CI](https://github.com/AtsushiSakai/PythonRobotics/workflows/Windows_CI/badge.svg)
 [![Build status](https://ci.appveyor.com/api/projects/status/sb279kxuv1be391g?svg=true)](https://ci.appveyor.com/project/AtsushiSakai/pythonrobotics)
 
-Python codes for robotics algorithm.
+Python codes and textbook for robotics algorithm.
 
 
 # Table of Contents
@@ -73,9 +73,9 @@ Python codes for robotics algorithm.
       * [1Password](#1password)
    * [Authors](#authors)
 
-# What is this?
+# What is PythonRobotics?
 
-This is a Python code collection of robotics algorithms.
+PythonRobotics is a Python code collection and a [textbook](https://atsushisakai.github.io/PythonRobotics/index.html) of robotics algorithms.
 
 Features:
 
@@ -90,7 +90,7 @@ See this paper for more details:
 - [\[1808\.10703\] PythonRobotics: a Python code collection of robotics algorithms](https://arxiv.org/abs/1808.10703) ([BibTeX](https://github.com/AtsushiSakai/PythonRoboticsPaper/blob/master/python_robotics.bib))
 
 
-# Requirements
+# Requirements to run the code
 
 For running each sample code:
 
@@ -116,13 +116,13 @@ For development:
   
 - [pycodestyle](https://pypi.org/project/pycodestyle/) (for code style check)
 
-# Documentation
+# Documentation (Textbook)
 
 This README only shows some examples of this project. 
 
 If you are interested in other examples or mathematical backgrounds of each algorithm, 
 
-You can check the full documentation online: [Welcome to PythonRobotics’s documentation\! — PythonRobotics documentation](https://atsushisakai.github.io/PythonRobotics/index.html)
+You can check the full documentation (textbook) online: [Welcome to PythonRobotics’s documentation\! — PythonRobotics documentation](https://atsushisakai.github.io/PythonRobotics/index.html)
 
 All animation gifs are stored here: [AtsushiSakai/PythonRoboticsGifs: Animation gifs of PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs)
 
