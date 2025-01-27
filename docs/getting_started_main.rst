@@ -10,7 +10,7 @@ What is PythonRobotics?
 
 This is an Open Source Software (OSS) project: PythonRobotics, which is a Python code collection of robotics algorithms.
 
-This is developped under `MIT license`_ and on `GitHub`_.
+This is developed under `MIT license`_ and on `GitHub`_.
 
 The focus of the project is on autonomous navigation, and the goal is for beginners in robotics to understand the basic ideas behind each algorithm.
 

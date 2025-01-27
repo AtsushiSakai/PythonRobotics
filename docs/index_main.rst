@@ -6,7 +6,7 @@
 Welcome to PythonRobotics's documentation!
 ==========================================
 
-"PythonRobotics" is a Python code collections and html based text book
+"PythonRobotics" is a Python code collections and textbook
 (This document) for robotics algorithm, which is developed on `GitHub`_.
 
 See this section (:ref:`What is PythonRobotics?`) for more details of this project.
