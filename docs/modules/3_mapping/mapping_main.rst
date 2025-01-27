@@ -2,6 +2,8 @@
 
 Mapping
 =======
+Mapping is the ability of a robot to understand its surroundings with external sensors such as LIDAR and camera. Robots have to recognize the position and shape of obstacles to avoid them. In mapping, grid mapping and machine learning algorithms are widely used[31][18]. Fig.3 shows mapping simulation results using grid mapping with 2D ray casting and 2D object clustering with k-means algorithm.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents

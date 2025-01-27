@@ -9,27 +9,49 @@ What is PythonRobotics?
 ------------------------
 
 This is an Open Source Software (OSS) project: PythonRobotics, which is a Python code collection of robotics algorithms.
+These codes are developed under `MIT license`_ and on `GitHub`_.
 
-This is developed under `MIT license`_ and on `GitHub`_.
+This project has three main philosophies below:
 
-The focus of the project is on autonomous navigation, and the goal is for beginners in robotics to understand the basic ideas behind each algorithm.
+1. Easy to understand each algorithm's basic idea.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In this project, the algorithms which are practical and widely used in both academia and industry are selected.
+The goal is for beginners in robotics to understand the basic ideas behind each algorithm.
+If the code is not easy to read, it would be difficult to achieve our goal of
+allowing beginners to understand the algorithms.
 
-Each sample code is written in Python3 and only depends on some standard modules for readability and ease of use. 
+Python[12] programming language is adopted in this project.
+Python has great libraries for matrix operation, mathematical and scientific operation,
+and visualization, which makes code more readable because such operations
+don’t need to be re-implemented.
+Having the core Python packages allows the user to focus on the algorithms,
+rather than the implementations.
 
 It includes intuitive animations to understand the behavior of the simulation.
 
-.. _GitHub: https://github.com/AtsushiSakai/PythonRobotics
-.. _`MIT license`: https://github.com/AtsushiSakai/PythonRobotics/blob/master/LICENSE
-
-Features:
-
-1. Easy to read for understanding each algorithm's basic idea.
+about documenttion
 
 2. Widely used and practical algorithms are selected.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The second philosophy is that implemented algorithms have to be practical
+and widely used in both academia and industry.
+We believe learning these algorithms will be useful in many applications.
+For example, Kalman filters and particle filter for localization,
+grid mapping for mapping,
+dynamic programming based approaches and sampling based approaches for path planning,
+and optimal control based approach for path tracking.
+These algorithms are implemented in this project.
 
 3. Minimum dependency.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Each sample code is written in Python3 and only depends on some standard
+modules for readability and ease of use.
+
+
+.. _GitHub: https://github.com/AtsushiSakai/PythonRobotics
+.. _`MIT license`: https://github.com/AtsushiSakai/PythonRobotics/blob/master/LICENSE
 
 
 See this paper for more details:

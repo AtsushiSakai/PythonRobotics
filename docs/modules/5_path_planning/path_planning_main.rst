@@ -3,6 +3,8 @@
 Path Planning
 =============
 
+Path planning is the ability of a robot to search feasible and efficient path to the goal. The path has to satisfy some constraints based on the robot’s motion model and obstacle positions, and optimize some objective functions such as time to goal and distance to obstacle. In path planning, dynamic programming based approaches and sampling based approaches are widely used[22]. Fig.5 shows simulation results of potential field path planning and LQRRRT* path planning[27].
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents
