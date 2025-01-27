@@ -6,7 +6,7 @@
 ![GitHub_Action_Windows_CI](https://github.com/AtsushiSakai/PythonRobotics/workflows/Windows_CI/badge.svg)
 [![Build status](https://ci.appveyor.com/api/projects/status/sb279kxuv1be391g?svg=true)](https://ci.appveyor.com/project/AtsushiSakai/pythonrobotics)
 
-Python codes and textbook for robotics algorithm.
+Python codes and [textbook](https://atsushisakai.github.io/PythonRobotics/index.html) for robotics algorithm.
 
 
 # Table of Contents
@@ -85,7 +85,11 @@ Features:
 
 3. Minimum dependency.
 
-See this paper for more details:
+See this documentation 
+
+- [Getting Started — PythonRobotics documentation](https://atsushisakai.github.io/PythonRobotics/getting_started.html#what-is-pythonrobotics)
+
+or this paper for more details:
 
 - [\[1808\.10703\] PythonRobotics: a Python code collection of robotics algorithms](https://arxiv.org/abs/1808.10703) ([BibTeX](https://github.com/AtsushiSakai/PythonRoboticsPaper/blob/master/python_robotics.bib))
 
