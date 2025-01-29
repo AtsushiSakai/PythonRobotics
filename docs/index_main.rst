@@ -33,7 +33,7 @@ this graph shows GitHub star history of this project:
    :maxdepth: 2
    :caption: Table of Contents
 
-   getting_started
+   modules/0_getting_started/0_getting_started
    modules/1_introduction/introduction
    modules/2_localization/localization
    modules/3_mapping/mapping
@@ -46,7 +46,6 @@ this graph shows GitHub star history of this project:
    modules/10_control/control
    modules/11_utils/utils
    modules/12_appendix/appendix
-   how_to_contribute
 
 
 Indices and tables
