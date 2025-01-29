@@ -8,7 +8,7 @@ These codes are developed under `MIT license`_ and on `GitHub`_.
 
 This project has three main philosophies below:
 
-1. Easy to understand each algorithm's basic idea.
+Philosophy 1. Easy to understand each algorithm's basic idea.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The goal is for beginners in robotics to understand the basic ideas behind each algorithm.
@@ -31,17 +31,26 @@ path planning in a highway scenario for autonomous vehicle.
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/FrenetOptimalTrajectory/high_speed_and_velocity_keeping_frenet_path.gif
 
 This animation is a gif file and is created using the `Matplotlib`_ library.
-All animaion gif files are stored in the `PythonRoboticsGifs`_ repository and
-all animation movies are uploaded to this `YouTube channel`_.
+All animation gif files are stored in the `PythonRoboticsGifs`_ repository and
+all animation movies are also uploaded to this `YouTube channel`_.
 
 PythonRobotics also provides a textbook that explains the basic ideas of each algorithm.
+The PythonRobotics textbook allows you to learn fundamental algorithms used in
+robotics with minimal mathematical formulas and textual explanations,
+based on PythonRobotics’ sample codes and animations.
+The contents of this document, like the code, are managed in the PythonRobotics
+`GitHub`_ repository and converted into HTML-based online documents using `Sphinx`_,
+which is a Python-based documentation builder.
+Please refer to this section ":ref:`How to read this textbook`" for information on
+how to read this document for learning.
+
 
 .. _`Python`: https://www.python.org/
 .. _`PythonRoboticsGifs`: https://github.com/AtsushiSakai/PythonRoboticsGifs
 .. _`YouTube channel`: https://youtube.com/playlist?list=PL12URV8HFpCozuz0SDxke6b2ae5UZvIwa&si=AH2fNPPYufPtK20S
 
 
-2. Widely used and practical algorithms are selected.
+Philosophy 2. Widely used and practical algorithms are selected.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The second philosophy is that implemented algorithms have to be practical
@@ -53,7 +62,7 @@ dynamic programming based approaches and sampling based approaches for path plan
 and optimal control based approach for path tracking.
 These algorithms are implemented in this project.
 
-3. Minimum dependency.
+Philosophy 3. Minimum dependency.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Each sample code is written in Python3 and only depends on some standard
@@ -84,7 +93,7 @@ For development:
 -  `pytest`_ (for unit tests)
 -  `pytest-xdist`_ (for parallel unit tests)
 -  `mypy`_ (for type check)
--  `sphinx`_ (for document generation)
+-  `Sphinx`_ (for document generation)
 -  `ruff`_ (for code style check)
 
 .. _`Python 3.12.x`: https://www.python.org/
@@ -95,6 +104,6 @@ For development:
 .. _`pytest`: https://docs.pytest.org/en/latest/
 .. _`pytest-xdist`: https://github.com/pytest-dev/pytest-xdist
 .. _`mypy`: https://mypy-lang.org/
-.. _`sphinx`: https://www.sphinx-doc.org/en/master/index.html
+.. _`Sphinx`: https://www.sphinx-doc.org/en/master/index.html
 .. _`ruff`: https://github.com/astral-sh/ruff
 
