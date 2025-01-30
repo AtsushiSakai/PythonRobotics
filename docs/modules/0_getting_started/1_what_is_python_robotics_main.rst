@@ -6,6 +6,9 @@ What is PythonRobotics?
 This is an Open Source Software (OSS) project: PythonRobotics, which is a Python code collection of robotics algorithms.
 These codes are developed under `MIT license`_ and on `GitHub`_.
 
+.. _GitHub: https://github.com/AtsushiSakai/PythonRobotics
+.. _`MIT license`: https://github.com/AtsushiSakai/PythonRobotics/blob/master/LICENSE
+
 This project has three main philosophies below:
 
 Philosophy 1. Easy to understand each algorithm's basic idea.
@@ -60,35 +63,32 @@ For example, Kalman filters and particle filter for localization,
 grid mapping for mapping,
 dynamic programming based approaches and sampling based approaches for path planning,
 and optimal control based approach for path tracking.
-These algorithms are implemented in this project.
+These algorithms are implemented and explained in the textbook in this project.
 
 Philosophy 3. Minimum dependency.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Each sample code is written in Python3 and only depends on some standard
-modules for readability and ease of use.
+Each sample code of PythonRobotics is written in Python3 and only depends on
+some standard modules for readability and ease to setup and use.
 
-
-.. _GitHub: https://github.com/AtsushiSakai/PythonRobotics
-.. _`MIT license`: https://github.com/AtsushiSakai/PythonRobotics/blob/master/LICENSE
-
-
-See this paper for more details:
-
-- PythonRobotics: a Python code collection of robotics algorithms: https://arxiv.org/abs/1808.10703
 
 .. _`Requirements`:
 
 Requirements
 ============
 
--  `Python 3.12.x`_
--  `NumPy`_
--  `SciPy`_
--  `Matplotlib`_
--  `cvxpy`_
+PythonRobotics depends only on the following five libraries,
+including Python itself, to run each sample code.
 
-For development:
+-  `Python 3.12.x`_ (for Python runtime)
+-  `NumPy`_ (for matrix operation)
+-  `SciPy`_ (for scientific operation)
+-  `cvxpy`_ (for convex optimization)
+-  `Matplotlib`_ (for visualization)
+
+If you only need to run the code, the five libraries mentioned above are sufficient.
+However, for code development or creating documentation for the textbook,
+the following additional libraries are required.
 
 -  `pytest`_ (for unit tests)
 -  `pytest-xdist`_ (for parallel unit tests)
@@ -106,4 +106,19 @@ For development:
 .. _`mypy`: https://mypy-lang.org/
 .. _`Sphinx`: https://www.sphinx-doc.org/en/master/index.html
 .. _`ruff`: https://github.com/astral-sh/ruff
+
+For instructions on installing the above libraries, please refer to
+this section ":ref:`How to run sample codes`".
+
+Arxiv paper
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We have published a paper on this project on Arxiv in 2018.
+
+See this paper for more details about this Project:
+
+- `PythonRobotics: a Python code collection of robotics algorithms`_ (`BibTeX`_)
+
+.. _`PythonRobotics: a Python code collection of robotics algorithms`: https://arxiv.org/abs/1808.10703
+.. _`BibTeX`: https://github.com/AtsushiSakai/PythonRoboticsPaper/blob/master/python_robotics.bib
 

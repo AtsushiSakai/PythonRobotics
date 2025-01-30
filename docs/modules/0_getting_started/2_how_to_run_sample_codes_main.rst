@@ -1,5 +1,7 @@
-How to use
-----------
+.. _`How to run sample codes`:
+
+How to run sample codes
+-------------------------
 
 1. Clone this repo and go into dir.
 
