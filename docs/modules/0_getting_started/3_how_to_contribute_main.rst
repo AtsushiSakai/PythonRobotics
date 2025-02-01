@@ -2,9 +2,18 @@ How To Contribute
 =================
 
 This document describes how to contribute this project.
+There are several ways to contribute to this project as below:
+
+#. `Adding a new algorithm example`_
+#. `Reporting and fixing a defect`_
+#. `Adding missed documentations for existing examples`_
+#. `Supporting this project`_
+
+
+.. _`Adding a new algorithm example`:
 
 Adding a new algorithm example
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This is a step by step manual to add a new algorithm example.
 
@@ -67,9 +76,16 @@ Please check other documents for details.
 
 You can build the doc locally based on `doc README`_.
 
-Note that the `reStructuredText`_ based doc should only focus on the mathematics and the algorithm of the example.
+For creating a gif animation, you can use this tool: `matplotrecorder`_.
 
-Documentations related codes should be in the python script as the header comments of the script or docstrings of each function.
+The created gif file should be stored in the `PythonRoboticsGifs`_ repository,
+so please create a PR to add it and refer to it in the doc.
+
+Note that the `reStructuredText`_ based doc should only focus on the
+mathematics and the algorithm of the example.
+
+Documentations related codes should be in the python script as the header
+comments of the script or docstrings of each function.
 
 
 .. _`submit a pull request`:
@@ -92,6 +108,9 @@ After that, I will start the review.
 
 Note that this is my hobby project; I appreciate your patience during the review process.
 
+　
+
+.. _`Reporting and fixing a defect`:
 
 Reporting and fixing a defect
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -115,19 +134,24 @@ in the test code to show the issue was solved.
 This doc `submit a pull request`_ can be helpful to submit a pull request.
 
 
+.. _`Adding missed documentations for existing examples`:
+
 Adding missed documentations for existing examples
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Adding the missed documentations for existing examples is also great contribution.
 
 If you check the `Python Robotics Docs`_, you can notice that some of the examples
-only have a simulation gif or short overview descriptions,
+only have a simulation gif or short overview descriptions or just TBD.,
 but no detailed algorithm or mathematical description.
+These documents needs to be improved.
 
 This doc `how to write doc`_ can be helpful to write documents.
 
+.. _`Supporting this project`:
+
 Supporting this project
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 Supporting this project financially is also a great contribution!!.
 
@@ -141,10 +165,12 @@ If you or your company would like to support this project, please consider:
 
 If you would like to support us in some other way, please contact with creating an issue.
 
-Sponsors
----------
+Current Major Sponsors
+-----------------------
 
-1. `JetBrains`_ : They are providing a free license of their IDEs for this OSS development.
+#. `JetBrains`_ : They are providing a free license of their IDEs for this OSS development.
+#. `1Password`_ : They are providing a free license of their 1Password team license for this OSS project.
+
 
 
 .. _`Python Robotics Docs`: https://atsushisakai.github.io/PythonRobotics
@@ -160,5 +186,8 @@ Sponsors
 .. _`Sponsor @AtsushiSakai on GitHub Sponsors`: https://github.com/sponsors/AtsushiSakai
 .. _`Become a backer or sponsor on Patreon`: https://www.patreon.com/myenigma
 .. _`One-time donation via PayPal`: https://www.paypal.com/paypalme/myenigmapay/
+.. _`1Password`: https://github.com/1Password/for-open-source
+.. _`matplotrecorder`: https://github.com/AtsushiSakai/matplotrecorder
+.. _`PythonRoboticsGifs`: https://github.com/AtsushiSakai/PythonRoboticsGifs
 
 
