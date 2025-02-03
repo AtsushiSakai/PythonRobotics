@@ -13,42 +13,92 @@ class Grid():
     time_limit = 100
     num_obstacles = 2
 
+    # Logging control
+    verbose = False
+
     def __init__(self, grid_size: np.ndarray[int, int]):
         self.grid_size = grid_size
         self.grid = np.zeros((grid_size[0], grid_size[1], self.time_limit))
 
-        for i in range(1, self.num_obstacles+1):
-            self.obstacle_paths.append(self.generate_dynamic_obstacle(i))
+        if self.num_obstacles > self.grid_size[0] * self.grid_size[1]:
+            raise Exception("Number of obstacles is greater than grid size!")
 
+        for i in range(self.num_obstacles):
+            self.obstacle_paths.append(self.generate_dynamic_obstacle(i+1))
+
+    """
+    Generate a dynamic obstacle following a random trajectory, and reserve its path in `self.grid`
+
+    input:
+        obs_idx (int): index of the obstacle. Used to reserve its path in `self.grid`
+    
+    output:
+        list[np.ndarray[int, int]]: list of positions of the obstacle at each time step
+    """
     def generate_dynamic_obstacle(self, obs_idx: int) -> list[np.ndarray[int, int]]:
-        # TODO: dont spawn on another obstacle
-        initial_position = (np.random.randint(0, self.grid_size[0]), np.random.randint(0, self.grid_size[1]))
+
+        # Sample until a free starting space is found
+        initial_position = self.sample_random_position()
+        while not self.valid_position(initial_position, 0):
+            initial_position = self.sample_random_position()
+
         positions = [initial_position]
-        print("Initial position: ", initial_position)
+        if self.verbose:
+            print("Obstacle initial position: ", initial_position)
         
         diffs = [np.array([0, 1]), np.array([0, -1]), np.array([1, 0]), np.array([-1, 0]), np.array([0, 0])]
 
         for t in range(1, self.time_limit-1):
             random.shuffle(diffs)
+            valid_position = None
             for diff in diffs:
                 new_position = positions[-1] + diff
 
-                # Check if new position is in grid
-                if new_position[0] < 0 or new_position[0] >= self.grid_size[0] or new_position[1] < 0 or new_position[1] >= self.grid_size[1]:
+                if not self.valid_position(new_position, t):
                     continue
 
-                # Check if new position occupied by another obstacle
-                if self.grid[new_position[0], new_position[1], t] == 0:
-                    positions.append(new_position)
-                    self.grid[new_position[0], new_position[1], t] = obs_idx
-                    break
+                valid_position = new_position
+                break
 
-                # Impossible situation for obstacle - stay in place
-                print("Impossible situation for obstacle!")
-                positions.append(positions[-1])
+            # Impossible situation for obstacle - stay in place
+            #   -> this can happen if another obstacle's path traps this one
+            if valid_position is None:
+                valid_position = positions[-1]
 
-        print('obs path len: ', len(positions))
+            # Reserve old & new position at this time step
+            positions.append(new_position)
+            self.grid[positions[-2][0], positions[-2][1], t] = obs_idx
+            self.grid[new_position[0], new_position[1], t] = obs_idx
+    
         return positions
+
+    """
+    Check if the given position is valid at time t
+
+    input:
+        position (np.ndarray[int, int]): (x, y) position
+        t (int): time step
+
+    output:
+        bool: True if position/time combination is valid, False otherwise
+    """
+    def valid_position(self, position, t) -> bool:
+
+        # Check if new position is in grid
+        if position[0] < 0 or position[0] >= self.grid_size[0] or position[1] < 0 or position[1] >= self.grid_size[1]:
+            return False
+
+        # Check if new position is not occupied at time t
+        return self.grid[position[0], position[1], t] == 0
+
+    """
+    Sample a random position that is within the grid's boundaries
+
+    output:
+        np.ndarray[int, int]: (x, y) position
+    """
+    def sample_random_position(self) -> np.ndarray[int, int]:
+        return np.array([np.random.randint(0, self.grid_size[0]), np.random.randint(0, self.grid_size[1])])
 
 show_animation = True
 
