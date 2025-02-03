@@ -1,7 +1,7 @@
 import numpy as np
 import random
 import matplotlib.pyplot as plt
-
+import matplotlib.animation as animation
 class Grid():
     
     # Set in constructor
@@ -47,53 +47,38 @@ class Grid():
                 print("Impossible situation for obstacle!")
                 positions.append(positions[-1])
 
+        print('obs path len: ', len(positions))
         return positions
 
 show_animation = True
 
 def main():
-    grid = Grid(np.array([10, 10]))
+    grid = Grid(np.array([11, 11]))
 
-    plt.figure()
+    if not show_animation:
+        return
 
-    for t in range(0, grid.time_limit):
-        plt.clf()
+    fig = plt.figure(figsize=(8, 7))
+    ax = fig.add_subplot(autoscale_on=False, xlim=(0, grid.grid_size[0]-1), ylim=(0, grid.grid_size[1]-1))
+    ax.set_aspect('equal')
+    ax.grid()
+    ax.set_xticks(np.arange(0, 11, 1))
+    ax.set_yticks(np.arange(0, 11, 1))
+    points, = ax.plot([], [], 'ro', ms=15)
 
-        if show_animation:  # pragma: no cover
-            # TODO: iter is clunky. Should use np array
-            ax = plt.axes()
-            ax.set_xlim(0, grid.grid_size[0])
-            ax.set_ylim(0, grid.grid_size[1])
+    def get_frame(i):
+        obs_x_points = []
+        obs_y_points = []
+        for (_obs_idx, obs_path) in enumerate(grid.obstacle_paths):
+            obs_pos = obs_path[i]
+            obs_x_points.append(obs_pos[0])
+            obs_y_points.append(obs_pos[1])
+        points.set_data(obs_x_points, obs_y_points)
+        return points,
 
-            for (obs_idx, obs_path) in enumerate(grid.obstacle_paths):
-                obs_pos = obs_path[t]
-                # plt.plot(obs_pos[0], obs_pos[1], "xr")
-                circle = plt.Circle((obs_pos[0], obs_pos[1]), 0.2)
-                ax.add_patch(circle)
-            plt.grid(True)
-            plt.pause(0.3)
-
-# TODO: better animation closing
-# fig, ax = plt.subplots()
-# line, = ax.plot([], [])
-# ax.set_xlim(0, 10)
-# ax.set_ylim(-1, 1)
-
-# def init():
-#     line.set_data([], [])
-#     return line,
-
-# def animate(i):
-#     x = [0, 10]
-#     y = [0, i % 2 * 2 - 1]
-#     line.set_data(x, y)
-#     return line,
-
-# ani = animation.FuncAnimation(fig, animate, init_func=init, frames=100, interval=20, blit=True)
-
-# def close_event(evt):
-#     ani.event_source.stop()
-#     plt.close(fig)
+    _ani = animation.FuncAnimation(
+        fig, get_frame, grid.time_limit-1, interval=500, blit=True, repeat=False)
+    plt.show()
 
 if __name__ == '__main__':
     main()
