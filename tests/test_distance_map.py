@@ -1,6 +1,6 @@
 import conftest  # noqa
 import numpy as np
-from PathPlanning.DistanceMap import distance_map as m
+from Mapping.DistanceMap import distance_map as m
 
 
 def test_compute_sdf():
