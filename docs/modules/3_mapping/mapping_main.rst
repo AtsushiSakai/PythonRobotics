@@ -17,3 +17,4 @@ Mapping is the ability of a robot to understand its surroundings with external s
    circle_fitting/circle_fitting
    rectangle_fitting/rectangle_fitting
    normal_vector_estimation/normal_vector_estimation
+   distance_map/distance_map
