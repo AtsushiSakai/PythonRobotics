@@ -123,7 +123,7 @@ def main():
     udf = compute_udf(obstacles)
 
     if ENABLE_PLOT:
-        fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 5))
+        _, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 5))
 
         obstacles_plot = ax1.imshow(obstacles, cmap="binary")
         ax1.set_title("Obstacles")
