@@ -31,4 +31,3 @@ Path planning is the ability of a robot to search feasible and efficient path to
    hybridastar/hybridastar
    frenet_frame_path/frenet_frame_path
    coverage_path/coverage_path
-   distance_map/distance_map
