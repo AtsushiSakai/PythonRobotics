@@ -17,9 +17,9 @@ The algorithm is demonstrated on a simple 2D grid with obstacles:
 API
 ~~~
 
-.. autofunction:: PathPlanning.DistanceMap.distance_map.compute_sdf
+.. autofunction:: Mapping.DistanceMap.distance_map.compute_sdf
 
-.. autofunction:: PathPlanning.DistanceMap.distance_map.compute_udf
+.. autofunction:: Mapping.DistanceMap.distance_map.compute_udf
 
 References
 ~~~~~~~~~~
