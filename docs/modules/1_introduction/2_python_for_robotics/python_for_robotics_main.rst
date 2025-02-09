@@ -1,6 +1,8 @@
 Python for Robotics
 ----------------------
 
+Python is used for this `PythonRobotics` project because of the above features
+to achieve the purpose of this project described in the :ref:`What is PythonRobotics?`.
 This section explains the Python itself and features for Robotics.
 
 Python for general-purpose programming
@@ -76,7 +78,27 @@ For example:
 
 ROS supports Python
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-ROS (Robot Operating System): ROS, a widely used framework for robotics development, has strong Python support (rospy). This allows developers to easily create nodes, manage communication between different parts of a robot system, and utilize various ROS tools.
+`ROS`_ (Robot Operating System) is an open-source and widely used framework for robotics development.
+It is designed to help developping complicated robotic applications.
+ROS provides essential tools, libraries, and drivers to simplify robot programming and integration.
+
+Key Features of ROS:
+
+- Modular Architecture – Uses a node-based system where different components (nodes) communicate via messages.
+- Hardware Abstraction – Supports various robots, sensors, and actuators, making development more flexible.
+- Powerful Communication System – Uses topics, services, and actions for efficient data exchange between components.
+- Rich Ecosystem – Offers many pre-built packages for navigation, perception, and manipulation.
+- Multi-language Support – Primarily uses Python and C++, but also supports other languages.
+- Simulation & Visualization – Tools like Gazebo (for simulation) and RViz (for visualization) aid in development and testing.
+- Scalability & Community Support – Widely used in academia and industry, with a large open-source community.
+
+ROS has strong Python support (`rospy`_ for ROS1 and `rclpy`_ for ROS2).
+This allows developers to easily create nodes, manage communication between
+different parts of a robot system, and utilize various ROS tools.
+
+.. _`ROS`: https://www.ros.org/
+.. _`rospy`: http://wiki.ros.org/rospy
+.. _`rclpy`: https://docs.ros.org/en/jazzy/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Py-Publisher-And-Subscriber.html
 
 Cross-Platform Compatibility
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -85,8 +107,3 @@ Python code can run on various operating systems (Windows, macOS, Linux), provid
 Large Community and Support
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Python has a vast and active community, offering ample resources, tutorials, and support for developers. This is invaluable when tackling challenges in robotics development.
-
-
-Python is used for this `PythonRobotics` project because of the above features
-to achieve the purpose of this project described in the :ref:`What is PythonRobotics?`.
-
