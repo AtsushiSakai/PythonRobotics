@@ -9,10 +9,30 @@ There are several ways to contribute to this project as below:
 #. `Adding missed documentations for existing examples`_
 #. `Supporting this project`_
 
+Before contributing
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Please check following items before contributing:
+
+Understanding this project
+---------------------------
+
+Please check this :ref:`What is PythonRobotics?` section and this paper
+`PythonRobotics: a Python code collection of robotics algorithms`_
+to understand the philosophies of this project.
+
+.. _`PythonRobotics: a Python code collection of robotics algorithms`: https://arxiv.org/abs/1808.10703
+
+Check your Python version.
+---------------------------
+
+We only accept a PR for Python 3.12.x or higher.
+
+We will not accept a PR for Python 2.x.
 
 .. _`Adding a new algorithm example`:
 
-Adding a new algorithm example
+1. Adding a new algorithm example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This is a step by step manual to add a new algorithm example.
@@ -112,8 +132,8 @@ Note that this is my hobby project; I appreciate your patience during the review
 
 .. _`Reporting and fixing a defect`:
 
-Reporting and fixing a defect
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2. Reporting and fixing a defect
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Reporting and fixing a defect is also great contribution.
 
@@ -136,8 +156,8 @@ This doc `submit a pull request`_ can be helpful to submit a pull request.
 
 .. _`Adding missed documentations for existing examples`:
 
-Adding missed documentations for existing examples
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+3. Adding missed documentations for existing examples
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Adding the missed documentations for existing examples is also great contribution.
 
@@ -150,8 +170,8 @@ This doc `how to write doc`_ can be helpful to write documents.
 
 .. _`Supporting this project`:
 
-Supporting this project
-^^^^^^^^^^^^^^^^^^^^^^^^
+4. Supporting this project
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Supporting this project financially is also a great contribution!!.
 
@@ -165,8 +185,7 @@ If you or your company would like to support this project, please consider:
 
 If you would like to support us in some other way, please contact with creating an issue.
 
-Current Major Sponsors
------------------------
+Current Major Sponsors:
 
 #. `JetBrains`_ : They are providing a free license of their IDEs for this OSS development.
 #. `1Password`_ : They are providing a free license of their 1Password team license for this OSS project.
