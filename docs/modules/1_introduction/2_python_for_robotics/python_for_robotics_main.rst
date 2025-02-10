@@ -1,9 +1,10 @@
 Python for Robotics
 ----------------------
 
-Python is used for this `PythonRobotics` project because of the above features
-to achieve the purpose of this project described in the :ref:`What is PythonRobotics?`.
-This section explains the Python itself and features for Robotics.
+A programing language, Python is used for this `PythonRobotics` project
+to achieve the purposes of this project described in the :ref:`What is PythonRobotics?`.
+
+This section explains the Python itself and features for science computing Robotics.
 
 Python for general-purpose programming
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -107,3 +108,28 @@ Python code can run on various operating systems (Windows, macOS, Linux), provid
 Large Community and Support
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Python has a vast and active community, offering ample resources, tutorials, and support for developers. This is invaluable when tackling challenges in robotics development.
+
+Situations which Python is NOT suitable for Robotics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We explained the advantages of Python for robotics.
+However, Python is not always the best choice for robotics development.
+
+These are situations where Python is NOT suitable for robotics:
+
+High-speed real-time control
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Python is an interpreted language, which means it is slower than compiled languages like C++.
+This can be a disadvantage when real-time control is required,
+such as in high-speed motion control or safety-critical systems.
+
+So, for these applications, we recommend to understand the each algorithm you
+needed using this project and implement it in other suitable languages like C++.
+
+Resource-constrained systems
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Python is a high-level language that requires more memory and processing power
+compared to low-level languages.
+So, it is difficult to run Python on resource-constrained systems like
+microcontrollers or embedded devices.
+In such cases, C or C++ is more suitable for these applications.
