@@ -1,6 +1,15 @@
 Technology for Robotics
 -------------------------
 
+
+Autonomous Navigation
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+In recent years, autonomous navigation technologies have received huge
+attention in many fields.
+Such fields include, autonomous driving[22], drone flight navigation,
+and other transportation systems.
+
 An autonomous navigation system is a system that can move to a goal over long
 periods of time without any external control by an operator.
 The system requires a wide range of technologies:

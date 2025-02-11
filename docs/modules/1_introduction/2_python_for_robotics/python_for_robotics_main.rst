@@ -4,7 +4,7 @@ Python for Robotics
 A programing language, Python is used for this `PythonRobotics` project
 to achieve the purposes of this project described in the :ref:`What is PythonRobotics?`.
 
-This section explains the Python itself and features for science computing Robotics.
+This section explains the Python itself and features for science computing and robotics.
 
 Python for general-purpose programming
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
