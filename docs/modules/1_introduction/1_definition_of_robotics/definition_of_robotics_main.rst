@@ -1,14 +1,24 @@
 Definition of Robotics
 ----------------------
 
+This section explains the definition, history, key components, and applications of robotics.
+
 What is Robotics?
 ^^^^^^^^^^^^^^^^^^
 
 Robot is a machine that can perform tasks automatically or semi-autonomously.
 Robotics is the study of robots.
-The field of robotics has wide areas of technologies such as mechanical engineering,
-electrical engineering, computer science, and artificial intelligence (AI),
-to create machines that can perform tasks autonomously or semi-autonomously.
+
+The word “robot” comes from the Czech word “robota,” which means “forced labor” or “drudgery.”
+It was first used in the 1920 science fiction play `R.U.R.`_ (Rossum’s Universal Robots)
+by the Czech writer `Karel Čapek`_.
+In the play, robots were artificial workers created to serve humans, but they eventually rebelled.
+
+Over time, “robot” came to refer to machines or automated systems that can perform tasks,
+often with some level of intelligence or autonomy.
+
+.. _`R.U.R.`: https://thereader.mitpress.mit.edu/origin-word-robot-rur/
+.. _`Karel Čapek`: https://en.wikipedia.org/wiki/Karel_%C4%8Capek
 
 The History of Robots
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -18,22 +28,30 @@ This timeline highlights key milestones in the history of robotics:
 Ancient and Early Concepts (Before 1500s)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The idea of **automated machines** has existed for thousands of years. Ancient civilizations imagined mechanical beings:
+The idea of **automated machines** has existed for thousands of years.
+Ancient civilizations imagined mechanical beings:
 
-- **Ancient Greece (4th Century BC)** – Greek engineer **Hero of Alexandria** designed early **automata** (self-operating machines) powered by water or air.
-- **Chinese and Arabic Automata (9th–13th Century)** – Inventors like **Al-Jazari** created intricate mechanical devices, including water clocks and humanoid robots.
+- **Ancient Greece (4th Century BC)** – Greek engineer `Hero of Alexandria`_ designed early **automata** (self-operating machines) powered by water or air.
+- **Chinese and Arabic Automata (9th–13th Century)** – Inventors like `Ismail Al-Jazari`_ created intricate mechanical devices, including water clocks and automated moving peacocks driven by hydropower.
+
+.. _`Hero of Alexandria`: https://en.wikipedia.org/wiki/Hero_of_Alexandria
+.. _`Ismail Al-Jazari`: https://en.wikipedia.org/wiki/Ismail_al-Jazari
 
 The Birth of Modern Robotics (1500s–1800s)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- **Leonardo da Vinci’s Robot (1495)** – Designed a humanoid knight with mechanical movement.
-- **Jacques de Vaucanson’s Automata (1738)** – Created robotic figures like a mechanical duck that could "eat" and "digest."
-- **Industrial Revolution (18th–19th Century)** – Machines began replacing human labor in factories, setting the foundation for automation.
+- `Leonardo da Vinci’s Robot`_  (1495) – Designed a humanoid knight with mechanical movement.
+- `Jacques de Vaucanson’s Digesting Duck`_ (1738) – Created robotic figures like a mechanical duck that could "eat" and "digest."
+- `Industrial Revolution`_ (18th–19th Century) – Machines began replacing human labor in factories, setting the foundation for automation.
+
+.. _`Leonardo da Vinci’s Robot`: https://en.wikipedia.org/wiki/Leonardo%27s_robot
+.. _`Jacques de Vaucanson’s Digesting Duck`: https://en.wikipedia.org/wiki/Jacques_de_Vaucanson
+.. _`Industrial Revolution`: https://en.wikipedia.org/wiki/Industrial_Revolution
 
 The Rise of Industrial Robots (1900s–1950s)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- **The Term “Robot” (1921)** – Czech writer **Karel Čapek** introduced the word *“robot”* in his play *R.U.R. (Rossum’s Universal Robots)*.
+- **The Term “Robot” (1921)** – Czech writer `Karel Čapek`_ introduced the word *“robot”* in his play `R.U.R.`_ (Rossum’s Universal Robots).
 - **Early Cybernetics (1940s–1950s)** – Scientists like **Norbert Wiener** developed theories of self-regulating machines, influencing modern robotics.
 
 The Birth of Modern Robotics (1950s–1980s)
