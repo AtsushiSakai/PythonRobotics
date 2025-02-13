@@ -53,6 +53,7 @@ class ElasticBands:
         self.kc = kc  # Contraction force gain
         self.kr = kr  # Repulsive force gain
         self.rho0 = rho0  # Maximum distance for applying repulsive force
+        self._maintain_overlap()
 
     def compute_rho(self, position):
         """Compute the distance field value at the position"""
@@ -143,8 +144,7 @@ class ElasticBands:
 class ElasticBandsVisualizer:
     def __init__(self):
         self.obstacles = np.zeros((500, 500))
-        self.start_point = None
-        self.end_point = None
+        self.path_points = []
         self.elastic_band = None
 
         if ENABLE_PLOT:
@@ -158,24 +158,7 @@ class ElasticBandsVisualizer:
             # Connect mouse events
             self.fig.canvas.mpl_connect("button_press_event", self.on_click)
         else:
-            self.path_points = [
-                [30, 136],
-                [61, 214],
-                [77, 256],
-                [77, 309],
-                [53, 366],
-                [41, 422],
-                [51, 453],
-                [110, 471],
-                [184, 437],
-                [257, 388],
-                [343, 353],
-                [402, 331],
-                [476, 273],
-                [456, 206],
-                [430, 160],
-                [402, 107],
-            ]
+            self.path_points = np.load(pathlib.Path(__file__).parent / "points.npy")
             self.obstacles = np.load(pathlib.Path(__file__).parent / "obstacles.npy")
             self.plan_path()
 
@@ -257,6 +240,6 @@ class ElasticBandsVisualizer:
 
 
 if __name__ == "__main__":
-    ElasticBandsVisualizer()
+    _ = ElasticBandsVisualizer()
     if ENABLE_PLOT:
         plt.show()
