@@ -52,21 +52,36 @@ The Rise of Industrial Robots (1900s–1950s)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - **The Term “Robot” (1921)** – Czech writer `Karel Čapek`_ introduced the word *“robot”* in his play `R.U.R.`_ (Rossum’s Universal Robots).
-- **Early Cybernetics (1940s–1950s)** – Scientists like **Norbert Wiener** developed theories of self-regulating machines, influencing modern robotics.
+- **Early Cybernetics (1940s–1950s)** – Scientists like `Norbert Wiener`_ developed theories of self-regulating machines, influencing modern robotics (Cybernetics).
+
+.. _`Norbert Wiener`: https://en.wikipedia.org/wiki/Norbert_Wiener
 
 The Birth of Modern Robotics (1950s–1980s)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- **First Industrial Robot (1961)** – *Unimate*, created by **George Devol and Joseph Engelberger**, was the first programmable robot used in a factory.
-- **Rise of AI & Autonomous Robots (1970s–1980s)** – Researchers developed mobile robots like **Shakey** (Stanford, 1966) and AI-based control systems.
+- **First Industrial Robot (1961)** – `Unimate`_, created by `George Devol`_ and `Joseph Engelberger`_, was the first programmable robot used in a factory.
+- **Rise of AI & Autonomous Robots (1970s–1980s)** – Researchers developed mobile robots like `Shakey`_ (Stanford, 1966) and AI-based control systems.
+
+.. _`Unimate`: https://en.wikipedia.org/wiki/Unimate
+.. _`George Devol`: https://en.wikipedia.org/wiki/George_Devol
+.. _`Joseph Engelberger`: https://en.wikipedia.org/wiki/Joseph_Engelberger
+.. _`Shakey`: https://en.wikipedia.org/wiki/Shakey_the_robot
 
 Advanced Robotics and AI Integration (1990s–Present)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- **Autonomous Vehicles & Drones** – Self-driving cars and UAVs (unmanned aerial vehicles) became more advanced.
-- **Medical Robotics** – Robots like **da Vinci Surgical System** revolutionized healthcare.
-- **Personal Robots** – Devices like **Roomba** (vacuum robot) and **Sophia** (AI humanoid) became popular.
-- **Collaborative Robots (Cobots)** – Robots started working alongside humans in industries.
+- **Autonomous Vehicles** – Self-driving cars for robo taxi like `Waymo`_ and autonomous haulage system in mining like `AHS`_ became more advanced and bisiness-ready.
+- **Medical Robotics** – Robots like `da Vinci Surgical System`_ revolutionized healthcare.
+- **Personal Robots** – Devices like `Roomba`_ (vacuum robot) and `Sophia`_ (AI humanoid) became popular.
+- **Service Robots** - Assistive robots like serving robots in restaurants and hotels like `Bellabot`_.
+- **Collaborative Robots (Drones)** – Collaborative robots like UAV (Unmanned Aerial Vehicle) in drone shows and delivery services.
+
+.. _`Waymo`: https://waymo.com/
+.. _`AHS`: https://www.futurebridge.com/industry/perspectives-industrial-manufacturing/autonomous-haulage-systems-the-future-of-mining-operations/
+.. _`da Vinci Surgical System`: https://en.wikipedia.org/wiki/Da_Vinci_Surgical_System
+.. _`Roomba`: https://en.wikipedia.org/wiki/Roomba
+.. _`Sophia`: https://en.wikipedia.org/wiki/Sophia_(robot)
+.. _`Bellabot`: https://www.pudurobotics.com/en
 
 Key Components of Robotics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
