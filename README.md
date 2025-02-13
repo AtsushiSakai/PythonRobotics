@@ -617,7 +617,7 @@ This is a list of user's comment and references:[users\_comments](https://github
 
 Any contribution is welcome!! 
 
-Please check this document:[How To Contribute — PythonRobotics documentation](https://atsushisakai.github.io/PythonRobotics/how_to_contribute.html)
+Please check this document:[How To Contribute — PythonRobotics documentation](https://atsushisakai.github.io/PythonRobotics/modules/0_getting_started/3_how_to_contribute.html)
 
 # Citing
 
