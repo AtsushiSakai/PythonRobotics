@@ -30,7 +30,7 @@ STEP_SIZE = 3.0  # Step size for calculating gradient
 
 # Visualization Params
 ENABLE_PLOT = True
-ENABLE_INTERACTIVE = False
+ENABLE_INTERACTIVE = True
 ENABLE_SAVE_DATA = False
 MAX_ITER = 50
 
@@ -101,8 +101,13 @@ class ElasticBands:
                 continue
 
             f_total = self.contraction_force(i) + self.repulsive_force(i)
+            v = self.bubbles[i - 1].pos - self.bubbles[i + 1].pos
+
+            # Remove tangential component
+            f_star = f_total - f_total * v * v / (np.linalg.norm(v) ** 2 + 1e-6)
+
             alpha = self.bubbles[i].radius  # Adaptive step size
-            new_pos = self.bubbles[i].pos + alpha * f_total
+            new_pos = self.bubbles[i].pos + alpha * f_star
             new_pos = np.clip(new_pos, 0, 499)
             new_radius = self.compute_rho(new_pos)
 
