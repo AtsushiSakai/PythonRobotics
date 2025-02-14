@@ -31,6 +31,7 @@ STEP_SIZE = 3.0  # Step size for calculating gradient
 # Visualization Params
 ENABLE_PLOT = True
 ENABLE_INTERACTIVE = False
+ENABLE_SAVE_DATA = False
 MAX_ITER = 50
 
 
@@ -144,6 +145,7 @@ class ElasticBands:
 class ElasticBandsVisualizer:
     def __init__(self):
         self.obstacles = np.zeros((500, 500))
+        self.obstacles_points = []
         self.path_points = []
         self.elastic_band = None
         self.running = True
@@ -159,8 +161,12 @@ class ElasticBandsVisualizer:
             # Connect mouse events
             self.fig.canvas.mpl_connect("button_press_event", self.on_click)
         else:
-            self.path_points = np.load(pathlib.Path(__file__).parent / "points.npy")
-            self.obstacles = np.load(pathlib.Path(__file__).parent / "obstacles.npy")
+            self.path_points = np.load(pathlib.Path(__file__).parent / "path.npy")
+            self.obstacles_points = np.load(
+                pathlib.Path(__file__).parent / "obstacles.npy"
+            )
+            for x, y in self.obstacles_points:
+                self.add_obstacle(x, y)
             self.plan_path()
 
         self.plot_background()
@@ -216,6 +222,16 @@ class ElasticBandsVisualizer:
         plt.draw()
         plt.pause(0.01)
 
+    def add_obstacle(self, x, y):
+        """Add an obstacle at the given coordinates"""
+        size = 30  # Side length of the square
+        half_size = size // 2
+        x_start = max(0, x - half_size)
+        x_end = min(self.obstacles.shape[0], x + half_size)
+        y_start = max(0, y - half_size)
+        y_end = min(self.obstacles.shape[1], y + half_size)
+        self.obstacles[x_start:x_end, y_start:y_end] = 1
+
     def on_click(self, event):
         """Handle mouse click events"""
         if event.inaxes != self.ax:
@@ -224,23 +240,22 @@ class ElasticBandsVisualizer:
         x, y = int(event.xdata), int(event.ydata)
 
         if event.button == 1:  # Left click to add obstacles
-            size = 30  # Side length of the square
-            half_size = size // 2
-
-            # Ensure not out of the map boundary
-            x_start = max(0, x - half_size)
-            x_end = min(self.obstacles.shape[0], x + half_size)
-            y_start = max(0, y - half_size)
-            y_end = min(self.obstacles.shape[1], y + half_size)
-
-            # Set the square area as obstacles (value set to 1)
-            self.obstacles[x_start:x_end, y_start:y_end] = 1
+            self.add_obstacle(x, y)
+            self.obstacles_points.append([x, y])
 
         elif event.button == 3:  # Right click to add path points
             self.path_points.append([x, y])
 
         elif event.button == 2:  # Middle click to end path input and start planning
             if len(self.path_points) >= 2:
+                if ENABLE_SAVE_DATA:
+                    np.save(
+                        pathlib.Path(__file__).parent / "path.npy", self.path_points
+                    )
+                    np.save(
+                        pathlib.Path(__file__).parent / "obstacles.npy",
+                        self.obstacles_points,
+                    )
                 self.plan_path()
 
         self.plot_background()
