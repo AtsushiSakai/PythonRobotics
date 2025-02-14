@@ -70,12 +70,17 @@ The Birth of Modern Robotics (1950s–1980s)
 Advanced Robotics and AI Integration (1990s–Present)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+- **Industrial Robots** – Advanced robots like `Baxter`_ and `Amazon Robotics`_ revolutionized manufacturing and logistics.
 - **Autonomous Vehicles** – Self-driving cars for robo taxi like `Waymo`_ and autonomous haulage system in mining like `AHS`_ became more advanced and bisiness-ready.
+- **Exploration Robots** – Used for planetary exploration (e.g., NASA’s `Mars rovers`_).
 - **Medical Robotics** – Robots like `da Vinci Surgical System`_ revolutionized healthcare.
 - **Personal Robots** – Devices like `Roomba`_ (vacuum robot) and `Sophia`_ (AI humanoid) became popular.
 - **Service Robots** - Assistive robots like serving robots in restaurants and hotels like `Bellabot`_.
 - **Collaborative Robots (Drones)** – Collaborative robots like UAV (Unmanned Aerial Vehicle) in drone shows and delivery services.
 
+.. _`Baxter`: https://en.wikipedia.org/wiki/Baxter_(robot)
+.. _`Amazon Robotics`: https://en.wikipedia.org/wiki/Amazon_Robotics
+.. _`Mars rovers`: https://en.wikipedia.org/wiki/Mars_rover
 .. _`Waymo`: https://waymo.com/
 .. _`AHS`: https://www.futurebridge.com/industry/perspectives-industrial-manufacturing/autonomous-haulage-systems-the-future-of-mining-operations/
 .. _`da Vinci Surgical System`: https://en.wikipedia.org/wiki/Da_Vinci_Surgical_System
@@ -88,23 +93,10 @@ Key Components of Robotics
 
 Robotics consists of several essential components:
 
-#. Sensors – Gather information from the environment (e.g., cameras, LiDAR, gyro, accelerometer, wheel encoders).
-#. Actuators – Enable movement and interaction with the world (e.g., motors, hydraulic systems).
-#. Computers – Process sensor data and make decisions (e.g., micro-controllers, CPUs, GPUs).
-#. Power Supply – Provides energy to run the robot (e.g., batteries, solar power).
-#. Software & Algorithms – Allow the robot to function and make intelligent decisions (e.g., ROS, machine learning models, localization, mapping, path planning, control).
+#. Sensors – Gather information from the environment (e.g., Cameras, LiDAR, GNSS, Gyro, Accelerometer, Wheel encoders).
+#. Actuators – Enable movement and interaction with the world (e.g., Motors, Hydraulic systems).
+#. Computers – Process sensor data and make decisions (e.g., Micro-controllers, CPUs, GPUs).
+#. Power Supply – Provides energy to run the robot (e.g., Batteries, Solar power).
+#. Software & Algorithms – Allow the robot to function and make intelligent decisions (e.g., ROS, Machine learning models, Localization, Mapping, Path planning, Control).
 
 This project, PythonRobotics, focuses on the software and algorithms part of robotics.
-
-Applications of Robots
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Robots come in various forms depending on their purpose:
-
-#. 🤖 Industrial Robots – Used in manufacturing (e.g., robotic arms in manufacturing factories).
-#. 🏠 Service Robots – Assist in daily life (e.g., vacuum robots, delivery robots).
-#. 🚗 Autonomous Vehicles – Self-driving cars and drones.
-#. 👨‍⚕️ Medical Robots – Assist in surgeries and healthcare.
-#. 🚀 Space & Exploration Robots – Used for planetary exploration (e.g., NASA’s Mars rovers).
-#. 🐶 Humanoid & Social Robots – Designed to interact with humans (e.g., ASIMO, Sophia).
-
