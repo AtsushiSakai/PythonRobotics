@@ -17,7 +17,7 @@ from matplotlib.patches import Circle
 
 sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 
-from Mapping.DistanceMap.distance_map import compute_sdf
+from Mapping.DistanceMap.distance_map import compute_sdf_scipy
 
 # Elastic Bands Params
 MAX_BUBBLE_RADIUS = 100
@@ -45,8 +45,8 @@ class Bubble:
 
 
 class ElasticBands:
-    def __init__(self, initial_path, obstacles, rho0=RHO0, kc=0.05, kr=-0.1):
-        self.distance_map = compute_sdf(obstacles)
+    def __init__(self, initial_path, obstacles, rho0=RHO0, kc=KC, kr=KR):
+        self.distance_map = compute_sdf_scipy(obstacles)
         self.bubbles = [
             Bubble(p, self.compute_rho(p)) for p in initial_path
         ]  # Initialize bubble chain
@@ -73,7 +73,7 @@ class ElasticBands:
         dir_next = (next_ - current) / (np.linalg.norm(next_ - current) + 1e-6)
         return self.kc * (dir_prev + dir_next)
 
-    def external_force(self, i):
+    def repulsive_force(self, i):
         """Calculate external repulsive force for the i-th bubble"""
         h = STEP_SIZE  # Step size
         b = self.bubbles[i].pos
@@ -99,7 +99,7 @@ class ElasticBands:
                 new_bubbles.append(self.bubbles[i])  # Fixed start and end points
                 continue
 
-            f_total = self.contraction_force(i) + self.external_force(i)
+            f_total = self.contraction_force(i) + self.repulsive_force(i)
             alpha = self.bubbles[i].radius  # Adaptive step size
             new_pos = self.bubbles[i].pos + alpha * f_total
             new_pos = np.clip(new_pos, 0, 499)
@@ -146,10 +146,11 @@ class ElasticBandsVisualizer:
         self.obstacles = np.zeros((500, 500))
         self.path_points = []
         self.elastic_band = None
+        self.running = True
 
         if ENABLE_PLOT:
             self.fig, self.ax = plt.subplots(figsize=(8, 8))
-            # Set the display range of the graph
+            self.fig.canvas.mpl_connect("close_event", self.on_close)
             self.ax.set_xlim(0, 500)
             self.ax.set_ylim(0, 500)
 
@@ -164,15 +165,32 @@ class ElasticBandsVisualizer:
 
         self.plot_background()
 
+    def on_close(self, event):
+        """Handle window close event"""
+        self.running = False
+        plt.close("all")  # Close all figure windows
+
     def plot_background(self):
         """Plot the background grid"""
-        if not ENABLE_PLOT:
+        if not ENABLE_PLOT or not self.running:
             return
 
         self.ax.cla()
         self.ax.set_xlim(0, 500)
         self.ax.set_ylim(0, 500)
         self.ax.grid(True)
+
+        if ENABLE_INTERACTIVE:
+            self.ax.set_title(
+                "Elastic Bands Path Planning\n"
+                "Left click: Add obstacles\n"
+                "Right click: Add path points\n"
+                "Middle click: Start planning",
+                pad=20,
+            )
+        else:
+            self.ax.set_title("Elastic Bands Path Planning", pad=20)
+
         if self.path_points:
             self.ax.plot(
                 [p[0] for p in self.path_points],
@@ -242,4 +260,4 @@ class ElasticBandsVisualizer:
 if __name__ == "__main__":
     _ = ElasticBandsVisualizer()
     if ENABLE_PLOT:
-        plt.show()
+        plt.show(block=True)
