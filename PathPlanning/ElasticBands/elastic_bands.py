@@ -30,7 +30,7 @@ STEP_SIZE = 3.0  # Step size for calculating gradient
 
 # Visualization Params
 ENABLE_PLOT = True
-ENABLE_INTERACTIVE = True
+ENABLE_INTERACTIVE = False
 ENABLE_SAVE_DATA = False
 MAX_ITER = 50
 
@@ -210,7 +210,8 @@ class ElasticBandsVisualizer:
                 markersize=8,
             )
 
-        self.ax.imshow(self.obstacles.T, origin="lower", cmap="binary", alpha=0.3)
+        self.ax.imshow(self.obstacles.T, origin="lower", cmap="binary", alpha=0.8)
+        self.ax.plot([], [], color="black", label="obstacles")
         if self.elastic_band is not None:
             path = [b.pos.tolist() for b in self.elastic_band.bubbles]
             path = np.array(path)
@@ -222,8 +223,9 @@ class ElasticBandsVisualizer:
                 )
                 self.ax.add_patch(circle)
                 self.ax.plot(bubble.pos[0], bubble.pos[1], "bo", markersize=10)
+            self.ax.plot([], [], color="green", label="bubbles")
 
-        self.ax.legend()
+        self.ax.legend(loc="upper right")
         plt.draw()
         plt.pause(0.01)
 
