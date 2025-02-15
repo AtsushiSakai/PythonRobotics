@@ -47,11 +47,13 @@ class Grid():
             print("Obstacle initial position: ", initial_position)
         
         diffs = [np.array([0, 1]), np.array([0, -1]), np.array([1, 0]), np.array([-1, 0]), np.array([0, 0])]
+        weights = [0.125, 0.125, 0.125, 0.125, 0.5] 
 
         for t in range(1, self.time_limit-1):
-            random.shuffle(diffs)
+            rand_diffs = random.sample(diffs, k=5)
+
             valid_position = None
-            for diff in diffs:
+            for diff in rand_diffs:
                 new_position = positions[-1] + diff
 
                 if not self.valid_position(new_position, t):
@@ -119,7 +121,7 @@ def main():
     def get_frame(i):
         obs_x_points = []
         obs_y_points = []
-        for (_obs_idx, obs_path) in enumerate(grid.obstacle_paths):
+        for obs_path in grid.obstacle_paths:
             obs_pos = obs_path[i]
             obs_x_points.append(obs_pos[0])
             obs_y_points.append(obs_pos[1])
