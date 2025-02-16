@@ -46,7 +46,16 @@ class Bubble:
 
 
 class ElasticBands:
-    def __init__(self, initial_path, obstacles, rho0=RHO0, kc=KC, kr=KR):
+    def __init__(
+        self,
+        initial_path,
+        obstacles,
+        rho0=RHO0,
+        kc=KC,
+        kr=KR,
+        lambda_=LAMBDA,
+        step_size=STEP_SIZE,
+    ):
         self.distance_map = compute_sdf_scipy(obstacles)
         self.bubbles = [
             Bubble(p, self.compute_rho(p)) for p in initial_path
@@ -54,6 +63,8 @@ class ElasticBands:
         self.kc = kc  # Contraction force gain
         self.kr = kr  # Repulsive force gain
         self.rho0 = rho0  # Maximum distance for applying repulsive force
+        self.lambda_ = lambda_  # Overlap constraint factor
+        self.step_size = step_size  # Step size for calculating gradient
         self._maintain_overlap()
 
     def compute_rho(self, position):
@@ -76,7 +87,7 @@ class ElasticBands:
 
     def repulsive_force(self, i):
         """Calculate external repulsive force for the i-th bubble"""
-        h = STEP_SIZE  # Step size
+        h = self.step_size  # Step size
         b = self.bubbles[i].pos
         rho = self.bubbles[i].radius
 
@@ -125,7 +136,7 @@ class ElasticBands:
         while i < len(self.bubbles) - 1:
             bi, bj = self.bubbles[i], self.bubbles[i + 1]
             dist = np.linalg.norm(bi.pos - bj.pos)
-            if dist > LAMBDA * (bi.radius + bj.radius):
+            if dist > self.lambda_ * (bi.radius + bj.radius):
                 new_pos = (bi.pos + bj.pos) / 2
                 rho = self.compute_rho(
                     new_pos
@@ -141,7 +152,7 @@ class ElasticBands:
             prev = self.bubbles[i - 1]
             next_ = self.bubbles[i + 1]
             dist = np.linalg.norm(prev.pos - next_.pos)
-            if dist <= LAMBDA * (prev.radius + next_.radius):
+            if dist <= self.lambda_ * (prev.radius + next_.radius):
                 del self.bubbles[i]  # Delete if redundant
             else:
                 i += 1
