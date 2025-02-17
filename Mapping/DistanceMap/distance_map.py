@@ -11,9 +11,60 @@ Ref:
 
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy
 
 INF = 1e20
 ENABLE_PLOT = True
+
+
+def compute_sdf_scipy(obstacles):
+    """
+    Compute the signed distance field (SDF) from a boolean field using scipy.
+    This function has the same functionality as compute_sdf.
+    However, by using scipy.ndimage.distance_transform_edt, it can compute much faster.
+
+    Example: 500×500 map
+    • compute_sdf: 3 sec
+    • compute_sdf_scipy: 0.05 sec
+
+    Parameters
+    ----------
+    obstacles : array_like
+        A 2D boolean array where '1' represents obstacles and '0' represents free space.
+
+    Returns
+    -------
+    array_like
+        A 2D array representing the signed distance field, where positive values indicate distance
+        to the nearest obstacle, and negative values indicate distance to the nearest free space.
+    """
+    # distance_transform_edt use '0' as obstacles, so we need to convert the obstacles to '0'
+    a = scipy.ndimage.distance_transform_edt(obstacles == 0)
+    b = scipy.ndimage.distance_transform_edt(obstacles == 1)
+    return a - b
+
+
+def compute_udf_scipy(obstacles):
+    """
+    Compute the unsigned distance field (UDF) from a boolean field using scipy.
+    This function has the same functionality as compute_udf.
+    However, by using scipy.ndimage.distance_transform_edt, it can compute much faster.
+
+    Example: 500×500 map
+    • compute_udf: 1.5 sec
+    • compute_udf_scipy: 0.02 sec
+
+    Parameters
+    ----------
+    obstacles : array_like
+        A 2D boolean array where '1' represents obstacles and '0' represents free space.
+
+    Returns
+    -------
+    array_like
+        A 2D array of distances from the nearest obstacle, with the same dimensions as `bool_field`.
+    """
+    return scipy.ndimage.distance_transform_edt(obstacles == 0)
 
 
 def compute_sdf(obstacles):
