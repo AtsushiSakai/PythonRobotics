@@ -30,7 +30,11 @@ STEP_SIZE = 3.0  # Step size for calculating gradient
 
 # Visualization Params
 ENABLE_PLOT = True
+# ENABLE_INTERACTIVE is True allows user to add obstacles by left clicking
+# and add path points by right clicking and start planning by middle clicking
 ENABLE_INTERACTIVE = False
+# ENABLE_SAVE_DATA is True allows saving the path and obstacles which added
+# by user in interactive mode to file
 ENABLE_SAVE_DATA = False
 MAX_ITER = 50
 
