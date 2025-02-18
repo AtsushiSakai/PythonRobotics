@@ -16,7 +16,7 @@ Core Concept
   * Maintain global path connectivity.
 
 Bubble Representation
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 - **Definition**: A local free-space region around configuration :math:`b`:
 
   .. math::
@@ -56,7 +56,7 @@ External Repulsion Force
      \frac{\partial \rho}{\partial x} \approx \frac{\rho(b_i + h) - \rho(b_i - h)}{2h}.
 
 Dynamic Path Maintenance
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 1. **Node Update**:
    
    .. math::
@@ -68,6 +68,7 @@ Dynamic Path Maintenance
 - Insert new nodes if adjacent nodes are too far apart
 - Remove redundant nodes if adjacent nodes are too close
 
-Ref:
+References
+~~~~~~~~~~~~~~~~~~~~~~~
 
 -  `Elastic Bands: Connecting Path Planning and Control <http://www8.cs.umu.se/research/ifor/dl/Control/elastic%20bands.pdf>`__

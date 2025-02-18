@@ -110,6 +110,12 @@ the following additional libraries are required.
 For instructions on installing the above libraries, please refer to
 this section ":ref:`How to run sample codes`".
 
+Audio overview of this project
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+For an audio overview of this project, please refer to this `YouTube video`_.
+
+.. _`YouTube video`: https://www.youtube.com/watch?v=uMeRnNoJAfU
+
 Arxiv paper
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
