@@ -14,5 +14,5 @@ covered in PythonRobotics.
 
    1_definition_of_robotics/definition_of_robotics
    2_python_for_robotics/python_for_robotics
-   3_technology_for_robotics/technology_for_robotics
+   3_technologies_for_robotics/technologies_for_robotics
 

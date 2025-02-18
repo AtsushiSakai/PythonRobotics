@@ -1,3 +1,5 @@
+.. _`Internal Sensors for Robots`:
+
 Internal Sensors for Robots
 ============================
 
