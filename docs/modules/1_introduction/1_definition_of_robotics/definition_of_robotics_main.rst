@@ -17,6 +17,10 @@ In the play, robots were artificial workers created to serve humans, but they ev
 Over time, “robot” came to refer to machines or automated systems that can perform tasks,
 often with some level of intelligence or autonomy.
 
+Currently, 2 millions robots are working in the world, and the number is increasing every year.
+In South Korea, where the adoption of robots is particularly rapid,
+50 robots are operating per 1,000 people.
+
 .. _`R.U.R.`: https://thereader.mitpress.mit.edu/origin-word-robot-rur/
 .. _`Karel Čapek`: https://en.wikipedia.org/wiki/Karel_%C4%8Capek
 
@@ -100,3 +104,4 @@ Robotics consists of several essential components:
 #. Software & Algorithms – Allow the robot to function and make intelligent decisions (e.g., ROS, Machine learning models, Localization, Mapping, Path planning, Control).
 
 This project, PythonRobotics, focuses on the software and algorithms part of robotics.
+If you are interested in `Sensors` hardware, you can check :ref:`Internal Sensors for Robotics`_ or :ref:`External Sensors for Robotics`_.

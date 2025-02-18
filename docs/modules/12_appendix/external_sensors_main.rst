@@ -1,3 +1,5 @@
+.. _`External Sensors for Robots`:
+
 External Sensors for Robots
 ============================
 
