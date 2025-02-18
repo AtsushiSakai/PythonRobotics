@@ -89,6 +89,10 @@ See this documentation
 
 - [Getting Started — PythonRobotics documentation](https://atsushisakai.github.io/PythonRobotics/getting_started.html#what-is-pythonrobotics)
 
+or this Youtube video:
+
+- [PythonRobotics project audio overview](https://www.youtube.com/watch?v=uMeRnNoJAfU)
+
 or this paper for more details:
 
 - [\[1808\.10703\] PythonRobotics: a Python code collection of robotics algorithms](https://arxiv.org/abs/1808.10703) ([BibTeX](https://github.com/AtsushiSakai/PythonRoboticsPaper/blob/master/python_robotics.bib))
