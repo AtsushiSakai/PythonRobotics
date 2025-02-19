@@ -187,6 +187,7 @@ If you would like to support us in some other way, please contact with creating 
 
 Current Major Sponsors:
 
+#. `GitHub`_ : They are providing a GitHub Copilot Pro license for this OSS development.
 #. `JetBrains`_ : They are providing a free license of their IDEs for this OSS development.
 #. `1Password`_ : They are providing a free license of their 1Password team license for this OSS project.
 
@@ -202,6 +203,7 @@ Current Major Sponsors:
 .. _`doc README`: https://github.com/AtsushiSakai/PythonRobotics/blob/master/docs/README.md
 .. _`test_codestyle.py`: https://github.com/AtsushiSakai/PythonRobotics/blob/master/tests/test_codestyle.py
 .. _`JetBrains`: https://www.jetbrains.com/
+.. _`GitHub`: https://www.github.com/
 .. _`Sponsor @AtsushiSakai on GitHub Sponsors`: https://github.com/sponsors/AtsushiSakai
 .. _`Become a backer or sponsor on Patreon`: https://www.patreon.com/myenigma
 .. _`One-time donation via PayPal`: https://www.paypal.com/paypalme/myenigmapay/
