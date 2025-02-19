@@ -2,6 +2,7 @@
 #
 
 # You can set these variables from the command line.
+# SPHINXOPTS with -W means turn warnings into errors to fail the build when warnings are present.
 SPHINXOPTS    = -W
 SPHINXBUILD   = sphinx-build
 SPHINXPROJ    = PythonRobotics
