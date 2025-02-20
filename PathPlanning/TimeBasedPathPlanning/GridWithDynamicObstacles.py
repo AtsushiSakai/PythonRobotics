@@ -1,7 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from enum import Enum
+from typing import Tuple, TypeAlias
 
+Numpy2DArray: TypeAlias = np.ndarray[Tuple[int, int], np.dtype[np.int_]]
+Numpy1DArray: TypeAlias = np.ndarray[np.dtype[np.int_]]
 
 class Position:
     x: int
@@ -11,7 +14,7 @@ class Position:
         self.x = x
         self.y = y
 
-    def as_ndarray(self) -> np.ndarray[int, int]:
+    def as_ndarray(self) -> Numpy1DArray:
         return np.array([self.x, self.y])
 
     def __add__(self, other):
@@ -46,8 +49,8 @@ class ObstacleArrangement(Enum):
 
 class Grid:
     # Set in constructor
-    grid_size = None
-    grid = None
+    grid_size: Numpy1DArray
+    grid: Numpy2DArray
     obstacle_paths: list[list[Position]] = []
     # Obstacles will never occupy these points. Useful to avoid impossible scenarios
     obstacle_avoid_points = []
@@ -60,7 +63,7 @@ class Grid:
 
     def __init__(
         self,
-        grid_size: np.ndarray[int, int],
+        grid_size: Numpy1DArray,
         num_obstacles: int = 40,
         obstacle_avoid_points: list[Position] = [],
         obstacle_arrangement: ObstacleArrangement = ObstacleArrangement.RANDOM,
@@ -180,7 +183,7 @@ class Grid:
     Check if the given position is valid at time t
 
     input:
-        position (np.ndarray[int, int]): (x, y) position
+        position (Position): (x, y) position
         t (int): time step
 
     output:
@@ -218,7 +221,7 @@ class Grid:
     Sample a random position that is within the grid's boundaries
 
     output:
-        np.ndarray[int, int]: (x, y) position
+        Position: (x, y) position
     """
     def sample_random_position(self) -> Position:
         return Position(
