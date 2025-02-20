@@ -1,4 +1,4 @@
-.. _localization:
+.. _`Localization`:
 
 Localization
 ============

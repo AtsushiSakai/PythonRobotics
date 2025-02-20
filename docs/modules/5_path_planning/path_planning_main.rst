@@ -1,4 +1,4 @@
-.. _path_planning:
+.. _`Path Planning`:
 
 Path Planning
 =============
