@@ -40,6 +40,10 @@ class PathFinderController:
         self.Kp_rho = Kp_rho
         self.Kp_alpha = Kp_alpha
         self.Kp_beta = Kp_beta
+        self.direction = 0  # 0: not initialized, 1: forward, -1: backward
+
+    def reset_direction(self):
+        self.direction = 0
 
     def calc_control_command(self, x_diff, y_diff, theta, theta_goal):
         """
@@ -76,19 +80,30 @@ class PathFinderController:
         # [-pi, pi] to prevent unstable behavior e.g. difference going
         # from 0 rad to 2*pi rad with slight turn
 
+        # Ref: The velocity v always has a constant sign which depends on the initial value of α.
+        if self.direction == 0:
+            alpha = angle_mod(np.arctan2(y_diff, x_diff) - theta)
+            if alpha > np.pi / 2 or alpha < -np.pi / 2:
+                print(f"alpha: {alpha}, direction: -1")
+                self.direction = -1
+            else:
+                print(f"alpha: {alpha}, direction: 1")
+                self.direction = 1
+
         rho = np.hypot(x_diff, y_diff)
         v = self.Kp_rho * rho
 
-        alpha = angle_mod(np.arctan2(y_diff, x_diff) - theta)
-        beta = angle_mod(theta_goal - theta - alpha)
-        if alpha > np.pi / 2 or alpha < -np.pi / 2:
-            # recalculate alpha to make alpha in the range of [-pi/2, pi/2]
-            alpha = angle_mod(np.arctan2(-y_diff, -x_diff) - theta)
-            beta = angle_mod(theta_goal - theta - alpha)
-            w = self.Kp_alpha * alpha - self.Kp_beta * beta
-            v = -v
+        if self.direction == 1:
+            alpha = angle_mod(np.arctan2(y_diff, x_diff) - theta)
+            alpha = np.clip(alpha, -np.pi / 2, np.pi / 2)
         else:
-            w = self.Kp_alpha * alpha - self.Kp_beta * beta
+            # backward direction should calculate alpha from the opposite direction
+            alpha = angle_mod(np.arctan2(-y_diff, -x_diff) - theta)
+            alpha = np.clip(alpha, -np.pi / 2, np.pi / 2)
+            v = -v
+
+        beta = angle_mod(theta_goal - theta - alpha)
+        w = self.Kp_alpha * alpha - self.Kp_beta * beta
 
         return rho, v, w
 
@@ -96,6 +111,7 @@ class PathFinderController:
 # simulation parameters
 controller = PathFinderController(9, 15, 3)
 dt = 0.01
+MAX_SIM_TIME = 5  # seconds, robot will stop moving when time exceeds this value
 
 # Robot specifications
 MAX_LINEAR_SPEED = 15
@@ -105,6 +121,7 @@ show_animation = True
 
 
 def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
+    controller.reset_direction()
     x = x_start
     y = y_start
     theta = theta_start
@@ -112,10 +129,12 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
     x_diff = x_goal - x
     y_diff = y_goal - y
 
-    x_traj, y_traj = [], []
+    x_traj, y_traj, v_traj, w_traj = [x], [y], [0], [0]
 
     rho = np.hypot(x_diff, y_diff)
-    while rho > 0.001:
+    t = 0
+    while rho > 0.001 and t < MAX_SIM_TIME:
+        t += dt
         x_traj.append(x)
         y_traj.append(y)
 
@@ -129,6 +148,9 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
 
         if abs(w) > MAX_ANGULAR_SPEED:
             w = np.sign(w) * MAX_ANGULAR_SPEED
+
+        v_traj.append(v)
+        w_traj.append(w)
 
         theta = theta + w * dt
         x = x + v * np.cos(theta) * dt
@@ -153,6 +175,8 @@ def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
                 width=0.1,
             )
             plot_vehicle(x, y, theta, x_traj, y_traj)
+
+    return x_traj, y_traj, v_traj, w_traj
 
 
 def plot_vehicle(x, y, theta, x_traj, y_traj):  # pragma: no cover
