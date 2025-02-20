@@ -5,10 +5,14 @@ Space-time A* Algorithm
     Reference: https://www.davidsilver.uk/wp-content/uploads/2020/03/coop-path-AIWisdom.pdf
 """
 
-from __future__ import annotations # For typehints of a class within itself
+from __future__ import annotations  # For typehints of a class within itself
 import numpy as np
 import matplotlib.pyplot as plt
-from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import Grid, ObstacleArrangement, Position
+from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
+    Grid,
+    ObstacleArrangement,
+    Position,
+)
 import heapq
 from collections.abc import Generator
 import random
@@ -18,13 +22,16 @@ RANDOM_SEED = 50
 random.seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
+
 class Node:
     position: Position
     time: int
     heuristic: int
     parent_index: int
 
-    def __init__(self, position: Position, time: int, heuristic: int, parent_index: int):
+    def __init__(
+        self, position: Position, time: int, heuristic: int, parent_index: int
+    ):
         self.position = position
         self.time = time
         self.heuristic = heuristic
@@ -34,11 +41,13 @@ class Node:
     This is what is used to drive node expansion. The node with the lowest value is expanded next.
     This comparison prioritizes the node with the lowest cost-to-come (self.time) + cost-to-go (self.heuristic)
     """
+
     def __lt__(self, other: Node):
         return (self.time + self.heuristic) < (other.time + other.heuristic)
 
     def __repr__(self):
         return f"Node(position={self.position}, time={self.time}, heuristic={self.heuristic}, parent_index={self.parent_index})"
+
 
 class NodePath:
     path: list[Node]
@@ -52,20 +61,23 @@ class NodePath:
     """
     Get the position of the path at a given time
     """
+
     def get_position(self, time: int) -> Position:
         return self.positions_at_time.get(time)
 
     """
     Time stamp of the last node in the path
     """
+
     def goal_reached_time(self) -> int:
         return self.path[-1].time
 
     def __repr__(self):
         repr_string = ""
-        for (i, node) in enumerate(self.path):
+        for i, node in enumerate(self.path):
             repr_string += f"{i}: {node}\n"
         return repr_string
+
 
 class TimeBasedAStar:
     grid: Grid
@@ -79,7 +91,9 @@ class TimeBasedAStar:
 
     def plan(self, verbose: bool = False) -> NodePath:
         open_set = []
-        heapq.heappush(open_set, Node(self.start, 0, self.calculate_heuristic(self.start), -1))
+        heapq.heappush(
+            open_set, Node(self.start, 0, self.calculate_heuristic(self.start), -1)
+        )
 
         expanded_set = []
         while open_set:
@@ -117,12 +131,26 @@ class TimeBasedAStar:
     """
     Generate possible successors of the provided `parent_node`
     """
-    def generate_successors(self, parent_node: Node, parent_node_idx: int, verbose: bool) -> Generator[Node, None, None]:
-        diffs = [Position(0, 1), Position(0, -1), Position(1, 0), Position(-1, 0), Position(0, 0)]
+
+    def generate_successors(
+        self, parent_node: Node, parent_node_idx: int, verbose: bool
+    ) -> Generator[Node, None, None]:
+        diffs = [
+            Position(0, 1),
+            Position(0, -1),
+            Position(1, 0),
+            Position(-1, 0),
+            Position(0, 0),
+        ]
         for diff in diffs:
             new_pos = parent_node.position + diff
-            if self.grid.valid_position(new_pos, parent_node.time+1):
-                new_node = Node(new_pos, parent_node.time+1, self.calculate_heuristic(new_pos), parent_node_idx)
+            if self.grid.valid_position(new_pos, parent_node.time + 1):
+                new_node = Node(
+                    new_pos,
+                    parent_node.time + 1,
+                    self.calculate_heuristic(new_pos),
+                    parent_node_idx,
+                )
                 if verbose:
                     print("\tNew successor node: ", new_node)
                 yield new_node
@@ -131,12 +159,20 @@ class TimeBasedAStar:
         diff = self.goal - position
         return abs(diff.x) + abs(diff.y)
 
+
 show_animation = True
+
+
 def main():
     start = Position(1, 11)
     goal = Position(19, 19)
     grid_side_length = 21
-    grid = Grid(np.array([grid_side_length, grid_side_length]), num_obstacles=40, obstacle_avoid_points=[start, goal], obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1)
+    grid = Grid(
+        np.array([grid_side_length, grid_side_length]),
+        num_obstacles=40,
+        obstacle_avoid_points=[start, goal],
+        obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1,
+    )
 
     planner = TimeBasedAStar(grid, start, goal)
     verbose = False
@@ -149,22 +185,26 @@ def main():
         return
 
     fig = plt.figure(figsize=(10, 7))
-    ax = fig.add_subplot(autoscale_on=False, xlim=(0, grid.grid_size[0]-1), ylim=(0, grid.grid_size[1]-1))
-    ax.set_aspect('equal')
+    ax = fig.add_subplot(
+        autoscale_on=False,
+        xlim=(0, grid.grid_size[0] - 1),
+        ylim=(0, grid.grid_size[1] - 1),
+    )
+    ax.set_aspect("equal")
     ax.grid()
     ax.set_xticks(np.arange(0, grid_side_length, 1))
     ax.set_yticks(np.arange(0, grid_side_length, 1))
 
-    start_and_goal, = ax.plot([], [], 'mD', ms=15, label="Start and Goal")
+    (start_and_goal,) = ax.plot([], [], "mD", ms=15, label="Start and Goal")
     start_and_goal.set_data([start.x, goal.x], [start.y, goal.y])
-    obs_points, = ax.plot([], [], 'ro', ms=15, label="Obstacles")
-    path_points, = ax.plot([], [], 'bo', ms=10, label="Path Found")
+    (obs_points,) = ax.plot([], [], "ro", ms=15, label="Obstacles")
+    (path_points,) = ax.plot([], [], "bo", ms=10, label="Path Found")
     ax.legend(bbox_to_anchor=(1.05, 1))
 
     # for stopping simulation with the esc key.
-    plt.gcf().canvas.mpl_connect('key_release_event',
-        lambda event: [exit(
-            0) if event.key == 'escape' else None])
+    plt.gcf().canvas.mpl_connect(
+        "key_release_event", lambda event: [exit(0) if event.key == "escape" else None]
+    )
 
     for i in range(0, path.goal_reached_time()):
         obs_positions = grid.get_obstacle_positions_at_time(i)
@@ -174,5 +214,6 @@ def main():
         plt.pause(0.2)
     plt.show()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
