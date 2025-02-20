@@ -92,7 +92,7 @@ class Grid:
     """
     def generate_dynamic_obstacles(self, obs_count: int) -> list[list[Position]]:
         obstacle_paths = []
-        for _obs_idx in (0, obs_count):
+        for _ in (0, obs_count):
             # Sample until a free starting space is found
             initial_position = self.sample_random_position()
             while not self.valid_obstacle_position(initial_position, 0):

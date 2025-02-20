@@ -16,13 +16,14 @@ from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
 import heapq
 from collections.abc import Generator
 import random
+from functools import total_ordering
 
 # Seed randomness for reproducibility
 RANDOM_SEED = 50
 random.seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
-
+@total_ordering # so the linter will chill about not implementing __gt__, __ge__, etc
 class Node:
     position: Position
     time: int
@@ -43,6 +44,9 @@ class Node:
     """
     def __lt__(self, other: Node):
         return (self.time + self.heuristic) < (other.time + other.heuristic)
+    
+    def __eq__(self, other: Node):
+        return self.position == other.position and self.time == other.time
 
     def __repr__(self):
         return f"Node(position={self.position}, time={self.time}, heuristic={self.heuristic}, parent_index={self.parent_index})"
@@ -157,7 +161,7 @@ class TimeBasedAStar:
 
 
 show_animation = True
-
+verbose = False
 
 def main():
     start = Position(1, 11)
@@ -171,7 +175,6 @@ def main():
     )
 
     planner = TimeBasedAStar(grid, start, goal)
-    verbose = False
     path = planner.plan(verbose)
 
     if verbose:
