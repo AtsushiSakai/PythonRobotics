@@ -41,7 +41,6 @@ class Node:
     This is what is used to drive node expansion. The node with the lowest value is expanded next.
     This comparison prioritizes the node with the lowest cost-to-come (self.time) + cost-to-go (self.heuristic)
     """
-
     def __lt__(self, other: Node):
         return (self.time + self.heuristic) < (other.time + other.heuristic)
 
@@ -61,14 +60,12 @@ class NodePath:
     """
     Get the position of the path at a given time
     """
-
     def get_position(self, time: int) -> Position:
         return self.positions_at_time.get(time)
 
     """
     Time stamp of the last node in the path
     """
-
     def goal_reached_time(self) -> int:
         return self.path[-1].time
 
@@ -131,16 +128,15 @@ class TimeBasedAStar:
     """
     Generate possible successors of the provided `parent_node`
     """
-
     def generate_successors(
         self, parent_node: Node, parent_node_idx: int, verbose: bool
     ) -> Generator[Node, None, None]:
         diffs = [
-            Position(0, 1),
-            Position(0, -1),
+            Position(0, 0),
             Position(1, 0),
             Position(-1, 0),
-            Position(0, 0),
+            Position(0, 1),
+            Position(0, -1),
         ]
         for diff in diffs:
             new_pos = parent_node.position + diff

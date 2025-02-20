@@ -90,7 +90,6 @@ class Grid:
     """
     Generate dynamic obstacles that move around the grid. Initial positions and movements are random
     """
-
     def generate_dynamic_obstacles(self, obs_count: int) -> list[list[Position]]:
         obstacle_paths = []
         for _obs_idx in (0, obs_count):
@@ -146,7 +145,6 @@ class Grid:
     Bottom half start moving right, top half start moving left. If `obs_count` is less than the length of
     the grid, only the first `obs_count` obstacles will be generated.
     """
-
     def obstacle_arrangement_1(self, obs_count: int) -> list[list[Position]]:
         obstacle_paths = []
         half_grid_x = self.grid_size[0] // 2
@@ -188,7 +186,6 @@ class Grid:
     output:
         bool: True if position/time combination is valid, False otherwise
     """
-
     def valid_position(self, position: Position, t: int) -> bool:
         # Check if new position is in grid
         if not self.inside_grid_bounds(position):
@@ -200,7 +197,6 @@ class Grid:
     """
     Returns True if the given position is valid at time t and is not in the set of obstacle_avoid_points
     """
-
     def valid_obstacle_position(self, position: Position, t: int) -> bool:
         return (
             self.valid_position(position, t)
@@ -210,7 +206,6 @@ class Grid:
     """
     Returns True if the given position is within the grid's boundaries
     """
-
     def inside_grid_bounds(self, position: Position) -> bool:
         return (
             position.x >= 0
@@ -225,7 +220,6 @@ class Grid:
     output:
         np.ndarray[int, int]: (x, y) position
     """
-
     def sample_random_position(self) -> Position:
         return Position(
             np.random.randint(0, self.grid_size[0]),
@@ -235,7 +229,6 @@ class Grid:
     """
     Returns a tuple of (x_positions, y_positions) of the obstacles at time t
     """
-
     def get_obstacle_positions_at_time(self, t: int) -> tuple[list[int], list[int]]:
         x_positions = []
         y_positions = []
