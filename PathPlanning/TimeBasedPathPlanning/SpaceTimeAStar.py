@@ -8,7 +8,7 @@ Space-time A* Algorithm
 from __future__ import annotations # For typehints of a class within itself
 import numpy as np
 import matplotlib.pyplot as plt
-from PathPlanning.TimeBasedPathPlanning.moving_obstacles import Grid, ObstacleArrangement, Position
+from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import Grid, ObstacleArrangement, Position
 import heapq
 from collections.abc import Generator
 import random
