@@ -81,29 +81,19 @@ class PathFinderController:
         # from 0 rad to 2*pi rad with slight turn
 
         # Ref: The velocity v always has a constant sign which depends on the initial value of α.
-        if self.direction == 0:
-            alpha = angle_mod(np.arctan2(y_diff, x_diff) - theta)
-            if alpha > np.pi / 2 or alpha < -np.pi / 2:
-                print(f"alpha: {alpha}, direction: -1")
-                self.direction = -1
-            else:
-                print(f"alpha: {alpha}, direction: 1")
-                self.direction = 1
-
         rho = np.hypot(x_diff, y_diff)
         v = self.Kp_rho * rho
 
-        if self.direction == 1:
-            alpha = angle_mod(np.arctan2(y_diff, x_diff) - theta)
-            alpha = np.clip(alpha, -np.pi / 2, np.pi / 2)
-        else:
-            # backward direction should calculate alpha from the opposite direction
-            alpha = angle_mod(np.arctan2(-y_diff, -x_diff) - theta)
-            alpha = np.clip(alpha, -np.pi / 2, np.pi / 2)
-            v = -v
-
+        alpha = angle_mod(np.arctan2(y_diff, x_diff) - theta)
         beta = angle_mod(theta_goal - theta - alpha)
-        w = self.Kp_alpha * alpha - self.Kp_beta * beta
+        if alpha > np.pi / 2 or alpha < -np.pi / 2:
+            # recalculate alpha to make alpha in the range of [-pi/2, pi/2]
+            alpha = angle_mod(np.arctan2(-y_diff, -x_diff) - theta)
+            beta = angle_mod(theta_goal - theta - alpha)
+            w = self.Kp_alpha * alpha - self.Kp_beta * beta
+            v = -v
+        else:
+            w = self.Kp_alpha * alpha - self.Kp_beta * beta
 
         return rho, v, w
 
