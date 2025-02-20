@@ -40,10 +40,6 @@ class PathFinderController:
         self.Kp_rho = Kp_rho
         self.Kp_alpha = Kp_alpha
         self.Kp_beta = Kp_beta
-        self.direction = 0  # 0: not initialized, 1: forward, -1: backward
-
-    def reset_direction(self):
-        self.direction = 0
 
     def calc_control_command(self, x_diff, y_diff, theta, theta_goal):
         """
@@ -111,7 +107,6 @@ show_animation = True
 
 
 def move_to_pose(x_start, y_start, theta_start, x_goal, y_goal, theta_goal):
-    controller.reset_direction()
     x = x_start
     y = y_start
     theta = theta_start
