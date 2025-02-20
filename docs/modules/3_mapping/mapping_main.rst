@@ -1,4 +1,4 @@
-.. _mapping:
+.. _`Mapping`:
 
 Mapping
 =======

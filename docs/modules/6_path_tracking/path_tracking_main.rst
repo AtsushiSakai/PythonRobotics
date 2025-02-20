@@ -1,4 +1,4 @@
-.. _path_tracking:
+.. _`Path Tracking`:
 
 Path Tracking
 =============
