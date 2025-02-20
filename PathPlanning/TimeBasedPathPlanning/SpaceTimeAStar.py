@@ -1,11 +1,17 @@
+"""
+Space-time A* Algorithm
+    This script demonstrates the Space-time A* algorithm for path planning in a grid world with moving obstacles.
+
+    Reference: https://www.davidsilver.uk/wp-content/uploads/2020/03/coop-path-AIWisdom.pdf
+"""
+
+from __future__ import annotations # For typehints of a class within itself
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-from moving_obstacles import Grid, Position
+from PathPlanning.TimeBasedPathPlanning.moving_obstacles import Grid, ObstacleArrangement, Position
 import heapq
-from typing import Generator
+from collections.abc import Generator
 import random
-from __future__ import annotations
 
 # Seed randomness for reproducibility
 RANDOM_SEED = 50
@@ -23,7 +29,11 @@ class Node:
         self.time = time
         self.heuristic = heuristic
         self.parent_index = parent_index
-        
+
+    """
+    This is what is used to drive node expansion. The node with the lowest value is expanded next.
+    This comparison prioritizes the node with the lowest cost-to-come (self.time) + cost-to-go (self.heuristic)
+    """
     def __lt__(self, other: Node):
         return (self.time + self.heuristic) < (other.time + other.heuristic)
 
@@ -32,25 +42,25 @@ class Node:
 
 class NodePath:
     path: list[Node]
+    positions_at_time: dict[int, Position] = {}
 
     def __init__(self, path: list[Node]):
         self.path = path
-    
-    def get_position(self, time: int) -> Position:
-        # TODO: this is inefficient
-        for i in range(0, len(self.path) - 2):
-            if self.path[i + 1].time > time:
-                print(f"position @ {i} is {self.path[i].position}")
-                return self.path[i].position
-        
-        if len(self.path) > 0:
-            return self.path[-1].position
+        for node in path:
+            self.positions_at_time[node.time] = node.position
 
-        return None
-    
+    """
+    Get the position of the path at a given time
+    """
+    def get_position(self, time: int) -> Position:
+        return self.positions_at_time.get(time)
+
+    """
+    Time stamp of the last node in the path
+    """
     def goal_reached_time(self) -> int:
         return self.path[-1].time
-    
+
     def __repr__(self):
         repr_string = ""
         for (i, node) in enumerate(self.path):
@@ -71,7 +81,6 @@ class TimeBasedAStar:
         open_set = []
         heapq.heappush(open_set, Node(self.start, 0, self.calculate_heuristic(self.start), -1))
 
-        # TODO: is vec good here?
         expanded_set = []
         while open_set:
             expanded_node: Node = heapq.heappop(open_set)
@@ -92,7 +101,7 @@ class TimeBasedAStar:
                     path_walker = expanded_set[path_walker.parent_index]
                 # TODO: fix hack around bad while condiiotn
                 path.append(path_walker)
-                
+
                 # reverse path so it goes start -> goal
                 path.reverse()
                 return NodePath(path)
@@ -102,9 +111,12 @@ class TimeBasedAStar:
 
             for child in self.generate_successors(expanded_node, expanded_idx, verbose):
                 heapq.heappush(open_set, child)
-        
+
         raise Exception("No path found")
-    
+
+    """
+    Generate possible successors of the provided `parent_node`
+    """
     def generate_successors(self, parent_node: Node, parent_node_idx: int, verbose: bool) -> Generator[Node, None, None]:
         diffs = [Position(0, 1), Position(0, -1), Position(1, 0), Position(-1, 0), Position(0, 0)]
         for diff in diffs:
@@ -119,13 +131,12 @@ class TimeBasedAStar:
         diff = self.goal - position
         return abs(diff.x) + abs(diff.y)
 
-import imageio.v2 as imageio
 show_animation = True
 def main():
-    start = Position(1, 1)
+    start = Position(1, 11)
     goal = Position(19, 19)
     grid_side_length = 21
-    grid = Grid(np.array([grid_side_length, grid_side_length]), num_obstacles=40, obstacle_avoid_points=[start, goal])
+    grid = Grid(np.array([grid_side_length, grid_side_length]), num_obstacles=40, obstacle_avoid_points=[start, goal], obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1)
 
     planner = TimeBasedAStar(grid, start, goal)
     verbose = False
@@ -144,7 +155,7 @@ def main():
     ax.set_xticks(np.arange(0, grid_side_length, 1))
     ax.set_yticks(np.arange(0, grid_side_length, 1))
 
-    start_and_goal, = ax.plot([], [], 'mD', ms=15, label="Start and Goal") 
+    start_and_goal, = ax.plot([], [], 'mD', ms=15, label="Start and Goal")
     start_and_goal.set_data([start.x, goal.x], [start.y, goal.y])
     obs_points, = ax.plot([], [], 'ro', ms=15, label="Obstacles")
     path_points, = ax.plot([], [], 'bo', ms=10, label="Path Found")
@@ -155,16 +166,12 @@ def main():
         lambda event: [exit(
             0) if event.key == 'escape' else None])
 
-    frames = []
     for i in range(0, path.goal_reached_time()):
         obs_positions = grid.get_obstacle_positions_at_time(i)
         obs_points.set_data(obs_positions[0], obs_positions[1])
         path_position = path.get_position(i)
         path_points.set_data([path_position.x], [path_position.y])
         plt.pause(0.2)
-        plt.savefig(f"frame_{i:03d}.png")  # Save each frame as an image
-        frames.append(imageio.imread(f"frame_{i:03d}.png"))
-    imageio.mimsave("path_animation.gif", frames, fps=5)  # Convert images to GIF
     plt.show()
 
 if __name__ == '__main__':
