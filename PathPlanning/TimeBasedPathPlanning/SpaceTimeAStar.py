@@ -5,9 +5,10 @@ from moving_obstacles import Grid, Position
 import heapq
 from typing import Generator
 import random
+from __future__ import annotations
 
 # Seed randomness for reproducibility
-RANDOM_SEED = 42
+RANDOM_SEED = 50
 random.seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
@@ -23,7 +24,7 @@ class Node:
         self.heuristic = heuristic
         self.parent_index = parent_index
         
-    def __lt__(self, other):
+    def __lt__(self, other: Node):
         return (self.time + self.heuristic) < (other.time + other.heuristic)
 
     def __repr__(self):
@@ -118,12 +119,13 @@ class TimeBasedAStar:
         diff = self.goal - position
         return abs(diff.x) + abs(diff.y)
 
+import imageio.v2 as imageio
 show_animation = True
 def main():
     start = Position(1, 1)
     goal = Position(19, 19)
     grid_side_length = 21
-    grid = Grid(np.array([grid_side_length, grid_side_length]), num_obstacles=115, obstacle_avoid_points=[start, goal])
+    grid = Grid(np.array([grid_side_length, grid_side_length]), num_obstacles=40, obstacle_avoid_points=[start, goal])
 
     planner = TimeBasedAStar(grid, start, goal)
     verbose = False
@@ -148,21 +150,21 @@ def main():
     path_points, = ax.plot([], [], 'bo', ms=10, label="Path Found")
     ax.legend(bbox_to_anchor=(1.05, 1))
 
-    def get_frame(i):
-        obs_x_points = []
-        obs_y_points = []
-        for obs_path in grid.obstacle_paths:
-            obs_pos = obs_path[i]
-            obs_x_points.append(obs_pos.x)
-            obs_y_points.append(obs_pos.y)
-        obs_points.set_data(obs_x_points, obs_y_points)
+    # for stopping simulation with the esc key.
+    plt.gcf().canvas.mpl_connect('key_release_event',
+        lambda event: [exit(
+            0) if event.key == 'escape' else None])
 
+    frames = []
+    for i in range(0, path.goal_reached_time()):
+        obs_positions = grid.get_obstacle_positions_at_time(i)
+        obs_points.set_data(obs_positions[0], obs_positions[1])
         path_position = path.get_position(i)
         path_points.set_data([path_position.x], [path_position.y])
-        return start_and_goal, obs_points, path_points
-
-    _ani = animation.FuncAnimation(
-        fig, get_frame, path.goal_reached_time(), interval=500, blit=True, repeat=False)
+        plt.pause(0.2)
+        plt.savefig(f"frame_{i:03d}.png")  # Save each frame as an image
+        frames.append(imageio.imread(f"frame_{i:03d}.png"))
+    imageio.mimsave("path_animation.gif", frames, fps=5)  # Convert images to GIF
     plt.show()
 
 if __name__ == '__main__':

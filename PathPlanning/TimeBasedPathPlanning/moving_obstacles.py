@@ -1,8 +1,6 @@
 import numpy as np
-import random
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-
+from enum import Enum
 class Position:
     x: int
     y: int
@@ -32,85 +30,116 @@ class Position:
     def __repr__(self):
         return f"Position({self.x}, {self.y})"
 
+class ObstacleArrangement(Enum):
+    # Random obstacle positions and movements
+    RANDOM = 0
+    # Obstacles start in a line in y at center of grid and move side-to-side in x
+    ARRANGEMENT1 = 1
+
 class Grid():
     
     # Set in constructor
     grid_size = None
     grid = None
-    obstacle_paths = []
+    obstacle_paths: list[list[Position]] = []
     # Obstacles will never occupy these points. Useful to avoid impossible scenarios
     obstacle_avoid_points = []
 
     # Problem definition
-    time_limit = 100
-    num_obstacles: int
+    # Number of time steps in the simulation
+    time_limit: int
 
     # Logging control
     verbose = False
 
-    def __init__(self, grid_size: np.ndarray[int, int], num_obstacles: int = 2, obstacle_avoid_points: list[Position] = []):
-        self.num_obstacles = num_obstacles
+    def __init__(self, grid_size: np.ndarray[int, int], num_obstacles: int = 2, obstacle_avoid_points: list[Position] = [], obstacle_arrangement: ObstacleArrangement = ObstacleArrangement.RANDOM,  time_limit: int = 100):
+        num_obstacles
         self.obstacle_avoid_points = obstacle_avoid_points
+        self.time_limit = time_limit
         self.grid_size = grid_size
         self.grid = np.zeros((grid_size[0], grid_size[1], self.time_limit))
 
-        if self.num_obstacles > self.grid_size[0] * self.grid_size[1]:
+        if num_obstacles > self.grid_size[0] * self.grid_size[1]:
             raise Exception("Number of obstacles is greater than grid size!")
 
-        for i in range(self.num_obstacles):
-            self.obstacle_paths.append(self.generate_dynamic_obstacle(i+1))
+        if obstacle_arrangement == ObstacleArrangement.RANDOM:
+            self.obstacle_paths = self.generate_dynamic_obstacles(num_obstacles)
+        elif obstacle_arrangement == ObstacleArrangement.ARRANGEMENT1:
+            self.obstacle_paths = self.obstacle_arrangement_1(num_obstacles)
+        
+        for (i, path) in enumerate(self.obstacle_paths):
+            obs_idx = i + 1 # avoid using 0 - that indicates free space
+            for (t, position) in enumerate(path):
+                # Reserve old & new position at this time step
+                if t > 0:
+                    self.grid[path[t-1].x, path[t-1].y, t] = obs_idx
+                self.grid[position.x, position.y, t] = obs_idx
 
-    """
-    Generate a dynamic obstacle following a random trajectory, and reserve its path in `self.grid`
-
-    input:
-        obs_idx (int): index of the obstacle. Used to reserve its path in `self.grid`
-    
-    output:
-        list[np.ndarray[int, int]]: list of positions of the obstacle at each time step
-    """
-    def generate_dynamic_obstacle(self, obs_idx: int) -> list[Position]:
-
-        # Sample until a free starting space is found
-        initial_position = self.sample_random_position()
-        while not self.valid_obstacle_position(initial_position, 0):
+    def generate_dynamic_obstacles(self, obs_count: int) -> list[list[Position]]:
+        obstacle_paths = []
+        for _obs_idx in (0, obs_count):
+            # Sample until a free starting space is found
             initial_position = self.sample_random_position()
+            while not self.valid_obstacle_position(initial_position, 0):
+                initial_position = self.sample_random_position()
 
-        positions = [initial_position]
-        if self.verbose:
-            print("Obstacle initial position: ", initial_position)
+            positions = [initial_position]
+            if self.verbose:
+                print("Obstacle initial position: ", initial_position)
 
-        # Encourage obstacles to mostly stay in place - too much movement leads to chaotic planning scenarios
-        # that are not fun to watch
-        weights = [0.05, 0.05, 0.05, 0.05, 0.8]
-        diffs = [Position(0, 1), Position(0, -1), Position(1, 0), Position(-1, 0), Position(0, 0)]
+            # Encourage obstacles to mostly stay in place - too much movement leads to chaotic planning scenarios
+            # that are not fun to watch
+            weights = [0.05, 0.05, 0.05, 0.05, 0.8]
+            diffs = [Position(0, 1), Position(0, -1), Position(1, 0), Position(-1, 0), Position(0, 0)]
 
-        for t in range(1, self.time_limit-1):
-            sampled_indices = np.random.choice(len(diffs), size=5, replace=False, p=weights)
-            rand_diffs = [diffs[i] for i in sampled_indices]
-            # rand_diffs = random.sample(diffs, k=len(diffs))
+            for t in range(1, self.time_limit-1):
+                sampled_indices = np.random.choice(len(diffs), size=5, replace=False, p=weights)
+                rand_diffs = [diffs[i] for i in sampled_indices]
 
-            valid_position = None
-            for diff in rand_diffs:
-                new_position = positions[-1] + diff
+                valid_position = None
+                for diff in rand_diffs:
+                    new_position = positions[-1] + diff
 
-                if not self.valid_obstacle_position(new_position, t):
-                    continue
+                    if not self.valid_obstacle_position(new_position, t):
+                        continue
 
-                valid_position = new_position
-                break
+                    valid_position = new_position
+                    break
 
-            # Impossible situation for obstacle - stay in place
-            #   -> this can happen if another obstacle's path traps this one
-            if valid_position is None:
-                valid_position = positions[-1]
+                # Impossible situation for obstacle - stay in place
+                #   -> this can happen if the oaths of other obstacles this one
+                if valid_position is None:
+                    valid_position = positions[-1]
 
-            # Reserve old & new position at this time step
-            self.grid[positions[-1].x, positions[-1].y, t] = obs_idx
-            self.grid[valid_position.x, valid_position.y, t] = obs_idx
-            positions.append(valid_position)
+                positions.append(valid_position)
     
-        return positions
+            obstacle_paths.append(positions)
+
+        return obstacle_paths
+    
+    def obstacle_arrangement_1(self, obs_count: int) -> list[list[Position]]:
+        # bottom half of y values start left -> right
+        # top half of y values start right -> left
+        obstacle_paths = []
+        half_grid_x = self.grid_size[0] // 2
+        half_grid_y = self.grid_size[1] // 2
+        
+        for y_idx in range(0, min(obs_count, self.grid_size[1] - 1)):
+            moving_right = y_idx < half_grid_y
+            position = Position(half_grid_x, y_idx)
+            path = [position]
+
+            for _t in range(1, self.time_limit-1):
+                # first check if we should switch direction (at edge of grid)
+                if (moving_right and position.x == self.grid_size[0] - 1) or (not moving_right and position.x == 0):
+                    moving_right = not moving_right
+                # step in direction
+                position = Position(position.x + (1 if moving_right else -1), position.y)
+                path.append(position)
+            
+            obstacle_paths.append(path)
+
+        return obstacle_paths
 
     """
     Check if the given position is valid at time t
@@ -151,11 +180,23 @@ class Grid():
     """
     def sample_random_position(self) -> Position:
         return Position(np.random.randint(0, self.grid_size[0]), np.random.randint(0, self.grid_size[1]))
+    
+    """
+    Returns a tuple of (x_positions, y_positions) of the obstacles at time t
+    """
+    def get_obstacle_positions_at_time(self, t: int) -> tuple[list[int], list[int]]:
+        
+        x_positions = []
+        y_positions = []
+        for obs_path in self.obstacle_paths:
+            x_positions.append(obs_path[t].x)
+            y_positions.append(obs_path[t].y)
+        return (x_positions, y_positions)
 
 show_animation = True
 
 def main():
-    grid = Grid(np.array([11, 11]))
+    grid = Grid(np.array([11, 11]), num_obstacles=10, obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1)
 
     if not show_animation:
         return
@@ -166,20 +207,17 @@ def main():
     ax.grid()
     ax.set_xticks(np.arange(0, 11, 1))
     ax.set_yticks(np.arange(0, 11, 1))
-    points, = ax.plot([], [], 'ro', ms=15)
+    obs_points, = ax.plot([], [], 'ro', ms=15)
 
-    def get_frame(i):
-        obs_x_points = []
-        obs_y_points = []
-        for obs_path in grid.obstacle_paths:
-            obs_pos = obs_path[i]
-            obs_x_points.append(obs_pos.x)
-            obs_y_points.append(obs_pos.y)
-        points.set_data(obs_x_points, obs_y_points)
-        return points,
+    # for stopping simulation with the esc key.
+    plt.gcf().canvas.mpl_connect('key_release_event',
+        lambda event: [exit(
+            0) if event.key == 'escape' else None])
 
-    _ani = animation.FuncAnimation(
-        fig, get_frame, grid.time_limit-1, interval=500, blit=True, repeat=False)
+    for i in range(0, grid.time_limit - 1):
+        obs_positions = grid.get_obstacle_positions_at_time(i)
+        obs_points.set_data(obs_positions[0], obs_positions[1])
+        plt.pause(0.2)
     plt.show()
 
 if __name__ == '__main__':
