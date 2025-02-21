@@ -1,6 +1,6 @@
 import conftest
 
-from Control.inverted_pendulum import inverted_pendulum_mpc_control as m
+from InvertedPendulum import inverted_pendulum_mpc_control as m
 
 
 def test1():

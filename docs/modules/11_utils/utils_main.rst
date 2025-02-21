@@ -1,4 +1,4 @@
-.. _utils:
+.. _`utils`:
 
 Utilities
 ==========
