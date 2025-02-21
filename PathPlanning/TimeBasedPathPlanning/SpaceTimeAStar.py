@@ -5,7 +5,6 @@ Space-time A* Algorithm
     Reference: https://www.davidsilver.uk/wp-content/uploads/2020/03/coop-path-AIWisdom.pdf
 """
 
-from __future__ import annotations  # For typehints of a class within itself
 import numpy as np
 import matplotlib.pyplot as plt
 from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
@@ -17,6 +16,7 @@ import heapq
 from collections.abc import Generator
 import random
 from functools import total_ordering
+from typing import Optional
 
 # Seed randomness for reproducibility
 RANDOM_SEED = 50
@@ -42,10 +42,14 @@ class Node:
     This is what is used to drive node expansion. The node with the lowest value is expanded next.
     This comparison prioritizes the node with the lowest cost-to-come (self.time) + cost-to-go (self.heuristic)
     """
-    def __lt__(self, other: Node):
+    def __lt__(self, other: object):
+        if not isinstance(other, Node):
+            return NotImplementedError(f"Cannot compare Node with object of type: {type(other)}")
         return (self.time + self.heuristic) < (other.time + other.heuristic)
     
-    def __eq__(self, other: Node):
+    def __eq__(self, other: object):
+        if not isinstance(other, Node):
+            return NotImplementedError(f"Cannot compare Node with object of type: {type(other)}")
         return self.position == other.position and self.time == other.time
 
     def __repr__(self):
@@ -64,7 +68,7 @@ class NodePath:
     """
     Get the position of the path at a given time
     """
-    def get_position(self, time: int) -> Position:
+    def get_position(self, time: int) -> Optional[Position]:
         return self.positions_at_time.get(time)
 
     """
@@ -91,12 +95,12 @@ class TimeBasedAStar:
         self.goal = goal
 
     def plan(self, verbose: bool = False) -> NodePath:
-        open_set = []
+        open_set: list[Node] = []
         heapq.heappush(
             open_set, Node(self.start, 0, self.calculate_heuristic(self.start), -1)
         )
 
-        expanded_set = []
+        expanded_set: list[Node] = []
         while open_set:
             expanded_node: Node = heapq.heappop(open_set)
             if verbose:

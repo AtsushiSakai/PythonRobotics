@@ -3,8 +3,7 @@ import matplotlib.pyplot as plt
 from enum import Enum
 from typing import Tuple, TypeAlias
 
-Numpy2DArray: TypeAlias = np.ndarray[Tuple[int, int], np.dtype[np.int_]]
-Numpy1DArray: TypeAlias = np.ndarray[np.dtype[np.int_]]
+Numpy3DArray: TypeAlias = np.ndarray[Tuple[int, int, int], np.dtype[np.int_]]
 
 class Position:
     x: int
@@ -14,7 +13,7 @@ class Position:
         self.x = x
         self.y = y
 
-    def as_ndarray(self) -> Numpy1DArray:
+    def as_ndarray(self) -> np.ndarray:
         return np.array([self.x, self.y])
 
     def __add__(self, other):
@@ -49,11 +48,11 @@ class ObstacleArrangement(Enum):
 
 class Grid:
     # Set in constructor
-    grid_size: Numpy1DArray
-    grid: Numpy2DArray
+    grid_size: np.ndarray
+    grid: Numpy3DArray
     obstacle_paths: list[list[Position]] = []
     # Obstacles will never occupy these points. Useful to avoid impossible scenarios
-    obstacle_avoid_points = []
+    obstacle_avoid_points: list[Position] = []
 
     # Number of time steps in the simulation
     time_limit: int
@@ -63,7 +62,7 @@ class Grid:
 
     def __init__(
         self,
-        grid_size: Numpy1DArray,
+        grid_size: np.ndarray,
         num_obstacles: int = 40,
         obstacle_avoid_points: list[Position] = [],
         obstacle_arrangement: ObstacleArrangement = ObstacleArrangement.RANDOM,
