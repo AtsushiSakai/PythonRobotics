@@ -1,7 +1,7 @@
 import itertools
 import numpy as np
 import conftest  # Add root path to sys.path
-from Control.move_to_pose import move_to_pose as m
+from PathTracking.move_to_pose import move_to_pose as m
 
 
 def test_random():

@@ -56,3 +56,13 @@ Robot type specific technologies
 
 #. :ref:`Aerial Navigation`
 #. :ref:`Bipedal`
+#. :ref:`Inverted Pendulum`
+
+
+Additional Information
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#. :ref:`utils`
+#. :ref:`Appendix`
+
+
