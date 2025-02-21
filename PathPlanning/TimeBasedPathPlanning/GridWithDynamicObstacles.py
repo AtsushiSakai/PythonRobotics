@@ -2,8 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from enum import Enum
 
-type Numpy3DArray = np.ndarray[tuple[int, int, int], np.dtype[np.int_]]
-
 class Position:
     x: int
     y: int
@@ -48,7 +46,7 @@ class ObstacleArrangement(Enum):
 class Grid:
     # Set in constructor
     grid_size: np.ndarray
-    grid: Numpy3DArray
+    grid: np.ndarray
     obstacle_paths: list[list[Position]] = []
     # Obstacles will never occupy these points. Useful to avoid impossible scenarios
     obstacle_avoid_points: list[Position] = []
