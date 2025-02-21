@@ -16,7 +16,6 @@ import heapq
 from collections.abc import Generator
 import random
 from functools import total_ordering
-from typing import Optional
 
 # Seed randomness for reproducibility
 RANDOM_SEED = 50
@@ -46,7 +45,7 @@ class Node:
         if not isinstance(other, Node):
             return NotImplementedError(f"Cannot compare Node with object of type: {type(other)}")
         return (self.time + self.heuristic) < (other.time + other.heuristic)
-    
+
     def __eq__(self, other: object):
         if not isinstance(other, Node):
             return NotImplementedError(f"Cannot compare Node with object of type: {type(other)}")
@@ -68,7 +67,7 @@ class NodePath:
     """
     Get the position of the path at a given time
     """
-    def get_position(self, time: int) -> Optional[Position]:
+    def get_position(self, time: int) -> Position | None:
         return self.positions_at_time.get(time)
 
     """

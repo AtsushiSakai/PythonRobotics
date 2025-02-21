@@ -1,9 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from enum import Enum
-from typing import Tuple, TypeAlias
 
-Numpy3DArray: TypeAlias = np.ndarray[Tuple[int, int, int], np.dtype[np.int_]]
+type Numpy3DArray = np.ndarray[tuple[int, int, int], np.dtype[np.int_]]
 
 class Position:
     x: int
