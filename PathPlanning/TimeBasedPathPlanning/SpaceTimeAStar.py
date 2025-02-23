@@ -1,6 +1,9 @@
 """
 Space-time A* Algorithm
     This script demonstrates the Space-time A* algorithm for path planning in a grid world with moving obstacles.
+    This algorithm is different from normal 2D A* in one key way - the cost (often notated as g(n)) is
+    the number of time steps it took to get to a given node, instead of the number of cells it has 
+    traversed. This ensures the path is time-optimal, while respescting any dynamic obstacles in the environment.
 
     Reference: https://www.davidsilver.uk/wp-content/uploads/2020/03/coop-path-AIWisdom.pdf
 """
@@ -15,31 +18,27 @@ from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
 import heapq
 from collections.abc import Generator
 import random
-from functools import total_ordering
+from dataclasses import dataclass
+
 
 # Seed randomness for reproducibility
 RANDOM_SEED = 50
 random.seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
-@total_ordering # so the linter will chill about not implementing __gt__, __ge__, etc
+@dataclass(order=True)
 class Node:
     position: Position
     time: int
     heuristic: int
     parent_index: int
 
-    def __init__(
-        self, position: Position, time: int, heuristic: int, parent_index: int
-    ):
-        self.position = position
-        self.time = time
-        self.heuristic = heuristic
-        self.parent_index = parent_index
-
     """
     This is what is used to drive node expansion. The node with the lowest value is expanded next.
     This comparison prioritizes the node with the lowest cost-to-come (self.time) + cost-to-go (self.heuristic)
+    
+    This an __eq__ are overridden because we don't care about parent_index when comparing these; two nodes
+    with the same position, time, and heuristic are equivalent from the search algorithm's perspective.
     """
     def __lt__(self, other: object):
         if not isinstance(other, Node):
@@ -50,9 +49,6 @@ class Node:
         if not isinstance(other, Node):
             return NotImplementedError(f"Cannot compare Node with object of type: {type(other)}")
         return self.position == other.position and self.time == other.time
-
-    def __repr__(self):
-        return f"Node(position={self.position}, time={self.time}, heuristic={self.heuristic}, parent_index={self.parent_index})"
 
 
 class NodePath:

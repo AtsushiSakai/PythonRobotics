@@ -1,14 +1,17 @@
+"""
+This file implements a grid with a 3d reservation matrix with dimensions for x, y, and time. There
+is also infrastructure to generate dynamic obstacles that move around the grid. The obstacles' paths
+are stored in the reservation matrix on creation.
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 from enum import Enum
+from dataclasses import dataclass
 
+@dataclass(order=True)
 class Position:
     x: int
     y: int
-
-    def __init__(self, x: int, y: int):
-        self.x = x
-        self.y = y
 
     def as_ndarray(self) -> np.ndarray:
         return np.array([self.x, self.y])
@@ -27,14 +30,6 @@ class Position:
             f"Subtraction not supported for Position and {type(other)}"
         )
 
-    def __eq__(self, other):
-        if isinstance(other, Position):
-            return self.x == other.x and self.y == other.y
-        return False
-
-    def __repr__(self):
-        return f"Position({self.x}, {self.y})"
-
 
 class ObstacleArrangement(Enum):
     # Random obstacle positions and movements
@@ -46,7 +41,7 @@ class ObstacleArrangement(Enum):
 class Grid:
     # Set in constructor
     grid_size: np.ndarray
-    grid: np.ndarray
+    reservation_matrix: np.ndarray
     obstacle_paths: list[list[Position]] = []
     # Obstacles will never occupy these points. Useful to avoid impossible scenarios
     obstacle_avoid_points: list[Position] = []
@@ -68,7 +63,7 @@ class Grid:
         self.obstacle_avoid_points = obstacle_avoid_points
         self.time_limit = time_limit
         self.grid_size = grid_size
-        self.grid = np.zeros((grid_size[0], grid_size[1], self.time_limit))
+        self.reservation_matrix = np.zeros((grid_size[0], grid_size[1], self.time_limit))
 
         if num_obstacles > self.grid_size[0] * self.grid_size[1]:
             raise Exception("Number of obstacles is greater than grid size!")
@@ -83,8 +78,8 @@ class Grid:
             for t, position in enumerate(path):
                 # Reserve old & new position at this time step
                 if t > 0:
-                    self.grid[path[t - 1].x, path[t - 1].y, t] = obs_idx
-                self.grid[position.x, position.y, t] = obs_idx
+                    self.reservation_matrix[path[t - 1].x, path[t - 1].y, t] = obs_idx
+                self.reservation_matrix[position.x, position.y, t] = obs_idx
 
     """
     Generate dynamic obstacles that move around the grid. Initial positions and movements are random
@@ -191,7 +186,7 @@ class Grid:
             return False
 
         # Check if new position is not occupied at time t
-        return self.grid[position.x, position.y, t] == 0
+        return self.reservation_matrix[position.x, position.y, t] == 0
 
     """
     Returns True if the given position is valid at time t and is not in the set of obstacle_avoid_points
