@@ -2,7 +2,7 @@
 Space-time A* Algorithm
     This script demonstrates the Space-time A* algorithm for path planning in a grid world with moving obstacles.
     This algorithm is different from normal 2D A* in one key way - the cost (often notated as g(n)) is
-    the number of time steps it took to get to a given node, instead of the number of cells it has 
+    the number of time steps it took to get to a given node, instead of the number of cells it has
     traversed. This ensures the path is time-optimal, while respescting any dynamic obstacles in the environment.
 
     Reference: https://www.davidsilver.uk/wp-content/uploads/2020/03/coop-path-AIWisdom.pdf
@@ -29,7 +29,7 @@ np.random.seed(RANDOM_SEED)
 
 @dataclass()
 # Note: Total_ordering is used instead of adding `order=True` to the @dataclass decorator because
-#     this class needs to override the __lt__ and __eq__ methods to ignore parent_index. Parent 
+#     this class needs to override the __lt__ and __eq__ methods to ignore parent_index. Parent
 #     index is just used to track the path found by the algorithm, and has no effect on the quality
 #     of a node.
 @total_ordering
