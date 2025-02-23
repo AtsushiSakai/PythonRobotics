@@ -19,6 +19,7 @@ import heapq
 from collections.abc import Generator
 import random
 from dataclasses import dataclass
+from functools import total_ordering
 
 
 # Seed randomness for reproducibility
@@ -26,7 +27,12 @@ RANDOM_SEED = 50
 random.seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
-@dataclass(order=True)
+@dataclass()
+# Note: Total_ordering is used instead of adding `order=True` to the @dataclass decorator because
+#     this class needs to override the __lt__ and __eq__ methods to ignore parent_index. Parent 
+#     index is just used to track the path found by the algorithm, and has no effect on the quality
+#     of a node.
+@total_ordering
 class Node:
     position: Position
     time: int
@@ -36,9 +42,6 @@ class Node:
     """
     This is what is used to drive node expansion. The node with the lowest value is expanded next.
     This comparison prioritizes the node with the lowest cost-to-come (self.time) + cost-to-go (self.heuristic)
-    
-    This an __eq__ are overridden because we don't care about parent_index when comparing these; two nodes
-    with the same position, time, and heuristic are equivalent from the search algorithm's perspective.
     """
     def __lt__(self, other: object):
         if not isinstance(other, Node):
