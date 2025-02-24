@@ -20,5 +20,3 @@ References:
 ~~~~~~~~~~~
 
 -  `Cooperative Pathfinding <https://www.davidsilver.uk/wp-content/uploads/2020/03/coop-path-AIWisdom.pdf>`__
-
-
