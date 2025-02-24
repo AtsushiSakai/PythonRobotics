@@ -1,8 +1,8 @@
 Time based grid search
------------------
+----------------------
 
 Space-time astar
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 This is an extension of AStar that supports planning around dynamic obstacles.
 
