@@ -18,14 +18,48 @@ class State:
             self.on_exit()
 
 
-class StateMachine(State):
-    def __init__(self, model: object, name: str, on_enter=None, on_exit=None):
-        State.__init__(self, name, on_enter, on_exit)
-        self.states = {}
-        self.events = {}
-        self.transition_table = {}
+class StateMachine:
+    def __init__(self, name: str, model=object):
+        """Initialize the state machine.
+
+        Args:
+            name (str): Name of the state machine.
+            model (object, optional): Model object used to automatically look up callback functions
+                for states and transitions:
+                State callbacks: Automatically searches for 'on_enter_<state>' and 'on_exit_<state>' methods.
+                Transition callbacks: When action or guard parameters are strings, looks up corresponding methods in the model.
+
+        Example:
+            >>> class MyModel:
+            ...     def on_enter_idle(self):
+            ...         print("Entering idle state")
+            ...     def on_exit_idle(self):
+            ...         print("Exiting idle state")
+            ...     def can_start(self):
+            ...         return True
+            ...     def on_start(self):
+            ...         print("Starting operation")
+            >>> model = MyModel()
+            >>> machine = StateMachine("my_machine", model)
+        """
+        self._name = name
+        self._states = {}
+        self._events = {}
+        self._transition_table = {}
         self._model = model
         self._state: StateMachine = None
+
+    def _register_event(self, event: str):
+        self._events[event] = event
+
+    def _get_state(self, name):
+        return self._states[name]
+
+    def _get_event(self, name):
+        return self._events[name]
+
+    def _has_event(self, event: str):
+        return event in self._events
 
     def add_transition(
         self,
@@ -38,19 +72,37 @@ class StateMachine(State):
         """Add a transition to the state machine.
 
         Args:
-            src_state: Source state name or State object
-            event: Event name or Event object
-            dst_state: Destination state name or State object
-            guard: Guard function name or callable
-            action: Action function name or callable
+            src_state (str | State): The source state where the transition begins.
+                Can be either a state name or a State object.
+            event (str): The event that triggers this transition.
+            dst_state (str | State): The destination state where the transition ends.
+                Can be either a state name or a State object.
+            guard (str | Callable, optional): Guard condition for the transition.
+                If callable: Function that returns bool.
+                If str: Name of a method in the model class.
+                If returns True: Transition proceeds.
+                If returns False: Transition is skipped.
+            action (str | Callable, optional): Action to execute during transition.
+                If callable: Function to execute.
+                If str: Name of a method in the model class.
+                Executed after guard passes and before entering new state.
+
+        Example:
+            >>> machine.add_transition(
+            ...     src_state="idle",
+            ...     event="start",
+            ...     dst_state="running",
+            ...     guard="can_start",
+            ...     action="on_start"
+            ... )
         """
         # Convert string parameters to objects if necessary
         self.register_state(src_state)
-        self.register_event(event)
+        self._register_event(event)
         self.register_state(dst_state)
 
         def get_state_obj(state):
-            return state if isinstance(state, State) else self.get_state(state)
+            return state if isinstance(state, State) else self._get_state(state)
 
         def get_callable(func):
             return func if callable(func) else getattr(self._model, func, None)
@@ -60,19 +112,19 @@ class StateMachine(State):
 
         guard_func = get_callable(guard) if guard else None
         action_func = get_callable(action) if action else None
-        self.transition_table[(src_state_obj.name, event)] = (
+        self._transition_table[(src_state_obj.name, event)] = (
             dst_state_obj,
             guard_func,
             action_func,
         )
 
     def state_transition(self, src_state: State, event: str):
-        if (src_state.name, event) not in self.transition_table:
+        if (src_state.name, event) not in self._transition_table:
             raise ValueError(
-                f"|{self.name}| invalid transition: <{src_state.name}> : [{event}]"
+                f"|{self._name}| invalid transition: <{src_state.name}> : [{event}]"
             )
 
-        dst_state, guard, action = self.transition_table[(src_state.name, event)]
+        dst_state, guard, action = self._transition_table[(src_state.name, event)]
 
         def call_guard(guard):
             if callable(guard):
@@ -88,14 +140,14 @@ class StateMachine(State):
             call_action(action)
             if src_state.name != dst_state.name:
                 print(
-                    f"|{self.name}| transitioning from <{src_state.name}> to <{dst_state.name}>"
+                    f"|{self._name}| transitioning from <{src_state.name}> to <{dst_state.name}>"
                 )
                 src_state.exit()
                 self._state = dst_state
                 dst_state.enter()
         else:
             print(
-                f"|{self.name}| skipping transition from <{src_state.name}> to <{dst_state.name}> because guard failed"
+                f"|{self._name}| skipping transition from <{src_state.name}> to <{dst_state.name}> because guard failed"
             )
 
     def register_state(self, state: str | State, on_enter=None, on_exit=None):
@@ -110,41 +162,23 @@ class StateMachine(State):
             on_exit (Callable, optional): Callback function to be executed when exiting the state.
                                         If state is a string and on_exit is None, it will look for
                                         a method named 'on_exit_<state>' in the model.
-
-        Raises:
-            ValueError: If a state with the same name is already registered with a different type.
+        Example:
+            >>> machine.register_state("idle", on_enter=on_enter_idle, on_exit=on_exit_idle)
+            >>> machine.register_state(State("running", on_enter=on_enter_running, on_exit=on_exit_running))
         """
         if isinstance(state, str):
             if on_enter is None:
                 on_enter = getattr(self._model, "on_enter_" + state, None)
             if on_exit is None:
                 on_exit = getattr(self._model, "on_exit_" + state, None)
-            self.states[state] = State(state, on_enter, on_exit)
+            self._states[state] = State(state, on_enter, on_exit)
             return
 
-        name = state.name
-        if name in self.states and type(self.states[name]) is not type(state):
-            raise ValueError(
-                f'State "{name}" {type(state).__name__} already registered as {type(self.states[name]).__name__}'
-            )
-
-        self.states[name] = state
-
-    def register_event(self, event: str):
-        self.events[event] = event
-
-    def get_state(self, name):
-        return self.states[name]
-
-    def get_event(self, name):
-        return self.events[name]
-
-    def has_event(self, event: str):
-        return event in self.events
+        self._states[state.name] = state
 
     def set_current_state(self, state: State | str):
         if isinstance(state, str):
-            self._state = self.get_state(state)
+            self._state = self._get_state(state)
         else:
             self._state = state
 
@@ -155,12 +189,52 @@ class StateMachine(State):
         """Process an event in the state machine.
 
         Args:
-            event: Event name or Event object
+            event: Event name.
+
+        Example:
+            >>> machine.process("start")
         """
         if self._state is None:
             raise ValueError("State machine is not initialized")
 
-        if self.has_event(event):
+        if self._has_event(event):
             self.state_transition(self._state, event)
         else:
             raise ValueError(f"Invalid event: {event}")
+
+    def generate_plantuml(self) -> str:
+        """Generate PlantUML state diagram representation of the state machine.
+
+        Returns:
+            str: PlantUML state diagram code.
+        """
+        if self._state is None:
+            raise ValueError("State machine is not initialized")
+
+        plantuml = ["@startuml"]
+        plantuml.append("[*] --> " + self._state.name)
+
+        # Generate transitions
+        for (src_state, event), (
+            dst_state,
+            guard,
+            action,
+        ) in self._transition_table.items():
+            transition = f"{src_state} --> {dst_state.name} : {event}"
+
+            # Add guard and action if present
+            conditions = []
+            if guard:
+                guard_name = guard.__name__ if callable(guard) else guard
+                conditions.append(f"[{guard_name}]")
+            if action:
+                action_name = action.__name__ if callable(action) else action
+                conditions.append(f"/ {action_name}")
+
+            if conditions:
+                transition += "\\n" + " ".join(conditions)
+
+            plantuml.append(transition)
+
+        plantuml.append("@enduml")
+        return "\n".join(plantuml)

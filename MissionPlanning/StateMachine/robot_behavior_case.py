@@ -7,7 +7,7 @@ class Robot:
         self.task_progress = 0
 
         # Initialize state machine
-        self.machine = StateMachine(self, "robot_sm")
+        self.machine = StateMachine("robot_sm", self)
 
         # Add state transition rules
         self.machine.add_transition(
@@ -93,6 +93,7 @@ class Robot:
 # Keep the test section structure the same, only modify the trigger method
 if __name__ == "__main__":
     robot = Robot()
+    print(robot.machine.generate_plantuml())
 
     print(f"Initial state: {robot.machine.get_current_state().name}")
     print("------------")

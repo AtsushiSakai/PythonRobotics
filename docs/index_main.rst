@@ -44,6 +44,7 @@ this graph shows GitHub star history of this project:
    modules/8_aerial_navigation/aerial_navigation
    modules/9_bipedal/bipedal
    modules/10_inverted_pendulum/inverted_pendulum
+   modules/13_mission_planning/mission_planning
    modules/11_utils/utils
    modules/12_appendix/appendix
 
