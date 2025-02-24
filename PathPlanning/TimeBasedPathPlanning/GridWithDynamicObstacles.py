@@ -30,6 +30,10 @@ class Position:
             f"Subtraction not supported for Position and {type(other)}"
         )
 
+@dataclass
+class Interval:
+    start_time: int
+    end_time: int
 
 class ObstacleArrangement(Enum):
     # Random obstacle positions and movements
@@ -180,10 +184,13 @@ class Grid:
     output:
         bool: True if position/time combination is valid, False otherwise
     """
-    def valid_position(self, position: Position, t: int) -> bool:
+    def valid_position(self, position: Position, t: int = None) -> bool:
         # Check if new position is in grid
         if not self.inside_grid_bounds(position):
             return False
+        
+        if not t:
+            return True
 
         # Check if new position is not occupied at time t
         return self.reservation_matrix[position.x, position.y, t] == 0
@@ -231,6 +238,52 @@ class Grid:
             y_positions.append(obs_path[t].y)
         return (x_positions, y_positions)
 
+    """
+    Returns safe intervals for each cell
+    """
+    def get_safe_intervals(self) -> np.ndarray:
+        intervals = np.empty((self.grid_size[0], self.grid_size[1]), dtype=object)
+        intervals[:] = [[[] for _ in range(intervals.shape[1])] for _ in range(intervals.shape[0])]
+        for x in range(intervals.shape[0]):
+            for y in range(intervals.shape[1]):
+                intervals[x, y] = self.get_safe_intervals_at_cell(Position(x, y))
+        
+        return intervals
+    
+    def get_safe_intervals_at_cell(self, cell: Position) -> list[Interval]:
+        vals = self.reservation_matrix[cell.x, cell.y, :]
+        # Find where the array is zero
+        zero_mask = (vals == 0)
+
+        # Identify transitions between zero and nonzero elements
+        diff = np.diff(zero_mask.astype(int))
+
+        # Start indices: where zeros begin (1 after a nonzero)
+        start_indices = np.where(diff == 1)[0] + 1
+
+        # End indices: where zeros stop (just before a nonzero)
+        end_indices = np.where(diff == -1)[0]
+
+        # Handle edge cases if the array starts or ends with zeros
+        if zero_mask[0]:  # If the first element is zero, add index 0 to start_indices
+            start_indices = np.insert(start_indices, 0, 0)
+        if zero_mask[-1]:  # If the last element is zero, add the last index to end_indices
+            end_indices = np.append(end_indices, len(vals) - 1)
+
+        # Create pairs of (first zero, last zero)
+        # TODO - this is generating np.int instead of normal int, is that alright?
+        intervals = [Interval(start, end) for start, end in zip(start_indices, end_indices)]
+
+        print(f"intervals at position {cell} : {intervals}")
+
+        # for i in range(len(intervals)):
+        for interval in intervals:
+            if interval.start_time == interval.end_time:
+                print("AAAAAAAAAA matching! ", interval.start_time)
+                # TODO: hate this modification in the loop
+                intervals.remove(interval)
+            
+        return intervals
 
 show_animation = True
 
