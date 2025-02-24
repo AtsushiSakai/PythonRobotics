@@ -90,7 +90,7 @@ class Grid:
     """
     def generate_dynamic_obstacles(self, obs_count: int) -> list[list[Position]]:
         obstacle_paths = []
-        for _ in (0, obs_count):
+        for _ in range(0, obs_count):
             # Sample until a free starting space is found
             initial_position = self.sample_random_position()
             while not self.valid_obstacle_position(initial_position, 0):
@@ -184,13 +184,10 @@ class Grid:
     output:
         bool: True if position/time combination is valid, False otherwise
     """
-    def valid_position(self, position: Position, t: int = None) -> bool:
+    def valid_position(self, position: Position, t: int) -> bool:
         # Check if new position is in grid
         if not self.inside_grid_bounds(position):
             return False
-        
-        if not t:
-            return True
 
         # Check if new position is not occupied at time t
         return self.reservation_matrix[position.x, position.y, t] == 0
@@ -274,12 +271,9 @@ class Grid:
         # TODO - this is generating np.int instead of normal int, is that alright?
         intervals = [Interval(start, end) for start, end in zip(start_indices, end_indices)]
 
-        print(f"intervals at position {cell} : {intervals}")
 
-        # for i in range(len(intervals)):
         for interval in intervals:
             if interval.start_time == interval.end_time:
-                print("AAAAAAAAAA matching! ", interval.start_time)
                 # TODO: hate this modification in the loop
                 intervals.remove(interval)
             

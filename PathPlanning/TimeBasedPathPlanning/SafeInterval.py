@@ -62,9 +62,15 @@ class NodePath:
 
     def __init__(self, path: list[Node]):
         self.path = path
-        for node in path:
-            self.positions_at_time[node.time] = node.position
+        for (i, node) in enumerate(path):
+            if i > 0:
+                # account for waiting in interval at previous node
+                prev_node = path[i-1]
+                for t in range(prev_node.time, node.time):
+                    self.positions_at_time[t] = prev_node.position
 
+            self.positions_at_time[node.time] = node.position
+        
     """
     Get the position of the path at a given time
     """
@@ -97,7 +103,6 @@ class SafeIntervalPathPlanner:
     def plan(self, verbose: bool = False) -> NodePath:
 
         safe_intervals = self.grid.get_safe_intervals()
-        print(safe_intervals[0, 0])
 
         open_set: list[Node] = []
         first_node_interval = safe_intervals[self.start.x, self.start.y][0]
@@ -164,7 +169,7 @@ class SafeIntervalPathPlanner:
         ]
         for diff in diffs:
             new_pos = parent_node.position + diff
-            if not self.grid.valid_position(new_pos):
+            if not self.grid.inside_grid_bounds(new_pos):
                 continue
 
             current_interval = parent_node.interval
@@ -218,20 +223,18 @@ class SafeIntervalPathPlanner:
 
 
 show_animation = True
-verbose = True
+verbose = False
 
-# TODO: viz shows obstacle finish 1 cell above the goal?
 def main():
-    start = Position(1, 18)
+    start = Position(1, 1)
     goal = Position(19, 19)
     grid_side_length = 21
     grid = Grid(
         np.array([grid_side_length, grid_side_length]),
-        # TODO: if this is set to 0, still get some obstacles with random set
-        num_obstacles=22,
+        num_obstacles=250,
         obstacle_avoid_points=[start, goal],
-        obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1,
-        # obstacle_arrangement=ObstacleArrangement.RANDOM,
+        # obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1,
+        obstacle_arrangement=ObstacleArrangement.RANDOM,
     )
 
     planner = SafeIntervalPathPlanner(grid, start, goal)
@@ -265,7 +268,7 @@ def main():
         "key_release_event", lambda event: [exit(0) if event.key == "escape" else None]
     )
 
-    for i in range(0, path.goal_reached_time()):
+    for i in range(0, path.goal_reached_time() + 1):
         obs_positions = grid.get_obstacle_positions_at_time(i)
         obs_points.set_data(obs_positions[0], obs_positions[1])
         path_position = path.get_position(i)
