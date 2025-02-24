@@ -32,3 +32,4 @@ Path planning is the ability of a robot to search feasible and efficient path to
    frenet_frame_path/frenet_frame_path
    coverage_path/coverage_path
    elastic_bands/elastic_bands
+   time_based_grid_search/time_based_grid_search
