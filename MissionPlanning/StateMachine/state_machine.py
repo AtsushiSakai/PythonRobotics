@@ -9,7 +9,34 @@ Ref:
 (https://en.wikipedia.org/wiki/Finite-state_machine)
 """
 
+import string
+from urllib.request import urlopen, Request
+from base64 import b64encode
+from zlib import compress
+from io import BytesIO
 from collections.abc import Callable
+from matplotlib.image import imread
+from matplotlib import pyplot as plt
+
+
+def deflate_and_encode(plantuml_text):
+    """
+    zlib compress the plantuml text and encode it for the plantuml server.
+
+    Ref: https://plantuml.com/en/text-encoding
+    """
+    plantuml_alphabet = (
+        string.digits + string.ascii_uppercase + string.ascii_lowercase + "-_"
+    )
+    base64_alphabet = (
+        string.ascii_uppercase + string.ascii_lowercase + string.digits + "+/"
+    )
+    b64_to_plantuml = bytes.maketrans(
+        base64_alphabet.encode("utf-8"), plantuml_alphabet.encode("utf-8")
+    )
+    zlibbed_str = compress(plantuml_text.encode("utf-8"))
+    compressed_string = zlibbed_str[2:-4]
+    return b64encode(compressed_string).translate(b64_to_plantuml).decode("utf-8")
 
 
 class State:
@@ -248,4 +275,20 @@ class StateMachine:
             plant_uml.append(transition)
 
         plant_uml.append("@enduml")
-        return "\n".join(plant_uml)
+        plant_uml_text = "\n".join(plant_uml)
+
+        try:
+            url = f"http://www.plantuml.com/plantuml/img/{deflate_and_encode(plant_uml_text)}"
+            headers = {"User-Agent": "Mozilla/5.0"}
+            request = Request(url, headers=headers)
+
+            with urlopen(request) as response:
+                content = response.read()
+
+            plt.imshow(imread(BytesIO(content), format="png"))
+            plt.axis("off")
+            plt.show()
+        except Exception as e:
+            print(f"Error showing PlantUML: {e}")
+
+        return plant_uml_text
