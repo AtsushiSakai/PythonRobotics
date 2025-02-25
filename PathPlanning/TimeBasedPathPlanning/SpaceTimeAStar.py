@@ -82,7 +82,7 @@ class NodePath:
         return repr_string
 
 
-class TimeBasedAStar:
+class SpaceTimeAStar:
     grid: Grid
     start: Position
     goal: Position
@@ -113,11 +113,11 @@ class TimeBasedAStar:
                 print(f"Found path to goal after {len(expanded_set)} expansions")
                 path = []
                 path_walker: Node = expanded_node
-                while path_walker.parent_index != -1:
+                while True:
                     path.append(path_walker)
+                    if path_walker.parent_index == -1:
+                        break
                     path_walker = expanded_set[path_walker.parent_index]
-                # TODO: fix hack around bad while condiiotn
-                path.append(path_walker)
 
                 # reverse path so it goes start -> goal
                 path.reverse()
@@ -176,7 +176,7 @@ def main():
         obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1,
     )
 
-    planner = TimeBasedAStar(grid, start, goal)
+    planner = SpaceTimeAStar(grid, start, goal)
     path = planner.plan(verbose)
 
     if verbose:

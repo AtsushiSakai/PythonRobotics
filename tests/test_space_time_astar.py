@@ -18,7 +18,7 @@ def test_1():
     )
 
     m.show_animation = False
-    planner = m.TimeBasedAStar(grid, start, goal)
+    planner = m.SpaceTimeAStar(grid, start, goal)
 
     path = planner.plan(False)
 
