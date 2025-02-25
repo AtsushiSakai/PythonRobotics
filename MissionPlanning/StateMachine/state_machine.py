@@ -1,3 +1,14 @@
+"""
+State Machine
+
+author: Wang Zheng (@Aglargil)
+
+Ref:
+
+- [State Machine]
+(https://en.wikipedia.org/wiki/Finite-state_machine)
+"""
+
 from collections.abc import Callable
 
 
@@ -47,7 +58,7 @@ class StateMachine:
         self._events = {}
         self._transition_table = {}
         self._model = model
-        self._state: StateMachine = None
+        self._state: State = None
 
     def _register_event(self, event: str):
         self._events[event] = event
@@ -211,8 +222,8 @@ class StateMachine:
         if self._state is None:
             raise ValueError("State machine is not initialized")
 
-        plantuml = ["@startuml"]
-        plantuml.append("[*] --> " + self._state.name)
+        plant_uml = ["@startuml"]
+        plant_uml.append("[*] --> " + self._state.name)
 
         # Generate transitions
         for (src_state, event), (
@@ -234,7 +245,7 @@ class StateMachine:
             if conditions:
                 transition += "\\n" + " ".join(conditions)
 
-            plantuml.append(transition)
+            plant_uml.append(transition)
 
-        plantuml.append("@enduml")
-        return "\n".join(plantuml)
+        plant_uml.append("@enduml")
+        return "\n".join(plant_uml)

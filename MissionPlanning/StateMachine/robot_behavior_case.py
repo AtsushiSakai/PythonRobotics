@@ -1,3 +1,9 @@
+"""
+A case study of robot behavior using state machine
+
+author: Wang Zheng (@Aglargil)
+"""
+
 from state_machine import StateMachine
 
 
