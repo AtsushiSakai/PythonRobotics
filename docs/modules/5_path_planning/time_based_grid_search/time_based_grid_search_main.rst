@@ -4,7 +4,7 @@ Time based grid search
 Space-time astar
 ~~~~~~~~~~~~~~~~~~~~~~
 
-This is an extension of AStar that supports planning around dynamic obstacles.
+This is an extension of A* algorithm that supports planning around dynamic obstacles.
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/TimeBasedPathPlanning/SpaceTimeAStar/path_animation.gif
 
