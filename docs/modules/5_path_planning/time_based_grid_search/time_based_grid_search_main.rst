@@ -16,7 +16,33 @@ Using a time-based cost and heuristic ensures the path found is optimal in terms
 The cost is the amount of time it takes to reach a given node, and the heuristic is the minimum amount of time it could take to reach the goal from that node, disregarding all obstacles.
 For a simple scenario where the robot can move 1 cell per time step and stop and go as it pleases, the heuristic for time is equivalent to the heuristic for distance.
 
+Safe Interval Path Planning
+~~~~~~~~~~~~~~~~~~~~~~
+
+The safe interval path planning algorithm is described in this paper: https://www.cs.cmu.edu/~maxim/files/sipp_icra11.pdf
+It is faster than space-time A* because it pre-computes the intervals of time that are unoccupied in each cell. This allows it to reduce the number of successor node it generates by avoiding nodes within the same interval.
+
+## Comparison with Space-time A*:
+Arrangement1 startings at (1, 18)
+
+SafeInterval planner:
+```
+Found path to goal after 322 expansions
+Planning took: 0.00730 seconds
+```
+
+SpaceTimeAStar:
+```
+Found path to goal after 2717154 expansions
+Planning took: 20.51330 seconds
+```
+
+.. image:: <gif-1>
+
+.. image:: <gif-2>
+
 References:
 ~~~~~~~~~~~
 
 -  `Cooperative Pathfinding <https://www.davidsilver.uk/wp-content/uploads/2020/03/coop-path-AIWisdom.pdf>`__
+-  `SIPP: Safe Interval Path Planning for Dynamic Environments <https://www.cs.cmu.edu/~maxim/files/sipp_icra11.pdf>`__

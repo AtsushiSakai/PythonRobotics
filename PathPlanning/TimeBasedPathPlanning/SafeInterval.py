@@ -13,11 +13,10 @@ from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
     Position,
 )
 import heapq
-from collections.abc import Generator
 import random
 from dataclasses import dataclass
 from functools import total_ordering
-
+import time
 
 # Seed randomness for reproducibility
 RANDOM_SEED = 50
@@ -55,6 +54,10 @@ class Node:
             return NotImplementedError(f"Cannot compare Node with object of type: {type(other)}")
         return self.position == other.position and self.time == other.time and self.interval == other.interval
 
+@dataclass
+class EntryTimeAndInterval:
+    entry_time: int
+    interval: Interval
 
 class NodePath:
     path: list[Node]
@@ -130,11 +133,11 @@ class SafeIntervalPathPlanner:
                 print(f"Found path to goal after {len(expanded_list)} expansions")
                 path = []
                 path_walker: Node = expanded_node
-                while path_walker.parent_index != -1:
+                while True:
                     path.append(path_walker)
+                    if path_walker.parent_index == -1:
+                        break
                     path_walker = expanded_list[path_walker.parent_index]
-                # TODO: fix hack around bad while condiiotn
-                path.append(path_walker)
 
                 # reverse path so it goes start -> goal
                 path.reverse()
@@ -142,12 +145,10 @@ class SafeIntervalPathPlanner:
 
             expanded_idx = len(expanded_list)
             expanded_list.append(expanded_node)
-            visited_intervals[expanded_node.position.x, expanded_node.position.y].append((expanded_node.time, expanded_node.interval))
+            entry_time_and_node = EntryTimeAndInterval(expanded_node.time, expanded_node.interval)
+            add_entry_to_visited_intervals_array(entry_time_and_node, visited_intervals, expanded_node)
 
-            # if len(expanded_set) > 100:
-            #     blarg
-
-            for child in self.generate_successors(expanded_node, expanded_idx, verbose, safe_intervals, visited_intervals):
+            for child in self.generate_successors(expanded_node, expanded_idx, safe_intervals, visited_intervals):
                 heapq.heappush(open_set, child)
 
         raise Exception("No path found")
@@ -157,7 +158,7 @@ class SafeIntervalPathPlanner:
     """
     # TODO: is intervals being passed by ref? (i think so?)
     def generate_successors(
-        self, parent_node: Node, parent_node_idx: int, verbose: bool, intervals: np.ndarray, visited_intervals: np.ndarray
+        self, parent_node: Node, parent_node_idx: int, intervals: np.ndarray, visited_intervals: np.ndarray
     ) -> list[Node]:
         new_nodes = []
         diffs = [
@@ -185,11 +186,10 @@ class SafeIntervalPathPlanner:
                 if interval.start_time > current_interval.end_time:
                     break
 
-                # TODO: this bit feels wonky
                 # if we have already expanded a node in this interval with a <= starting time, continue
                 better_node_expanded = False
                 for visited in visited_intervals[new_pos.x, new_pos.y]:
-                    if interval == visited[1] and visited[0] <= parent_node.time + 1:
+                    if interval == visited.interval and visited.entry_time <= parent_node.time + 1:
                         better_node_expanded = True
                         break
                 if better_node_expanded:
@@ -197,23 +197,18 @@ class SafeIntervalPathPlanner:
 
                 # We know there is some overlap. Generate successor at the earliest possible time the
                 # new interval can be entered
-                # TODO: dont love the optionl usage here
-                new_node_t = None
                 for possible_t in range(max(parent_node.time + 1, interval.start_time), min(current_interval.end_time, interval.end_time)):
                     if self.grid.valid_position(new_pos, possible_t):
-                        new_node_t = possible_t
+                        new_nodes.append(Node(
+                            new_pos,
+                            # entry is max of interval start and parent node start time (get there as soon as possible)
+                            max(parent_node.time + 1, interval.start_time),
+                            self.calculate_heuristic(new_pos),
+                            parent_node_idx,
+                            interval,
+                        ))
+                        # break because all t's after this will make nodes with a higher cost, the same heuristic, and are in the same interval
                         break
-
-                if new_node_t:
-                    # TODO: should be able to break here?
-                    new_nodes.append(Node(
-                        new_pos,
-                        # entry is max of interval start and parent node start time (get there as soon as possible)
-                        max(parent_node.time + 1, interval.start_time),
-                        self.calculate_heuristic(new_pos),
-                        parent_node_idx,
-                        interval,
-                    ))
 
         return new_nodes
 
@@ -222,23 +217,38 @@ class SafeIntervalPathPlanner:
         return abs(diff.x) + abs(diff.y)
 
 
+def add_entry_to_visited_intervals_array(entry_time_and_interval: EntryTimeAndInterval, visited_intervals: np.ndarray, expanded_node: Node):
+    # if entry is present, update entry time if better
+    for existing_entry_and_interval in visited_intervals[expanded_node.position.x, expanded_node.position.y]:
+        if existing_entry_and_interval.interval == entry_time_and_interval.interval:
+            existing_entry_and_interval.entry_time = min(existing_entry_and_interval.entry_time, entry_time_and_interval.entry_time)
+
+    # Otherwise, append
+    visited_intervals[expanded_node.position.x, expanded_node.position.y].append(entry_time_and_interval)
+
+
 show_animation = True
 verbose = False
 
 def main():
-    start = Position(1, 1)
+    start = Position(1, 18)
     goal = Position(19, 19)
     grid_side_length = 21
+
+    start_time = time.time()
+
     grid = Grid(
         np.array([grid_side_length, grid_side_length]),
         num_obstacles=250,
         obstacle_avoid_points=[start, goal],
-        # obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1,
-        obstacle_arrangement=ObstacleArrangement.RANDOM,
+        obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1,
+        # obstacle_arrangement=ObstacleArrangement.RANDOM,
     )
 
     planner = SafeIntervalPathPlanner(grid, start, goal)
     path = planner.plan(verbose)
+    runtime = time.time() - start_time
+    print(f"Planning took: {runtime:.5f} seconds")
 
     if verbose:
         print(f"Path: {path}")

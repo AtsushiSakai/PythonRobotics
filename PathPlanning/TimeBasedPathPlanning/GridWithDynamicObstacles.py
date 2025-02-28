@@ -30,6 +30,9 @@ class Position:
             f"Subtraction not supported for Position and {type(other)}"
         )
 
+    def __hash__(self):
+        return hash((self.x, self.y))
+
 @dataclass
 class Interval:
     start_time: int
