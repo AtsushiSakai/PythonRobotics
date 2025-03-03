@@ -2,7 +2,7 @@ numpy == 2.2.3
 scipy == 1.15.2
 matplotlib == 3.10.0
 cvxpy == 1.5.3
-pytest == 8.3.4 # For unit test
+pytest == 8.3.5 # For unit test
 pytest-xdist == 3.6.1 # For unit test
 mypy == 1.15.0 # For unit test
 ruff == 0.9.7 # For unit test
