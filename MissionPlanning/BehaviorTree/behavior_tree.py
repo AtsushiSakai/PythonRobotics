@@ -92,15 +92,17 @@ class SequenceNode(ControlNode):
     Executes child nodes in sequence until one fails or all succeed.
 
     Returns:
-    - Returns FAILURE if any child returns FAILURE
-    - Returns SUCCESS when all children have succeeded
-    - Returns RUNNING when a child is still running or when moving to the next child
+        - Returns FAILURE if any child returns FAILURE
+        - Returns SUCCESS when all children have succeeded
+        - Returns RUNNING when a child is still running or when moving to the next child
 
     Example:
-    <Sequence>
-        <Action1 />
-        <Action2 />
-    </Sequence>
+        .. code-block:: xml
+
+            <Sequence>
+                <Action1 />
+                <Action2 />
+            </Sequence>
     """
 
     def __init__(self, name):
@@ -131,15 +133,17 @@ class SelectorNode(ControlNode):
     Executes child nodes in sequence until one succeeds or all fail.
 
     Returns:
-    - Returns SUCCESS if any child returns SUCCESS
-    - Returns FAILURE when all children have failed
-    - Returns RUNNING when a child is still running or when moving to the next child
+        - Returns SUCCESS if any child returns SUCCESS
+        - Returns FAILURE when all children have failed
+        - Returns RUNNING when a child is still running or when moving to the next child
 
-    Example:
-    <Selector>
-        <Action1 />
-        <Action2 />
-    </Selector>
+    Examples:
+        .. code-block:: xml
+
+            <Selector>
+                <Action1 />
+                <Action2 />
+            </Selector>
     """
 
     def __init__(self, name):
@@ -170,17 +174,19 @@ class WhileDoElseNode(ControlNode):
     Conditional execution node with three parts: condition, do, and optional else.
 
     Returns:
-    - First executes the condition node (child[0])
-    - If condition succeeds, executes do node (child[1]) and returns RUNNING
-    - If condition fails, executes else node (child[2]) if present and returns result of else node
-    - If condition fails and there is no else node, returns SUCCESS
+        First executes the condition node (child[0])
+        If condition succeeds, executes do node (child[1]) and returns RUNNING
+        If condition fails, executes else node (child[2]) if present and returns result of else node
+        If condition fails and there is no else node, returns SUCCESS
 
     Example:
-    <WhileDoElse>
-        <Condition />
-        <Do />
-        <Else />
-    </WhileDoElse>
+        .. code-block:: xml
+
+            <WhileDoElse>
+                <Condition />
+                <Do />
+                <Else />
+            </WhileDoElse>
     """
 
     def __init__(self, name):
@@ -236,11 +242,13 @@ class SleepNode(ActionNode):
     Sleep node that sleeps for a specified duration.
 
     Returns:
-    - Returns SUCCESS after the specified duration has passed
-    - Returns RUNNING if the duration has not yet passed
+        Returns SUCCESS after the specified duration has passed
+        Returns RUNNING if the duration has not yet passed
 
     Example:
-    <Sleep sec="1.5" />
+        .. code-block:: xml
+
+            <Sleep sec="1.5" />
     """
 
     def __init__(self, name, duration):
@@ -261,10 +269,12 @@ class EchoNode(ActionNode):
     Echo node that prints a message to the console.
 
     Returns:
-    - Returns SUCCESS after the message has been printed
+        Returns SUCCESS after the message has been printed
 
     Example:
-    <Echo message="Hello, World!" />
+        .. code-block:: xml
+
+            <Echo message="Hello, World!" />
     """
 
     def __init__(self, name, message):
@@ -302,13 +312,16 @@ class InverterNode(DecoratorNode):
     Inverter node that inverts the status of its child node.
 
     Returns:
-    - Returns SUCCESS if the child returns FAILURE
-    - Returns FAILURE if the child returns SUCCESS
-    - Returns RUNNING if the child returns RUNNING
-    Example:
-    <Inverter>
-        <Action />
-    </Inverter>
+        - Returns SUCCESS if the child returns FAILURE
+        - Returns FAILURE if the child returns SUCCESS
+        - Returns RUNNING if the child returns RUNNING
+
+    Examples:
+        .. code-block:: xml
+
+            <Inverter>
+                <Action />
+            </Inverter>
     """
 
     def __init__(self, name):
@@ -325,13 +338,15 @@ class TimeoutNode(DecoratorNode):
     Timeout node that fails if the child node takes too long to execute
 
     Returns:
-    - FAILURE: If the timeout duration has been exceeded
-    - Child's status: Otherwise, passes through the status of the child node
+        - FAILURE: If the timeout duration has been exceeded
+        - Child's status: Otherwise, passes through the status of the child node
 
     Example:
-    <Timeout sec="1.5">
-        <Action />
-    </Timeout>
+        .. code-block:: xml
+
+            <Timeout sec="1.5">
+                <Action />
+            </Timeout>
     """
 
     def __init__(self, name, timeout):
@@ -354,13 +369,15 @@ class DelayNode(DecoratorNode):
     Delay node that delays the execution of its child node for a specified duration.
 
     Returns:
-    - Returns RUNNING if the duration has not yet passed
-    - Returns child's status after the duration has passed
+        - Returns RUNNING if the duration has not yet passed
+        - Returns child's status after the duration has passed
 
     Example:
-    <Delay sec="1.5">
-        <Action />
-    </Delay>
+        .. code-block:: xml
+
+            <Delay sec="1.5">
+                <Action />
+            </Delay>
     """
 
     def __init__(self, name, delay):
@@ -382,8 +399,8 @@ class ForceSuccessNode(DecoratorNode):
     ForceSuccess node that always returns SUCCESS.
 
     Returns:
-    - Returns RUNNING if the child returns RUNNING
-    - Returns SUCCESS if the child returns SUCCESS or FAILURE
+        - Returns RUNNING if the child returns RUNNING
+        - Returns SUCCESS if the child returns SUCCESS or FAILURE
     """
 
     def __init__(self, name):
@@ -402,8 +419,8 @@ class ForceFailureNode(DecoratorNode):
     ForceFailure node that always returns FAILURE.
 
     Returns:
-    - Returns RUNNING if the child returns RUNNING
-    - Returns FAILURE if the child returns SUCCESS or FAILURE
+        - Returns RUNNING if the child returns RUNNING
+        - Returns FAILURE if the child returns SUCCESS or FAILURE
     """
 
     def __init__(self, name):
@@ -484,12 +501,12 @@ class BehaviorTree:
         """
         Print the behavior tree.
 
-        Node types:
+        Node print format:
             Action: <Action>
             Decorator: (Decorator)
             Control: [Control]
 
-        Colors:
+        Node status colors:
             Yellow: RUNNING
             Green: SUCCESS
             Red: FAILURE
@@ -577,6 +594,18 @@ class BehaviorTreeFactory:
         Args:
             node_name (str): The name of the node.
             builder (function): The builder function.
+
+        Example:
+            .. code-block:: python
+
+                factory = BehaviorTreeFactory()
+                factory.register_node_builder(
+                    "MyNode",
+                    lambda node: MyNode(
+                        node.attrib.get("name", MyNode.__name__),
+                        node.attrib["my_param"],
+                    ),
+                )
         """
         self.node_builders[node_name] = builder
 
