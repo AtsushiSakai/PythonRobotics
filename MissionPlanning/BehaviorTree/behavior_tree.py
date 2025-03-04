@@ -52,6 +52,18 @@ class Node:
         self.status = self.tick()
         return self.status
 
+    def reset(self):
+        """
+        Reset the node.
+        """
+        self.status = None
+
+    def reset_children(self):
+        """
+        Reset the children of the node.
+        """
+        pass
+
 
 class ControlNode(Node):
     """
@@ -69,6 +81,10 @@ class ControlNode(Node):
     def not_set_children_raise_error(self):
         if len(self.children) == 0:
             raise ValueError("Children are not set")
+
+    def reset_children(self):
+        for child in self.children:
+            child.reset()
 
 
 class SequenceNode(ControlNode):
@@ -95,9 +111,11 @@ class SequenceNode(ControlNode):
         self.not_set_children_raise_error()
 
         if self.current_child_index >= len(self.children):
+            self.reset_children()
             return Status.SUCCESS
         status = self.children[self.current_child_index].tick_and_set_status()
         if status == Status.FAILURE:
+            self.reset_children()
             return Status.FAILURE
         elif status == Status.SUCCESS:
             self.current_child_index += 1
@@ -132,9 +150,11 @@ class SelectorNode(ControlNode):
         self.not_set_children_raise_error()
 
         if self.current_child_index >= len(self.children):
+            self.reset_children()
             return Status.FAILURE
         status = self.children[self.current_child_index].tick_and_set_status()
         if status == Status.SUCCESS:
+            self.reset_children()
             return Status.SUCCESS
         elif status == Status.FAILURE:
             self.current_child_index += 1
@@ -151,9 +171,9 @@ class WhileDoElseNode(ControlNode):
 
     Returns:
     - First executes the condition node (child[0])
-    - If condition succeeds, executes and returns result of do node (child[1])
-    - If condition fails, executes and returns result of else node (child[2]) if present
-    - Otherwise returns SUCCESS when condition fails with no else node
+    - If condition succeeds, executes do node (child[1]) and returns RUNNING
+    - If condition fails, executes else node (child[2]) if present and returns result of else node
+    - If condition fails and there is no else node, returns SUCCESS
 
     Example:
     <WhileDoElse>
@@ -176,13 +196,24 @@ class WhileDoElseNode(ControlNode):
 
         condition_status = condition_node.tick_and_set_status()
         if condition_status == Status.SUCCESS:
-            return do_node.tick_and_set_status()
+            do_node.tick_and_set_status()
+            return Status.RUNNING
         elif condition_status == Status.FAILURE:
-            return (
-                else_node.tick_and_set_status()
-                if else_node is not None
-                else Status.SUCCESS
-            )
+            if else_node is not None:
+                else_status = else_node.tick_and_set_status()
+                if else_status == Status.SUCCESS:
+                    self.reset_children()
+                    return Status.SUCCESS
+                elif else_status == Status.FAILURE:
+                    self.reset_children()
+                    return Status.FAILURE
+                elif else_status == Status.RUNNING:
+                    return Status.RUNNING
+                else:
+                    raise ValueError("Unknown status")
+            else:
+                self.reset_children()
+                return Status.SUCCESS
         else:
             raise ValueError("Unknown status")
 
@@ -262,6 +293,9 @@ class DecoratorNode(Node):
         if self.child is None:
             raise ValueError("Child is not set")
 
+    def reset_children(self):
+        self.child.reset()
+
 
 class InverterNode(DecoratorNode):
     """
@@ -311,6 +345,7 @@ class TimeoutNode(DecoratorNode):
             self.start_time = time.time()
         if time.time() - self.start_time > self.timeout:
             return Status.FAILURE
+        print(f"{self.name} is running")
         return self.child.tick_and_set_status()
 
 
@@ -396,12 +431,18 @@ class BehaviorTree:
         """
         self.root.tick_and_set_status()
 
-    def tick_while_running(self, interval=1.0, enable_print=True):
+    def reset(self):
+        """
+        Reset the behavior tree.
+        """
+        self.root.reset()
+
+    def tick_while_running(self, interval=None, enable_print=True):
         """
         Tick the behavior tree while it is running.
 
         Args:
-            interval (float, optional): The interval between ticks. Defaults to 1.0.
+            interval (float, optional): The interval between ticks. Defaults to None.
             enable_print (bool, optional): Whether to print the behavior tree. Defaults to True.
         """
         while self.root.tick_and_set_status() == Status.RUNNING:
@@ -501,6 +542,18 @@ class BehaviorTreeFactory:
                 float(node.attrib["sec"]),
             ),
         )
+        self.register_node_builder(
+            "ForceSuccess",
+            lambda node: ForceSuccessNode(
+                node.attrib.get("name", ForceSuccessNode.__name__)
+            ),
+        )
+        self.register_node_builder(
+            "ForceFailure",
+            lambda node: ForceFailureNode(
+                node.attrib.get("name", ForceFailureNode.__name__)
+            ),
+        )
         # Action nodes
         self.register_node_builder(
             "Sleep",
@@ -541,16 +594,18 @@ class BehaviorTreeFactory:
             root = self.node_builders[node.tag](node)
             if root.type == NodeType.CONTROL_NODE:
                 if len(node) <= 0:
-                    raise ValueError("Control node must have children")
+                    raise ValueError(f"{root.name} Control node must have children")
                 for child in node:
                     root.children.append(self.build_node(child))
             elif root.type == NodeType.DECORATOR_NODE:
                 if len(node) != 1:
-                    raise ValueError("Decorator node must have exactly one child")
+                    raise ValueError(
+                        f"{root.name} Decorator node must have exactly one child"
+                    )
                 root.child = self.build_node(node[0])
             elif root.type == NodeType.ACTION_NODE:
                 if len(node) != 0:
-                    raise ValueError("Action node must have no children")
+                    raise ValueError(f"{root.name} Action node must have no children")
             return root
         else:
             raise ValueError(f"Unknown node type: {node.tag}")
