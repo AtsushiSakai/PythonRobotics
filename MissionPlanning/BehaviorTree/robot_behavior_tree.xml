@@ -1,0 +1,57 @@
+<Selector name="Robot Main Controller">
+    <!-- Charge battery when power is low -->
+    <Sequence name="Battery Management">
+        <Inverter name="Low Battery Detection">
+            <CheckBattery name="Check Battery" threshold="30" />
+        </Inverter>
+        <Echo name="Low Battery Warning" message="Battery level low! Charging needed" />
+        <ChargeBattery name="Charge Battery" charge_rate="20" />
+    </Sequence>
+    <!-- Main task sequence -->
+    <Sequence name="Patrol Task">
+        <Echo name="Start Task" message="Starting patrol task" />
+        <!-- Move to position A -->
+        <Sequence name="Move to Position A">
+            <MoveToPosition name="Move to A" position="A" move_duration="2" />
+            <!-- Handle obstacles -->
+            <Selector name="Obstacle Handling A">
+                <Sequence name="Obstacle Present">
+                    <DetectObstacle name="Detect Obstacle" obstacle_probability="0.3" />
+                    <AvoidObstacle name="Avoid Obstacle" avoid_duration="1.5" />
+                </Sequence>
+                <Echo name="No Obstacle" message="Path clear" />
+            </Selector>
+            <PerformTask name="Position A Task" task_name="Check Device Status" task_duration="2" />
+        </Sequence>
+        <!-- Move to position B -->
+        <Sequence name="Move to Position B">
+            <Delay name="Short Wait" sec="1">
+                <Echo name="Prepare Movement" message="Preparing to move to next position" />
+            </Delay>
+            <MoveToPosition name="Move to B" position="B" move_duration="3" />
+            <!-- Handle obstacles with timeout -->
+            <Timeout name="Limited Time Obstacle Handling" sec="2">
+                <Sequence name="Obstacle Present">
+                    <DetectObstacle name="Detect Obstacle" obstacle_probability="0.4" />
+                    <AvoidObstacle name="Avoid Obstacle" avoid_duration="1.8" />
+                </Sequence>
+            </Timeout>
+            <PerformTask name="Position B Task" task_name="Data Collection" task_duration="2.5" />
+        </Sequence>
+        <!-- Move to position C -->
+        <WhileDoElse name="Conditional Move to C">
+            <CheckBattery name="Check Sufficient Battery" threshold="50" />
+            <Sequence name="Perform Position C Task">
+                <MoveToPosition name="Move to C" position="C" move_duration="2.5" />
+                <ForceSuccess name="Ensure Completion">
+                    <PerformTask name="Position C Task" task_name="Environment Monitoring"
+                        task_duration="2" />
+                </ForceSuccess>
+            </Sequence>
+            <Echo name="Skip Position C" message="Insufficient power, skipping position C task" />
+        </WhileDoElse>
+        <Echo name="Complete Patrol" message="Patrol task completed, returning to charging station" />
+        <MoveToPosition name="Return to Charging Station" position="Charging Station"
+            move_duration="4" />
+    </Sequence>
+</Selector> 

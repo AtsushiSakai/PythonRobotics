@@ -10,3 +10,4 @@ Mission planning includes tools such as finite state machines and behavior trees
    :caption: Contents
 
    state_machine/state_machine
+   behavior_tree/behavior_tree
