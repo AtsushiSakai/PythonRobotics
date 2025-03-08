@@ -88,6 +88,8 @@ class SpaceTimeAStar:
     grid: Grid
     start: Position
     goal: Position
+    # Used to evaluate solutions
+    expanded_node_count: int = -1
 
     def __init__(self, grid: Grid, start: Position, goal: Position):
         self.grid = grid
@@ -124,6 +126,7 @@ class SpaceTimeAStar:
 
                 # reverse path so it goes start -> goal
                 path.reverse()
+                self.expanded_node_count = len(expanded_set)
                 return NodePath(path)
 
             expanded_idx = len(expanded_list)
