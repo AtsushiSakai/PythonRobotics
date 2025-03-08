@@ -283,9 +283,11 @@ class Grid:
         # Create pairs of (first zero, last zero)
         intervals = [Interval(start, end) for start, end in zip(start_indices, end_indices)]
 
+        # Remove intervals where a cell is only free for one time step. Those intervals not provide enough time to
+        # move into and out of the cell each take 1 time step, and the cell is considered occupied during
+        # both the time step when it is entering the cell,  and the time step when it is leaving the cell.
         for interval in intervals:
             if interval.start_time == interval.end_time:
-                # TODO: hate this modification in the loop
                 intervals.remove(interval)
             
         return intervals
