@@ -42,9 +42,9 @@ Found path to goal after 2717154 expansions
 Planning took: 20.51330 seconds
 ```
 
-.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/blob/master/PathPlanning/TimeBasedPathPlanning/SafeIntervalPathPlanner/path_animation.gif
+.. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/refs/heads/master/PathPlanning/TimeBasedPathPlanning/SafeIntervalPathPlanner/path_animation.gif
 
-.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/blob/master/PathPlanning/TimeBasedPathPlanning/SafeIntervalPathPlanner/path_animation2.gif
+.. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/refs/heads/master/PathPlanning/TimeBasedPathPlanning/SafeIntervalPathPlanner/path_animation2.gif
 
 References:
 ~~~~~~~~~~~
