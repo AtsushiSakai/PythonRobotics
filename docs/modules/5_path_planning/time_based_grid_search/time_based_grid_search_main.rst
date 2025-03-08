@@ -25,7 +25,9 @@ https://www.cs.cmu.edu/~maxim/files/sipp_icra11.pdf
 
 It is faster than space-time A* because it pre-computes the intervals of time that are unoccupied in each cell. This allows it to reduce the number of successor node it generates by avoiding nodes within the same interval.
 
-## Comparison with Space-time A*:
+Comparison with Space-time A*:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Arrangement1 startings at (1, 18)
 
 **SafeInterval planner**::

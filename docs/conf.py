@@ -94,9 +94,9 @@ else:
 # documentation.
 #
 html_logo = '../icon.png'
-html_theme_options = {
-    'display_version': False,
-}
+# html_theme_options = {
+#     'display_version': False,
+# }
 
 # replace "view page source" with "edit on github" in Read The Docs theme
 #  * https://github.com/readthedocs/sphinx_rtd_theme/issues/529
