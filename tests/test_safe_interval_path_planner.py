@@ -22,7 +22,7 @@ def test_1():
 
     path = planner.plan(False)
 
-    # path should have 28 entries
+    # path should have 31 entries
     assert len(path.path) == 31
 
     # path should end at the goal
