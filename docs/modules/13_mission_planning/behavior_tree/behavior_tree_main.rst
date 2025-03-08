@@ -1,7 +1,9 @@
 Behavior Tree
 -------------
 
-Behavior Tree is a modular, hierarchical decision model that is widely used in robot control, and game development.
+Behavior Tree is a modular, hierarchical decision model that is widely used in robot control, and game development. 
+It present some similarities to hierarchical state machines with the key difference that the main building block of a behavior is a task rather than a state.
+Behavior Tree have been shown to generalize several other control architectures (https://ieeexplore.ieee.org/document/7790863)
 
 Core Concepts
 ~~~~~~~~~~~~~

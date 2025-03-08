@@ -10,15 +10,16 @@ Ref:
 
 import time
 import xml.etree.ElementTree as ET
+from enum import Enum
 
 
-class Status:
+class Status(Enum):
     SUCCESS = "success"
     FAILURE = "failure"
     RUNNING = "running"
 
 
-class NodeType:
+class NodeType(Enum):
     CONTROL_NODE = "ControlNode"
     ACTION_NODE = "ActionNode"
     DECORATOR_NODE = "DecoratorNode"
