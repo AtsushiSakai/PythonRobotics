@@ -37,9 +37,9 @@ Found path to goal after 2717154 expansions
 Planning took: 20.51330 seconds
 ```
 
-.. image:: <gif-1>
+#.. image:: <gif-1>
 
-.. image:: <gif-2>
+#.. image:: <gif-2>
 
 References:
 ~~~~~~~~~~~
