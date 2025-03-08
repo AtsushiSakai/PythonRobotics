@@ -28,7 +28,7 @@ It is faster than space-time A* because it pre-computes the intervals of time th
 Comparison with Space-time A*:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Arrangement1 startings at (1, 18)
+Arrangement 1 starting at (1, 18)
 
 **SafeInterval planner**::
 
@@ -40,7 +40,17 @@ Arrangement1 startings at (1, 18)
     Found path to goal after 2717154 expansions
     Planning took: 20.51330 seconds
 
+**250 random obstacles**
+
+    Found path to goal after 764 expansions
+    Planning took: 0.60596 seconds
+
 .. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/refs/heads/master/PathPlanning/TimeBasedPathPlanning/SafeIntervalPathPlanner/path_animation.gif
+
+**Arrangement 1 starting at (1, 18)**::
+
+    Found path to goal after 322 expansions
+    Planning took: 0.00730 seconds
 
 .. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/refs/heads/master/PathPlanning/TimeBasedPathPlanning/SafeIntervalPathPlanner/path_animation2.gif
 
