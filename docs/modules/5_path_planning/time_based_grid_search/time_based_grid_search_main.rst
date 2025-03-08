@@ -19,19 +19,24 @@ For a simple scenario where the robot can move 1 cell per time step and stop and
 Safe Interval Path Planning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The safe interval path planning algorithm is described in this paper: https://www.cs.cmu.edu/~maxim/files/sipp_icra11.pdf
+The safe interval path planning algorithm is described in this paper:
+
+https://www.cs.cmu.edu/~maxim/files/sipp_icra11.pdf
+
 It is faster than space-time A* because it pre-computes the intervals of time that are unoccupied in each cell. This allows it to reduce the number of successor node it generates by avoiding nodes within the same interval.
 
 ## Comparison with Space-time A*:
 Arrangement1 startings at (1, 18)
 
 SafeInterval planner:
+
 ```
 Found path to goal after 322 expansions
 Planning took: 0.00730 seconds
 ```
 
 SpaceTimeAStar:
+
 ```
 Found path to goal after 2717154 expansions
 Planning took: 20.51330 seconds
