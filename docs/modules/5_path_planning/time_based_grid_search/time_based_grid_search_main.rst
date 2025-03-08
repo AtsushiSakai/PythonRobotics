@@ -40,7 +40,7 @@ Arrangement 1 starting at (1, 18)
     Found path to goal after 2717154 expansions
     Planning took: 20.51330 seconds
 
-**250 random obstacles**
+**250 random obstacles**::
 
     Found path to goal after 764 expansions
     Planning took: 0.60596 seconds
