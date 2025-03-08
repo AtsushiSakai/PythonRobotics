@@ -184,4 +184,36 @@ texinfo_documents = [
 ]
 
 
-# -- Extension configuration -------------------------------------------------
+# -- linkcode setting -------------------------------------------------
+
+import inspect
+import os
+import sys
+import functools
+
+GITHUB_REPO = "https://github.com/AtsushiSakai/PythonRobotics"
+GITHUB_BRANCH = "main"
+
+
+def linkcode_resolve(domain, info):
+    if domain != "py":
+        return None
+
+    modname = info["module"]
+    fullname = info["fullname"]
+
+    try:
+        module = __import__(modname, fromlist=[fullname])
+        obj = functools.reduce(getattr, fullname.split("."), module)
+    except (ImportError, AttributeError):
+        return None
+
+    try:
+        srcfile = inspect.getsourcefile(obj)
+        srcfile = os.path.relpath(srcfile, start=os.path.dirname(
+            sys.modules[modname].__file__))
+        lineno = inspect.getsourcelines(obj)[1]
+    except Exception:
+        return None
+
+    return f"{GITHUB_REPO}/blob/{GITHUB_BRANCH}/{srcfile}#L{lineno}"
