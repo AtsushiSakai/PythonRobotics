@@ -30,17 +30,19 @@ Arrangement1 startings at (1, 18)
 
 SafeInterval planner:
 
-```
+``
 Found path to goal after 322 expansions
+
 Planning took: 0.00730 seconds
-```
+``
 
 SpaceTimeAStar:
 
-```
+``
 Found path to goal after 2717154 expansions
+
 Planning took: 20.51330 seconds
-```
+``
 
 .. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/refs/heads/master/PathPlanning/TimeBasedPathPlanning/SafeIntervalPathPlanner/path_animation.gif
 
