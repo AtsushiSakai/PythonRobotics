@@ -156,11 +156,11 @@ def run_simulation(robots):
                 lambda event: [exit(0) if event.key == 'escape' else None])
 
             plt.text(0.3, PLOT_WINDOW_SIZE_Y - 1,
-                     f'Time: {time:.2f}',
+                     'Time: {:.2f}'.format(time),
                      fontsize=PLOT_FONT_SIZE)
 
             plt.text(0.3, PLOT_WINDOW_SIZE_Y - 2,
-                     f'Reached target: {robot_names} = '
+                     'Reached target: {} = '.format(robot_names)
                      + str(robots_are_at_target),
                      fontsize=PLOT_FONT_SIZE)
 
