@@ -78,7 +78,7 @@ class NodePath:
                     self.positions_at_time[t] = prev_node.position
 
             self.positions_at_time[node.time] = node.position
-        
+
     """
     Get the position of the path at a given time
     """
@@ -110,7 +110,6 @@ class SafeIntervalPathPlanner:
 
     """
     Generate a plan given the loaded problem statement. Raises an exception if it fails to find a path.
-    
     Arguments:
         verbose (bool): set to True to print debug information
     """

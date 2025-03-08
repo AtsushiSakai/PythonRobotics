@@ -253,9 +253,9 @@ class Grid:
         for x in range(intervals.shape[0]):
             for y in range(intervals.shape[1]):
                 intervals[x, y] = self.get_safe_intervals_at_cell(Position(x, y))
-        
+
         return intervals
-    
+
     """
     Generate the safe intervals for a given cell. The intervals will be in order of start time.
     ex: Interval (2, 3) will be before Interval (4, 5)
@@ -281,7 +281,7 @@ class Grid:
             end_indices = np.append(end_indices, len(vals) - 1)
 
         # Create pairs of (first zero, last zero)
-        intervals = [Interval(start, end) for start, end in zip(start_indices, end_indices)]
+        intervals = [Interval(int(start), int(end)) for start, end in zip(start_indices, end_indices)]
 
         # Remove intervals where a cell is only free for one time step. Those intervals not provide enough time to
         # move into and out of the cell each take 1 time step, and the cell is considered occupied during
@@ -289,7 +289,7 @@ class Grid:
         for interval in intervals:
             if interval.start_time == interval.end_time:
                 intervals.remove(interval)
-            
+
         return intervals
 
 show_animation = True

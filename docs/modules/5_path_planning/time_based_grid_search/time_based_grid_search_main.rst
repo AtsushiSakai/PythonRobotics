@@ -17,7 +17,7 @@ The cost is the amount of time it takes to reach a given node, and the heuristic
 For a simple scenario where the robot can move 1 cell per time step and stop and go as it pleases, the heuristic for time is equivalent to the heuristic for distance.
 
 Safe Interval Path Planning
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The safe interval path planning algorithm is described in this paper: https://www.cs.cmu.edu/~maxim/files/sipp_icra11.pdf
 It is faster than space-time A* because it pre-computes the intervals of time that are unoccupied in each cell. This allows it to reduce the number of successor node it generates by avoiding nodes within the same interval.
