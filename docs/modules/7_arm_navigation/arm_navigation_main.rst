@@ -1,4 +1,4 @@
-.. _arm_navigation:
+.. _`Arm Navigation`:
 
 Arm Navigation
 ==============

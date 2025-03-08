@@ -1,4 +1,4 @@
-.. _bipedal:
+.. _`Bipedal`:
 
 Bipedal
 =================

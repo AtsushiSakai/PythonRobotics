@@ -7,12 +7,12 @@ SUBPACKAGE_LIST = [
     "AerialNavigation",
     "ArmNavigation",
     "Bipedal",
-    "Control",
     "Localization",
     "Mapping",
     "PathPlanning",
     "PathTracking",
     "SLAM",
+    "InvertedPendulum"
 ]
 
 

@@ -1,5 +1,5 @@
 import conftest
-from Control.inverted_pendulum import inverted_pendulum_lqr_control as m
+from InvertedPendulum import inverted_pendulum_lqr_control as m
 
 
 def test_1():

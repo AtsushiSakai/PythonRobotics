@@ -89,6 +89,10 @@ See this documentation
 
 - [Getting Started — PythonRobotics documentation](https://atsushisakai.github.io/PythonRobotics/getting_started.html#what-is-pythonrobotics)
 
+or this Youtube video:
+
+- [PythonRobotics project audio overview](https://www.youtube.com/watch?v=uMeRnNoJAfU)
+
 or this paper for more details:
 
 - [\[1808\.10703\] PythonRobotics: a Python code collection of robotics algorithms](https://arxiv.org/abs/1808.10703) ([BibTeX](https://github.com/AtsushiSakai/PythonRoboticsPaper/blob/master/python_robotics.bib))
@@ -617,7 +621,7 @@ This is a list of user's comment and references:[users\_comments](https://github
 
 Any contribution is welcome!! 
 
-Please check this document:[How To Contribute — PythonRobotics documentation](https://atsushisakai.github.io/PythonRobotics/how_to_contribute.html)
+Please check this document:[How To Contribute — PythonRobotics documentation](https://atsushisakai.github.io/PythonRobotics/modules/0_getting_started/3_how_to_contribute.html)
 
 # Citing
 

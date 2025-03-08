@@ -1,5 +1,7 @@
-Inverted Pendulum Control
------------------------------
+.. _`Inverted Pendulum`:
+
+Inverted Pendulum
+------------------
 
 An inverted pendulum on a cart consists of a mass :math:`m` at the top of a pole of length :math:`l` pivoted on a
 horizontally moving base as shown in the adjacent.

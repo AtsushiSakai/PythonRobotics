@@ -165,7 +165,7 @@ different data sources into a single optimization problem.
             6             215.8405          -0.000000
 
 
-.. figure:: graphSLAM_SE2_example_files/Graph_SLAM_optimization.gif
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/GraphBasedSLAM/Graph_SLAM_optimization.gif
 
 .. code:: ipython3
 

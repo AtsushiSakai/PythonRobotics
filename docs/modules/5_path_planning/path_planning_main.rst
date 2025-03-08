@@ -1,4 +1,4 @@
-.. _path_planning:
+.. _`Path Planning`:
 
 Path Planning
 =============
@@ -12,6 +12,7 @@ Path planning is the ability of a robot to search feasible and efficient path to
    dynamic_window_approach/dynamic_window_approach
    bugplanner/bugplanner
    grid_base_search/grid_base_search
+   time_based_grid_search/time_based_grid_search
    model_predictive_trajectory_generator/model_predictive_trajectory_generator
    state_lattice_planner/state_lattice_planner
    prm_planner/prm_planner
@@ -31,3 +32,4 @@ Path planning is the ability of a robot to search feasible and efficient path to
    hybridastar/hybridastar
    frenet_frame_path/frenet_frame_path
    coverage_path/coverage_path
+   elastic_bands/elastic_bands
