@@ -44,6 +44,13 @@ class ObstacleArrangement(Enum):
     # Obstacles start in a line in y at center of grid and move side-to-side in x
     ARRANGEMENT1 = 1
 
+"""
+Generates a 2d numpy array with lists for elements.
+"""
+def empty_2d_array_of_lists(x: int, y: int) -> np.ndarray:
+    arr = np.empty((x, y), dtype=object)
+    arr[:] = [[[] for _ in range(y)] for _ in range(x)]
+    return arr
 
 class Grid:
     # Set in constructor
@@ -239,17 +246,20 @@ class Grid:
         return (x_positions, y_positions)
 
     """
-    Returns safe intervals for each cell
+    Returns safe intervals for each cell.
     """
     def get_safe_intervals(self) -> np.ndarray:
-        intervals = np.empty((self.grid_size[0], self.grid_size[1]), dtype=object)
-        intervals[:] = [[[] for _ in range(intervals.shape[1])] for _ in range(intervals.shape[0])]
+        intervals = empty_2d_array_of_lists(self.grid_size[0], self.grid_size[1])
         for x in range(intervals.shape[0]):
             for y in range(intervals.shape[1]):
                 intervals[x, y] = self.get_safe_intervals_at_cell(Position(x, y))
         
         return intervals
     
+    """
+    Generate the safe intervals for a given cell. The intervals will be in order of start time.
+    ex: Interval (2, 3) will be before Interval (4, 5)
+    """
     def get_safe_intervals_at_cell(self, cell: Position) -> list[Interval]:
         vals = self.reservation_matrix[cell.x, cell.y, :]
         # Find where the array is zero
@@ -271,9 +281,7 @@ class Grid:
             end_indices = np.append(end_indices, len(vals) - 1)
 
         # Create pairs of (first zero, last zero)
-        # TODO - this is generating np.int instead of normal int, is that alright?
         intervals = [Interval(start, end) for start, end in zip(start_indices, end_indices)]
-
 
         for interval in intervals:
             if interval.start_time == interval.end_time:

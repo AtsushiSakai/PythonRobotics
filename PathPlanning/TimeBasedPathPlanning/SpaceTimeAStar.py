@@ -20,7 +20,7 @@ from collections.abc import Generator
 import random
 from dataclasses import dataclass
 from functools import total_ordering
-import time
+
 
 # Seed randomness for reproducibility
 RANDOM_SEED = 50
@@ -53,8 +53,6 @@ class Node:
             return NotImplementedError(f"Cannot compare Node with object of type: {type(other)}")
         return self.position == other.position and self.time == other.time
 
-    def __hash__(self):
-        return hash((self.position, self.time, self.heuristic))
 
 class NodePath:
     path: list[Node]
@@ -100,8 +98,7 @@ class SpaceTimeAStar:
             open_set, Node(self.start, 0, self.calculate_heuristic(self.start), -1)
         )
 
-        expanded_list: list[Node] = []
-        expanded_set: set[Node] = set()
+        expanded_set: list[Node] = []
         while open_set:
             expanded_node: Node = heapq.heappop(open_set)
             if verbose:
@@ -113,24 +110,23 @@ class SpaceTimeAStar:
                 continue
 
             if expanded_node.position == self.goal:
-                print(f"Found path to goal after {len(expanded_list)} expansions")
+                print(f"Found path to goal after {len(expanded_set)} expansions")
                 path = []
                 path_walker: Node = expanded_node
                 while True:
                     path.append(path_walker)
                     if path_walker.parent_index == -1:
                         break
-                    path_walker = expanded_list[path_walker.parent_index]
+                    path_walker = expanded_set[path_walker.parent_index]
 
                 # reverse path so it goes start -> goal
                 path.reverse()
                 return NodePath(path)
 
-            expanded_idx = len(expanded_list)
-            expanded_list.append(expanded_node)
-            expanded_set.add(expanded_node)
+            expanded_idx = len(expanded_set)
+            expanded_set.append(expanded_node)
 
-            for child in self.generate_successors(expanded_node, expanded_idx, verbose, expanded_set):
+            for child in self.generate_successors(expanded_node, expanded_idx, verbose):
                 heapq.heappush(open_set, child)
 
         raise Exception("No path found")
@@ -139,7 +135,7 @@ class SpaceTimeAStar:
     Generate possible successors of the provided `parent_node`
     """
     def generate_successors(
-        self, parent_node: Node, parent_node_idx: int, verbose: bool, expanded_set: set[Node]
+        self, parent_node: Node, parent_node_idx: int, verbose: bool
     ) -> Generator[Node, None, None]:
         diffs = [
             Position(0, 0),
@@ -150,17 +146,13 @@ class SpaceTimeAStar:
         ]
         for diff in diffs:
             new_pos = parent_node.position + diff
-            new_node = Node(
-                new_pos,
-                parent_node.time + 1,
-                self.calculate_heuristic(new_pos),
-                parent_node_idx,
-            )
-
-            if new_node in expanded_set:
-                continue
-
             if self.grid.valid_position(new_pos, parent_node.time + 1):
+                new_node = Node(
+                    new_pos,
+                    parent_node.time + 1,
+                    self.calculate_heuristic(new_pos),
+                    parent_node_idx,
+                )
                 if verbose:
                     print("\tNew successor node: ", new_node)
                 yield new_node
@@ -174,12 +166,9 @@ show_animation = True
 verbose = False
 
 def main():
-    start = Position(1, 5)
+    start = Position(1, 11)
     goal = Position(19, 19)
     grid_side_length = 21
-
-    start_time = time.time()
-
     grid = Grid(
         np.array([grid_side_length, grid_side_length]),
         num_obstacles=40,
@@ -189,9 +178,6 @@ def main():
 
     planner = SpaceTimeAStar(grid, start, goal)
     path = planner.plan(verbose)
-
-    runtime = time.time() - start_time
-    print(f"Planning took: {runtime:.5f} seconds")
 
     if verbose:
         print(f"Path: {path}")
