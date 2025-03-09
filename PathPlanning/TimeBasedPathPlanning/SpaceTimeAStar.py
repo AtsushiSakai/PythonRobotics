@@ -48,13 +48,17 @@ class Node:
             return NotImplementedError(f"Cannot compare Node with object of type: {type(other)}")
         return (self.time + self.heuristic) < (other.time + other.heuristic)
 
+    """
+    Note: cost and heuristic are not included in eq or hash, since they will always be the same
+          for a given (position, time) pair. Including either cost or heuristic would be redundant.
+    """
     def __eq__(self, other: object):
         if not isinstance(other, Node):
             return NotImplementedError(f"Cannot compare Node with object of type: {type(other)}")
         return self.position == other.position and self.time == other.time
 
     def __hash__(self):
-        return hash((self.position, self.time, self.heuristic))
+        return hash((self.position, self.time))
 
 class NodePath:
     path: list[Node]
