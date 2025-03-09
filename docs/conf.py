@@ -13,6 +13,8 @@
 #
 import os
 import sys
+from pathlib import Path
+
 sys.path.insert(0, os.path.abspath('../'))
 
 
@@ -41,7 +43,7 @@ extensions = [
     'matplotlib.sphinxext.plot_directive',
     'sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
-    'sphinx.ext.viewcode',
+    'sphinx.ext.linkcode',
     'sphinx.ext.napoleon',
     'sphinx.ext.imgconverter',
     'IPython.sphinxext.ipython_console_highlighting',
@@ -184,4 +186,45 @@ texinfo_documents = [
 ]
 
 
-# -- Extension configuration -------------------------------------------------
+# -- linkcode setting -------------------------------------------------
+
+import inspect
+import os
+import sys
+import functools
+
+GITHUB_REPO = "https://github.com/AtsushiSakai/PythonRobotics"
+GITHUB_BRANCH = "master"
+
+
+def linkcode_resolve(domain, info):
+    if domain != "py":
+        return None
+
+    modname = info["module"]
+    fullname = info["fullname"]
+
+    try:
+        module = __import__(modname, fromlist=[fullname])
+        obj = functools.reduce(getattr, fullname.split("."), module)
+    except (ImportError, AttributeError):
+        return None
+
+    try:
+        srcfile = inspect.getsourcefile(obj)
+        srcfile = get_relative_path_from_parent(srcfile, "PythonRobotics")
+        lineno = inspect.getsourcelines(obj)[1]
+    except Exception:
+        return None
+
+    return f"{GITHUB_REPO}/blob/{GITHUB_BRANCH}/{srcfile}#L{lineno}"
+
+
+def get_relative_path_from_parent(file_path: str, parent_dir: str):
+    path = Path(file_path).resolve()
+
+    try:
+        parent_path = next(p for p in path.parents if p.name == parent_dir)
+        return str(path.relative_to(parent_path))
+    except StopIteration:
+        raise ValueError(f"Parent directory '{parent_dir}' not found in {file_path}")
