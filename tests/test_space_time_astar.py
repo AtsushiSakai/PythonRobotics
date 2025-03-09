@@ -28,6 +28,7 @@ def test_1():
     # path should end at the goal
     assert path.path[-1].position == goal
 
+    assert planner.expanded_node_count < 1000
 
 if __name__ == "__main__":
     conftest.run_this_test(__file__)
