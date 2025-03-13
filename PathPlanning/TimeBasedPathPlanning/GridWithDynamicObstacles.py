@@ -30,6 +30,9 @@ class Position:
             f"Subtraction not supported for Position and {type(other)}"
         )
 
+    def __hash__(self):
+        return hash((self.x, self.y))
+
 
 class ObstacleArrangement(Enum):
     # Random obstacle positions and movements
