@@ -8,10 +8,13 @@ author: Atsushi Sakai(@Atsushi_twi)
 import matplotlib.pyplot as plt
 import math
 import numpy as np
-from utils.angle import angle_mod
-
+import sys
+import pathlib
 from scipy import interpolate
 from scipy import optimize
+
+sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
+from utils.angle import angle_mod
 
 Kp = 1.0  # speed proportional gain
 # steering control parameter
