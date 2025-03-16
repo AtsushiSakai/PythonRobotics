@@ -11,9 +11,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.linalg as la
 import pathlib
-from utils.angle import angle_mod
-sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 
+sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
+from utils.angle import angle_mod
 from PathPlanning.CubicSpline import cubic_spline_planner
 
 # === Parameters =====
