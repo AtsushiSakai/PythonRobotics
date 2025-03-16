@@ -39,7 +39,7 @@ Safe Interval Path Planning
 
 The safe interval path planning algorithm is described in this paper:
 
-https://www.cs.cmu.edu/~maxim/files/sipp_icra11.pdf
+`SIPP: Safe Interval Path Planning for Dynamic Environments <https://www.cs.cmu.edu/~maxim/files/sipp_icra11.pdf>`__
 
 It is faster than space-time A* because it pre-computes the intervals of time that are unoccupied in each cell. This allows it to reduce the number of successor node it generates by avoiding nodes within the same interval.
 
