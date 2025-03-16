@@ -48,9 +48,7 @@ class ObstacleArrangement(Enum):
 Generates a 2d numpy array with lists for elements.
 """
 def empty_2d_array_of_lists(x: int, y: int) -> np.ndarray:
-    arr = np.empty((x, y), dtype=object)
-    arr[:] = [[[] for _ in range(y)] for _ in range(x)]
-    return arr
+    return np.full((x, y), [], dtype=object)
 
 class Grid:
     # Set in constructor

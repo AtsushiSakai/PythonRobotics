@@ -23,11 +23,6 @@ from dataclasses import dataclass
 from functools import total_ordering
 import time
 
-# Seed randomness for reproducibility
-RANDOM_SEED = 50
-random.seed(RANDOM_SEED)
-np.random.seed(RANDOM_SEED)
-
 @dataclass()
 # Note: Total_ordering is used instead of adding `order=True` to the @dataclass decorator because
 #     this class needs to override the __lt__ and __eq__ methods to ignore parent_index. The Parent
@@ -107,6 +102,11 @@ class SafeIntervalPathPlanner:
         self.grid = grid
         self.start = start
         self.goal = goal
+
+        # Seed randomness for reproducibility
+        RANDOM_SEED = 50
+        random.seed(RANDOM_SEED)
+        np.random.seed(RANDOM_SEED)
 
     """
     Generate a plan given the loaded problem statement. Raises an exception if it fails to find a path.
