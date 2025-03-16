@@ -56,7 +56,7 @@ class Node:
     """
     def __eq__(self, other: object):
         if not isinstance(other, Node):
-            return NotImplementedError(f"Cannot compare Node with object of type: {type(other)}")
+            return NotImplemented
         return self.position == other.position and self.time == other.time
 
 @dataclass
