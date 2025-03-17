@@ -33,6 +33,10 @@ class Position:
     def __hash__(self):
         return hash((self.x, self.y))
 
+@dataclass
+class Interval:
+    start_time: int
+    end_time: int
 
 class ObstacleArrangement(Enum):
     # Random obstacle positions and movements
@@ -40,6 +44,14 @@ class ObstacleArrangement(Enum):
     # Obstacles start in a line in y at center of grid and move side-to-side in x
     ARRANGEMENT1 = 1
 
+"""
+Generates a 2d numpy array with lists for elements.
+"""
+def empty_2d_array_of_lists(x: int, y: int) -> np.ndarray:
+    arr = np.empty((x, y), dtype=object)
+    # assign each element individually - np.full creates references to the same list
+    arr[:] = [[[] for _ in range(y)] for _ in range(x)]
+    return arr
 
 class Grid:
     # Set in constructor
@@ -89,7 +101,7 @@ class Grid:
     """
     def generate_dynamic_obstacles(self, obs_count: int) -> list[list[Position]]:
         obstacle_paths = []
-        for _ in (0, obs_count):
+        for _ in range(0, obs_count):
             # Sample until a free starting space is found
             initial_position = self.sample_random_position()
             while not self.valid_obstacle_position(initial_position, 0):
@@ -234,6 +246,49 @@ class Grid:
             y_positions.append(obs_path[t].y)
         return (x_positions, y_positions)
 
+    """
+    Returns safe intervals for each cell.
+    """
+    def get_safe_intervals(self) -> np.ndarray:
+        intervals = empty_2d_array_of_lists(self.grid_size[0], self.grid_size[1])
+        for x in range(intervals.shape[0]):
+            for y in range(intervals.shape[1]):
+                intervals[x, y] = self.get_safe_intervals_at_cell(Position(x, y))
+
+        return intervals
+
+    """
+    Generate the safe intervals for a given cell. The intervals will be in order of start time.
+    ex: Interval (2, 3) will be before Interval (4, 5)
+    """
+    def get_safe_intervals_at_cell(self, cell: Position) -> list[Interval]:
+        vals = self.reservation_matrix[cell.x, cell.y, :]
+        # Find where the array is zero
+        zero_mask = (vals == 0)
+
+        # Identify transitions between zero and nonzero elements
+        diff = np.diff(zero_mask.astype(int))
+
+        # Start indices: where zeros begin (1 after a nonzero)
+        start_indices = np.where(diff == 1)[0] + 1
+
+        # End indices: where zeros stop (just before a nonzero)
+        end_indices = np.where(diff == -1)[0]
+
+        # Handle edge cases if the array starts or ends with zeros
+        if zero_mask[0]:  # If the first element is zero, add index 0 to start_indices
+            start_indices = np.insert(start_indices, 0, 0)
+        if zero_mask[-1]:  # If the last element is zero, add the last index to end_indices
+            end_indices = np.append(end_indices, len(vals) - 1)
+
+        # Create pairs of (first zero, last zero)
+        intervals = [Interval(int(start), int(end)) for start, end in zip(start_indices, end_indices)]
+
+        # Remove intervals where a cell is only free for one time step. Those intervals not provide enough time to
+        # move into and out of the cell each take 1 time step, and the cell is considered occupied during
+        # both the time step when it is entering the cell,  and the time step when it is leaving the cell.
+        intervals = [interval for interval in intervals if interval.start_time != interval.end_time]
+        return intervals
 
 show_animation = True
 

@@ -33,7 +33,48 @@ After::
 
 When starting at (1, 11) in the structured obstacle arrangement (second of the two gifs above).
 
-References:
+
+Safe Interval Path Planning
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The safe interval path planning algorithm is described in this paper:
+
+`SIPP: Safe Interval Path Planning for Dynamic Environments <https://www.cs.cmu.edu/~maxim/files/sipp_icra11.pdf>`__
+
+It is faster than space-time A* because it pre-computes the intervals of time that are unoccupied in each cell. This allows it to reduce the number of successor node it generates by avoiding nodes within the same interval.
+
+**Comparison with SpaceTime A*:**
+
+Arrangement 1 starting at (1, 18)
+
+SafeInterval planner::
+
+    Found path to goal after 322 expansions
+    Planning took: 0.00730 seconds
+
+SpaceTime A*::
+
+    Found path to goal after 2717154 expansions
+    Planning took: 20.51330 seconds
+
+**Benchmarking the Safe Interval Path Planner:**
+
+250 random obstacles::
+
+    Found path to goal after 764 expansions
+    Planning took: 0.60596 seconds
+
+.. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/refs/heads/master/PathPlanning/TimeBasedPathPlanning/SafeIntervalPathPlanner/path_animation.gif
+
+Arrangement 1 starting at (1, 18)::
+
+    Found path to goal after 322 expansions
+    Planning took: 0.00730 seconds
+
+.. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/refs/heads/master/PathPlanning/TimeBasedPathPlanning/SafeIntervalPathPlanner/path_animation2.gif
+
+References
 ~~~~~~~~~~~
 
 -  `Cooperative Pathfinding <https://www.davidsilver.uk/wp-content/uploads/2020/03/coop-path-AIWisdom.pdf>`__
+-  `SIPP: Safe Interval Path Planning for Dynamic Environments <https://www.cs.cmu.edu/~maxim/files/sipp_icra11.pdf>`__
