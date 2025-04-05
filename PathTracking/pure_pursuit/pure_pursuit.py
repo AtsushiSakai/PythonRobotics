@@ -18,7 +18,7 @@ dt = 0.1  # [s] time tick
 WB = 2.9  # [m] wheel base of vehicle
 
 show_animation = True
-
+pause_simulation = False  # 新增暂停标志
 
 class State:
 
@@ -141,7 +141,94 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
         plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),
                   fc=fc, ec=ec, head_width=width, head_length=width)
         plt.plot(x, y)
+def plot_vehicle(x, y, yaw, steer=0.0, color='blue'):
+    """
+    绘制带四个车轮的车辆模型
+    Args:
+        x, y: 车辆中心位置
+        yaw: 车辆航向角
+        steer: 转向角
+        color: 车辆颜色
+    """
+    # 车辆参数
+    LENGTH = WB + 1.0  # 车长
+    WIDTH = 2.0  # 车宽
+    WHEEL_LEN = 0.6  # 车轮长度
+    WHEEL_WIDTH = 0.2  # 车轮宽度
 
+    def plot_wheel(x, y, yaw, steer=0.0):
+        """绘制单个车轮"""
+        wheel = np.array([
+            [-WHEEL_LEN/2, WHEEL_WIDTH/2],
+            [WHEEL_LEN/2, WHEEL_WIDTH/2],
+            [WHEEL_LEN/2, -WHEEL_WIDTH/2],
+            [-WHEEL_LEN/2, -WHEEL_WIDTH/2],
+            [-WHEEL_LEN/2, WHEEL_WIDTH/2]
+        ])
+
+        # 如果有转向角，先旋转车轮
+        if steer != 0:
+            c, s = np.cos(steer), np.sin(steer)
+            rot_steer = np.array([[c, -s], [s, c]])
+            wheel = wheel @ rot_steer.T
+
+        # 考虑车辆朝向
+        c, s = np.cos(yaw), np.sin(yaw)
+        rot_yaw = np.array([[c, -s], [s, c]])
+        wheel = wheel @ rot_yaw.T
+
+        # 平移到指定位置
+        wheel[:, 0] += x
+        wheel[:, 1] += y
+
+        plt.plot(wheel[:, 0], wheel[:, 1], color=color)
+
+    # 计算车身四个角点
+    corners = np.array([
+        [-LENGTH/2, WIDTH/2],
+        [LENGTH/2, WIDTH/2],
+        [LENGTH/2, -WIDTH/2],
+        [-LENGTH/2, -WIDTH/2],
+        [-LENGTH/2, WIDTH/2]
+    ])
+
+    # 旋转矩阵
+    c, s = np.cos(yaw), np.sin(yaw)
+    Rot = np.array([[c, -s], [s, c]])
+
+    # 旋转并平移车身
+    rotated = corners @ Rot.T
+    rotated[:, 0] += x
+    rotated[:, 1] += y
+
+    # 绘制车身
+    plt.plot(rotated[:, 0], rotated[:, 1], color=color)
+
+    # 绘制四个车轮
+    # 前轮（左）
+    plot_wheel(x + LENGTH/4 * c - WIDTH/2 * s,
+              y + LENGTH/4 * s + WIDTH/2 * c,
+              yaw, steer)
+    # 前轮（右）
+    plot_wheel(x + LENGTH/4 * c + WIDTH/2 * s,
+              y + LENGTH/4 * s - WIDTH/2 * c,
+              yaw, steer)
+    # 后轮（左）
+    plot_wheel(x - LENGTH/4 * c - WIDTH/2 * s,
+              y - LENGTH/4 * s + WIDTH/2 * c,
+              yaw)
+    # 后轮（右）
+    plot_wheel(x - LENGTH/4 * c + WIDTH/2 * s,
+              y - LENGTH/4 * s - WIDTH/2 * c,
+              yaw)
+
+# 添加键盘事件处理函数
+def on_key(event):
+    global pause_simulation
+    if event.key == ' ':  # 空格键
+        pause_simulation = not pause_simulation
+    elif event.key == 'escape':
+        exit(0)
 
 def main():
     #  target course
@@ -177,17 +264,28 @@ def main():
         if show_animation:  # pragma: no cover
             plt.cla()
             # for stopping simulation with the esc key.
-            plt.gcf().canvas.mpl_connect(
-                'key_release_event',
-                lambda event: [exit(0) if event.key == 'escape' else None])
-            plot_arrow(state.x, state.y, state.yaw)
+            plt.gcf().canvas.mpl_connect('key_release_event', on_key)
+            plot_vehicle(state.x, state.y, state.yaw, di)  # di 是转向角
             plt.plot(cx, cy, "-r", label="course")
             plt.plot(states.x, states.y, "-b", label="trajectory")
             plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")
             plt.axis("equal")
             plt.grid(True)
             plt.title("Speed[km/h]:" + str(state.v * 3.6)[:4])
+            plt.legend()  # 添加这一行显示图例
+
+            # 添加暂停状态显示
+            if pause_simulation:
+                plt.text(0.02, 0.95, 'PAUSED', transform=plt.gca().transAxes,
+                        bbox=dict(facecolor='red', alpha=0.5))
+
             plt.pause(0.001)
+
+            # 暂停处理
+            while pause_simulation:
+                plt.pause(0.1)  # 降低 CPU 占用
+                if not plt.get_fignums():  # 检查窗口是否被关闭
+                    exit(0)
 
     # Test
     assert lastIndex >= target_ind, "Cannot goal"
