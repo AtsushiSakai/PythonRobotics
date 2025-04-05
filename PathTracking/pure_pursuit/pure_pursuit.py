@@ -28,6 +28,7 @@ LENGTH = WB + 1.0  # Vehicle length
 WIDTH = 2.0  # Vehicle width
 WHEEL_LEN = 0.6  # Wheel length
 WHEEL_WIDTH = 0.2  # Wheel width
+MAX_STEER = math.pi / 4  # Maximum steering angle [rad]
 
 
 show_animation = True
@@ -144,12 +145,8 @@ def pure_pursuit_steer_control(state, trajectory, pind):
     # Reverse steering angle when reversing
     delta = state.direction * math.atan2(2.0 * WB * math.sin(alpha) / Lf, 1.0)
 
-    if delta > math.pi / 4:
-        delta = math.pi / 4
-    elif delta < - math.pi / 4:
-        delta = - 1 * math.pi / 4
-    else:
-        delta = delta
+    # Limit steering angle to max value
+    delta = max(min(delta, MAX_STEER), -MAX_STEER)
 
     return delta, ind
 
