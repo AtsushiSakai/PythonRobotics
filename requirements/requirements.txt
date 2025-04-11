@@ -8,3 +8,4 @@ mypy # For unit test
 ruff # For unit test
 coveralls # For unit test
 pytest-cov
+pyyaml
