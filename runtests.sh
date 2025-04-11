@@ -6,3 +6,4 @@ echo "Run test suites! "
 # --durations=0: show ranking of test durations
 # -l (--showlocals); show local variables when test failed
 pytest --cov=PathPlanning tests -l --durations=0
+coveralls
