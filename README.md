@@ -5,6 +5,7 @@
 ![GitHub_Action_MacOS_CI](https://github.com/AtsushiSakai/PythonRobotics/workflows/MacOS_CI/badge.svg)
 ![GitHub_Action_Windows_CI](https://github.com/AtsushiSakai/PythonRobotics/workflows/Windows_CI/badge.svg)
 [![Build status](https://ci.appveyor.com/api/projects/status/sb279kxuv1be391g?svg=true)](https://ci.appveyor.com/project/AtsushiSakai/pythonrobotics)
+[![Coverage Status](https://coveralls.io/repos/github/velgersdyk25/PythonRobotics-coveralls/badge.svg)](https://coveralls.io/github/velgersdyk25/PythonRobotics-coveralls)
 
 Python codes and [textbook](https://atsushisakai.github.io/PythonRobotics/index.html) for robotics algorithm.
 
