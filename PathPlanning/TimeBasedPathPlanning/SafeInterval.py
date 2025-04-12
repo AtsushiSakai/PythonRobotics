@@ -18,6 +18,7 @@ from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
     empty_2d_array_of_lists,
 )
 from PathPlanning.TimeBasedPathPlanning.Node import Node, NodePath
+from PathPlanning.TimeBasedPathPlanning.SingleAgentPlannerBase import SingleAgentPlanner
 import heapq
 import random
 from dataclasses import dataclass
@@ -38,20 +39,7 @@ class EntryTimeAndInterval:
     entry_time: int
     interval: Interval
 
-class SafeIntervalPathPlanner:
-    grid: Grid
-    start: Position
-    goal: Position
-
-    def __init__(self, grid: Grid, start: Position, goal: Position):
-        self.grid = grid
-        self.start = start
-        self.goal = goal
-
-        # Seed randomness for reproducibility
-        RANDOM_SEED = 50
-        random.seed(RANDOM_SEED)
-        np.random.seed(RANDOM_SEED)
+class SafeIntervalPathPlanner(SingleAgentPlanner):
 
     """
     Generate a plan given the loaded problem statement. Raises an exception if it fails to find a path.

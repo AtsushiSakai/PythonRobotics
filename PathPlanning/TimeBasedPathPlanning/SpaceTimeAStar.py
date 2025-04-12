@@ -20,6 +20,7 @@ import heapq
 from collections.abc import Generator
 import random
 import time
+from PathPlanning.TimeBasedPathPlanning.SingleAgentPlannerBase import SingleAgentPlanner
 
 # Seed randomness for reproducibility
 RANDOM_SEED = 50
@@ -27,17 +28,7 @@ random.seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
 
-class SpaceTimeAStar:
-    grid: Grid
-    start: Position
-    goal: Position
-    # Used to evaluate solutions
-    expanded_node_count: int = -1
-
-    def __init__(self, grid: Grid, start: Position, goal: Position):
-        self.grid = grid
-        self.start = start
-        self.goal = goal
+class SpaceTimeAStar(SingleAgentPlanner):
 
     def plan(self, verbose: bool = False) -> NodePath:
         open_set: list[Node] = []
