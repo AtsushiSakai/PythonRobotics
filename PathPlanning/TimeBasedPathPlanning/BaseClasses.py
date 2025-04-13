@@ -8,7 +8,6 @@ import numpy.random as numpy_random
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-# TODO: have planners call this somehow?
 # Seed randomness for reproducibility
 RANDOM_SEED = 50
 random.seed(RANDOM_SEED)
