@@ -9,7 +9,6 @@ Space-time A* Algorithm
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
 from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
     Grid,
     ObstacleArrangement,
@@ -99,7 +98,8 @@ class SpaceTimeAStar(SingleAgentPlanner):
             if new_node in expanded_set:
                 continue
 
-            if grid.valid_position(new_pos, parent_node.time + 1):
+            # Check if the new node is valid for the next 2 time steps - one step to enter, and another to leave
+            if all([grid.valid_position(new_pos, parent_node.time + dt) for dt in [1, 2]]):
                 if verbose:
                     print("\tNew successor node: ", new_node)
                 yield new_node

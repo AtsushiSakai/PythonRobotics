@@ -196,11 +196,11 @@ class Grid:
         bool: True if position/time combination is valid, False otherwise
     """
     def valid_position(self, position: Position, t: int) -> bool:
-        # Check if new position is in grid
+        # Check if position is in grid
         if not self.inside_grid_bounds(position):
             return False
 
-        # Check if new position is not occupied at time t
+        # Check if position is not occupied at time t
         return self.reservation_matrix[position.x, position.y, t] == 0
 
     """

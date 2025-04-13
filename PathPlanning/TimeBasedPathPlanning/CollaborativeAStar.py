@@ -3,7 +3,6 @@ TODO - doc comment
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
 from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
     Grid,
     Interval,
@@ -16,13 +15,7 @@ from PathPlanning.TimeBasedPathPlanning.BaseClasses import SingleAgentPlanner
 from PathPlanning.TimeBasedPathPlanning.SafeInterval import SafeIntervalPathPlanner
 from PathPlanning.TimeBasedPathPlanning.SpaceTimeAStar import SpaceTimeAStar
 from PathPlanning.TimeBasedPathPlanning.Plotting import PlotNodePaths
-import heapq
-import random
-from dataclasses import dataclass
-from functools import total_ordering
 import time
-from enum import Enum
-# TODO: audit imports
 
 class CollaborativeAStar(MultiAgentPlanner):
 
@@ -37,10 +30,11 @@ class CollaborativeAStar(MultiAgentPlanner):
         # TODO: smarter ordering
         paths = []
         for start_and_goal in start_and_goals:
-            print(f"\nPlanning for agent:  {start_and_goal}" )
+            if True:
+                print(f"\nPlanning for agent:  {start_and_goal}" )
 
             grid.clear_initial_reservation(start_and_goal.start, start_and_goal.index)
-            path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal)
+            path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, verbose)
 
             if path is None:
                 print(f"Failed to find path for {start_and_goal}")
@@ -64,7 +58,6 @@ def main():
         np.array([grid_side_length, grid_side_length]),
         num_obstacles=250,
         obstacle_avoid_points=obstacle_avoid_points,
-        # TODO: some static obstacle arrangements
         obstacle_arrangement=ObstacleArrangement.NARROW_CORRIDOR,
         # obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1,
         # obstacle_arrangement=ObstacleArrangement.RANDOM,

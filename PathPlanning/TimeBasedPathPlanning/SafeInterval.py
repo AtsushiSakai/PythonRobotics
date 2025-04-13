@@ -9,7 +9,6 @@ Safe interval path planner
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
 from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
     Grid,
     Interval,
