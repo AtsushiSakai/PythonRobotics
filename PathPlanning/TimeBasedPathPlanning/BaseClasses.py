@@ -8,6 +8,12 @@ import numpy.random as numpy_random
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+# TODO: have planners call this somehow?
+# Seed randomness for reproducibility
+RANDOM_SEED = 50
+random.seed(RANDOM_SEED)
+numpy_random.seed(RANDOM_SEED)
+
 class SingleAgentPlanner(ABC):
     """
     Base class for single agent planners
@@ -20,6 +26,8 @@ class SingleAgentPlanner(ABC):
 
 @dataclass
 class StartAndGoal:
+    # Index of this agent
+    index: int
     # Start position of the robot
     start: Position
     # Goal position of the robot
@@ -28,24 +36,12 @@ class StartAndGoal:
 class MultiAgentPlanner(ABC):
     """
     Base class for multi-agent planners
-    """
-
-    def __init__(self, grid: Grid, start_and_goal_positions: list[StartAndGoal]):
-        self.grid = grid
-        self.start_and_goal_positions = start_and_goal_positions
-
-        # Seed randomness for reproducibility
-        RANDOM_SEED = 50
-        random.seed(RANDOM_SEED)
-        numpy_random.seed(RANDOM_SEED)
+    """       
     
-    def plan(self, verbose: bool = False) -> list[NodePath]:
+    @staticmethod
+    @abstractmethod
+    def plan(grid: Grid, start_and_goal_positions: list[StartAndGoal], verbose: bool = False) -> list[NodePath]:
         """
         Plan for all agents. Returned paths are in the order of the `StartAndGoal` list this object was instantiated with
         """
-        paths = []
-        for start_and_goal in self.start_and_goal_positions:
-            planner = self.create_planner(start_and_goal.start, start_and_goal.goal)
-            path = planner.plan(verbose)
-            paths.append(path)
-        return paths
+        pass

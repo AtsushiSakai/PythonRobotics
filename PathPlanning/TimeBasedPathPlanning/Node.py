@@ -1,8 +1,31 @@
 from dataclasses import dataclass
-from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
-    Position,
-)
 from functools import total_ordering
+import numpy as np
+
+@dataclass(order=True)
+class Position:
+    x: int
+    y: int
+
+    def as_ndarray(self) -> np.ndarray:
+        return np.array([self.x, self.y])
+
+    def __add__(self, other):
+        if isinstance(other, Position):
+            return Position(self.x + other.x, self.y + other.y)
+        raise NotImplementedError(
+            f"Addition not supported for Position and {type(other)}"
+        )
+
+    def __sub__(self, other):
+        if isinstance(other, Position):
+            return Position(self.x - other.x, self.y - other.y)
+        raise NotImplementedError(
+            f"Subtraction not supported for Position and {type(other)}"
+        )
+
+    def __hash__(self):
+        return hash((self.x, self.y))
 
 @dataclass()
 # Note: Total_ordering is used instead of adding `order=True` to the @dataclass decorator because
@@ -39,12 +62,18 @@ class Node:
 
 class NodePath:
     path: list[Node]
-    positions_at_time: dict[int, Position] = {}
+    positions_at_time: dict[int, Position]
 
     def __init__(self, path: list[Node]):
         self.path = path
-        for node in path:
-            self.positions_at_time[node.time] = node.position
+        self.positions_at_time = {}
+        for i, node in enumerate(path):
+            reservation_finish_time = node.time + 1
+            if i < len(path) - 1:
+                reservation_finish_time = path[i + 1].time
+
+            for t in range(node.time, reservation_finish_time):
+                self.positions_at_time[t] = node.position
 
     """
     Get the position of the path at a given time
