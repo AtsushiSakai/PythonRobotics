@@ -21,6 +21,7 @@ from collections.abc import Generator
 import random
 import time
 from PathPlanning.TimeBasedPathPlanning.BaseClasses import SingleAgentPlanner
+from PathPlanning.TimeBasedPathPlanning.Plotting import PlotNodePath
 
 # Seed randomness for reproducibility
 RANDOM_SEED = 50
@@ -137,36 +138,7 @@ def main():
     if not show_animation:
         return
 
-    fig = plt.figure(figsize=(10, 7))
-    ax = fig.add_subplot(
-        autoscale_on=False,
-        xlim=(0, grid.grid_size[0] - 1),
-        ylim=(0, grid.grid_size[1] - 1),
-    )
-    ax.set_aspect("equal")
-    ax.grid()
-    ax.set_xticks(np.arange(0, grid_side_length, 1))
-    ax.set_yticks(np.arange(0, grid_side_length, 1))
-
-    (start_and_goal,) = ax.plot([], [], "mD", ms=15, label="Start and Goal")
-    start_and_goal.set_data([start.x, goal.x], [start.y, goal.y])
-    (obs_points,) = ax.plot([], [], "ro", ms=15, label="Obstacles")
-    (path_points,) = ax.plot([], [], "bo", ms=10, label="Path Found")
-    ax.legend(bbox_to_anchor=(1.05, 1))
-
-    # for stopping simulation with the esc key.
-    plt.gcf().canvas.mpl_connect(
-        "key_release_event", lambda event: [exit(0) if event.key == "escape" else None]
-    )
-
-    for i in range(0, path.goal_reached_time()):
-        obs_positions = grid.get_obstacle_positions_at_time(i)
-        obs_points.set_data(obs_positions[0], obs_positions[1])
-        path_position = path.get_position(i)
-        path_points.set_data([path_position.x], [path_position.y])
-        plt.pause(0.2)
-    plt.show()
-
+    PlotNodePath(grid, start, goal, path)
 
 if __name__ == "__main__":
     main()
