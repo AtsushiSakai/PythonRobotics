@@ -20,7 +20,7 @@ import heapq
 from collections.abc import Generator
 import random
 import time
-from PathPlanning.TimeBasedPathPlanning.SingleAgentPlannerBase import SingleAgentPlanner
+from PathPlanning.TimeBasedPathPlanning.BaseClasses import SingleAgentPlanner
 
 # Seed randomness for reproducibility
 RANDOM_SEED = 50
@@ -30,10 +30,11 @@ np.random.seed(RANDOM_SEED)
 
 class SpaceTimeAStar(SingleAgentPlanner):
 
-    def plan(self, verbose: bool = False) -> NodePath:
+    @staticmethod
+    def plan(grid: Grid, start: Position, goal: Position, verbose: bool = False) -> NodePath:
         open_set: list[Node] = []
         heapq.heappush(
-            open_set, Node(self.start, 0, self.calculate_heuristic(self.start), -1)
+            open_set, Node(start, 0, SpaceTimeAStar.calculate_heuristic(start, goal), -1)
         )
 
         expanded_list: list[Node] = []
@@ -43,12 +44,12 @@ class SpaceTimeAStar(SingleAgentPlanner):
             if verbose:
                 print("Expanded node:", expanded_node)
 
-            if expanded_node.time + 1 >= self.grid.time_limit:
+            if expanded_node.time + 1 >= grid.time_limit:
                 if verbose:
                     print(f"\tSkipping node that is past time limit: {expanded_node}")
                 continue
 
-            if expanded_node.position == self.goal:
+            if expanded_node.position == goal:
                 print(f"Found path to goal after {len(expanded_list)} expansions")
                 path = []
                 path_walker: Node = expanded_node
@@ -60,14 +61,13 @@ class SpaceTimeAStar(SingleAgentPlanner):
 
                 # reverse path so it goes start -> goal
                 path.reverse()
-                self.expanded_node_count = len(expanded_set)
                 return NodePath(path)
 
             expanded_idx = len(expanded_list)
             expanded_list.append(expanded_node)
             expanded_set.add(expanded_node)
 
-            for child in self.generate_successors(expanded_node, expanded_idx, verbose, expanded_set):
+            for child in SpaceTimeAStar.generate_successors(grid, goal, expanded_node, expanded_idx, verbose, expanded_set):
                 heapq.heappush(open_set, child)
 
         raise Exception("No path found")
@@ -75,8 +75,9 @@ class SpaceTimeAStar(SingleAgentPlanner):
     """
     Generate possible successors of the provided `parent_node`
     """
+    @staticmethod
     def generate_successors(
-        self, parent_node: Node, parent_node_idx: int, verbose: bool, expanded_set: set[Node]
+        grid: Grid, goal: Position, parent_node: Node, parent_node_idx: int, verbose: bool, expanded_set: set[Node]
     ) -> Generator[Node, None, None]:
         diffs = [
             Position(0, 0),
@@ -90,20 +91,21 @@ class SpaceTimeAStar(SingleAgentPlanner):
             new_node = Node(
                 new_pos,
                 parent_node.time + 1,
-                self.calculate_heuristic(new_pos),
+                SpaceTimeAStar.calculate_heuristic(new_pos, goal),
                 parent_node_idx,
             )
 
             if new_node in expanded_set:
                 continue
 
-            if self.grid.valid_position(new_pos, parent_node.time + 1):
+            if grid.valid_position(new_pos, parent_node.time + 1):
                 if verbose:
                     print("\tNew successor node: ", new_node)
                 yield new_node
 
-    def calculate_heuristic(self, position) -> int:
-        diff = self.goal - position
+    @staticmethod
+    def calculate_heuristic(position: Position, goal: Position) -> int:
+        diff = goal - position
         return abs(diff.x) + abs(diff.y)
 
 
@@ -124,8 +126,7 @@ def main():
         obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1,
     )
 
-    planner = SpaceTimeAStar(grid, start, goal)
-    path = planner.plan(verbose)
+    path = SpaceTimeAStar.plan(grid, start, goal, verbose)
 
     runtime = time.time() - start_time
     print(f"Planning took: {runtime:.5f} seconds")

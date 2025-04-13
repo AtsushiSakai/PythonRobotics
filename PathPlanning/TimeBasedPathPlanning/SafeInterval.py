@@ -18,9 +18,8 @@ from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
     empty_2d_array_of_lists,
 )
 from PathPlanning.TimeBasedPathPlanning.Node import Node, NodePath
-from PathPlanning.TimeBasedPathPlanning.SingleAgentPlannerBase import SingleAgentPlanner
+from PathPlanning.TimeBasedPathPlanning.BaseClasses import SingleAgentPlanner
 import heapq
-import random
 from dataclasses import dataclass
 from functools import total_ordering
 import time
@@ -46,29 +45,30 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
     Arguments:
         verbose (bool): set to True to print debug information
     """
-    def plan(self, verbose: bool = False) -> NodePath:
+    @staticmethod
+    def plan(grid: Grid, start: Position, goal: Position, verbose: bool = False) -> NodePath:
 
-        safe_intervals = self.grid.get_safe_intervals()
+        safe_intervals = grid.get_safe_intervals()
 
         open_set: list[SIPPNode] = []
-        first_node_interval = safe_intervals[self.start.x, self.start.y][0]
+        first_node_interval = safe_intervals[start.x, start.y][0]
         heapq.heappush(
-            open_set, SIPPNode(self.start, 0, self.calculate_heuristic(self.start), -1, first_node_interval)
+            open_set, SIPPNode(start, 0, SafeIntervalPathPlanner.calculate_heuristic(start, goal), -1, first_node_interval)
         )
 
         expanded_list: list[SIPPNode] = []
-        visited_intervals = empty_2d_array_of_lists(self.grid.grid_size[0], self.grid.grid_size[1])
+        visited_intervals = empty_2d_array_of_lists(grid.grid_size[0], grid.grid_size[1])
         while open_set:
             expanded_node: SIPPNode = heapq.heappop(open_set)
             if verbose:
                 print("Expanded node:", expanded_node)
 
-            if expanded_node.time + 1 >= self.grid.time_limit:
+            if expanded_node.time + 1 >= grid.time_limit:
                 if verbose:
                     print(f"\tSkipping node that is past time limit: {expanded_node}")
                 continue
 
-            if expanded_node.position == self.goal:
+            if expanded_node.position == goal:
                 print(f"Found path to goal after {len(expanded_list)} expansions")
                 path = []
                 path_walker: SIPPNode = expanded_node
@@ -87,7 +87,7 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
             entry_time_and_node = EntryTimeAndInterval(expanded_node.time, expanded_node.interval)
             add_entry_to_visited_intervals_array(entry_time_and_node, visited_intervals, expanded_node)
 
-            for child in self.generate_successors(expanded_node, expanded_idx, safe_intervals, visited_intervals):
+            for child in SafeIntervalPathPlanner.generate_successors(grid, goal, expanded_node, expanded_idx, safe_intervals, visited_intervals):
                 heapq.heappush(open_set, child)
 
         raise Exception("No path found")
@@ -95,8 +95,9 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
     """
     Generate list of possible successors of the provided `parent_node` that are worth expanding
     """
+    @staticmethod
     def generate_successors(
-        self, parent_node: SIPPNode, parent_node_idx: int, intervals: np.ndarray, visited_intervals: np.ndarray
+        grid: Grid, goal: Position, parent_node: SIPPNode, parent_node_idx: int, intervals: np.ndarray, visited_intervals: np.ndarray
     ) -> list[SIPPNode]:
         new_nodes = []
         diffs = [
@@ -108,7 +109,7 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
         ]
         for diff in diffs:
             new_pos = parent_node.position + diff
-            if not self.grid.inside_grid_bounds(new_pos):
+            if not grid.inside_grid_bounds(new_pos):
                 continue
 
             current_interval = parent_node.interval
@@ -136,12 +137,12 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
                 # We know there is a node worth expanding. Generate successor at the earliest possible time the
                 # new interval can be entered
                 for possible_t in range(max(parent_node.time + 1, interval.start_time), min(current_interval.end_time, interval.end_time)):
-                    if self.grid.valid_position(new_pos, possible_t):
+                    if grid.valid_position(new_pos, possible_t):
                         new_nodes.append(SIPPNode(
                             new_pos,
                             # entry is max of interval start and parent node time + 1 (get there as soon as possible)
                             max(interval.start_time, parent_node.time + 1),
-                            self.calculate_heuristic(new_pos),
+                            SafeIntervalPathPlanner.calculate_heuristic(new_pos, goal),
                             parent_node_idx,
                             interval,
                         ))
@@ -153,8 +154,9 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
     """
     Calculate the heuristic for a given position - Manhattan distance to the goal
     """
-    def calculate_heuristic(self, position) -> int:
-        diff = self.goal - position
+    @staticmethod
+    def calculate_heuristic(position: Position, goal: Position) -> int:
+        diff = goal - position
         return abs(diff.x) + abs(diff.y)
 
 
@@ -190,8 +192,7 @@ def main():
         # obstacle_arrangement=ObstacleArrangement.RANDOM,
     )
 
-    planner = SafeIntervalPathPlanner(grid, start, goal)
-    path = planner.plan(verbose)
+    path = SafeIntervalPathPlanner.plan(grid, start, goal, verbose)
     runtime = time.time() - start_time
     print(f"Planning took: {runtime:.5f} seconds")
 
