@@ -17,16 +17,9 @@ from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
 from PathPlanning.TimeBasedPathPlanning.Node import Node, NodePath
 import heapq
 from collections.abc import Generator
-import random
 import time
 from PathPlanning.TimeBasedPathPlanning.BaseClasses import SingleAgentPlanner
 from PathPlanning.TimeBasedPathPlanning.Plotting import PlotNodePath
-
-# Seed randomness for reproducibility
-RANDOM_SEED = 50
-random.seed(RANDOM_SEED)
-np.random.seed(RANDOM_SEED)
-
 
 class SpaceTimeAStar(SingleAgentPlanner):
 
