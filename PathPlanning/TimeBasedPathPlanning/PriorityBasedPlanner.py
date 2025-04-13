@@ -2,6 +2,7 @@
 TODO - doc comment
 
 sort of outlined in this paper: https://pure.tudelft.nl/ws/portalfiles/portal/67074672/07138650.pdf
+better paper: https://people.csail.mit.edu/tlp/publications/01087401.pdf
 """
 
 import numpy as np
