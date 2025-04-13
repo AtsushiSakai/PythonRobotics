@@ -113,6 +113,6 @@ def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: list[N
                 path_position = path.get_position(i)
                 path_plots[j].set_data([path_position.x], [path_position.y])
         
-        plt.pause(0.5)
+        plt.pause(0.2)
 
     plt.show()

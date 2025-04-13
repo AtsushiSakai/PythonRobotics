@@ -17,7 +17,7 @@ from PathPlanning.TimeBasedPathPlanning.SpaceTimeAStar import SpaceTimeAStar
 from PathPlanning.TimeBasedPathPlanning.Plotting import PlotNodePaths
 import time
 
-class CollaborativeAStar(MultiAgentPlanner):
+class PriorityBasedPlanner(MultiAgentPlanner):
 
     def plan(grid: Grid, start_and_goals: list[StartAndGoal], single_agent_planner_class: SingleAgentPlanner, verbose: bool) -> list[NodePath]: # TODO: list of what
         
@@ -58,13 +58,13 @@ def main():
         np.array([grid_side_length, grid_side_length]),
         num_obstacles=250,
         obstacle_avoid_points=obstacle_avoid_points,
-        obstacle_arrangement=ObstacleArrangement.NARROW_CORRIDOR,
-        # obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1,
+        # obstacle_arrangement=ObstacleArrangement.NARROW_CORRIDOR,
+        obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1,
         # obstacle_arrangement=ObstacleArrangement.RANDOM,
     )
 
     start_time = time.time()
-    paths: list[NodePath] = CollaborativeAStar.plan(grid, start_and_goals, SafeIntervalPathPlanner, verbose)
+    paths: list[NodePath] = PriorityBasedPlanner.plan(grid, start_and_goals, SafeIntervalPathPlanner, verbose)
 
     runtime = time.time() - start_time
     print(f"\nPlanning took: {runtime:.5f} seconds")
