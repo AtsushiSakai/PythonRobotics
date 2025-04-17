@@ -6,6 +6,12 @@ coverage:
         target: auto #default
         threshold: 0%
         base: auto
+    patch: #add everything under here, more options at https://docs.codecov.com/docs/commit-status
+      default:
+        # basic
+        target: 80% #default
+        threshold: 0%
+        base: auto
 comment:                  #this is a top-level key
   layout: " diff, flags, files"
   behavior: default
