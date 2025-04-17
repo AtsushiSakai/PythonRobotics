@@ -1,8 +1,11 @@
-numpy == 2.2.4
-scipy == 1.15.2
-matplotlib == 3.10.1
-cvxpy == 1.5.3
-pytest == 8.3.5 # For unit test
-pytest-xdist == 3.6.1 # For unit test
-mypy == 1.15.0 # For unit test
-ruff == 0.11.0 # For unit test
+numpy
+scipy
+matplotlib
+cvxpy
+pytest # For unit test
+pytest-xdist # For unit test
+mypy # For unit test
+ruff # For unit test
+coveralls # For unit test
+pytest-cov
+pyyaml

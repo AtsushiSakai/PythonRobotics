@@ -5,4 +5,4 @@ echo "Run test suites! "
 # -Werror: warning as error
 # --durations=0: show ranking of test durations
 # -l (--showlocals); show local variables when test failed
-pytest tests -l -Werror --durations=0
+pytest --cov=PathPlanning tests -l --durations=0
