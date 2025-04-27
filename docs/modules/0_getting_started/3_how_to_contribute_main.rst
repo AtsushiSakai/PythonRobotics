@@ -107,6 +107,18 @@ mathematics and the algorithm of the example.
 Documentations related codes should be in the python script as the header
 comments of the script or docstrings of each function.
 
+Also, each document should have a link to the code in Github.
+You can easily add the link by using the `.. autoclass::`, `.. autofunction::`, and `.. automodule` by Sphinx's `autodoc`_ module.
+
+Using this `autodoc`_ module, the generated documentations have the link to the code in Github like:
+
+.. image:: /_static/img/source_link_1.png
+
+When you click the link, you will jump to the source code in Github like:
+
+.. image:: /_static/img/source_link_2.png
+
+
 
 .. _`submit a pull request`:
 
@@ -210,5 +222,6 @@ Current Major Sponsors:
 .. _`1Password`: https://github.com/1Password/for-open-source
 .. _`matplotrecorder`: https://github.com/AtsushiSakai/matplotrecorder
 .. _`PythonRoboticsGifs`: https://github.com/AtsushiSakai/PythonRoboticsGifs
+.. _`autodoc`: https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html
 
 
