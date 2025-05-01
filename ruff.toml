@@ -5,8 +5,8 @@ ignore = ["E501", "E741", "E402"]
 exclude = [
 ]
 
-# Assume Python 3.11
-target-version = "py312"
+# Assume Python 3.13
+target-version = "py313"
 
 [per-file-ignores]
 
