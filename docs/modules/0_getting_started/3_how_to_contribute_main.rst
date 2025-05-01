@@ -26,7 +26,7 @@ to understand the philosophies of this project.
 Check your Python version.
 ---------------------------
 
-We only accept a PR for Python 3.12.x or higher.
+We only accept a PR for Python 3.13.x or higher.
 
 We will not accept a PR for Python 2.x.
 
