@@ -91,7 +91,7 @@ def mpc_control(x0):
     prob = cvxpy.Problem(cvxpy.Minimize(cost), constr)
 
     start = time.time()
-    prob.solve(verbose=False)
+    prob.solve(verbose=False, solver=cvxpy.CLARABEL)
     elapsed_time = time.time() - start
     print(f"calc time:{elapsed_time:.6f} [sec]")
 
