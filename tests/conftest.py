@@ -10,4 +10,4 @@ sys.path.append(ROOT_DIR)
 
 
 def run_this_test(file):
-    pytest.main([os.path.abspath(file)])
+    pytest.main(args=["-W", "error", "-Werror", "--pythonwarnings=error", os.path.abspath(file)])

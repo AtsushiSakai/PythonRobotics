@@ -2,6 +2,7 @@ numpy == 2.2.4
 scipy == 1.15.2
 matplotlib == 3.10.1
 cvxpy == 1.6.5
+ecos == 2.0.14
 pytest == 8.3.5 # For unit test
 pytest-xdist == 3.6.1 # For unit test
 mypy == 1.15.0 # For unit test
