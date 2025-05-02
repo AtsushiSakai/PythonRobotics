@@ -11,3 +11,7 @@ The red crosses are observations from a ranging sensor.
 
 The red circle is the estimated object shape using circle fitting.
 
+Code Link
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: Mapping.circle_fitting.circle_fitting.circle_fitting
