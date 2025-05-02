@@ -17,7 +17,7 @@ The black stars are landmarks for graph edge generation.
 .. include:: graphSLAM_formulation.rst
 .. include:: graphSLAM_SE2_example.rst
 
-References:
+Reference
 ~~~~~~~~~~~
 
 - `A Tutorial on Graph-Based SLAM <http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf>`_

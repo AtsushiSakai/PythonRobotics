@@ -91,7 +91,7 @@ the target minimum velocity :math:`v_{min}` can be calculated as follows:
 :math:`v_{min} = \frac{d_{t+1}+d_{t}}{\Delta t} = \frac{d_{t+1}+d_{t}}{(\kappa_{t+1}-\kappa_{t})}\frac{tan\dot{\delta}_{max}}{WB}`
 
 
-References:
+Reference
 ~~~~~~~~~~~
 
 - `Vehicle Dynamics and Control <https://link.springer.com/book/10.1007/978-1-4614-1433-9>`_

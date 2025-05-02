@@ -5,7 +5,7 @@ Left-click the plot to set the goal position of the end effector
 Author: Daniel Ingram (daniel-s-ingram)
         Atsushi Sakai (@Atsushi_twi)
 
-Ref: P. I. Corke, "Robotics, Vision & Control", Springer 2017,
+Reference: P. I. Corke, "Robotics, Vision & Control", Springer 2017,
  ISBN 978-3-319-54413-7 p102
 - [Robotics, Vision and Control]
 (https://link.springer.com/book/10.1007/978-3-642-20144-8)

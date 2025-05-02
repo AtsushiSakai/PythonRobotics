@@ -63,7 +63,7 @@ This is a 2D grid based shortest path planning with D star algorithm.
 
 The animation shows a robot finding its path avoiding an obstacle using the D* search algorithm.
 
-Ref:
+Reference
 
 -  `D* search Wikipedia <https://en.wikipedia.org/wiki/D*>`__
 
@@ -74,7 +74,7 @@ This is a 2D grid based path planning and replanning with D star lite algorithm.
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DStarLite/animation.gif
 
-Ref:
+Reference
 
 - `Improved Fast Replanning for Robot Navigation in Unknown Terrain <http://www.cs.cmu.edu/~maxim/files/dlite_icra02.pdf>`_
 
@@ -88,7 +88,7 @@ This is a 2D grid based path planning with Potential Field algorithm.
 
 In the animation, the blue heat map shows potential value on each grid.
 
-Ref:
+Reference
 
 -  `Robotic Motion Planning:Potential
    Functions <https://www.cs.cmu.edu/~motionplanning/lecture/Chap4-Potential-Field_howie.pdf>`__

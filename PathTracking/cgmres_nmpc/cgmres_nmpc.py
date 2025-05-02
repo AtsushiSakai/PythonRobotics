@@ -4,7 +4,7 @@ Nonlinear MPC simulation with CGMRES
 
 author Atsushi Sakai (@Atsushi_twi)
 
-Ref:
+Reference:
 Shunichi09/nonlinear_control: Implementing the nonlinear model predictive
 control, sliding mode control https://github.com/Shunichi09/PythonLinearNonlinearControl
 

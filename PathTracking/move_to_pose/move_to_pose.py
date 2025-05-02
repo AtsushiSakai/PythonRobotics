@@ -76,7 +76,7 @@ class PathFinderController:
         # [-pi, pi] to prevent unstable behavior e.g. difference going
         # from 0 rad to 2*pi rad with slight turn
 
-        # Ref: The velocity v always has a constant sign which depends on the initial value of α.
+        # The velocity v always has a constant sign which depends on the initial value of α.
         rho = np.hypot(x_diff, y_diff)
         v = self.Kp_rho * rho
 

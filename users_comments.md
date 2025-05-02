@@ -10,7 +10,7 @@ This is an electric wheelchair control demo by [Katsushun89](https://github.com/
 
 ![1](https://github.com/AtsushiSakai/PythonRoboticsGifs/blob/master/Users/WHILL_Model_CR_with_move_to_a_pose/WHLL_Model_CR_with_move_to_a_pose.gif)
 
-Ref:
+Reference:
 
 - [toioと同じように動くWHILL Model CR (in Japanese)](https://qiita.com/KatsuShun89/items/68fde7544ecfe36096d2)
 

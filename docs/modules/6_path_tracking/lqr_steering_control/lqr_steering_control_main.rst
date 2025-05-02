@@ -113,7 +113,7 @@ The optimal control input `u` can be calculated as:
 
 where `K` is the feedback gain matrix obtained by solving the Riccati equation.
 
-References:
+Reference
 ~~~~~~~~~~~
 -  `ApolloAuto/apollo: An open autonomous driving platform <https://github.com/ApolloAuto/apollo>`_
 

@@ -13,7 +13,7 @@ You can get different Beizer course:
 
 .. image:: Figure_2.png
 
-Ref:
+Reference
 
 -  `Continuous Curvature Path Generation Based on Bezier Curves for
    Autonomous

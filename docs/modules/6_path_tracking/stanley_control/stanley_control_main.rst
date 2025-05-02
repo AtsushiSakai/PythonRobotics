@@ -6,7 +6,7 @@ control.
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/stanley_controller/animation.gif
 
-References:
+Reference
 ~~~~~~~~~~~
 
 -  `Stanley: The robot that won the DARPA grand

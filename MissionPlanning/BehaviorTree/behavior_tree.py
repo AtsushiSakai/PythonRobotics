@@ -3,7 +3,7 @@ Behavior Tree
 
 author: Wang Zheng (@Aglargil)
 
-Ref:
+Reference:
 
 - [Behavior Tree](https://en.wikipedia.org/wiki/Behavior_tree_(artificial_intelligence,_robotics_and_control))
 """

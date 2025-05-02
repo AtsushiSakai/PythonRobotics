@@ -3,7 +3,7 @@ State Machine
 
 author: Wang Zheng (@Aglargil)
 
-Ref:
+Reference:
 
 - [State Machine]
 (https://en.wikipedia.org/wiki/Finite-state_machine)
@@ -23,7 +23,7 @@ def deflate_and_encode(plantuml_text):
     """
     zlib compress the plantuml text and encode it for the plantuml server.
 
-    Ref: https://plantuml.com/en/text-encoding
+    Reference https://plantuml.com/en/text-encoding
     """
     plantuml_alphabet = (
         string.digits + string.ascii_uppercase + string.ascii_lowercase + "-_"

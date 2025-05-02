@@ -9,7 +9,7 @@ speed control.
 The red line is a target course, the green cross means the target point
 for pure pursuit control, the blue line is the tracking.
 
-References:
+Reference
 ~~~~~~~~~~~
 
 -  `A Survey of Motion Planning and Control Techniques for Self-driving

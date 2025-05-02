@@ -53,7 +53,7 @@ This is a path planning code with Informed RRT*.
 
 The cyan ellipse is the heuristic sampling domain of Informed RRT*.
 
-Ref:
+Reference
 
 -  `Informed RRT\*: Optimal Sampling-based Path Planning Focused via
    Direct Sampling of an Admissible Ellipsoidal
@@ -68,7 +68,7 @@ Batch Informed RRT\*
 
 This is a path planning code with Batch Informed RRT*.
 
-Ref:
+Reference
 
 -  `Batch Informed Trees (BIT*): Sampling-based Optimal Planning via the
    Heuristically Guided Search of Implicit Random Geometric
@@ -87,7 +87,7 @@ In this code, pure-pursuit algorithm is used for steering control,
 
 PID is used for speed control.
 
-Ref:
+Reference
 
 -  `Motion Planning in Complex Environments using Closed-loop
    Prediction <https://acl.mit.edu/papers/KuwataGNC08.pdf>`__
@@ -109,7 +109,7 @@ A double integrator motion model is used for LQR local planner.
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/LQRRRTStar/animation.gif
 
-Ref:
+Reference
 
 -  `LQR-RRT\*: Optimal Sampling-Based Motion Planning with Automatically
    Derived Extension

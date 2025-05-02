@@ -97,7 +97,7 @@ Each velocity and acceleration boundary condition can be calculated with each or
 
 :math:`v_{xe}=v_ecos(\theta_e), v_{ye}=v_esin(\theta_e)`
 
-References:
+Reference
 ~~~~~~~~~~~
 
 -  `Local Path Planning And Motion Control For Agv In

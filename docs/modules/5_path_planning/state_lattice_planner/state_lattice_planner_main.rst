@@ -22,7 +22,7 @@ Lane sampling
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/StateLatticePlanner/LaneSampling.gif
 
-Ref:
+Reference
 
 -  `Optimal rough terrain trajectory generation for wheeled mobile
    robots <https://journals.sagepub.com/doi/pdf/10.1177/0278364906075328>`__
