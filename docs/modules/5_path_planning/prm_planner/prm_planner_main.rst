@@ -13,7 +13,7 @@ Cyan crosses means searched points with Dijkstra method,
 
 The red line is the final path of PRM.
 
-Ref:
+Reference
 
 -  `Probabilistic roadmap -
    Wikipedia <https://en.wikipedia.org/wiki/Probabilistic_roadmap>`__

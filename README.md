@@ -168,7 +168,7 @@ All animation gifs are stored here: [AtsushiSakai/PythonRoboticsGifs: Animation 
 
 <img src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/extended_kalman_filter/animation.gif" width="640" alt="EKF pic">
 
-Ref:
+Reference
 
 - [documentation](https://atsushisakai.github.io/PythonRobotics/modules/localization/extended_kalman_filter_localization_files/extended_kalman_filter_localization.html)
 
@@ -186,7 +186,7 @@ It is assumed that the robot can measure a distance from landmarks (RFID).
 
 These measurements are used for PF localization.
 
-Ref:
+Reference
 
 - [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
 
@@ -207,7 +207,7 @@ The filter integrates speed input and range observations from RFID for localizat
 
 Initial position is not needed.
 
-Ref:
+Reference
 
 - [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
 
@@ -256,7 +256,7 @@ It can calculate a rotation matrix, and a translation vector between points and 
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/iterative_closest_point/animation.gif)
 
-Ref:
+Reference
 
 - [Introduction to Mobile Robotics: Iterative Closest Point Algorithm](https://cs.gmu.edu/~kosecka/cs685/cs685-icp.pdf)
 
@@ -275,7 +275,7 @@ Black points are landmarks, blue crosses are estimated landmark positions by Fas
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/FastSLAM1/animation.gif)
 
 
-Ref:
+Reference
 
 - [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
 
@@ -321,7 +321,7 @@ This is a 2D grid based the shortest path planning with D star algorithm.
 
 The animation shows a robot finding its path avoiding an obstacle using the D* search algorithm.
 
-Ref:
+Reference
 
 - [D* Algorithm Wikipedia](https://en.wikipedia.org/wiki/D*)
 
@@ -346,7 +346,7 @@ This is a 2D grid based path planning with Potential Field algorithm.
 
 In the animation, the blue heat map shows potential value on each grid.
 
-Ref:
+Reference
 
 - [Robotic Motion Planning:Potential Functions](https://www.cs.cmu.edu/~motionplanning/lecture/Chap4-Potential-Field_howie.pdf)
 
@@ -362,7 +362,7 @@ This script is a path planning code with state lattice planning.
 
 This code uses the model predictive trajectory generator to solve boundary problem.
 
-Ref: 
+Reference 
 
 - [Optimal rough terrain trajectory generation for wheeled mobile robots](https://journals.sagepub.com/doi/pdf/10.1177/0278364906075328)
 
@@ -390,7 +390,7 @@ Cyan crosses means searched points with Dijkstra method,
 
 The red line is the final path of PRM.
 
-Ref:
+Reference
 
 - [Probabilistic roadmap \- Wikipedia](https://en.wikipedia.org/wiki/Probabilistic_roadmap)
 
@@ -406,7 +406,7 @@ This is a path planning code with RRT\*
 
 Black circles are obstacles, green line is a searched tree, red crosses are start and goal positions.
 
-Ref:
+Reference
 
 - [Incremental Sampling-based Algorithms for Optimal Motion Planning](https://arxiv.org/abs/1005.0416)
 
@@ -426,7 +426,7 @@ A double integrator motion model is used for LQR local planner.
 
 ![LQR_RRT](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/LQRRRTStar/animation.gif)
 
-Ref:
+Reference
 
 - [LQR\-RRT\*: Optimal Sampling\-Based Motion Planning with Automatically Derived Extension Heuristics](https://lis.csail.mit.edu/pubs/perez-icra12.pdf)
 
@@ -441,7 +441,7 @@ Motion planning with quintic polynomials.
 
 It can calculate a 2D path, velocity, and acceleration profile based on quintic polynomials.
 
-Ref:
+Reference
 
 - [Local Path Planning And Motion Control For Agv In Positioning](https://ieeexplore.ieee.org/document/637936/)
 
@@ -451,7 +451,7 @@ A sample code with Reeds Shepp path planning.
 
 ![RSPlanning](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ReedsSheppPath/animation.gif?raw=true)
 
-Ref:
+Reference
 
 - [15.3.2 Reeds\-Shepp Curves](http://planning.cs.uiuc.edu/node822.html) 
 
@@ -477,7 +477,7 @@ The cyan line is the target course and black crosses are obstacles.
 
 The red line is the predicted path.
 
-Ref:
+Reference
 
 - [Optimal Trajectory Generation for Dynamic Street Scenarios in a Frenet Frame](https://www.researchgate.net/profile/Moritz_Werling/publication/224156269_Optimal_Trajectory_Generation_for_Dynamic_Street_Scenarios_in_a_Frenet_Frame/links/54f749df0cf210398e9277af.pdf)
 
@@ -492,7 +492,7 @@ This is a simulation of moving to a pose control
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/move_to_pose/animation.gif)
 
-Ref:
+Reference
 
 - [P. I. Corke, "Robotics, Vision and Control" \| SpringerLink p102](https://link.springer.com/book/10.1007/978-3-642-20144-8)
 
@@ -503,7 +503,7 @@ Path tracking simulation with Stanley steering control and PID speed control.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/stanley_controller/animation.gif)
 
-Ref:
+Reference
 
 - [Stanley: The robot that won the DARPA grand challenge](http://robots.stanford.edu/papers/thrun.stanley05.pdf)
 
@@ -517,7 +517,7 @@ Path tracking simulation with rear wheel feedback steering control and PID speed
 
 ![PythonRobotics/figure_1.png at master · AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/rear_wheel_feedback/animation.gif)
 
-Ref:
+Reference
 
 - [A Survey of Motion Planning and Control Techniques for Self-driving Urban Vehicles](https://arxiv.org/abs/1604.07446)
 
@@ -528,7 +528,7 @@ Path tracking simulation with LQR speed and steering control.
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/lqr_speed_steer_control/animation.gif)
 
-Ref:
+Reference
 
 - [Towards fully autonomous driving: Systems and algorithms \- IEEE Conference Publication](https://ieeexplore.ieee.org/document/5940562/)
 
@@ -539,7 +539,7 @@ Path tracking simulation with iterative linear model predictive speed and steeri
 
 <img src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif" width="640" alt="MPC pic">
 
-Ref:
+Reference
 
 - [documentation](https://atsushisakai.github.io/PythonRobotics/modules/path_tracking/model_predictive_speed_and_steering_control/model_predictive_speed_and_steering_control.html)
 
@@ -551,7 +551,7 @@ A motion planning and path tracking simulation with NMPC of C-GMRES
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/cgmres_nmpc/animation.gif)
 
-Ref:
+Reference
 
 - [documentation](https://atsushisakai.github.io/PythonRobotics/modules/path_tracking/cgmres_nmpc/cgmres_nmpc.html)
 
@@ -591,7 +591,7 @@ This is a 3d trajectory generation simulation for a rocket powered landing.
 
 ![3](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/AerialNavigation/rocket_powered_landing/animation.gif)
 
-Ref:
+Reference
 
 - [documentation](https://atsushisakai.github.io/PythonRobotics/modules/aerial_navigation/rocket_powered_landing/rocket_powered_landing.html)
 

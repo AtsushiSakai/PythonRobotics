@@ -578,7 +578,7 @@ reckoning and control functions are passed along here as well.
 
 .. image:: ekf_slam_1_0.png
 
-References:
+Reference
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - `PROBABILISTIC ROBOTICS <http://www.probabilistic-robotics.org/>`_

@@ -5,3 +5,8 @@ Ensamble Kalman Filter Localization
 
 This is a sensor fusion localization with Ensamble Kalman Filter(EnKF).
 
+Code Link
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: Localization.ensemble_kalman_filter.ensemble_kalman_filter.enkf_localization
+

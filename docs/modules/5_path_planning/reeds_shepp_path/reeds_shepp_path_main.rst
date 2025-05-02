@@ -380,7 +380,7 @@ Hence, we have:
 - :math:`v = (t - φ)`
 
 
-Ref:
+Reference
 
 -  `15.3.2 Reeds-Shepp
    Curves <https://lavalle.pl/planning/node822.html>`__

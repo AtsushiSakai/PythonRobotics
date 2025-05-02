@@ -3,7 +3,7 @@ Distance Map
 
 author: Wang Zheng (@Aglargil)
 
-Ref:
+Reference:
 
 - [Distance Map]
 (https://cs.brown.edu/people/pfelzens/papers/dt-final.pdf)

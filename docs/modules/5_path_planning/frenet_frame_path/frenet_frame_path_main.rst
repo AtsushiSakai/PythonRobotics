@@ -35,7 +35,7 @@ Low Speed and Merging and Stopping Scenario
 
 This scenario illustrates the trajectory planning at low speeds with merging and stopping behaviors.
 
-Ref:
+Reference
 
 -  `Optimal Trajectory Generation for Dynamic Street Scenarios in a
    Frenet

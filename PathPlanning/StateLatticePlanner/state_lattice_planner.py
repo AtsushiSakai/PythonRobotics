@@ -8,7 +8,7 @@ author: Atsushi Sakai (@Atsushi_twi)
 https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathPlanning
 /ModelPredictiveTrajectoryGenerator/lookup_table_generator.py
 
-Ref:
+Reference:
 
 - State Space Sampling of Feasible Motions for High-Performance Mobile Robot
 Navigation in Complex Environments

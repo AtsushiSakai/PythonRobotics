@@ -16,6 +16,11 @@ The filter uses speed input and range observations from RFID for localization.
 
 Initial position information is not needed.
 
+Code Link
+~~~~~~~~~~~~~
+
+.. autofunction:: Localization.histogram_filter.histogram_filter.histogram_filter_localization
+
 Filtering algorithm
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -107,7 +112,7 @@ There are two ways to calculate the final positions:
 
 
 
-References:
+Reference
 ~~~~~~~~~~~
 
 - `_PROBABILISTIC ROBOTICS: <http://www.probabilistic-robotics.org>`_

@@ -4,7 +4,7 @@ Potential Field based path planner
 
 author: Atsushi Sakai (@Atsushi_twi)
 
-Ref:
+Reference:
 https://www.cs.cmu.edu/~motionplanning/lecture/Chap4-Potential-Field_howie.pdf
 
 """

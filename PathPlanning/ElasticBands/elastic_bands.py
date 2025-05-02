@@ -3,7 +3,7 @@ Elastic Bands
 
 author: Wang Zheng (@Aglargil)
 
-Ref:
+Reference:
 
 - [Elastic Bands: Connecting Path Planning and Control]
 (http://www8.cs.umu.se/research/ifor/dl/Control/elastic%20bands.pdf)

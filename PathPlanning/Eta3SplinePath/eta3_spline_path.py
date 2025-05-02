@@ -5,7 +5,7 @@ eta^3 polynomials planner
 author: Joe Dinius, Ph.D (https://jwdinius.github.io)
         Atsushi Sakai (@Atsushi_twi)
 
-Ref:
+Reference:
 - [eta^3-Splines for the Smooth Path Generation of Wheeled Mobile Robots]
 (https://ieeexplore.ieee.org/document/4339545/)
 

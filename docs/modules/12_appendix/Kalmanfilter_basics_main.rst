@@ -552,7 +552,7 @@ a given (X,Y) value.
 .. image:: Kalmanfilter_basics_files/Kalmanfilter_basics_28_1.png
 
 
-References:
+Reference
 ~~~~~~~~~~~
 
 1. Roger Labbe’s
