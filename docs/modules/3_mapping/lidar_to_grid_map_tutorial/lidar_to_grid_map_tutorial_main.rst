@@ -196,3 +196,9 @@ Let’s use this flood fill on real data:
 
 .. image:: lidar_to_grid_map_tutorial_14_1.png
 
+Code Link
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: Mapping.lidar_to_grid_map.lidar_to_grid_map.main
+
+

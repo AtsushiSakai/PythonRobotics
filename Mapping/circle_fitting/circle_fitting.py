@@ -16,12 +16,33 @@ show_animation = True
 
 def circle_fitting(x, y):
     """
-    Circle Fitting with least squared
-        input: point x-y positions
-        output  cxe x center position
-                cye y center position
-                re  radius of circle
-                error: prediction error
+    Fits a circle to a given set of points using a least-squares approach.
+
+    This function calculates the center (x, y) and radius of a circle that best fits
+    the given set of points in a two-dimensional plane. It minimizes the squared
+    errors between the circle and the provided points and returns the calculated
+    center coordinates, radius, and the fitting error.
+
+    Raises
+    ------
+    ValueError
+        If the input lists x and y do not contain the same number of elements.
+
+    Parameters
+    ----------
+    x : list[float]
+        The x-coordinates of the points.
+    y : list[float]
+        The y-coordinates of the points.
+
+    Returns
+    -------
+    tuple[float, float, float, float]
+        A tuple containing:
+        - The x-coordinate of the center of the fitted circle (float).
+        - The y-coordinate of the center of the fitted circle (float).
+        - The radius of the fitted circle (float).
+        - The fitting error as a deviation metric (float).
     """
 
     sumx = sum(x)

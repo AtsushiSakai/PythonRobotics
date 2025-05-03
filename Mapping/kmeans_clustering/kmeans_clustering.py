@@ -17,12 +17,37 @@ show_animation = True
 
 
 def kmeans_clustering(rx, ry, nc):
+    """
+    Performs k-means clustering on the given dataset, iteratively adjusting cluster centroids
+    until convergence within a defined threshold or reaching the maximum number of
+    iterations.
+
+    The implementation initializes clusters, calculates initial centroids, and refines the
+    clusters through iterative updates to optimize the cost function based on minimum
+    distance between datapoints and centroids.
+
+    Arguments:
+        rx: List[float]
+            The x-coordinates of the dataset points to be clustered.
+        ry: List[float]
+            The y-coordinates of the dataset points to be clustered.
+        nc: int
+            The number of clusters to group the data into.
+
+    Returns:
+        Clusters
+            An instance containing the final cluster assignments and centroids after
+            convergence.
+
+    Raises:
+        None
+
+    """
     clusters = Clusters(rx, ry, nc)
     clusters.calc_centroid()
 
     pre_cost = float("inf")
     for loop in range(MAX_LOOP):
-        print("loop:", loop)
         cost = clusters.update_clusters()
         clusters.calc_centroid()
 

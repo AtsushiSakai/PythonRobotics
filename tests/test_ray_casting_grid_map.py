@@ -1,5 +1,5 @@
 import conftest  # Add root path to sys.path
-from Mapping.raycasting_grid_map import raycasting_grid_map as m
+from Mapping.ray_casting_grid_map import ray_casting_grid_map as m
 
 
 def test1():
