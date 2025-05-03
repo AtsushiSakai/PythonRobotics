@@ -51,6 +51,7 @@ References
 - *Introduction to Autonomous Mobile Robots*, Roland Siegwart, Illah Nourbakhsh, Davide Scaramuzza
 - *Probabilistic Robotics*, Sebastian Thrun, Wolfram Burgard, Dieter Fox
 - Wikipedia articles:
+
   - `Inertial Measurement Unit (IMU) <https://en.wikipedia.org/wiki/Inertial_measurement_unit>`_
   - `Accelerometer <https://en.wikipedia.org/wiki/Accelerometer>`_
   - `Gyroscope <https://en.wikipedia.org/wiki/Gyroscope>`_
