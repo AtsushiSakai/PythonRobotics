@@ -7,7 +7,12 @@ Path tracking simulation with LQR speed and steering control.
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/lqr_speed_steer_control/animation.gif
 
-`[Code Link] <https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/lqr_speed_steer_control/lqr_speed_steer_control.py>`_
+
+Code Link
+~~~~~~~~~~~~~~~
+
+.. autofunction:: PathTracking.lqr_speed_steer_control.lqr_speed_steer_control.lqr_speed_steering_control
+
 
 Overview
 ~~~~~~~~

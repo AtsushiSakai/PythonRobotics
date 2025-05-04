@@ -5,13 +5,6 @@ Model predictive speed and steering control
 .. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif?raw=true
    :alt: Model predictive speed and steering control
 
-   Model predictive speed and steering control
-
-code:
-
-`PythonRobotics/model_predictive_speed_and_steer_control.py at master ·
-AtsushiSakai/PythonRobotics <https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/model_predictive_speed_and_steer_control.py>`__
-
 This is a path tracking simulation using model predictive control (MPC).
 
 The MPC controller controls vehicle speed and steering base on
@@ -21,6 +14,12 @@ This code uses cvxpy as an optimization modeling tool.
 
 -  `Welcome to CVXPY 1.0 — CVXPY 1.0.6
    documentation <http://www.cvxpy.org/>`__
+
+Code Link
+~~~~~~~~~~~~~~~
+
+.. autofunction:: PathTracking.model_predictive_speed_and_steer_control.model_predictive_speed_and_steer_control.iterative_linear_mpc_control
+
 
 MPC modeling
 ~~~~~~~~~~~~

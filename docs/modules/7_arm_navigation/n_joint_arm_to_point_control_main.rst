@@ -11,3 +11,10 @@ plotting area.
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/ArmNavigation/n_joint_arm_to_point_control/animation.gif
 
 In this simulation N = 10, however, you can change it.
+
+
+Code Link
+~~~~~~~~~~~~~~~
+
+.. autofunction:: ArmNavigation.n_joint_arm_to_point_control.n_joint_arm_to_point_control.main
+

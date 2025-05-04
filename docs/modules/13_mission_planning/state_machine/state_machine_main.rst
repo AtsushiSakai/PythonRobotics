@@ -12,8 +12,8 @@ Core Concepts
 - **Action**: An operation executed during transition (before entering new state)
 - **Guard**: A precondition that must be satisfied to allow transition
 
-API
-~~~
+Code Link
+~~~~~~~~~~~
 
 .. autoclass:: MissionPlanning.StateMachine.state_machine.StateMachine
    :members: add_transition, process, register_state

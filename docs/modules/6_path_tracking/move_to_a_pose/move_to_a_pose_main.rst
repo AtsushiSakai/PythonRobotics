@@ -3,7 +3,13 @@ Move to a Pose Control
 
 In this section, we present the logic of PathFinderController that drives a car from a start pose (x, y, theta) to a goal pose. A simulation of moving to a pose control is presented below.
 
-.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/move_to_pose/animation.gif
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/move_to_pose/animation.gif
+
+Code Link
+~~~~~~~~~~~~~~~
+
+.. autofunction:: PathTracking.move_to_pose.move_to_pose.move_to_pose
+
 
 Position Control of non-Holonomic Systems
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

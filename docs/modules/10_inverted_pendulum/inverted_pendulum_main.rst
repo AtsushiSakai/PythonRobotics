@@ -89,6 +89,12 @@ and :math:`P` is the unique positive definite solution to the discrete time
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/InvertedPendulumCart/animation_lqr.gif
 
+Code Link
+^^^^^^^^^^^
+
+.. autofunction:: InvertedPendulum.inverted_pendulum_lqr_control.main
+
+
 MPC control
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The MPC controller minimize this cost function defined as:
@@ -101,3 +107,9 @@ subject to:
 - Initial state
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/InvertedPendulumCart/animation.gif
+
+Code Link
+^^^^^^^^^^^
+
+.. autofunction:: InvertedPendulum.inverted_pendulum_mpc_control.main
+
