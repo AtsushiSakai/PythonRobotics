@@ -11,6 +11,12 @@ This is a interactive simulation.
 
 You can set the goal position of the end effector with left-click on the plotting area.
 
+Code Link
+~~~~~~~~~~~~~~~
+
+.. autofunction:: ArmNavigation.two_joint_arm_to_point_control.two_joint_arm_to_point_control.main
+
+
 Inverse Kinematics for a Planar Two-Link Robotic Arm
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

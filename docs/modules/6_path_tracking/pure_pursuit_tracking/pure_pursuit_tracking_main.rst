@@ -9,6 +9,12 @@ speed control.
 The red line is a target course, the green cross means the target point
 for pure pursuit control, the blue line is the tracking.
 
+Code Link
+~~~~~~~~~~~~~~~
+
+.. autofunction:: PathTracking.pure_pursuit.pure_pursuit.pure_pursuit_steer_control
+
+
 Reference
 ~~~~~~~~~~~
 

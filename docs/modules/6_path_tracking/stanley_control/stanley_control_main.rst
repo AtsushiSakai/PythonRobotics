@@ -6,6 +6,12 @@ control.
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/stanley_controller/animation.gif
 
+Code Link
+~~~~~~~~~~~~~~~
+
+.. autofunction:: PathTracking.stanley_control.stanley_control.stanley_control
+
+
 Reference
 ~~~~~~~~~~~
 
