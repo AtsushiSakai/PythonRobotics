@@ -7,6 +7,12 @@ The animation has the same meanings as one of FastSLAM 1.0.
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/FastSLAM2/animation.gif
 
+Code Link
+~~~~~~~~~~~
+
+.. autofunction:: SLAM.FastSLAM2.fast_slam2.fast_slam2
+
+
 References
 ~~~~~~~~~~
 

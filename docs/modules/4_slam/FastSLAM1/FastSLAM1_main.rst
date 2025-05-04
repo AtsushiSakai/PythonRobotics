@@ -22,6 +22,11 @@ The red points are particles of FastSLAM.
 Black points are landmarks, blue crosses are estimated landmark
 positions by FastSLAM.
 
+Code Link
+~~~~~~~~~~~~
+
+.. autofunction:: SLAM.FastSLAM1.fast_slam1.fast_slam1
+
 
 Introduction
 ~~~~~~~~~~~~

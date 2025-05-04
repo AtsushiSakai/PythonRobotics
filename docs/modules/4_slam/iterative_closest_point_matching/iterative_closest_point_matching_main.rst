@@ -10,7 +10,13 @@ points to points.
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/iterative_closest_point/animation.gif
 
+Code Link
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: SLAM.ICPMatching.icp_matching.icp_matching
+
+
 References
-~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - `Introduction to Mobile Robotics: Iterative Closest Point Algorithm <https://cs.gmu.edu/~kosecka/cs685/cs685-icp.pdf>`_
