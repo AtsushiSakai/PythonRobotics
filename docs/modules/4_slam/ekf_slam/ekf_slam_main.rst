@@ -21,6 +21,12 @@ This is a simulation of EKF SLAM.
 -  Blue line: ground truth
 -  Red line: EKF SLAM position estimation
 
+Code Link
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: SLAM.EKFSLAM.ekf_slam.ekf_slam
+
+
 Introduction
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

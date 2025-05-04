@@ -1,5 +1,5 @@
 import conftest
-from SLAM.iterative_closest_point import iterative_closest_point as m
+from SLAM.ICPMatching import icp_matching as m
 
 
 def test_1():
