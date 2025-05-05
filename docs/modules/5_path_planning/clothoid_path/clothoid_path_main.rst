@@ -73,6 +73,11 @@ The final clothoid path can be calculated with the path parameters and Fresnel i
         &y(s)=y_{0}+\int_{0}^{s} \sin \left(\frac{1}{2} \kappa^{\prime} \tau^{2}+\kappa \tau+\vartheta_{0}\right) \mathrm{d} \tau
         \end{aligned}
 
+Code Link
+~~~~~~~~~~~~~
+
+.. autofunction:: PathPlanning.ClothoidPath.clothoid_path_planner.generate_clothoid_path
+
 
 References
 ~~~~~~~~~~
