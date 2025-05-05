@@ -14,6 +14,12 @@ This is a simple path planning code with Rapidly-Exploring Random Trees
 Black circles are obstacles, green line is a searched tree, red crosses
 are start and goal positions.
 
+Code Link
+^^^^^^^^^^
+
+.. autoclass:: PathPlanning.RRT.rrt.RRT
+
+
 .. include:: rrt_star.rst
 
 
@@ -24,6 +30,12 @@ RRT with dubins path
 
 Path planning for a car robot with RRT and dubins path planner.
 
+Code Link
+^^^^^^^^^^
+
+.. autoclass:: PathPlanning.RRTDubins.rrt_dubins.RRTDubins
+
+
 .. _rrt*-with-dubins-path:
 
 RRT\* with dubins path
@@ -33,6 +45,12 @@ RRT\* with dubins path
 
 Path planning for a car robot with RRT\* and dubins path planner.
 
+Code Link
+^^^^^^^^^^
+
+.. autoclass:: PathPlanning.RRTStarDubins.rrt_star_dubins.RRTStarDubins
+
+
 .. _rrt*-with-reeds-sheep-path:
 
 RRT\* with reeds-sheep path
@@ -41,6 +59,12 @@ RRT\* with reeds-sheep path
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/RRTStarReedsShepp/animation.gif
 
 Path planning for a car robot with RRT\* and reeds sheep path planner.
+
+Code Link
+^^^^^^^^^^
+
+.. autoclass:: PathPlanning.RRTStarReedsShepp.rrt_star_reeds_shepp.RRTStarReedsShepp
+
 
 .. _informed-rrt*:
 
@@ -53,7 +77,14 @@ This is a path planning code with Informed RRT*.
 
 The cyan ellipse is the heuristic sampling domain of Informed RRT*.
 
+Code Link
+^^^^^^^^^^
+
+.. autoclass:: PathPlanning.InformedRRTStar.informed_rrt_star.InformedRRTStar
+
+
 Reference
+^^^^^^^^^^
 
 -  `Informed RRT\*: Optimal Sampling-based Path Planning Focused via
    Direct Sampling of an Admissible Ellipsoidal
@@ -68,11 +99,19 @@ Batch Informed RRT\*
 
 This is a path planning code with Batch Informed RRT*.
 
+Code Link
+^^^^^^^^^^
+
+.. autoclass:: PathPlanning.BatchInformedRRTStar.batch_informed_rrt_star.BITStar
+
+
 Reference
+^^^^^^^^^^^
 
 -  `Batch Informed Trees (BIT*): Sampling-based Optimal Planning via the
    Heuristically Guided Search of Implicit Random Geometric
    Graphs <https://arxiv.org/abs/1405.5848>`__
+
 
 .. _closed-loop-rrt*:
 
@@ -87,7 +126,14 @@ In this code, pure-pursuit algorithm is used for steering control,
 
 PID is used for speed control.
 
+Code Link
+^^^^^^^^^^
+
+.. autoclass:: PathPlanning.ClosedLoopRRTStar.closed_loop_rrt_star_car.ClosedLoopRRTStar
+
+
 Reference
+^^^^^^^^^^^^
 
 -  `Motion Planning in Complex Environments using Closed-loop
    Prediction <https://acl.mit.edu/papers/KuwataGNC08.pdf>`__
@@ -97,6 +143,7 @@ Reference
 
 -  `[1601.06326] Sampling-based Algorithms for Optimal Motion Planning
    Using Closed-loop Prediction <https://arxiv.org/abs/1601.06326>`__
+
 
 .. _lqr-rrt*:
 
@@ -109,7 +156,14 @@ A double integrator motion model is used for LQR local planner.
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/LQRRRTStar/animation.gif
 
+Code Link
+^^^^^^^^^^
+
+.. autoclass:: PathPlanning.LQRRRTStar.lqr_rrt_star.LQRRRTStar
+
+
 Reference
+~~~~~~~~~~~~~
 
 -  `LQR-RRT\*: Optimal Sampling-Based Motion Planning with Automatically
    Derived Extension

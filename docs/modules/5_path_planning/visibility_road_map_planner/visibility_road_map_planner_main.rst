@@ -13,6 +13,11 @@ red crosses are visibility nodes, and blue lines area collision free visibility 
 
 The red line is the final path searched by dijkstra algorithm frm the visibility graphs.
 
+Code Link
+~~~~~~~~~~~~
+.. autoclass:: PathPlanning.VisibilityRoadMap.visibility_road_map.VisibilityRoadMap
+
+
 Algorithms
 ~~~~~~~~~~
 
@@ -64,7 +69,7 @@ The red line is searched path in the figure:
 You can find the details of Dijkstra algorithm in :ref:`dijkstra`.
 
 References
-^^^^^^^^^^
+~~~~~~~~~~~~
 
 - `Visibility graph - Wikipedia <https://en.wikipedia.org/wiki/Visibility_graph>`_
 

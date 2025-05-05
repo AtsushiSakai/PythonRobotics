@@ -5,6 +5,12 @@ A sample code with Reeds Shepp path planning.
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ReedsSheppPath/animation.gif?raw=true
 
+Code Link
+==============
+
+.. autofunction:: PathPlanning.ReedsSheppPath.reeds_shepp_path_planning.reeds_shepp_path_planning
+
+
 Mathematical Description of Individual Path Types
 =================================================
 Here is an overview of mathematical derivations of formulae for individual path types.
@@ -381,6 +387,7 @@ Hence, we have:
 
 
 Reference
+=============
 
 -  `15.3.2 Reeds-Shepp
    Curves <https://lavalle.pl/planning/node822.html>`__

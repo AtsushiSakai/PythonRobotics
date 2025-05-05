@@ -62,7 +62,7 @@ You can generate a path from these information and the maximum curvature informa
 A path type which has minimum course length among 6 types is selected,
 and then a path is constructed based on the selected type and its distances.
 
-API
+Code Link
 ~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: PathPlanning.DubinsPath.dubins_path_planner.plan_dubins_path

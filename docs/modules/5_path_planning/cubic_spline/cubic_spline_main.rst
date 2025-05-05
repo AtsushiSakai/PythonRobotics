@@ -171,8 +171,8 @@ the second derivative by:
 
 These equations can be calculated by differentiating the cubic polynomial.
 
-API
-===
+Code Link
+==========
 
 This is the 1D cubic spline class API:
 
@@ -199,8 +199,8 @@ Curvature of each point can be also calculated analytically by:
 
 :math:`\kappa=\frac{y^{\prime \prime} x^{\prime}-x^{\prime \prime} y^{\prime}}{\left(x^{\prime2}+y^{\prime2}\right)^{\frac{2}{3}}}`
 
-API
-===
+Code Link
+==========
 
 .. autoclass:: PathPlanning.CubicSpline.cubic_spline_planner.CubicSpline2D
 	:members:

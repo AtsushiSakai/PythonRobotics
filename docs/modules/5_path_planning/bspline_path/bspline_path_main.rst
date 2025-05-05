@@ -105,8 +105,8 @@ The default spline degree is 3, so curvature changes smoothly.
 
 .. image:: interp_and_curvature.png
 
-API
-++++
+Code link
+++++++++++
 
 .. autofunction:: PathPlanning.BSplinePath.bspline_path.interpolate_b_spline_path
 
@@ -133,8 +133,8 @@ The default spline degree is 3, so curvature changes smoothly.
 
 .. image:: approx_and_curvature.png
 
-API
-++++
+Code Link
+++++++++++
 
 .. autofunction:: PathPlanning.BSplinePath.bspline_path.approximate_b_spline_path
 

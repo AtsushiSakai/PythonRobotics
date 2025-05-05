@@ -33,6 +33,10 @@ After::
 
 When starting at (1, 11) in the structured obstacle arrangement (second of the two gifs above).
 
+Code Link
+^^^^^^^^^^^^^
+.. autoclass:: PathPlanning.TimeBasedPathPlanning.SpaceTimeAStar.SpaceTimeAStar
+
 
 Safe Interval Path Planning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -72,6 +76,11 @@ Arrangement 1 starting at (1, 18)::
     Planning took: 0.00730 seconds
 
 .. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/refs/heads/master/PathPlanning/TimeBasedPathPlanning/SafeIntervalPathPlanner/path_animation2.gif
+
+Code Link
+^^^^^^^^^^^^^
+.. autoclass:: PathPlanning.TimeBasedPathPlanning.SafeInterval.SafeIntervalPathPlanner
+
 
 References
 ~~~~~~~~~~~

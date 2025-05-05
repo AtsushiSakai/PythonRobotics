@@ -9,6 +9,11 @@ Motion planning with quintic polynomials.
 It can calculate 2D path, velocity, and acceleration profile based on
 quintic polynomials.
 
+Code Link
+~~~~~~~~~~~~~~~
+
+.. autofunction:: PathPlanning.QuinticPolynomialsPlanner.quintic_polynomials_planner.quintic_polynomials_planner
+
 
 
 Quintic polynomials for one dimensional robot motion
