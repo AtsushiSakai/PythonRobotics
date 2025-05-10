@@ -87,7 +87,7 @@ Features:
 
 See this documentation 
 
-- [Getting Started — PythonRobotics documentation](https://atsushisakai.github.io/PythonRobotics/getting_started.html#what-is-pythonrobotics)
+- [Getting Started — PythonRobotics documentation](https://atsushisakai.github.io/PythonRobotics/modules/0_getting_started/1_what_is_python_robotics.html)
 
 or this Youtube video:
 
@@ -170,7 +170,7 @@ All animation gifs are stored here: [AtsushiSakai/PythonRoboticsGifs: Animation 
 
 Reference
 
-- [documentation](https://atsushisakai.github.io/PythonRobotics/modules/localization/extended_kalman_filter_localization_files/extended_kalman_filter_localization.html)
+- [documentation](https://atsushisakai.github.io/PythonRobotics/modules/2_localization/extended_kalman_filter_localization_files/extended_kalman_filter_localization.html)
 
 ## Particle filter localization
 
@@ -490,7 +490,7 @@ Reference
 
 This is a simulation of moving to a pose control
 
-![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/move_to_pose/animation.gif)
+![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/move_to_pose/animation.gif)
 
 Reference
 
@@ -541,7 +541,7 @@ Path tracking simulation with iterative linear model predictive speed and steeri
 
 Reference
 
-- [documentation](https://atsushisakai.github.io/PythonRobotics/modules/path_tracking/model_predictive_speed_and_steering_control/model_predictive_speed_and_steering_control.html)
+- [documentation](https://atsushisakai.github.io/PythonRobotics/modules/6_path_tracking/model_predictive_speed_and_steering_control/model_predictive_speed_and_steering_control.html)
 
 - [Real\-time Model Predictive Control \(MPC\), ACADO, Python \| Work\-is\-Playing](http://grauonline.de/wordpress/?page_id=3244)
 
@@ -553,7 +553,7 @@ A motion planning and path tracking simulation with NMPC of C-GMRES
 
 Reference
 
-- [documentation](https://atsushisakai.github.io/PythonRobotics/modules/path_tracking/cgmres_nmpc/cgmres_nmpc.html)
+- [documentation](https://atsushisakai.github.io/PythonRobotics/modules/6_path_tracking/cgmres_nmpc/cgmres_nmpc.html)
 
 
 # Arm Navigation
@@ -593,7 +593,7 @@ This is a 3d trajectory generation simulation for a rocket powered landing.
 
 Reference
 
-- [documentation](https://atsushisakai.github.io/PythonRobotics/modules/aerial_navigation/rocket_powered_landing/rocket_powered_landing.html)
+- [documentation](https://atsushisakai.github.io/PythonRobotics/modules/8_aerial_navigation/rocket_powered_landing/rocket_powered_landing.html)
 
 # Bipedal
 
