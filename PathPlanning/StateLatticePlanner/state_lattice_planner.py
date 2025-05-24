@@ -22,7 +22,9 @@ from matplotlib import pyplot as plt
 import numpy as np
 import math
 import pathlib
+
 sys.path.append(str(pathlib.Path(__file__).parent.parent))
+sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 
 import ModelPredictiveTrajectoryGenerator.trajectory_generator as planner
 import ModelPredictiveTrajectoryGenerator.motion_model as motion_model
