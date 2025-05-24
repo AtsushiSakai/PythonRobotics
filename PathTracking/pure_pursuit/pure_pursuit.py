@@ -146,7 +146,7 @@ def pure_pursuit_steer_control(state, trajectory, pind):
     delta = state.direction * math.atan2(2.0 * WB * math.sin(alpha) / Lf, 1.0)
 
     # Limit steering angle to max value
-    delta = max(min(delta, MAX_STEER), -MAX_STEER)
+    delta = np.clip(delta, -MAX_STEER, MAX_STEER)
 
     return delta, ind
 
