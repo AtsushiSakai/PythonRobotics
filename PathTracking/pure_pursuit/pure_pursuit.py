@@ -163,6 +163,7 @@ def plot_arrow(x, y, yaw, length=1.0, width=0.5, fc="r", ec="k"):
         plt.arrow(x, y, length * math.cos(yaw), length * math.sin(yaw),
                   fc=fc, ec=ec, head_width=width, head_length=width)
         plt.plot(x, y)
+
 def plot_vehicle(x, y, yaw, steer=0.0, color='blue', is_reverse=False):
     """
     Plot vehicle model with four wheels
