@@ -51,10 +51,44 @@ def get_target_point(path, targetL):
     return [x, y, ti]
 
 
-def line_collision_check(first, second, obstacle_list, robot_radius=0.0):
+def is_point_collision(x, y, obstacle_list, robot_radius):
+    """
+    Check whether a single point collides with any obstacle.
+
+    This function calculates the Euclidean distance between the given point (x, y)
+    and each obstacle center. If the distance is less than or equal to the sum of
+    the obstacle's radius and the robot's radius, a collision is detected.
+
+    Args:
+        x (float): X-coordinate of the point to check.
+        y (float): Y-coordinate of the point to check.
+        obstacle_list (List[Tuple[float, float, float]]): List of obstacles defined as (ox, oy, radius).
+        robot_radius (float): Radius of the robot, used to inflate the obstacles.
+
+    Returns:
+        bool: True if the point is in collision with any obstacle, False otherwise.
+    """
+    for (ox, oy, obstacle_radius) in obstacle_list:
+        d = math.hypot(ox - x, oy - y)
+        if d <= obstacle_radius + robot_radius:
+            return True  # Collided
+    return False
+
+
+def line_collision_check(first, second, obstacle_list, robot_radius=0.0, sample_step=0.2):
     """
     Check if the line segment between `first` and `second` collides with any obstacle.
     Considers the robot_radius by inflating the obstacle size.
+
+    Args:
+        first (List[float]): Start point of the line [x, y]
+        second (List[float]): End point of the line [x, y]
+        obstacle_list (List[Tuple[float, float, float]]): Obstacles as (x, y, radius)
+        robot_radius (float): Radius of robot
+        sample_step (float): Distance between sampling points along the segment
+
+    Returns:
+        bool: True if collision-free, False otherwise
     """
     x1, y1 = first[0], first[1]
     x2, y2 = second[0], second[1]
@@ -64,19 +98,18 @@ def line_collision_check(first, second, obstacle_list, robot_radius=0.0):
     length = math.hypot(dx, dy)
 
     if length == 0:
-        return True  # Degenerate case
+        # Degenerate case: point collision check
+        return not is_point_collision(x1, y1, obstacle_list, robot_radius)
 
-    steps = int(length / 0.2) + 1  # Sampling every 0.2m along the segment
+    steps = int(length / sample_step) + 1  # Sampling every sample_step along the segment
 
     for i in range(steps + 1):
         t = i / steps
         x = x1 + t * dx
         y = y1 + t * dy
 
-        for (ox, oy, size) in obstacle_list:
-            d = math.hypot(ox - x, oy - y)
-            if d <= size + robot_radius:
-                return False  # Collision
+        if is_point_collision(x, y, obstacle_list, robot_radius):
+            return False  # Collision found
 
     return True  # Safe
 
@@ -149,7 +182,7 @@ def main():
         (3, 10, 2),
         (7, 5, 2),
         (9, 5, 2)
-    ]  # [x,y,size]
+    ]  # [x,y,radius]
     rrt = RRT(start=[0, 0], goal=[6, 10],
               rand_area=[-2, 15], obstacle_list=obstacleList,
               robot_radius=0.3)
