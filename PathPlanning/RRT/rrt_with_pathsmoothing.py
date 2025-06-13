@@ -51,30 +51,60 @@ def get_target_point(path, targetL):
     return [x, y, ti]
 
 
-def line_collision_check(first, second, obstacleList):
-    # Line Equation
+def line_collision_check(first, second, obstacle_list, robot_radius=0.0):
+    """
+    Check if the line segment between `first` and `second` collides with any obstacle.
+    Considers the robot_radius by inflating the obstacle size.
+    """
+    x1, y1 = first[0], first[1]
+    x2, y2 = second[0], second[1]
 
-    x1 = first[0]
-    y1 = first[1]
-    x2 = second[0]
-    y2 = second[1]
+    dx = x2 - x1
+    dy = y2 - y1
+    length = math.hypot(dx, dy)
 
-    try:
-        a = y2 - y1
-        b = -(x2 - x1)
-        c = y2 * (x2 - x1) - x2 * (y2 - y1)
-    except ZeroDivisionError:
-        return False
+    if length == 0:
+        return True  # Degenerate case
 
-    for (ox, oy, size) in obstacleList:
-        d = abs(a * ox + b * oy + c) / (math.hypot(a, b))
-        if d <= size:
-            return False
+    steps = int(length / 0.2) + 1  # Sampling every 0.2m along the segment
 
-    return True  # OK
+    for i in range(steps + 1):
+        t = i / steps
+        x = x1 + t * dx
+        y = y1 + t * dy
+
+        for (ox, oy, size) in obstacle_list:
+            d = math.hypot(ox - x, oy - y)
+            if d <= size + robot_radius:
+                return False  # Collision
+
+    return True  # Safe
 
 
-def path_smoothing(path, max_iter, obstacle_list):
+def path_smoothing(path, max_iter, obstacle_list, robot_radius=0.0):
+    """
+    Smooths a given path by iteratively replacing segments with shortcut connections,
+    while ensuring the new segments are collision-free.
+
+    The algorithm randomly picks two points along the original path and attempts to
+    connect them with a straight line. If the line does not collide with any obstacles
+    (considering the robot's radius), the intermediate path points between them are
+    replaced with the direct connection.
+
+    Args:
+        path (List[List[float]]): The original path as a list of [x, y] coordinates.
+        max_iter (int): Number of iterations for smoothing attempts.
+        obstacle_list (List[Tuple[float, float, float]]): List of obstacles represented as
+            (x, y, radius).
+        robot_radius (float, optional): Radius of the robot, used to inflate obstacle size
+            during collision checking. Defaults to 0.0.
+
+    Returns:
+        List[List[float]]: The smoothed path as a list of [x, y] coordinates.
+
+    Example:
+        >>> smoothed = path_smoothing(path, 1000, obstacle_list, robot_radius=0.5)
+    """
     le = get_path_length(path)
 
     for i in range(max_iter):
@@ -94,7 +124,7 @@ def path_smoothing(path, max_iter, obstacle_list):
             continue
 
         # collision check
-        if not line_collision_check(first, second, obstacle_list):
+        if not line_collision_check(first, second, obstacle_list, robot_radius):
             continue
 
         # Create New path
@@ -121,12 +151,14 @@ def main():
         (9, 5, 2)
     ]  # [x,y,size]
     rrt = RRT(start=[0, 0], goal=[6, 10],
-              rand_area=[-2, 15], obstacle_list=obstacleList)
+              rand_area=[-2, 15], obstacle_list=obstacleList,
+              robot_radius=0.3)
     path = rrt.planning(animation=show_animation)
 
     # Path smoothing
     maxIter = 1000
-    smoothedPath = path_smoothing(path, maxIter, obstacleList)
+    smoothedPath = path_smoothing(path, maxIter, obstacleList,
+                                  robot_radius=rrt.robot_radius)
 
     # Draw final path
     if show_animation:
