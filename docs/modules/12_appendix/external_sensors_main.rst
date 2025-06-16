@@ -56,6 +56,7 @@ Ultrasonic sensors are commonly used in indoor robots and some automotive autono
 
 References
 ----------
+
 - Wikipedia articles:
 
   - `Lidar Sensors <https://en.wikipedia.org/wiki/Lidar>`_
