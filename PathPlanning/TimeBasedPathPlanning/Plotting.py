@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.backend_bases import KeyEvent
 from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
     Grid,
     Position,
@@ -30,13 +31,18 @@ def PlotNodePath(grid: Grid, start: Position, goal: Position, path: NodePath):
 
     # for stopping simulation with the esc key.
     plt.gcf().canvas.mpl_connect(
-        "key_release_event", lambda event: [exit(0) if event.key == "escape" else None]
+        "key_release_event",
+        lambda event: [exit(0) if event.key == "escape" else None]
+        if isinstance(event, KeyEvent) else None
     )
 
     for i in range(0, path.goal_reached_time()):
         obs_positions = grid.get_obstacle_positions_at_time(i)
         obs_points.set_data(obs_positions[0], obs_positions[1])
         path_position = path.get_position(i)
+        if not path_position:
+            raise Exception(f"Path position not found for time {i}.")
+
         path_points.set_data([path_position.x], [path_position.y])
         plt.pause(0.2)
     plt.show()
@@ -91,7 +97,9 @@ def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: list[N
 
     # For stopping simulation with the esc key
     plt.gcf().canvas.mpl_connect(
-        "key_release_event", lambda event: [exit(0) if event.key == "escape" else None]
+        "key_release_event",
+        lambda event: [exit(0) if event.key == "escape" else None]
+        if isinstance(event, KeyEvent) else None
     )
 
     # Find the maximum time across all paths
@@ -112,6 +120,8 @@ def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: list[N
                     print(path)
                     print(i)
                 path_position = path.get_position(i)
+                if not path_position:
+                    raise Exception(f"Path position not found for time {i}.")
 
                 # Verify position is valid
                 assert not path_position in obs_positions

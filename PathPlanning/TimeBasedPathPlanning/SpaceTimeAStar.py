@@ -54,7 +54,7 @@ class SpaceTimeAStar(SingleAgentPlanner):
 
                 # reverse path so it goes start -> goal
                 path.reverse()
-                return NodePath(path)
+                return NodePath(path, len(expanded_set))
 
             expanded_idx = len(expanded_list)
             expanded_list.append(expanded_node)

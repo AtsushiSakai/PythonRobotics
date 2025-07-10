@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from functools import total_ordering
 import numpy as np
+from typing import Sequence
 
 @dataclass(order=True)
 class Position:
@@ -61,11 +62,15 @@ class Node:
         return hash((self.position, self.time))
 
 class NodePath:
-    path: list[Node]
+    path: Sequence[Node]
     positions_at_time: dict[int, Position]
+    # Number of nodes expanded while finding this path
+    expanded_node_count: int
 
-    def __init__(self, path: list[Node]):
+    def __init__(self, path: Sequence[Node], expanded_node_count: int):
         self.path = path
+        self.expanded_node_count = expanded_node_count
+
         self.positions_at_time = {}
         for i, node in enumerate(path):
             reservation_finish_time = node.time + 1

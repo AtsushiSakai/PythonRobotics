@@ -23,7 +23,7 @@ import time
 class PriorityBasedPlanner(MultiAgentPlanner):
 
     @staticmethod
-    def plan(grid: Grid, start_and_goals: list[StartAndGoal], single_agent_planner_class: SingleAgentPlanner, verbose: bool) -> tuple[list[StartAndGoal], list[NodePath]]:
+    def plan(grid: Grid, start_and_goals: list[StartAndGoal], single_agent_planner_class: SingleAgentPlanner, verbose: bool = False) -> tuple[list[StartAndGoal], list[NodePath]]:
         """
         Generate a path from the start to the goal for each agent in the `start_and_goals` list.
         Returns the re-ordered StartAndGoal combinations, and a list of path plans. The order of the plans
@@ -76,8 +76,6 @@ def main():
     )
 
     start_time = time.time()
-    start_and_goals: list[StartAndGoal]
-    paths: list[NodePath]
     start_and_goals, paths = PriorityBasedPlanner.plan(grid, start_and_goals, SafeIntervalPathPlanner, verbose)
 
     runtime = time.time() - start_time
