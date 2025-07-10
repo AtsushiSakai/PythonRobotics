@@ -1,3 +1,4 @@
+import imageio.v2 as imageio
 import numpy as np
 import matplotlib.pyplot as plt
 from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
@@ -44,7 +45,7 @@ def PlotNodePath(grid: Grid, start: Position, goal: Position, path: NodePath):
 '''
 Plot a series of agent paths.
 '''
-def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: list[NodePath]):
+def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: list[NodePath], save_gif: bool = False):
     fig = plt.figure(figsize=(10, 7))
 
     ax = fig.add_subplot(
@@ -98,7 +99,12 @@ def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: list[N
     max_time = max(path.goal_reached_time() for path in paths)
 
     # Animation loop
+    frames = []
     for i in range(0, max_time + 1):
+        if save_gif:
+            plt.savefig(f"frame_{i:03d}.png")  # Save each frame as an image
+            frames.append(imageio.imread(f"frame_{i:03d}.png"))
+
         # Update obstacle positions
         obs_positions = grid.get_obstacle_positions_at_time(i)
         obs_points.set_data(obs_positions[0], obs_positions[1])
@@ -121,5 +127,8 @@ def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: list[N
                 path_plots[j].set_data([path_position.x], [path_position.y])
         
         plt.pause(0.2)
+
+    if save_gif:
+        imageio.mimsave("path_animation2.gif", frames, fps=5)  # Convert images to GIF
 
     plt.show()
