@@ -1,3 +1,6 @@
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+import math
 from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
     Grid,
     Position,
@@ -5,8 +8,6 @@ from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
 from PathPlanning.TimeBasedPathPlanning.Node import NodePath
 import random
 import numpy.random as numpy_random
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
 
 # Seed randomness for reproducibility
 RANDOM_SEED = 50
@@ -31,6 +32,9 @@ class StartAndGoal:
     start: Position
     # Goal position of the robot
     goal: Position
+
+    def distance_start_to_goal(self) -> float:
+        return pow(self.goal.x - self.start.x, 2) + pow(self.goal.y - self.start.y, 2)
 
 class MultiAgentPlanner(ABC):
     """

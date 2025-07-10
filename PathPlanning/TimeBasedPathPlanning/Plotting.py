@@ -105,12 +105,19 @@ def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: list[N
         
         # Update each agent's position
         for (j, path) in enumerate(paths):
+            path_postitions = []
             if i <= path.goal_reached_time():
                 res = path.get_position(i)
                 if not res:
                     print(path)
                     print(i)
                 path_position = path.get_position(i)
+
+                # Verify position is valid
+                assert not path_position in obs_positions
+                assert not path_position in path_postitions
+                path_postitions.append(path_position)
+
                 path_plots[j].set_data([path_position.x], [path_position.y])
         
         plt.pause(0.2)

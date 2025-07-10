@@ -1,8 +1,9 @@
 """
-TODO - doc comment
+Priority Based Planner for multi agent path planning.
+The planner generates an order to plan in, and generates plans for the robots in that order. Each planned
+path is reserved in the grid, and all future plans must avoid that path.
 
-sort of outlined in this paper: https://pure.tudelft.nl/ws/portalfiles/portal/67074672/07138650.pdf
-better paper: https://people.csail.mit.edu/tlp/publications/01087401.pdf
+Algorithm outlined in section III of this paper: https://pure.tudelft.nl/ws/portalfiles/portal/67074672/07138650.pdf
 """
 
 import numpy as np
@@ -16,13 +17,12 @@ from PathPlanning.TimeBasedPathPlanning.BaseClasses import MultiAgentPlanner, St
 from PathPlanning.TimeBasedPathPlanning.Node import NodePath
 from PathPlanning.TimeBasedPathPlanning.BaseClasses import SingleAgentPlanner
 from PathPlanning.TimeBasedPathPlanning.SafeInterval import SafeIntervalPathPlanner
-from PathPlanning.TimeBasedPathPlanning.SpaceTimeAStar import SpaceTimeAStar
 from PathPlanning.TimeBasedPathPlanning.Plotting import PlotNodePaths
 import time
 
 class PriorityBasedPlanner(MultiAgentPlanner):
 
-    def plan(grid: Grid, start_and_goals: list[StartAndGoal], single_agent_planner_class: SingleAgentPlanner, verbose: bool) -> list[NodePath]: # TODO: list of what
+    def plan(grid: Grid, start_and_goals: list[StartAndGoal], single_agent_planner_class: SingleAgentPlanner, verbose: bool) -> list[NodePath]:
         
         print(f"Using planner: {single_agent_planner_class}")
 
@@ -30,7 +30,11 @@ class PriorityBasedPlanner(MultiAgentPlanner):
         for start_and_goal in start_and_goals:
             grid.reserve_position(start_and_goal.start, start_and_goal.index, Interval(0, 10))
 
-        # TODO: smarter ordering
+        # Plan in descending order of distance from start to goal
+        start_and_goals = sorted(start_and_goals,
+                    key=lambda item: item.distance_start_to_goal(),
+                    reverse=True)
+
         paths = []
         for start_and_goal in start_and_goals:
             if True:
