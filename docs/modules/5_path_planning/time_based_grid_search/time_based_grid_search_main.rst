@@ -85,7 +85,7 @@ Multi-Agent Path Planning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Priority Based Planning
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The planner generates an order to plan in, and generates plans for the robots in that order. Each planned path is reserved in the grid, and all future plans must avoid that path. The robots are planned for in descending order of distance from start to goal.
 
