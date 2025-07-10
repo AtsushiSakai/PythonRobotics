@@ -24,12 +24,6 @@ def test_1():
         obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1,
     )
 
-    grid_side_length = 21
-    grid = Grid(
-        np.array([grid_side_length, grid_side_length]),
-        obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1,
-    )
-
     m.show_animation = False
 
     start_and_goals: list[StartAndGoal]

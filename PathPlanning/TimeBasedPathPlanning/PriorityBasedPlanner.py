@@ -22,6 +22,7 @@ import time
 
 class PriorityBasedPlanner(MultiAgentPlanner):
 
+    @staticmethod
     def plan(grid: Grid, start_and_goals: list[StartAndGoal], single_agent_planner_class: SingleAgentPlanner, verbose: bool) -> tuple[list[StartAndGoal], list[NodePath]]:
         """
         Generate a path from the start to the goal for each agent in the `start_and_goals` list.
@@ -41,7 +42,7 @@ class PriorityBasedPlanner(MultiAgentPlanner):
 
         paths = []
         for start_and_goal in start_and_goals:
-            if True:
+            if verbose:
                 print(f"\nPlanning for agent:  {start_and_goal}" )
 
             grid.clear_initial_reservation(start_and_goal.start, start_and_goal.index)

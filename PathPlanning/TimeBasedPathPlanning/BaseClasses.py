@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-import math
 from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
     Grid,
     Position,
