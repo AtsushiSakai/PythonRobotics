@@ -29,7 +29,7 @@ class PriorityBasedPlanner(MultiAgentPlanner):
         Returns the re-ordered StartAndGoal combinations, and a list of path plans. The order of the plans
         corresponds to the order of the `start_and_goals` list.
         """
-        print(f"Using single-agent planner: {single_agent_planner_class.__name__}")
+        print(f"Using single-agent planner: {single_agent_planner_class}")
 
         # Reserve initial positions
         for start_and_goal in start_and_goals:
