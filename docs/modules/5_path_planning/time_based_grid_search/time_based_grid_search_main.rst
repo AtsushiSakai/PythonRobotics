@@ -91,7 +91,13 @@ The planner generates an order to plan in, and generates plans for the robots in
 
 This is a sub-optimal algorithm because no replanning happens once paths are found. It does not guarantee the shortest path is found for any particular robot, nor that the final set of paths found contains the lowest possible amount of time or movement.
 
-TODO: include a gif
+Static Obstacles:
+
+.. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/refs/heads/master/PathPlanning/TimeBasedPathPlanning/PriorityBasedPlanner/priority_planner2.gif
+
+Dynamic Obstacles:
+
+.. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/refs/heads/master/PathPlanning/TimeBasedPathPlanning/PriorityBasedPlanner/priority_planner.gif
 
 
 References
