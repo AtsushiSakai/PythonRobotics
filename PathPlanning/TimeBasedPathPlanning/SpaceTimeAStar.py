@@ -43,7 +43,9 @@ class SpaceTimeAStar(SingleAgentPlanner):
                 continue
 
             if expanded_node.position == goal:
-                print(f"Found path to goal after {len(expanded_list)} expansions")
+                if verbose:
+                    print(f"Found path to goal after {len(expanded_list)} expansions")
+
                 path = []
                 path_walker: Node = expanded_node
                 while True:

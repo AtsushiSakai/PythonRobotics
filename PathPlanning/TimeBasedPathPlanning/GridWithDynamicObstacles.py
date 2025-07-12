@@ -177,7 +177,7 @@ class Grid:
                 continue
 
             obstacle_path = []
-            x = 10 # middle of the grid
+            x = self.grid_size[0] // 2 # middle of the grid
             for t in range(0, self.time_limit - 1):
                 obstacle_path.append(Position(x, y))
 
