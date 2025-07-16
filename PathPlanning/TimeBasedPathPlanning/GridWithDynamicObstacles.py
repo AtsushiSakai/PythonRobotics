@@ -7,31 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from enum import Enum
 from dataclasses import dataclass
-
-@dataclass(order=True)
-class Position:
-    x: int
-    y: int
-
-    def as_ndarray(self) -> np.ndarray:
-        return np.array([self.x, self.y])
-
-    def __add__(self, other):
-        if isinstance(other, Position):
-            return Position(self.x + other.x, self.y + other.y)
-        raise NotImplementedError(
-            f"Addition not supported for Position and {type(other)}"
-        )
-
-    def __sub__(self, other):
-        if isinstance(other, Position):
-            return Position(self.x - other.x, self.y - other.y)
-        raise NotImplementedError(
-            f"Subtraction not supported for Position and {type(other)}"
-        )
-
-    def __hash__(self):
-        return hash((self.x, self.y))
+from PathPlanning.TimeBasedPathPlanning.Node import NodePath, Position
 
 @dataclass
 class Interval:
@@ -43,6 +19,8 @@ class ObstacleArrangement(Enum):
     RANDOM = 0
     # Obstacles start in a line in y at center of grid and move side-to-side in x
     ARRANGEMENT1 = 1
+    # Static obstacle arrangement
+    NARROW_CORRIDOR = 2
 
 """
 Generates a 2d numpy array with lists for elements.
@@ -87,6 +65,8 @@ class Grid:
             self.obstacle_paths = self.generate_dynamic_obstacles(num_obstacles)
         elif obstacle_arrangement == ObstacleArrangement.ARRANGEMENT1:
             self.obstacle_paths = self.obstacle_arrangement_1(num_obstacles)
+        elif obstacle_arrangement == ObstacleArrangement.NARROW_CORRIDOR:
+            self.obstacle_paths = self.generate_narrow_corridor_obstacles(num_obstacles)
 
         for i, path in enumerate(self.obstacle_paths):
             obs_idx = i + 1  # avoid using 0 - that indicates free space in the grid
@@ -184,6 +164,26 @@ class Grid:
             obstacle_paths.append(path)
 
         return obstacle_paths
+    
+    def generate_narrow_corridor_obstacles(self, obs_count: int) -> list[list[Position]]:
+        obstacle_paths = []
+
+        for y in range(0, self.grid_size[1]):
+            if y > obs_count:
+                break
+
+            if y == self.grid_size[1] // 2:
+                # Skip the middle row
+                continue
+
+            obstacle_path = []
+            x = self.grid_size[0] // 2 # middle of the grid
+            for t in range(0, self.time_limit - 1):
+                obstacle_path.append(Position(x, y))
+
+            obstacle_paths.append(obstacle_path)
+
+        return obstacle_paths
 
     """
     Check if the given position is valid at time t
@@ -196,11 +196,11 @@ class Grid:
         bool: True if position/time combination is valid, False otherwise
     """
     def valid_position(self, position: Position, t: int) -> bool:
-        # Check if new position is in grid
+        # Check if position is in grid
         if not self.inside_grid_bounds(position):
             return False
 
-        # Check if new position is not occupied at time t
+        # Check if position is not occupied at time t
         return self.reservation_matrix[position.x, position.y, t] == 0
 
     """
@@ -289,9 +289,48 @@ class Grid:
         # both the time step when it is entering the cell,  and the time step when it is leaving the cell.
         intervals = [interval for interval in intervals if interval.start_time != interval.end_time]
         return intervals
+    
+    """
+    Reserve an agent's path in the grid. Raises an exception if the agent's index is 0, or if a position is
+    already reserved by a different agent.
+    """
+    def reserve_path(self, node_path: NodePath, agent_index: int):
+        if agent_index == 0:
+            raise Exception("Agent index cannot be 0")
+        
+        for i, node in enumerate(node_path.path):
+            reservation_finish_time = node.time + 1
+            if i < len(node_path.path) - 1:
+                reservation_finish_time = node_path.path[i + 1].time
+
+            self.reserve_position(node.position, agent_index, Interval(node.time, reservation_finish_time))
+
+    """
+    Reserve a position for the provided agent during the provided time interval.
+    Raises an exception if the agent's index is 0, or if the position is already reserved by a different agent during the interval.
+    """
+    def reserve_position(self, position: Position, agent_index: int, interval: Interval):
+        if agent_index == 0:
+            raise Exception("Agent index cannot be 0")
+
+        for t in range(interval.start_time, interval.end_time + 1):
+            current_reserver = self.reservation_matrix[position.x, position.y, t]
+            if current_reserver not in [0, agent_index]:
+                raise Exception(
+                    f"Agent {agent_index} tried to reserve a position already reserved by another agent: {position} at time {t}, reserved by {current_reserver}"
+                )
+            self.reservation_matrix[position.x, position.y, t] = agent_index
+
+    """
+    Clears the initial reservation for an agent by clearing reservations at its start position with its index for
+    from time 0 to the time limit.
+    """
+    def clear_initial_reservation(self, position: Position, agent_index: int):
+        for t in range(self.time_limit):
+            if self.reservation_matrix[position.x, position.y, t] == agent_index:
+                self.reservation_matrix[position.x, position.y, t] = 0
 
 show_animation = True
-
 
 def main():
     grid = Grid(

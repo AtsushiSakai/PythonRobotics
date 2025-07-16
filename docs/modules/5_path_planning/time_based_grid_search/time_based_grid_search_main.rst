@@ -81,9 +81,28 @@ Code Link
 ^^^^^^^^^^^^^
 .. autoclass:: PathPlanning.TimeBasedPathPlanning.SafeInterval.SafeIntervalPathPlanner
 
+Multi-Agent Path Planning
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Priority Based Planning
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The planner generates an order to plan in, and generates plans for the robots in that order. Each planned path is reserved in the grid, and all future plans must avoid that path. The robots are planned for in descending order of distance from start to goal.
+
+This is a sub-optimal algorithm because no replanning happens once paths are found. It does not guarantee the shortest path is found for any particular robot, nor that the final set of paths found contains the lowest possible amount of time or movement.
+
+Static Obstacles:
+
+.. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/refs/heads/master/PathPlanning/TimeBasedPathPlanning/PriorityBasedPlanner/priority_planner2.gif
+
+Dynamic Obstacles:
+
+.. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/refs/heads/master/PathPlanning/TimeBasedPathPlanning/PriorityBasedPlanner/priority_planner.gif
+
 
 References
 ~~~~~~~~~~~
 
 -  `Cooperative Pathfinding <https://www.davidsilver.uk/wp-content/uploads/2020/03/coop-path-AIWisdom.pdf>`__
 -  `SIPP: Safe Interval Path Planning for Dynamic Environments <https://www.cs.cmu.edu/~maxim/files/sipp_icra11.pdf>`__
+- `Prioritized Planning Algorithms for Trajectory Coordination of Multiple Mobile Robots <https://pure.tudelft.nl/ws/portalfiles/portal/67074672/07138650.pdf>`__
