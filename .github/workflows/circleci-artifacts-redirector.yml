@@ -6,7 +6,7 @@ jobs:
     name: Run CircleCI artifacts redirector!!
     steps:
       - name: run-circleci-artifacts-redirector
-        uses: larsoner/circleci-artifacts-redirector-action@v1.1.0
+        uses: larsoner/circleci-artifacts-redirector-action@v1.2.0
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           api-token: ${{ secrets.CIRCLECI_TOKEN }}
