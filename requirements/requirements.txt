@@ -5,5 +5,5 @@ cvxpy == 1.7.1
 ecos == 2.0.14
 pytest == 8.4.1 # For unit test
 pytest-xdist == 3.8.0 # For unit test
-mypy == 1.17.0 # For unit test
+mypy == 1.17.1 # For unit test
 ruff == 0.12.5 # For unit test
