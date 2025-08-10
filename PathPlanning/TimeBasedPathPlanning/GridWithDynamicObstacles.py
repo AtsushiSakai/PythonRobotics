@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from enum import Enum
 from dataclasses import dataclass
 from PathPlanning.TimeBasedPathPlanning.Node import NodePath, Position
+from PathPlanning.TimeBasedPathPlanning.ConstraintTree import AppliedConstraint
 
 @dataclass
 class Interval:
@@ -31,6 +32,12 @@ def empty_2d_array_of_lists(x: int, y: int) -> np.ndarray:
     arr[:] = [[[] for _ in range(y)] for _ in range(x)]
     return arr
 
+def empty_3d_array_of_sets(x: int, y: int, z: int) -> np.ndarray:
+    arr = np.empty((x, y, z), dtype=object)
+    # assign each element individually - np.full creates references to the same list
+    arr[:] = [[[set() for _ in range(z)] for _ in range(y)] for _ in range(x)]
+    return arr
+
 class Grid:
     # Set in constructor
     grid_size: np.ndarray
@@ -38,6 +45,9 @@ class Grid:
     obstacle_paths: list[list[Position]] = []
     # Obstacles will never occupy these points. Useful to avoid impossible scenarios
     obstacle_avoid_points: list[Position] = []
+
+    # TODO: do i want this as part of grid?
+    constraint_points: np.ndarray
 
     # Number of time steps in the simulation
     time_limit: int
@@ -57,6 +67,8 @@ class Grid:
         self.time_limit = time_limit
         self.grid_size = grid_size
         self.reservation_matrix = np.zeros((grid_size[0], grid_size[1], self.time_limit))
+
+        self.constraint_points = empty_3d_array_of_sets(grid_size[0], grid_size[1], self.time_limit)
 
         if num_obstacles > self.grid_size[0] * self.grid_size[1]:
             raise Exception("Number of obstacles is greater than grid size!")
@@ -185,6 +197,19 @@ class Grid:
 
         return obstacle_paths
 
+    def apply_constraint_points(self, constraints: list[AppliedConstraint], verbose = False):
+        for constraint in constraints:
+            if verbose:
+                print(f"Applying {constraint=}")
+            if constraint not in self.constraint_points[constraint.constraint.position.x, constraint.constraint.position.y, constraint.constraint.time]:
+                self.constraint_points[constraint.constraint.position.x, constraint.constraint.position.y, constraint.constraint.time].add(constraint)
+
+            if verbose:
+                print(f"\tExisting constraints: {self.constraint_points[constraint.constraint.position.x, constraint.constraint.position.y, constraint.constraint.time]}")
+
+    def clear_constraint_points(self):
+        self.constraint_points = empty_3d_array_of_sets(self.grid_size[0], self.grid_size[1], self.time_limit)
+
     """
     Check if the given position is valid at time t
 
@@ -195,10 +220,18 @@ class Grid:
     output:
         bool: True if position/time combination is valid, False otherwise
     """
-    def valid_position(self, position: Position, t: int) -> bool:
+    def valid_position(self, position: Position, t: int, agent_idx: int) -> bool:
         # Check if position is in grid
         if not self.inside_grid_bounds(position):
             return False
+
+        constraints = self.constraint_points[position.x, position.y, t]
+        for constraint in constraints:
+            if constraint.constrained_agent == agent_idx:
+                return False
+
+        # if any([constraint.constrained_agent == agent_idx for constraint in constraints]):
+        #     return False
 
         # Check if position is not occupied at time t
         return self.reservation_matrix[position.x, position.y, t] == 0

@@ -20,7 +20,7 @@ class SingleAgentPlanner(ABC):
     
     @staticmethod
     @abstractmethod
-    def plan(grid: Grid, start: Position, goal: Position, verbose: bool = False) -> NodePath:
+    def plan(grid: Grid, start: Position, goal: Position, agent_idx: int, verbose: bool = False) -> NodePath:
         pass
 
 @dataclass

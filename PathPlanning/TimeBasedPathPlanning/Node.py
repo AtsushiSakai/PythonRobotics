@@ -28,6 +28,17 @@ class Position:
     def __hash__(self):
         return hash((self.x, self.y))
 
+@dataclass(order=True)
+class PositionAtTime:
+    position: Position
+    time: int
+
+    def __hash__(self):
+        return hash((self.position, self.time))
+    
+    def __eq__(self, other):
+        return self.position == other.position and self.time == other.time
+
 @dataclass()
 # Note: Total_ordering is used instead of adding `order=True` to the @dataclass decorator because
 #     this class needs to override the __lt__ and __eq__ methods to ignore parent_index. Parent

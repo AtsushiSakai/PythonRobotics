@@ -47,7 +47,7 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
         verbose (bool): set to True to print debug information
     """
     @staticmethod
-    def plan(grid: Grid, start: Position, goal: Position, verbose: bool = False) -> NodePath:
+    def plan(grid: Grid, start: Position, goal: Position, agent_idx: int, verbose: bool = False) -> NodePath:
 
         safe_intervals = grid.get_safe_intervals()
 
@@ -90,7 +90,7 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
             entry_time_and_node = EntryTimeAndInterval(expanded_node.time, expanded_node.interval)
             add_entry_to_visited_intervals_array(entry_time_and_node, visited_intervals, expanded_node)
 
-            for child in SafeIntervalPathPlanner.generate_successors(grid, goal, expanded_node, expanded_idx, safe_intervals, visited_intervals):
+            for child in SafeIntervalPathPlanner.generate_successors(grid, goal, expanded_node, expanded_idx, safe_intervals, visited_intervals, agent_idx):
                 heapq.heappush(open_set, child)
 
         raise Exception("No path found")
@@ -100,7 +100,7 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
     """
     @staticmethod
     def generate_successors(
-        grid: Grid, goal: Position, parent_node: SIPPNode, parent_node_idx: int, intervals: np.ndarray, visited_intervals: np.ndarray
+        grid: Grid, goal: Position, parent_node: SIPPNode, parent_node_idx: int, intervals: np.ndarray, visited_intervals: np.ndarray, agent_idx: int
     ) -> list[SIPPNode]:
         new_nodes = []
         diffs = [
@@ -140,7 +140,7 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
                 # We know there is a node worth expanding. Generate successor at the earliest possible time the
                 # new interval can be entered
                 for possible_t in range(max(parent_node.time + 1, interval.start_time), min(current_interval.end_time, interval.end_time)):
-                    if grid.valid_position(new_pos, possible_t):
+                    if grid.valid_position(new_pos, possible_t, agent_idx):
                         new_nodes.append(SIPPNode(
                             new_pos,
                             # entry is max of interval start and parent node time + 1 (get there as soon as possible)
