@@ -81,6 +81,7 @@ class Grid:
             self.obstacle_paths = self.generate_narrow_corridor_obstacles(num_obstacles)
 
         for i, path in enumerate(self.obstacle_paths):
+            # TODO: i think this is a bug. obstacle indices will overlap with robot indices
             obs_idx = i + 1  # avoid using 0 - that indicates free space in the grid
             for t, position in enumerate(path):
                 # Reserve old & new position at this time step
@@ -282,11 +283,11 @@ class Grid:
     """
     Returns safe intervals for each cell.
     """
-    def get_safe_intervals(self) -> np.ndarray:
+    def get_safe_intervals(self, agent_idx: int) -> np.ndarray:
         intervals = empty_2d_array_of_lists(self.grid_size[0], self.grid_size[1])
         for x in range(intervals.shape[0]):
             for y in range(intervals.shape[1]):
-                intervals[x, y] = self.get_safe_intervals_at_cell(Position(x, y))
+                intervals[x, y] = self.get_safe_intervals_at_cell(Position(x, y), agent_idx)
 
         return intervals
 
@@ -294,8 +295,24 @@ class Grid:
     Generate the safe intervals for a given cell. The intervals will be in order of start time.
     ex: Interval (2, 3) will be before Interval (4, 5)
     """
-    def get_safe_intervals_at_cell(self, cell: Position) -> list[Interval]:
+    def get_safe_intervals_at_cell(self, cell: Position, agent_idx: int) -> list[Interval]:
         vals = self.reservation_matrix[cell.x, cell.y, :]
+
+        had_constraints = False
+        # ct: AppliedConstraint
+        for constraint_set in self.constraint_points[cell.x, cell.y]:
+            for constraint in constraint_set:
+                if constraint.constrained_agent != agent_idx:
+                    continue
+                if constraint.constraint.position != cell:
+                    continue
+                had_constraints = True
+                vals[constraint.constraint.time] = 99999 # TODO: no magic numbers
+                
+                # TODO: hack
+                # if constraint.constraint.time + 1 < self.time_limit:
+                #     vals[constraint.constraint.time + 1] = 99999 # TODO: no magic numbers
+
         # Find where the array is zero
         zero_mask = (vals == 0)
 
@@ -321,6 +338,10 @@ class Grid:
         # move into and out of the cell each take 1 time step, and the cell is considered occupied during
         # both the time step when it is entering the cell,  and the time step when it is leaving the cell.
         intervals = [interval for interval in intervals if interval.start_time != interval.end_time]
+
+        # if had_constraints:
+            # print("\t\tconstraints: ", self.constraint_points[cell.x, cell.y])
+            # print("\t\tintervals: ", intervals)
         return intervals
     
     """

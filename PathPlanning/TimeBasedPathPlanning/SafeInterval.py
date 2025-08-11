@@ -49,7 +49,7 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
     @staticmethod
     def plan(grid: Grid, start: Position, goal: Position, agent_idx: int, verbose: bool = False) -> NodePath:
 
-        safe_intervals = grid.get_safe_intervals()
+        safe_intervals = grid.get_safe_intervals(agent_idx)
 
         open_set: list[SIPPNode] = []
         first_node_interval = safe_intervals[start.x, start.y][0]

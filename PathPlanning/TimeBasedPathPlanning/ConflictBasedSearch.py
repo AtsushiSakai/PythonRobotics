@@ -101,7 +101,7 @@ def main():
     grid_side_length = 21
 
     # start_and_goals = [StartAndGoal(i, Position(1, i), Position(19, 19-i)) for i in range(1, 16)]
-    start_and_goals = [StartAndGoal(i, Position(1, 8+i), Position(19, 19-i)) for i in range(5)]
+    start_and_goals = [StartAndGoal(i, Position(1, 8+i), Position(19, 19-i)) for i in range(4)]
     obstacle_avoid_points = [pos for item in start_and_goals for pos in (item.start, item.goal)]
 
     grid = Grid(
@@ -114,7 +114,8 @@ def main():
     )
 
     start_time = time.time()
-    start_and_goals, paths = ConflictBasedSearch.plan(grid, start_and_goals, SpaceTimeAStar, verbose)
+    start_and_goals, paths = ConflictBasedSearch.plan(grid, start_and_goals, SafeIntervalPathPlanner, verbose)
+    # start_and_goals, paths = ConflictBasedSearch.plan(grid, start_and_goals, SpaceTimeAStar, verbose)
 
     runtime = time.time() - start_time
     print(f"\nPlanning took: {runtime:.5f} seconds")
