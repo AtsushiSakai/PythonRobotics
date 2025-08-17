@@ -22,6 +22,10 @@ class ObstacleArrangement(Enum):
     ARRANGEMENT1 = 1
     # Static obstacle arrangement
     NARROW_CORRIDOR = 2
+    # A hallway surrounded by obstacles with a 2-cell opening in the middle
+    HALLWAY = 3
+    # A temporary obstacle that vanishes after some time
+    TEMPORARY_OBSTACLE = 4
 
 """
 Generates a 2d numpy array with lists for elements.
@@ -29,7 +33,10 @@ Generates a 2d numpy array with lists for elements.
 def empty_2d_array_of_lists(x: int, y: int) -> np.ndarray:
     arr = np.empty((x, y), dtype=object)
     # assign each element individually - np.full creates references to the same list
-    arr[:] = [[[] for _ in range(y)] for _ in range(x)]
+    # arr[:] = [[[] for _ in range(y)] for _ in range(x)]
+    for x in range(arr.shape[0]):
+        for y in range(arr.shape[1]):
+            arr[x, y] = []
     return arr
 
 def empty_3d_array_of_sets(x: int, y: int, z: int) -> np.ndarray:
@@ -79,7 +86,24 @@ class Grid:
             self.obstacle_paths = self.obstacle_arrangement_1(num_obstacles)
         elif obstacle_arrangement == ObstacleArrangement.NARROW_CORRIDOR:
             self.obstacle_paths = self.generate_narrow_corridor_obstacles(num_obstacles)
+        elif obstacle_arrangement == ObstacleArrangement.HALLWAY:
+            self.obstacle_paths = self.generate_hallway_obstacles()
+        elif obstacle_arrangement == ObstacleArrangement.TEMPORARY_OBSTACLE:
+            self.obstacle_paths = self.generate_temporary_obstacle()
 
+        for i, path in enumerate(self.obstacle_paths):
+            # TODO: i think this is a bug. obstacle indices will overlap with robot indices
+            obs_idx = i + 1  # avoid using 0 - that indicates free space in the grid
+            for t, position in enumerate(path):
+                # Reserve old & new position at this time step
+                if t > 0:
+                    self.reservation_matrix[path[t - 1].x, path[t - 1].y, t] = obs_idx
+                self.reservation_matrix[position.x, position.y, t] = obs_idx
+
+    def reset(self):
+        self.reservation_matrix = np.zeros((self.grid_size[0], self.grid_size[1], self.time_limit))
+
+        # TODO: copy pasta from above
         for i, path in enumerate(self.obstacle_paths):
             # TODO: i think this is a bug. obstacle indices will overlap with robot indices
             obs_idx = i + 1  # avoid using 0 - that indicates free space in the grid
@@ -198,6 +222,55 @@ class Grid:
 
         return obstacle_paths
 
+
+    def generate_hallway_obstacles(self) -> list[list[Position]]:
+        """
+        Generate obstacles that form a hallway with a 2-cell opening in the middle.
+        Creates only a 1-cell border around the edges and hallway walls.
+        
+        Pattern created:
+        **********
+        *        *
+        ***    ***
+        **********
+        
+        Args:
+            hallway_length: Length of the hallway (number of rows for the corridor)
+        
+        Returns:
+            List of obstacle paths, where each path represents one obstacle over time
+        """
+        obstacle_paths = []
+        
+        for y in range(8, 12):
+            for x in range(5, 15):
+                is_obstacle = False
+                
+                # Border walls
+                if x == 5 or x == 14 or y == 8 or y == 11:
+                    is_obstacle = True
+                if y == 9 and x not in [9, 10]:
+                    is_obstacle = True
+                
+                # If this position should be an obstacle, create a path for it
+                if is_obstacle:
+                    obstacle_path = []
+                    for t in range(self.time_limit):
+                        obstacle_path.append(Position(x, y))
+                    obstacle_paths.append(obstacle_path)
+        
+        return obstacle_paths
+    
+    def generate_temporary_obstacle(self, hallway_length: int = 3) -> list[list[Position]]:
+        """
+        Generates a temporary obstacle at (10, 10) that disappears at t=30
+        """
+        obstacle_path = []
+        for t in range(max(self.time_limit, 40)):
+            obstacle_path.append(Position(15, 15))
+        
+        return [obstacle_path]
+
     def apply_constraint_points(self, constraints: list[AppliedConstraint], verbose = False):
         for constraint in constraints:
             if verbose:
@@ -299,7 +372,7 @@ class Grid:
         vals = self.reservation_matrix[cell.x, cell.y, :]
 
         had_constraints = False
-        # ct: AppliedConstraint
+
         for constraint_set in self.constraint_points[cell.x, cell.y]:
             for constraint in constraint_set:
                 if constraint.constrained_agent != agent_idx:
@@ -308,10 +381,12 @@ class Grid:
                     continue
                 had_constraints = True
                 vals[constraint.constraint.time] = 99999 # TODO: no magic numbers
-                
+                # print(f"\tapplying constraint at cell {cell}: {constraint}")
                 # TODO: hack
-                # if constraint.constraint.time + 1 < self.time_limit:
-                #     vals[constraint.constraint.time + 1] = 99999 # TODO: no magic numbers
+                # if constraint.constraint.time + 3 < self.time_limit:
+                    # vals[constraint.constraint.time + 1] = 99999 # TODO: no magic numbers
+                    # vals[constraint.constraint.time + 2] = 99999 # TODO: no magic numbers
+                    # vals[constraint.constraint.time + 3] = 99999 # TODO: no magic numbers
 
         # Find where the array is zero
         zero_mask = (vals == 0)
@@ -340,8 +415,9 @@ class Grid:
         intervals = [interval for interval in intervals if interval.start_time != interval.end_time]
 
         # if had_constraints:
-            # print("\t\tconstraints: ", self.constraint_points[cell.x, cell.y])
-            # print("\t\tintervals: ", intervals)
+        #     print(f"agent {agent_idx}")
+        #     print("\t\tconstraints: ", self.constraint_points[cell.x, cell.y])
+        #     print("\t\tintervals: ", intervals)
         return intervals
     
     """
@@ -352,6 +428,7 @@ class Grid:
         if agent_index == 0:
             raise Exception("Agent index cannot be 0")
         
+        # TODO: this is wrong for SIPP
         for i, node in enumerate(node_path.path):
             reservation_finish_time = node.time + 1
             if i < len(node_path.path) - 1:

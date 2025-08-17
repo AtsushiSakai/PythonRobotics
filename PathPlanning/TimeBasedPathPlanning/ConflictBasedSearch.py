@@ -33,19 +33,24 @@ class ConflictBasedSearch(MultiAgentPlanner):
 
         initial_solution: dict[AgentId, NodePath] = {}
 
-        # Reserve initial positions
+        # Generate initial solution (no reservations for robots)
         for agent_idx, start_and_goal in enumerate(start_and_goals):
-            # grid.reserve_position(start_and_goal.start, start_and_goal.index, Interval(0, 10))
             path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, agent_idx, verbose)
             initial_solution[AgentId(agent_idx)] = path
 
+        # for (agent_idx, path) in initial_solution.items():
+        #     print(f"\nAgent {agent_idx} path:\n {path}")
+
         constraint_tree = ConstraintTree(initial_solution)
+
+        attempted_constraint_combos = set()
 
         while constraint_tree.nodes_to_expand:
             constraint_tree_node = constraint_tree.get_next_node_to_expand()
             ancestor_constraints = constraint_tree.get_ancestor_constraints(constraint_tree_node.parent_idx)
-            print(f"Expanded node: {constraint_tree_node.constraint} with parent: {constraint_tree_node.parent_idx}")
-            print(f"\tAncestor constraints: {ancestor_constraints}")
+
+            # print(f"Expanded node: {constraint_tree_node.constraint} with parent: {constraint_tree_node.parent_idx}")
+            # print(f"\tAncestor constraints: {ancestor_constraints}")
 
             if verbose:
                 print(f"Expanding node with constraint {constraint_tree_node.constraint} and parent {constraint_tree_node.parent_idx} ")
@@ -66,9 +71,18 @@ class ConflictBasedSearch(MultiAgentPlanner):
                 if verbose:
                     print(f"\nOuter loop step for agent {constrained_agent}")
 
-                applied_constraint = AppliedConstraint(constraint_tree_node.constraint.constraint, constrained_agent)
-                all_constraints = deepcopy(ancestor_constraints)
+                applied_constraint = AppliedConstraint(constrained_agent.constraint, constrained_agent.agent)
+
+                # TODO: check type of other constraints somewhere
+                all_constraints = deepcopy(ancestor_constraints) # TODO - no deepcopy pls
                 all_constraints.append(applied_constraint)
+
+                # Skip if we have already tried this set of constraints
+                constraint_hash = hash(frozenset(all_constraints))
+                if constraint_hash in attempted_constraint_combos:
+                    break
+                else:
+                    attempted_constraint_combos.add(constraint_hash)
 
                 if verbose:
                     print(f"\tall constraints: {all_constraints}")
@@ -76,11 +90,25 @@ class ConflictBasedSearch(MultiAgentPlanner):
                 grid.clear_constraint_points()
                 grid.apply_constraint_points(all_constraints)
 
+                failed_to_plan = False
                 for agent_idx, start_and_goal in enumerate(start_and_goals):
-                    path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, agent_idx, verbose)
+                    # print("planning for:", agent_idx)
+                    try:
+                        path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, agent_idx, verbose)
+                    except Exception as e:
+                        print(f"Failed to plan with constraints: {all_constraints}")
+                        failed_to_plan = True
+
                     if path is None:
                         raise RuntimeError(f"Failed to find path for {start_and_goal}")
                     paths[AgentId(start_and_goal.index)] = path
+
+                if failed_to_plan:
+                    print(f"Failed to plan with constraints: {all_constraints}")
+                    continue
+
+                # for (agent_idx, path) in paths.items():
+                #     print(f"\nAgent {agent_idx} path:\n {path}")
 
                 applied_constraint_parent = deepcopy(constraint_tree_node) #TODO: not sure if deepcopy is actually needed
                 applied_constraint_parent.constraint = applied_constraint
@@ -89,25 +117,50 @@ class ConflictBasedSearch(MultiAgentPlanner):
                 new_constraint_tree_node = ConstraintTreeNode(paths, parent_idx)
                 if new_constraint_tree_node.constraint is None:
                     # This means we found a solution!
+                    print("Found a path with constraints:")
+                    for constraint in all_constraints:
+                        print(f"\t{constraint}")
                     return (start_and_goals, [paths[AgentId(i)] for i in range(len(start_and_goals))])
 
-                if verbose:
-                    print(f"Adding new constraint tree node with constraint: {new_constraint_tree_node.constraint}")
+                # if verbose:
+                print(f"Adding new constraint tree node with constraint: {new_constraint_tree_node.constraint}")
                 constraint_tree.add_node_to_tree(new_constraint_tree_node)
+
+        raise RuntimeError("No solution found")
+# TODO
+# * get SIPP working w CBS
+# * add checks for duplicate expansions
+# * fan out across multiple threads
+# * sipp intervals seem much larger than needed?
 
 verbose = False
 show_animation = True
 def main():
     grid_side_length = 21
 
-    # start_and_goals = [StartAndGoal(i, Position(1, i), Position(19, 19-i)) for i in range(1, 16)]
-    start_and_goals = [StartAndGoal(i, Position(1, 8+i), Position(19, 19-i)) for i in range(4)]
+    # TODO: bug somewhere where it expects agent ids to match indices
+    # start_and_goals = [StartAndGoal(i, Position(1, i), Position(19, 19-i)) for i in range(1, 12)]
+    start_and_goals = [StartAndGoal(i, Position(1, 8+i), Position(19, 19-i)) for i in range(6)]
+    # start_and_goals = [StartAndGoal(i, Position(1, 2*i), Position(19, 19-i)) for i in range(4)]
+
+    # hallway cross
+    # start_and_goals = [StartAndGoal(0, Position(6, 10), Position(13, 10)),
+    #                    StartAndGoal(1, Position(13, 10), Position(7, 10)),
+    #                    StartAndGoal(2, Position(11, 10), Position(6, 10))]
+
+    # temporary obstacle
+    # start_and_goals = [StartAndGoal(0, Position(15, 14), Position(15, 16))]
+
+    # start_and_goals = [StartAndGoal(1, Position(6, 10), Position(8, 10)),
+    #                    StartAndGoal(2, Position(13, 10), Position(11, 10))]
     obstacle_avoid_points = [pos for item in start_and_goals for pos in (item.start, item.goal)]
 
     grid = Grid(
         np.array([grid_side_length, grid_side_length]),
         num_obstacles=250,
         obstacle_avoid_points=obstacle_avoid_points,
+        # obstacle_arrangement=ObstacleArrangement.TEMPORARY_OBSTACLE,
+        # obstacle_arrangement=ObstacleArrangement.HALLWAY,
         obstacle_arrangement=ObstacleArrangement.NARROW_CORRIDOR,
         # obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1,
         # obstacle_arrangement=ObstacleArrangement.RANDOM,

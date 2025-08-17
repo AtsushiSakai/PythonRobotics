@@ -24,6 +24,7 @@ import heapq
 from dataclasses import dataclass
 from functools import total_ordering
 import time
+from typing import Sequence
 
 @dataclass()
 # Note: Total_ordering is used instead of adding `order=True` to the @dataclass decorator because
@@ -34,6 +35,20 @@ import time
 class SIPPNode(Node):
     interval: Interval
 
+class SIPPNodePath(NodePath):
+    def __init__(self, path: Sequence[SIPPNode], expanded_node_count: int):
+        super().__init__(path, expanded_node_count)
+        
+        self.positions_at_time = {}
+        last_position = path[0].position
+        for t in range(0, path[-1].time + 1):
+            for node in path:
+                if node.time == t:
+                    last_position = node.position
+                    break
+                if node.time > t:
+                    break
+            self.positions_at_time[t] = last_position
 @dataclass
 class EntryTimeAndInterval:
     entry_time: int
@@ -49,7 +64,10 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
     @staticmethod
     def plan(grid: Grid, start: Position, goal: Position, agent_idx: int, verbose: bool = False) -> NodePath:
 
+        # TODO: hacky
+        grid.reset()
         safe_intervals = grid.get_safe_intervals(agent_idx)
+
 
         open_set: list[SIPPNode] = []
         first_node_interval = safe_intervals[start.x, start.y][0]
@@ -83,7 +101,7 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
 
                 # reverse path so it goes start -> goal
                 path.reverse()
-                return NodePath(path, len(expanded_list))
+                return SIPPNodePath(path, len(expanded_list))
 
             expanded_idx = len(expanded_list)
             expanded_list.append(expanded_node)
@@ -143,8 +161,7 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
                     if grid.valid_position(new_pos, possible_t, agent_idx):
                         new_nodes.append(SIPPNode(
                             new_pos,
-                            # entry is max of interval start and parent node time + 1 (get there as soon as possible)
-                            max(interval.start_time, parent_node.time + 1),
+                            possible_t,
                             SafeIntervalPathPlanner.calculate_heuristic(new_pos, goal),
                             parent_node_idx,
                             interval,
