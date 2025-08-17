@@ -142,7 +142,7 @@ class ConstraintTree:
             if node.constraint and isinstance(node.constraint, AppliedConstraint):
                 constraints.append(node.constraint)
             else:
-                print(f"Aha!!! {node.constraint}")
+                raise RuntimeError(f"Expected AppliedConstraint, but got: {node.constraint}")
             parent_index = node.parent_idx
         return constraints
 

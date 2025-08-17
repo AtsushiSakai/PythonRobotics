@@ -68,9 +68,6 @@ class ConflictBasedSearch(MultiAgentPlanner):
 
             # TODO: contents of this loop should probably be in a helper?
             for constrained_agent in constraint_tree_node.constraint.constrained_agents:
-                num_expansions = constraint_tree.expanded_node_count()
-                if num_expansions % 50 == 0:
-                    print(f"Expanded {num_expansions} nodes so far...")
                 if verbose:
                     print(f"\nOuter loop step for agent {constrained_agent}")
 
@@ -79,6 +76,11 @@ class ConflictBasedSearch(MultiAgentPlanner):
                 # TODO: check type of other constraints somewhere
                 all_constraints = deepcopy(ancestor_constraints) # TODO - no deepcopy pls
                 all_constraints.append(applied_constraint)
+
+                num_expansions = constraint_tree.expanded_node_count()
+                if num_expansions % 50 == 0:
+                    print(f"Expanded {num_expansions} nodes so far...")
+                    print(f"\tlen of constraints {len(all_constraints)}")
 
                 # Skip if we have already tried this set of constraints
                 constraint_hash = hash(frozenset(all_constraints))
@@ -143,13 +145,25 @@ class ConflictBasedSearch(MultiAgentPlanner):
 # * SIPP stinks at 3 robots in the hallway case
 verbose = False
 show_animation = True
+np.random.seed(42)  # For reproducibility
 def main():
     grid_side_length = 21
 
     # TODO: bug somewhere where it expects agent ids to match indices
     # start_and_goals = [StartAndGoal(i, Position(1, i), Position(19, 19-i)) for i in range(1, 12)]
-    start_and_goals = [StartAndGoal(i, Position(1, 8+i), Position(19, 19-i)) for i in range(6)]
+    # start_and_goals = [StartAndGoal(i, Position(1, 8+i), Position(19, 19-i)) for i in range(6)]
     # start_and_goals = [StartAndGoal(i, Position(1, 2*i), Position(19, 19-i)) for i in range(4)]
+
+    # generate random start and goals
+    start_and_goals: list[StartAndGoal] = []
+    for i in range(40):
+        start = Position(np.random.randint(0, grid_side_length), np.random.randint(0, grid_side_length))
+        goal = Position(np.random.randint(0, grid_side_length), np.random.randint(0, grid_side_length))
+        while any([start_and_goal.start == start for start_and_goal in start_and_goals]):
+            start = Position(np.random.randint(0, grid_side_length), np.random.randint(0, grid_side_length))
+            goal = Position(np.random.randint(0, grid_side_length), np.random.randint(0, grid_side_length))
+
+        start_and_goals.append(StartAndGoal(i, start, goal))
 
     # hallway cross
     # start_and_goals = [StartAndGoal(0, Position(6, 10), Position(13, 10)),
@@ -169,14 +183,15 @@ def main():
         obstacle_avoid_points=obstacle_avoid_points,
         # obstacle_arrangement=ObstacleArrangement.TEMPORARY_OBSTACLE,
         # obstacle_arrangement=ObstacleArrangement.HALLWAY,
-        obstacle_arrangement=ObstacleArrangement.NARROW_CORRIDOR,
+        # obstacle_arrangement=ObstacleArrangement.NARROW_CORRIDOR,
+        obstacle_arrangement=ObstacleArrangement.NONE,
         # obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1,
         # obstacle_arrangement=ObstacleArrangement.RANDOM,
     )
 
     start_time = time.time()
-    # start_and_goals, paths = ConflictBasedSearch.plan(grid, start_and_goals, SafeIntervalPathPlanner, verbose)
-    start_and_goals, paths = ConflictBasedSearch.plan(grid, start_and_goals, SpaceTimeAStar, verbose)
+    start_and_goals, paths = ConflictBasedSearch.plan(grid, start_and_goals, SafeIntervalPathPlanner, verbose)
+    # start_and_goals, paths = ConflictBasedSearch.plan(grid, start_and_goals, SpaceTimeAStar, verbose)
 
     runtime = time.time() - start_time
     print(f"\nPlanning took: {runtime:.5f} seconds")

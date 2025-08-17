@@ -16,16 +16,18 @@ class Interval:
     end_time: int
 
 class ObstacleArrangement(Enum):
+    # No obstacles
+    NONE = 0
     # Random obstacle positions and movements
-    RANDOM = 0
+    RANDOM = 1
     # Obstacles start in a line in y at center of grid and move side-to-side in x
-    ARRANGEMENT1 = 1
+    ARRANGEMENT1 = 2
     # Static obstacle arrangement
-    NARROW_CORRIDOR = 2
+    NARROW_CORRIDOR = 3
     # A hallway surrounded by obstacles with a 2-cell opening in the middle
-    HALLWAY = 3
+    HALLWAY = 4
     # A temporary obstacle that vanishes after some time
-    TEMPORARY_OBSTACLE = 4
+    TEMPORARY_OBSTACLE = 5
 
 """
 Generates a 2d numpy array with lists for elements.
@@ -91,6 +93,8 @@ class Grid:
             self.obstacle_paths = self.generate_hallway_obstacles()
         elif obstacle_arrangement == ObstacleArrangement.TEMPORARY_OBSTACLE:
             self.obstacle_paths = self.generate_temporary_obstacle()
+        elif obstacle_arrangement == ObstacleArrangement.NONE:
+            self.obstacle_paths = []
 
         for i, path in enumerate(self.obstacle_paths):
             # TODO: i think this is a bug. obstacle indices will overlap with robot indices
