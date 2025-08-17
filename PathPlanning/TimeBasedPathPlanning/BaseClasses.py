@@ -26,6 +26,7 @@ class SingleAgentPlanner(ABC):
 @dataclass
 class StartAndGoal:
     # Index of this agent
+    # TODO: better name and use AgentId type
     index: int
     # Start position of the robot
     start: Position
