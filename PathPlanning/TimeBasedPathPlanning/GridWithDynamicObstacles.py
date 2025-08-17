@@ -55,6 +55,7 @@ class Grid:
 
     # TODO: do i want this as part of grid?
     constraint_points: np.ndarray
+    applied_constraints: list[AppliedConstraint] = []
 
     # Number of time steps in the simulation
     time_limit: int
@@ -272,6 +273,7 @@ class Grid:
         return [obstacle_path]
 
     def apply_constraint_points(self, constraints: list[AppliedConstraint], verbose = False):
+        self.applied_constraints.extend(constraints)
         for constraint in constraints:
             if verbose:
                 print(f"Applying {constraint=}")
@@ -282,7 +284,10 @@ class Grid:
                 print(f"\tExisting constraints: {self.constraint_points[constraint.constraint.position.x, constraint.constraint.position.y, constraint.constraint.time]}")
 
     def clear_constraint_points(self):
-        self.constraint_points = empty_3d_array_of_sets(self.grid_size[0], self.grid_size[1], self.time_limit)
+        for constraint in self.applied_constraints:
+            if constraint in self.constraint_points[constraint.constraint.position.x, constraint.constraint.position.y, constraint.constraint.time]:
+                self.constraint_points[constraint.constraint.position.x, constraint.constraint.position.y, constraint.constraint.time].remove(constraint)
+        self.applied_constraints.clear()
 
     """
     Check if the given position is valid at time t
@@ -303,9 +308,6 @@ class Grid:
         for constraint in constraints:
             if constraint.constrained_agent == agent_idx:
                 return False
-
-        # if any([constraint.constrained_agent == agent_idx for constraint in constraints]):
-        #     return False
 
         # Check if position is not occupied at time t
         return self.reservation_matrix[position.x, position.y, t] == 0

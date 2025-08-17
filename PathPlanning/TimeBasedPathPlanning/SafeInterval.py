@@ -63,7 +63,6 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
     """
     @staticmethod
     def plan(grid: Grid, start: Position, goal: Position, agent_idx: int, verbose: bool = False) -> NodePath:
-
         # TODO: hacky
         grid.reset()
         safe_intervals = grid.get_safe_intervals(agent_idx)
@@ -134,8 +133,8 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
                 continue
 
             current_interval = parent_node.interval
-
             new_cell_intervals: list[Interval] = intervals[new_pos.x, new_pos.y]
+
             for interval in new_cell_intervals:
                 # if interval starts after current ends, break
                 # assumption: intervals are sorted by start time, so all future intervals will hit this condition as well
@@ -157,7 +156,9 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
 
                 # We know there is a node worth expanding. Generate successor at the earliest possible time the
                 # new interval can be entered
-                for possible_t in range(max(parent_node.time + 1, interval.start_time), min(current_interval.end_time, interval.end_time)):
+                minimum_entry_time = max(parent_node.time + 1, interval.start_time)
+                maximum_entry_time = min(current_interval.end_time, interval.end_time)
+                for possible_t in range(minimum_entry_time, maximum_entry_time + 1):
                     if grid.valid_position(new_pos, possible_t, agent_idx):
                         new_nodes.append(SIPPNode(
                             new_pos,

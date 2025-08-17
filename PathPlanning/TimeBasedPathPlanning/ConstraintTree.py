@@ -75,8 +75,8 @@ class ConstraintTreeNode:
                         conflicting_agent_id2 = positions_at_time[old_position_at_new_time]
                         
                         if conflicting_agent_id1 == conflicting_agent_id2 and conflicting_agent_id1 != agent_id:
-                            print(f"Found edge constraint between with agent {conflicting_agent_id1} for {agent_id}")
-                            print(f"\tpositions old: {old_position_at_new_time}, new: {position_at_time}")
+                            # print(f"Found edge constraint between with agent {conflicting_agent_id1} for {agent_id}")
+                            # print(f"\tpositions old: {old_position_at_new_time}, new: {position_at_time}")
                             new_constraint = ForkingConstraint((
                                 ConstrainedAgent(agent_id, position_at_time),
                                 ConstrainedAgent(conflicting_agent_id1, Constraint(position=last_position, time=t))
@@ -94,14 +94,17 @@ class ConstraintTreeNode:
                     )))
                     continue
             if possible_constraints:
-                print(f"choosing best constraint of {possible_constraints}")
+                if verbose:
+                    print(f"Choosing best constraint of {possible_constraints}")
                 # first check for edge constraints
                 for constraint in possible_constraints:
                     if constraint.constrained_agents[0].constraint.position != constraint.constrained_agents[1].constraint.position:
-                        print(f"\tfound edge conflict constraint: {constraint}")
+                        if verbose:
+                            print(f"\tFound edge conflict constraint: {constraint}")
                         return constraint
                 # if none, then return first normal constraint
-                print("\treturning normal constraint")
+                if verbose:
+                    print(f"\tReturning normal constraint: {possible_constraints[0]}")
                 return possible_constraints[0]
 
         return None
@@ -150,3 +153,6 @@ class ConstraintTree:
         parent_idx = len(self.expanded_nodes)
         self.expanded_nodes[parent_idx] = node
         return parent_idx
+
+    def expanded_node_count(self) -> int:
+        return len(self.expanded_nodes)
