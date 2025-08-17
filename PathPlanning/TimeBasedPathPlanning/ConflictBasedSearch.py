@@ -66,8 +66,6 @@ class ConflictBasedSearch(MultiAgentPlanner):
 
             # TODO: contents of this loop should probably be in a helper?
             for constrained_agent in constraint_tree_node.constraint.constrained_agents:
-                paths: dict[AgentId, NodePath] = {}
-
                 if verbose:
                     print(f"\nOuter loop step for agent {constrained_agent}")
 
@@ -90,37 +88,31 @@ class ConflictBasedSearch(MultiAgentPlanner):
                 grid.clear_constraint_points()
                 grid.apply_constraint_points(all_constraints)
 
-                failed_to_plan = False
-                for agent_idx, start_and_goal in enumerate(start_and_goals):
-                    # print("planning for:", agent_idx)
-                    try:
-                        path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, agent_idx, verbose)
-                    except Exception as e:
-                        print(f"Failed to plan with constraints: {all_constraints}")
-                        failed_to_plan = True
-
-                    if path is None:
-                        raise RuntimeError(f"Failed to find path for {start_and_goal}")
-                    paths[AgentId(start_and_goal.index)] = path
-
-                if failed_to_plan:
-                    print(f"Failed to plan with constraints: {all_constraints}")
+                # Just plan for agent with new constraint
+                start_and_goal = start_and_goals[constrained_agent.agent]
+                try:
+                    new_path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, start_and_goal.index, verbose)
+                except Exception as e:
                     continue
+
+                applied_constraint_parent = deepcopy(constraint_tree_node) #TODO: not sure if deepcopy is actually needed
+                paths: dict[AgentId, NodePath] = deepcopy(applied_constraint_parent.paths) # TODO: not sure if deepcopy is actually needed
+                paths[constrained_agent.agent] = new_path
 
                 # for (agent_idx, path) in paths.items():
                 #     print(f"\nAgent {agent_idx} path:\n {path}")
 
-                applied_constraint_parent = deepcopy(constraint_tree_node) #TODO: not sure if deepcopy is actually needed
                 applied_constraint_parent.constraint = applied_constraint
                 parent_idx = constraint_tree.add_expanded_node(applied_constraint_parent)
 
-                new_constraint_tree_node = ConstraintTreeNode(paths, parent_idx)
+                new_constraint_tree_node = ConstraintTreeNode(deepcopy(paths), parent_idx, all_constraints)
                 if new_constraint_tree_node.constraint is None:
                     # This means we found a solution!
                     print("Found a path with constraints:")
                     for constraint in all_constraints:
                         print(f"\t{constraint}")
-                    return (start_and_goals, [paths[AgentId(i)] for i in range(len(start_and_goals))])
+                    # return (start_and_goals, [paths[AgentId(i)] for i in range(len(start_and_goals))])
+                    return (start_and_goals, paths.values())
 
                 # if verbose:
                 print(f"Adding new constraint tree node with constraint: {new_constraint_tree_node.constraint}")
@@ -140,13 +132,13 @@ def main():
 
     # TODO: bug somewhere where it expects agent ids to match indices
     # start_and_goals = [StartAndGoal(i, Position(1, i), Position(19, 19-i)) for i in range(1, 12)]
-    # start_and_goals = [StartAndGoal(i, Position(1, 8+i), Position(19, 19-i)) for i in range(6)]
+    start_and_goals = [StartAndGoal(i, Position(1, 8+i), Position(19, 19-i)) for i in range(6)]
     # start_and_goals = [StartAndGoal(i, Position(1, 2*i), Position(19, 19-i)) for i in range(4)]
 
     # hallway cross
-    start_and_goals = [StartAndGoal(0, Position(6, 10), Position(13, 10)),
-                       StartAndGoal(1, Position(12, 10), Position(7, 10)),
-                       StartAndGoal(2, Position(11, 10), Position(6, 10))]
+    # start_and_goals = [StartAndGoal(0, Position(6, 10), Position(13, 10)),
+    #                    StartAndGoal(1, Position(13, 10), Position(7, 10)),
+    #                    StartAndGoal(2, Position(11, 10), Position(6, 10))]
 
     # temporary obstacle
     # start_and_goals = [StartAndGoal(0, Position(15, 14), Position(15, 16))]
@@ -160,8 +152,8 @@ def main():
         num_obstacles=250,
         obstacle_avoid_points=obstacle_avoid_points,
         # obstacle_arrangement=ObstacleArrangement.TEMPORARY_OBSTACLE,
-        obstacle_arrangement=ObstacleArrangement.HALLWAY,
-        # obstacle_arrangement=ObstacleArrangement.NARROW_CORRIDOR,
+        # obstacle_arrangement=ObstacleArrangement.HALLWAY,
+        obstacle_arrangement=ObstacleArrangement.NARROW_CORRIDOR,
         # obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1,
         # obstacle_arrangement=ObstacleArrangement.RANDOM,
     )

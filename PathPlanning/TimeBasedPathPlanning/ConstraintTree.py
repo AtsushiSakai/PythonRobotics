@@ -33,13 +33,16 @@ class ConstraintTreeNode:
     paths: dict[AgentId, NodePath]
     cost: int
 
-    def __init__(self, paths: dict[AgentId, NodePath], parent_idx: int):
+    def __init__(self, paths: dict[AgentId, NodePath], parent_idx: int, all_constraints: list[AppliedConstraint]):
         self.paths = paths
         self.cost = sum(path.goal_reached_time() for path in paths.values())
         self.parent_idx = parent_idx
         self.constraint = self.get_constraint_point()
+        self.all_constraints = all_constraints
 
     def __lt__(self, other) -> bool:
+        if self.cost == other.cost:
+            return len(self.all_constraints) < len(other.all_constraints)
         return self.cost < other.cost
 
     def get_constraint_point(self, verbose = False) -> Optional[ForkingConstraint]:
@@ -88,8 +91,6 @@ class ConstraintTreeNode:
                             ))
                             print(f"new constraint: {new_constraint}")
                             return new_constraint
-                    else:
-                        positions_at_time[new_position_at_last_time] = AgentId(agent_id)
         return None
 
 
@@ -102,7 +103,7 @@ class ConstraintTree:
     def __init__(self, initial_solution: dict[AgentId, NodePath]):
         self.nodes_to_expand = []
         self.expanded_nodes = {}
-        heapq.heappush(self.nodes_to_expand, ConstraintTreeNode(initial_solution, -1))
+        heapq.heappush(self.nodes_to_expand, ConstraintTreeNode(initial_solution, -1, []))
 
     def get_next_node_to_expand(self) -> Optional[ConstraintTreeNode]:
         if not self.nodes_to_expand:
