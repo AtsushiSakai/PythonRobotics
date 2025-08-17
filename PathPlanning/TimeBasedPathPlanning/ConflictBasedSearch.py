@@ -140,13 +140,13 @@ def main():
 
     # TODO: bug somewhere where it expects agent ids to match indices
     # start_and_goals = [StartAndGoal(i, Position(1, i), Position(19, 19-i)) for i in range(1, 12)]
-    start_and_goals = [StartAndGoal(i, Position(1, 8+i), Position(19, 19-i)) for i in range(6)]
+    # start_and_goals = [StartAndGoal(i, Position(1, 8+i), Position(19, 19-i)) for i in range(6)]
     # start_and_goals = [StartAndGoal(i, Position(1, 2*i), Position(19, 19-i)) for i in range(4)]
 
     # hallway cross
-    # start_and_goals = [StartAndGoal(0, Position(6, 10), Position(13, 10)),
-    #                    StartAndGoal(1, Position(13, 10), Position(7, 10)),
-    #                    StartAndGoal(2, Position(11, 10), Position(6, 10))]
+    start_and_goals = [StartAndGoal(0, Position(6, 10), Position(13, 10)),
+                       StartAndGoal(1, Position(12, 10), Position(7, 10)),
+                       StartAndGoal(2, Position(11, 10), Position(6, 10))]
 
     # temporary obstacle
     # start_and_goals = [StartAndGoal(0, Position(15, 14), Position(15, 16))]
@@ -160,8 +160,8 @@ def main():
         num_obstacles=250,
         obstacle_avoid_points=obstacle_avoid_points,
         # obstacle_arrangement=ObstacleArrangement.TEMPORARY_OBSTACLE,
-        # obstacle_arrangement=ObstacleArrangement.HALLWAY,
-        obstacle_arrangement=ObstacleArrangement.NARROW_CORRIDOR,
+        obstacle_arrangement=ObstacleArrangement.HALLWAY,
+        # obstacle_arrangement=ObstacleArrangement.NARROW_CORRIDOR,
         # obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1,
         # obstacle_arrangement=ObstacleArrangement.RANDOM,
     )
