@@ -176,7 +176,7 @@ Adding the missed documentations for existing examples is also great contributio
 If you check the `Python Robotics Docs`_, you can notice that some of the examples
 only have a simulation gif or short overview descriptions or just TBD.,
 but no detailed algorithm or mathematical description.
-These documents needs to be improved.
+These documents need to be improved.
 
 This doc `how to write doc`_ can be helpful to write documents.
 
