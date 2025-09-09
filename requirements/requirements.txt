@@ -3,7 +3,7 @@ scipy == 1.15.2
 matplotlib == 3.10.1
 cvxpy == 1.7.2
 ecos == 2.0.14
-pytest == 8.4.1 # For unit test
+pytest == 8.4.2 # For unit test
 pytest-xdist == 3.8.0 # For unit test
 mypy == 1.17.1 # For unit test
 ruff == 0.12.10 # For unit test
