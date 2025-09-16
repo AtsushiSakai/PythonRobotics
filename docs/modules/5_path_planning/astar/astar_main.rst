@@ -1,5 +1,5 @@
 A star
----------------------
+-------------------------
 
 This is a simple vehicle model based A\* path planner.
 
@@ -11,7 +11,7 @@ Code Link
 .. autofunction:: PathPlanning.AStar.a_star.AStarPlanner
 
 Bidirectional A* Search
-----------------------
+-------------------------
 
 This is an implementation of A* algorithm that searches from both start and goal simultaneously, which can be more efficient than traditional A* in many cases.
 
