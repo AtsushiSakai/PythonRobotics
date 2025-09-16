@@ -9,6 +9,7 @@ Path planning is the ability of a robot to search feasible and efficient path to
    :maxdepth: 2
    :caption: Contents
 
+   astar/astar
    dynamic_window_approach/dynamic_window_approach
    bugplanner/bugplanner
    grid_base_search/grid_base_search
