@@ -318,7 +318,7 @@ def calc_ref_trajectory(state, cx, cy, cyaw, ck, sp, dl, pind):
 
     travel = 0.0
 
-    for i in range(T + 1):
+    for i in range(1, T + 1):
         travel += abs(state.v) * DT
         dind = int(round(travel / dl))
 
