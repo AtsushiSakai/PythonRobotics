@@ -10,8 +10,8 @@ References:
     - Shi, Y.; Eberhart, R. (1998). "A Modified Particle Swarm Optimizer"
     - https://machinelearningmastery.com/a-gentle-introduction-to-particle-swarm-optimization/
 
-This implementation uses PSO to find collision-free paths by treating 
-path planning as an optimization problem where particles explore the 
+This implementation uses PSO to find collision-free paths by treating
+path planning as an optimization problem where particles explore the
 search space to minimize distance to target while avoiding obstacles.
 """
 import numpy as np
@@ -107,7 +107,16 @@ class PSOSwarm:
         return dist + penalty
 
     def check_collision(self, start, end, obstacle):
-        """Check if path from start to end hits obstacle using line-circle intersection"""
+        """Check if path from start to end hits obstacle using line-circle intersection
+        
+        Args:
+            start: Starting position (numpy array)
+            end: Ending position (numpy array)  
+            obstacle: Tuple (ox, oy, r) representing obstacle center and radius
+            
+        Returns:
+            bool: True if collision detected, False otherwise
+        """
         ox, oy, r = obstacle
         center = np.array([ox, oy])
         
@@ -116,6 +125,12 @@ class PSOSwarm:
         f = start - center
         
         a = np.dot(d, d)
+        
+        # FIX: Guard against zero-length steps to prevent ZeroDivisionError
+        if a < 1e-10:  # Near-zero length step
+            # Check if start point is inside obstacle
+            return np.linalg.norm(f) <= r
+        
         b = 2 * np.dot(f, d)
         c = np.dot(f, f) - r * r
         
@@ -125,13 +140,18 @@ class PSOSwarm:
             return False
         
         # Check if intersection on segment
-        t1 = (-b - np.sqrt(discriminant)) / (2 * a)
-        t2 = (-b + np.sqrt(discriminant)) / (2 * a)
+        sqrt_discriminant = np.sqrt(discriminant)
+        t1 = (-b - sqrt_discriminant) / (2 * a)
+        t2 = (-b + sqrt_discriminant) / (2 * a)
         
         return (0 <= t1 <= 1) or (0 <= t2 <= 1)
 
     def step(self):
-        """Run one PSO iteration"""
+        """Run one PSO iteration
+        
+        Returns:
+            bool: True if algorithm should continue, False if completed
+        """
         if self.iteration >= self.max_iter:
             return False
         
@@ -178,18 +198,31 @@ class PSOSwarm:
         self.iteration += 1
         if show_animation and self.iteration % 20 == 0:
             print(f"Iteration {self.iteration}/{self.max_iter}, Best: {self.gbest_value:.2f}")
+        
         return True
 
 
 def main():
-    """Test PSO path planning algorithm"""
+    """Run PSO path planning algorithm demonstration.
+    
+    This function demonstrates PSO-based path planning with the following setup:
+    - 15 particles exploring a (-50,50) x (-50,50) search space
+    - Start zone: (-45,-35) to (-35,-35) 
+    - Target: (40, 35)
+    - 4 circular obstacles with collision avoidance
+    - Real-time visualization showing particle convergence (if show_animation=True)
+    - Headless mode support for testing (if show_animation=False)
+    
+    The algorithm runs for up to 150 iterations, displaying particle movement,
+    personal/global best positions, and the evolving optimal path.
+    """
     print(__file__ + " start!!")
     
     # Set matplotlib backend for headless environments
     if not show_animation:
         matplotlib.use('Agg')  # Use non-GUI backend for testing
     
-    # Setup
+    # Setup parameters
     N_PARTICLES = 15
     MAX_ITER = 150
     SEARCH_BOUNDS = [(-50, 50), (-50, 50)]
@@ -211,8 +244,9 @@ def main():
         obstacles=OBSTACLES
     )
     
-    if show_animation:  # pragma: no cover
-        # Visualization
+    # pragma: no cover
+    if show_animation:
+        # Visualization setup
         fig, ax = plt.subplots(figsize=(10, 10))
         ax.set_xlim(SEARCH_BOUNDS[0])
         ax.set_ylim(SEARCH_BOUNDS[1])
@@ -250,8 +284,10 @@ def main():
         ax.legend(loc='upper right')
         
         def animate(frame):
+            """Animation function for matplotlib FuncAnimation"""
             if not swarm.step():
-                return
+                return (particles_scatter, gbest_scatter, gbest_path_line, 
+                        iteration_text, *particle_paths)
             
             # Update particle positions
             positions = np.array([p.position for p in swarm.particles])
@@ -281,13 +317,17 @@ def main():
             return (particles_scatter, gbest_scatter, gbest_path_line, 
                     iteration_text, *particle_paths)
         
-        ani = animation.FuncAnimation(
+        # Create animation and store reference to prevent garbage collection
+        animation_ref = animation.FuncAnimation(
             fig, animate, frames=MAX_ITER, 
             interval=100, blit=True, repeat=False
         )
         
         plt.tight_layout()
         plt.show()
+        
+        # Keep reference to prevent garbage collection
+        return animation_ref
     else:
         # Run without animation for testing
         print("Running PSO algorithm without animation...")
@@ -301,6 +341,8 @@ def main():
         print(f"Best fitness: {swarm.gbest_value:.2f}")
         if swarm.gbest_position is not None:
             print(f"Best position: [{swarm.gbest_position[0]:.2f}, {swarm.gbest_position[1]:.2f}]")
+        
+        return None
 
 
 if __name__ == "__main__":
