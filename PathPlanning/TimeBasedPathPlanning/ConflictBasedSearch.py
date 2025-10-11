@@ -21,10 +21,14 @@ from PathPlanning.TimeBasedPathPlanning.Plotting import PlotNodePaths
 from PathPlanning.TimeBasedPathPlanning.ConstraintTree import AgentId, AppliedConstraint, ConstraintTree, ConstraintTreeNode, ForkingConstraint
 import time
 
+# TODO: dont include this
+from constraint_tree_viz import visualize_cbs_tree
 class ConflictBasedSearch(MultiAgentPlanner):
 
+
+    # TODO: remove ConstraintTree from return
     @staticmethod
-    def plan(grid: Grid, start_and_goals: list[StartAndGoal], single_agent_planner_class: SingleAgentPlanner, verbose: bool = False) -> tuple[list[StartAndGoal], list[NodePath]]:
+    def plan(grid: Grid, start_and_goals: list[StartAndGoal], single_agent_planner_class: SingleAgentPlanner, verbose: bool = False) -> tuple[list[StartAndGoal], list[NodePath], ConstraintTree]:
         """
         Generate a path from the start to the goal for each agent in the `start_and_goals` list.
         Returns the re-ordered StartAndGoal combinations, and a list of path plans. The order of the plans
@@ -97,7 +101,7 @@ class ConflictBasedSearch(MultiAgentPlanner):
                     for constraint in all_constraints:
                         print(f"\t{constraint}")
                     print(f"Final cost: {constraint_tree_node.cost}")
-                    return (start_and_goals, paths.values())
+                    return (start_and_goals, paths.values(), constraint_tree)
 
                 if verbose:
                     print(f"Adding new constraint tree node with constraint: {new_constraint_tree_node.constraint}")
@@ -161,7 +165,7 @@ def main():
     grid_side_length = 21
 
     # start_and_goals = [StartAndGoal(i, Position(1, i), Position(19, 19-i)) for i in range(1, 12)]
-    start_and_goals = [StartAndGoal(i, Position(1, 8+i), Position(19, 19-i)) for i in range(5)]
+    # start_and_goals = [StartAndGoal(i, Position(1, 8+i), Position(19, 19-i)) for i in range(5)]
     # start_and_goals = [StartAndGoal(i, Position(1, 2*i), Position(19, 19-i)) for i in range(4)]
 
     # generate random start and goals
@@ -176,9 +180,9 @@ def main():
     #     start_and_goals.append(StartAndGoal(i, start, goal))
 
     # hallway cross
-    # start_and_goals = [StartAndGoal(0, Position(6, 10), Position(13, 10)),
-    #                    StartAndGoal(1, Position(11, 10), Position(6, 10)),
-    #                    StartAndGoal(2, Position(13, 10), Position(7, 10))]
+    start_and_goals = [StartAndGoal(0, Position(6, 10), Position(13, 10)),
+                       StartAndGoal(1, Position(11, 10), Position(6, 10)),
+                       StartAndGoal(2, Position(13, 10), Position(7, 10))]
 
     # temporary obstacle
     # start_and_goals = [StartAndGoal(0, Position(15, 14), Position(15, 16))]
@@ -192,15 +196,15 @@ def main():
         num_obstacles=250,
         obstacle_avoid_points=obstacle_avoid_points,
         # obstacle_arrangement=ObstacleArrangement.TEMPORARY_OBSTACLE,
-        # obstacle_arrangement=ObstacleArrangement.HALLWAY,
-        obstacle_arrangement=ObstacleArrangement.NARROW_CORRIDOR,
+        obstacle_arrangement=ObstacleArrangement.HALLWAY,
+        # obstacle_arrangement=ObstacleArrangement.NARROW_CORRIDOR,
         # obstacle_arrangement=ObstacleArrangement.NONE,
         # obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1,
         # obstacle_arrangement=ObstacleArrangement.RANDOM,
     )
 
     start_time = time.time()
-    start_and_goals, paths = ConflictBasedSearch.plan(grid, start_and_goals, SafeIntervalPathPlanner, verbose)
+    start_and_goals, paths, constraint_tree = ConflictBasedSearch.plan(grid, start_and_goals, SafeIntervalPathPlanner, verbose)
     # start_and_goals, paths = ConflictBasedSearch.plan(grid, start_and_goals, SpaceTimeAStar, verbose)
 
     runtime = time.time() - start_time
@@ -214,7 +218,8 @@ def main():
     if not show_animation:
         return
 
-    PlotNodePaths(grid, start_and_goals, paths)
+    visualize_cbs_tree(constraint_tree.expanded_nodes, constraint_tree.nodes_to_expand)
+    # PlotNodePaths(grid, start_and_goals, paths)
 
 if __name__ == "__main__":
     main()
