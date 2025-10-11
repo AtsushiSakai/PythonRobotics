@@ -30,11 +30,9 @@ def visualize_cbs_tree(
         node_colors.append("lightblue")
         node_sizes.append(initial_size)
         
-        # Add edge from parent
-        # if node.parent_idx is not None:
+        # Add edge from parent only if parent exists in expanded_nodes
         if node.parent_idx is not None and node.parent_idx in expanded_nodes:
             G.add_edge(node.parent_idx, idx)
-            # G.add_edge(0, 5)
             print(f"adding edge btwn {node.parent_idx} and {idx}")
 
     # Add unexpanded nodes
@@ -52,37 +50,68 @@ def visualize_cbs_tree(
     #         if node.parent_idx is not None and node.parent_idx >= 0:
     #             G.add_edge(node.parent_idx, idx)
 
+    # Debug: print all edges in the graph
+    print(f"\nAll edges in graph: {list(G.edges())}")
+    print(f"All nodes in graph: {list(G.nodes())}")
+    
+    
     # Use hierarchical layout with fixed horizontal spacing
-    pos = _hierarchy_pos(G, root=next(iter(G.nodes()), None), vert_gap=0.3, horiz_gap=1.5)
+    # Handle disconnected components
+    pos = {}
+    x_offset = 0
+    for component in nx.weakly_connected_components(G):
+        subgraph = G.subgraph(component)
+        root = next(iter(subgraph.nodes()))
+        component_pos = _hierarchy_pos(subgraph, root=root, vert_gap=0.3, horiz_gap=3.0)
+        
+        # Offset each component horizontally to avoid overlap
+        for node, (x, y) in component_pos.items():
+            pos[node] = (x + x_offset, y)
+        
+        # Increment x_offset for next component
+        if len(component_pos) > 0:
+            x_offset += max(x for x, y in component_pos.values()) + 3
 
-    # Extract edge coordinates
+    print(f"Positions: {pos}")
+    
+    # Extract edge coordinates with hover text
     edge_x = []
     edge_y = []
+    edge_text = []
     for edge in G.edges():
         print(f"Drawing edge: {edge}")
         if edge[0] in pos and edge[1] in pos:
             x0, y0 = pos[edge[0]]
             x1, y1 = pos[edge[1]]
+            print(f"  From ({x0}, {y0}) to ({x1}, {y1})")
             edge_x.extend([x0, x1, None])
             edge_y.extend([y0, y1, None])
+            edge_text.extend([f"Node {edge[0]} → Node {edge[1]}", f"Node {edge[0]} → Node {edge[1]}", None])
         else:
+            print(f"  Edge position not found")
             edge_x.extend([1, 1, None])
             edge_y.extend([5, 5, None])
-    
+            edge_text.extend([f"Node {edge[0]} → Node {edge[1]}", f"Node {edge[0]} → Node {edge[1]}", None])
+
     # Extract node coordinates
     node_x = []
     node_y = []
-    for node in G.nodes():
+    node_list = list(G.nodes())
+    for node in node_list:
         x, y = 1, 1
         if node in pos:
             x, y = pos[node]
+        else:
+            print(f"WARNING: Node {node} not in positions!")
         node_x.append(x)
         node_y.append(y)
+    
+    print(f"Node coordinates: {list(zip(node_list, node_x, node_y))}")
     
     # Create figure
     fig = go.Figure()
     
-    # Add edges
+    # Add edges (visible lines)
     fig.add_trace(go.Scatter(
         x=edge_x, y=edge_y,
         mode='lines',
@@ -90,6 +119,17 @@ def visualize_cbs_tree(
         hoverinfo='none',
         showlegend=False
     ))
+    
+    # Add invisible thick edges for hover detection
+    fig.add_trace(go.Scatter(
+        x=edge_x, y=edge_y,
+        mode='lines',
+        line=dict(width=20, color='rgba(0,0,0,0)'),
+        text=edge_text,
+        hoverinfo='text',
+        showlegend=False
+    ))
+
     # Add nodes
     fig.add_trace(go.Scatter(
         x=node_x, y=node_y,
@@ -99,10 +139,10 @@ def visualize_cbs_tree(
             color=node_colors,
             line=dict(width=2, color='darkblue')
         ),
-        text=[node_labels[node] for node in G.nodes() if node in node_labels],
+        text=[node_labels.get(node, f"Node {node}") for node in node_list],
         hoverinfo='text',
         showlegend=False,
-        customdata=list(G.nodes())
+        customdata=node_list
     ))
     
     fig.update_layout(
@@ -157,26 +197,33 @@ def visualize_cbs_tree(
 def _hierarchy_pos(G, root=None, vert_gap=0.2, horiz_gap=1.0, xcenter=0.5):
     """
     Create hierarchical layout for tree visualization with fixed horizontal spacing.
+    Spreads nodes wide at each level to avoid overlaps.
     """
     if not nx.is_tree(G):
         G = nx.DiGraph(G)
     
-    def _hierarchy_pos_recursive(G, root, vert_gap=0.2, horiz_gap=1.0, xcenter=0.5, pos=None, parent=None, child_index=0):
+    def _hierarchy_pos_recursive(G, root, vert_gap=0.2, horiz_gap=1.0, xcenter=0.5, pos=None, parent=None, child_index=0, level_nodes=None):
         if pos is None:
             pos = {root: (xcenter, 0)}
+            level_nodes = {0: [root]}
         else:
+            level = pos[parent][1] / (-vert_gap)
             pos[root] = (xcenter, pos[parent][1] - vert_gap)
+            if int(level) + 1 not in level_nodes:
+                level_nodes[int(level) + 1] = []
+            level_nodes[int(level) + 1].append(root)
         
         neighbors = list(G.neighbors(root))
         
         if len(neighbors) != 0:
             num_children = len(neighbors)
-            # Spread children horizontally with fixed gap
-            start_x = xcenter - (num_children - 1) * horiz_gap / 2
+            # Spread children very wide to avoid any overlap
+            spread = num_children * horiz_gap * 2
+            start_x = xcenter - spread / 2
             for i, neighbor in enumerate(neighbors):
-                nextx = start_x + i * horiz_gap
+                nextx = start_x + i * (spread / max(num_children - 1, 1))
                 _hierarchy_pos_recursive(G, neighbor, vert_gap=vert_gap, horiz_gap=horiz_gap,
-                                        xcenter=nextx, pos=pos, parent=root, child_index=i)
+                                        xcenter=nextx, pos=pos, parent=root, child_index=i, level_nodes=level_nodes)
         
         return pos
     
