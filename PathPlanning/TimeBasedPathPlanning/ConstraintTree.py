@@ -150,9 +150,9 @@ class ConstraintTree:
         """
         Add an expanded node to the tree. Returns the index of this node in the expanded nodes dictionary.
         """
-        parent_idx = len(self.expanded_nodes)
-        self.expanded_nodes[parent_idx] = node
-        return parent_idx
+        node_idx = len(self.expanded_nodes)
+        self.expanded_nodes[node_idx] = node
+        return node_idx
 
     def expanded_node_count(self) -> int:
         return len(self.expanded_nodes)

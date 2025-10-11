@@ -10,6 +10,7 @@ from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
     ObstacleArrangement,
     Position,
 )
+from typing import Optional
 from copy import deepcopy
 from PathPlanning.TimeBasedPathPlanning.BaseClasses import MultiAgentPlanner, StartAndGoal
 from PathPlanning.TimeBasedPathPlanning.Node import NodePath
@@ -33,7 +34,7 @@ class ConflictBasedSearch(MultiAgentPlanner):
 
         initial_solution: dict[AgentId, NodePath] = {}
 
-        # Generate initial solution (no reservations for robots)
+        # Generate initial solution (no constraints)
         for start_and_goal in start_and_goals:
             path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, start_and_goal.index, verbose)
             initial_solution[AgentId(start_and_goal.index)] = path
@@ -44,126 +45,135 @@ class ConflictBasedSearch(MultiAgentPlanner):
                 print(f"\nAgent {agent_idx} path:\n {path}")
 
         constraint_tree = ConstraintTree(initial_solution)
-
         attempted_constraint_combos = set()
 
         while constraint_tree.nodes_to_expand:
             constraint_tree_node = constraint_tree.get_next_node_to_expand()
             ancestor_constraints = constraint_tree.get_ancestor_constraints(constraint_tree_node.parent_idx)
 
-            # print(f"Expanded node: {constraint_tree_node.constraint} with parent: {constraint_tree_node.parent_idx}")
-            # print(f"\tAncestor constraints: {ancestor_constraints}")
-
             if verbose:
                 print(f"Expanding node with constraint {constraint_tree_node.constraint} and parent {constraint_tree_node.parent_idx}")
+                print(f"\tCOST: {constraint_tree_node.cost}")
 
             if constraint_tree_node is None:
                 raise RuntimeError("No more nodes to expand in the constraint tree.")
             if not constraint_tree_node.constraint:
                 # This means we found a solution!
+                print(f"Found a path with constraints after {constraint_tree.expanded_node_count()} expansions:")
+                print(f"Final cost: {constraint_tree_node.cost}")
                 return (start_and_goals, [constraint_tree_node.paths[start_and_goal.index] for start_and_goal in start_and_goals])
 
             if not isinstance(constraint_tree_node.constraint, ForkingConstraint):
                 raise ValueError(f"Expected a ForkingConstraint, but got: {constraint_tree_node.constraint}")
 
-            # TODO: contents of this loop should probably be in a helper?
             for constrained_agent in constraint_tree_node.constraint.constrained_agents:
-                if verbose:
-                    print(f"\nOuter loop step for agent {constrained_agent}")
-
                 applied_constraint = AppliedConstraint(constrained_agent.constraint, constrained_agent.agent)
 
-                # TODO: check type of other constraints somewhere
                 all_constraints = deepcopy(ancestor_constraints) # TODO - no deepcopy pls
                 all_constraints.append(applied_constraint)
 
-                num_expansions = constraint_tree.expanded_node_count()
-                if num_expansions % 50 == 0:
-                    print(f"Expanded {num_expansions} nodes so far...")
-                    print(f"\tlen of constraints {len(all_constraints)}")
-
-                # Skip if we have already tried this set of constraints
-                constraint_hash = hash(frozenset(all_constraints))
-                if constraint_hash in attempted_constraint_combos:
-                    if verbose:
-                        print(f"\tSkipping already attempted constraint combination: {all_constraints}")
-                    continue
-                else:
-                    attempted_constraint_combos.add(constraint_hash)
-
-                if verbose:
-                    print(f"\tall constraints: {all_constraints}")
-
-                grid.clear_constraint_points()
-                grid.apply_constraint_points(all_constraints)
-
-                # Just plan for agent with new constraint
-                start_and_goal = ConflictBasedSearch.find_by_index(start_and_goals, constrained_agent.agent)
-                try:
-                    if verbose:
-                        print("\tplanning for: {}", start_and_goal)
-                    new_path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, start_and_goal.index, verbose)
-                except Exception as e:
+                new_path = ConflictBasedSearch.plan_for_agent(constrained_agent, all_constraints, constraint_tree, attempted_constraint_combos, grid, single_agent_planner_class, start_and_goals)
+                if not new_path:
                     continue
 
-                applied_constraint_parent = deepcopy(constraint_tree_node) #TODO: not sure if deepcopy is actually needed
-                paths: dict[AgentId, NodePath] = deepcopy(constraint_tree_node.paths) # TODO: not sure if deepcopy is actually needed
+                # Deepcopy to update with applied constraint and new paths
+                applied_constraint_parent = deepcopy(constraint_tree_node)
+                # TODO: could have a map under the hood to make these copies cheaper
+                paths: dict[AgentId, NodePath] = deepcopy(constraint_tree_node.paths)
                 paths[constrained_agent.agent] = new_path
 
-                # for (agent_idx, path) in paths.items():
-                #     print(f"\nAgent {agent_idx} path:\n {path}")
+                if verbose:
+                    for (agent_idx, path) in paths.items():
+                        print(f"\nAgent {agent_idx} path:\n {path}")
 
                 applied_constraint_parent.constraint = applied_constraint
+                # applied_constraint_parent.paths = paths
                 parent_idx = constraint_tree.add_expanded_node(applied_constraint_parent)
 
                 new_constraint_tree_node = ConstraintTreeNode(paths, parent_idx, all_constraints)
                 if new_constraint_tree_node.constraint is None:
                     # This means we found a solution!
-                    print(f"Found a path with constraints after {num_expansions} expansions:")
+                    print(f"Found a path with constraints after {constraint_tree.expanded_node_count()} expansions:")
                     for constraint in all_constraints:
                         print(f"\t{constraint}")
-                    # return (start_and_goals, [paths[AgentId(i)] for i in range(len(start_and_goals))])
+                    print(f"Final cost: {constraint_tree_node.cost}")
                     return (start_and_goals, paths.values())
 
-                # if verbose:
-                # print(f"Adding new constraint tree node with constraint: {new_constraint_tree_node.constraint}")
+                if verbose:
+                    print(f"Adding new constraint tree node with constraint: {new_constraint_tree_node.constraint}")
                 constraint_tree.add_node_to_tree(new_constraint_tree_node)
 
         raise RuntimeError("No solution found")
     
-    # TODO: bad function name
-    def find_by_index(start_and_goal_list: list[StartAndGoal], target_index: AgentId) -> AgentId:
+    def get_agents_start_and_goal(start_and_goal_list: list[StartAndGoal], target_index: AgentId) -> StartAndGoal:
         for item in start_and_goal_list:
             if item.index == target_index:
                 return item
         raise RuntimeError(f"Could not find agent with index {target_index} in {start_and_goal_list}")
 
+
+    def plan_for_agent(constrained_agent: ConstraintTreeNode,
+                 all_constraints: list[AppliedConstraint],
+                 constraint_tree: ConstraintTree,
+                 attempted_constraint_combos: set,
+                 grid: Grid,
+                 single_agent_planner_class: SingleAgentPlanner,
+                 start_and_goals: list[StartAndGoal]) -> Optional[tuple[list[StartAndGoal], list[NodePath]]]:
+
+        num_expansions = constraint_tree.expanded_node_count()
+        if num_expansions % 50 == 0:
+            print(f"Expanded {num_expansions} nodes so far...")
+            print(f"\tNumber of constraints on expanded node: {len(all_constraints)}")
+
+        # Skip if we have already tried this set of constraints
+        constraint_hash = hash(frozenset(all_constraints))
+        if constraint_hash in attempted_constraint_combos:
+            if verbose:
+                print(f"\tSkipping already attempted constraint combination: {all_constraints}")
+            return None
+        else:
+            attempted_constraint_combos.add(constraint_hash)
+
+        if verbose:
+            print(f"\tall constraints: {all_constraints}")
+
+        grid.clear_constraint_points()
+        grid.apply_constraint_points(all_constraints)
+
+        # Just plan for agent with new constraint
+        start_and_goal = ConflictBasedSearch.get_agents_start_and_goal(start_and_goals, constrained_agent.agent)
+        try:
+            if verbose:
+                print("\tplanning for: {}", start_and_goal)
+            new_path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, start_and_goal.index, verbose)
+            return new_path
+        except Exception as e:
+            print(f"Error: {e}")
+            return None
+
 # TODO
-# * still discrepancies between sipp and A*
 # * fan out across multiple threads
 # * somehow test/check that high level tree is doing what you want
-# * SIPP stinks at 3 robots in the hallway case
 verbose = False
 show_animation = True
 np.random.seed(42)  # For reproducibility
 def main():
     grid_side_length = 21
 
-    # TODO: bug somewhere where it expects agent ids to match indices
     # start_and_goals = [StartAndGoal(i, Position(1, i), Position(19, 19-i)) for i in range(1, 12)]
-    # start_and_goals = [StartAndGoal(i, Position(1, 8+i), Position(19, 19-i)) for i in range(6)]
+    start_and_goals = [StartAndGoal(i, Position(1, 8+i), Position(19, 19-i)) for i in range(5)]
     # start_and_goals = [StartAndGoal(i, Position(1, 2*i), Position(19, 19-i)) for i in range(4)]
 
     # generate random start and goals
-    start_and_goals: list[StartAndGoal] = []
-    for i in range(40):
-        start = Position(np.random.randint(0, grid_side_length), np.random.randint(0, grid_side_length))
-        goal = Position(np.random.randint(0, grid_side_length), np.random.randint(0, grid_side_length))
-        while any([start_and_goal.start == start for start_and_goal in start_and_goals]):
-            start = Position(np.random.randint(0, grid_side_length), np.random.randint(0, grid_side_length))
-            goal = Position(np.random.randint(0, grid_side_length), np.random.randint(0, grid_side_length))
+    # start_and_goals: list[StartAndGoal] = []
+    # for i in range(40):
+    #     start = Position(np.random.randint(0, grid_side_length), np.random.randint(0, grid_side_length))
+    #     goal = Position(np.random.randint(0, grid_side_length), np.random.randint(0, grid_side_length))
+    #     while any([start_and_goal.start == start for start_and_goal in start_and_goals]):
+    #         start = Position(np.random.randint(0, grid_side_length), np.random.randint(0, grid_side_length))
+    #         goal = Position(np.random.randint(0, grid_side_length), np.random.randint(0, grid_side_length))
 
-        start_and_goals.append(StartAndGoal(i, start, goal))
+    #     start_and_goals.append(StartAndGoal(i, start, goal))
 
     # hallway cross
     # start_and_goals = [StartAndGoal(0, Position(6, 10), Position(13, 10)),
@@ -183,8 +193,8 @@ def main():
         obstacle_avoid_points=obstacle_avoid_points,
         # obstacle_arrangement=ObstacleArrangement.TEMPORARY_OBSTACLE,
         # obstacle_arrangement=ObstacleArrangement.HALLWAY,
-        # obstacle_arrangement=ObstacleArrangement.NARROW_CORRIDOR,
-        obstacle_arrangement=ObstacleArrangement.NONE,
+        obstacle_arrangement=ObstacleArrangement.NARROW_CORRIDOR,
+        # obstacle_arrangement=ObstacleArrangement.NONE,
         # obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1,
         # obstacle_arrangement=ObstacleArrangement.RANDOM,
     )
