@@ -27,8 +27,24 @@ def signal_handler(sig, frame):
     print("\nExiting...")
     plt.close("all")
     sys.exit(0)
+
 signal.signal(signal.SIGINT, signal_handler)
+
 class Particle:
+    """Represents a single particle in the PSO swarm.
+    Each particle maintains its current position, velocity, and personal best
+    position discovered during the search. Particles explore the search space
+    by updating their velocity based on personal experience (cognitive component)
+    and swarm knowledge (social component).
+    Attributes:
+        search_bounds: List of tuples [(x_min, x_max), (y_min, y_max)] defining search space
+        max_velocity: Maximum velocity allowed in each dimension (5% of search space range)
+        position: Current 2D position [x, y] in search space
+        velocity: Current velocity vector [vx, vy]
+        pbest_position: Personal best position found so far
+        pbest_value: Fitness value at personal best position
+        path: List of all positions visited by this particle
+    """
     def __init__(self, search_bounds, spawn_bounds):
         self.search_bounds = search_bounds
         self.max_velocity = np.array([(b[1] - b[0]) * 0.05 for b in search_bounds])
