@@ -131,32 +131,31 @@ class ThetaStarPlanner:
 
             # expand_grid search grid based on motion model
             for i, _ in enumerate(self.motion):
-                for i, _ in enumerate(self.motion):
-                    node = self.Node(current.x + self.motion[i][0],
-                                        current.y + self.motion[i][1],
-                                        current.cost + self.motion[i][2], c_id)  # cost may later be updated by theta star path compression
-                    n_id = self.calc_grid_index(node)
+                node = self.Node(current.x + self.motion[i][0],
+                                    current.y + self.motion[i][1],
+                                    current.cost + self.motion[i][2], c_id)  # cost may later be updated by theta star path compression
+                n_id = self.calc_grid_index(node)
 
-                    if not self.verify_node(node):
-                        continue
+                if not self.verify_node(node):
+                    continue
 
-                    if n_id in closed_set:
-                        continue
+                if n_id in closed_set:
+                    continue
 
-                    # Theta* modification:
-                    if use_theta_star and current.parent_index != -1 and current.parent_index in closed_set:
-                        grandparent = closed_set[current.parent_index]
-                        if self.line_of_sight(grandparent, node):
-                            # If parent(current) has line of sight to neighbor
-                            node.cost = grandparent.cost + math.hypot(node.x - grandparent.x, node.y - grandparent.y)
-                            node.parent_index = current.parent_index # compress path directly to grandparent
+                # Theta* modification:
+                if use_theta_star and current.parent_index != -1 and current.parent_index in closed_set:
+                    grandparent = closed_set[current.parent_index]
+                    if self.line_of_sight(grandparent, node):
+                        # If parent(current) has line of sight to neighbor
+                        node.cost = grandparent.cost + math.hypot(node.x - grandparent.x, node.y - grandparent.y)
+                        node.parent_index = current.parent_index # compress path directly to grandparent
 
-                    if n_id not in open_set:
-                        open_set[n_id] = node
-                    else:
-                        if open_set[n_id].cost > node.cost:
-                            # This path is the best until now. record it
-                            open_set[n_id] = node 
+                if n_id not in open_set:
+                    open_set[n_id] = node
+                else:
+                    if open_set[n_id].cost > node.cost:
+                        # This path is the best until now. record it
+                        open_set[n_id] = node 
 
 
         rx, ry = self.calc_final_path(goal_node, closed_set)
