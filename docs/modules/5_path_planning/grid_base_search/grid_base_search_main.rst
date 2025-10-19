@@ -97,6 +97,10 @@ As a result, Theta star produces shorter, smoother paths than A star, ideal for 
 
 In the animation, each cyan arrow represents a node pointing to its parent.
 
+Reference
+++++++++++++
+
+-  `Theta*: Any-Angle Path Planning on Grids <https://cdn.aaai.org/AAAI/2007/AAAI07-187.pdf>`__
 
 Code Link
 +++++++++++++
