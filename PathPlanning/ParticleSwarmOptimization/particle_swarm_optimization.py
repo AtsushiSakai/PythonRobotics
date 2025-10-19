@@ -15,7 +15,6 @@ path planning as an optimization problem where particles explore the
 search space to minimize distance to target while avoiding obstacles.
 """
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.patches as patches
@@ -41,8 +40,8 @@ class Particle:
         max_velocity: Maximum velocity allowed in each dimension (5% of search space range)
         position: Current 2D position [x, y] in search space
         velocity: Current velocity vector [vx, vy]
-        personla_best_position: Personal best position found so far
-        personla_best_value: Fitness value at personal best position
+        personal_best_position: Personal best position found so far
+        personal_best_value: Fitness value at personal best position
         path: List of all positions visited by this particle
     """
     def __init__(self, search_bounds, spawn_bounds):
@@ -50,16 +49,16 @@ class Particle:
         self.max_velocity = np.array([(b[1] - b[0]) * 0.05 for b in search_bounds])
         self.position = np.array([np.random.uniform(b[0], b[1]) for b in spawn_bounds])
         self.velocity = np.random.randn(2) * 0.1
-        self.personla_best_position = self.position.copy()
-        self.personla_best_value = np.inf
+        self.personal_best_position = self.position.copy()
+        self.personal_best_value = np.inf
         self.path = [self.position.copy()]
     def update_velocity(self, gbest_pos, w, c1, c2):
         """Update particle velocity using PSO equation:
-        v = w*v + c1*r1*(personla_best - x) + c2*r2*(gbest - x)
+        v = w*v + c1*r1*(personal_best - x) + c2*r2*(gbest - x)
         """
         r1 = np.random.rand(2)
         r2 = np.random.rand(2)
-        cognitive = c1 * r1 * (self.personla_best_position - self.position)
+        cognitive = c1 * r1 * (self.personal_best_position - self.position)
         social = c2 * r2 * (gbest_pos - self.position)
         self.velocity = w * self.velocity + cognitive + social
         self.velocity = np.clip(self.velocity, -self.max_velocity, self.max_velocity)
@@ -120,7 +119,7 @@ class PSOSwarm:
         d = end - start
         f = start - center
         a = np.dot(d, d)
-        # FIX: Guard against zero-length steps to prevent ZeroDivisionError
+        # Guard against zero-length steps to prevent ZeroDivisionError
         if a < 1e-10:  # Near-zero length step
             # Check if start point is inside obstacle
             return np.linalg.norm(f) <= r
@@ -149,9 +148,9 @@ class PSOSwarm:
         for particle in self.particles:
             value = self.fitness(particle.position)
             # Update personal best
-            if value < particle.personla_best_value:
-                particle.personla_best_value = value
-                particle.personla_best_position = particle.position.copy()
+            if value < particle.personal_best_value:
+                particle.personal_best_value = value
+                particle.personal_best_position = particle.position.copy()
             # Update global best
             if value < self.gbest_value:
                 self.gbest_value = value
@@ -213,6 +212,7 @@ def main():
     # pragma: no cover
     if show_animation:
         # Visualization setup
+        signal.signal(signal.SIGINT, signal_handler)
         fig, ax = plt.subplots(figsize=(10, 10))
         ax.set_xlim(SEARCH_BOUNDS[0])
         ax.set_ylim(SEARCH_BOUNDS[1])
