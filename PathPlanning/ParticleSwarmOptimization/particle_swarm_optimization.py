@@ -41,8 +41,8 @@ class Particle:
         max_velocity: Maximum velocity allowed in each dimension (5% of search space range)
         position: Current 2D position [x, y] in search space
         velocity: Current velocity vector [vx, vy]
-        pbest_position: Personal best position found so far
-        pbest_value: Fitness value at personal best position
+        personla_best_position: Personal best position found so far
+        personla_best_value: Fitness value at personal best position
         path: List of all positions visited by this particle
     """
     def __init__(self, search_bounds, spawn_bounds):
@@ -50,16 +50,16 @@ class Particle:
         self.max_velocity = np.array([(b[1] - b[0]) * 0.05 for b in search_bounds])
         self.position = np.array([np.random.uniform(b[0], b[1]) for b in spawn_bounds])
         self.velocity = np.random.randn(2) * 0.1
-        self.pbest_position = self.position.copy()
-        self.pbest_value = np.inf
+        self.personla_best_position = self.position.copy()
+        self.personla_best_value = np.inf
         self.path = [self.position.copy()]
     def update_velocity(self, gbest_pos, w, c1, c2):
         """Update particle velocity using PSO equation:
-        v = w*v + c1*r1*(pbest - x) + c2*r2*(gbest - x)
+        v = w*v + c1*r1*(personla_best - x) + c2*r2*(gbest - x)
         """
         r1 = np.random.rand(2)
         r2 = np.random.rand(2)
-        cognitive = c1 * r1 * (self.pbest_position - self.position)
+        cognitive = c1 * r1 * (self.personla_best_position - self.position)
         social = c2 * r2 * (gbest_pos - self.position)
         self.velocity = w * self.velocity + cognitive + social
         self.velocity = np.clip(self.velocity, -self.max_velocity, self.max_velocity)
@@ -149,9 +149,9 @@ class PSOSwarm:
         for particle in self.particles:
             value = self.fitness(particle.position)
             # Update personal best
-            if value < particle.pbest_value:
-                particle.pbest_value = value
-                particle.pbest_position = particle.position.copy()
+            if value < particle.personla_best_value:
+                particle.personla_best_value = value
+                particle.personla_best_position = particle.position.copy()
             # Update global best
             if value < self.gbest_value:
                 self.gbest_value = value
@@ -183,7 +183,7 @@ def main():
     """Run PSO path planning algorithm demonstration.
     This function demonstrates PSO-based path planning with the following setup:
     - 15 particles exploring a (-50,50) x (-50,50) search space
-    - Start zone: (-45,-35) to (-35,-35)
+    - Start zone: (-45,-45) to (-35,-35)
     - Target: (40, 35)
     - 4 circular obstacles with collision avoidance
     - Real-time visualization showing particle convergence (if show_animation=True)
@@ -194,7 +194,7 @@ def main():
     print(__file__ + " start!!")
     # Set matplotlib backend for headless environments
     if not show_animation:
-        matplotlib.use("Agg")  # Use non-GUI backend for testing
+        plt.switch_backend("Agg")  # Use non-GUI backend for testing
     # Setup parameters
     N_PARTICLES = 15
     MAX_ITER = 150

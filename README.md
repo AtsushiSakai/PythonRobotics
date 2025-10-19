@@ -359,7 +359,7 @@ This is a 2D grid based coverage path planning simulation.
 
 ### Particle Swarm Optimization (PSO)
 
-This is a 2D path planning with Particle Swarm Optimization algorithm.
+This is a 2D path planning simulation using the Particle Swarm Optimization algorithm.
 
 ![PSO](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ParticleSwarmOptimization/animation.gif)
 
@@ -367,7 +367,7 @@ PSO is a metaheuristic optimization algorithm inspired by bird flocking behavior
 
 The animation shows particles (blue dots) converging towards the optimal path (yellow line) from start (green area) to goal (red star).
 
-Reference
+References
 
 - [Particle swarm optimization - Wikipedia](https://en.wikipedia.org/wiki/Particle_swarm_optimization)
 

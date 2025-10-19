@@ -3,7 +3,7 @@
 Particle Swarm Optimization Path Planning
 ------------------------------------------
 
-This is a 2D path planning implementation using Particle Swarm Optimization (PSO).
+This is a 2D path planning simulation using the Particle Swarm Optimization algorithm.
 
 PSO is a metaheuristic optimization algorithm inspired by the social behavior of bird flocking or fish schooling. In path planning, particles represent potential solutions that explore the search space to find collision-free paths from start to goal.
 
