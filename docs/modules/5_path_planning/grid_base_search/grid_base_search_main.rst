@@ -89,6 +89,10 @@ Theta\* algorithm
 
 This is a 2D grid based shortest path planning with Theta star algorithm.
 
+It offers an optimization over the A* algorithm to generate any-angle paths. Unlike A star, which always assigns a new node’s parent as the node it came from, Theta star checks for a line-of-sight (unblocked path) from an earlier node (typically the parent of the previous node) and assigns it directly if visible. This reduces cost by replacing staggered segments with straight lines. 
+
+As a result, Theta star produces shorter, smoother paths than A star, ideal for ground or aerial robots operating in continuous environments where smoother motion enables higher acceleration and reduced travel time.
+
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ThetaStar/animation.gif
 
 In the animation, each cyan arrow represents a node pointing to its parent.
