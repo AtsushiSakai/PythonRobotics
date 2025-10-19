@@ -82,6 +82,24 @@ Code Link
 .. autofunction:: PathPlanning.BidirectionalAStar.bidirectional_a_star.BidirectionalAStarPlanner
 
 
+.. _Theta*-algorithm:
+
+Theta\* algorithm
+~~~~~~~~~~~~~~~~~
+
+This is a 2D grid based shortest path planning with Theta star algorithm.
+
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ThetaStar/animation.gif
+
+In the animation, each cyan arrow represents a node pointing to its parent.
+
+
+Code Link
++++++++++++++
+
+.. autofunction:: PathPlanning.ThetaStar.theta_star.ThetaStarPlanner
+
+
 .. _D*-algorithm:
 
 D\* algorithm
