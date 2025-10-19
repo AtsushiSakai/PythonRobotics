@@ -99,7 +99,7 @@ class ThetaStarPlanner:
                     dy = py - y
 
                     # scale down vector for visibility
-                    norm = math.sqrt(dx*dx + dy*dy)
+                    norm = math.hypot(dx, dy)
                     dx /= norm
                     dy /= norm
 
