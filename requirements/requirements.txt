@@ -6,4 +6,4 @@ ecos == 2.0.14
 pytest == 8.4.2 # For unit test
 pytest-xdist == 3.8.0 # For unit test
 mypy == 1.18.2 # For unit test
-ruff == 0.14.0 # For unit test
+ruff == 0.14.1 # For unit test
