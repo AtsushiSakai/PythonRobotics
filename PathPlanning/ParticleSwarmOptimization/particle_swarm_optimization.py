@@ -22,6 +22,7 @@ import signal
 import sys
 # Add show_animation flag for consistency with other planners
 show_animation = True
+
 def signal_handler(sig, frame):
     print("\nExiting...")
     plt.close("all")
@@ -44,6 +45,7 @@ class Particle:
         personal_best_value: Fitness value at personal best position
         path: List of all positions visited by this particle
     """
+
     def __init__(self, search_bounds, spawn_bounds):
         self.search_bounds = search_bounds
         self.max_velocity = np.array([(b[1] - b[0]) * 0.05 for b in search_bounds])
@@ -52,6 +54,7 @@ class Particle:
         self.personal_best_position = self.position.copy()
         self.personal_best_value = np.inf
         self.path = [self.position.copy()]
+
     def update_velocity(self, gbest_pos, w, c1, c2):
         """Update particle velocity using PSO equation:
         v = w*v + c1*r1*(personal_best - x) + c2*r2*(gbest - x)
@@ -62,6 +65,7 @@ class Particle:
         social = c2 * r2 * (gbest_pos - self.position)
         self.velocity = w * self.velocity + cognitive + social
         self.velocity = np.clip(self.velocity, -self.max_velocity, self.max_velocity)
+
     def update_position(self):
         self.position = self.position + self.velocity
         # Keep in bounds
@@ -70,7 +74,9 @@ class Particle:
                 self.position[i], self.search_bounds[i][0], self.search_bounds[i][1]
             )
         self.path.append(self.position.copy())
+
 class PSOSwarm:
+
     def __init__(
         self, n_particles, max_iter, target, search_bounds, spawn_bounds, obstacles
     ):
@@ -92,6 +98,7 @@ class PSOSwarm:
         self.gbest_value = np.inf
         self.gbest_path = []
         self.iteration = 0
+
     def fitness(self, pos):
         """Calculate fitness - distance to target + obstacle penalty"""
         dist = np.linalg.norm(pos - self.target)
@@ -104,6 +111,7 @@ class PSOSwarm:
             elif obs_dist < r + 5:
                 penalty += 50 / (obs_dist - r + 0.1)  # Too close
         return dist + penalty
+
     def check_collision(self, start, end, obstacle):
         """Check if path from start to end hits obstacle using line-circle intersection
             Args:
@@ -133,6 +141,7 @@ class PSOSwarm:
         t1 = (-b - sqrt_discriminant) / (2 * a)
         t2 = (-b + sqrt_discriminant) / (2 * a)
         return (0 <= t1 <= 1) or (0 <= t2 <= 1)
+
     def step(self):
         """Run one PSO iteration
         Returns:
@@ -178,6 +187,7 @@ class PSOSwarm:
                 f"Iteration {self.iteration}/{self.max_iter}, Best: {self.gbest_value:.2f}"
             )
         return True
+
 def main():
     """Run PSO path planning algorithm demonstration.
     This function demonstrates PSO-based path planning with the following setup:
