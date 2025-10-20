@@ -8,6 +8,8 @@ on:
   schedule:
     - cron: '0 19 * * 0'
 
+permissions:
+  contents: read
 jobs:
   CodeQL-Build:
 
