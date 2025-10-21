@@ -36,6 +36,7 @@ Python codes and [textbook](https://atsushisakai.github.io/PythonRobotics/index.
          * [D* Lite algorithm](#d-lite-algorithm)
          * [Potential Field algorithm](#potential-field-algorithm)
          * [Grid based coverage path planning](#grid-based-coverage-path-planning)
+         * [Particle Swarm Optimization (PSO)](#particle-swarm-optimization-pso)  
       * [State Lattice Planning](#state-lattice-planning)
          * [Biased polar sampling](#biased-polar-sampling)
          * [Lane sampling](#lane-sampling)
@@ -355,6 +356,24 @@ Reference
 This is a 2D grid based coverage path planning simulation.
 
 ![PotentialField](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/GridBasedSweepCPP/animation.gif)
+
+### Particle Swarm Optimization (PSO)
+
+This is a 2D path planning simulation using the Particle Swarm Optimization algorithm.
+
+![PSO](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/ParticleSwarmOptimization/animation.gif)
+
+PSO is a metaheuristic optimization algorithm inspired by bird flocking behavior. In path planning, particles explore the search space to find collision-free paths while avoiding obstacles.
+
+The animation shows particles (blue dots) converging towards the optimal path (yellow line) from start (green area) to goal (red star).
+
+References
+
+- [Particle swarm optimization - Wikipedia](https://en.wikipedia.org/wiki/Particle_swarm_optimization)
+
+- [Kennedy, J.; Eberhart, R. (1995). "Particle Swarm Optimization"](https://ieeexplore.ieee.org/document/488968)
+
+
 
 ## State Lattice Planning
 
