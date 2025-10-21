@@ -76,7 +76,7 @@ Disadvantages
 - **Premature convergence**: May stagnate if parameters not tuned well
 
 References
-~~~~~~~~~
+~~~~~~~~~~~
 
 - `Ant colony optimization algorithms - Wikipedia <https://en.wikipedia.org/wiki/Ant_colony_optimization_algorithms>`__
 - Dorigo, M.; Maniezzo, V.; Colorni, A. (1996). "Ant system: optimization by a colony of cooperating agents". IEEE Transactions on Systems, Man, and Cybernetics, Part B. 26 (1): 29–41.
