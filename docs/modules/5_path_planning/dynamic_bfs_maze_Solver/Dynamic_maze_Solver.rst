@@ -42,28 +42,30 @@ The BFS frontier expands as:
 
 .. math::
 
-   Q = [(s, [s])]
+   Q = [(s, [s])], \qquad s \in M
 
-where *s* is the start position, and the second term is the path history.
+where each element of \(Q\) is a pair \((v, P)\) with a current node \(v\) and
+its path history \(P\).
 
-At each iteration:
+The BFS expansion step (pseudocode):
 
 .. math::
 
-   (r, c), path = Q.pop(0)
+   \begin{aligned}
+   (r,c),\;P &= Q.pop(0), \\
+   	ext{for each } (r',c') \in N(r,c):\quad &\text{if } 0\le r'<R,\ 0\le c'<C,\ M_{r',c'}=0,\ (r',c')\notin\text{visited},\\
+  &\quad \text{then } \text{visited} \leftarrow \text{visited} \cup \{(r',c')\},\\
+  &\quad Q.append\big((r',c'),\; P + [(r',c')]\big).
+  \end{aligned}
 
-   \text{for each neighbor } (r', c') \text{ in } N(r, c):
-       \text{if } (r', c') \text{ is free and unvisited:}
-           Q.append((r', c'), path + [(r', c')])
-
-The algorithm halts when the target node *t* is reached.
-
-Because BFS explores all nodes in increasing distance order, the path returned
-is the shortest (in terms of number of moves).
+The algorithm halts when the target node \(t\) is reached. Because BFS explores
+nodes in order of increasing distance, it returns a shortest path (by move count)
+for static grids.
 
 
 Dynamic Components
 ------------------
+
 
 ### Moving Target
 
@@ -71,9 +73,9 @@ Every few frames, the target moves randomly to an adjacent open cell:
 
 .. math::
 
-   T_{new} = T_{old} + \Delta
+   T_{t+1} = T_t + \Delta_t,\qquad \Delta_t \in \{(-1,0),(1,0),(0,-1),(0,1)\}
 
-where :math:`\Delta \in \{ (-1,0), (1,0), (0,-1), (0,1) \}`.
+with the constraint that the new position must be inside the grid and on a free cell.
 
 This simulates dynamic goals or moving entities in robotic navigation.
 
@@ -83,10 +85,9 @@ With a small probability :math:`p`, each cell toggles between *free* and *blocke
 
 .. math::
 
-   M_{i,j}^{t+1} =
-   \begin{cases}
-       1 - M_{i,j}^{t} & \text{with probability } p \\
-       M_{i,j}^{t} & \text{otherwise}
+   M_{i,j}^{t+1} = \begin{cases}
+      1 - M_{i,j}^{t}, & \text{with probability } p,\\
+      M_{i,j}^{t}, & \text{with probability } 1-p.
    \end{cases}
 
 This reflects real-world conditions like temporary obstructions or environment changes.
@@ -125,45 +126,21 @@ If :math:`E_t` is the set of explored nodes at frame :math:`t`, then:
 
 .. math::
 
-   L_t = |P_t|, \quad E_t = |V_t|
+   L_t = |P_t|, \qquad E_t = |V_t|
 
-where :math:`P_t` is the discovered path and :math:`V_t` is the visited node set.
+where \(P_t\) is the discovered path at frame \(t\) and \(V_t\) is the set of visited nodes.
 
-The solver continually re-estimates the path to accommodate new maze configurations.
+Remarks:
+
+- BFS returns a shortest-path in terms of number of grid moves when the grid is static.
+- When the environment changes over time, the solver must recompute; this makes optimality
+  relative to the latest observed configuration rather than the original static grid.
 
 
 Code Link
 ++++++++
 
 .. automodule:: PathPlanning.BreadthFirstSearch.dynamic_maze_solver
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Usage Example
-++++++++++++
-
-.. code-block:: python
-   import matplotlib.pyplot as plt
-   from PathPlanning.BreadthFirstSearch.dynamic_maze_solver import MazeVisualizer
-
-   initial_maze = [
-       [0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
-       [0, 1, 0, 1, 1, 0, 1, 0, 1, 0],
-       [0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
-       [0, 1, 0, 1, 0, 1, 1, 1, 1, 0],
-       [0, 1, 0, 0, 0, 0, 0, 0, 1, 0],
-       [0, 1, 1, 1, 1, 1, 1, 0, 1, 0],
-       [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-       [1, 1, 1, 1, 0, 1, 1, 1, 1, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-   ]
-
-   start_point = (0, 0)
-   end_point = (8, 9)
-
-   visualizer = MazeVisualizer(initial_maze, start_point, end_point)
-   visualizer.run()
 
 
 References
