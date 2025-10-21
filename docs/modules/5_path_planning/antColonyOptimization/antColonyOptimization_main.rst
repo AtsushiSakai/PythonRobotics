@@ -75,7 +75,7 @@ Disadvantages
 - **Memory intensive**: Stores pheromone matrix for entire grid
 - **Premature convergence**: May stagnate if parameters not tuned well
 
-Reference2
+References
 ~~~~~~~~~
 
 - `Ant colony optimization algorithms - Wikipedia <https://en.wikipedia.org/wiki/Ant_colony_optimization_algorithms>`__
