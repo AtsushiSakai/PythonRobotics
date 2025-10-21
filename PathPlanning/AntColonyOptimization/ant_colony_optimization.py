@@ -6,8 +6,8 @@ author: Anish (@anishk85)
 See Wikipedia article (https://en.wikipedia.org/wiki/Ant_colony_optimization_algorithms)
 
 References:
-    - Dorigo, M.; Maniezzo, V.; Colorni, A. (1996). "Ant system: optimization by a 
-      colony of cooperating agents". IEEE Transactions on Systems, Man, and 
+    - Dorigo, M.; Maniezzo, V.; Colorni, A. (1996). "Ant system: optimization by a
+      colony of cooperating agents". IEEE Transactions on Systems, Man, and
       Cybernetics, Part B. 26 (1): 29–41.
     - Dorigo, M.; Stützle, T. (2004). "Ant Colony Optimization". MIT Press.
 
@@ -55,12 +55,12 @@ class Node:
 class ACOPathPlanner:
     """
     Ant Colony Optimization path planner for grid-based environments.
-    
+
     ACO simulates the behavior of real ants searching for food. Ants deposit
     pheromones on paths they traverse, and other ants are attracted to paths
     with higher pheromone concentrations. Over time, shorter paths accumulate
     more pheromones, leading the colony to converge on optimal solutions.
-    
+
         Attributes:
         resolution: Grid resolution in meters
         min_x, max_x: X-axis boundaries
@@ -75,7 +75,7 @@ class ACOPathPlanner:
     def __init__(self, ox, oy, resolution, start, goal):
         """
         Initialize ACO planner.
-        
+
         Args:
             ox: List of x positions of obstacles [m]
             oy: List of y positions of obstacles [m]
@@ -113,7 +113,7 @@ class ACOPathPlanner:
     def planning(self):
         """
         Execute ACO path planning algorithm.
-        
+
         Returns:
             rx: List of x positions along the path
             ry: List of y positions along the path
@@ -158,7 +158,7 @@ class ACOPathPlanner:
     def construct_solution(self):
         """
         Construct a solution path for one ant using probabilistic state transition.
-        
+
         Returns:
             path: List of nodes representing the path, or None if no path found
         """
@@ -197,11 +197,11 @@ class ACOPathPlanner:
     def get_neighbors(self, node, visited):
         """
         Get valid neighboring nodes (not visited, not obstacles, within bounds).
-        
+
         Args:
             node: Current node
             visited: Set of visited node coordinates
-            
+
         Returns:
             neighbors: List of valid neighbor nodes
         """
@@ -230,14 +230,14 @@ class ACOPathPlanner:
     def select_next_node(self, current, neighbors):
         """
         Select next node based on pheromone trail and heuristic information.
-        
+
         Uses the ACO probability formula:
         P[i,j] = (tau[i,j]^alpha * eta[i,j]^beta) / sum(tau^alpha * eta^beta)
-        
+
         Args:
             current: Current node
             neighbors: List of candidate neighbor nodes
-            
+
         Returns:
             selected_node: Next node to visit
         """
@@ -273,10 +273,10 @@ class ACOPathPlanner:
     def calc_heuristic(self, node):
         """
         Calculate heuristic value (Euclidean distance to goal).
-        
+
         Args:
             node: Node to evaluate
-            
+
         Returns:
             distance: Euclidean distance to goal node
         """
@@ -285,10 +285,10 @@ class ACOPathPlanner:
     def update_pheromones(self, all_paths, all_path_lengths):
         """
         Update pheromone levels: evaporation + deposition.
-        
+
         Pheromone update rule:
         tau[i,j] = (1 - rho) * tau[i,j] + sum(delta_tau[i,j])
-        
+
         Args:
             all_paths: List of paths found by all ants
             all_path_lengths: Corresponding path lengths
@@ -307,10 +307,10 @@ class ACOPathPlanner:
     def calc_path_length(self, path):
         """
         Calculate total Euclidean path length.
-        
+
         Args:
             path: List of nodes
-            
+
         Returns:
             length: Total path length in grid units
         """
@@ -332,11 +332,11 @@ class ACOPathPlanner:
     def get_obstacle_map(self, ox, oy):
         """
         Create 2D boolean obstacle map from obstacle coordinates.
-        
+
         Args:
             ox: List of obstacle x coordinates
             oy: List of obstacle y coordinates
-            
+
         Returns:
             obstacle_map: 2D boolean array
         """
@@ -356,7 +356,7 @@ class ACOPathPlanner:
     def get_motion_model():
         """
         Define 8-directional movement model.
-        
+
         Returns:
             motion: List of [dx, dy] movement vectors
         """
@@ -375,7 +375,7 @@ class ACOPathPlanner:
     def plot_pheromone_map(self, iteration):
         """
         Visualize pheromone distribution as heatmap.
-        
+
         Args:
             iteration: Current iteration number
         """
