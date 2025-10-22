@@ -90,13 +90,21 @@ Motion Model
 
 The robot uses a simple kinematic model:
 
-.. math:: 
-   \begin{align}
-   x_{t+1} &= x_t + v_t \cos(\theta_t) \Delta t \\
-   y_{t+1} &= y_t + v_t \sin(\theta_t) \Delta t \\
-   \theta_{t+1} &= \theta_t + \omega_t \Delta t \\
-   v_{t+1} &= v_t
-   \end{align}
+.. math::
+
+   x_{t+1} = x_t + v_t \cos(\theta_t) \Delta t
+
+.. math::
+
+   y_{t+1} = y_t + v_t \sin(\theta_t) \Delta t
+
+.. math::
+
+   \theta_{t+1} = \theta_t + \omega_t \Delta t
+
+.. math::
+
+   v_{t+1} = v_t
 
 where :math:`\mathbf{u}_t = [v_t, \omega_t]^T` is the control input (velocity and yaw rate).
 
@@ -107,16 +115,17 @@ In matrix form:
 where
 
 .. math::
-   F = \begin{bmatrix} 
-   1 & 0 & 0 & 0\\ 
-   0 & 1 & 0 & 0\\ 
-   0 & 0 & 1 & 0 \\ 
-   0 & 0 & 0 & 0 
+
+   F = \begin{bmatrix}
+   1 & 0 & 0 & 0\\
+   0 & 1 & 0 & 0\\
+   0 & 0 & 1 & 0 \\
+   0 & 0 & 0 & 0
    \end{bmatrix}, \quad
-   B = \begin{bmatrix} 
-   \cos(\theta_t) \Delta t & 0\\ 
-   \sin(\theta_t) \Delta t & 0\\ 
-   0 & \Delta t\\ 
+   B = \begin{bmatrix}
+   \cos(\theta_t) \Delta t & 0\\
+   \sin(\theta_t) \Delta t & 0\\
+   0 & \Delta t\\
    1 & 0
    \end{bmatrix}
 
