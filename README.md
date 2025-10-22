@@ -37,7 +37,8 @@ Python codes and [textbook](https://atsushisakai.github.io/PythonRobotics/index.
          * [Potential Field algorithm](#potential-field-algorithm)
          * [Grid based coverage path planning](#grid-based-coverage-path-planning)
          * [Particle Swarm Optimization (PSO)](#particle-swarm-optimization-pso)  
-      * [State Lattice Planning](#state-lattice-planning)
+         * [Fringe Search](#fringe-search)
+         * [State Lattice Planning](#state-lattice-planning)
          * [Biased polar sampling](#biased-polar-sampling)
          * [Lane sampling](#lane-sampling)
       * [Probabilistic Road-Map (PRM) planning](#probabilistic-road-map-prm-planning)
@@ -373,6 +374,20 @@ References
 
 - [Kennedy, J.; Eberhart, R. (1995). "Particle Swarm Optimization"](https://ieeexplore.ieee.org/document/488968)
 
+### Fringe Search
+This is a memory-efficient grid-based path planning implementation using Fringe Search.
+
+![FringeSearch](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/FringeSearch/animation.gif)
+
+Fringe Search is an informed search algorithm that combines iterative deepening with A*-style heuristics. It maintains a small "fringe" of nodes at the search frontier and iteratively explores paths with increasing f-cost thresholds.
+
+Key advantages include significantly lower memory usage compared to A* (no priority queue), while maintaining comparable performance and guaranteeing optimal paths on grid maps.
+
+References
+
+- [Fringe Search: Beating A* at Pathfinding on Game Maps](https://webdocs.cs.ualberta.ca/~holte/Publications/fringe.pdf)
+
+- [Björnsson, Y.; Enzenberger, M.; Holte, R.; Schaeffer, J. (2005)](https://cdn.aaai.org/AAAI/2005/AAAI05-184.pdf)
 
 
 ## State Lattice Planning
