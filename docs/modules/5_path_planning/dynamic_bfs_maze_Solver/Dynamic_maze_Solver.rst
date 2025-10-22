@@ -32,9 +32,7 @@ Code Link
 +++++++++
 
 .. automodule:: PathPlanning.BreadthFirstSearch.dynamic_maze_solver
-   :members:
-   :undoc-members:
-   :show-inheritance:
+
 
 References
 ----------
