@@ -1,3 +1,13 @@
+"""
+Dynamic Maze Solver
+
+Dynamic BFS maze visualizer demonstrating breadth-first search on a grid.
+
+author: Ujjansh Sundram
+
+See Wikipedia: https://en.wikipedia.org/wiki/Breadth-first_search
+"""
+
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
@@ -65,39 +75,39 @@ class MazeVisualizer:
         visited = {self.solver_pos}
 
         while queue:
-            (r, c), path = queue.popleft()
+            (row, col), path = queue.popleft()
 
-            if (r, c) == self.target_pos:
+            if (row, col) == self.target_pos:
                 return path, visited
 
-            for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                nr, nc = r + dr, c + dc
-                if 0 <= nr < self.rows and 0 <= nc < self.cols and \
-                        self.maze[nr][nc] == 0 and (nr, nc) not in visited:
-                    visited.add((nr, nc))
-                    queue.append(((nr, nc), path + [(nr, nc)]))
+            for d_row, d_col in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                n_row, n_col = row + d_row, col + d_col
+                if 0 <= n_row < self.rows and 0 <= n_col < self.cols and \
+                        self.maze[n_row][n_col] == 0 and (n_row, n_col) not in visited:
+                    visited.add((n_row, n_col))
+                    queue.append(((n_row, n_col), path + [(n_row, n_col)]))
 
         return None, visited
 
     def _update_target(self):
         """Moves the target randomly to an adjacent open cell."""
-        tr, tc = self.target_pos
+        t_row, t_col = self.target_pos
         moves = [(-1, 0), (1, 0), (0, -1), (0, 1)]
         random.shuffle(moves)
-        for dr, dc in moves:
-            nr, nc = tr + dr, tc + dc
-            if 0 <= nr < self.rows and 0 <= nc < self.cols and self.maze[nr][nc] == 0:
-                self.target_pos = (nr, nc)
+        for d_row, d_col in moves:
+            n_row, n_col = t_row + d_row, t_col + d_col
+            if 0 <= n_row < self.rows and 0 <= n_col < self.cols and self.maze[n_row][n_col] == 0:
+                self.target_pos = (n_row, n_col)
                 break
 
     def _update_obstacles(self):
         """Randomly toggle a few obstacles."""
-        for r in range(self.rows):
-            for c in range(self.cols):
-                if (r, c) in [self.solver_pos, self.target_pos]:
+        for row in range(self.rows):
+            for col in range(self.cols):
+                if (row, col) in [self.solver_pos, self.target_pos]:
                     continue
                 if random.random() < self.obstacle_change_prob:
-                    self.maze[r, c] = 1 - self.maze[r, c]
+                    self.maze[row, col] = 1 - self.maze[row, col]
 
     def _update_frame(self, frame):
         """Main animation loop."""
@@ -121,8 +131,8 @@ class MazeVisualizer:
         # Visited overlay
         self.visited_overlay.fill(0)
         visited_color = mcolors.to_rgba('#0077b6', alpha=0.3)
-        for r, c in self.visited_nodes:
-            self.visited_overlay[r, c] = visited_color
+        for row, col in self.visited_nodes:
+            self.visited_overlay[row, col] = visited_color
         self.visited_plot.set_data(self.visited_overlay)
 
         # Path line

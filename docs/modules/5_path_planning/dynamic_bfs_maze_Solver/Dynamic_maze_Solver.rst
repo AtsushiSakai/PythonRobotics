@@ -10,7 +10,7 @@ Overview
 
 This example demonstrates a **dynamic maze-solving algorithm** based on the
 **Breadth-First Search (BFS)** strategy. The visualizer dynamically updates a maze
-in real-time while the solver attempts to reach a moving target. 
+in real time while the solver attempts to reach a moving target.
 
 Unlike static pathfinding examples, this version introduces:
 
@@ -20,6 +20,13 @@ Unlike static pathfinding examples, this version introduces:
 
 This simulation provides intuition for dynamic pathfinding problems such as
 robot navigation in unpredictable environments.
+
+
+
+A sample animation frame:
+
+.. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/master/PathPlanning/dynamic_maze_solver/animation.gif
+
 
 
 Algorithmic Background
@@ -107,14 +114,6 @@ Elements include:
 - **Target** - magenta star
 - **Breadcrumbs** - trail of previously visited solver positions
 
-A sample animation frame:
-
-.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/dynamic_maze_solver/animation.gif
-   :alt: Maze BFS dynamic visualizer frame
-   :align: center
-   :scale: 80 %
-
-
 Mathematical Insights
 ---------------------
 
@@ -141,6 +140,9 @@ Code Link
 ++++++++
 
 .. automodule:: PathPlanning.BreadthFirstSearch.dynamic_maze_solver
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 
 References
