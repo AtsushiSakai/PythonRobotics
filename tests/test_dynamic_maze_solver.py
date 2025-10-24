@@ -1,5 +1,5 @@
 import conftest
-from PathPlanning.BreadthFirstSearch.dynamic_maze_solver import MazeVisualizer
+from PathPlanning.Dynamic_maze_Solver.dynamic_maze_solver import MazeVisualizer
 
 
 def test_bfs_finds_path():
