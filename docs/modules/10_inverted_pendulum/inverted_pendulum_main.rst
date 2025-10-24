@@ -4,7 +4,7 @@ Inverted Pendulum
 ------------------
 
 An inverted pendulum on a cart consists of a mass :math:`m` at the top of a pole of length :math:`l` pivoted on a
-horizontally moving base as shown in the adjacent.
+horizontally moving base as shown in the adjacent figure.
 
 The objective of the control system is to balance the inverted pendulum by applying a force to the cart that the pendulum is attached to.
 
@@ -97,7 +97,7 @@ Code Link
 
 MPC control
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The MPC controller minimize this cost function defined as:
+The MPC controller minimizes this cost function defined as:
 
 .. math:: J = x^T Q x + u^T R u
 

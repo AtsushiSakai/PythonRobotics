@@ -55,7 +55,7 @@ Variance, Covariance and Correlation
 Variance
 ^^^^^^^^
 
-Variance is the spread of the data. The mean does’nt tell much **about**
+Variance is the spread of the data. The mean doesn’t tell much **about**
 the data. Therefore the variance tells us about the **story** about the
 data meaning the spread of the data.
 

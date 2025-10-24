@@ -32,7 +32,7 @@ Constructor
 
    PathFinderController(Kp_rho, Kp_alpha, Kp_beta)
 
-Constructs an instantiate of the PathFinderController for navigating a 3-DOF wheeled robot on a 2D plane.
+Constructs an instance of the PathFinderController for navigating a 3-DOF wheeled robot on a 2D plane.
 
 Parameters:
 

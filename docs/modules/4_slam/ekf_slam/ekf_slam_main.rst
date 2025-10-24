@@ -32,7 +32,7 @@ Introduction
 
 EKF SLAM models the SLAM problem in a single EKF where the modeled state
 is both the pose :math:`(x, y, \theta)` and an array of landmarks
-:math:`[(x_1, y_1), (x_2, x_y), ... , (x_n, y_n)]` for :math:`n`
+:math:`[(x_1, y_1), (x_2, y_2), ... , (x_n, y_n)]` for :math:`n`
 landmarks. The covariance between each of the positions and landmarks
 are also tracked.
 

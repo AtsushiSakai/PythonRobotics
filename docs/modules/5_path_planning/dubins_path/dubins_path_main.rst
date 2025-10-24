@@ -13,7 +13,7 @@ It can generates a shortest path between two 2D poses (x, y, yaw) with maximum c
 
 Generated paths consist of 3 segments of maximum curvature curves or a straight line segment.
 
-Each segment type can is categorized by 3 type: 'Right turn (R)' , 'Left turn (L)', and 'Straight (S).' 
+Each segment type can be categorized by 3 types: 'Right turn (R)' , 'Left turn (L)', and 'Straight (S).' 
 
 Possible path will be at least one of these six types: RSR, RSL, LSR, LSL, RLR, LRL.
 

@@ -17,7 +17,7 @@ Here is an overview of mathematical derivations of formulae for individual path 
 
 In all the derivations below, radius of curvature of the vehicle is assumed to be of unit length and start pose is considered to be at origin.  (*In code we are removing the offset due to start position and normalising the lengths before passing the values to these functions.*)
 
-Also, (t, u, v) respresent the measure of each motion requried. Thus, in case of a turning maneuver, they represent the angle inscribed at the centre of turning circle and in case of straight maneuver, they represent the distance to be travelled. 
+Also, (t, u, v) represent the measure of each motion required. Thus, in case of a turning maneuver, they represent the angle inscribed at the centre of turning circle and in case of straight maneuver, they represent the distance to be travelled. 
 
 1. **Left-Straight-Left**
 
