@@ -13,7 +13,7 @@ The visualizer dynamically updates a maze in real time while the solver attempts
 
 A sample animation frame:
 
-.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/Dynamic_maze_solver/animation.gif
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/Dynamic_maze_Solver/animation.gif
 
 Algorithmic Background
 ----------------------
