@@ -12,7 +12,7 @@ Path planning is the ability of a robot to search feasible and efficient path to
    dynamic_window_approach/dynamic_window_approach
    bugplanner/bugplanner
    grid_base_search/grid_base_search
-   dynamic_bfs_maze_solver/dynamic_maze_solver_index
+   dynamic_bfs_maze_solver/dynamic_bfs_maze_solver
    time_based_grid_search/time_based_grid_search
    model_predictive_trajectory_generator/model_predictive_trajectory_generator
    state_lattice_planner/state_lattice_planner
