@@ -18,20 +18,21 @@ A sample animation frame:
 Algorithmic Background
 ----------------------
 
-### Breadth-First Search (BFS)
+Breadth-First Search (BFS)
+--------------------------
 
 The BFS algorithm is a graph traversal method that explores nodes in layers, guaranteeing the shortest path in an unweighted grid.
 
 .. math::
 
-   M = \{ (i, j) \mid 0 \leq i < R, 0 \leq j < C \}
+   M = \\{ (i, j) \mid 0 \leq i < R, 0 \leq j < C \\}
 
-...
+where R and C denote the number of rows and columns in the grid.
 
 Code Link
 +++++++++
 
-.. automodule:: PathPlanning.BreadthFirstSearch.dynamic_maze_solver
+.. automodule:: PathPlanning.DynamicMazeSolver.dynamic_maze_solver
 
 
 References
