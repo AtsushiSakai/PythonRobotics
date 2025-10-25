@@ -32,7 +32,10 @@ where R and C denote the number of rows and columns in the grid.
 Code Link
 +++++++++
 
-.. automodule:: PathPlanning.DynamicMazeSolver.dynamic_maze_solver
+.. autoclass:: PathPlanning.DynamicMazeSolver.dynamic_maze_solver.MazeVisualizer
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 
 References
