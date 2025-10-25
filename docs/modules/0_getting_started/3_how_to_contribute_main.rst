@@ -132,7 +132,7 @@ At first, please fix all CI errors before code review.
 You can check your PR doc from the CI panel.
 
 After the "ci/circleci: build_doc" CI is succeeded,
-you can access you PR doc with clicking the [Details] of the "ci/circleci: build_doc artifact" CI.
+you can access your PR doc with clicking the [Details] of the "ci/circleci: build_doc artifact" CI.
 
 .. image:: /_static/img/doc_ci.png
 

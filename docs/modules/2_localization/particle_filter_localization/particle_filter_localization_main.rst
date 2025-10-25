@@ -13,7 +13,7 @@ and the red line is estimated trajectory with PF.
 It is assumed that the robot can measure a distance from landmarks
 (RFID).
 
-This measurements are used for PF localization.
+These measurements are used for PF localization.
 
 Code Link
 ~~~~~~~~~~~~~

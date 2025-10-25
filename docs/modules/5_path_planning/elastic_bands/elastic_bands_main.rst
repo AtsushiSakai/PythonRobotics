@@ -67,7 +67,7 @@ Dynamic Path Maintenance
    .. math::
       b_i^{\text{new}} = b_i^{\text{old}} + \alpha (f_c + f_r),
 
-   where :math:`\alpha` is a step-size parameter, which often proportional to :math:`\rho(b_i^{\text{old}})`
+   where :math:`\alpha` is a step-size parameter, which is often proportional to :math:`\rho(b_i^{\text{old}})`
 
 2. **Overlap Enforcement**:
 - Insert new nodes if adjacent nodes are too far apart

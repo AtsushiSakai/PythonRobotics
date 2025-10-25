@@ -112,7 +112,7 @@ will converge to the correct estimate.
     MAX_RANGE = 20.0  # maximum observation range
     M_DIST_TH = 2.0  # Threshold of Mahalanobis distance for data association.
     STATE_SIZE = 3  # State size [x,y,yaw]
-    LM_SIZE = 2  # LM srate size [x,y]
+    LM_SIZE = 2  # LM state size [x,y]
     N_PARTICLE = 100  # number of particle
     NTH = N_PARTICLE / 1.5  # Number of particle for re-sampling
     
@@ -409,7 +409,7 @@ probably will die out.
 3- Resampling
 ~~~~~~~~~~~~~
 
-In the reseampling steps a new set of particles are chosen from the old
+In the resampling steps a new set of particles are chosen from the old
 set. This is done according to the weight of each particle.
 
 The figure shows 100 particles distributed uniformly between [-0.5, 0.5]

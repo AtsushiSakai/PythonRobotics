@@ -68,7 +68,7 @@ But, the probability is getting uncertain without observations:
 
 
 The `gaussian filter <https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.gaussian_filter.html>`_
-is used in the simulation for adding noize.
+is used in the simulation for adding noise.
 
 Step3: Update probability by observation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

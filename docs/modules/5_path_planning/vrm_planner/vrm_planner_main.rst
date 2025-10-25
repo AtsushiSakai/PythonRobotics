@@ -9,7 +9,7 @@ In the animation, blue points are Voronoi points,
 
 Cyan crosses mean searched points with Dijkstra method,
 
-The red line is the final path of Vornoi Road-Map.
+The red line is the final path of Voronoi Road-Map.
 
 Code Link
 ~~~~~~~~~~~~~~~

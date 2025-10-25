@@ -34,17 +34,17 @@ Input vector is:
 
 .. math::  u = [a, \delta]
 
-a: accellation, δ: steering angle
+a: acceleration, δ: steering angle
 
-The MPC cotroller minimize this cost function for path tracking:
+The MPC cotroller minimizes this cost function for path tracking:
 
 .. math:: min\ Q_f(z_{T,ref}-z_{T})^2+Q\Sigma({z_{t,ref}-z_{t}})^2+R\Sigma{u_t}^2+R_d\Sigma({u_{t+1}-u_{t}})^2
 
-z_ref come from target path and speed.
+z_ref comes from target path and speed.
 
 subject to:
 
--  Linearlied vehicle model
+-  Linearized vehicle model
 
 .. math:: z_{t+1}=Az_t+Bu+C
 

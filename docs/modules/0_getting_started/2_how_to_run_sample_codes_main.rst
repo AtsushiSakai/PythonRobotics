@@ -46,7 +46,7 @@ using pip :
 
 5. Execute python script in each directory.
 
-For example, to run the sample code of `Extented Kalman Filter` in the
+For example, to run the sample code of `Extended Kalman Filter` in the
 `localization` directory, execute the following command:
 
 .. code-block::
