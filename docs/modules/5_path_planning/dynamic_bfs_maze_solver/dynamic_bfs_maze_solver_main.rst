@@ -30,7 +30,7 @@ The BFS algorithm is a graph traversal method that explores nodes in layers, gua
 where R and C denote the number of rows and columns in the grid.
 
 Code Link
-++++++++
++++++++++
 
 .. automodule:: PathPlanning.DynamicMazeSolver.dynamic_maze_solver
 
