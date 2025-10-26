@@ -16,6 +16,36 @@ Code Link
 .. autofunction:: PathPlanning.BreadthFirstSearch.breadth_first_search.BreadthFirstSearchPlanner
 
 
+Dynamic Maze Solver using Breadth-First Search (BFS)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is a dynamic maze solver using Breadth-First Search algorithm with real-time visualization.
+The visualizer dynamically updates a maze in real time while the solver attempts to reach a moving target.
+
+Features:
+
+- **Dynamic Maze Solving**: Real-time BFS pathfinding on a grid
+- **Moving Target**: The target position changes dynamically during the search
+- **Evolving Obstacles**: Obstacles can appear/disappear randomly during execution
+- **Visual Feedback**: Live animation showing the pathfinding process
+
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DynamicMazeSolver/animation.gif
+
+In the animation, the visualizer displays:
+   - Black points representing obstacles
+   - Solver position with live updates
+   - Path visualization showing the solution trajectory
+   - Breadcrumb trail displaying the solver's movement history
+
+Code Link
++++++++++++++
+
+.. autoclass:: PathPlanning.DynamicMazeSolver.dynamic_maze_solver.MazeVisualizer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
 Depth First Search
 ~~~~~~~~~~~~~~~~~~~~
 
