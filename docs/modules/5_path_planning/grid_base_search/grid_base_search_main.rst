@@ -45,6 +45,13 @@ Code Link
    :undoc-members:
    :show-inheritance:
 
+References
+----------
+
+- **Algorithm:** `Breadth-First Search (BFS) <https://en.wikipedia.org/wiki/Breadth-first_search>`_
+- **Visualization:** Matplotlib animation
+- **Maze Solver:** `AI Maze BFS Example <https://medium.com/@luthfisauqi17_68455/artificial-intelligence-search-problem-solve-maze-using-breadth-first-search-bfs-algorithm-255139c6e1a3>`_
+
 
 Depth First Search
 ~~~~~~~~~~~~~~~~~~~~
