@@ -72,3 +72,6 @@ target/
 
 matplotrecorder/*
 .vscode/settings.json
+
+# Emacs backup files
+*~
