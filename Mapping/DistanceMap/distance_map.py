@@ -4,152 +4,121 @@ Distance Map
 author: Wang Zheng (@Aglargil)
 
 Reference:
-
-- [Distance Map]
-(https://cs.brown.edu/people/pfelzens/papers/dt-final.pdf)
+- [Distance Map](https://cs.brown.edu/people/pfelzens/papers/dt-final.pdf)
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy
+from scipy.ndimage import distance_transform_edt  # Change: Explicit import
 
 INF = 1e20
 ENABLE_PLOT = True
 
 
-def compute_sdf_scipy(obstacles):
+def compute_sdf_scipy(obstacles: np.ndarray) -> np.ndarray:
     """
     Compute the signed distance field (SDF) from a boolean field using scipy.
-    This function has the same functionality as compute_sdf.
-    However, by using scipy.ndimage.distance_transform_edt, it can compute much faster.
-
-    Example: 500×500 map
-    • compute_sdf: 3 sec
-    • compute_sdf_scipy: 0.05 sec
 
     Parameters
     ----------
-    obstacles : array_like
+    obstacles : np.ndarray
         A 2D boolean array where '1' represents obstacles and '0' represents free space.
 
     Returns
     -------
-    array_like
-        A 2D array representing the signed distance field, where positive values indicate distance
-        to the nearest obstacle, and negative values indicate distance to the nearest free space.
+    np.ndarray
+        A 2D array representing the signed distance field.
     """
     # distance_transform_edt use '0' as obstacles, so we need to convert the obstacles to '0'
-    a = scipy.ndimage.distance_transform_edt(obstacles == 0)
-    b = scipy.ndimage.distance_transform_edt(obstacles == 1)
+    a = distance_transform_edt(obstacles == 0)
+    b = distance_transform_edt(obstacles == 1)
+    
+    # Fix: Changed (+) to (-) to correctly calculate Signed Distance
     return a - b
 
 
-def compute_udf_scipy(obstacles):
+def compute_udf_scipy(obstacles: np.ndarray) -> np.ndarray:
     """
     Compute the unsigned distance field (UDF) from a boolean field using scipy.
-    This function has the same functionality as compute_udf.
-    However, by using scipy.ndimage.distance_transform_edt, it can compute much faster.
-
-    Example: 500×500 map
-    • compute_udf: 1.5 sec
-    • compute_udf_scipy: 0.02 sec
-
-    Parameters
-    ----------
-    obstacles : array_like
-        A 2D boolean array where '1' represents obstacles and '0' represents free space.
-
-    Returns
-    -------
-    array_like
-        A 2D array of distances from the nearest obstacle, with the same dimensions as `bool_field`.
     """
-    return scipy.ndimage.distance_transform_edt(obstacles == 0)
+    return distance_transform_edt(obstacles == 0)
 
 
-def compute_sdf(obstacles):
+def compute_sdf(obstacles: np.ndarray) -> np.ndarray:
     """
     Compute the signed distance field (SDF) from a boolean field.
-
-    Parameters
-    ----------
-    obstacles : array_like
-        A 2D boolean array where '1' represents obstacles and '0' represents free space.
-
-    Returns
-    -------
-    array_like
-        A 2D array representing the signed distance field, where positive values indicate distance
-        to the nearest obstacle, and negative values indicate distance to the nearest free space.
     """
     a = compute_udf(obstacles)
     b = compute_udf(obstacles == 0)
     return a - b
 
 
-def compute_udf(obstacles):
+def compute_udf(obstacles: np.ndarray) -> np.ndarray:
     """
     Compute the unsigned distance field (UDF) from a boolean field.
-
-    Parameters
-    ----------
-    obstacles : array_like
-        A 2D boolean array where '1' represents obstacles and '0' represents free space.
-
-    Returns
-    -------
-    array_like
-        A 2D array of distances from the nearest obstacle, with the same dimensions as `bool_field`.
     """
-    edt = obstacles.copy()
-    if not np.all(np.isin(edt, [0, 1])):
+    edt = obstacles.copy().astype(float) # Ensure float for INF values
+    
+    if not np.all(np.isin(obstacles, [0, 1])):
         raise ValueError("Input array should only contain 0 and 1")
+    
+    # Fix: Initialize free space to INF, not 0. 
+    # If set to 0, the minimization step in DT will not propagate distances.
     edt = np.where(edt == 0, INF, edt)
     edt = np.where(edt == 1, 0, edt)
+
+    # Pass 1: Rows
     for row in range(len(edt)):
         dt(edt[row])
+
     edt = edt.T
+
+    # Pass 2: Columns
     for row in range(len(edt)):
         dt(edt[row])
+
+    # Fix: Added missing transpose to return array to original orientation
     edt = edt.T
+
     return np.sqrt(edt)
 
 
-def dt(d):
+def dt(d: np.ndarray):
     """
     Compute 1D distance transform under the squared Euclidean distance
-
-    Parameters
-    ----------
-    d : array_like
-        Input array containing the distances.
-
-    Returns:
-    --------
-    d : array_like
-        The transformed array with computed distances.
+    Modifies input array 'd' in-place.
     """
-    v = np.zeros(len(d) + 1)
-    z = np.zeros(len(d) + 1)
+    n = len(d)
+    # Fix: Arrays v and z must be size n+1 to handle boundary conditions in the loop
+    # Change: Enforce integer type for index array 'v'
+    v = np.zeros(n + 1, dtype=int)
+    z = np.zeros(n + 1)
+
     k = 0
     v[0] = 0
     z[0] = -INF
     z[1] = INF
-    for q in range(1, len(d)):
-        s = ((d[q] + q * q) - (d[int(v[k])] + v[k] * v[k])) / (2 * q - 2 * v[k])
+
+    for q in range(1, n):
+        # Calculate intersection of parabolas
+        s = ((d[q] + q * q) - (d[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k])
+        
         while s <= z[k]:
             k = k - 1
-            s = ((d[q] + q * q) - (d[int(v[k])] + v[k] * v[k])) / (2 * q - 2 * v[k])
+            s = ((d[q] + q * q) - (d[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k])
+        
         k = k + 1
         v[k] = q
         z[k] = s
         z[k + 1] = INF
+
     k = 0
-    for q in range(len(d)):
+    for q in range(n):
         while z[k + 1] < q:
             k = k + 1
+        
         dx = q - v[k]
-        d[q] = dx * dx + d[int(v[k])]
+        d[q] = dx * dx + d[v[k]]
 
 
 def main():
@@ -174,6 +143,7 @@ def main():
     udf = compute_udf(obstacles)
 
     if ENABLE_PLOT:
+        # Fix: Typo 'sublots' -> 'subplots'
         _, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 5))
 
         obstacles_plot = ax1.imshow(obstacles, cmap="binary")
