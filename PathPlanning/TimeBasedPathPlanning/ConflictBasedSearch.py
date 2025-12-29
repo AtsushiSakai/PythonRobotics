@@ -34,11 +34,9 @@ class ConflictBasedSearch(MultiAgentPlanner):
 
 
     @staticmethod
-    def plan(grid: Grid, start_and_goals: list[StartAndGoal], single_agent_planner_class: SingleAgentPlanner, verbose: bool = False) -> tuple[list[StartAndGoal], list[NodePath]]:
+    def plan(grid: Grid, start_and_goals: list[StartAndGoal], single_agent_planner_class: SingleAgentPlanner, verbose: bool = False) -> dict[AgentId, NodePath]:
         """
         Generate a path from the start to the goal for each agent in the `start_and_goals` list.
-        Returns the re-ordered StartAndGoal combinations, and a list of path plans. The order of the plans
-        corresponds to the order of the `start_and_goals` list.
         """
         print(f"Using single-agent planner: {single_agent_planner_class}")
 
@@ -72,7 +70,10 @@ class ConflictBasedSearch(MultiAgentPlanner):
                 print(f"\nFound a path with constraints after {constraint_tree.expanded_node_count()} expansions")
                 print(f"Final cost: {constraint_tree_node.cost}")
                 print(f"Number of constraints on solution: {len(constraint_tree_node.all_constraints)}")
-                return (start_and_goals, [constraint_tree_node.paths[start_and_goal.agent_id] for start_and_goal in start_and_goals])
+                final_paths = {}
+                for start_and_goal in start_and_goals:
+                    final_paths[start_and_goal.agent_id] = constraint_tree_node.paths[start_and_goal.agent_id]
+                return final_paths
 
             if not isinstance(constraint_tree_node.constraint, ForkingConstraint):
                 raise ValueError(f"Expected a ForkingConstraint, but got: {constraint_tree_node.constraint}")
@@ -89,7 +90,6 @@ class ConflictBasedSearch(MultiAgentPlanner):
 
                 # Deepcopy to update with applied constraint and new paths
                 applied_constraint_parent = deepcopy(constraint_tree_node)
-                # Copy paths for child node - we just need to update constrained agent's path
                 applied_constraint_parent.paths[constrained_agent.agent] = new_path
 
                 if verbose:
@@ -163,6 +163,7 @@ class Scenario(Enum):
 scenario = Scenario.HALLWAY_CROSS
 verbose = False
 show_animation = True
+use_sipp = False # Condition here mainly to appease the linter
 np.random.seed(42)  # For reproducibility
 def main():
     grid_side_length = 21
@@ -187,16 +188,16 @@ def main():
         obstacle_arrangement=obstacle_arrangement,
     )
 
+    single_agent_planner = SafeIntervalPathPlanner if use_sipp else SpaceTimeAStar
     start_time = time.time()
-    start_and_goals, paths = ConflictBasedSearch.plan(grid, start_and_goals, SafeIntervalPathPlanner, verbose)
-    # start_and_goals, paths = ConflictBasedSearch.plan(grid, start_and_goals, SpaceTimeAStar, verbose)
+    paths = ConflictBasedSearch.plan(grid, start_and_goals, single_agent_planner, verbose)
 
     runtime = time.time() - start_time
     print(f"\nPlanning took: {runtime:.5f} seconds")
 
     if verbose:
         print(f"Paths:")
-        for path in paths:
+        for path in paths.values():
             print(f"{path}\n")
 
     if not show_animation:

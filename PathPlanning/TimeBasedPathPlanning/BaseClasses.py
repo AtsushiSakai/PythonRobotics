@@ -43,8 +43,8 @@ class MultiAgentPlanner(ABC):
     
     @staticmethod
     @abstractmethod
-    def plan(grid: Grid, start_and_goal_positions: list[StartAndGoal], single_agent_planner_class: SingleAgentPlanner, verbose: bool = False) -> tuple[list[StartAndGoal], list[NodePath]]:
+    def plan(grid: Grid, start_and_goal_positions: list[StartAndGoal], single_agent_planner_class: SingleAgentPlanner, verbose: bool = False) -> dict[AgentId, NodePath]:
         """
-        Plan for all agents. Returned paths are in order corresponding to the returned list of `StartAndGoal` objects
+        Plan for all agents. Returned paths found for each agent
         """
         pass
