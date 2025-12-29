@@ -3,22 +3,27 @@ import heapq
 
 from PathPlanning.TimeBasedPathPlanning.Node import NodePath, Position, PositionAtTime
 
+# ID of an agent
 type AgentId = int
 
+# An (x, y, t) tuple that exists in two or more agents' paths
 @dataclass(frozen=True)
 class Constraint:
     position: Position
     time: int
 
+# An agent that is constrained (must avoid the constraint tuple)
 @dataclass
 class ConstrainedAgent:
     agent: AgentId
     constraint: Constraint
 
+# A constraint to apply to the two colliding agents
 @dataclass
 class ForkingConstraint:
     constrained_agents: tuple[ConstrainedAgent, ConstrainedAgent]
 
+# A constraint that has been applied to an agent
 @dataclass(frozen=True)
 class AppliedConstraint:
     constraint: Constraint
@@ -26,10 +31,15 @@ class AppliedConstraint:
 
 @dataclass
 class ConstraintTreeNode:
+    # Index of the parent node
     parent_idx: int
+    # Either a constraint to apply (forking) which will result in two new nodes, a constraint that was already applied
+    # to generate this node (AppliedConstraint), or None if there are no constraints in this node's paths
     constraint: ForkingConstraint | AppliedConstraint | None
 
+    # Paths for the agents
     paths: dict[AgentId, NodePath]
+    # Cost of the solution at this node (sum of duration of each agent's path)
     cost: int
 
     def __init__(self, paths: dict[AgentId, NodePath], parent_idx: int, all_constraints: list[AppliedConstraint]):
