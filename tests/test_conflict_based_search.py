@@ -29,14 +29,13 @@ def test_no_constraints(single_agent_planner):
         obstacle_arrangement=ObstacleArrangement.NONE,
     )
 
-    start_and_goals: list[StartAndGoal]
     paths: list[NodePath]
-    start_and_goals, paths = m.ConflictBasedSearch.plan(grid, start_and_goals, single_agent_planner, False)
+    paths = m.ConflictBasedSearch.plan(grid, start_and_goals, single_agent_planner, False)
 
     # All paths should start at the specified position and reach the goal
-    for i, start_and_goal in enumerate(start_and_goals):
-        assert paths[i].path[0].position == start_and_goal.start
-        assert paths[i].path[-1].position == start_and_goal.goal
+    for start_and_goal in start_and_goals:
+        assert paths[start_and_goal.agent_id].path[0].position == start_and_goal.start
+        assert paths[start_and_goal.agent_id].path[-1].position == start_and_goal.goal
 
 @pytest.mark.parametrize("single_agent_planner", [SpaceTimeAStar, SafeIntervalPathPlanner])
 def test_narrow_corridor(single_agent_planner):
@@ -53,14 +52,13 @@ def test_narrow_corridor(single_agent_planner):
         obstacle_arrangement=ObstacleArrangement.NARROW_CORRIDOR,
     )
 
-    start_and_goals: list[StartAndGoal]
     paths: list[NodePath]
-    start_and_goals, paths = m.ConflictBasedSearch.plan(grid, start_and_goals, single_agent_planner, False)
+    paths = m.ConflictBasedSearch.plan(grid, start_and_goals, single_agent_planner, False)
 
     # All paths should start at the specified position and reach the goal
-    for i, start_and_goal in enumerate(start_and_goals):
-        assert paths[i].path[0].position == start_and_goal.start
-        assert paths[i].path[-1].position == start_and_goal.goal
+    for start_and_goal in start_and_goals:
+        assert paths[start_and_goal.agent_id].path[0].position == start_and_goal.start
+        assert paths[start_and_goal.agent_id].path[-1].position == start_and_goal.goal
 
 @pytest.mark.parametrize("single_agent_planner", [SpaceTimeAStar, SafeIntervalPathPlanner])
 def test_hallway_pass(single_agent_planner: SingleAgentPlanner):
@@ -78,14 +76,13 @@ def test_hallway_pass(single_agent_planner: SingleAgentPlanner):
         obstacle_arrangement=ObstacleArrangement.HALLWAY,
     )
 
-    start_and_goals: list[StartAndGoal]
     paths: list[NodePath]
-    start_and_goals, paths = m.ConflictBasedSearch.plan(grid, start_and_goals, single_agent_planner, False)
+    paths = m.ConflictBasedSearch.plan(grid, start_and_goals, single_agent_planner, False)
 
     # All paths should start at the specified position and reach the goal
-    for i, start_and_goal in enumerate(start_and_goals):
-        assert paths[i].path[0].position == start_and_goal.start
-        assert paths[i].path[-1].position == start_and_goal.goal
+    for start_and_goal in start_and_goals:
+        assert paths[start_and_goal.agent_id].path[0].position == start_and_goal.start
+        assert paths[start_and_goal.agent_id].path[-1].position == start_and_goal.goal
 
 if __name__ == "__main__":
     m.show_animation = False

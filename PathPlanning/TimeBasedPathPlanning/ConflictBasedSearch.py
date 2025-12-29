@@ -1,5 +1,5 @@
 """
-Conflict Based Search generates paths in 2 dimensions (x, y, time) for a set of agents. It does
+Conflict Based Search generates paths in 3 dimensions (x, y, time) for a set of agents. It does
 so by performing searches on two levels. The top level search applies constraints that agents
 must avoid, and the bottom level performs a single-agent search for individual agents given
 the constraints provided by the top level search. Initially, paths are generated for each agent
@@ -105,14 +105,18 @@ class ConflictBasedSearch(MultiAgentPlanner):
                 constraint_tree.add_node_to_tree(new_constraint_tree_node)
 
         raise RuntimeError("No solution found")
-    
+
+    @staticmethod
     def get_agents_start_and_goal(start_and_goal_list: list[StartAndGoal], target_index: AgentId) -> StartAndGoal:
+        """
+        Returns the start and goal of a specific agent
+        """
         for item in start_and_goal_list:
             if item.agent_id == target_index:
                 return item
         raise RuntimeError(f"Could not find agent with index {target_index} in {start_and_goal_list}")
 
-
+    @staticmethod
     def plan_for_agent(constrained_agent: ConstraintTreeNode,
                  all_constraints: list[AppliedConstraint],
                  constraint_tree: ConstraintTree,
@@ -121,7 +125,9 @@ class ConflictBasedSearch(MultiAgentPlanner):
                  single_agent_planner_class: SingleAgentPlanner,
                  start_and_goals: list[StartAndGoal],
                  verbose: False) -> Optional[tuple[list[StartAndGoal], list[NodePath]]]:
-
+        """
+        Attempt to generate a path plan for a single agent
+        """
         num_expansions = constraint_tree.expanded_node_count()
         if num_expansions % 50 == 0:
             print(f"Expanded {num_expansions} nodes so far...")

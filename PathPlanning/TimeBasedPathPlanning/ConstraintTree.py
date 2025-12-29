@@ -46,67 +46,75 @@ class ConstraintTreeNode:
         return self.cost < other.cost
 
     def get_constraint_point(self, verbose = False) -> Optional[ForkingConstraint]:
+        """
+        Check paths for any constraints, and if any are found return the earliest one.
+        """
 
         final_t = max(path.goal_reached_time() for path in self.paths.values())
         positions_at_time: dict[PositionAtTime, AgentId] = {}
         for t in range(final_t + 1):
-            possible_constraints: list[ForkingConstraint] = []
-            for agent_id, path in self.paths.items():
-                # Check for edge conflicts
-                last_position = None
-                if t > 0:
-                    last_position = path.get_position(t - 1)
+            possible_constraints: list[ForkingConstraint] = self.check_for_constraints_at_time(positions_at_time, t, verbose)
+            if not possible_constraints:
+                continue
 
-                position = path.get_position(t)
-                if position is None:
-                    continue
-                position_at_time = PositionAtTime(position, t)
-                if position_at_time not in positions_at_time:
-                    positions_at_time[position_at_time] = AgentId(agent_id)
-                
-                # edge conflict
-                if last_position:
-                    new_position_at_last_time = PositionAtTime(position, t-1)
-                    old_position_at_new_time = PositionAtTime(last_position, t)
-                    if new_position_at_last_time in positions_at_time and old_position_at_new_time in positions_at_time:
-                        conflicting_agent_id1 = positions_at_time[new_position_at_last_time]
-                        conflicting_agent_id2 = positions_at_time[old_position_at_new_time]
-                        
-                        if conflicting_agent_id1 == conflicting_agent_id2 and conflicting_agent_id1 != agent_id:
-                            if verbose:
-                                print(f"Found edge constraint between with agent {conflicting_agent_id1} for {agent_id}")
-                                print(f"\tpositions old: {old_position_at_new_time}, new: {position_at_time}")
-                            new_constraint = ForkingConstraint((
-                                ConstrainedAgent(agent_id, position_at_time),
-                                ConstrainedAgent(conflicting_agent_id1, Constraint(position=last_position, time=t))
-                            ))
-                            possible_constraints.append(new_constraint)
-                            continue
-                
-                # double reservation at a (cell, time) combination
-                if positions_at_time[position_at_time] != agent_id:
-                    conflicting_agent_id = positions_at_time[position_at_time]
-
-                    constraint = Constraint(position=position, time=t)
-                    possible_constraints.append(ForkingConstraint((
-                        ConstrainedAgent(agent_id, constraint), ConstrainedAgent(conflicting_agent_id, constraint)
-                    )))
-                    continue
-            if possible_constraints:
-                if verbose:
-                    print(f"Choosing best constraint of {possible_constraints}")
-                # first check for edge constraints
-                for constraint in possible_constraints:
-                    if constraint.constrained_agents[0].constraint.position != constraint.constrained_agents[1].constraint.position:
-                        if verbose:
-                            print(f"\tFound edge conflict constraint: {constraint}")
-                        return constraint
-                # if none, then return first normal constraint
-                if verbose:
-                    print(f"\tReturning normal constraint: {possible_constraints[0]}")
-                return possible_constraints[0]
+            if verbose:
+                print(f"Choosing best constraint of {possible_constraints}")
+            # first check for edge constraints
+            for constraint in possible_constraints:
+                if constraint.constrained_agents[0].constraint.position != constraint.constrained_agents[1].constraint.position:
+                    if verbose:
+                        print(f"\tFound edge conflict constraint: {constraint}")
+                    return constraint
+            # if none, then return first normal constraint
+            if verbose:
+                print(f"\tReturning normal constraint: {possible_constraints[0]}")
+            return possible_constraints[0]
 
         return None
+
+    def check_for_constraints_at_time(self, positions_at_time: dict[PositionAtTime, AgentId], t: int, verbose: bool) -> list[ForkingConstraint]:
+        """
+        Check for constraints between paths at a particular time step
+        """
+        possible_constraints: list[ForkingConstraint] = []
+        for agent_id, path in self.paths.items():
+
+            position = path.get_position(t)
+            if position is None:
+                continue
+            position_at_time = PositionAtTime(position, t)
+            if position_at_time not in positions_at_time:
+                positions_at_time[position_at_time] = AgentId(agent_id)
+
+            # double reservation at a (cell, time) combination
+            if positions_at_time[position_at_time] != agent_id:
+                conflicting_agent_id = positions_at_time[position_at_time]
+                constraint = Constraint(position=position, time=t)
+                possible_constraints.append(ForkingConstraint((
+                    ConstrainedAgent(agent_id, constraint), ConstrainedAgent(conflicting_agent_id, constraint)
+                )))
+
+            # Check for edge conflicts (can only happen after first time step)
+            if t == 0:
+                continue
+            last_position = path.get_position(t - 1)
+            new_position_at_last_time = PositionAtTime(position, t-1)
+            old_position_at_new_time = PositionAtTime(last_position, t)
+            if new_position_at_last_time in positions_at_time and old_position_at_new_time in positions_at_time:
+                conflicting_agent_id1 = positions_at_time[new_position_at_last_time]
+                conflicting_agent_id2 = positions_at_time[old_position_at_new_time]
+
+                if conflicting_agent_id1 == conflicting_agent_id2 and conflicting_agent_id1 != agent_id:
+                    if verbose:
+                        print(f"Found edge constraint between with agent {conflicting_agent_id1} for {agent_id}")
+                        print(f"\tpositions old: {old_position_at_new_time}, new: {position_at_time}")
+                    new_constraint = ForkingConstraint((
+                        ConstrainedAgent(agent_id, position_at_time),
+                        ConstrainedAgent(conflicting_agent_id1, Constraint(position=last_position, time=t))
+                    ))
+                    possible_constraints.append(new_constraint)
+
+        return possible_constraints
 
 
 class ConstraintTree:
