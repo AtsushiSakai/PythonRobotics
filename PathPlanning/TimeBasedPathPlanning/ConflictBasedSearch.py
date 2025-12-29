@@ -45,7 +45,7 @@ class ConflictBasedSearch(MultiAgentPlanner):
         # Generate initial solution (no constraints)
         for start_and_goal in start_and_goals:
             path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, start_and_goal.agent_id, verbose)
-            initial_solution[AgentId(start_and_goal.agent_id)] = path
+            initial_solution[start_and_goal.agent_id] = path
 
         if verbose:
             print("Initial solution:")

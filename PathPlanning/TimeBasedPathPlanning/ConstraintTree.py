@@ -1,10 +1,9 @@
 from dataclasses import dataclass
-from typing import TypeAlias
 import heapq
 
 from PathPlanning.TimeBasedPathPlanning.Node import NodePath, Position, PositionAtTime
 
-AgentId: TypeAlias = int
+type AgentId = int
 
 @dataclass(frozen=True)
 class Constraint:
@@ -84,7 +83,7 @@ class ConstraintTreeNode:
                 continue
             position_at_time = PositionAtTime(position, t)
             if position_at_time not in positions_at_time:
-                positions_at_time[position_at_time] = AgentId(agent_id)
+                positions_at_time[position_at_time] = agent_id
 
             # double reservation at a (cell, time) combination
             if positions_at_time[position_at_time] != agent_id:

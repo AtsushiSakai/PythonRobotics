@@ -219,13 +219,13 @@ class Grid:
         """
         Generate obstacles that form a hallway with a 2-cell opening in the middle.
         Creates only a 1-cell border around the edges and hallway walls.
-        
+
         Pattern created:
         **********
         *        *
         ***    ***
         **********
-        
+
         Args:
             hallway_length: Length of the hallway (number of rows for the corridor)
 
