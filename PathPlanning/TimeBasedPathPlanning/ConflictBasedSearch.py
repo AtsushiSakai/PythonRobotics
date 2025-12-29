@@ -169,7 +169,7 @@ class Scenario(Enum):
 scenario = Scenario.HALLWAY_CROSS
 verbose = False
 show_animation = True
-use_sipp = False # Condition here mainly to appease the linter
+use_sipp = True # Condition here mainly to appease the linter
 np.random.seed(42)  # For reproducibility
 def main():
     grid_side_length = 21
