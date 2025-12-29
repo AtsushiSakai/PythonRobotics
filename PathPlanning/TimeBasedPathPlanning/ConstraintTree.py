@@ -98,7 +98,7 @@ class ConstraintTreeNode:
             if t == 0:
                 continue
             last_position = path.get_position(t - 1)
-            if not position:
+            if not last_position:
                 raise RuntimeError(f"Failed to get position for agent {agent_id} at time {t-1}")
             new_position_at_last_time = PositionAtTime(position, t-1)
             old_position_at_new_time = PositionAtTime(last_position, t)
@@ -123,10 +123,11 @@ class ConstraintTree:
     # Child nodes have been created (Maps node_index to ConstraintTreeNode)
     expanded_nodes: dict[int, ConstraintTreeNode]
     # Need to solve and generate children
-    nodes_to_expand = list[ConstraintTreeNode]
+    nodes_to_expand: list[ConstraintTreeNode]
 
     def __init__(self, initial_solution: dict[AgentId, NodePath]):
         self.expanded_nodes = {}
+        self.nodes_to_expand = []
         heapq.heappush(self.nodes_to_expand, ConstraintTreeNode(initial_solution, -1, []))
 
     def get_next_node_to_expand(self) -> ConstraintTreeNode | None:
@@ -137,7 +138,7 @@ class ConstraintTree:
     """
     Add a node to the tree and generate children if needed. Returns true if the node is a solution, false otherwise.
     """
-    def add_node_to_tree(self, node: ConstraintTreeNode) -> bool:
+    def add_node_to_tree(self, node: ConstraintTreeNode):
         heapq.heappush(self.nodes_to_expand, node)
 
     """

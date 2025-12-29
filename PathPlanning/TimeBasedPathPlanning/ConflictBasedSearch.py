@@ -20,14 +20,15 @@ from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
     ObstacleArrangement,
     Position,
 )
+import time
+
 from PathPlanning.TimeBasedPathPlanning.BaseClasses import MultiAgentPlanner, StartAndGoal
 from PathPlanning.TimeBasedPathPlanning.Node import NodePath
 from PathPlanning.TimeBasedPathPlanning.BaseClasses import SingleAgentPlanner
 from PathPlanning.TimeBasedPathPlanning.SafeInterval import SafeIntervalPathPlanner
 from PathPlanning.TimeBasedPathPlanning.SpaceTimeAStar import SpaceTimeAStar
 from PathPlanning.TimeBasedPathPlanning.Plotting import PlotNodePaths
-from PathPlanning.TimeBasedPathPlanning.ConstraintTree import AgentId, AppliedConstraint, ConstraintTree, ConstraintTreeNode, ForkingConstraint
-import time
+from PathPlanning.TimeBasedPathPlanning.ConstraintTree import AgentId, AppliedConstraint, ConstrainedAgent, ConstraintTree, ConstraintTreeNode, ForkingConstraint
 
 class ConflictBasedSearch(MultiAgentPlanner):
 
@@ -56,13 +57,16 @@ class ConflictBasedSearch(MultiAgentPlanner):
 
         while constraint_tree.nodes_to_expand:
             constraint_tree_node = constraint_tree.get_next_node_to_expand()
+            if constraint_tree_node is None:
+                raise RuntimeError("No more nodes to expand in the constraint tree.")
+
             ancestor_constraints = constraint_tree.get_ancestor_constraints(constraint_tree_node.parent_idx)
 
             if verbose:
                 print(f"Expanding node with constraint {constraint_tree_node.constraint} and parent {constraint_tree_node.parent_idx}")
                 print(f"\tCOST: {constraint_tree_node.cost}")
 
-            if constraint_tree_node is None:
+            if constraint_tree_node.constraint is None:
                 raise RuntimeError("No more nodes to expand in the constraint tree.")
             if not constraint_tree_node.constraint:
                 # This means we found a solution!
@@ -83,7 +87,16 @@ class ConflictBasedSearch(MultiAgentPlanner):
                 all_constraints = ancestor_constraints
                 all_constraints.append(applied_constraint)
 
-                new_path = ConflictBasedSearch.plan_for_agent(constrained_agent, all_constraints, constraint_tree, attempted_constraint_combos, grid, single_agent_planner_class, start_and_goals, verbose)
+                new_path = ConflictBasedSearch.plan_for_agent(
+                    constrained_agent,
+                    all_constraints,
+                    constraint_tree,
+                    attempted_constraint_combos,
+                    grid,
+                    single_agent_planner_class,
+                    start_and_goals,
+                    verbose
+                )
                 if not new_path:
                     continue
 
@@ -116,14 +129,14 @@ class ConflictBasedSearch(MultiAgentPlanner):
         raise RuntimeError(f"Could not find agent with index {target_index} in {start_and_goal_list}")
 
     @staticmethod
-    def plan_for_agent(constrained_agent: ConstraintTreeNode,
+    def plan_for_agent(constrained_agent: ConstrainedAgent,
                  all_constraints: list[AppliedConstraint],
                  constraint_tree: ConstraintTree,
                  attempted_constraint_combos: set,
                  grid: Grid,
                  single_agent_planner_class: SingleAgentPlanner,
                  start_and_goals: list[StartAndGoal],
-                 verbose: False) -> tuple[list[StartAndGoal], list[NodePath]] | None:
+                 verbose: bool) -> NodePath | None:
         """
         Attempt to generate a path plan for a single agent
         """
