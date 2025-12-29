@@ -193,7 +193,7 @@ class Grid:
             obstacle_paths.append(path)
 
         return obstacle_paths
-    
+
     def generate_narrow_corridor_obstacles(self, obs_count: int) -> list[list[Position]]:
         obstacle_paths = []
 
@@ -228,39 +228,39 @@ class Grid:
         
         Args:
             hallway_length: Length of the hallway (number of rows for the corridor)
-        
+
         Returns:
             List of obstacle paths, where each path represents one obstacle over time
         """
         obstacle_paths = []
-        
+
         for y in range(8, 12):
             for x in range(5, 15):
                 is_obstacle = False
-                
+
                 # Border walls
                 if x == 5 or x == 14 or y == 8 or y == 11:
                     is_obstacle = True
                 if y == 9 and x not in [9, 10]:
                     is_obstacle = True
-                
+
                 # If this position should be an obstacle, create a path for it
                 if is_obstacle:
                     obstacle_path = []
                     for t in range(self.time_limit):
                         obstacle_path.append(Position(x, y))
                     obstacle_paths.append(obstacle_path)
-        
+
         return obstacle_paths
-    
+
     def generate_temporary_obstacle(self, hallway_length: int = 3) -> list[list[Position]]:
         """
         Generates a temporary obstacle at (10, 10) that disappears at t=30
         """
         obstacle_path = []
-        for t in range(max(self.time_limit, 40)):
+        for _ in range(max(self.time_limit, 40)):
             obstacle_path.append(Position(15, 15))
-        
+
         return [obstacle_path]
 
     def apply_constraint_points(self, constraints: list[AppliedConstraint], verbose = False):
@@ -308,7 +308,7 @@ class Grid:
     """
     def valid_obstacle_position(self, position: Position, t: int) -> bool:
         return (
-            self.valid_position(position, t)
+            self.valid_position(position, t, OBSTACLE_INDEX)
             and position not in self.obstacle_avoid_points
         )
 
@@ -399,7 +399,7 @@ class Grid:
         intervals = [interval for interval in intervals if interval.start_time != interval.end_time]
 
         return intervals
-    
+
     """
     Reserve an agent's path in the grid. Raises an exception if the agent's index is 0, or if a position is
     already reserved by a different agent.
@@ -407,7 +407,7 @@ class Grid:
     def reserve_path(self, node_path: NodePath, agent_index: int):
         if agent_index == 0:
             raise Exception("Agent index cannot be 0")
-        
+
         for i, node in enumerate(node_path.path):
             reservation_finish_time = node.time + 1
             if i < len(node_path.path) - 1:

@@ -77,10 +77,10 @@ def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: dict[A
             raise RuntimeError(f"Failed to get start and goal for agent {agent_id}")
         start = start_and_goal.start
         goal = start_and_goal.goal
-        
+
         color = np.random.rand(3,)
         colors[agent_id] = color
-        sg_plot, = ax.plot([], [], markers[marker_idx], c=color, ms=15, 
+        sg_plot, = ax.plot([], [], markers[marker_idx], c=color, ms=15,
                             label=f"Agent {agent_id} Start/Goal")
         sg_plot.set_data([start.x, goal.x], [start.y, goal.y])
         start_and_goal_plots.append(sg_plot)
@@ -91,7 +91,7 @@ def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: dict[A
     # Create plots for each agent's path
     path_plots = {}
     for agent_id, path in paths.items():
-        path_plot, = ax.plot([], [], "o", c=colors[agent_id], ms=10, 
+        path_plot, = ax.plot([], [], "o", c=colors[agent_id], ms=10,
                             label=f"Agent {agent_id} Path")
         path_plots[agent_id] = path_plot
 
@@ -112,7 +112,7 @@ def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: dict[A
         # Update obstacle positions
         obs_positions = grid.get_obstacle_positions_at_time(t)
         obs_points.set_data(obs_positions[0], obs_positions[1])
-        
+
         # Update each agent's position
         for agent_id, path in paths.items():
             path_positions = []
@@ -126,12 +126,12 @@ def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: dict[A
                     raise Exception(f"Path position not found for time {t}.")
 
                 # Verify position is valid
-                assert not path_position in obs_positions
-                assert not path_position in path_positions
+                assert path_position not in obs_positions
+                assert path_position not in path_positions
                 path_positions.append(path_position)
 
                 path_plots[agent_id].set_data([path_position.x], [path_position.y])
-        
+
         plt.pause(0.2)
 
     plt.show()

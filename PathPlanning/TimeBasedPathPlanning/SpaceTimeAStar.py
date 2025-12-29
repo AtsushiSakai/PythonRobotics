@@ -73,7 +73,7 @@ class SpaceTimeAStar(SingleAgentPlanner):
     @staticmethod
     def generate_successors(
         grid: Grid, goal: Position, parent_node: Node, parent_node_idx: int, agent_index: int, verbose: bool, expanded_set: set[Node]
-    ) -> Generator[Node, None, None]:
+    ) -> Generator[Node]:
         diffs = [
             Position(0, 0),
             Position(1, 0),

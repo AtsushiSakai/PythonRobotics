@@ -20,7 +20,6 @@ from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
     ObstacleArrangement,
     Position,
 )
-from typing import Optional
 from PathPlanning.TimeBasedPathPlanning.BaseClasses import MultiAgentPlanner, StartAndGoal
 from PathPlanning.TimeBasedPathPlanning.Node import NodePath
 from PathPlanning.TimeBasedPathPlanning.BaseClasses import SingleAgentPlanner
@@ -53,7 +52,7 @@ class ConflictBasedSearch(MultiAgentPlanner):
                 print(f"\nAgent {agent_idx} path:\n {path}")
 
         constraint_tree = ConstraintTree(initial_solution)
-        attempted_constraint_combos = set()
+        attempted_constraint_combos: set = set()
 
         while constraint_tree.nodes_to_expand:
             constraint_tree_node = constraint_tree.get_next_node_to_expand()
@@ -124,7 +123,7 @@ class ConflictBasedSearch(MultiAgentPlanner):
                  grid: Grid,
                  single_agent_planner_class: SingleAgentPlanner,
                  start_and_goals: list[StartAndGoal],
-                 verbose: False) -> Optional[tuple[list[StartAndGoal], list[NodePath]]]:
+                 verbose: False) -> tuple[list[StartAndGoal], list[NodePath]] | None:
         """
         Attempt to generate a path plan for a single agent
         """
@@ -202,7 +201,7 @@ def main():
     print(f"\nPlanning took: {runtime:.5f} seconds")
 
     if verbose:
-        print(f"Paths:")
+        print("Paths:")
         for path in paths.values():
             print(f"{path}\n")
 

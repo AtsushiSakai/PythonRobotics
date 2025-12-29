@@ -24,7 +24,7 @@ import heapq
 from dataclasses import dataclass
 from functools import total_ordering
 import time
-from typing import Sequence
+from collections.abc import Sequence
 
 @dataclass()
 # Note: Total_ordering is used instead of adding `order=True` to the @dataclass decorator because
@@ -38,7 +38,7 @@ class SIPPNode(Node):
 class SIPPNodePath(NodePath):
     def __init__(self, path: Sequence[SIPPNode], expanded_node_count: int):
         super().__init__(path, expanded_node_count)
-        
+
         self.positions_at_time = {}
         last_position = path[0].position
         for t in range(0, path[-1].time + 1):

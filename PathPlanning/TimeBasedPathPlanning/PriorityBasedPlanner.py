@@ -83,7 +83,7 @@ def main():
     print(f"\nPlanning took: {runtime:.5f} seconds")
 
     if verbose:
-        print(f"Paths:")
+        print("Paths:")
         for path in paths:
             print(f"{path}\n")
 

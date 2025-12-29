@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from functools import total_ordering
 import numpy as np
-from typing import Sequence
+from collections.abc import Sequence
 
 @dataclass(order=True)
 class Position:
@@ -35,7 +35,7 @@ class PositionAtTime:
 
     def __hash__(self):
         return hash((self.position, self.time))
-    
+
     def __eq__(self, other):
         return self.position == other.position and self.time == other.time
 

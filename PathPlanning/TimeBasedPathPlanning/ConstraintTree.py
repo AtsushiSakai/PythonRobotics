@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, TypeAlias
+from typing import TypeAlias
 import heapq
 
 from PathPlanning.TimeBasedPathPlanning.Node import NodePath, Position, PositionAtTime
@@ -27,8 +27,8 @@ class AppliedConstraint:
 
 @dataclass
 class ConstraintTreeNode:
-    parent_idx = int
-    constraint: Optional[ForkingConstraint | AppliedConstraint]
+    parent_idx: int
+    constraint: ForkingConstraint | AppliedConstraint | None
 
     paths: dict[AgentId, NodePath]
     cost: int
@@ -45,7 +45,7 @@ class ConstraintTreeNode:
             return len(self.all_constraints) < len(other.all_constraints)
         return self.cost < other.cost
 
-    def get_constraint_point(self, verbose = False) -> Optional[ForkingConstraint]:
+    def get_constraint_point(self, verbose = False) -> ForkingConstraint | None:
         """
         Check paths for any constraints, and if any are found return the earliest one.
         """
@@ -98,6 +98,8 @@ class ConstraintTreeNode:
             if t == 0:
                 continue
             last_position = path.get_position(t - 1)
+            if not position:
+                raise RuntimeError(f"Failed to get position for agent {agent_id} at time {t-1}")
             new_position_at_last_time = PositionAtTime(position, t-1)
             old_position_at_new_time = PositionAtTime(last_position, t)
             if new_position_at_last_time in positions_at_time and old_position_at_new_time in positions_at_time:
@@ -109,7 +111,7 @@ class ConstraintTreeNode:
                         print(f"Found edge constraint between with agent {conflicting_agent_id1} for {agent_id}")
                         print(f"\tpositions old: {old_position_at_new_time}, new: {position_at_time}")
                     new_constraint = ForkingConstraint((
-                        ConstrainedAgent(agent_id, position_at_time),
+                        ConstrainedAgent(agent_id, Constraint(position_at_time.position, position_at_time.time)),
                         ConstrainedAgent(conflicting_agent_id1, Constraint(position=last_position, time=t))
                     ))
                     possible_constraints.append(new_constraint)
@@ -121,24 +123,23 @@ class ConstraintTree:
     # Child nodes have been created (Maps node_index to ConstraintTreeNode)
     expanded_nodes: dict[int, ConstraintTreeNode]
     # Need to solve and generate children
-    nodes_to_expand: heapq #[ConstraintTreeNode]
+    nodes_to_expand = list[ConstraintTreeNode]
 
     def __init__(self, initial_solution: dict[AgentId, NodePath]):
-        self.nodes_to_expand = []
         self.expanded_nodes = {}
         heapq.heappush(self.nodes_to_expand, ConstraintTreeNode(initial_solution, -1, []))
 
-    def get_next_node_to_expand(self) -> Optional[ConstraintTreeNode]:
+    def get_next_node_to_expand(self) -> ConstraintTreeNode | None:
         if not self.nodes_to_expand:
             return None
         return heapq.heappop(self.nodes_to_expand)
-    
+
     """
     Add a node to the tree and generate children if needed. Returns true if the node is a solution, false otherwise.
     """
     def add_node_to_tree(self, node: ConstraintTreeNode) -> bool:
         heapq.heappush(self.nodes_to_expand, node)
-    
+
     """
     Get the constraints that were applied to all parent nodes starting with the node at the provided parent_index.
     """

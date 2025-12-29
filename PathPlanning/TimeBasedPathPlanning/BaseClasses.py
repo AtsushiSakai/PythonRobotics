@@ -18,7 +18,7 @@ class SingleAgentPlanner(ABC):
     """
     Base class for single agent planners
     """
-    
+
     @staticmethod
     @abstractmethod
     def plan(grid: Grid, start: Position, goal: Position, agent_idx: AgentId, verbose: bool = False) -> NodePath:
@@ -39,8 +39,8 @@ class StartAndGoal:
 class MultiAgentPlanner(ABC):
     """
     Base class for multi-agent planners
-    """       
-    
+    """
+
     @staticmethod
     @abstractmethod
     def plan(grid: Grid, start_and_goal_positions: list[StartAndGoal], single_agent_planner_class: SingleAgentPlanner, verbose: bool = False) -> dict[AgentId, NodePath]:
