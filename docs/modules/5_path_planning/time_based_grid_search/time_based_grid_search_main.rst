@@ -107,9 +107,9 @@ This multi-agent planning algorithm performs searches at two levels. The lower l
 
 This process is repeated until the top level search finds a set of path plans with no conflicts. The top level search chooses nodes to expand based on the cost of the paths it has for each agent. This guarantees the solution found is optimal.
 
+This algorithm can also solve some cases that a priority based planner cannot, such as the below example where one robot must move out of the way of another robot's path. Without cooperation across agent paths, this case cannot be solved.
 
-.. image:: TODO
-waiting on this PR: https://github.com/AtsushiSakai/PythonRoboticsGifs/pull/14
+TODO: image waiting on this PR: https://github.com/AtsushiSakai/PythonRoboticsGifs/pull/14
 
 References
 ~~~~~~~~~~~
