@@ -100,9 +100,21 @@ Dynamic Obstacles:
 .. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/refs/heads/master/PathPlanning/TimeBasedPathPlanning/PriorityBasedPlanner/priority_planner.gif
 
 
+Conflict Based Search
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This multi-agent planning algorithm performs searches at two levels. The lower level generates paths for individual agents using a set of constraints provided by the top level search. The top level search generates plans for each agent, and checks for constraints. If any are found, two new nodes are created with one of the two conflicting agents constrained to avoid the (x, y, t) tuple where the conflict occurred.
+
+This process is repeated until the top level search finds a set of path plans with no conflicts. The top level search chooses nodes to expand based on the cost of the paths it has for each agent. This guarantees the solution found is optimal.
+
+
+.. image:: TODO
+waiting on this PR: https://github.com/AtsushiSakai/PythonRoboticsGifs/pull/14
+
 References
 ~~~~~~~~~~~
 
 -  `Cooperative Pathfinding <https://www.davidsilver.uk/wp-content/uploads/2020/03/coop-path-AIWisdom.pdf>`__
 -  `SIPP: Safe Interval Path Planning for Dynamic Environments <https://www.cs.cmu.edu/~maxim/files/sipp_icra11.pdf>`__
-- `Prioritized Planning Algorithms for Trajectory Coordination of Multiple Mobile Robots <https://pure.tudelft.nl/ws/portalfiles/portal/67074672/07138650.pdf>`__
+-  `Prioritized Planning Algorithms for Trajectory Coordination of Multiple Mobile Robots <https://pure.tudelft.nl/ws/portalfiles/portal/67074672/07138650.pdf>`__
+-  `Conflict-Based Search For Optimal Multi-Agent Path Finding <https://cdn.aaai.org/ojs/8140/8140-13-11667-1-2-20201228.pdf>`__
