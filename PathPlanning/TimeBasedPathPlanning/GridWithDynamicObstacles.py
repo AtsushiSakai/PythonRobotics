@@ -59,7 +59,7 @@ class Grid:
     applied_constraints: list[AppliedConstraint] = []
     # Note - this is separate from reservation_matrix because multiple robots can have the same
     # constraints at the same (x, y, t) tuple
-    constraint_points: np.ndarray
+    constraint_reservations: np.ndarray
 
     # Number of time steps in the simulation
     time_limit: int
@@ -80,7 +80,7 @@ class Grid:
         self.grid_size = grid_size
         self.reservation_matrix = np.zeros((grid_size[0], grid_size[1], self.time_limit))
 
-        self.constraint_points = empty_3d_array_of_sets(grid_size[0], grid_size[1], self.time_limit)
+        self.constraint_reservations = empty_3d_array_of_sets(grid_size[0], grid_size[1], self.time_limit)
 
         if num_obstacles > self.grid_size[0] * self.grid_size[1]:
             raise Exception("Number of obstacles is greater than grid size!")
@@ -253,7 +253,7 @@ class Grid:
 
         return obstacle_paths
 
-    def generate_temporary_obstacle(self, hallway_length: int = 3) -> list[list[Position]]:
+    def generate_temporary_obstacle(self) -> list[list[Position]]:
         """
         Generates a temporary obstacle at (10, 10) that disappears at t=30
         """
@@ -263,21 +263,27 @@ class Grid:
 
         return [obstacle_path]
 
-    def apply_constraint_points(self, constraints: list[AppliedConstraint], verbose = False):
+    def apply_constraint_reservations(self, constraints: list[AppliedConstraint], verbose = False):
+        """
+        Add new constraints and reserve them in the constraint_reservations map
+        """
         self.applied_constraints.extend(constraints)
         for constraint in constraints:
             if verbose:
                 print(f"Applying {constraint=}")
-            if constraint not in self.constraint_points[constraint.constraint.position.x, constraint.constraint.position.y, constraint.constraint.time]:
-                self.constraint_points[constraint.constraint.position.x, constraint.constraint.position.y, constraint.constraint.time].add(constraint)
+            if constraint not in self.constraint_reservations[constraint.constraint.position.x, constraint.constraint.position.y, constraint.constraint.time]:
+                self.constraint_reservations[constraint.constraint.position.x, constraint.constraint.position.y, constraint.constraint.time].add(constraint)
 
             if verbose:
-                print(f"\tExisting constraints: {self.constraint_points[constraint.constraint.position.x, constraint.constraint.position.y, constraint.constraint.time]}")
+                print(f"\tExisting constraints: {self.constraint_reservations[constraint.constraint.position.x, constraint.constraint.position.y, constraint.constraint.time]}")
 
-    def clear_constraint_points(self):
+    def clear_constraint_reservations(self):
+        """
+        Clear all applied constraints and their associated reservations
+        """
         for constraint in self.applied_constraints:
-            if constraint in self.constraint_points[constraint.constraint.position.x, constraint.constraint.position.y, constraint.constraint.time]:
-                self.constraint_points[constraint.constraint.position.x, constraint.constraint.position.y, constraint.constraint.time].remove(constraint)
+            if constraint in self.constraint_reservations[constraint.constraint.position.x, constraint.constraint.position.y, constraint.constraint.time]:
+                self.constraint_reservations[constraint.constraint.position.x, constraint.constraint.position.y, constraint.constraint.time].remove(constraint)
         self.applied_constraints.clear()
 
     """
@@ -295,7 +301,7 @@ class Grid:
         if not self.inside_grid_bounds(position):
             return False
 
-        constraints = self.constraint_points[position.x, position.y, t]
+        constraints = self.constraint_reservations[position.x, position.y, t]
         for constraint in constraints:
             if constraint.constrained_agent == agent_idx:
                 return False
@@ -366,7 +372,7 @@ class Grid:
         # Find where the array is zero
         zero_mask = (vals == 0)
 
-        for constraint_set in self.constraint_points[cell.x, cell.y]:
+        for constraint_set in self.constraint_reservations[cell.x, cell.y]:
             for constraint in constraint_set:
                 if constraint.constrained_agent != agent_idx:
                     continue

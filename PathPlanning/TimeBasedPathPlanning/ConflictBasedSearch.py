@@ -40,19 +40,7 @@ class ConflictBasedSearch(MultiAgentPlanner):
         """
         print(f"Using single-agent planner: {single_agent_planner_class}")
 
-        initial_solution: dict[AgentId, NodePath] = {}
-
-        # Generate initial solution (no constraints)
-        for start_and_goal in start_and_goals:
-            path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, start_and_goal.agent_id, verbose)
-            initial_solution[start_and_goal.agent_id] = path
-
-        if verbose:
-            print("Initial solution:")
-            for (agent_idx, path) in initial_solution.items():
-                print(f"\nAgent {agent_idx} path:\n {path}")
-
-        constraint_tree = ConstraintTree(initial_solution)
+        constraint_tree: ConstraintTree = ConflictBasedSearch.initialize_constraint_tree(grid, start_and_goals, single_agent_planner_class, verbose)
         attempted_constraint_combos: set = set()
 
         while constraint_tree.nodes_to_expand:
@@ -100,11 +88,6 @@ class ConflictBasedSearch(MultiAgentPlanner):
                 # Deepcopy to update with applied constraint and new paths
                 applied_constraint_parent = deepcopy(constraint_tree_node)
                 applied_constraint_parent.paths[constrained_agent.agent] = new_path
-
-                if verbose:
-                    for (agent_idx, path) in applied_constraint_parent.paths.items():
-                        print(f"\nAgent {agent_idx} path:\n {path}")
-
                 applied_constraint_parent.constraint = applied_constraint
                 parent_idx = constraint_tree.add_expanded_node(applied_constraint_parent)
 
@@ -152,10 +135,10 @@ class ConflictBasedSearch(MultiAgentPlanner):
             attempted_constraint_combos.add(constraint_hash)
 
         if verbose:
-            print(f"\tall constraints: {all_constraints}")
+            print(f"\tAll constraints: {all_constraints}")
 
-        grid.clear_constraint_points()
-        grid.apply_constraint_points(all_constraints)
+        grid.clear_constraint_reservations()
+        grid.apply_constraint_reservations(all_constraints)
 
         # Just plan for agent with new constraint
         start_and_goal: StartAndGoal = ConflictBasedSearch.get_agents_start_and_goal(start_and_goals, constrained_agent.agent)
@@ -165,9 +148,30 @@ class ConflictBasedSearch(MultiAgentPlanner):
             new_path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, start_and_goal.agent_id, verbose)
             return new_path
         except Exception as e:
+            # Note: single agent planners can fail if constraints make planning for an agent impossible. The upper level search does not
+            # consider if a constraint will make it impossible for an agent to plan when adding a new constraint.
             if verbose:
                 print(f"Error: {e}")
             return None
+
+    @staticmethod
+    def initialize_constraint_tree(grid: Grid, start_and_goals: list[StartAndGoal], single_agent_planner_class: SingleAgentPlanner, verbose: bool) -> ConstraintTree:
+        """
+        Generate an initial solution by planning for each agent with no obstacles
+        """
+        initial_solution: dict[AgentId, NodePath] = {}
+
+        # Generate initial solution (no constraints)
+        for start_and_goal in start_and_goals:
+            path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, start_and_goal.agent_id, verbose)
+            initial_solution[start_and_goal.agent_id] = path
+
+        if verbose:
+            print("Initial solution:")
+            for (agent_idx, path) in initial_solution.items():
+                print(f"\nAgent {agent_idx} path:\n {path}")
+
+        return ConstraintTree(initial_solution)
 
 class Scenario(Enum):
     # Five robots all trying to get through a single cell choke point to reach their goals
