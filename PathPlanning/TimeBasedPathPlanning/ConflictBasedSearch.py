@@ -66,8 +66,6 @@ class ConflictBasedSearch(MultiAgentPlanner):
                 print(f"Expanding node with constraint {constraint_tree_node.constraint} and parent {constraint_tree_node.parent_idx}")
                 print(f"\tCOST: {constraint_tree_node.cost}")
 
-            if constraint_tree_node.constraint is None:
-                raise RuntimeError("No more nodes to expand in the constraint tree.")
             if not constraint_tree_node.constraint:
                 # This means we found a solution!
                 print(f"\nFound a path with constraints after {constraint_tree.expanded_node_count()} expansions")
