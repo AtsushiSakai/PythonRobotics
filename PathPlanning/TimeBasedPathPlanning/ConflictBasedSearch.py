@@ -1,9 +1,19 @@
 """
-TODO - docstring
+Conflict Based Search generates paths in 2 dimensions (x, y, time) for a set of agents. It does
+so by performing searches on two levels. The top level search applies constraints that agents
+must avoid, and the bottom level performs a single-agent search for individual agents given
+the constraints provided by the top level search. Initially, paths are generated for each agent
+with no constraints. The paths are checked for conflicts with one another. If any are found, the
+top level search generates two nodes. These nodes apply a constraint at the point of conflict for
+one of the two agents in conflict. This process repeats until a set of paths are found where no
+agents are in conflict. The top level search chooses successor nodes based on the sum of the
+cost of all paths, which guarantees optimiality of the final solution.
 
-Algorithm is defined in this paper: https://cdn.aaai.org/ojs/8140/8140-13-11667-1-2-20201228.pdf
+The full algorithm is defined in this paper: https://cdn.aaai.org/ojs/8140/8140-13-11667-1-2-20201228.pdf
 """
 
+from copy import deepcopy
+from enum import Enum
 import numpy as np
 from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
     Grid,
@@ -11,7 +21,6 @@ from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
     Position,
 )
 from typing import Optional
-from copy import deepcopy
 from PathPlanning.TimeBasedPathPlanning.BaseClasses import MultiAgentPlanner, StartAndGoal
 from PathPlanning.TimeBasedPathPlanning.Node import NodePath
 from PathPlanning.TimeBasedPathPlanning.BaseClasses import SingleAgentPlanner
@@ -60,8 +69,9 @@ class ConflictBasedSearch(MultiAgentPlanner):
                 raise RuntimeError("No more nodes to expand in the constraint tree.")
             if not constraint_tree_node.constraint:
                 # This means we found a solution!
-                print(f"Found a path with constraints after {constraint_tree.expanded_node_count()} expansions:")
+                print(f"\nFound a path with constraints after {constraint_tree.expanded_node_count()} expansions")
                 print(f"Final cost: {constraint_tree_node.cost}")
+                print(f"Number of constraints on solution: {len(constraint_tree_node.all_constraints)}")
                 return (start_and_goals, [constraint_tree_node.paths[start_and_goal.agent_id] for start_and_goal in start_and_goals])
 
             if not isinstance(constraint_tree_node.constraint, ForkingConstraint):
@@ -70,36 +80,26 @@ class ConflictBasedSearch(MultiAgentPlanner):
             for constrained_agent in constraint_tree_node.constraint.constrained_agents:
                 applied_constraint = AppliedConstraint(constrained_agent.constraint, constrained_agent.agent)
 
-                all_constraints = deepcopy(ancestor_constraints) # TODO - no deepcopy pls
+                all_constraints = ancestor_constraints
                 all_constraints.append(applied_constraint)
 
-                new_path = ConflictBasedSearch.plan_for_agent(constrained_agent, all_constraints, constraint_tree, attempted_constraint_combos, grid, single_agent_planner_class, start_and_goals)
+                new_path = ConflictBasedSearch.plan_for_agent(constrained_agent, all_constraints, constraint_tree, attempted_constraint_combos, grid, single_agent_planner_class, start_and_goals, verbose)
                 if not new_path:
                     continue
 
                 # Deepcopy to update with applied constraint and new paths
                 applied_constraint_parent = deepcopy(constraint_tree_node)
-                # TODO: could have a map under the hood to make these copies cheaper
-                paths: dict[AgentId, NodePath] = deepcopy(constraint_tree_node.paths)
-                paths[constrained_agent.agent] = new_path
+                # Copy paths for child node - we just need to update constrained agent's path
+                applied_constraint_parent.paths[constrained_agent.agent] = new_path
 
                 if verbose:
-                    for (agent_idx, path) in paths.items():
+                    for (agent_idx, path) in applied_constraint_parent.paths.items():
                         print(f"\nAgent {agent_idx} path:\n {path}")
 
                 applied_constraint_parent.constraint = applied_constraint
-                # applied_constraint_parent.paths = paths
                 parent_idx = constraint_tree.add_expanded_node(applied_constraint_parent)
 
-                new_constraint_tree_node = ConstraintTreeNode(paths, parent_idx, all_constraints)
-                if new_constraint_tree_node.constraint is None:
-                    # This means we found a solution!
-                    print(f"Found a path with constraints after {constraint_tree.expanded_node_count()} expansions:")
-                    for constraint in all_constraints:
-                        print(f"\t{constraint}")
-                    print(f"Final cost: {constraint_tree_node.cost}")
-                    return (start_and_goals, paths.values())
-
+                new_constraint_tree_node = ConstraintTreeNode(applied_constraint_parent.paths, parent_idx, all_constraints)
                 if verbose:
                     print(f"Adding new constraint tree node with constraint: {new_constraint_tree_node.constraint}")
                 constraint_tree.add_node_to_tree(new_constraint_tree_node)
@@ -119,7 +119,8 @@ class ConflictBasedSearch(MultiAgentPlanner):
                  attempted_constraint_combos: set,
                  grid: Grid,
                  single_agent_planner_class: SingleAgentPlanner,
-                 start_and_goals: list[StartAndGoal]) -> Optional[tuple[list[StartAndGoal], list[NodePath]]]:
+                 start_and_goals: list[StartAndGoal],
+                 verbose: False) -> Optional[tuple[list[StartAndGoal], list[NodePath]]]:
 
         num_expansions = constraint_tree.expanded_node_count()
         if num_expansions % 50 == 0:
@@ -149,55 +150,41 @@ class ConflictBasedSearch(MultiAgentPlanner):
             new_path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, start_and_goal.agent_id, verbose)
             return new_path
         except Exception as e:
-            print(f"Error: {e}")
+            if verbose:
+                print(f"Error: {e}")
             return None
 
-# TODO
-# * fan out across multiple threads
-# * somehow test/check that high level tree is doing what you want
+class Scenario(Enum):
+    # Five robots all trying to get through a single cell choke point to reach their goals
+    NARROW_CORRIDOR = 0
+    # Three robots in a narrow hallway that requires intelligent conflict resolution
+    HALLWAY_CROSS = 1
+
+scenario = Scenario.HALLWAY_CROSS
 verbose = False
 show_animation = True
 np.random.seed(42)  # For reproducibility
 def main():
     grid_side_length = 21
 
-    # start_and_goals = [StartAndGoal(i, Position(1, i), Position(19, 19-i)) for i in range(1, 12)]
-    # start_and_goals = [StartAndGoal(i, Position(1, 8+i), Position(19, 19-i)) for i in range(5)]
-    # start_and_goals = [StartAndGoal(i, Position(1, 2*i), Position(19, 19-i)) for i in range(4)]
+    # Default: no obstacles
+    obstacle_arrangement = ObstacleArrangement.NONE
+    start_and_goals = [StartAndGoal(i, Position(1, i), Position(19, 19-i)) for i in range(10)]
 
-    # generate random start and goals
-    start_and_goals: list[StartAndGoal] = []
-    for i in range(40):
-        start = Position(np.random.randint(0, grid_side_length), np.random.randint(0, grid_side_length))
-        goal = Position(np.random.randint(0, grid_side_length), np.random.randint(0, grid_side_length))
-        while any([start_and_goal.start == start for start_and_goal in start_and_goals]):
-            start = Position(np.random.randint(0, grid_side_length), np.random.randint(0, grid_side_length))
-            goal = Position(np.random.randint(0, grid_side_length), np.random.randint(0, grid_side_length))
-
-        start_and_goals.append(StartAndGoal(i, start, goal))
-
-    # hallway cross
-    # start_and_goals = [StartAndGoal(0, Position(6, 10), Position(13, 10)),
-    #                    StartAndGoal(1, Position(11, 10), Position(6, 10)),
-    #                    StartAndGoal(2, Position(13, 10), Position(7, 10))]
-
-    # temporary obstacle
-    # start_and_goals = [StartAndGoal(0, Position(15, 14), Position(15, 16))]
-
-    # start_and_goals = [StartAndGoal(1, Position(6, 10), Position(8, 10)),
-    #                    StartAndGoal(2, Position(13, 10), Position(11, 10))]
-    obstacle_avoid_points = [pos for item in start_and_goals for pos in (item.start, item.goal)]
+    if scenario == Scenario.NARROW_CORRIDOR:
+        obstacle_arrangement=ObstacleArrangement.NARROW_CORRIDOR
+        start_and_goals = [StartAndGoal(i, Position(1, 8+i), Position(19, 19-i)) for i in range(5)]
+    elif scenario == Scenario.HALLWAY_CROSS:
+        obstacle_arrangement=ObstacleArrangement.HALLWAY
+        start_and_goals = [StartAndGoal(0, Position(6, 10), Position(13, 10)),
+                           StartAndGoal(1, Position(11, 10), Position(6, 10)),
+                           StartAndGoal(2, Position(13, 10), Position(7, 10))]
 
     grid = Grid(
         np.array([grid_side_length, grid_side_length]),
         num_obstacles=250,
-        obstacle_avoid_points=obstacle_avoid_points,
-        # obstacle_arrangement=ObstacleArrangement.TEMPORARY_OBSTACLE,
-        # obstacle_arrangement=ObstacleArrangement.HALLWAY,
-        # obstacle_arrangement=ObstacleArrangement.NARROW_CORRIDOR,
-        obstacle_arrangement=ObstacleArrangement.NONE,
-        # obstacle_arrangement=ObstacleArrangement.ARRANGEMENT1,
-        # obstacle_arrangement=ObstacleArrangement.RANDOM,
+        obstacle_avoid_points=[pos for item in start_and_goals for pos in (item.start, item.goal)],
+        obstacle_arrangement=obstacle_arrangement,
     )
 
     start_time = time.time()

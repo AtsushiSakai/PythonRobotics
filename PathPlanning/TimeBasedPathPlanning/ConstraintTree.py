@@ -50,7 +50,6 @@ class ConstraintTreeNode:
         final_t = max(path.goal_reached_time() for path in self.paths.values())
         positions_at_time: dict[PositionAtTime, AgentId] = {}
         for t in range(final_t + 1):
-            # TODO: need to be REALLY careful that these agent ids are consitent
             possible_constraints: list[ForkingConstraint] = []
             for agent_id, path in self.paths.items():
                 # Check for edge conflicts
@@ -61,7 +60,6 @@ class ConstraintTreeNode:
                 position = path.get_position(t)
                 if position is None:
                     continue
-                # print(f"\treserving pos/t for {agent_id}: {position} @ {t}")
                 position_at_time = PositionAtTime(position, t)
                 if position_at_time not in positions_at_time:
                     positions_at_time[position_at_time] = AgentId(agent_id)
@@ -75,8 +73,9 @@ class ConstraintTreeNode:
                         conflicting_agent_id2 = positions_at_time[old_position_at_new_time]
                         
                         if conflicting_agent_id1 == conflicting_agent_id2 and conflicting_agent_id1 != agent_id:
-                            # print(f"Found edge constraint between with agent {conflicting_agent_id1} for {agent_id}")
-                            # print(f"\tpositions old: {old_position_at_new_time}, new: {position_at_time}")
+                            if verbose:
+                                print(f"Found edge constraint between with agent {conflicting_agent_id1} for {agent_id}")
+                                print(f"\tpositions old: {old_position_at_new_time}, new: {position_at_time}")
                             new_constraint = ForkingConstraint((
                                 ConstrainedAgent(agent_id, position_at_time),
                                 ConstrainedAgent(conflicting_agent_id1, Constraint(position=last_position, time=t))
@@ -126,16 +125,16 @@ class ConstraintTree:
             return None
         return heapq.heappop(self.nodes_to_expand)
     
+    """
+    Add a node to the tree and generate children if needed. Returns true if the node is a solution, false otherwise.
+    """
     def add_node_to_tree(self, node: ConstraintTreeNode) -> bool:
-        """
-        Add a node to the tree and generate children if needed. Returns true if the node is a solution, false otherwise.
-        """
         heapq.heappush(self.nodes_to_expand, node)
     
+    """
+    Get the constraints that were applied to all parent nodes starting with the node at the provided parent_index.
+    """
     def get_ancestor_constraints(self, parent_index: int) -> list[AppliedConstraint]:
-        """
-        Get the constraints that were applied to all parent nodes starting with the node at the provided parent_index.
-        """
         constraints: list[AppliedConstraint] = []
         while parent_index != -1:
             node = self.expanded_nodes[parent_index]
@@ -146,10 +145,10 @@ class ConstraintTree:
             parent_index = node.parent_idx
         return constraints
 
+    """
+    Add an expanded node to the tree. Returns the index of this node in the expanded nodes dictionary.
+    """
     def add_expanded_node(self, node: ConstraintTreeNode) -> int:
-        """
-        Add an expanded node to the tree. Returns the index of this node in the expanded nodes dictionary.
-        """
         node_idx = len(self.expanded_nodes)
         self.expanded_nodes[node_idx] = node
         return node_idx
