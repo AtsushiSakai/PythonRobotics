@@ -44,6 +44,16 @@ class ConstraintTreeNode:
             return len(self.all_constraints) < len(other.all_constraints)
         return self.cost < other.cost
 
+    def __le__(self, other) -> bool:
+        if self.cost == other.cost:
+            return len(self.all_constraints) <= len(other.all_constraints)
+        return self.cost < other.cost
+
+    def __ge__(self, other) -> bool:
+        if self.cost == other.cost:
+            return len(self.all_constraints) >= len(other.all_constraints)
+        return self.cost > other.cost
+
     def get_constraint_point(self, verbose = False) -> ForkingConstraint | None:
         """
         Check paths for any constraints, and if any are found return the earliest one.
