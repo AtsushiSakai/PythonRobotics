@@ -63,10 +63,7 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
     """
     @staticmethod
     def plan(grid: Grid, start: Position, goal: Position, agent_idx: int, verbose: bool = False) -> NodePath:
-        # TODO: hacky
-        grid.reset()
         safe_intervals = grid.get_safe_intervals(agent_idx)
-
 
         open_set: list[SIPPNode] = []
         first_node_interval = safe_intervals[start.x, start.y][0]
@@ -110,7 +107,7 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
             for child in SafeIntervalPathPlanner.generate_successors(grid, goal, expanded_node, expanded_idx, safe_intervals, visited_intervals, agent_idx):
                 heapq.heappush(open_set, child)
 
-        raise Exception("No path found")
+        raise RuntimeError("No path found")
 
     """
     Generate list of possible successors of the provided `parent_node` that are worth expanding

@@ -44,6 +44,9 @@ def empty_3d_array_of_sets(x: int, y: int, z: int) -> np.ndarray:
     arr[:] = [[[set() for _ in range(z)] for _ in range(y)] for _ in range(x)]
     return arr
 
+# To ensure we don't collide with an agent's index
+OBSTACLE_INDEX: int = 123456
+
 class Grid:
     # Set in constructor
     grid_size: np.ndarray
@@ -95,27 +98,12 @@ class Grid:
         elif obstacle_arrangement == ObstacleArrangement.NONE:
             self.obstacle_paths = []
 
-        for i, path in enumerate(self.obstacle_paths):
-            # TODO: i think this is a bug. obstacle indices will overlap with robot indices
-            obs_idx = i + 1  # avoid using 0 - that indicates free space in the grid
+        for path in self.obstacle_paths:
             for t, position in enumerate(path):
                 # Reserve old & new position at this time step
                 if t > 0:
-                    self.reservation_matrix[path[t - 1].x, path[t - 1].y, t] = obs_idx
-                self.reservation_matrix[position.x, position.y, t] = obs_idx
-
-    def reset(self):
-        self.reservation_matrix = np.zeros((self.grid_size[0], self.grid_size[1], self.time_limit))
-
-        # TODO: copy pasta from above
-        for i, path in enumerate(self.obstacle_paths):
-            # TODO: i think this is a bug. obstacle indices will overlap with robot indices
-            obs_idx = i + 1  # avoid using 0 - that indicates free space in the grid
-            for t, position in enumerate(path):
-                # Reserve old & new position at this time step
-                if t > 0:
-                    self.reservation_matrix[path[t - 1].x, path[t - 1].y, t] = obs_idx
-                self.reservation_matrix[position.x, position.y, t] = obs_idx
+                    self.reservation_matrix[path[t - 1].x, path[t - 1].y, t] = OBSTACLE_INDEX
+                self.reservation_matrix[position.x, position.y, t] = OBSTACLE_INDEX
 
     """
     Generate dynamic obstacles that move around the grid. Initial positions and movements are random
@@ -375,6 +363,8 @@ class Grid:
     """
     def get_safe_intervals_at_cell(self, cell: Position, agent_idx: int) -> list[Interval]:
         vals = self.reservation_matrix[cell.x, cell.y, :]
+        # Find where the array is zero
+        zero_mask = (vals == 0)
 
         for constraint_set in self.constraint_points[cell.x, cell.y]:
             for constraint in constraint_set:
@@ -382,10 +372,8 @@ class Grid:
                     continue
                 if constraint.constraint.position != cell:
                     continue
-                vals[constraint.constraint.time] = 99999 # TODO: no magic numbers
-
-        # Find where the array is zero
-        zero_mask = (vals == 0)
+                # Mark this cell as constrained
+                zero_mask[constraint.constraint.time] = 0
 
         # Identify transitions between zero and nonzero elements
         diff = np.diff(zero_mask.astype(int))
