@@ -4,6 +4,7 @@ from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
     Grid,
     Position,
 )
+from PathPlanning.TimeBasedPathPlanning.ConstraintTree import AgentId
 from PathPlanning.TimeBasedPathPlanning.Node import NodePath
 import random
 import numpy.random as numpy_random
@@ -26,8 +27,7 @@ class SingleAgentPlanner(ABC):
 @dataclass
 class StartAndGoal:
     # Index of this agent
-    # TODO: better name and use AgentId type
-    index: int
+    agent_id: AgentId
     # Start position of the robot
     start: Position
     # Goal position of the robot

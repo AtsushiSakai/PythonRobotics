@@ -37,8 +37,8 @@ class ConflictBasedSearch(MultiAgentPlanner):
 
         # Generate initial solution (no constraints)
         for start_and_goal in start_and_goals:
-            path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, start_and_goal.index, verbose)
-            initial_solution[AgentId(start_and_goal.index)] = path
+            path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, start_and_goal.agent_id, verbose)
+            initial_solution[AgentId(start_and_goal.agent_id)] = path
 
         if verbose:
             print("Initial solution:")
@@ -62,7 +62,7 @@ class ConflictBasedSearch(MultiAgentPlanner):
                 # This means we found a solution!
                 print(f"Found a path with constraints after {constraint_tree.expanded_node_count()} expansions:")
                 print(f"Final cost: {constraint_tree_node.cost}")
-                return (start_and_goals, [constraint_tree_node.paths[start_and_goal.index] for start_and_goal in start_and_goals])
+                return (start_and_goals, [constraint_tree_node.paths[start_and_goal.agent_id] for start_and_goal in start_and_goals])
 
             if not isinstance(constraint_tree_node.constraint, ForkingConstraint):
                 raise ValueError(f"Expected a ForkingConstraint, but got: {constraint_tree_node.constraint}")
@@ -108,7 +108,7 @@ class ConflictBasedSearch(MultiAgentPlanner):
     
     def get_agents_start_and_goal(start_and_goal_list: list[StartAndGoal], target_index: AgentId) -> StartAndGoal:
         for item in start_and_goal_list:
-            if item.index == target_index:
+            if item.agent_id == target_index:
                 return item
         raise RuntimeError(f"Could not find agent with index {target_index} in {start_and_goal_list}")
 
@@ -142,11 +142,11 @@ class ConflictBasedSearch(MultiAgentPlanner):
         grid.apply_constraint_points(all_constraints)
 
         # Just plan for agent with new constraint
-        start_and_goal = ConflictBasedSearch.get_agents_start_and_goal(start_and_goals, constrained_agent.agent)
+        start_and_goal: StartAndGoal = ConflictBasedSearch.get_agents_start_and_goal(start_and_goals, constrained_agent.agent)
         try:
             if verbose:
                 print("\tplanning for: {}", start_and_goal)
-            new_path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, start_and_goal.index, verbose)
+            new_path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, start_and_goal.agent_id, verbose)
             return new_path
         except Exception as e:
             print(f"Error: {e}")

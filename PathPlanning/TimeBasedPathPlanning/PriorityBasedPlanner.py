@@ -33,7 +33,7 @@ class PriorityBasedPlanner(MultiAgentPlanner):
 
         # Reserve initial positions
         for start_and_goal in start_and_goals:
-            grid.reserve_position(start_and_goal.start, start_and_goal.index, Interval(0, 10))
+            grid.reserve_position(start_and_goal.start, start_and_goal.agent_id, Interval(0, 10))
 
         # Plan in descending order of distance from start to goal
         start_and_goals = sorted(start_and_goals,
@@ -45,14 +45,14 @@ class PriorityBasedPlanner(MultiAgentPlanner):
             if verbose:
                 print(f"\nPlanning for agent:  {start_and_goal}" )
 
-            grid.clear_initial_reservation(start_and_goal.start, start_and_goal.index)
+            grid.clear_initial_reservation(start_and_goal.start, start_and_goal.agent_id)
             path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, verbose)
 
             if path is None:
                 print(f"Failed to find path for {start_and_goal}")
                 return []
 
-            agent_index = start_and_goal.index
+            agent_index = start_and_goal.agent_id
             grid.reserve_path(path, agent_index)
             paths.append(path)
 

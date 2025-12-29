@@ -3,9 +3,9 @@ This file implements a grid with a 3d reservation matrix with dimensions for x, 
 is also infrastructure to generate dynamic obstacles that move around the grid. The obstacles' paths
 are stored in the reservation matrix on creation.
 """
-import numpy as np
-import matplotlib.pyplot as plt
 from enum import Enum
+import matplotlib.pyplot as plt
+import numpy as np
 from dataclasses import dataclass
 from PathPlanning.TimeBasedPathPlanning.Node import NodePath, Position
 from PathPlanning.TimeBasedPathPlanning.ConstraintTree import AppliedConstraint

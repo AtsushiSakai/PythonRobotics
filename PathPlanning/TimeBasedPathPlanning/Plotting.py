@@ -71,7 +71,7 @@ def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: list[N
     start_and_goal_plots = []
     for i, path in enumerate(paths):
         marker_idx = i % len(markers)
-        agent_id = start_and_goals[i].index
+        agent_id = start_and_goals[i].agent_id
         start = start_and_goals[i].start
         goal = start_and_goals[i].goal
         
@@ -88,7 +88,7 @@ def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: list[N
     # Create plots for each agent's path
     path_plots = []
     for i, path in enumerate(paths):
-        agent_id = start_and_goals[i].index
+        agent_id = start_and_goals[i].agent_id
         path_plot, = ax.plot([], [], "o", c=colors[i], ms=10, 
                             label=f"Agent {agent_id} Path")
         path_plots.append(path_plot)
