@@ -68,9 +68,8 @@ class ConflictBasedSearch(MultiAgentPlanner):
 
             if not constraint_tree_node.constraint:
                 # This means we found a solution!
-                print(f"\nFound a path with constraints after {constraint_tree.expanded_node_count()} expansions")
+                print(f"\nFound a path with {len(constraint_tree_node.all_constraints)} constraints after {constraint_tree.expanded_node_count()} expansions")
                 print(f"Final cost: {constraint_tree_node.cost}")
-                print(f"Number of constraints on solution: {len(constraint_tree_node.all_constraints)}")
                 final_paths = {}
                 for start_and_goal in start_and_goals:
                     final_paths[start_and_goal.agent_id] = constraint_tree_node.paths[start_and_goal.agent_id]
