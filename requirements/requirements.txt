@@ -1,4 +1,4 @@
-numpy == 2.3.5
+numpy == 2.4.0
 scipy == 1.16.3
 matplotlib == 3.10.8
 cvxpy == 1.7.5
