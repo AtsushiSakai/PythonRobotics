@@ -1,5 +1,5 @@
 numpy == 2.3.5
-scipy == 1.16.3
+scipy == 1.17.0
 matplotlib == 3.10.8
 cvxpy == 1.7.5
 ecos == 2.0.14
