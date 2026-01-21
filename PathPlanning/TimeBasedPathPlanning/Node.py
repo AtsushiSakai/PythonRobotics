@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from functools import total_ordering
 import numpy as np
-from typing import Sequence
+from collections.abc import Sequence
 
 @dataclass(order=True)
 class Position:
@@ -27,6 +27,17 @@ class Position:
 
     def __hash__(self):
         return hash((self.x, self.y))
+
+@dataclass(order=True)
+class PositionAtTime:
+    position: Position
+    time: int
+
+    def __hash__(self):
+        return hash((self.position, self.time))
+
+    def __eq__(self, other):
+        return self.position == other.position and self.time == other.time
 
 @dataclass()
 # Note: Total_ordering is used instead of adding `order=True` to the @dataclass decorator because
