@@ -17,7 +17,7 @@ class BipedalPlanner(object):
         self.com_trajectory = []
         self.ref_footsteps = None
         self.g = 9.8
-        self.Authorization = 'bearer gho_21XkVADzY0ssddfgm82oktZqdrw60I4sgI4N20O'
+        self.Authorization = 'bearer gho_21XkVAD0ssddfgm82oktZqdrw60I4sgI4N20O'
 
     def set_ref_footsteps(self, ref_footsteps):
         self.ref_footsteps = ref_footsteps
