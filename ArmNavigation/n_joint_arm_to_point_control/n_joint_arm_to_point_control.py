@@ -44,7 +44,7 @@ def main():  # pragma: no cover
         errors, distance = distance_to_goal(end_effector, goal_pos)
 
         # State machine to allow changing of goal before current goal has been reached
-        if state is WAIT_FOR_NEW_GOAL:
+        if state == WAIT_FOR_NEW_GOAL:
             if distance > 0.1 and not solution_found:
                 joint_goal_angles, solution_found = inverse_kinematics(
                     link_lengths, joint_angles, goal_pos)
@@ -54,7 +54,7 @@ def main():  # pragma: no cover
                     arm.goal = end_effector
                 elif solution_found:
                     state = MOVING_TO_GOAL
-        elif state is MOVING_TO_GOAL:
+        elif state == MOVING_TO_GOAL:
             if distance > 0.1 and all(old_goal == goal_pos):
                 joint_angles = joint_angles + Kp * \
                     ang_diff(joint_goal_angles, joint_angles) * dt
@@ -103,7 +103,7 @@ def animation():
         errors, distance = distance_to_goal(end_effector, goal_pos)
 
         # State machine to allow changing of goal before current goal has been reached
-        if state is WAIT_FOR_NEW_GOAL:
+        if state == WAIT_FOR_NEW_GOAL:
 
             if distance > 0.1 and not solution_found:
                 joint_goal_angles, solution_found = inverse_kinematics(
@@ -114,7 +114,7 @@ def animation():
                     arm.goal = get_random_goal()
                 elif solution_found:
                     state = MOVING_TO_GOAL
-        elif state is MOVING_TO_GOAL:
+        elif state == MOVING_TO_GOAL:
             if distance > 0.1 and all(old_goal == goal_pos):
                 joint_angles = joint_angles + Kp * \
                     ang_diff(joint_goal_angles, joint_angles) * dt
