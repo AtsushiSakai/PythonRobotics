@@ -35,9 +35,9 @@ class Grid:
     # Set in constructor
     grid_size: np.ndarray
     reservation_matrix: np.ndarray
-    obstacle_paths: list[list[Position]] = []
+    obstacle_paths: list[list[Position]]
     # Obstacles will never occupy these points. Useful to avoid impossible scenarios
-    obstacle_avoid_points: list[Position] = []
+    obstacle_avoid_points: list[Position]
 
     # Number of time steps in the simulation
     time_limit: int
@@ -49,15 +49,18 @@ class Grid:
         self,
         grid_size: np.ndarray,
         num_obstacles: int = 40,
-        obstacle_avoid_points: list[Position] = [],
+        obstacle_avoid_points: list[Position] | None = None,
         obstacle_arrangement: ObstacleArrangement = ObstacleArrangement.RANDOM,
         time_limit: int = 100,
     ):
+        if obstacle_avoid_points is None:
+            obstacle_avoid_points = []
         self.obstacle_avoid_points = obstacle_avoid_points
         self.time_limit = time_limit
         self.grid_size = grid_size
         self.reservation_matrix = np.zeros((grid_size[0], grid_size[1], self.time_limit))
 
+        self.obstacle_paths = []
         if num_obstacles > self.grid_size[0] * self.grid_size[1]:
             raise Exception("Number of obstacles is greater than grid size!")
 
