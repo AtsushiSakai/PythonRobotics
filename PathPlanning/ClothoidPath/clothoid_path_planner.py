@@ -86,7 +86,7 @@ def generate_clothoid_path(start_point, start_yaw,
             y = start_point.y + s * Y(curvature_rate * s ** 2, curvature * s,
                                       start_yaw)
             points.append(Point(x, y))
-        except Exception as e:
+        except (ValueError, TypeError) as e:
             print(f"Skipping failed clothoid point: {e}")
 
     return points
