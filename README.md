@@ -10,9 +10,9 @@ Python codes and [textbook](https://atsushisakai.github.io/PythonRobotics/index.
 
 
 # Table of Contents
-   * [What is this?](#what-is-this)
-   * [Requirements](#requirements)
-   * [Documentation](#documentation)
+   * [What is this?](#what-is-pythonrobotics)
+   * [Requirements](#requirements-to-run-the-code)
+   * [Documentation](#documentation-textbook)
    * [How to use](#how-to-use)
    * [Localization](#localization)
       * [Extended Kalman Filter localization](#extended-kalman-filter-localization)
@@ -68,7 +68,7 @@ Python codes and [textbook](https://atsushisakai.github.io/PythonRobotics/index.
    * [Use-case](#use-case)
    * [Contribution](#contribution)
    * [Citing](#citing)
-   * [Support](#support)
+   * [Support](#supporting-this-project)
    * [Sponsors](#sponsors)
       * [JetBrains](#JetBrains)
       * [1Password](#1password)
@@ -280,7 +280,7 @@ Reference
 
 - [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
 
-- [SLAM simulations by Tim Bailey](http://www-personal.acfr.usyd.edu.au/tbailey/software/slam_simulations.htm)
+- [SLAM simulations by Tim Bailey](https://openslam-org.github.io/bailey-slam.html)
 
 
 # Path Planning
@@ -472,7 +472,7 @@ A sample code with Reeds Shepp path planning.
 
 Reference
 
-- [15.3.2 Reeds\-Shepp Curves](http://planning.cs.uiuc.edu/node822.html) 
+- [15.3.2 Reeds\-Shepp Curves](http://lavalle.pl/planning/node822.html) 
 
 - [optimal paths for a car that goes both forwards and backwards](https://pdfs.semanticscholar.org/932e/c495b1d0018fd59dee12a0bf74434fac7af4.pdf)
 
