@@ -288,7 +288,7 @@ class StateMachine:
             plt.imshow(imread(BytesIO(content), format="png"))
             plt.axis("off")
             plt.show()
-        except Exception as e:
+        except (OSError, ValueError, TypeError) as e:
             print(f"Error showing PlantUML: {e}")
 
         return plant_uml_text
