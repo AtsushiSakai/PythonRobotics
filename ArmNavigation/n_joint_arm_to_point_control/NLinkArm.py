@@ -56,7 +56,7 @@ class NLinkArm(object):
                 lambda event: [exit(0) if event.key == 'escape' else None])
 
         for i in range(self.n_links + 1):
-            if i is not self.n_links:
+            if i != self.n_links:
                 plt.plot([self.points[i][0], self.points[i + 1][0]],
                          [self.points[i][1], self.points[i + 1][1]], 'r-')
             plt.plot(self.points[i][0], self.points[i][1], 'ko')
