@@ -32,7 +32,7 @@ W_DELTA_SIGMA = 1e-1  # difference in flight time
 W_NU = 1e5  # virtual control
 
 print(cvxpy.installed_solvers())
-solver = 'ECOS'
+solver = 'CLARABEL'
 verbose_solver = False
 
 show_animation = True
