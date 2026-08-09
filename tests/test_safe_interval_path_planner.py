@@ -18,7 +18,7 @@ def test_1():
     )
 
     m.show_animation = False
-    path = m.SafeIntervalPathPlanner.plan(grid, start, goal)
+    path = m.SafeIntervalPathPlanner.plan(grid, start, goal, 0)
 
     # path should have 31 entries
     assert len(path.path) == 31
