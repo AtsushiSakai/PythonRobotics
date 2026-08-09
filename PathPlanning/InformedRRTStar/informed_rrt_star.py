@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from utils.angle import rot_mat_2d
+from utils.plot import plot_circle
 
 show_animation = True
 
@@ -289,7 +290,7 @@ class InformedRRTStar:
                              [node.y, self.node_list[node.parent].y], "-g")
 
         for (ox, oy, size) in self.obstacle_list:
-            plt.plot(ox, oy, "ok", ms=30 * size)
+            plot_circle(ox, oy, size)
 
         plt.plot(self.start.x, self.start.y, "xr")
         plt.plot(self.goal.x, self.goal.y, "xr")

@@ -1,7 +1,9 @@
 import conftest  # Add root path to sys.path
-from utils import angle
+import matplotlib.pyplot as plt
 from numpy.testing import assert_allclose
 import numpy as np
+
+from utils import angle, plot
 
 
 def test_rot_mat_2d():
@@ -21,6 +23,36 @@ def test_angle_mod():
 
     assert_allclose(angle.angle_mod(-60.0, zero_2_2pi=True, degree=True),
                     [300.])
+
+
+def test_plot_circle_uses_data_coordinates():
+    figure, axes = plt.subplots()
+
+    circle = plot.plot_circle(2.0, -1.0, 0.75, ax=axes)
+
+    expected_bounds = [1.25, -1.75, 2.75, -0.25]
+    assert circle in axes.patches
+    assert axes.get_aspect() == 1.0
+    assert axes.get_adjustable() == "box"
+
+    figure.canvas.draw()
+    bounds = circle.get_window_extent()
+    assert_allclose(bounds.width, bounds.height)
+    assert_allclose(
+        bounds.transformed(axes.transData.inverted()).extents,
+        expected_bounds,
+    )
+
+    figure.set_size_inches(12.0, 3.0)
+    figure.canvas.draw()
+    resized_bounds = circle.get_window_extent()
+    assert_allclose(resized_bounds.width, resized_bounds.height)
+    assert_allclose(
+        resized_bounds.transformed(axes.transData.inverted()).extents,
+        expected_bounds,
+    )
+
+    plt.close(figure)
 
 
 if __name__ == '__main__':
