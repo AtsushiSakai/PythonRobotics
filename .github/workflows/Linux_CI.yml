@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ '3.13' ]
+        python-version: [ '3.13', '3.14' ]
 
     name: Python ${{ matrix.python-version }} CI
 
