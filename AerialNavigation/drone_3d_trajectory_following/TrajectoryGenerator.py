@@ -7,7 +7,7 @@ Author: Daniel Ingram (daniel-s-ingram)
 import numpy as np
 
 class TrajectoryGenerator():
-    def __init__(self, start_pos, des_pos, T, start_vel=[0,0,0], des_vel=[0,0,0], start_acc=[0,0,0], des_acc=[0,0,0]):
+    def __init__(self, start_pos, des_pos, T, start_vel=(0,0,0), des_vel=(0,0,0), start_acc=(0,0,0), des_acc=(0,0,0)):
         self.start_x = start_pos[0]
         self.start_y = start_pos[1]
         self.start_z = start_pos[2]
