@@ -100,7 +100,7 @@ class GridMap:
 
         x_ind, y_ind = self.get_xy_index_from_xy_pos(x_pos, y_pos)
 
-        if (not x_ind) or (not y_ind):
+        if (x_ind is None) or (y_ind is None):
             return False  # NG
 
         flag = self.set_value_from_xy_index(x_ind, y_ind, val)
@@ -118,7 +118,7 @@ class GridMap:
         """
 
         if (x_ind is None) or (y_ind is None):
-            return False, False
+            return False
 
         grid_ind = int(y_ind * self.width + x_ind)
 
