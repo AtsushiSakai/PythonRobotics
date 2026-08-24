@@ -53,5 +53,33 @@ def test2():
         check_path_length(px, py, lengths)
 
 
+def test_identical_start_and_goal_pose():
+    for pose in [(0.0, 0.0, 0.0), (1.2, -3.4, 0.7)]:
+        px, py, pyaw, _, lengths = m.reeds_shepp_path_planning(
+            *pose, *pose, maxc=1.0
+        )
+
+        assert sum(np.abs(lengths)) == 0.0
+        assert np.all(np.isfinite(px))
+        assert np.all(np.isfinite(py))
+        assert np.all(np.isfinite(pyaw))
+        assert np.all(np.isfinite(lengths))
+        np.testing.assert_allclose(px, pose[0], atol=1e-10)
+        np.testing.assert_allclose(py, pose[1], atol=1e-10)
+        np.testing.assert_allclose(pyaw, pose[2], atol=1e-10)
+
+
+def test_near_singular_path_formula():
+    for distance in [1e-6, 1e-12]:
+        is_valid, lengths, modes = m.left_right_x_left(
+            distance, 0.0, 0.0
+        )
+
+        assert is_valid
+        assert np.all(np.isfinite(lengths))
+        np.testing.assert_allclose(lengths[1], distance / 2.0, rtol=1e-12)
+        assert modes == ["L", "R", "L"]
+
+
 if __name__ == '__main__':
     conftest.run_this_test(__file__)
