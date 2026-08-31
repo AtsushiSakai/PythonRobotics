@@ -89,13 +89,13 @@ class RRTDubins(RRT):
 
             if (not search_until_max_iter) and new_node:  # check reaching the goal
                 last_index = self.search_best_goal_node()
-                if last_index:
+                if last_index is not None:
                     return self.generate_final_course(last_index)
 
         print("reached max iteration")
 
         last_index = self.search_best_goal_node()
-        if last_index:
+        if last_index is not None:
             return self.generate_final_course(last_index)
         else:
             print("Cannot find path")
@@ -141,7 +141,6 @@ class RRTDubins(RRT):
         new_node.x = px[-1]
         new_node.y = py[-1]
         new_node.yaw = pyaw[-1]
-
         new_node.path_x = px
         new_node.path_y = py
         new_node.path_yaw = pyaw
