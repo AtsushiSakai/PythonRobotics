@@ -17,7 +17,7 @@ def test_steer_handles_failed_local_planner():
         obstacle_list=[],
         rand_area=[-1.0, 1.0],
     )
-    planner.lqr_planner.lqr_planning = lambda *args, **kwargs: ([], [])
+    planner.lqr_planner.MAX_TIME = 0.0
 
     result = planner.steer(planner.start, planner.end)
 
