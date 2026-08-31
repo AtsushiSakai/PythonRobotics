@@ -141,6 +141,7 @@ class RRTDubins(RRT):
         new_node.x = px[-1]
         new_node.y = py[-1]
         new_node.yaw = pyaw[-1]
+
         new_node.path_x = px
         new_node.path_y = py
         new_node.path_yaw = pyaw
