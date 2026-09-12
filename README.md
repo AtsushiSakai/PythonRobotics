@@ -169,6 +169,16 @@ All animation gifs are stored here: [AtsushiSakai/PythonRoboticsGifs: Animation 
 
 <img src="https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Localization/extended_kalman_filter/animation.gif" width="640" alt="EKF pic">
 
+This is a sensor fusion localization with Extended Kalman Filter.
+
+The blue line is true trajectory, the black line is dead reckoning trajectory,
+
+green dots are measured sensor data and the dotted ellipse is estimated region containing the true position
+
+and the red line is an estimated trajectory with EKF localization.
+
+It is assumed that it has the noisy position data, speed and yaw rate.
+
 Reference
 
 - [documentation](https://atsushisakai.github.io/PythonRobotics/modules/2_localization/extended_kalman_filter_localization_files/extended_kalman_filter_localization.html)
@@ -220,11 +230,20 @@ This is a 2D Gaussian grid mapping example.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/gaussian_grid_map/animation.gif)
 
+The red cross is true position of obstacle, blue dot is robot (fixed) position.
+
+The blue heat map shows the Gaussian probability grid map generated from the obstacle positions.
+
+
 ## Ray casting grid map
 
 This is a 2D ray casting grid mapping example.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/raycasting_grid_map/animation.gif)
+
+The red cross is true position of obstacle, blue dot is robot (fixed) position.
+
+White cells are free (no obstacle), dark blue cells are occupied (obstacle detected) and the remaining blue cells are unknown/unobserved (occluded from the robot's view).
 
 ## Lidar to grid map
 
@@ -232,17 +251,33 @@ This example shows how to convert a 2D range measurement to a grid map.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/lidar_to_grid_map/animation.gif)
 
+The red line/dots are the LIDAR beams and their hit points.
+
+Green spaces are free (no obstacle), red spaces are occupied (LIDAR collision) and the yellows spaces are unknown/unobserved (no beams reached).
+
 ## k-means object clustering
 
 This is a 2D object clustering with k-means algorithm.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/kmeans_clustering/animation.gif)
 
+The blue and yellow dots are the data points, grouped and colored by their assigned cluster.
+
+The crosses are each cluster's centroid — the mean position of all points currently assigned to it, recalculated each iteration until convergence.
+
 ## Rectangle fitting
 
 This is a 2D rectangle fitting for vehicle detection.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/rectangle_fitting/animation.gif)
+
+The blue rectangles are the true shapes/positions of the vehicles, with the blue dot at each center.
+
+The green dot is the fixed position of the LIDAR sensor. The green lines are the individual laser beams from the sensor to each detected point on a vehicle's surface.
+
+The red rectangle is the estimated shape fitted to those detected points.
+
+The colored dots are the LIDAR hit points on each vehicle's surface (colored by which cluster the segmentation step grouped them into).
 
 
 # SLAM
