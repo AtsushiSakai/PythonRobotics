@@ -472,7 +472,7 @@ A sample code with Reeds Shepp path planning.
 
 Reference
 
-- [15.3.2 Reeds\-Shepp Curves](http://planning.cs.uiuc.edu/node822.html) 
+- [15.3.2 Reeds\-Shepp Curves](https://lavalle.pl/planning/node822.html) 
 
 - [optimal paths for a car that goes both forwards and backwards](https://pdfs.semanticscholar.org/932e/c495b1d0018fd59dee12a0bf74434fac7af4.pdf)
 
