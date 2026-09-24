@@ -36,7 +36,8 @@ Python codes and [textbook](https://atsushisakai.github.io/PythonRobotics/index.
          * [D* Lite algorithm](#d-lite-algorithm)
          * [Potential Field algorithm](#potential-field-algorithm)
          * [Grid based coverage path planning](#grid-based-coverage-path-planning)
-         * [Particle Swarm Optimization (PSO)](#particle-swarm-optimization-pso)  
+         * [Particle Swarm Optimization (PSO)](#particle-swarm-optimization-pso)
+         * [Ant Colony Optimization (ACO)](#ant-colony-optimization-aco)
       * [State Lattice Planning](#state-lattice-planning)
          * [Biased polar sampling](#biased-polar-sampling)
          * [Lane sampling](#lane-sampling)
@@ -373,7 +374,21 @@ References
 
 - [Kennedy, J.; Eberhart, R. (1995). "Particle Swarm Optimization"](https://ieeexplore.ieee.org/document/488968)
 
+### Ant Colony Optimization (ACO)
 
+This is a 2D grid-based path planning simulation using the Ant Colony Optimization algorithm.
+
+![ACO](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/AntColonyOptimization/animation.gif)
+
+ACO is a metaheuristic optimization algorithm inspired by the foraging behavior of real ants. Ants deposit pheromones on paths they traverse, creating trails that guide other ants. Over time, shorter paths accumulate more pheromones, leading the colony to converge on optimal solutions.
+
+The animation shows the pheromone heatmap (red = high concentration) with the best path (blue line) evolving from start (green circle) to goal (red cross).
+
+References
+
+- [Ant colony optimization algorithms - Wikipedia](https://en.wikipedia.org/wiki/Ant_colony_optimization_algorithms)
+
+- [Dorigo, M.; Maniezzo, V.; Colorni, A. (1996). "Ant system: optimization by a colony of cooperating agents"](https://ieeexplore.ieee.org/document/484436)
 
 ## State Lattice Planning
 
