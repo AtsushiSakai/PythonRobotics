@@ -42,5 +42,21 @@ def test_too_big_step_size():
     assert path is None
 
 
+def test_goal_yaw_wraparound():
+    yaw_offset = 0.005
+    planner = m.RRTStarReedsShepp(
+        start=[0.0, 0.0, m.math.pi - yaw_offset],
+        goal=[0.0, 0.0, -m.math.pi + yaw_offset],
+        obstacle_list=[],
+        rand_area=[-1.0, 1.0],
+        max_iter=0,
+    )
+    planner.node_list = [planner.start]
+
+    goal_index = planner.search_best_goal_node()
+
+    assert goal_index == 0
+
+
 if __name__ == '__main__':
     conftest.run_this_test(__file__)
