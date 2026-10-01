@@ -152,7 +152,7 @@ class GridMap:
 
                 flag = self.check_inside_polygon(x_pos, y_pos, pol_x, pol_y)
 
-                if flag is inside:
+                if flag == inside:
                     self.set_value_from_xy_index(x_ind, y_ind, val)
 
     def calc_grid_index_from_xy_index(self, x_ind, y_ind):
