@@ -149,8 +149,8 @@ class RRTStar(RRT):
             self.calc_dist_to_goal(n.x, n.y) for n in self.node_list
         ]
         goal_inds = [
-            dist_to_goal_list.index(i) for i in dist_to_goal_list
-            if i <= self.expand_dis
+            i for i, distance in enumerate(dist_to_goal_list)
+            if distance <= self.expand_dis
         ]
 
         safe_goal_inds = []
@@ -197,7 +197,7 @@ class RRTStar(RRT):
             r = min(r, self.expand_dis)
         dist_list = [(node.x - new_node.x)**2 + (node.y - new_node.y)**2
                      for node in self.node_list]
-        near_inds = [dist_list.index(i) for i in dist_list if i <= r**2]
+        near_inds = [i for i, distance in enumerate(dist_list) if distance <= r**2]
         return near_inds
 
     def rewire(self, new_node, near_inds):
