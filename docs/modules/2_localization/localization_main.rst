@@ -9,6 +9,7 @@ Localization is the ability of a robot to know its position and orientation with
    :caption: Contents
 
    extended_kalman_filter_localization_files/extended_kalman_filter_localization
+   gps_imu_fusion/gps_imu_fusion
    ensamble_kalman_filter_localization_files/ensamble_kalman_filter_localization
    unscented_kalman_filter_localization/unscented_kalman_filter_localization
    histogram_filter_localization/histogram_filter_localization

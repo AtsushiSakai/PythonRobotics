@@ -16,6 +16,7 @@ Python codes and [textbook](https://atsushisakai.github.io/PythonRobotics/index.
    * [How to use](#how-to-use)
    * [Localization](#localization)
       * [Extended Kalman Filter localization](#extended-kalman-filter-localization)
+      * [GPS/IMU fusion](#gpsimu-fusion)
       * [Particle filter localization](#particle-filter-localization)
       * [Histogram filter localization](#histogram-filter-localization)
    * [Mapping](#mapping)
@@ -172,6 +173,17 @@ All animation gifs are stored here: [AtsushiSakai/PythonRoboticsGifs: Animation 
 Reference
 
 - [documentation](https://atsushisakai.github.io/PythonRobotics/modules/2_localization/extended_kalman_filter_localization_files/extended_kalman_filter_localization.html)
+
+## GPS/IMU fusion
+
+![GPS/IMU fusion](https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/b762650770bc6f6c3f9686b4a778415a8332847a/Localization/gps_imu_fusion/animation.gif)
+
+An extended Kalman filter fuses body-frame accelerometer and gyroscope readings
+with lower-rate GPS positions, estimates sensor biases, and continues inertial
+prediction during a temporary GPS outage.
+
+- [documentation](https://atsushisakai.github.io/PythonRobotics/modules/2_localization/gps_imu_fusion/gps_imu_fusion.html)
+- [sample code](Localization/gps_imu_fusion/gps_imu_fusion.py)
 
 ## Particle filter localization
 
