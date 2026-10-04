@@ -7,6 +7,12 @@ The cyan line is the target course and black crosses are obstacles.
 
 The red line is predicted path.
 
+Code Link
+~~~~~~~~~~~~~~
+
+.. autofunction:: PathPlanning.FrenetOptimalTrajectory.frenet_optimal_trajectory.main
+
+
 High Speed and Velocity Keeping Scenario
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -35,7 +41,7 @@ Low Speed and Merging and Stopping Scenario
 
 This scenario illustrates the trajectory planning at low speeds with merging and stopping behaviors.
 
-Ref:
+Reference
 
 -  `Optimal Trajectory Generation for Dynamic Street Scenarios in a
    Frenet

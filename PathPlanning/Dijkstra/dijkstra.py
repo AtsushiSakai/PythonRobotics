@@ -12,7 +12,7 @@ import math
 show_animation = True
 
 
-class Dijkstra:
+class DijkstraPlanner:
 
     def __init__(self, ox, oy, resolution, robot_radius):
         """
@@ -246,7 +246,7 @@ def main():
         plt.grid(True)
         plt.axis("equal")
 
-    dijkstra = Dijkstra(ox, oy, grid_size, robot_radius)
+    dijkstra = DijkstraPlanner(ox, oy, grid_size, robot_radius)
     rx, ry = dijkstra.planning(sx, sy, gx, gy)
 
     if show_animation:  # pragma: no cover

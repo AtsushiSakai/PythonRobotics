@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+cd "$(dirname "$0")" || exit 1
 echo "Run test suites! "
 
 # === pytest based test runner ===

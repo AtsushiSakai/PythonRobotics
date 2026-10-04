@@ -4,7 +4,7 @@ Inverted Pendulum
 ------------------
 
 An inverted pendulum on a cart consists of a mass :math:`m` at the top of a pole of length :math:`l` pivoted on a
-horizontally moving base as shown in the adjacent.
+horizontally moving base as shown in the adjacent figure.
 
 The objective of the control system is to balance the inverted pendulum by applying a force to the cart that the pendulum is attached to.
 
@@ -89,9 +89,15 @@ and :math:`P` is the unique positive definite solution to the discrete time
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/InvertedPendulumCart/animation_lqr.gif
 
+Code Link
+^^^^^^^^^^^
+
+.. autofunction:: InvertedPendulum.inverted_pendulum_lqr_control.main
+
+
 MPC control
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The MPC controller minimize this cost function defined as:
+The MPC controller minimizes this cost function defined as:
 
 .. math:: J = x^T Q x + u^T R u
 
@@ -101,3 +107,9 @@ subject to:
 - Initial state
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Control/InvertedPendulumCart/animation.gif
+
+Code Link
+^^^^^^^^^^^
+
+.. autofunction:: InvertedPendulum.inverted_pendulum_mpc_control.main
+

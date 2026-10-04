@@ -7,6 +7,12 @@ This is a path planning code with RRT\*
 
 Black circles are obstacles, green line is a searched tree, red crosses are start and goal positions.
 
+Code Link
+^^^^^^^^^^
+
+.. autoclass:: PathPlanning.RRTStar.rrt_star.RRTStar
+
+
 Simulation
 ^^^^^^^^^^
 

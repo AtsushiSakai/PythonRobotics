@@ -57,8 +57,8 @@ This evaluation function uses the squreed distances between the edges of the rec
 Calculating the squared error is the same as calculating the variance.
 The smaller this variance, the more it signifies that the points fit within the rectangle.
 
-API
-~~~~~~
+Code Link
+~~~~~~~~~~~
 
 .. autoclass:: Mapping.rectangle_fitting.rectangle_fitting.LShapeFitting
 	:members:

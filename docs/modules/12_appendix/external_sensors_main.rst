@@ -10,9 +10,7 @@ Therefore, we will provide an overview.
 Introduction
 ------------
 
-In recent years, the application of robotic technology has advanced,
-particularly in areas such as autonomous vehicles and disaster response robots.
-A crucial element in these technologies is external recognition—the robot's ability to understand its surrounding environment, identify safe zones, and detect moving objects using onboard sensors. Achieving effective external recognition involves various techniques, but equally important is the selection of appropriate sensors. Robots, like the sensors they employ, come in many forms, but external recognition sensors can be broadly categorized into three types. Developing an advanced external recognition system requires a thorough understanding of each sensor's principles and characteristics to determine their optimal application. This article summarizes the principles and features of these sensors for personal study purposes.
+In recent years, the application of robotic technology has advanced, particularly in areas such as autonomous vehicles and disaster response robots. A crucial element in these technologies is external recognition—the robot's ability to understand its surrounding environment, identify safe zones, and detect moving objects using onboard sensors. Achieving effective external recognition involves various techniques, but equally important is the selection of appropriate sensors. Robots, like the sensors they employ, come in many forms, but external recognition sensors can be broadly categorized into three types. Developing an advanced external recognition system requires a thorough understanding of each sensor's principles and characteristics to determine their optimal application. This article summarizes the principles and features of these sensors for personal study purposes.
 
 Laser Sensors
 -------------
@@ -22,7 +20,7 @@ Laser sensors measure distances by utilizing light, commonly referred to as Ligh
 Radar Sensors
 -------------
 
-TBD
+Radar measures distances using radio waves, commonly referred to as Radio Detection and Ranging (RADAR). It operates by transmitting radio signals towards an object and calculating the distance based on the time it takes for the reflected waves to return, using the speed of radio waves as a constant. 
 
 
 Monocular Cameras
@@ -59,4 +57,9 @@ Ultrasonic sensors are commonly used in indoor robots and some automotive autono
 References
 ----------
 
-TBD
+- Wikipedia articles:
+
+  - `Lidar Sensors <https://en.wikipedia.org/wiki/Lidar>`_
+  - `Radar Sensors <https://en.wikipedia.org/wiki/Radar>`_
+  - `Stereo Cameras <https://en.wikipedia.org/wiki/Stereo_camera>`_
+  - `Ultrasonic Sensors <https://en.wikipedia.org/wiki/Ultrasonic_transducer>`_

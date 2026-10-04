@@ -5,7 +5,7 @@ A rocket powered landing with successive convexification
 author: Sven Niederberger
         Atsushi Sakai
 
-Ref:
+Reference:
 - Python implementation of 'Successive Convexification for 6-DoF Mars Rocket Powered Landing with Free-Final-Time' paper
 by Michael Szmuk and Behcet Acıkmese.
 

@@ -6,11 +6,11 @@ This is an electric wheelchair control demo by [Katsushun89](https://github.com/
 
 [WHILL Model CR](https://whill.jp/model-cr) is the control target, [M5Stack](https://m5stack.com/) is used for the controller, and [toio](https://toio.io/) is used for the control input device.
 
-[Move to a Pose Control — PythonRobotics documentation](https://atsushisakai.github.io/PythonRobotics/modules/control/move_to_a_pose_control/move_to_a_pose_control.html) is used for its control algorithm ([code link](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/move_to_pose/move_to_pose.py)).
+[Move to a Pose Control — PythonRobotics documentation](https://atsushisakai.github.io/PythonRobotics/modules/6_path_tracking/move_to_a_pose/move_to_a_pose.html) is used for its control algorithm ([code link](https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/move_to_pose/move_to_pose.py)).
 
 ![1](https://github.com/AtsushiSakai/PythonRoboticsGifs/blob/master/Users/WHILL_Model_CR_with_move_to_a_pose/WHLL_Model_CR_with_move_to_a_pose.gif)
 
-Ref:
+Reference:
 
 - [toioと同じように動くWHILL Model CR (in Japanese)](https://qiita.com/KatsuShun89/items/68fde7544ecfe36096d2)
 
@@ -101,7 +101,7 @@ Thank you!
 
 ---
 
-Dear AtsushiSakai, <br>Thanks a lot for the wonderful collection of projects.It was really useful. I really appreciate your time in maintaing and building this repository.It will be really great if I get a chance to meet you in person sometime.I got really inspired looking at your work. <br>All the very best for all your future endeavors! <br> Thanks once again, <br>
+Dear AtsushiSakai, <br>Thanks a lot for the wonderful collection of projects.It was really useful. I really appreciate your time in maintaining and building this repository.It will be really great if I get a chance to meet you in person sometime.I got really inspired looking at your work. <br>All the very best for all your future endeavors! <br> Thanks once again, <br>
 
 ---Ezhil Bharathi 
 
@@ -163,7 +163,7 @@ so kind of you can you make videos of it.
 
 ---
 
-Dear AtshshiSakai, <br>You are very wise and smart that you created this library for students wanting to learn Probabilistic Robotics and actually perform robot control. <br>Hats off to you and your work. <br>I am also reading your book titled : Python Robotics
+Dear AtsushiSakai, <br>You are very wise and smart that you created this library for students wanting to learn Probabilistic Robotics and actually perform robot control. <br>Hats off to you and your work. <br>I am also reading your book titled : Python Robotics
 
 --Himanshu
 
@@ -263,7 +263,7 @@ Hey Atsushi <br>We are working on a multiagent simulation game and this project 
 
 ---
 
-Thanks a lot for this amazing set of very useful librarires!
+Thanks a lot for this amazing set of very useful libraries!
 
 --Razvan Viorel Mihai
 
@@ -275,7 +275,7 @@ Dear Atsushi Sakai, <br> <br>This is probably one of the best open-source roboti
 
 ---
 
-hanks frnd, for ur contibusion
+Thanks friend, for your contribution
 
 —--
 

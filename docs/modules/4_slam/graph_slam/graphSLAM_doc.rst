@@ -28,7 +28,7 @@ available that uses graph-based approaches to perform online estimation
 or to solve for a subset of the poses.
 
 GraphSLAM uses the motion information as well as the observations of the
-environment to create least square problem that can be solved using
+environment to create a least squares problem that can be solved using
 standard optimization techniques.
 
 Minimal Example
@@ -331,7 +331,7 @@ between node 0 and 1 will be created. The equations for the error is as follows:
 
 :math:`e_{ij}^y = y_j + d_j sin(\psi_j + \theta_j) - y_i - d_i sin(\psi_i + \theta_i)`
 
-:math:`e_{ij}^x = \psi_j + \theta_j - \psi_i - \theta_i`
+:math:`e_{ij}^{\psi} = \psi_j + \theta_j - \psi_i - \theta_i`
 
 Where :math:`[x_i, y_i, \psi_i]` is the pose for node :math:`i` and
 similarly for node :math:`j`, :math:`d` is the measured distance at

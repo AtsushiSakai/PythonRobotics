@@ -5,13 +5,6 @@ Model predictive speed and steering control
 .. figure:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/model_predictive_speed_and_steer_control/animation.gif?raw=true
    :alt: Model predictive speed and steering control
 
-   Model predictive speed and steering control
-
-code:
-
-`PythonRobotics/model_predictive_speed_and_steer_control.py at master ·
-AtsushiSakai/PythonRobotics <https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/model_predictive_speed_and_steer_control/model_predictive_speed_and_steer_control.py>`__
-
 This is a path tracking simulation using model predictive control (MPC).
 
 The MPC controller controls vehicle speed and steering base on
@@ -21,6 +14,12 @@ This code uses cvxpy as an optimization modeling tool.
 
 -  `Welcome to CVXPY 1.0 — CVXPY 1.0.6
    documentation <http://www.cvxpy.org/>`__
+
+Code Link
+~~~~~~~~~~~~~~~
+
+.. autofunction:: PathTracking.model_predictive_speed_and_steer_control.model_predictive_speed_and_steer_control.iterative_linear_mpc_control
+
 
 MPC modeling
 ~~~~~~~~~~~~
@@ -35,17 +34,17 @@ Input vector is:
 
 .. math::  u = [a, \delta]
 
-a: accellation, δ: steering angle
+a: acceleration, δ: steering angle
 
-The MPC cotroller minimize this cost function for path tracking:
+The MPC cotroller minimizes this cost function for path tracking:
 
 .. math:: min\ Q_f(z_{T,ref}-z_{T})^2+Q\Sigma({z_{t,ref}-z_{t}})^2+R\Sigma{u_t}^2+R_d\Sigma({u_{t+1}-u_{t}})^2
 
-z_ref come from target path and speed.
+z_ref comes from target path and speed.
 
 subject to:
 
--  Linearlied vehicle model
+-  Linearized vehicle model
 
 .. math:: z_{t+1}=Az_t+Bu+C
 

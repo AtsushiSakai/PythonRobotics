@@ -4,7 +4,7 @@ Object shape recognition with L-shape fitting
 
 author: Atsushi Sakai (@Atsushi_twi)
 
-Ref:
+Reference:
 - Efficient L-Shape Fitting for Vehicle Detection Using Laser Scanners -
 The Robotics Institute Carnegie Mellon University
 https://www.ri.cmu.edu/publications/

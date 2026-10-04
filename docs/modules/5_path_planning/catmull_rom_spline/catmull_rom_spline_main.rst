@@ -88,8 +88,8 @@ Catmull-Rom Spline API
 
 This section provides an overview of the functions used for Catmull-Rom spline path planning.
 
-API
-++++
+Code Link
+++++++++++
 
 .. autofunction:: PathPlanning.Catmull_RomSplinePath.catmull_rom_spline_path.catmull_rom_point
 

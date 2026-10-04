@@ -29,7 +29,7 @@ class MaxVelocityNotReached(Exception):
         self.message = f'Actual velocity {actual_vel} does not equal desired max velocity {max_vel}!'
 
 
-class eta3_trajectory(Eta3Path):
+class Eta3SplineTrajectory(Eta3Path):
     """
     eta3_trajectory
 
@@ -300,8 +300,8 @@ def test1(max_vel=0.5):
         trajectory_segments.append(Eta3PathSegment(
             start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
 
-        traj = eta3_trajectory(trajectory_segments,
-                               max_vel=max_vel, max_accel=0.5)
+        traj = Eta3SplineTrajectory(trajectory_segments,
+                                    max_vel=max_vel, max_accel=0.5)
 
         # interpolate at several points along the path
         times = np.linspace(0, traj.total_time, 101)
@@ -334,8 +334,8 @@ def test2(max_vel=0.5):
         trajectory_segments.append(Eta3PathSegment(
             start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
 
-        traj = eta3_trajectory(trajectory_segments,
-                               max_vel=max_vel, max_accel=0.5)
+        traj = Eta3SplineTrajectory(trajectory_segments,
+                                    max_vel=max_vel, max_accel=0.5)
 
         # interpolate at several points along the path
         times = np.linspace(0, traj.total_time, 101)
@@ -400,8 +400,8 @@ def test3(max_vel=2.0):
         start_pose=start_pose, end_pose=end_pose, eta=eta, kappa=kappa))
 
     # construct the whole path
-    traj = eta3_trajectory(trajectory_segments,
-                           max_vel=max_vel, max_accel=0.5, max_jerk=1)
+    traj = Eta3SplineTrajectory(trajectory_segments,
+                                max_vel=max_vel, max_accel=0.5, max_jerk=1)
 
     # interpolate at several points along the path
     times = np.linspace(0, traj.total_time, 1001)

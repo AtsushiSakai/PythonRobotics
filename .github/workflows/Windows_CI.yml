@@ -16,14 +16,14 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        python-version: [ '3.13' ]
+        python-version: [ '3.14' ]
     name: Python ${{ matrix.python-version }} CI
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: git fetch --prune --unshallow
 
       - name: Setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
 

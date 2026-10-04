@@ -14,8 +14,8 @@ The algorithm is demonstrated on a simple 2D grid with obstacles:
 
 .. image:: distance_map.png
 
-API
-~~~
+Code Link
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. autofunction:: Mapping.DistanceMap.distance_map.compute_sdf
 

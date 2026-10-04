@@ -27,8 +27,8 @@ This method determines which each point is in a grid, and replaces the point
 clouds that are in the same Voxel with their average to reduce the number of
 points.
 
-API
-=====
+Code Link
+==========
 
 .. autofunction:: Mapping.point_cloud_sampling.point_cloud_sampling.voxel_point_sampling
 
@@ -61,8 +61,8 @@ Although this method does not have good performance comparing the Farthest
 distance sample where each point is distributed farther from each other,
 this is suitable for real-time processing because of its fast computation time.
 
-API
-=====
+Code Link
+==========
 
 .. autofunction:: Mapping.point_cloud_sampling.point_cloud_sampling.poisson_disk_sampling
 

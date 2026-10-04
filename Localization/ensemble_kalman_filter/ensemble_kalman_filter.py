@@ -4,7 +4,7 @@ Ensemble Kalman Filter(EnKF) localization sample
 
 author: Ryohei Sasaki(rsasaki0109)
 
-Ref:
+Reference:
 Ensemble Kalman filtering
 (https://rmets.onlinelibrary.wiley.com/doi/10.1256/qj.05.135)
 

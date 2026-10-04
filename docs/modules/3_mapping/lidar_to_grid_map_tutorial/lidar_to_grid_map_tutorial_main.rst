@@ -19,7 +19,7 @@ unknown (unobserved) areas, which are close to 0.5.
 .. figure:: grid_map_example.png
 
 In order to construct the grid map from the measurement we need to
-discretise the values. But, first let’s need to ``import`` some
+discretise the values. But, first we need to ``import`` some
 necessary packages.
 
 .. code:: ipython3
@@ -195,4 +195,10 @@ Let’s use this flood fill on real data:
 
 
 .. image:: lidar_to_grid_map_tutorial_14_1.png
+
+Code Link
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: Mapping.lidar_to_grid_map.lidar_to_grid_map.main
+
 

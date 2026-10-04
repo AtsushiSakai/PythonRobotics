@@ -48,7 +48,7 @@ def atan_zero_to_twopi(y, x):
     return angle
 
 
-def precasting(minx, miny, xw, yw, xyreso, yawreso):
+def pre_casting(minx, miny, xw, yw, xyreso, yawreso):
 
     precast = [[] for i in range(int(round((math.pi * 2.0) / yawreso)) + 1)]
 
@@ -81,7 +81,7 @@ def generate_ray_casting_grid_map(ox, oy, xyreso, yawreso):
 
     pmap = [[0.0 for i in range(yw)] for i in range(xw)]
 
-    precast = precasting(minx, miny, xw, yw, xyreso, yawreso)
+    precast = pre_casting(minx, miny, xw, yw, xyreso, yawreso)
 
     for (x, y) in zip(ox, oy):
 

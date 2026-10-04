@@ -1,5 +1,5 @@
 import conftest  # Add root path to sys.path
-from PathTracking.rear_wheel_feedback import rear_wheel_feedback as m
+from PathTracking.rear_wheel_feedback_control import rear_wheel_feedback_control as m
 
 
 def test1():

@@ -7,9 +7,15 @@ Two joint arm to point control
 
 This is two joint arm to a point control simulation.
 
-This is a interactive simulation.
+This is an interactive simulation.
 
 You can set the goal position of the end effector with left-click on the plotting area.
+
+Code Link
+~~~~~~~~~~~~~~~
+
+.. autofunction:: ArmNavigation.two_joint_arm_to_point_control.two_joint_arm_to_point_control.main
+
 
 Inverse Kinematics for a Planar Two-Link Robotic Arm
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

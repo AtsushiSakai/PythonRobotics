@@ -13,7 +13,7 @@ It can generates a shortest path between two 2D poses (x, y, yaw) with maximum c
 
 Generated paths consist of 3 segments of maximum curvature curves or a straight line segment.
 
-Each segment type can is categorized by 3 type: 'Right turn (R)' , 'Left turn (L)', and 'Straight (S).' 
+Each segment type can be categorized by 3 types: 'Right turn (R)' , 'Left turn (L)', and 'Straight (S).' 
 
 Possible path will be at least one of these six types: RSR, RSL, LSR, LSL, RLR, LRL.
 
@@ -62,7 +62,7 @@ You can generate a path from these information and the maximum curvature informa
 A path type which has minimum course length among 6 types is selected,
 and then a path is constructed based on the selected type and its distances.
 
-API
+Code Link
 ~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: PathPlanning.DubinsPath.dubins_path_planner.plan_dubins_path

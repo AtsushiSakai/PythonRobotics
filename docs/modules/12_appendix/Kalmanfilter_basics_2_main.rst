@@ -331,7 +331,7 @@ are vectors and matrices, but the concepts are exactly the same:
 -  Use the process model to predict the next state (the prior)
 -  Form an estimate part way between the measurement and the prior
 
-References:
+Reference
 ~~~~~~~~~~~
 
 1. Roger Labbe’s

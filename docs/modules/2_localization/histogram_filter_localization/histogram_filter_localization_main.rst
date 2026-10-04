@@ -16,6 +16,11 @@ The filter uses speed input and range observations from RFID for localization.
 
 Initial position information is not needed.
 
+Code Link
+~~~~~~~~~~~~~
+
+.. autofunction:: Localization.histogram_filter.histogram_filter.histogram_filter_localization
+
 Filtering algorithm
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -63,7 +68,7 @@ But, the probability is getting uncertain without observations:
 
 
 The `gaussian filter <https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.gaussian_filter.html>`_
-is used in the simulation for adding noize.
+is used in the simulation for adding noise.
 
 Step3: Update probability by observation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -107,7 +112,7 @@ There are two ways to calculate the final positions:
 
 
 
-References:
+Reference
 ~~~~~~~~~~~
 
 - `_PROBABILISTIC ROBOTICS: <http://www.probabilistic-robotics.org>`_

@@ -9,6 +9,11 @@ Motion planning with quintic polynomials.
 It can calculate 2D path, velocity, and acceleration profile based on
 quintic polynomials.
 
+Code Link
+~~~~~~~~~~~~~~~
+
+.. autofunction:: PathPlanning.QuinticPolynomialsPlanner.quintic_polynomials_planner.quintic_polynomials_planner
+
 
 
 Quintic polynomials for one dimensional robot motion
@@ -97,7 +102,7 @@ Each velocity and acceleration boundary condition can be calculated with each or
 
 :math:`v_{xe}=v_ecos(\theta_e), v_{ye}=v_esin(\theta_e)`
 
-References:
+Reference
 ~~~~~~~~~~~
 
 -  `Local Path Planning And Motion Control For Agv In

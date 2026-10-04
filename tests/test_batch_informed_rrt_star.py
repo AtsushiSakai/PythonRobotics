@@ -1,7 +1,7 @@
 import random
 
 import conftest
-from PathPlanning.BatchInformedRRTStar import batch_informed_rrtstar as m
+from PathPlanning.BatchInformedRRTStar import batch_informed_rrt_star as m
 
 
 def test_1():

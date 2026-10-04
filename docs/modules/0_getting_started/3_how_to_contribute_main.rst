@@ -30,6 +30,38 @@ We only accept a PR for Python 3.13.x or higher.
 
 We will not accept a PR for Python 2.x.
 
+Before opening a pull request
+--------------------------------
+
+Check the items that apply to your change before opening a PR. The steps below
+explain these points in more detail.
+
+- **Scope:** Focus on one algorithm, bug, or documentation topic. Split large
+  changes into smaller PRs, and propose substantial changes in an issue first.
+- **Diff:** Use a separate branch and review the diff against ``master``. Remove
+  unrelated formatting, parameter, dependency, and CI configuration changes.
+- **Readability:** Use descriptive names and small, clear functions. Keep the
+  code easy to relate to the algorithm's equations, even when optimizing it.
+- **Compatibility:** Follow `Check your Python version.`_ and the current CI
+  configuration. Use only the existing :ref:`Requirements` libraries.
+- **Existing behavior:** Preserve default parameters and working examples unless
+  the change is intentional and explained. Do not weaken tests to hide failures.
+- **Tests:** For code changes, add or extend tests under ``tests`` that check the
+  expected result and relevant boundary cases. Run examples without animation
+  and run ``bash runtests.sh`` locally, including its code style checks.
+- **Documentation:** Update the existing official RST page, or add one for a new
+  example. Explain the algorithm and mathematics there; explain code, inputs,
+  outputs, and units in headers and docstrings. Write these explanations in English.
+- **Navigation and rendering:** Add new pages to the appropriate parent
+  ``toctree``. Build the docs and inspect the generated HTML, including equations,
+  lists, links, and images.
+- **Animation:** For new examples or changed visual behavior, check that the
+  animation makes the result, colors, and lines understandable. Submit new GIFs
+  to `PythonRoboticsGifs`_ and link them from the documentation.
+- **PR description:** Prepare the issue link, reason for the change, and test
+  results. Include before-and-after results where useful, and comparable timings
+  with the test configuration for performance improvements.
+
 .. _`Adding a new algorithm example`:
 
 1. Adding a new algorithm example
@@ -60,13 +92,40 @@ When you implement an algorithm, please keep the following items in mind.
 
 1. Use only Python. Other language code is not acceptable.
 
-2. This project only accept codes for python 3.9 or higher.
+2. Use the Python version described in `Check your Python version.`_ and run the
+   example with the versions used by the current CI configuration.
 
-3. Use matplotlib based animation to show how the algorithm works.
+3. Use matplotlib based animation to show how the algorithm works. Make the
+   start, goal, obstacles, and result clear where applicable, and explain the
+   meaning of colors and lines. The animation should help readers understand
+   the algorithm's behavior, such as how a path changes after detecting an obstacle.
 
 4. Only use current :ref:`Requirements` libraries, not adding new dependencies.
 
-5. Keep simple your code. The main goal is to make it easy for users to understand the algorithm, not for practical usage.
+5. Keep the code simple and easy to follow. The main goal is to help beginners
+   understand the algorithm. Favor readability over performance or additional
+   abstractions, and keep the implementation recognizable from the algorithm's
+   equations. Avoid shortcuts that only work for the default simulation.
+
+6. Use descriptive names instead of unexplained abbreviations or single-letter
+   names. For example, prefer ``parent_index`` to ``pind``. If mathematical symbols
+   help relate the code to an equation, explain their meaning. Split long
+   functions and complex conditions into clearly named functions or intermediate
+   variables, and follow the style of nearby examples.
+
+7. Add a short file header describing the example, its author, and relevant
+   references. Use docstrings to explain functions, classes, inputs, outputs,
+   and configuration parameters, including units where applicable. Keep useful
+   existing explanations when refactoring.
+
+8. Use named configuration parameters instead of unexplained numeric constants.
+   Preserve existing defaults unless changing them is part of the intended fix;
+   set parameters for a particular test inside that test.
+
+9. Put the runnable example in a ``main()`` function and guard plotting with
+   ``show_animation`` so that the example also runs without animation. Prefer
+   existing Python, NumPy, SciPy, and project functions when they make the
+   algorithm easier to read, rather than duplicating the same implementation.
 
 
 Step 3: Add a unittest
@@ -77,7 +136,21 @@ This sample test code might help you : `test_a_star.py`_.
 
 At the least, try to run the example code without animation in the unit test.
 
-If you want to run the test suites locally, you can use the `runtests.sh` script by just executing it.
+When extending an existing example, add test cases to its existing test file
+where possible. Give tests descriptive names that explain the scenario, such as
+``test_no_obstacle`` or ``test_too_big_step_size``. Cover the added algorithm
+variants and relevant boundary cases.
+
+For a bug fix, reproduce the reported problem and assert the expected result,
+not just that the code runs without an exception. Keep existing tests and default
+examples working. Do not weaken an assertion merely to make a changed algorithm
+pass; explain and test any intentional change in behavior.
+
+Run the test suite locally from the repository root:
+
+.. code-block:: bash
+
+   bash runtests.sh
 
 The `test_codestyle.py`_ check code style for your PR's codes.
 
@@ -86,15 +159,27 @@ The `test_codestyle.py`_ check code style for your PR's codes.
 
 Step 4: Write a document about the algorithm
 ----------------------------------------------
-Please add a document to describe the algorithm details, mathematical backgrounds and show graphs and animation gif.
+Please describe the algorithm's basic steps, mathematical background, and
+relevant references, with graphs and an animation GIF. Explain how it differs
+from related algorithms and where it is useful when this helps readers
+understand the example.
 
 This project is using `Sphinx`_ as a document builder, all documentations are written by `reStructuredText`_.
 
-You can add a new rst file under the subdirectory in `doc modules dir`_ and the top rst file can include it.
+For an existing example, update its official document instead of creating a
+separate README or a duplicate explanation. For a new example, add a
+``*_main.rst`` page under the appropriate category in `doc modules dir`_ and
+include it in the parent page's ``toctree``. Follow the naming and toctree entries
+of nearby pages so that the new page appears in the documentation navigation.
 
 Please check other documents for details.
 
 You can build the doc locally based on `doc README`_.
+
+After building, open the generated HTML or the PR's documentation artifact and
+check the changed pages. Confirm that equations, lists, links, images, and
+animations render correctly, and that the page is reachable from its parent.
+A successful build alone does not guarantee that the page looks correct.
 
 For creating a gif animation, you can use this tool: `matplotrecorder`_.
 
@@ -125,14 +210,25 @@ When you click the link, you will jump to the source code in Github like:
 Step 5: Submit a pull request and fix codes based on review
 ------------------------------------------------------------
 
-Let's submit a pull request when your code, test, and doc are ready.
+Use the `Before opening a pull request`_ checklist, then submit your PR when the
+code, tests, and documentation are ready.
+
+In the PR description, link the relevant issue and explain the problem, why the
+change solves it, and how you tested it. For changes to a simulation, include
+before-and-after results or animations where useful. For a performance
+improvement, explain the technique and provide comparable timings and the
+configuration used to obtain them.
 
 At first, please fix all CI errors before code review.
+
+Check the test, code style, and documentation build results. If a failure appears
+unrelated to your changes, report the failing check and relevant log rather than
+changing CI settings or removing tests to hide the failure.
 
 You can check your PR doc from the CI panel.
 
 After the "ci/circleci: build_doc" CI is succeeded,
-you can access you PR doc with clicking the [Details] of the "ci/circleci: build_doc artifact" CI.
+you can access your PR doc with clicking the [Details] of the "ci/circleci: build_doc artifact" CI.
 
 .. image:: /_static/img/doc_ci.png
 
@@ -162,6 +258,8 @@ If you want to fix any bug, you can find reported issues in `bug labeled issues`
 
 If you fix a bug of existing codes, please add a test function
 in the test code to show the issue was solved.
+Use the failing inputs as a regression case and assert the corrected behavior,
+including relevant boundary conditions. Keep unrelated changes in separate PRs.
 
 This doc `submit a pull request`_ can be helpful to submit a pull request.
 
@@ -176,7 +274,7 @@ Adding the missed documentations for existing examples is also great contributio
 If you check the `Python Robotics Docs`_, you can notice that some of the examples
 only have a simulation gif or short overview descriptions or just TBD.,
 but no detailed algorithm or mathematical description.
-These documents needs to be improved.
+These documents need to be improved.
 
 This doc `how to write doc`_ can be helpful to write documents.
 
@@ -223,5 +321,3 @@ Current Major Sponsors:
 .. _`matplotrecorder`: https://github.com/AtsushiSakai/matplotrecorder
 .. _`PythonRoboticsGifs`: https://github.com/AtsushiSakai/PythonRoboticsGifs
 .. _`autodoc`: https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html
-
-

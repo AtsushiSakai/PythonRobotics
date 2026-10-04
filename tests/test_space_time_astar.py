@@ -18,9 +18,7 @@ def test_1():
     )
 
     m.show_animation = False
-    planner = m.SpaceTimeAStar(grid, start, goal)
-
-    path = planner.plan(False)
+    path = m.SpaceTimeAStar.plan(grid, start, goal)
 
     # path should have 28 entries
     assert len(path.path) == 31
@@ -28,7 +26,7 @@ def test_1():
     # path should end at the goal
     assert path.path[-1].position == goal
 
-    assert planner.expanded_node_count < 1000
+    assert path.expanded_node_count < 1000
 
 if __name__ == "__main__":
     conftest.run_this_test(__file__)

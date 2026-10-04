@@ -1,6 +1,14 @@
 Rocket powered landing
 -----------------------------
 
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/AerialNavigation/rocket_powered_landing/animation.gif
+
+Code Link
+~~~~~~~~~~~~~~~
+
+.. autofunction:: AerialNavigation.rocket_powered_landing.rocket_powered_landing.main
+
+
 Simulation
 ~~~~~~~~~~
 

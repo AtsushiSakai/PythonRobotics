@@ -1,5 +1,5 @@
 import conftest  # Add root path to sys.path
-from PathTracking.stanley_controller import stanley_controller as m
+from PathTracking.stanley_control import stanley_control as m
 
 
 def test1():

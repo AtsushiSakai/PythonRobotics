@@ -19,6 +19,7 @@ Path planning is the ability of a robot to search feasible and efficient path to
    visibility_road_map_planner/visibility_road_map_planner
    vrm_planner/vrm_planner
    rrt/rrt
+   particleSwarmOptimization/particleSwarmOptimization
    cubic_spline/cubic_spline
    bspline_path/bspline_path
    catmull_rom_spline/catmull_rom_spline

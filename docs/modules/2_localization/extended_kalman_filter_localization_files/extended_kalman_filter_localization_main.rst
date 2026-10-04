@@ -23,28 +23,40 @@ is estimated trajectory with EKF.
 
 The red ellipse is estimated covariance ellipse with EKF.
 
-Code: `PythonRobotics/extended_kalman_filter.py at master ·
-AtsushiSakai/PythonRobotics <https://github.com/AtsushiSakai/PythonRobotics/blob/master/Localization/extended_kalman_filter/extended_kalman_filter.py>`__
-
-Kalman Filter with Speed Scale Factor Correction
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-.. image:: ekf_with_velocity_correction_1_0.png
-   :width: 600px
-
-This is a Extended kalman filter (EKF) localization with velocity correction.
-
-This is for correcting the vehicle speed measured with scale factor errors due to factors such as wheel wear.
-
-Code: `PythonRobotics/extended_kalman_ekf_with_velocity_correctionfilter.py
-AtsushiSakai/PythonRobotics <https://github.com/AtsushiSakai/PythonRobotics/blob/master/Localization/extended_kalman_filter/extended_kalman_ekf_with_velocity_correctionfilter.py>`__
-
-Filter design
+Code Link
 ~~~~~~~~~~~~~
 
-Position Estimation Kalman Filter
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. autofunction:: Localization.extended_kalman_filter.extended_kalman_filter.ekf_estimation
+
+Extended Kalman Filter algorithm
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Localization process using Extended Kalman Filter:EKF is
+
+=== Predict ===
+
+:math:`x_{Pred} = Fx_t+Bu_t`
+
+:math:`P_{Pred} = J_f P_t J_f^T + Q`
+
+=== Update ===
+
+:math:`z_{Pred} = Hx_{Pred}`
+
+:math:`y = z - z_{Pred}`
+
+:math:`S = J_g P_{Pred}.J_g^T + R`
+
+:math:`K = P_{Pred}.J_g^T S^{-1}`
+
+:math:`x_{t+1} = x_{Pred} + Ky`
+
+:math:`P_{t+1} = ( I - K J_g) P_{Pred}`
+
+
+
+Filter design
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In this simulation, the robot has a state vector includes 4 states at
 time :math:`t`.
@@ -82,27 +94,9 @@ In the code, “observation” function generates the input and observation
 vector with noise
 `code <https://github.com/AtsushiSakai/PythonRobotics/blob/916b4382de090de29f54538b356cef1c811aacce/Localization/extended_kalman_filter/extended_kalman_filter.py#L34-L50>`__
 
-Kalman Filter with Speed Scale Factor Correction
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-In this simulation, the robot has a state vector includes 5 states at
-time :math:`t`.
-
-.. math:: \textbf{x}_t=[x_t, y_t, \phi_t, v_t, s_t]
-
-x, y are a 2D x-y position, :math:`\phi` is orientation, v is
-velocity, and s is a scale factor of velocity.
-
-In the code, “xEst” means the state vector.
-`code <https://github.com/AtsushiSakai/PythonRobotics/blob/916b4382de090de29f54538b356cef1c811aacce/Localization/extended_kalman_filter/extended_kalman_ekf_with_velocity_correctionfilter.py#L163>`__
-
-The rest is the same as the Position Estimation Kalman Filter.
 
 Motion Model
-~~~~~~~~~~~~
-
-Position Estimation Kalman Filter
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 The robot model is
 
@@ -137,9 +131,61 @@ Its Jacobian matrix is
 
 :math:`\begin{equation*} 　= \begin{bmatrix} 1& 0 & -v \sin(\phi) \Delta t & \cos(\phi) \Delta t\\ 0 & 1 & v \cos(\phi) \Delta t & \sin(\phi) \Delta t\\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix} \end{equation*}`
 
+Observation Model
+~~~~~~~~~~~~~~~~~
+
+The robot can get x-y position information from GPS.
+
+So GPS Observation model is
+
+.. math:: \textbf{z}_{t} = g(\textbf{x}_t) = H \textbf{x}_t
+
+where
+
+:math:`\begin{equation*} H = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ \end{bmatrix} \end{equation*}`
+
+The observation function states that
+
+:math:`\begin{equation*} \begin{bmatrix} x' \\ y' \end{bmatrix} = g(\textbf{x}) = \begin{bmatrix} x \\ y \end{bmatrix} \end{equation*}`
+
+Its Jacobian matrix is
+
+:math:`\begin{equation*} J_g = \begin{bmatrix} \frac{\partial x'}{\partial x} & \frac{\partial x'}{\partial y} & \frac{\partial x'}{\partial \phi} & \frac{\partial x'}{\partial v}\\ \frac{\partial y'}{\partial x}& \frac{\partial y'}{\partial y} & \frac{\partial y'}{\partial \phi} & \frac{\partial y'}{ \partial v}\\ \end{bmatrix} \end{equation*}`
+
+:math:`\begin{equation*} 　= \begin{bmatrix} 1& 0 & 0 & 0\\ 0 & 1 & 0 & 0\\ \end{bmatrix} \end{equation*}`
+
 
 Kalman Filter with Speed Scale Factor Correction
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+This is a Extended kalman filter (EKF) localization with velocity correction.
+
+This is for correcting the vehicle speed measured with scale factor errors due to factors such as wheel wear.
+
+
+In this simulation, the robot has a state vector includes 5 states at
+time :math:`t`.
+
+.. math:: \textbf{x}_t=[x_t, y_t, \phi_t, v_t, s_t]
+
+x, y are a 2D x-y position, :math:`\phi` is orientation, v is
+velocity, and s is a scale factor of velocity.
+
+In the code, “xEst” means the state vector.
+`code <https://github.com/AtsushiSakai/PythonRobotics/blob/916b4382de090de29f54538b356cef1c811aacce/Localization/extended_kalman_filter/extended_kalman_ekf_with_velocity_correctionfilter.py#L163>`__
+
+The rest is the same as the Position Estimation Kalman Filter.
+
+.. image:: ekf_with_velocity_correction_1_0.png
+   :width: 600px
+
+Code Link
+~~~~~~~~~~~~~
+
+.. autofunction:: Localization.extended_kalman_filter.ekf_with_velocity_correction.ekf_estimation
+
+
+Motion Model
+~~~~~~~~~~~~
 
 The robot model is
 
@@ -178,33 +224,7 @@ Its Jacobian matrix is
 Observation Model
 ~~~~~~~~~~~~~~~~~
 
-Position Estimation Kalman Filter
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The robot can get x-y position infomation from GPS.
-
-So GPS Observation model is
-
-.. math:: \textbf{z}_{t} = g(\textbf{x}_t) = H \textbf{x}_t
-
-where
-
-:math:`\begin{equation*} H = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ \end{bmatrix} \end{equation*}`
-
-The observation function states that
-
-:math:`\begin{equation*} \begin{bmatrix} x' \\ y' \end{bmatrix} = g(\textbf{x}) = \begin{bmatrix} x \\ y \end{bmatrix} \end{equation*}`
-
-Its Jacobian matrix is
-
-:math:`\begin{equation*} J_g = \begin{bmatrix} \frac{\partial x'}{\partial x} & \frac{\partial x'}{\partial y} & \frac{\partial x'}{\partial \phi} & \frac{\partial x'}{\partial v}\\ \frac{\partial y'}{\partial x}& \frac{\partial y'}{\partial y} & \frac{\partial y'}{\partial \phi} & \frac{\partial y'}{ \partial v}\\ \end{bmatrix} \end{equation*}`
-
-:math:`\begin{equation*} 　= \begin{bmatrix} 1& 0 & 0 & 0\\ 0 & 1 & 0 & 0\\ \end{bmatrix} \end{equation*}`
-
-Kalman Filter with Speed Scale Factor Correction
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The robot can get x-y position infomation from GPS.
+The robot can get x-y position information from GPS.
 
 So GPS Observation model is
 
@@ -225,32 +245,8 @@ Its Jacobian matrix is
 :math:`\begin{equation*} 　= \begin{bmatrix} 1& 0 & 0 & 0 & 0\\ 0 & 1 & 0 & 0 & 0\\ \end{bmatrix} \end{equation*}`
 
 
-Extended Kalman Filter
-~~~~~~~~~~~~~~~~~~~~~~
 
-Localization process using Extended Kalman Filter:EKF is
-
-=== Predict ===
-
-:math:`x_{Pred} = Fx_t+Bu_t`
-
-:math:`P_{Pred} = J_f P_t J_f^T + Q`
-
-=== Update ===
-
-:math:`z_{Pred} = Hx_{Pred}`
-
-:math:`y = z - z_{Pred}`
-
-:math:`S = J_g P_{Pred}.J_g^T + R`
-
-:math:`K = P_{Pred}.J_g^T S^{-1}`
-
-:math:`x_{t+1} = x_{Pred} + Ky`
-
-:math:`P_{t+1} = ( I - K J_g) P_{Pred}`
-
-Ref:
-~~~~
+Reference
+^^^^^^^^^^^
 
 -  `PROBABILISTIC-ROBOTICS.ORG <http://www.probabilistic-robotics.org/>`__

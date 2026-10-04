@@ -4,7 +4,7 @@ Path tracking simulation with Stanley steering control and PID speed control.
 
 author: Atsushi Sakai (@Atsushi_twi)
 
-Ref:
+Reference:
     - [Stanley: The robot that won the DARPA grand challenge](http://isl.ecst.csuchico.edu/DOCS/darpa2005/DARPA%202005%20Stanley.pdf)
     - [Autonomous Automobile Path Tracking](https://www.ri.cmu.edu/pub_files/2009/2/Automatic_Steering_Methods_for_Autonomous_Automobile_Path_Tracking.pdf)
 

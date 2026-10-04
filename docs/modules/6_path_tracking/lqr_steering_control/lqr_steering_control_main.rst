@@ -8,7 +8,11 @@ control.
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathTracking/lqr_steer_control/animation.gif
 
-`[Code Link] <https://github.com/AtsushiSakai/PythonRobotics/blob/master/PathTracking/lqr_steer_control/lqr_steer_control.py>`_
+Code Link
+~~~~~~~~~~~~~~~
+
+.. autofunction:: PathTracking.lqr_steer_control.lqr_steer_control.lqr_steering_control
+
 
 Overview
 ~~~~~~~~
@@ -113,7 +117,7 @@ The optimal control input `u` can be calculated as:
 
 where `K` is the feedback gain matrix obtained by solving the Riccati equation.
 
-References:
+Reference
 ~~~~~~~~~~~
 -  `ApolloAuto/apollo: An open autonomous driving platform <https://github.com/ApolloAuto/apollo>`_
 

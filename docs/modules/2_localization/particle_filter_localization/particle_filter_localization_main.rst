@@ -13,7 +13,13 @@ and the red line is estimated trajectory with PF.
 It is assumed that the robot can measure a distance from landmarks
 (RFID).
 
-This measurements are used for PF localization.
+These measurements are used for PF localization.
+
+Code Link
+~~~~~~~~~~~~~
+
+.. autofunction:: Localization.particle_filter.particle_filter.pf_localization
+
 
 How to calculate covariance matrix from particles
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -30,7 +36,7 @@ The covariance matrix :math:`\Xi` from particle information is calculated by the
 
 - :math:`\mu_j` is the :math:`j` th mean state of particles.
 
-References:
+Reference
 ~~~~~~~~~~~
 
 - `_PROBABILISTIC ROBOTICS: <http://www.probabilistic-robotics.org>`_

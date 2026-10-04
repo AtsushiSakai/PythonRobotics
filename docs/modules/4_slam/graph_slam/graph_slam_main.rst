@@ -13,11 +13,17 @@ The black stars are landmarks for graph edge generation.
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/SLAM/GraphBasedSLAM/animation.gif
 
+Code Link
+~~~~~~~~~~~~
+
+.. autofunction:: SLAM.GraphBasedSLAM.graph_based_slam.graph_based_slam
+
+
 .. include:: graphSLAM_doc.rst
 .. include:: graphSLAM_formulation.rst
 .. include:: graphSLAM_SE2_example.rst
 
-References:
+Reference
 ~~~~~~~~~~~
 
 - `A Tutorial on Graph-Based SLAM <http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf>`_
