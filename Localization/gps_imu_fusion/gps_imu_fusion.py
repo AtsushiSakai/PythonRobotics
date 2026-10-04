@@ -7,8 +7,10 @@ Only horizontal motion is modeled; roll, pitch, altitude, magnetometers and
 barometers are outside this example. GPS and IMU are assumed time-aligned and
 co-located. Initial heading and velocity are assumed approximately known.
 
-Run this file to compare fusion against IMU-only dead reckoning, including a
-GPS outage. No external data or dependencies beyond NumPy/Matplotlib are needed.
+Run this file to compare fusion with and without bias estimation against
+IMU-only dead reckoning, including a GPS outage. Without bias estimation, the
+state contains only [x, y, vx, vy, yaw] and biases are assumed zero.
+No external data or dependencies beyond NumPy/Matplotlib are needed.
 
 Reference: Oliver J. Woodman, An introduction to inertial navigation, 2007.
 https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-696.pdf
@@ -41,28 +43,31 @@ def wrap_angle(angle):
 
 def motion_model(state, imu, dt):
     """Propagate one IMU sample, holding world acceleration constant for dt."""
-    acceleration = rotation(state[4]) @ (imu[:2] - state[5:7])
+    bias = state[5:] if len(state) == 8 else np.zeros(3)
+    acceleration = rotation(state[4]) @ (imu[:2] - bias[:2])
     predicted = state.copy()
     predicted[:2] += state[2:4] * dt + 0.5 * acceleration * dt**2
     predicted[2:4] += acceleration * dt
-    predicted[4] = wrap_angle(state[4] + (imu[2] - state[7]) * dt)
+    predicted[4] = wrap_angle(state[4] + (imu[2] - bias[2]) * dt)
     return predicted
 
 
 def motion_jacobians(state, imu, dt):
     """Return state and IMU-input Jacobians of the discrete motion model."""
     rot = rotation(state[4])
-    acceleration = rot @ (imu[:2] - state[5:7])
+    bias = state[5:7] if len(state) == 8 else np.zeros(2)
+    acceleration = rot @ (imu[:2] - bias)
     yaw_derivative = np.array([-acceleration[1], acceleration[0]])
-    f = np.eye(8)
+    f = np.eye(len(state))
     f[:2, 2:4] = np.eye(2) * dt
     f[:2, 4] = 0.5 * yaw_derivative * dt**2
     f[2:4, 4] = yaw_derivative * dt
-    f[:2, 5:7] = -0.5 * rot * dt**2
-    f[2:4, 5:7] = -rot * dt
-    f[4, 7] = -dt
+    if len(state) == 8:
+        f[:2, 5:7] = -0.5 * rot * dt**2
+        f[2:4, 5:7] = -rot * dt
+        f[4, 7] = -dt
 
-    g = np.zeros((8, 3))
+    g = np.zeros((len(state), 3))
     g[:2, :2] = 0.5 * rot * dt**2
     g[2:4, :2] = rot * dt
     g[4, 2] = dt
@@ -74,10 +79,12 @@ def predict(state, covariance, imu, dt=DT):
 
     IMU_STD describes independent noise on each discrete IMU sample, while
     BIAS_RW_STD describes continuous bias random walk per sqrt(second).
+    A five-state filter assumes zero bias and has no bias random walk.
     """
     f, g = motion_jacobians(state, imu, dt)
     process_noise = g @ np.diag(IMU_STD**2) @ g.T
-    process_noise[5:8, 5:8] += np.diag(BIAS_RW_STD**2) * dt
+    if len(state) == 8:
+        process_noise[5:8, 5:8] += np.diag(BIAS_RW_STD**2) * dt
     predicted_covariance = f @ covariance @ f.T + process_noise
     return motion_model(state, imu, dt), (
         predicted_covariance + predicted_covariance.T) / 2.0
@@ -89,7 +96,7 @@ def update_gps(state, covariance, position):
     GPS observes only position. Velocity, heading and biases are corrected
     through cross-covariances accumulated during IMU prediction.
     """
-    h = np.zeros((2, 8))
+    h = np.zeros((2, len(state)))
     h[:, :2] = np.eye(2)
     r = np.eye(2) * GPS_STD**2
     innovation_covariance = h @ covariance @ h.T + r
@@ -97,7 +104,7 @@ def update_gps(state, covariance, position):
     updated = state + gain @ (position - h @ state)
     updated[4] = wrap_angle(updated[4])
     # Joseph form preserves covariance symmetry and positive semidefiniteness.
-    residual = np.eye(8) - gain @ h
+    residual = np.eye(len(state)) - gain @ h
     updated_covariance = residual @ covariance @ residual.T + gain @ r @ gain.T
     return updated, (updated_covariance + updated_covariance.T) / 2.0
 
@@ -120,25 +127,33 @@ def simulate(duration=SIM_TIME, seed=0, gps_outage=(20.0, 30.0)):
 
     GPS outages cover [start, end); pass None for uninterrupted GPS. Truth is
     computed analytically, independently of the filter's discrete integrator.
-    Both estimates start with the known initial pose/velocity and zero bias.
+    All three estimates share the same biased, noisy measurements and start
+    with the known initial pose/velocity. The eight-state EKF starts with zero
+    estimated bias; the five-state EKF and dead reckoning assume zero bias.
     """
     rng = np.random.default_rng(seed)
     times = np.arange(int(round(duration / DT)) + 1) * DT
     truth = np.array([reference_motion(t)[0] for t in times])
     estimates = np.zeros_like(truth)
+    no_bias_estimates = np.zeros((len(times), 5))
     dead_reckoning = np.zeros_like(truth)
     covariances = np.zeros((len(times), 8, 8))
+    no_bias_covariances = np.zeros((len(times), 5, 5))
     gps = np.full((len(times), 2), np.nan)
     state = truth[0].copy()
     state[5:] = 0.0
     dead_state = state.copy()
     covariance = np.diag([1.0, 1.0, 0.2, 0.2, np.deg2rad(5.0),
                           0.1, 0.1, np.deg2rad(1.0)])**2
+    no_bias_state = state[:5].copy()
+    no_bias_covariance = covariance[:5, :5].copy()
     estimates[0], dead_reckoning[0], covariances[0] = state, dead_state, covariance
+    no_bias_estimates[0], no_bias_covariances[0] = no_bias_state, no_bias_covariance
     for i in range(1, len(times)):
         _, ideal_imu = reference_motion(times[i - 1])
         imu = ideal_imu + TRUE_BIAS + rng.normal(size=3) * IMU_STD
         state, covariance = predict(state, covariance, imu)
+        no_bias_state, no_bias_covariance = predict(no_bias_state, no_bias_covariance, imu)
         dead_state = motion_model(dead_state, imu, DT)
         # Draw every scheduled fix, even during outages, to keep sensor noise
         # identical when comparing different outage schedules with the same seed.
@@ -147,8 +162,12 @@ def simulate(duration=SIM_TIME, seed=0, gps_outage=(20.0, 30.0)):
             if gps_outage is None or not gps_outage[0] <= times[i] < gps_outage[1]:
                 gps[i] = measurement
                 state, covariance = update_gps(state, covariance, measurement)
+                no_bias_state, no_bias_covariance = update_gps(
+                    no_bias_state, no_bias_covariance, measurement)
         estimates[i], dead_reckoning[i], covariances[i] = state, dead_state, covariance
+        no_bias_estimates[i], no_bias_covariances[i] = no_bias_state, no_bias_covariance
     return {"time": times, "truth": truth, "estimate": estimates,
+            "no_bias_estimate": no_bias_estimates, "no_bias_covariance": no_bias_covariances,
             "dead_reckoning": dead_reckoning, "covariance": covariances,
             "gps": gps, "gps_outage": gps_outage}
 
@@ -156,10 +175,13 @@ def simulate(duration=SIM_TIME, seed=0, gps_outage=(20.0, 30.0)):
 def create_animation(history):  # pragma: no cover
     """Create the path/error animation; keep the returned object alive to play it."""
     fig, (path_ax, error_ax) = plt.subplots(1, 2, figsize=(11, 4.8))
-    colors = {"truth": "black", "estimate": "tab:blue", "dead_reckoning": "tab:orange"}
-    labels = {"truth": "Ground truth", "estimate": "GPS + IMU EKF",
+    colors = {"truth": "black", "estimate": "tab:blue",
+              "no_bias_estimate": "tab:red", "dead_reckoning": "tab:orange"}
+    labels = {"truth": "Ground truth", "estimate": "EKF (bias estimation)",
+              "no_bias_estimate": "EKF (no bias estimation)",
               "dead_reckoning": "IMU only"}
-    lines = {key: path_ax.plot([], [], color=color, label=labels[key])[0]
+    styles = {"truth": "-", "estimate": "-", "no_bias_estimate": "--", "dead_reckoning": ":"}
+    lines = {key: path_ax.plot([], [], color=color, linestyle=styles[key], label=labels[key])[0]
              for key, color in colors.items()}
     gps_line, = path_ax.plot([], [], "+", color="tab:green", label="GPS fixes", alpha=0.7)
     positions = np.vstack([history[key][:, :2] for key in colors])
@@ -169,8 +191,8 @@ def create_animation(history):  # pragma: no cover
     path_ax.set_aspect("equal", adjustable="box")
     path_ax.legend(loc="best", fontsize=8)
     errors = {key: np.linalg.norm(history[key][:, :2] - history["truth"][:, :2], axis=1)
-              for key in ["estimate", "dead_reckoning"]}
-    error_lines = {key: error_ax.plot([], [], color=colors[key], label=labels[key])[0]
+              for key in ["estimate", "no_bias_estimate", "dead_reckoning"]}
+    error_lines = {key: error_ax.plot([], [], color=colors[key], linestyle=styles[key], label=labels[key])[0]
                    for key in errors}
     error_ax.set(xlim=(0, history["time"][-1]),
                  ylim=(0, max(values.max() for values in errors.values()) * 1.1 + 0.1),
@@ -203,7 +225,7 @@ def create_animation(history):  # pragma: no cover
 
 def main():
     history = simulate(duration=SIM_TIME)
-    for key in ["estimate", "dead_reckoning"]:
+    for key in ["estimate", "no_bias_estimate", "dead_reckoning"]:
         error = history[key][:, :2] - history["truth"][:, :2]
         print(f"{key} position RMSE: {np.sqrt(np.mean(np.sum(error**2, axis=1))):.2f} m")
     animation = create_animation(history) if show_animation else None

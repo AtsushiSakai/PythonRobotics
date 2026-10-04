@@ -176,11 +176,13 @@ Reference
 
 ## GPS/IMU fusion
 
-![GPS/IMU fusion](https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/b762650770bc6f6c3f9686b4a778415a8332847a/Localization/gps_imu_fusion/animation.gif)
+![GPS/IMU fusion](https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/5da61a2d63ee5ebfce23f67e514f67056c26cc04/Localization/gps_imu_fusion/animation.gif)
 
 An extended Kalman filter fuses body-frame accelerometer and gyroscope readings
 with lower-rate GPS positions, estimates sensor biases, and continues inertial
-prediction during a temporary GPS outage.
+prediction during a temporary GPS outage. The animation compares it with an
+EKF without bias estimation and IMU-only dead reckoning using the same sensor
+measurements.
 
 - [documentation](https://atsushisakai.github.io/PythonRobotics/modules/2_localization/gps_imu_fusion/gps_imu_fusion.html)
 - [sample code](Localization/gps_imu_fusion/gps_imu_fusion.py)
@@ -686,4 +688,3 @@ They are providing a free license of their 1Password team license for this OSS p
 # Authors
 
 - [Contributors to AtsushiSakai/PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics/graphs/contributors)
-

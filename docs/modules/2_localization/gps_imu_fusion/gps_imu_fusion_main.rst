@@ -4,11 +4,11 @@ GPS/IMU Fusion
 This example uses an extended Kalman filter (EKF) to combine body-frame
 accelerometer and gyroscope measurements with GPS positions in a local metric
 frame. IMU prediction runs at 20 Hz and GPS correction at 1 Hz. The simulation
-compares the fused estimate with IMU-only dead reckoning along a figure-eight
-trajectory, including a GPS outage from 20 to 30 seconds.
+compares fusion with and without bias estimation and IMU-only dead reckoning
+along a figure-eight trajectory, including a GPS outage from 20 to 30 seconds.
 
-.. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/b762650770bc6f6c3f9686b4a778415a8332847a/Localization/gps_imu_fusion/animation.gif
-   :alt: GPS and IMU fusion compared with inertial dead reckoning during a GPS outage
+.. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/5da61a2d63ee5ebfce23f67e514f67056c26cc04/Localization/gps_imu_fusion/animation.gif
+   :alt: GPS and IMU fusion with and without bias estimation compared with inertial dead reckoning during a GPS outage
 
 Assumptions
 -----------
@@ -101,10 +101,27 @@ helps preserve numerical symmetry and positive semidefiniteness. Between GPS
 fixes, and throughout the outage, only IMU prediction is performed. Uncertainty
 can grow during the outage and decreases when GPS corrections resume.
 
+Comparison without bias estimation
+----------------------------------
+
+The baseline EKF estimates only :math:`[p_x,p_y,v_x,v_y,\psi]^T`. It assumes
+zero accelerometer and gyroscope bias, so it uses the raw IMU measurements
+without bias compensation. Its prediction uses the first five rows and
+columns of :math:`F` and the first five rows of :math:`G`, with no bias
+random-walk term. GPS still corrects position, velocity and heading through
+their cross-covariances. Thus it differs from IMU-only dead reckoning, which
+never receives GPS corrections.
+
+All three methods use exactly the same IMU samples, including the same nonzero
+sensor biases and noise. Both EKFs receive the same GPS fixes and outage
+schedule, and start with the same pose, velocity and corresponding covariance.
+Only the eight-state EKF estimates and compensates for the biases. The red
+dashed curves show the five-state EKF without bias estimation.
+
 The analytic reference trajectory is independent of the filter's discrete
-integrator. A fixed random seed makes the example reproducible. The same IMU
-measurements drive both estimates, and the error plot shows their Euclidean
-position errors; these synthetic results are not a real-sensor accuracy claim.
+integrator. A fixed random seed makes the example reproducible, and the error
+plot shows each method's Euclidean position error. These synthetic results
+are not a real-sensor accuracy claim.
 
 Code
 ----
