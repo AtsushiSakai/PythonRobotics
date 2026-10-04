@@ -172,6 +172,16 @@ def simulate(duration=SIM_TIME, seed=0, gps_outage=(20.0, 30.0)):
             "gps": gps, "gps_outage": gps_outage}
 
 
+def position_covariance_ellipse(position, covariance):
+    """Return the 2D position ellipse with semi-axes of three standard deviations."""
+    eigenvalues, eigenvectors = np.linalg.eigh(covariance[:2, :2])
+    angles = np.linspace(0.0, 2.0 * np.pi, 61)
+    circle = np.array([np.cos(angles), np.sin(angles)])
+    # Clip roundoff at zero for positive semidefinite covariances.
+    radii = 3.0 * np.sqrt(np.maximum(eigenvalues, 0.0))
+    return position[:2, None] + eigenvectors @ (radii[:, None] * circle)
+
+
 def create_animation(history):  # pragma: no cover
     """Animate paths, position errors and bias estimates against ground truth."""
     fig = plt.figure(figsize=(12, 8))
@@ -188,19 +198,37 @@ def create_animation(history):  # pragma: no cover
     styles = {"truth": "-", "estimate": "-", "no_bias_estimate": "--", "dead_reckoning": ":"}
     lines = {key: path_ax.plot([], [], color=color, linestyle=styles[key], label=labels[key])[0]
              for key, color in colors.items()}
+    current_points = {key: path_ax.plot([], [], marker="x" if key == "truth" else "o",
+                                       color=colors[key], markersize=6, linestyle="none")[0]
+                      for key in ["truth", "estimate", "no_bias_estimate"]}
     gps_line, = path_ax.plot([], [], "+", color="tab:green", label="GPS fixes", alpha=0.7)
-    positions = np.vstack([history[key][:, :2] for key in colors])
+    covariance_keys = {"estimate": "covariance", "no_bias_estimate": "no_bias_covariance"}
+    ellipse_lines = {}
+    positions = [history[key][:, :2] for key in colors]
+    for key, covariance_key in covariance_keys.items():
+        ellipse_lines[key], = path_ax.plot([], [], color=colors[key], linestyle=styles[key],
+                                           linewidth=1.5, label=labels[key] + " 3σ")
+        position_width = 3.0 * np.sqrt(np.maximum(
+            np.diagonal(history[covariance_key][:, :2, :2], axis1=1, axis2=2), 0.0))
+        positions.extend([history[key][:, :2] - position_width,
+                          history[key][:, :2] + position_width])
+    positions = np.vstack(positions)
     path_ax.set(xlim=(positions[:, 0].min() - 3, positions[:, 0].max() + 3),
                 ylim=(positions[:, 1].min() - 3, positions[:, 1].max() + 3),
                 xlabel="x [m]", ylabel="y [m]")
     path_ax.set_aspect("equal", adjustable="box")
-    path_ax.legend(loc="best", fontsize=8)
+    path_ax.legend(loc="best", fontsize=7)
     errors = {key: np.linalg.norm(history[key][:, :2] - history["truth"][:, :2], axis=1)
               for key in ["estimate", "no_bias_estimate", "dead_reckoning"]}
     error_lines = {key: error_ax.plot([], [], color=colors[key], linestyle=styles[key], label=labels[key])[0]
                    for key in errors}
+    # This is the ellipse's enclosing radius, not a 1D error standard deviation.
+    position_radius = 3.0 * np.sqrt(np.maximum(
+        np.linalg.eigvalsh(history["covariance"][:, :2, :2])[:, -1], 0.0))
+    radius_line, = error_ax.plot([], [], "--", color="tab:blue", label="EKF 3σ major radius")
     error_ax.set(xlim=(0, history["time"][-1]),
-                 ylim=(0, max(values.max() for values in errors.values()) * 1.1 + 0.1),
+                 ylim=(0, max(position_radius.max(),
+                              max(values.max() for values in errors.values())) * 1.1 + 0.1),
                  xlabel="Time [s]", ylabel="Position error [m]")
     outage = history["gps_outage"]
     if outage is not None:
@@ -213,14 +241,20 @@ def create_animation(history):  # pragma: no cover
     bias_scale = np.array([1.0, 1.0, 180.0 / np.pi])
     bias_estimates = history["estimate"][:, 5:8] * bias_scale
     bias_truth = history["truth"][:, 5:8] * bias_scale
+    bias_width = 3.0 * np.sqrt(np.maximum(
+        np.diagonal(history["covariance"], axis1=1, axis2=2)[:, 5:8], 0.0)) * bias_scale
+    bias_lower, bias_upper = bias_estimates - bias_width, bias_estimates + bias_width
     bias_titles = ["Accelerometer x bias", "Accelerometer y bias", "Gyroscope bias"]
     bias_units = ["Bias [m/s²]", "Bias [m/s²]", "Bias [deg/s]"]
     bias_lines = []
+    bias_bands = []
     for i, ax in enumerate(bias_axes):
         line, = ax.plot([], [], color="tab:blue", label="EKF estimate")
         bias_lines.append(line)
         ax.plot(history["time"], bias_truth[:, i], "k--", label="Ground truth")
-        values = np.concatenate((bias_estimates[:, i], bias_truth[:, i]))
+        bias_bands.append(ax.fill_between([], [], [], color="tab:blue", alpha=0.2,
+                                           label="Estimate ±3σ"))
+        values = np.concatenate((bias_lower[:, i], bias_upper[:, i], bias_truth[:, i]))
         padding = max(np.ptp(values) * 0.15, 0.01)
         ax.set(ylim=(values.min() - padding, values.max() + padding),
                xlabel="Time [s]", ylabel=bias_units[i], title=bias_titles[i])
@@ -236,15 +270,25 @@ def create_animation(history):  # pragma: no cover
     def update(index):
         for key, line in lines.items():
             line.set_data(history[key][:index + 1, 0], history[key][:index + 1, 1])
+        for key, point in current_points.items():
+            point.set_data([history[key][index, 0]], [history[key][index, 1]])
+        for key, line in ellipse_lines.items():
+            ellipse = position_covariance_ellipse(
+                history[key][index], history[covariance_keys[key]][index])
+            line.set_data(ellipse[0], ellipse[1])
         gps_line.set_data(history["gps"][:index + 1, 0], history["gps"][:index + 1, 1])
         for key, line in error_lines.items():
             line.set_data(history["time"][:index + 1], errors[key][:index + 1])
+        radius_line.set_data(history["time"][:index + 1], position_radius[:index + 1])
         for i, line in enumerate(bias_lines):
             line.set_data(history["time"][:index + 1], bias_estimates[:index + 1, i])
+            bias_bands[i].set_data(history["time"][:index + 1],
+                                   bias_lower[:index + 1, i], bias_upper[:index + 1, i])
         time = history["time"][index]
         status = "GPS unavailable" if outage is not None and outage[0] <= time < outage[1] else "GPS available (1 Hz)"
         title.set_text(f"{animation_title}\n{time:.1f} s — {status}")
-        return [*lines.values(), gps_line, *error_lines.values(), *bias_lines, title]
+        return [*lines.values(), *current_points.values(), *ellipse_lines.values(),
+                gps_line, *error_lines.values(), radius_line, *bias_lines, *bias_bands, title]
 
     frames = list(range(0, len(history["time"]), 5))
     if frames[-1] != len(history["time"]) - 1:

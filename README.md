@@ -176,14 +176,15 @@ Reference
 
 ## GPS/IMU Fusion Localization with Bias Estimation
 
-![GPS/IMU Fusion Localization with Bias Estimation](https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/5d1bb293772b94b19e7795d4265891017b5925f6/Localization/gps_imu_fusion/animation.gif)
+![GPS/IMU Fusion Localization with Bias Estimation](https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/5abf69412ae056a2f30ba562a1c04600b6062fe4/Localization/gps_imu_fusion/animation.gif)
 
 An extended Kalman filter fuses body-frame accelerometer and gyroscope readings
 with lower-rate GPS positions, estimates sensor biases, and continues inertial
 prediction during a temporary GPS outage. The animation compares it with an
 EKF without bias estimation and IMU-only dead reckoning using the same sensor
 measurements. It also plots the accelerometer and gyroscope bias estimates
-against their true values.
+against their true values, with covariance-derived 3σ position ellipses and
+bias uncertainty bands.
 
 - [documentation](https://atsushisakai.github.io/PythonRobotics/modules/2_localization/gps_imu_fusion/gps_imu_fusion.html)
 - [sample code](Localization/gps_imu_fusion/gps_imu_fusion.py)

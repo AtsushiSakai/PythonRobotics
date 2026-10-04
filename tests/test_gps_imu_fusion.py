@@ -141,6 +141,23 @@ def test_main_without_animation(monkeypatch):
     assert len(history["time"]) == 41
 
 
+@pytest.mark.parametrize("covariance", [np.diag([4.0, 1.0]),
+                                       np.array([[3.0, 2.0], [2.0, 3.0]])])
+def test_position_ellipse_has_three_sigma_mahalanobis_radius(covariance):
+    position = np.array([2.0, -1.0])
+    points = m.position_covariance_ellipse(position, covariance)
+    errors = points - position[:, None]
+    squared_distance = np.sum(errors * np.linalg.solve(covariance, errors), axis=0)
+    np.testing.assert_allclose(squared_distance, 9.0, atol=1e-12)
+    np.testing.assert_allclose(points[:, 0], points[:, -1], atol=1e-12)
+
+
+def test_position_ellipse_with_zero_variance_axis():
+    points = m.position_covariance_ellipse(np.array([2.0, -1.0]), np.diag([4.0, 0.0]))
+    np.testing.assert_allclose(points[1], -1.0)
+    np.testing.assert_allclose([points[0].min(), points[0].max()], [-4.0, 8.0])
+
+
 def test_animation_renders(tmp_path):
     history = m.simulate(duration=1.0, gps_outage=(0.4, 0.8))
     animation = m.create_animation(history)

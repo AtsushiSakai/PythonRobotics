@@ -7,13 +7,46 @@ frame. IMU prediction runs at 20 Hz and GPS correction at 1 Hz. The simulation
 compares fusion with and without bias estimation and IMU-only dead reckoning
 along a figure-eight trajectory, including a GPS outage from 20 to 30 seconds.
 
-.. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/5d1bb293772b94b19e7795d4265891017b5925f6/Localization/gps_imu_fusion/animation.gif
-   :alt: GPS and IMU fusion localization with path comparisons, position errors, and accelerometer and gyroscope bias estimates against ground truth
+.. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/5abf69412ae056a2f30ba562a1c04600b6062fe4/Localization/gps_imu_fusion/animation.gif
+   :alt: GPS and IMU fusion localization with position covariance ellipses and bias estimates with three-sigma uncertainty bands against ground truth
 
 The lower three panels show the EKF's estimated accelerometer x/y biases
 (m/s²) and gyroscope bias (deg/s) in blue, with ground truth as black dashed
 lines. The true biases are 0.04 m/s², -0.03 m/s² and 0.4 deg/s, respectively.
 Gray shading marks the GPS outage in the error and bias plots.
+
+Covariance-based uncertainty
+----------------------------
+
+The path plot shows a 3σ position ellipse centered on each EKF estimate, with
+markers for the current estimates and ground truth. If :math:`\lambda_i` are
+the eigenvalues of the position covariance :math:`P_{xy}`, the semi-axis
+lengths are :math:`3\sqrt{\lambda_i}` and the eigenvectors give their directions.
+This includes the x/y cross-covariance. The ellipse boundary satisfies
+:math:`(\mathbf{p}-\hat{\mathbf{p}})^T P_{xy}^{-1}
+(\mathbf{p}-\hat{\mathbf{p}})=9`.
+
+The dashed blue line in the position-error plot tracks the bias-estimating
+EKF's ellipse semi-major axis, :math:`3\sqrt{\lambda_{\max}(P_{xy})}`.
+It is the ellipse's enclosing radius, not the standard deviation of the
+Euclidean position error. An error below this line alone does not guarantee
+that the true position lies inside the ellipse; direction also matters.
+
+Each bias panel shades :math:`\hat b_i \pm 3\sqrt{P_{ii}}`, using the matching
+diagonal element of the estimated state covariance. Gyroscope estimates and
+standard deviations are both converted from rad/s to deg/s. The estimate is
+at the center of its band; the true value provides an independent comparison.
+The plots use the filter covariance directly, so they show uncertainty
+contracting with GPS corrections and growing during the outage.
+
+For the default seed-0 simulation, ground truth stays within the
+bias-estimating EKF's position ellipse and all three bias bands at every
+sample. The EKF without bias estimation has position errors outside its
+ellipse during parts of the run. These are results for this synthetic run,
+not a guarantee of coverage for other data. A 3σ ellipse encloses about
+98.9% of an ideal 2D Gaussian, whereas a scalar ±3σ interval encloses about
+99.7%; see `Matplotlib's confidence-ellipse explanation
+<https://matplotlib.org/stable/gallery/statistics/confidence_ellipse.html>`_.
 
 Assumptions
 -----------
