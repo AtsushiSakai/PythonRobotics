@@ -30,20 +30,37 @@ We only accept a PR for Python 3.13.x or higher.
 
 We will not accept a PR for Python 2.x.
 
-Keep pull requests focused
----------------------------
+Before opening a pull request
+--------------------------------
 
-Please focus each PR on one algorithm, bug, or documentation topic. Split large
-changes into smaller PRs that can be reviewed independently. Propose substantial
-changes in an issue before implementing them.
+Check the items that apply to your change before opening a PR. The steps below
+explain these points in more detail.
 
-Use a separate branch for each PR and check the diff against ``master`` before
-submitting. Avoid unrelated formatting, parameter, dependency, or CI configuration
-changes. Explain why each change is needed, especially when changing an equation
-or the behavior of an existing example.
-
-Write documentation, code comments, and docstrings in English so that they can be
-maintained with the rest of the project.
+- **Scope:** Focus on one algorithm, bug, or documentation topic. Split large
+  changes into smaller PRs, and propose substantial changes in an issue first.
+- **Diff:** Use a separate branch and review the diff against ``master``. Remove
+  unrelated formatting, parameter, dependency, and CI configuration changes.
+- **Readability:** Use descriptive names and small, clear functions. Keep the
+  code easy to relate to the algorithm's equations, even when optimizing it.
+- **Compatibility:** Follow `Check your Python version.`_ and the current CI
+  configuration. Use only the existing :ref:`Requirements` libraries.
+- **Existing behavior:** Preserve default parameters and working examples unless
+  the change is intentional and explained. Do not weaken tests to hide failures.
+- **Tests:** For code changes, add or extend tests under ``tests`` that check the
+  expected result and relevant boundary cases. Run examples without animation
+  and run ``bash runtests.sh`` locally, including its code style checks.
+- **Documentation:** Update the existing official RST page, or add one for a new
+  example. Explain the algorithm and mathematics there; explain code, inputs,
+  outputs, and units in headers and docstrings. Write these explanations in English.
+- **Navigation and rendering:** Add new pages to the appropriate parent
+  ``toctree``. Build the docs and inspect the generated HTML, including equations,
+  lists, links, and images.
+- **Animation:** For new examples or changed visual behavior, check that the
+  animation makes the result, colors, and lines understandable. Submit new GIFs
+  to `PythonRoboticsGifs`_ and link them from the documentation.
+- **PR description:** Prepare the issue link, reason for the change, and test
+  results. Include before-and-after results where useful, and comparable timings
+  with the test configuration for performance improvements.
 
 .. _`Adding a new algorithm example`:
 
@@ -193,7 +210,8 @@ When you click the link, you will jump to the source code in Github like:
 Step 5: Submit a pull request and fix codes based on review
 ------------------------------------------------------------
 
-Let's submit a pull request when your code, test, and doc are ready.
+Use the `Before opening a pull request`_ checklist, then submit your PR when the
+code, tests, and documentation are ready.
 
 In the PR description, link the relevant issue and explain the problem, why the
 change solves it, and how you tested it. For changes to a simulation, include
@@ -303,4 +321,3 @@ Current Major Sponsors:
 .. _`matplotrecorder`: https://github.com/AtsushiSakai/matplotrecorder
 .. _`PythonRoboticsGifs`: https://github.com/AtsushiSakai/PythonRoboticsGifs
 .. _`autodoc`: https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html
-
