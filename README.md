@@ -29,6 +29,7 @@ Python codes and [textbook](https://atsushisakai.github.io/PythonRobotics/index.
       * [FastSLAM 1.0](#fastslam-10)
    * [Path Planning](#path-planning)
       * [Dynamic Window Approach](#dynamic-window-approach)
+      * [Flocking](#flocking)
       * [Grid based search](#grid-based-search)
          * [Dijkstra algorithm](#dijkstra-algorithm)
          * [A* algorithm](#a-algorithm)
@@ -293,6 +294,16 @@ This is a 2D navigation sample code with Dynamic Window Approach.
 
 ![2](https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/DynamicWindowApproach/animation.gif)
 
+
+## Flocking
+
+Olfati-Saber’s Algorithm 2 coordinates a group of agents through local spacing
+and velocity alignment while following a moving reference in free space.
+
+![Flocking](https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/ca4eb94b0876aa666e44b2125bcce450f7594f30/PathPlanning/Flocking/animation.gif)
+
+- [Algorithm documentation](https://atsushisakai.github.io/PythonRobotics/modules/5_path_planning/flocking/flocking.html)
+- [Flocking for Multi-Agent Dynamic Systems: Algorithms and Theory](https://doi.org/10.1109/TAC.2005.864190)
 
 ## Grid based search
 
