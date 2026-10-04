@@ -200,7 +200,10 @@ class RRTStar:
             improved_cost = near_node.cost > edge_node.cost
 
             if no_collision and improved_cost:
-                self.node_list[i] = edge_node
+                # Preserve the vertex position and descendant references.
+                near_node.path_x = edge_node.path_x
+                near_node.parent = edge_node.parent
+                near_node.cost = edge_node.cost
                 self.propagate_cost_to_leaves(new_node)
 
     def calc_new_cost(self, from_node, to_node):
