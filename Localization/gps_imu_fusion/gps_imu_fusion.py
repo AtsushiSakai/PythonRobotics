@@ -173,8 +173,13 @@ def simulate(duration=SIM_TIME, seed=0, gps_outage=(20.0, 30.0)):
 
 
 def create_animation(history):  # pragma: no cover
-    """Create the path/error animation; keep the returned object alive to play it."""
-    fig, (path_ax, error_ax) = plt.subplots(1, 2, figsize=(11, 4.8))
+    """Animate paths, position errors and bias estimates against ground truth."""
+    fig = plt.figure(figsize=(12, 8))
+    grid = fig.add_gridspec(2, 6, height_ratios=[1.3, 1])
+    path_ax = fig.add_subplot(grid[0, :3])
+    error_ax = fig.add_subplot(grid[0, 3:])
+    bias_axes = [fig.add_subplot(grid[1, 2 * i:2 * i + 2], sharex=error_ax)
+                 for i in range(3)]
     colors = {"truth": "black", "estimate": "tab:blue",
               "no_bias_estimate": "tab:red", "dead_reckoning": "tab:orange"}
     labels = {"truth": "Ground truth", "estimate": "EKF (bias estimation)",
@@ -203,7 +208,29 @@ def create_animation(history):  # pragma: no cover
     error_ax.legend(loc="upper left", fontsize=8)
     path_ax.grid(True)
     error_ax.grid(True)
-    title = fig.suptitle("GPS/IMU fusion")
+
+    # Accelerometer biases stay in m/s^2; show gyroscope bias in deg/s.
+    bias_scale = np.array([1.0, 1.0, 180.0 / np.pi])
+    bias_estimates = history["estimate"][:, 5:8] * bias_scale
+    bias_truth = history["truth"][:, 5:8] * bias_scale
+    bias_titles = ["Accelerometer x bias", "Accelerometer y bias", "Gyroscope bias"]
+    bias_units = ["Bias [m/s²]", "Bias [m/s²]", "Bias [deg/s]"]
+    bias_lines = []
+    for i, ax in enumerate(bias_axes):
+        line, = ax.plot([], [], color="tab:blue", label="EKF estimate")
+        bias_lines.append(line)
+        ax.plot(history["time"], bias_truth[:, i], "k--", label="Ground truth")
+        values = np.concatenate((bias_estimates[:, i], bias_truth[:, i]))
+        padding = max(np.ptp(values) * 0.15, 0.01)
+        ax.set(ylim=(values.min() - padding, values.max() + padding),
+               xlabel="Time [s]", ylabel=bias_units[i], title=bias_titles[i])
+        if outage is not None:
+            ax.axvspan(*outage, color="gray", alpha=0.2)
+        ax.legend(loc="best", fontsize=8)
+        ax.grid(True)
+
+    animation_title = "GPS/IMU Fusion Localization with Bias Estimation"
+    title = fig.suptitle(animation_title + "\n", fontsize=12)
     fig.tight_layout()
 
     def update(index):
@@ -212,10 +239,12 @@ def create_animation(history):  # pragma: no cover
         gps_line.set_data(history["gps"][:index + 1, 0], history["gps"][:index + 1, 1])
         for key, line in error_lines.items():
             line.set_data(history["time"][:index + 1], errors[key][:index + 1])
+        for i, line in enumerate(bias_lines):
+            line.set_data(history["time"][:index + 1], bias_estimates[:index + 1, i])
         time = history["time"][index]
         status = "GPS unavailable" if outage is not None and outage[0] <= time < outage[1] else "GPS available (1 Hz)"
-        title.set_text(f"GPS/IMU fusion — {time:.1f} s — {status}")
-        return [*lines.values(), gps_line, *error_lines.values(), title]
+        title.set_text(f"{animation_title}\n{time:.1f} s — {status}")
+        return [*lines.values(), gps_line, *error_lines.values(), *bias_lines, title]
 
     frames = list(range(0, len(history["time"]), 5))
     if frames[-1] != len(history["time"]) - 1:

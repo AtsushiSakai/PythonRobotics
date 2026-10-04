@@ -1,5 +1,5 @@
-GPS/IMU Fusion
-==============
+GPS/IMU Fusion Localization with Bias Estimation
+================================================
 
 This example uses an extended Kalman filter (EKF) to combine body-frame
 accelerometer and gyroscope measurements with GPS positions in a local metric
@@ -7,8 +7,13 @@ frame. IMU prediction runs at 20 Hz and GPS correction at 1 Hz. The simulation
 compares fusion with and without bias estimation and IMU-only dead reckoning
 along a figure-eight trajectory, including a GPS outage from 20 to 30 seconds.
 
-.. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/5da61a2d63ee5ebfce23f67e514f67056c26cc04/Localization/gps_imu_fusion/animation.gif
-   :alt: GPS and IMU fusion with and without bias estimation compared with inertial dead reckoning during a GPS outage
+.. image:: https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/5d1bb293772b94b19e7795d4265891017b5925f6/Localization/gps_imu_fusion/animation.gif
+   :alt: GPS and IMU fusion localization with path comparisons, position errors, and accelerometer and gyroscope bias estimates against ground truth
+
+The lower three panels show the EKF's estimated accelerometer x/y biases
+(m/s²) and gyroscope bias (deg/s) in blue, with ground truth as black dashed
+lines. The true biases are 0.04 m/s², -0.03 m/s² and 0.4 deg/s, respectively.
+Gray shading marks the GPS outage in the error and bias plots.
 
 Assumptions
 -----------
