@@ -5,11 +5,22 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import art3d
-from matplotlib.patches import FancyArrowPatch
+from matplotlib.patches import Circle, FancyArrowPatch
 from mpl_toolkits.mplot3d.proj3d import proj_transform
 from mpl_toolkits.mplot3d import Axes3D
 
 from utils.angle import rot_mat_2d
+
+
+def plot_circle(x, y, radius, color="k", fill=True, ax=None, **kwargs):
+    """Plot a circle whose center and radius use axes data coordinates."""
+    if ax is None:
+        ax = plt.gca()
+
+    circle = Circle((x, y), radius, color=color, fill=fill, **kwargs)
+    ax.add_patch(circle)
+    ax.set_aspect("equal", adjustable="box")
+    return circle
 
 
 def plot_covariance_ellipse(x, y, cov, chi2=3.0, color="-r", ax=None):
