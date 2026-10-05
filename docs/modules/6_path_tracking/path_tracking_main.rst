@@ -10,6 +10,7 @@ Path tracking is the ability of a robot to follow the reference path generated b
    :caption: Contents
 
    pure_pursuit_tracking/pure_pursuit_tracking
+   vector_pursuit/vector_pursuit
    stanley_control/stanley_control
    rear_wheel_feedback_control/rear_wheel_feedback_control
    lqr_steering_control/lqr_steering_control
