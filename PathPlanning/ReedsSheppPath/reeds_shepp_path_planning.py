@@ -72,8 +72,9 @@ def set_path(paths, lengths, ctypes, step_size):
         if type_is_same and length_is_close:
             return paths  # same path found, so do not insert path
 
-    # check path is long enough
-    if path.L <= step_size:
+    # Keep a stationary solution, but discard nonzero paths that are shorter
+    # than the interpolation step.
+    if 0.0 < path.L <= step_size:
         return paths  # too short, so do not insert path
 
     paths.append(path)
@@ -147,8 +148,8 @@ def left_right_x_left(x, y, phi):
     u1, theta = polar(zeta, eeta)
 
     if u1 <= 4.0:
-        u = math.acos(1 - u1**2 * 0.125)
-        A = math.asin(2 * math.sin(u) / u1)
+        u = 2.0 * math.asin(0.25 * u1)
+        A = math.acos(0.25 * u1)
         t = mod2pi(-A + theta + math.pi/2)
         v = mod2pi(t - u - phi)
         return True, [t, u, -v], ['L', 'R', 'L']
