@@ -23,8 +23,8 @@ def icp_matching(previous_points, current_points):
     previous_points: 2D or 3D points in the previous frame
     current_points: 2D or 3D points in the current frame
     - output
-    R: Rotation matrix
-    T: Translation vector
+    R: Rotation matrix mapping the original current points to the previous frame
+    T: Translation vector, so aligned_points = R @ current_points + T[:, None]
     """
     H = None  # homogeneous transformation matrix
 
@@ -73,6 +73,7 @@ def icp_matching(previous_points, current_points):
 
 
 def update_homogeneous_matrix(Hin, R, T):
+    """Apply the latest rigid motion after the accumulated point transform."""
 
     r_size = R.shape[0]
     H = np.zeros((r_size + 1, r_size + 1))
@@ -84,7 +85,7 @@ def update_homogeneous_matrix(Hin, R, T):
     if Hin is None:
         return H
     else:
-        return Hin @ H
+        return H @ Hin
 
 
 def nearest_neighbor_association(previous_points, current_points):
