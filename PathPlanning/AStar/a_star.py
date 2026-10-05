@@ -15,10 +15,13 @@ import matplotlib.pyplot as plt
 
 show_animation = True
 
+TIE_BREAKER_OPTIONS = (None, "larger_g")
+
 
 class AStarPlanner:
 
-    def __init__(self, ox, oy, resolution, rr):
+    def __init__(self, ox, oy, resolution, rr, heuristic_weight=1.0,
+                 tie_breaker=None):
         """
         Initialize grid map for a star planning
 
@@ -26,10 +29,24 @@ class AStarPlanner:
         oy: y position list of Obstacles [m]
         resolution: grid resolution [m]
         rr: robot radius[m]
+        heuristic_weight: multiplier for the Euclidean heuristic. A value of
+            1.0 keeps the default A* behavior.
+        tie_breaker: optional tie-break strategy. None keeps the default
+            behavior, and "larger_g" prefers nodes farther from the start when
+            priorities are equal.
         """
+
+        if heuristic_weight <= 0.0:
+            raise ValueError("heuristic_weight must be positive")
+        if tie_breaker not in TIE_BREAKER_OPTIONS:
+            raise ValueError(
+                f"tie_breaker must be one of {TIE_BREAKER_OPTIONS}")
 
         self.resolution = resolution
         self.rr = rr
+        self.heuristic_weight = heuristic_weight
+        self.tie_breaker = tie_breaker
+        self.last_expanded_node_count = 0
         self.min_x, self.min_y = 0, 0
         self.max_x, self.max_y = 0, 0
         self.obstacle_map = None
@@ -70,17 +87,16 @@ class AStarPlanner:
 
         open_set, closed_set = dict(), dict()
         open_set[self.calc_grid_index(start_node)] = start_node
+        self.last_expanded_node_count = 0
 
         while True:
             if len(open_set) == 0:
                 print("Open set is empty..")
                 break
 
-            c_id = min(
-                open_set,
-                key=lambda o: open_set[o].cost + self.calc_heuristic(goal_node,
-                                                                     open_set[
-                                                                         o]))
+            c_id = min(open_set,
+                       key=lambda o: self.calc_node_priority(
+                           goal_node, open_set[o]))
             current = open_set[c_id]
 
             # show graph
@@ -105,6 +121,7 @@ class AStarPlanner:
 
             # Add it to the closed set
             closed_set[c_id] = current
+            self.last_expanded_node_count += 1
 
             # expand_grid search grid based on motion model
             for i, _ in enumerate(self.motion):
@@ -144,10 +161,15 @@ class AStarPlanner:
 
         return rx, ry
 
-    @staticmethod
-    def calc_heuristic(n1, n2):
-        w = 1.0  # weight of heuristic
-        d = w * math.hypot(n1.x - n2.x, n1.y - n2.y)
+    def calc_node_priority(self, goal_node, node):
+        priority = node.cost + self.calc_heuristic(goal_node, node)
+        if self.tie_breaker == "larger_g":
+            return priority, -node.cost
+
+        return priority
+
+    def calc_heuristic(self, n1, n2):
+        d = self.heuristic_weight * math.hypot(n1.x - n2.x, n1.y - n2.y)
         return d
 
     def calc_grid_position(self, index, min_position):
