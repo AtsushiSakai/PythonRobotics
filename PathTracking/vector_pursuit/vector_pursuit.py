@@ -165,7 +165,7 @@ def create_animation(course, history, targets, steering_history):
     steer_ax.axhline(math.degrees(MAX_STEER), color="r", linestyle="--")
     steer_ax.axhline(-math.degrees(MAX_STEER), color="r", linestyle="--")
     steer_ax.set(xlabel="Time [s]", ylabel="Steering [deg]",
-                 xlim=(0.0, history[-1, 0]), ylim=(-50.0, 50.0))
+                 xlim=(0.0, max(DT, history[-1, 0])), ylim=(-50.0, 50.0))
     steer_ax.grid(True)
     fig.tight_layout()
 

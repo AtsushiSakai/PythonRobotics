@@ -113,12 +113,16 @@ def test_straight_course_converges_from_lateral_offset():
     assert abs(history[-1, 3]) < 0.02
 
 
-def test_timeout_is_reported_and_initial_goal_is_complete():
+def test_timeout_is_reported_and_initial_goal_is_complete(tmp_path):
     with pytest.raises(RuntimeError, match="did not reach"):
         m.simulate(max_time=m.DT)
     course = np.array([[0.0, 0.0, 0.0], [1.0, 0.0, 0.0]])
-    _, history, targets, _ = m.simulate(course, m.State(x=1.0, y=0.0))
+    result = m.simulate(course, m.State(x=1.0, y=0.0))
+    _, history, targets, _ = result
     assert len(history) == 1 and len(targets) == 0
+    animation = m.create_animation(*result)
+    animation.save(tmp_path / "already_at_goal.gif", writer=PillowWriter(fps=5))
+    plt.close("all")
 
 
 def test_animation_and_headless_main(tmp_path, monkeypatch):
