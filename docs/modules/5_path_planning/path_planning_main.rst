@@ -31,6 +31,7 @@ Path planning is the ability of a robot to search feasible and efficient path to
    reeds_shepp_path/reeds_shepp_path
    lqr_path/lqr_path
    hybridastar/hybridastar
+   hybrid_astar_trailer/hybrid_astar_trailer
    frenet_frame_path/frenet_frame_path
    coverage_path/coverage_path
    elastic_bands/elastic_bands
