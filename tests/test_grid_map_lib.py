@@ -1,4 +1,4 @@
-from Mapping.grid_map_lib.grid_map_lib import GridMap
+from Mapping.grid_map_lib.grid_map_lib import GridMap, FloatGrid
 import conftest
 import numpy as np
 
@@ -34,6 +34,23 @@ def test_xy_and_grid_index_conversion():
             x_ind_2, y_ind_2 = grid_map.calc_xy_index_from_grid_index(grid_ind)
             assert x_ind == x_ind_2
             assert y_ind == y_ind_2
+
+
+def test_set_xy_pos_at_origin_index():
+    # Regression: the guard used to be `if (not x_ind) or (not y_ind):`
+    # which rejected the valid grid index 0 (since `not 0` is True in
+    # Python). Setting a value at the (0, 0) cell must succeed and the
+    # return value must be a plain `True` (not the tuple `(False, False)`
+    # that the previous None-guard returned).
+    grid_map = GridMap(4, 4, 1.0, 2.0, 2.0)  # left_lower = (0, 0)
+    ok = grid_map.set_value_from_xy_index(0, 0, FloatGrid(0.5))
+    assert ok is True
+    assert grid_map.data[0].get_float_data() == 0.5
+
+    # And the higher-level pos API should accept the (0, 0) cell.
+    ok = grid_map.set_value_from_xy_pos(0.5, 0.5, FloatGrid(0.7))
+    assert ok is True
+    assert grid_map.data[0].get_float_data() == 0.7
 
 
 if __name__ == '__main__':
