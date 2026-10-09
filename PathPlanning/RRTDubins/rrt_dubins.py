@@ -16,6 +16,7 @@ sys.path.append(str(pathlib.Path(__file__).parent.parent))
 
 from RRT.rrt import RRT
 from DubinsPath import dubins_path_planner
+from utils.angle import angle_mod
 from utils.plot import plot_arrow
 
 show_animation = True
@@ -180,7 +181,7 @@ class RRTDubins(RRT):
         # angle check
         final_goal_indexes = []
         for i in goal_indexes:
-            if abs(self.node_list[i].yaw - self.end.yaw) <= self.goal_yaw_th:
+            if abs(angle_mod(self.node_list[i].yaw - self.end.yaw)) <= self.goal_yaw_th:
                 final_goal_indexes.append(i)
 
         if not final_goal_indexes:
