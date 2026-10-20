@@ -1,7 +1,25 @@
 import conftest
 import math
+import pytest
 
 from PathPlanning.RRT import rrt_with_pathsmoothing as rrt_module
+
+
+@pytest.mark.parametrize("distance, expected", [
+    (0.0, [0.0, 0.0, 0]),
+    (5.0, [5.0, 0.0, 0]),
+    (10.0, [10.0, 0.0, 0]),
+    (15.0, [10.0, 5.0, 1]),
+    (20.0, [10.0, 10.0, 1]),
+])
+def test_target_point_matches_path_arclength(distance, expected):
+    path = [[0.0, 0.0], [10.0, 0.0], [10.0, 10.0]]
+    assert rrt_module.get_target_point(path, distance) == expected
+
+
+def test_target_point_skips_zero_length_segments():
+    path = [[0.0, 0.0], [0.0, 0.0], [10.0, 0.0], [10.0, 10.0]]
+    assert rrt_module.get_target_point(path, 5.0) == [5.0, 0.0, 1]
 
 def test_smoothed_path_safety():
     # Define test environment
