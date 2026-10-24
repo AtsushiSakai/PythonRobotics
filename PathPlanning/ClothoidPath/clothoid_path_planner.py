@@ -102,7 +102,15 @@ def Y(a, b, c):
 
 def solve_g_for_root(theta1, theta2, delta):
     initial_guess = 3*(theta1 + theta2)
-    return fsolve(lambda A: Y(2*A, delta - A, theta1), [initial_guess])
+    root, info, status, message = fsolve(
+        lambda A: Y(2*A[0], delta - A[0], theta1), [initial_guess],
+        full_output=True)
+    root = root[0]
+    residual = abs(np.asarray(info["fvec"]).item())
+    if (not np.isfinite(root) or not np.isfinite(residual)
+            or (status != 1 and residual > np.finfo(float).eps)):
+        raise ValueError(message)
+    return root
 
 
 def compute_path_length(r, theta1, delta, A):
