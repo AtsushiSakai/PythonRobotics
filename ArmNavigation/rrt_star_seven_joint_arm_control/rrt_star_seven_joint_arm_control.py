@@ -250,14 +250,16 @@ class RRTStar:
 
         start, end = np.array(from_node.x), np.array(to_node.x)
         v = end - start
-        u = v / (np.sqrt(np.sum(v ** 2)))
-        for _ in range(n_expand):
-            new_node.x += u * self.path_resolution
-            new_node.path_x.append(list(new_node.x))
+        if n_expand > 0:
+            u = v / (np.sqrt(np.sum(v ** 2)))
+            for _ in range(n_expand):
+                new_node.x += u * self.path_resolution
+                new_node.path_x.append(list(new_node.x))
 
         d, _, _ = self.calc_distance_and_angle(new_node, to_node)
         if d <= self.path_resolution:
             new_node.path_x.append(list(to_node.x))
+            new_node.x = list(to_node.x)
 
         new_node.parent = from_node
 
