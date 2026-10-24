@@ -4,16 +4,21 @@ Reeds Shepp path planner sample code
 
 author Atsushi Sakai(@Atsushi_twi)
 co-author Videh Patel(@videh25) : Added the missing RS paths
+co-author fishyy119(@fishyy119) : Improved runtime efficiency
 
 """
-import sys
 import pathlib
+import sys
+
 sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 
 import math
+from typing import List, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy.typing import NDArray
+
 from utils.angle import angle_mod
 
 show_animation = True
@@ -342,63 +347,86 @@ def generate_path(q0, q1, max_curvature, step_size):
     return paths
 
 
-def calc_interpolate_dists_list(lengths, step_size):
-    interpolate_dists_list = []
+def calc_interpolate_dists_list(lengths: List[float], step_size: float) -> List[NDArray[np.floating]]:
+    interpolate_dists_list: List[NDArray[np.floating]] = []
     for length in lengths:
         d_dist = step_size if length >= 0.0 else -step_size
-        interp_dists = np.arange(0.0, length, d_dist)
-        interp_dists = np.append(interp_dists, length)
+
+        interp_core = np.arange(0.0, length, d_dist, dtype=np.float64)
+        interp_dists = np.empty(len(interp_core) + 1, dtype=np.float64)
+        interp_dists[:-1] = interp_core
+        interp_dists[-1] = length
+
         interpolate_dists_list.append(interp_dists)
 
     return interpolate_dists_list
 
 
-def generate_local_course(lengths, modes, max_curvature, step_size):
+def generate_local_course(
+    lengths: List[float],
+    modes: List[str],
+    max_curvature: float,
+    step_size: float,
+) -> Tuple[NDArray[np.floating], NDArray[np.floating], NDArray[np.floating], NDArray[np.signedinteger]]:
     interpolate_dists_list = calc_interpolate_dists_list(lengths, step_size * max_curvature)
+    total_len = sum(len(arr) for arr in interpolate_dists_list)
+    xs = np.empty(total_len, dtype=np.float64)
+    ys = np.empty_like(xs)
+    yaws = np.empty_like(xs)
+    directions = np.empty_like(xs, dtype=np.int32)
 
     origin_x, origin_y, origin_yaw = 0.0, 0.0, 0.0
+    idx = 0
 
-    xs, ys, yaws, directions = [], [], [], []
-    for (interp_dists, mode, length) in zip(interpolate_dists_list, modes,
-                                            lengths):
+    for interp_dists, mode, length in zip(interpolate_dists_list, modes, lengths):
+        n = len(interp_dists)
+        x_arr, y_arr, yaw_arr, dir_arr = interpolate_vectorized(
+            interp_dists, length, mode, max_curvature, origin_x, origin_y, origin_yaw
+        )
+        xs[idx : idx + n] = x_arr
+        ys[idx : idx + n] = y_arr
+        yaws[idx : idx + n] = yaw_arr
+        directions[idx : idx + n] = dir_arr
 
-        for dist in interp_dists:
-            x, y, yaw, direction = interpolate(dist, length, mode,
-                                               max_curvature, origin_x,
-                                               origin_y, origin_yaw)
-            xs.append(x)
-            ys.append(y)
-            yaws.append(yaw)
-            directions.append(direction)
-        origin_x = xs[-1]
-        origin_y = ys[-1]
-        origin_yaw = yaws[-1]
+        origin_x = x_arr[-1]
+        origin_y = y_arr[-1]
+        origin_yaw = yaw_arr[-1]
+        idx += n
 
     return xs, ys, yaws, directions
 
 
-def interpolate(dist, length, mode, max_curvature, origin_x, origin_y,
-                origin_yaw):
+def interpolate_vectorized(
+    dists: NDArray[np.floating],
+    length: float,
+    mode: str,
+    max_curvature: float,
+    origin_x: float,
+    origin_y: float,
+    origin_yaw: float,
+) -> Tuple[NDArray[np.floating], NDArray[np.floating], NDArray[np.floating], NDArray[np.signedinteger]]:
     if mode == "S":
-        x = origin_x + dist / max_curvature * math.cos(origin_yaw)
-        y = origin_y + dist / max_curvature * math.sin(origin_yaw)
-        yaw = origin_yaw
+        x = origin_x + dists / max_curvature * math.cos(origin_yaw)
+        y = origin_y + dists / max_curvature * math.sin(origin_yaw)
+        yaw = np.full_like(dists, origin_yaw)
     else:  # curve
-        ldx = math.sin(dist) / max_curvature
-        ldy = 0.0
-        yaw = None
+        ldx = np.sin(dists) / max_curvature
         if mode == "L":  # left turn
-            ldy = (1.0 - math.cos(dist)) / max_curvature
-            yaw = origin_yaw + dist
-        elif mode == "R":  # right turn
-            ldy = (1.0 - math.cos(dist)) / -max_curvature
-            yaw = origin_yaw - dist
-        gdx = math.cos(-origin_yaw) * ldx + math.sin(-origin_yaw) * ldy
-        gdy = -math.sin(-origin_yaw) * ldx + math.cos(-origin_yaw) * ldy
+            ldy = (1.0 - np.cos(dists)) / max_curvature
+            yaw = origin_yaw + dists
+        else:  # elif mode == "R":  # right turn
+            ldy = (1.0 - np.cos(dists)) / (-max_curvature)
+            yaw = origin_yaw - dists
+
+        cos_oy = math.cos(-origin_yaw)
+        sin_oy = math.sin(-origin_yaw)
+        gdx = cos_oy * ldx + sin_oy * ldy
+        gdy = -sin_oy * ldx + cos_oy * ldy
         x = origin_x + gdx
         y = origin_y + gdy
 
-    return x, y, yaw, 1 if length > 0.0 else -1
+    direction = 1 if length > 0 else -1
+    return x, y, yaw, np.full_like(dists, direction, dtype=np.int32)
 
 
 def calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size):
@@ -407,19 +435,23 @@ def calc_paths(sx, sy, syaw, gx, gy, gyaw, maxc, step_size):
 
     paths = generate_path(q0, q1, maxc, step_size)
     for path in paths:
-        xs, ys, yaws, directions = generate_local_course(path.lengths,
-                                                         path.ctypes, maxc,
-                                                         step_size)
+        xs, ys, yaws, directions = generate_local_course(path.lengths, path.ctypes, maxc, step_size)
 
         # convert global coordinate
-        path.x = [math.cos(-q0[2]) * ix + math.sin(-q0[2]) * iy + q0[0] for
-                  (ix, iy) in zip(xs, ys)]
-        path.y = [-math.sin(-q0[2]) * ix + math.cos(-q0[2]) * iy + q0[1] for
-                  (ix, iy) in zip(xs, ys)]
-        path.yaw = [pi_2_pi(yaw + q0[2]) for yaw in yaws]
-        path.directions = directions
-        path.lengths = [length / maxc for length in path.lengths]
-        path.L = path.L / maxc
+        local_pts = np.vstack([xs, ys, np.ones_like(xs)])  # shape: [3, N]
+        cos_y = np.cos(syaw)
+        sin_y = np.sin(syaw)
+        se2 = np.array([[cos_y, -sin_y, sx],[sin_y, cos_y, sy],[0, 0, 1]])
+        global_pts = se2 @ local_pts  # shape: [3, N]
+
+        path.x = global_pts[0, :].tolist()
+        path.y = global_pts[1, :].tolist()
+
+        path.yaw = ((yaws + syaw + np.pi) % (2 * np.pi) - np.pi).tolist()
+
+        path.directions = directions.tolist()
+        path.lengths = [l / maxc for l in path.lengths]
+        path.L /= maxc
 
     return paths
 
