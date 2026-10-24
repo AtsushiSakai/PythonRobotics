@@ -167,9 +167,11 @@ class RRTStar:
         if not safe_goal_inds:
             return None
 
-        min_cost = min([self.node_list[i].cost for i in safe_goal_inds])
-        for i in safe_goal_inds:
-            if self.node_list[i].cost == min_cost:
+        safe_goal_costs = [self.calc_new_cost(self.node_list[i], self.goal_node)
+                          for i in safe_goal_inds]
+        min_cost = min(safe_goal_costs)
+        for i, cost in zip(safe_goal_inds, safe_goal_costs):
+            if cost == min_cost:
                 return i
 
         return None
