@@ -11,3 +11,4 @@ Mission planning includes tools such as finite state machines and behavior trees
 
    state_machine/state_machine
    behavior_tree/behavior_tree
+   sequential_single_item_auction/sequential_single_item_auction
