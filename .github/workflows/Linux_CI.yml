@@ -17,7 +17,7 @@ jobs:
     name: Python ${{ matrix.python-version }} CI
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - run: git fetch --prune --unshallow
 
     - name: Setup python
