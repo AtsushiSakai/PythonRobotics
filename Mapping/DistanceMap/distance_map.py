@@ -122,12 +122,7 @@ def dt(d):
     Parameters
     ----------
     d : array_like
-        Input array containing the distances.
-
-    Returns:
-    --------
-    d : array_like
-        The transformed array with computed distances.
+        Input costs, overwritten in place with the squared distance transform.
     """
     v = np.zeros(len(d) + 1)
     z = np.zeros(len(d) + 1)
@@ -144,12 +139,14 @@ def dt(d):
         v[k] = q
         z[k] = s
         z[k + 1] = INF
+    # Keep the original parabola costs while overwriting the output in place.
+    costs = d.copy()
     k = 0
     for q in range(len(d)):
         while z[k + 1] < q:
             k = k + 1
         dx = q - v[k]
-        d[q] = dx * dx + d[int(v[k])]
+        d[q] = dx * dx + costs[int(v[k])]
 
 
 def main():
