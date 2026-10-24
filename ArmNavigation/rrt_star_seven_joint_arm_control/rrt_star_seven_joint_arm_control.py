@@ -329,15 +329,21 @@ class RRTStar:
         for (ox, oy, oz, size) in obstacleList:
             for x in node.path_x:
                 x_list, y_list, z_list = robot.get_points(x)
-                dx_list = [ox - x_point for x_point in x_list]
-                dy_list = [oy - y_point for y_point in y_list]
-                dz_list = [oz - z_point for z_point in z_list]
-                d_list = [dx * dx + dy * dy + dz * dz
-                          for (dx, dy, dz) in zip(dx_list,
-                                                  dy_list,
-                                                  dz_list)]
-
-                if min(d_list) <= size ** 2:
+                points = np.column_stack((x_list, y_list, z_list))
+                center = np.array([ox, oy, oz])
+                links = points[1:] - points[:-1]
+                length_squared = np.sum(links ** 2, axis=1)
+                projection = np.sum((center - points[:-1]) * links, axis=1)
+                # A zero-length link is a point, with closest fraction zero.
+                fraction = np.divide(projection, length_squared,
+                                     out=np.zeros_like(projection),
+                                     where=length_squared > 0)
+                fraction = np.clip(fraction, 0.0, 1.0)
+                closest = points[:-1] + fraction[:, None] * links
+                # Retain the base point even for an arm without links.
+                closest = np.concatenate((points[:1], closest), axis=0)
+                distance_squared = np.sum((closest - center) ** 2, axis=1)
+                if np.any(distance_squared <= size ** 2):
                     return False  # collision
 
         return True  # safe
