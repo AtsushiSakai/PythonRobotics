@@ -196,8 +196,9 @@ def calc_obstacle_cost(trajectory, ob, config):
         rot = np.array([[np.cos(yaw), -np.sin(yaw)], [np.sin(yaw), np.cos(yaw)]])
         rot = np.transpose(rot, [2, 0, 1])
         local_ob = ob[:, None] - trajectory[:, 0:2]
-        local_ob = local_ob.reshape(-1, local_ob.shape[-1])
-        local_ob = np.array([local_ob @ x for x in rot])
+        # Pair each obstacle offset with the rotation at the same trajectory
+        # step, rather than checking every offset against every heading.
+        local_ob = np.einsum("mti,tij->mtj", local_ob, rot)
         local_ob = local_ob.reshape(-1, local_ob.shape[-1])
         upper_check = local_ob[:, 0] <= config.robot_length / 2
         right_check = local_ob[:, 1] <= config.robot_width / 2
