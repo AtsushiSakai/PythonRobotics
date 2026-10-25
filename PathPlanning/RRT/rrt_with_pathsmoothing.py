@@ -30,25 +30,19 @@ def get_path_length(path):
 
 
 def get_target_point(path, targetL):
-    le = 0
-    ti = 0
-    lastPairLen = 0
+    """Return the point and containing segment at distance targetL along path."""
+    remaining_length = targetL
     for i in range(len(path) - 1):
         dx = path[i + 1][0] - path[i][0]
         dy = path[i + 1][1] - path[i][1]
-        d = math.hypot(dx, dy)
-        le += d
-        if le >= targetL:
-            ti = i - 1
-            lastPairLen = d
-            break
-
-    partRatio = (le - targetL) / lastPairLen
-
-    x = path[ti][0] + (path[ti + 1][0] - path[ti][0]) * partRatio
-    y = path[ti][1] + (path[ti + 1][1] - path[ti][1]) * partRatio
-
-    return [x, y, ti]
+        segment_length = math.hypot(dx, dy)
+        if segment_length == 0:
+            continue
+        if remaining_length <= segment_length:
+            ratio = remaining_length / segment_length
+            return [path[i][0] + ratio * dx, path[i][1] + ratio * dy, i]
+        remaining_length -= segment_length
+    return [path[-1][0], path[-1][1], len(path) - 2]
 
 
 def is_point_collision(x, y, obstacle_list, robot_radius):
