@@ -24,6 +24,7 @@ import heapq
 from dataclasses import dataclass
 from functools import total_ordering
 import time
+from collections.abc import Sequence
 
 @dataclass()
 # Note: Total_ordering is used instead of adding `order=True` to the @dataclass decorator because
@@ -34,6 +35,20 @@ import time
 class SIPPNode(Node):
     interval: Interval
 
+class SIPPNodePath(NodePath):
+    def __init__(self, path: Sequence[SIPPNode], expanded_node_count: int):
+        super().__init__(path, expanded_node_count)
+
+        self.positions_at_time = {}
+        last_position = path[0].position
+        for t in range(0, path[-1].time + 1):
+            for node in path:
+                if node.time == t:
+                    last_position = node.position
+                    break
+                if node.time > t:
+                    break
+            self.positions_at_time[t] = last_position
 @dataclass
 class EntryTimeAndInterval:
     entry_time: int
@@ -47,9 +62,8 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
         verbose (bool): set to True to print debug information
     """
     @staticmethod
-    def plan(grid: Grid, start: Position, goal: Position, verbose: bool = False) -> NodePath:
-
-        safe_intervals = grid.get_safe_intervals()
+    def plan(grid: Grid, start: Position, goal: Position, agent_idx: int, verbose: bool = False) -> NodePath:
+        safe_intervals = grid.get_safe_intervals(agent_idx)
 
         open_set: list[SIPPNode] = []
         first_node_interval = safe_intervals[start.x, start.y][0]
@@ -83,24 +97,24 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
 
                 # reverse path so it goes start -> goal
                 path.reverse()
-                return NodePath(path, len(expanded_list))
+                return SIPPNodePath(path, len(expanded_list))
 
             expanded_idx = len(expanded_list)
             expanded_list.append(expanded_node)
             entry_time_and_node = EntryTimeAndInterval(expanded_node.time, expanded_node.interval)
             add_entry_to_visited_intervals_array(entry_time_and_node, visited_intervals, expanded_node)
 
-            for child in SafeIntervalPathPlanner.generate_successors(grid, goal, expanded_node, expanded_idx, safe_intervals, visited_intervals):
+            for child in SafeIntervalPathPlanner.generate_successors(grid, goal, expanded_node, expanded_idx, safe_intervals, visited_intervals, agent_idx):
                 heapq.heappush(open_set, child)
 
-        raise Exception("No path found")
+        raise RuntimeError("No path found")
 
     """
     Generate list of possible successors of the provided `parent_node` that are worth expanding
     """
     @staticmethod
     def generate_successors(
-        grid: Grid, goal: Position, parent_node: SIPPNode, parent_node_idx: int, intervals: np.ndarray, visited_intervals: np.ndarray
+        grid: Grid, goal: Position, parent_node: SIPPNode, parent_node_idx: int, intervals: np.ndarray, visited_intervals: np.ndarray, agent_idx: int
     ) -> list[SIPPNode]:
         new_nodes = []
         diffs = [
@@ -116,8 +130,8 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
                 continue
 
             current_interval = parent_node.interval
-
             new_cell_intervals: list[Interval] = intervals[new_pos.x, new_pos.y]
+
             for interval in new_cell_intervals:
                 # if interval starts after current ends, break
                 # assumption: intervals are sorted by start time, so all future intervals will hit this condition as well
@@ -139,12 +153,13 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
 
                 # We know there is a node worth expanding. Generate successor at the earliest possible time the
                 # new interval can be entered
-                for possible_t in range(max(parent_node.time + 1, interval.start_time), min(current_interval.end_time, interval.end_time)):
-                    if grid.valid_position(new_pos, possible_t):
+                minimum_entry_time = max(parent_node.time + 1, interval.start_time)
+                maximum_entry_time = min(current_interval.end_time, interval.end_time)
+                for possible_t in range(minimum_entry_time, maximum_entry_time + 1):
+                    if grid.valid_position(new_pos, possible_t, agent_idx):
                         new_nodes.append(SIPPNode(
                             new_pos,
-                            # entry is max of interval start and parent node time + 1 (get there as soon as possible)
-                            max(interval.start_time, parent_node.time + 1),
+                            possible_t,
                             SafeIntervalPathPlanner.calculate_heuristic(new_pos, goal),
                             parent_node_idx,
                             interval,
