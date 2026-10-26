@@ -44,6 +44,12 @@ possible.
 This method is useful for machine learning and other situations where
 you want to obtain a specified number of points from point cloud.
 
+The requested count must be an integer between zero and the number of input
+rows, inclusive. Each input row is selected at most once, even when multiple
+rows have identical coordinates. A zero count returns an empty array with the
+same coordinate dimension and dtype as the input. Negative or excessive counts
+raise ``ValueError`` instead of starting a sampling loop that cannot finish.
+
 API
 =====
 
