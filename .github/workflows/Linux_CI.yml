@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ '3.13' ]
+        python-version: [ '3.14' ]
 
     name: Python ${{ matrix.python-version }} CI
 
@@ -21,7 +21,7 @@ jobs:
     - run: git fetch --prune --unshallow
 
     - name: Setup python
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies

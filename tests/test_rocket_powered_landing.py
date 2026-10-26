@@ -1,18 +1,24 @@
 import conftest  # Add root path to sys.path
+import warnings
+
 import numpy as np
-from numpy.testing import suppress_warnings
 
 from AerialNavigation.rocket_powered_landing import rocket_powered_landing as m
 
 
 def test1():
     m.show_animation = False
-    with suppress_warnings() as sup:
-        sup.filter(UserWarning,
-                   "You are solving a parameterized problem that is not DPP"
-                   )
-        sup.filter(UserWarning,
-                   "Solution may be inaccurate")
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message="You are solving a parameterized problem that is not DPP",
+            category=UserWarning,
+        )
+        warnings.filterwarnings(
+            "ignore",
+            message="Solution may be inaccurate",
+            category=UserWarning,
+        )
         m.main(rng=np.random.default_rng(1234))
 
 
