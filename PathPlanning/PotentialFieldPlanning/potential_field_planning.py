@@ -24,10 +24,12 @@ show_animation = True
 
 
 def calc_potential_field(gx, gy, ox, oy, reso, rr, sx, sy):
-    minx = min(min(ox), sx, gx) - AREA_WIDTH / 2.0
-    miny = min(min(oy), sy, gy) - AREA_WIDTH / 2.0
-    maxx = max(max(ox), sx, gx) + AREA_WIDTH / 2.0
-    maxy = max(max(oy), sy, gy) + AREA_WIDTH / 2.0
+    x_coords = [sx, gx, *ox]
+    y_coords = [sy, gy, *oy]
+    minx = min(x_coords) - AREA_WIDTH / 2.0
+    miny = min(y_coords) - AREA_WIDTH / 2.0
+    maxx = max(x_coords) + AREA_WIDTH / 2.0
+    maxy = max(y_coords) + AREA_WIDTH / 2.0
     xw = int(round((maxx - minx) / reso))
     yw = int(round((maxy - miny) / reso))
 
@@ -52,6 +54,9 @@ def calc_attractive_potential(x, y, gx, gy):
 
 
 def calc_repulsive_potential(x, y, ox, oy, rr):
+    if len(ox) == 0:
+        return 0.0
+
     # search nearest obstacle
     minid = -1
     dmin = float("inf")
