@@ -9,7 +9,6 @@ def test1():
     m.main()
 
 
-
 @pytest.mark.parametrize("dt", [0.5, 0.7, 6.0])
 def test_quintic_trajectory_includes_exact_terminal_time(dt):
     m.show_animation = False
