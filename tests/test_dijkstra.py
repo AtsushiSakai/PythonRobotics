@@ -25,5 +25,20 @@ def test_calc_index_uses_grid_coordinates():
         ) == planner.x_width * planner.y_width - 1
 
 
+
+def test_planning_preserves_start_when_grid_key_would_be_negative_one():
+    # The old index formula gave cell (0, 1) key -1, which is also the
+    # parent-chain sentinel, so path reconstruction stopped before the start.
+    m.show_animation = False
+    planner = m.DijkstraPlanner(
+        [1.0, 5.0, 1.0, 5.0], [1.0, 1.0, 5.0, 5.0],
+        1.0, 0.0
+    )
+
+    rx, ry = planner.planning(1.0, 2.0, 1.0, 3.0)
+
+    assert list(zip(rx, ry)) == [(1.0, 3.0), (1.0, 2.0)]
+
+
 if __name__ == '__main__':
     conftest.run_this_test(__file__)
