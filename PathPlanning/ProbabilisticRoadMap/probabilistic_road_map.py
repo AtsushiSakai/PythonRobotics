@@ -69,33 +69,34 @@ def prm_planning(start_x, start_y, goal_x, goal_y,
 
 
 def is_collision(sx, sy, gx, gy, rr, obstacle_kd_tree):
-    x = sx
-    y = sy
     dx = gx - sx
     dy = gy - sy
-    yaw = math.atan2(gy - sy, gx - sx)
     d = math.hypot(dx, dy)
 
     if d >= MAX_EDGE_LEN:
         return True
 
-    D = rr
-    n_step = round(d / D)
+    if d == 0.0:
+        dist, _ = obstacle_kd_tree.query([sx, sy])
+        return dist <= rr
 
-    for i in range(n_step):
-        dist, _ = obstacle_kd_tree.query([x, y])
-        if dist <= rr:
-            return True  # collision
-        x += D * math.cos(yaw)
-        y += D * math.sin(yaw)
+    start = np.array([sx, sy])
+    direction = np.array([dx, dy])
 
-    # goal point check
-    dist, _ = obstacle_kd_tree.query([gx, gy])
-    if dist <= rr:
-        return True  # collision
+    # The edge's swept disk lies within this ball around its midpoint.
+    # Query only nearby obstacles, then check exact segment clearance.
+    midpoint = start + direction / 2.0
+    nearby = obstacle_kd_tree.query_ball_point(midpoint, d / 2.0 + rr)
+    if not nearby:
+        return False
 
-    return False  # OK
+    obstacles = obstacle_kd_tree.data[nearby]
+    fraction = np.clip((obstacles - start) @ direction / (d * d),
+                       0.0, 1.0)
+    closest = start + fraction[:, None] * direction
+    clearance_sq = np.sum((obstacles - closest) ** 2, axis=1)
 
+    return bool(np.any(clearance_sq <= rr ** 2))
 
 def generate_road_map(sample_x, sample_y, rr, obstacle_kd_tree):
     """
