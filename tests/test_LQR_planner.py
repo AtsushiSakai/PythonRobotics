@@ -9,7 +9,6 @@ def test_1():
     m.main()
 
 
-
 def test_dare_uses_matrix_products():
     planner = m.LQRPlanner()
     planner.EPS = 1e-10
