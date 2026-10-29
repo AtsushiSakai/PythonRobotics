@@ -9,7 +9,6 @@ def test1():
     probabilistic_road_map.main(rng=np.random.default_rng(1233))
 
 
-
 def test_collision_detects_obstacle_between_edge_samples():
     # The obstacle is less than 1 m from the segment, but more than
     # 1 m from both endpoints (the old discrete samples).
