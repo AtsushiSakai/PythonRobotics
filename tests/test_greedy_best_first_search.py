@@ -7,7 +7,6 @@ def test_1():
     m.main()
 
 
-
 def _make_bounded_map(block_center=False):
     ox, oy = [], []
     for i in range(8):
