@@ -7,7 +7,6 @@ def test1():
     m.main()
 
 
-
 def test_equidistant_neighbors_keep_distinct_indices_and_cheaper_parent():
     planner = m.InformedRRTStar(
         start=[-1.0, 0.0], goal=[5.0, 0.0],
