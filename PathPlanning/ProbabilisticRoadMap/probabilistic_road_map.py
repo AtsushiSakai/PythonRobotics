@@ -98,6 +98,7 @@ def is_collision(sx, sy, gx, gy, rr, obstacle_kd_tree):
 
     return bool(np.any(clearance_sq <= rr ** 2))
 
+
 def generate_road_map(sample_x, sample_y, rr, obstacle_kd_tree):
     """
     Road map generation
