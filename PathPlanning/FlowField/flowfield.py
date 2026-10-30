@@ -137,7 +137,7 @@ class FlowField:
         while curr_x is not None and curr_y is not None:
             curr_x, curr_y = self.vector_field[(curr_x, curr_y)]
 
-            if show_animation:
+            if show_animation and curr_x is not None and curr_y is not None:
                 plt.plot(curr_x, curr_y, "b*")
                 plt.pause(0.001)
 
