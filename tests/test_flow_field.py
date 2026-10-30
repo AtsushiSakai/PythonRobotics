@@ -8,7 +8,6 @@ def test():
     flow_field.main()
 
 
-
 def test_free_grid_with_goal_at_boundary():
     flow_field.show_animation = False
     grid = {(x, y): 'free' for x in range(3) for y in range(3)}
