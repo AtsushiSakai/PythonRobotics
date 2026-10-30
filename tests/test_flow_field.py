@@ -53,5 +53,27 @@ def test_single_cell_grid_is_valid():
     assert planner.vector_field[(0, 0)] == (None, None)
 
 
+
+
+def test_animation_skips_termination_sentinel(monkeypatch):
+    """Do not send (None, None) to Matplotlib after reaching the goal."""
+    monkeypatch.setattr(flow_field, 'show_animation', True)
+    plotted = []
+    shown = []
+    monkeypatch.setattr(
+        flow_field.plt, 'plot',
+        lambda x, y, *args: plotted.append((x, y)),
+    )
+    monkeypatch.setattr(flow_field.plt, 'pause', lambda *_: None)
+    monkeypatch.setattr(flow_field.plt, 'show', lambda: shown.append(True))
+
+    grid = {(0, 0): 'free', (1, 0): 'free'}
+    planner = flow_field.FlowField(grid, 1, 0, 0, 0, 2, 1)
+    planner.find_path()
+
+    assert plotted == [(1, 0)]
+    assert shown == [True]
+
+
 if __name__ == '__main__':
     conftest.run_this_test(__file__)
