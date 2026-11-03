@@ -16,7 +16,7 @@ sys.path.append(str(pathlib.Path(__file__).parent.parent))
 
 from DubinsPath import dubins_path_planner
 from RRTStar.rrt_star import RRTStar
-from utils.plot import plot_arrow
+from utils.plot import plot_arrow, plot_circle
 
 show_animation = True
 
@@ -119,7 +119,7 @@ class RRTStarDubins(RRTStar):
                 plt.plot(node.path_x, node.path_y, "-g")
 
         for (ox, oy, size) in self.obstacle_list:
-            plt.plot(ox, oy, "ok", ms=30 * size)
+            plot_circle(ox, oy, size)
 
         plt.plot(self.start.x, self.start.y, "xr")
         plt.plot(self.end.x, self.end.y, "xr")
