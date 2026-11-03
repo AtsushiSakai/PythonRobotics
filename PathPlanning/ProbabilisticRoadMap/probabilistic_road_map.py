@@ -205,7 +205,7 @@ def dijkstra_planning(sx, sy, gx, gy, road_map, sample_x, sample_y):
             else:
                 open_set[n_id] = node
 
-    if path_found is False:
+    if not path_found:
         return [], []
 
     # generate final course
