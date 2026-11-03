@@ -17,6 +17,16 @@ def test_free_grid_with_goal_at_boundary():
     assert planner.integration_field[(2, 2)] == 0
     assert np.isfinite(planner.integration_field[(0, 0)])
 
+    # Every free cell has a finite cost and a valid descending direction.
+    for position, cost in planner.integration_field.items():
+        assert np.isfinite(cost)
+        if position == (2, 2):
+            assert planner.vector_field[position] == (None, None)
+            continue
+        neighbor = planner.vector_field[position]
+        assert neighbor in grid
+        assert planner.integration_field[neighbor] < cost
+
     position = (0, 0)
     visited = {position}
     for _ in range(9):
@@ -51,8 +61,6 @@ def test_single_cell_grid_is_valid():
 
     assert planner.integration_field[(0, 0)] == 0
     assert planner.vector_field[(0, 0)] == (None, None)
-
-
 
 
 def test_animation_skips_termination_sentinel(monkeypatch):
