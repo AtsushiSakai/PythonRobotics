@@ -17,8 +17,7 @@ class CubicSpline1D:
     ----------
     x : list
         x coordinates for data points. This x coordinates must be
-        sorted
-        in ascending order.
+        strictly increasing.
     y : list
         y coordinates for data points
 
@@ -46,8 +45,8 @@ class CubicSpline1D:
     def __init__(self, x, y):
 
         h = np.diff(x)
-        if np.any(h < 0):
-            raise ValueError("x coordinates must be sorted in ascending order")
+        if np.any(h <= 0):
+            raise ValueError("x coordinates must be strictly increasing")
 
         self.a, self.b, self.c, self.d = [], [], [], []
         self.x = x
