@@ -51,6 +51,7 @@ Python codes and [textbook](https://atsushisakai.github.io/PythonRobotics/index.
       * [LQR based path planning](#lqr-based-path-planning)
       * [Optimal Trajectory in a Frenet Frame](#optimal-trajectory-in-a-frenet-frame)
    * [Path Tracking](#path-tracking)
+      * [Vector Pursuit](#vector-pursuit)
       * [move to a pose control](#move-to-a-pose-control)
       * [Stanley control](#stanley-control)
       * [Rear wheel feedback control](#rear-wheel-feedback-control)
@@ -520,6 +521,16 @@ Reference
 
 
 # Path Tracking
+
+## Vector Pursuit
+
+Forward bicycle-model path tracking using the position and tangent heading of
+a look-ahead target, with steering limits and proportional speed control.
+
+![Vector Pursuit](https://raw.githubusercontent.com/AtsushiSakai/PythonRoboticsGifs/f379e41f9ba6aad4ada89139392e48325bfdc512/PathTracking/vector_pursuit/animation.gif)
+
+- [Algorithm documentation](https://atsushisakai.github.io/PythonRobotics/modules/6_path_tracking/vector_pursuit/vector_pursuit.html)
+- [Autonomous Ground Vehicle Path Tracking](https://doi.org/10.1002/rob.20031)
 
 ## move to a pose control
 
