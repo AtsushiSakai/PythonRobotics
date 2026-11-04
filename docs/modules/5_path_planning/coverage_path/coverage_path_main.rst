@@ -8,6 +8,11 @@ This is a 2D grid based sweep coverage path planner simulation:
 
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/GridBasedSweepCPP/animation.gif
 
+The underlying occupancy grid has finite boundaries. Cell indices range from
+zero to one less than the number of columns or rows. Cells outside either
+axis are treated as occupied by the sweep search, and obstacle expansion is
+clipped at the grid boundary rather than wrapping into another row.
+
 Code Link
 +++++++++++++
 
