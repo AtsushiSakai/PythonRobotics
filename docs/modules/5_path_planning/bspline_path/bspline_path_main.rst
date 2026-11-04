@@ -13,6 +13,24 @@ This codes provide two types of B-Spline curve generations:
 
 2. Approximation: generate a curve that approximates the waypoints. (Not passing through all waypoints)
 
+Path curvature
+~~~~~~~~~~~~~~
+
+For a planar spline parameterised by :math:`u`, the signed curvature is
+
+.. math::
+
+   \kappa(u) =
+   \frac{x'(u)y''(u) - y'(u)x''(u)}
+   {\left(x'(u)^2 + y'(u)^2\right)^{3/2}}.
+
+This expression does not depend on the speed of the spline parameter.
+Positive curvature describes a left turn and negative curvature a right turn.
+Curvature has inverse position units: uniformly scaling a path by a positive
+factor :math:`a` divides its curvature by :math:`a`, while preserving its heading.
+The expression assumes a nonzero tangent; curvature is undefined where both
+first derivatives vanish.
+
 Bspline basics
 ~~~~~~~~~~~~~~
 

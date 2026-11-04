@@ -51,7 +51,7 @@ def approximate_b_spline_path(x: list,
     heading : array
         heading of the result path
     curvature : array
-        curvature of the result path
+        signed curvature of the result path, in inverse position units
 
     """
     distances = _calc_distance_vector(x, y)
@@ -89,7 +89,7 @@ def interpolate_b_spline_path(x, y,
     heading : array
         heading of the result path
     curvature : array
-        curvature of the result path
+        signed curvature of the result path, in inverse position units
 
     """
     return approximate_b_spline_path(x, y, n_path_points, degree, s=0.0)
@@ -111,7 +111,9 @@ def _evaluate_spline(sampled, spl_i_x, spl_i_y):
     heading = np.arctan2(dy, dx)
     ddx = spl_i_x.derivative(2)(sampled)
     ddy = spl_i_y.derivative(2)(sampled)
-    curvature = (ddy * dx - ddx * dy) / np.power(dx * dx + dy * dy, 2.0 / 3.0)
+    speed = np.hypot(dx, dy)
+    # Normalize the tangent before the cross product; divide without cubing speed.
+    curvature = (ddy * (dx / speed) - ddx * (dy / speed)) / speed / speed
     return np.array(x), y, heading, curvature,
 
 
