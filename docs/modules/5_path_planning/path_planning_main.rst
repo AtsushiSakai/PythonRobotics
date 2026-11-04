@@ -10,6 +10,7 @@ Path planning is the ability of a robot to search feasible and efficient path to
    :caption: Contents
 
    dynamic_window_approach/dynamic_window_approach
+   flocking/flocking
    bugplanner/bugplanner
    grid_base_search/grid_base_search
    time_based_grid_search/time_based_grid_search
