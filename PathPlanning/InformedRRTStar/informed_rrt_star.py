@@ -139,7 +139,9 @@ class InformedRRTStar:
         r = 50.0 * math.sqrt(math.log(n_node) / n_node)
         d_list = [(node.x - new_node.x) ** 2 + (node.y - new_node.y) ** 2 for
                   node in self.node_list]
-        near_inds = [d_list.index(i) for i in d_list if i <= r ** 2]
+        near_inds = [
+            i for i, dist_sq in enumerate(d_list) if dist_sq <= r ** 2
+        ]
         return near_inds
 
     def informed_sample(self, c_max, c_min, x_center, c):
