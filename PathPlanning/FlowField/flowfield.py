@@ -90,7 +90,7 @@ class FlowField:
             for i in range(-1, 2):
                 for j in range(-1, 2):
                     x, y = curr_x + i, curr_y + j
-                    if self.obs_grid[(x, y)] == 'obs':
+                    if (x, y) not in self.integration_field:
                         continue
                     if (i, j) in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
                         e_cost = 10
@@ -118,20 +118,26 @@ class FlowField:
                 offset_list = [(i + a, j + b)
                                for a in range(-1, 2)
                                for b in range(-1, 2)]
-                neighbor_list = [{'loc': pt,
-                                  'cost': self.integration_field[pt]}
-                                 for pt in offset_list
-                                 if self.obs_grid[pt] != 'obs']
-                neighbor_list = sorted(neighbor_list, key=lambda x: x['cost'])
-                best_neighbor = neighbor_list[0]['loc']
-                self.vector_field[(i, j)] = best_neighbor
+                # Only traversable, goal-connected cells provide directions.
+                neighbor_list = [
+                    (self.integration_field[pt], pt)
+                    for pt in offset_list
+                    if pt in self.integration_field
+                    and np.isfinite(self.integration_field[pt])
+                ]
+                if not neighbor_list:
+                    self.vector_field[(i, j)] = (None, None)
+                    continue
+
+                self.vector_field[(i, j)] = min(
+                    neighbor_list, key=lambda item: item[0])[1]
 
     def follow_vectors(self):
         curr_x, curr_y = self.start_pt
         while curr_x is not None and curr_y is not None:
             curr_x, curr_y = self.vector_field[(curr_x, curr_y)]
 
-            if show_animation:
+            if show_animation and curr_x is not None and curr_y is not None:
                 plt.plot(curr_x, curr_y, "b*")
                 plt.pause(0.001)
 
