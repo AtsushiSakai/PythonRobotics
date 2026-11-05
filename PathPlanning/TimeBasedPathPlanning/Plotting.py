@@ -7,6 +7,7 @@ from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
 )
 from PathPlanning.TimeBasedPathPlanning.BaseClasses import StartAndGoal
 from PathPlanning.TimeBasedPathPlanning.Node import NodePath
+from PathPlanning.TimeBasedPathPlanning.ConstraintTree import AgentId
 
 '''
 Plot a single agent path.
@@ -50,7 +51,7 @@ def PlotNodePath(grid: Grid, start: Position, goal: Position, path: NodePath):
 '''
 Plot a series of agent paths.
 '''
-def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: list[NodePath]):
+def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: dict[AgentId, NodePath]):
     fig = plt.figure(figsize=(10, 7))
 
     ax = fig.add_subplot(
@@ -64,20 +65,22 @@ def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: list[N
     ax.set_yticks(np.arange(0, grid.grid_size[1], 1))
 
     # Plot start and goal positions for each agent
-    colors = [] # generated randomly in loop
+    colors = {} # generated randomly in loop. Maps agent id to color
     markers = ['D', 's', '^', 'o', 'p']  # Different markers for visual distinction
 
     # Create plots for start and goal positions
     start_and_goal_plots = []
-    for i, path in enumerate(paths):
-        marker_idx = i % len(markers)
-        agent_id = start_and_goals[i].index
-        start = start_and_goals[i].start
-        goal = start_and_goals[i].goal
-        
+    for agent_id, path in paths.items():
+        marker_idx = agent_id % len(markers)
+        start_and_goal = next((elem for elem in start_and_goals if elem.agent_id == agent_id), None)
+        if not start_and_goal:
+            raise RuntimeError(f"Failed to get start and goal for agent {agent_id}")
+        start = start_and_goal.start
+        goal = start_and_goal.goal
+
         color = np.random.rand(3,)
-        colors.append(color)
-        sg_plot, = ax.plot([], [], markers[marker_idx], c=color, ms=15, 
+        colors[agent_id] = color
+        sg_plot, = ax.plot([], [], markers[marker_idx], c=color, ms=15,
                             label=f"Agent {agent_id} Start/Goal")
         sg_plot.set_data([start.x, goal.x], [start.y, goal.y])
         start_and_goal_plots.append(sg_plot)
@@ -86,12 +89,11 @@ def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: list[N
     (obs_points,) = ax.plot([], [], "ro", ms=15, label="Obstacles")
 
     # Create plots for each agent's path
-    path_plots = []
-    for i, path in enumerate(paths):
-        agent_id = start_and_goals[i].index
-        path_plot, = ax.plot([], [], "o", c=colors[i], ms=10, 
+    path_plots = {}
+    for agent_id, path in paths.items():
+        path_plot, = ax.plot([], [], "o", c=colors[agent_id], ms=10,
                             label=f"Agent {agent_id} Path")
-        path_plots.append(path_plot)
+        path_plots[agent_id] = path_plot
 
     ax.legend(bbox_to_anchor=(1.05, 1))
 
@@ -103,33 +105,33 @@ def PlotNodePaths(grid: Grid, start_and_goals: list[StartAndGoal], paths: list[N
     )
 
     # Find the maximum time across all paths
-    max_time = max(path.goal_reached_time() for path in paths)
+    max_time = max(path.goal_reached_time() for path in paths.values())
 
     # Animation loop
-    for i in range(0, max_time + 1):
+    for t in range(0, max_time + 1):
         # Update obstacle positions
-        obs_positions = grid.get_obstacle_positions_at_time(i)
+        obs_positions = grid.get_obstacle_positions_at_time(t)
         obs_points.set_data(obs_positions[0], obs_positions[1])
-        
+
         # Update each agent's position
-        for (j, path) in enumerate(paths):
+        for agent_id, path in paths.items():
             path_positions = []
-            if i <= path.goal_reached_time():
-                res = path.get_position(i)
+            if t <= path.goal_reached_time():
+                res = path.get_position(t)
                 if not res:
-                    print(path)
-                    print(i)
-                path_position = path.get_position(i)
+                    print(f"Error getting position for agent {agent_id} at time {t}")
+                    print(t)
+                path_position = path.get_position(t)
                 if not path_position:
-                    raise Exception(f"Path position not found for time {i}.")
+                    raise Exception(f"Path position not found for time {t}.")
 
                 # Verify position is valid
-                assert not path_position in obs_positions
-                assert not path_position in path_positions
+                assert path_position not in obs_positions
+                assert path_position not in path_positions
                 path_positions.append(path_position)
 
-                path_plots[j].set_data([path_position.x], [path_position.y])
-        
+                path_plots[agent_id].set_data([path_position.x], [path_position.y])
+
         plt.pause(0.2)
 
     plt.show()

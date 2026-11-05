@@ -1,0 +1,186 @@
+from dataclasses import dataclass
+import heapq
+
+from PathPlanning.TimeBasedPathPlanning.Node import NodePath, Position, PositionAtTime
+
+# ID of an agent
+type AgentId = int
+
+# An (x, y, t) tuple that exists in two or more agents' paths
+@dataclass(frozen=True)
+class Constraint:
+    position: Position
+    time: int
+
+# An agent that is constrained (must avoid the constraint tuple)
+@dataclass
+class ConstrainedAgent:
+    agent: AgentId
+    constraint: Constraint
+
+# A constraint to apply to the two colliding agents
+@dataclass
+class ForkingConstraint:
+    constrained_agents: tuple[ConstrainedAgent, ConstrainedAgent]
+
+# A constraint that has been applied to an agent
+@dataclass(frozen=True)
+class AppliedConstraint:
+    constraint: Constraint
+    constrained_agent: AgentId
+
+@dataclass
+class ConstraintTreeNode:
+    # Index of the parent node
+    parent_idx: int
+    # Either a constraint to apply (forking) which will result in two new nodes, a constraint that was already applied
+    # to generate this node (AppliedConstraint), or None if there are no constraints in this node's paths
+    constraint: ForkingConstraint | AppliedConstraint | None
+
+    # Paths for the agents
+    paths: dict[AgentId, NodePath]
+    # Cost of the solution at this node (sum of duration of each agent's path)
+    cost: int
+
+    def __init__(self, paths: dict[AgentId, NodePath], parent_idx: int, all_constraints: list[AppliedConstraint]):
+        self.paths = paths
+        self.cost = sum(path.goal_reached_time() for path in paths.values())
+        self.parent_idx = parent_idx
+        self.constraint = self.get_constraint_point()
+        self.all_constraints = all_constraints
+
+    def __lt__(self, other) -> bool:
+        if self.cost == other.cost:
+            return len(self.all_constraints) < len(other.all_constraints)
+        return self.cost < other.cost
+
+    def __le__(self, other) -> bool:
+        if self.cost == other.cost:
+            return len(self.all_constraints) <= len(other.all_constraints)
+        return self.cost < other.cost
+
+    def __ge__(self, other) -> bool:
+        if self.cost == other.cost:
+            return len(self.all_constraints) >= len(other.all_constraints)
+        return self.cost > other.cost
+
+    def get_constraint_point(self, verbose = False) -> ForkingConstraint | None:
+        """
+        Check paths for any constraints, and if any are found return the earliest one.
+        """
+
+        final_t = max(path.goal_reached_time() for path in self.paths.values())
+        positions_at_time: dict[PositionAtTime, AgentId] = {}
+        for t in range(final_t + 1):
+            possible_constraints: list[ForkingConstraint] = self.check_for_constraints_at_time(positions_at_time, t, verbose)
+            if not possible_constraints:
+                continue
+
+            if verbose:
+                print(f"Choosing best constraint of {possible_constraints}")
+            # first check for edge constraints
+            for constraint in possible_constraints:
+                if constraint.constrained_agents[0].constraint.position != constraint.constrained_agents[1].constraint.position:
+                    if verbose:
+                        print(f"\tFound edge conflict constraint: {constraint}")
+                    return constraint
+            # if none, then return first normal constraint
+            if verbose:
+                print(f"\tReturning normal constraint: {possible_constraints[0]}")
+            return possible_constraints[0]
+
+        return None
+
+    def check_for_constraints_at_time(self, positions_at_time: dict[PositionAtTime, AgentId], t: int, verbose: bool) -> list[ForkingConstraint]:
+        """
+        Check for constraints between paths at a particular time step
+        """
+        possible_constraints: list[ForkingConstraint] = []
+        for agent_id, path in self.paths.items():
+
+            position = path.get_position(t)
+            if position is None:
+                continue
+            position_at_time = PositionAtTime(position, t)
+            if position_at_time not in positions_at_time:
+                positions_at_time[position_at_time] = agent_id
+
+            # double reservation at a (cell, time) combination
+            if positions_at_time[position_at_time] != agent_id:
+                conflicting_agent_id = positions_at_time[position_at_time]
+                constraint = Constraint(position=position, time=t)
+                possible_constraints.append(ForkingConstraint((
+                    ConstrainedAgent(agent_id, constraint), ConstrainedAgent(conflicting_agent_id, constraint)
+                )))
+
+            # Check for edge conflicts (can only happen after first time step)
+            if t == 0:
+                continue
+            last_position = path.get_position(t - 1)
+            if not last_position:
+                raise RuntimeError(f"Failed to get position for agent {agent_id} at time {t-1}")
+            new_position_at_last_time = PositionAtTime(position, t-1)
+            old_position_at_new_time = PositionAtTime(last_position, t)
+            if new_position_at_last_time in positions_at_time and old_position_at_new_time in positions_at_time:
+                conflicting_agent_id1 = positions_at_time[new_position_at_last_time]
+                conflicting_agent_id2 = positions_at_time[old_position_at_new_time]
+
+                if conflicting_agent_id1 == conflicting_agent_id2 and conflicting_agent_id1 != agent_id:
+                    if verbose:
+                        print(f"Found edge constraint between with agent {conflicting_agent_id1} for {agent_id}")
+                        print(f"\tpositions old: {old_position_at_new_time}, new: {position_at_time}")
+                    new_constraint = ForkingConstraint((
+                        ConstrainedAgent(agent_id, Constraint(position_at_time.position, position_at_time.time)),
+                        ConstrainedAgent(conflicting_agent_id1, Constraint(position=last_position, time=t))
+                    ))
+                    possible_constraints.append(new_constraint)
+
+        return possible_constraints
+
+
+class ConstraintTree:
+    # Child nodes have been created (Maps node_index to ConstraintTreeNode)
+    expanded_nodes: dict[int, ConstraintTreeNode]
+    # Need to solve and generate children
+    nodes_to_expand: list[ConstraintTreeNode]
+
+    def __init__(self, initial_solution: dict[AgentId, NodePath]):
+        self.expanded_nodes = {}
+        self.nodes_to_expand = []
+        heapq.heappush(self.nodes_to_expand, ConstraintTreeNode(initial_solution, -1, []))
+
+    def get_next_node_to_expand(self) -> ConstraintTreeNode | None:
+        if not self.nodes_to_expand:
+            return None
+        return heapq.heappop(self.nodes_to_expand)
+
+    """
+    Add a node to the tree and generate children if needed. Returns true if the node is a solution, false otherwise.
+    """
+    def add_node_to_tree(self, node: ConstraintTreeNode):
+        heapq.heappush(self.nodes_to_expand, node)
+
+    """
+    Get the constraints that were applied to all parent nodes starting with the node at the provided parent_index.
+    """
+    def get_ancestor_constraints(self, parent_index: int) -> list[AppliedConstraint]:
+        constraints: list[AppliedConstraint] = []
+        while parent_index != -1:
+            node = self.expanded_nodes[parent_index]
+            if node.constraint and isinstance(node.constraint, AppliedConstraint):
+                constraints.append(node.constraint)
+            else:
+                raise RuntimeError(f"Expected AppliedConstraint, but got: {node.constraint}")
+            parent_index = node.parent_idx
+        return constraints
+
+    """
+    Add an expanded node to the tree. Returns the index of this node in the expanded nodes dictionary.
+    """
+    def add_expanded_node(self, node: ConstraintTreeNode) -> int:
+        node_idx = len(self.expanded_nodes)
+        self.expanded_nodes[node_idx] = node
+        return node_idx
+
+    def expanded_node_count(self) -> int:
+        return len(self.expanded_nodes)
