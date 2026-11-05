@@ -3,6 +3,7 @@ from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
     ObstacleArrangement,
     Position,
 )
+from PathPlanning.TimeBasedPathPlanning.BaseClasses import StartAndGoal
 from PathPlanning.TimeBasedPathPlanning import SafeInterval as m
 import numpy as np
 import conftest
@@ -18,7 +19,8 @@ def test_1():
     )
 
     m.show_animation = False
-    path = m.SafeIntervalPathPlanner.plan(grid, start, goal, 0)
+    start_and_goal = StartAndGoal(1, start, goal)
+    path = m.SafeIntervalPathPlanner.plan(grid, start_and_goal)
 
     # path should have 31 entries
     assert len(path.path) == 31
