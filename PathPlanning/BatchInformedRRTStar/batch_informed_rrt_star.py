@@ -579,7 +579,7 @@ class BITStar:
             plt.plot([start[0], start[1]], [end[0], end[1]], "-g")
 
         for (ox, oy, size) in self.obstacleList:
-            plt.plot(ox, oy, "ok", ms=30 * size)
+            plt.gca().add_patch(plt.Circle((ox, oy), size, color="k"))
 
         plt.plot(self.start[0], self.start[1], "xr")
         plt.plot(self.goal[0], self.goal[1], "xr")

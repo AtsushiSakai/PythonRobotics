@@ -110,7 +110,7 @@ class LQRRRTStar(RRTStar):
                 plt.plot(node.path_x, node.path_y, "-g")
 
         for (ox, oy, size) in self.obstacle_list:
-            plt.plot(ox, oy, "ok", ms=30 * size)
+            plt.gca().add_patch(plt.Circle((ox, oy), size, color="k"))
 
         plt.plot(self.start.x, self.start.y, "xr")
         plt.plot(self.end.x, self.end.y, "xr")

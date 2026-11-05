@@ -289,7 +289,7 @@ class InformedRRTStar:
                              [node.y, self.node_list[node.parent].y], "-g")
 
         for (ox, oy, size) in self.obstacle_list:
-            plt.plot(ox, oy, "ok", ms=30 * size)
+            plt.gca().add_patch(plt.Circle((ox, oy), size, color="k"))
 
         plt.plot(self.start.x, self.start.y, "xr")
         plt.plot(self.goal.x, self.goal.y, "xr")
