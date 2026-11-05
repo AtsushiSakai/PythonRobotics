@@ -7,12 +7,14 @@ def test_1():
     m.main()
 
 
-def test_calc_index_uses_grid_indices():
-    # The obstacle map does not start at the origin, so min_x/min_y are
-    # non-zero. calc_index must be computed from grid indices only.
+def test_calc_index_starts_at_zero_for_offset_origin_and_resolution():
+    # Map origin is not (0, 0) and the resolution is not 1, so mixing the
+    # origin in meters into the grid index would shift the indices.
     ox = [10.0, 10.0, 20.0, 20.0]
     oy = [-5.0, 5.0, -5.0, 5.0]
-    planner = m.DijkstraPlanner(ox, oy, 1.0, 0.5)
+    planner = m.DijkstraPlanner(ox, oy, 0.5, 0.5)
+
+    assert planner.calc_index(planner.Node(0, 0, 0.0, -1)) == 0
 
     indices = set()
     for ix in range(planner.x_width):
