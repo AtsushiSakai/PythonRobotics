@@ -111,7 +111,10 @@ def quintic_polynomials_planner(sx, sy, syaw, sv, sa, gx, gy, gyaw, gv, ga, max_
 
         time, rx, ry, ryaw, rv, ra, rj = [], [], [], [], [], [], []
 
-        for t in np.arange(0.0, T + dt, dt):
+        # Sample up to T without extrapolating beyond the terminal boundary.
+        # Always include T, even when dt does not divide the duration.
+        sample_times = np.append(np.arange(0.0, T, dt), T)
+        for t in sample_times:
             time.append(t)
             rx.append(xqp.calc_point(t))
             ry.append(yqp.calc_point(t))
