@@ -47,7 +47,7 @@ class PriorityBasedPlanner(MultiAgentPlanner):
                 print(f"\nPlanning for agent:  {start_and_goal}" )
 
             grid.clear_initial_reservation(start_and_goal.start, start_and_goal.agent_id)
-            path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, verbose)
+            path = single_agent_planner_class.plan(grid, start_and_goal, verbose)
 
             if path is None:
                 print(f"Failed to find path for {start_and_goal}")

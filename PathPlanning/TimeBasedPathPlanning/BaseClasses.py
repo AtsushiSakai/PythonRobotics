@@ -14,15 +14,6 @@ RANDOM_SEED = 50
 random.seed(RANDOM_SEED)
 numpy_random.seed(RANDOM_SEED)
 
-class SingleAgentPlanner(ABC):
-    """
-    Base class for single agent planners
-    """
-
-    @staticmethod
-    @abstractmethod
-    def plan(grid: Grid, start: Position, goal: Position, agent_idx: AgentId, verbose: bool = False) -> NodePath:
-        pass
 
 @dataclass
 class StartAndGoal:
@@ -35,6 +26,16 @@ class StartAndGoal:
 
     def distance_start_to_goal(self) -> float:
         return pow(self.goal.x - self.start.x, 2) + pow(self.goal.y - self.start.y, 2)
+
+class SingleAgentPlanner(ABC):
+    """
+    Base class for single agent planners
+    """
+
+    @staticmethod
+    @abstractmethod
+    def plan(grid: Grid, start_and_goal: StartAndGoal, verbose: bool = False) -> NodePath:
+        pass
 
 class MultiAgentPlanner(ABC):
     """

@@ -145,7 +145,7 @@ class ConflictBasedSearch(MultiAgentPlanner):
         try:
             if verbose:
                 print("\tplanning for: {}", start_and_goal)
-            new_path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, start_and_goal.agent_id, verbose)
+            new_path = single_agent_planner_class.plan(grid, start_and_goal, verbose)
             return new_path
         except Exception as e:
             # Note: single agent planners can fail if constraints make planning for an agent impossible. The upper level search does not
@@ -163,7 +163,7 @@ class ConflictBasedSearch(MultiAgentPlanner):
 
         # Generate initial solution (no constraints)
         for start_and_goal in start_and_goals:
-            path = single_agent_planner_class.plan(grid, start_and_goal.start, start_and_goal.goal, start_and_goal.agent_id, verbose)
+            path = single_agent_planner_class.plan(grid, start_and_goal, verbose)
             initial_solution[start_and_goal.agent_id] = path
 
         if verbose:

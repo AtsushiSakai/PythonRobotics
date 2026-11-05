@@ -16,7 +16,7 @@ from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
     Position,
     empty_2d_array_of_lists,
 )
-from PathPlanning.TimeBasedPathPlanning.BaseClasses import SingleAgentPlanner
+from PathPlanning.TimeBasedPathPlanning.BaseClasses import SingleAgentPlanner, StartAndGoal
 from PathPlanning.TimeBasedPathPlanning.Node import Node, NodePath
 from PathPlanning.TimeBasedPathPlanning.Plotting import PlotNodePath
 
@@ -62,8 +62,11 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
         verbose (bool): set to True to print debug information
     """
     @staticmethod
-    def plan(grid: Grid, start: Position, goal: Position, agent_idx: int, verbose: bool = False) -> NodePath:
-        safe_intervals = grid.get_safe_intervals(agent_idx)
+    def plan(grid: Grid, start_and_goal: StartAndGoal, verbose: bool = False) -> NodePath:
+        start = start_and_goal.start
+        goal = start_and_goal.goal
+        agent_idx = start_and_goal.agent_id
+        safe_intervals = grid.get_safe_intervals(start_and_goal.agent_id)
 
         open_set: list[SIPPNode] = []
         first_node_interval = safe_intervals[start.x, start.y][0]
@@ -154,7 +157,8 @@ class SafeIntervalPathPlanner(SingleAgentPlanner):
                 # We know there is a node worth expanding. Generate successor at the earliest possible time the
                 # new interval can be entered
                 minimum_entry_time = max(parent_node.time + 1, interval.start_time)
-                maximum_entry_time = min(current_interval.end_time, interval.end_time)
+                # (target_cell_inteval.end_time - 1) because we need time to step out of the node
+                maximum_entry_time = min(current_interval.end_time, interval.end_time - 1)
                 for possible_t in range(minimum_entry_time, maximum_entry_time + 1):
                     if grid.valid_position(new_pos, possible_t, agent_idx):
                         new_nodes.append(SIPPNode(
