@@ -15,6 +15,7 @@ sys.path.append(str(pathlib.Path(__file__).parent.parent))
 from ClosedLoopRRTStar import pure_pursuit
 from ClosedLoopRRTStar import unicycle_model
 from ReedsSheppPath import reeds_shepp_path_planning
+from utils.angle import angle_mod
 from RRTStarReedsShepp.rrt_star_reeds_shepp import RRTStarReedsShepp
 
 show_animation = True
@@ -108,7 +109,7 @@ class ClosedLoopRRTStar(RRTStarReedsShepp):
         if not find_goal:
             print("cannot reach goal")
 
-        if abs(yaw[-1] - goal[2]) >= self.yaw_th * 10.0:
+        if abs(angle_mod(yaw[-1] - goal[2])) >= self.yaw_th * 10.0:
             print("final angle is bad")
             find_goal = False
 
@@ -140,7 +141,7 @@ class ClosedLoopRRTStar(RRTStarReedsShepp):
         # angle check
         fgoalinds = []
         for i in goalinds:
-            if abs(self.node_list[i].yaw - self.end.yaw) <= self.yaw_th:
+            if abs(angle_mod(self.node_list[i].yaw - self.end.yaw)) <= self.yaw_th:
                 fgoalinds.append(i)
         print("OK YAW TH num is")
         print(len(fgoalinds))
