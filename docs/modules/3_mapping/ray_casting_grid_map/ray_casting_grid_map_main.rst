@@ -3,6 +3,9 @@ Ray casting grid map
 
 This is a 2D ray casting grid mapping example.
 
+A measured endpoint is occupied even when it falls behind a nearer return in
+the same angular bin. Other cells behind a return are marked unknown.
+
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/raycasting_grid_map/animation.gif
 
 Code Link
