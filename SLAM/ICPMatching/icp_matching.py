@@ -89,15 +89,10 @@ def update_homogeneous_matrix(Hin, R, T):
 
 def nearest_neighbor_association(previous_points, current_points):
 
-    # calc the sum of residual errors
-    delta_points = previous_points - current_points
-    d = np.linalg.norm(delta_points, axis=0)
-    error = sum(d)
-
-    # calc index with nearest neighbor assosiation
-    d = np.linalg.norm(np.repeat(current_points, previous_points.shape[1], axis=1)
-                       - np.tile(previous_points, (1, current_points.shape[1])), axis=0)
-    indexes = np.argmin(d.reshape(current_points.shape[1], previous_points.shape[1]), axis=1)
+    distances = np.linalg.norm(
+        current_points[:, :, np.newaxis] - previous_points[:, np.newaxis, :], axis=0)
+    indexes = np.argmin(distances, axis=1)
+    error = distances[np.arange(current_points.shape[1]), indexes].sum()
 
     return indexes, error
 
