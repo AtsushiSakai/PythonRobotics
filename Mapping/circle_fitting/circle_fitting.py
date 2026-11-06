@@ -45,6 +45,9 @@ def circle_fitting(x, y):
         - The fitting error as a deviation metric (float).
     """
 
+    if len(x) != len(y):
+        raise ValueError("x and y must contain the same number of points")
+
     sumx = sum(x)
     sumy = sum(y)
     sumx2 = sum([ix ** 2 for ix in x])
