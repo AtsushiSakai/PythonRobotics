@@ -57,6 +57,7 @@ class BreadthFirstSearchPlanner:
         output:
             rx: x position list of the final path
             ry: y position list of the final path
+            Both lists are empty when the goal cannot be reached.
         """
 
         nstart = self.Node(self.calc_xyindex(sx, self.minx),
@@ -70,7 +71,7 @@ class BreadthFirstSearchPlanner:
         while True:
             if len(open_set) == 0:
                 print("Open set is empty..")
-                break
+                return [], []
 
             current = open_set.pop(list(open_set.keys())[0])
 
@@ -118,7 +119,8 @@ class BreadthFirstSearchPlanner:
         # generate final course
         rx, ry = [self.calc_grid_position(ngoal.x, self.minx)], [
             self.calc_grid_position(ngoal.y, self.miny)]
-        n = closedset[ngoal.parent_index]
+        # The goal has no parent when the start is the goal
+        n = closedset.get(ngoal.parent_index)
         while n is not None:
             rx.append(self.calc_grid_position(n.x, self.minx))
             ry.append(self.calc_grid_position(n.y, self.miny))
