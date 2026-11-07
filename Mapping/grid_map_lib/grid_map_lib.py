@@ -100,12 +100,7 @@ class GridMap:
 
         x_ind, y_ind = self.get_xy_index_from_xy_pos(x_pos, y_pos)
 
-        if (not x_ind) or (not y_ind):
-            return False  # NG
-
-        flag = self.set_value_from_xy_index(x_ind, y_ind, val)
-
-        return flag
+        return self.set_value_from_xy_index(x_ind, y_ind, val)
 
     def set_value_from_xy_index(self, x_ind, y_ind, val):
         """set_value_from_xy_index
@@ -118,7 +113,7 @@ class GridMap:
         """
 
         if (x_ind is None) or (y_ind is None):
-            return False, False
+            return False
 
         grid_ind = int(y_ind * self.width + x_ind)
 
@@ -138,11 +133,6 @@ class GridMap:
         :param val: grid value
         :param inside: setting data inside or outside
         """
-
-        # making ring polygon
-        if (pol_x[0] != pol_x[-1]) or (pol_y[0] != pol_y[-1]):
-            np.append(pol_x, pol_x[0])
-            np.append(pol_y, pol_y[0])
 
         # setting value for all grid
         for x_ind in range(self.width):
@@ -174,6 +164,8 @@ class GridMap:
         y_ind = self.calc_xy_index_from_position(
             y_pos, self.left_lower_y, self.height)
 
+        if x_ind is None or y_ind is None:
+            return None
         return self.calc_grid_index_from_xy_index(x_ind, y_ind)
 
     def calc_grid_central_xy_position_from_grid_index(self, grid_ind):
@@ -193,7 +185,7 @@ class GridMap:
 
     def calc_xy_index_from_position(self, pos, lower_pos, max_index):
         ind = int(np.floor((pos - lower_pos) / self.resolution))
-        if 0 <= ind <= max_index:
+        if 0 <= ind < max_index:
             return ind
         else:
             return None
@@ -228,10 +220,10 @@ class GridMap:
     @staticmethod
     def check_inside_polygon(iox, ioy, x, y):
 
-        n_point = len(x) - 1
+        n_point = len(x)
         inside = False
         for i1 in range(n_point):
-            i2 = (i1 + 1) % (n_point + 1)
+            i2 = (i1 + 1) % n_point
 
             if x[i1] >= x[i2]:
                 min_x, max_x = x[i2], x[i1]
