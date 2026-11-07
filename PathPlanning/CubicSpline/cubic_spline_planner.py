@@ -45,9 +45,13 @@ class CubicSpline1D:
 
     def __init__(self, x, y):
 
+        if len(x) != len(y):
+            raise ValueError("x and y must have the same number of coordinates")
+        if len(x) < 2:
+            raise ValueError("at least two coordinates are required")
         h = np.diff(x)
-        if np.any(h < 0):
-            raise ValueError("x coordinates must be sorted in ascending order")
+        if np.any(h <= 0):
+            raise ValueError("x coordinates must be strictly increasing")
 
         self.a, self.b, self.c, self.d = [], [], [], []
         self.x = x
@@ -181,7 +185,7 @@ class CubicSpline1D:
         """
         search data segment index
         """
-        return bisect.bisect(self.x, x) - 1
+        return min(bisect.bisect(self.x, x) - 1, self.nx - 2)
 
     def __calc_A(self, h):
         """
@@ -320,6 +324,8 @@ class CubicSpline2D:
         k : float
             curvature for given s.
         """
+        if s < self.s[0] or s > self.s[-1]:
+            return None
         dx = self.sx.calc_first_derivative(s)
         ddx = self.sx.calc_second_derivative(s)
         dy = self.sy.calc_first_derivative(s)
@@ -342,6 +348,8 @@ class CubicSpline2D:
         k : float
             curvature rate for given s.
         """
+        if s < self.s[0] or s > self.s[-1]:
+            return None
         dx = self.sx.calc_first_derivative(s)
         dy = self.sy.calc_first_derivative(s)
         ddx = self.sx.calc_second_derivative(s)
@@ -369,6 +377,8 @@ class CubicSpline2D:
         yaw : float
             yaw angle (tangent vector) for given s.
         """
+        if s < self.s[0] or s > self.s[-1]:
+            return None
         dx = self.sx.calc_first_derivative(s)
         dy = self.sy.calc_first_derivative(s)
         yaw = math.atan2(dy, dx)
