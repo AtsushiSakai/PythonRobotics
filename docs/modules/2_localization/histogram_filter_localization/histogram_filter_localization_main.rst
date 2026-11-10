@@ -14,6 +14,11 @@ but x,y positions are unknown.
 
 The filter uses speed input and range observations from RFID for localization.
 
+The simulator propagates the true position with the clean control input and
+returns a separate noisy speed measurement to the filter. Sensor noise does
+not modify the caller's control input or accumulate in the true trajectory
+when a command is reused.
+
 Initial position information is not needed.
 
 Code Link
