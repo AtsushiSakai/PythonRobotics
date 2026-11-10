@@ -412,6 +412,10 @@ probably will die out.
 In the resampling steps a new set of particles are chosen from the old
 set. This is done according to the weight of each particle.
 
+All selected poses and landmark estimates must come from the particle set
+before resampling. Each offspring keeps independent copies of its landmark
+positions and covariances, so updating one hypothesis cannot change another.
+
 The figure shows 100 particles distributed uniformly between [-0.5, 0.5]
 with the weights of each particle distributed according to a Gaussian
 funciton.
@@ -447,6 +451,8 @@ indices
         return particles
     
     
+    import copy
+
     def resampling(particles):
         """
         low variance re-sampling
@@ -475,7 +481,7 @@ indices
                     ind += 1
                 inds.append(ind)
     
-            tparticles = particles[:]
+            tparticles = copy.deepcopy(particles)
             for i in range(len(inds)):
                 particles[i].x = tparticles[inds[i]].x
                 particles[i].y = tparticles[inds[i]].y
