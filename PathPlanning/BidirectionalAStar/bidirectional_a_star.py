@@ -59,6 +59,7 @@ class BidirectionalAStarPlanner:
         output:
             rx: x position list of the final path
             ry: y position list of the final path
+            Both lists are empty when the goal cannot be reached.
         """
 
         start_node = self.Node(self.calc_xy_index(sx, self.min_x),
@@ -78,11 +79,11 @@ class BidirectionalAStarPlanner:
         while True:
             if len(open_set_A) == 0:
                 print("Open set A is empty..")
-                break
+                return [], []
 
             if len(open_set_B) == 0:
                 print("Open set B is empty..")
-                break
+                return [], []
 
             c_id_A = min(
                 open_set_A,
