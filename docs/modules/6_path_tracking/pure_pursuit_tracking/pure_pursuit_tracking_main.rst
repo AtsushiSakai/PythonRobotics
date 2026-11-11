@@ -9,6 +9,9 @@ speed control.
 The red line is a target course, the green cross means the target point
 for pure pursuit control, the blue line is the tracking.
 
+If the look-ahead search reaches the end of the course,
+the final waypoint is used as the target.
+
 Code Link
 ~~~~~~~~~~~~~~~
 

@@ -93,6 +93,7 @@ class TargetCourse:
         self.old_nearest_point_index = None
 
     def search_target_index(self, state):
+        """Return the target waypoint index and look-ahead distance in meters."""
 
         # To speed up nearest point search, doing it at only first time.
         if self.old_nearest_point_index is None:
@@ -106,12 +107,12 @@ class TargetCourse:
             ind = self.old_nearest_point_index
             distance_this_index = state.calc_distance(self.cx[ind],
                                                       self.cy[ind])
-            while True:
+            while ind + 1 < len(self.cx):
                 distance_next_index = state.calc_distance(self.cx[ind + 1],
                                                           self.cy[ind + 1])
                 if distance_this_index < distance_next_index:
                     break
-                ind = ind + 1 if (ind + 1) < len(self.cx) else ind
+                ind += 1
                 distance_this_index = distance_next_index
             self.old_nearest_point_index = ind
 
@@ -231,13 +232,13 @@ def plot_vehicle(x, y, yaw, steer=0.0, color='blue', is_reverse=False):
     # Plot wheels (darker color for front wheels)
     front_color = 'darkblue'
     rear_color = color
-    
+
     # Plot four wheels
     # Front left
     plot_wheel(x + LENGTH/4 * c - WIDTH/2 * s,
               y + LENGTH/4 * s + WIDTH/2 * c,
               yaw, steer, front_color)
-    # Front right  
+    # Front right
     plot_wheel(x + LENGTH/4 * c + WIDTH/2 * s,
               y + LENGTH/4 * s - WIDTH/2 * c,
               yaw, steer, front_color)
