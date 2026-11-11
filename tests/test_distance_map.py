@@ -1,5 +1,6 @@
 import conftest  # noqa
 import numpy as np
+import pytest
 from Mapping.DistanceMap import distance_map as m
 
 
@@ -112,6 +113,80 @@ def test_main():
     """Test the execution of main function"""
     m.ENABLE_PLOT = False
     m.main()
+
+
+def test_dt_preserves_parabola_costs():
+    distances = np.array([0.0, 4.0, 9.0, 9.0])
+    assert m.dt(distances) is None
+    np.testing.assert_array_equal(distances, [0.0, 1.0, 4.0, 8.0])
+
+
+def test_dt_matches_brute_force():
+    rng = np.random.default_rng(0)
+    for size in range(1, 17):
+        for _ in range(10):
+            costs = rng.uniform(0.0, 30.0, size)
+            expected = [min((q - j) ** 2 + costs[j] for j in range(size))
+                        for q in range(size)]
+            distances = costs.copy()
+            m.dt(distances)
+            np.testing.assert_allclose(distances, expected)
+
+
+def test_dt_updates_strided_view():
+    values = np.array([[0.0, 10.0], [4.0, 20.0],
+                       [9.0, 30.0], [9.0, 40.0]])
+    m.dt(values[:, 0])
+    np.testing.assert_array_equal(values[:, 0], [0.0, 1.0, 4.0, 8.0])
+    np.testing.assert_array_equal(values[:, 1], [10.0, 20.0, 30.0, 40.0])
+
+
+def brute_force_udf(obstacles):
+    obstacle_indices = np.argwhere(obstacles)
+    return np.array([
+        min(np.sum((np.array(index) - obstacle) ** 2)
+            for obstacle in obstacle_indices) ** 0.5
+        for index in np.ndindex(obstacles.shape)
+    ]).reshape(obstacles.shape)
+
+
+def test_distance_fields_preserve_column_costs():
+    obstacles = np.array([[1, 0, 0, 0], [0, 0, 1, 0],
+                          [0, 0, 0, 1], [0, 0, 0, 1]])
+    expected = brute_force_udf(obstacles)
+    assert expected[3, 0] == np.sqrt(8)
+    np.testing.assert_allclose(m.compute_udf(obstacles), expected)
+    np.testing.assert_allclose(m.compute_sdf(obstacles),
+                               expected - brute_force_udf(obstacles == 0))
+
+
+@pytest.mark.parametrize("shape", [(1, 7), (7, 1), (3, 5), (5, 3), (7, 8)])
+def test_distance_fields_match_brute_force(shape):
+    rng = np.random.default_rng(0)
+    for _ in range(10):
+        obstacles = rng.integers(0, 2, size=shape).astype(bool)
+        obstacles.flat[0] = True
+        obstacles.flat[-1] = False
+        original = obstacles.copy()
+        expected_udf = brute_force_udf(obstacles)
+        expected_sdf = expected_udf - brute_force_udf(~obstacles)
+        np.testing.assert_allclose(m.compute_udf(obstacles), expected_udf)
+        np.testing.assert_allclose(m.compute_sdf(obstacles), expected_sdf)
+        np.testing.assert_allclose(m.compute_udf_scipy(obstacles), expected_udf)
+        np.testing.assert_allclose(m.compute_sdf_scipy(obstacles), expected_sdf)
+        np.testing.assert_array_equal(obstacles, original)
+
+
+@pytest.mark.parametrize("occupied", [False, True])
+@pytest.mark.parametrize("shape", [(1, 1), (1, 5), (5, 1), (3, 4)])
+def test_uniform_distance_fields(shape, occupied):
+    obstacles = np.full(shape, occupied)
+    expected_udf = 0.0 if occupied else np.sqrt(m.INF)
+    expected_sdf = -np.sqrt(m.INF) if occupied else np.sqrt(m.INF)
+    np.testing.assert_array_equal(m.compute_udf(obstacles),
+                                  np.full(shape, expected_udf))
+    np.testing.assert_array_equal(m.compute_sdf(obstacles),
+                                  np.full(shape, expected_sdf))
 
 
 if __name__ == "__main__":
