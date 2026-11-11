@@ -200,7 +200,9 @@ class RRTStarReedsShepp(RRTStar):
         # angle check
         final_goal_indexes = []
         for i in goal_indexes:
-            if abs(self.node_list[i].yaw - self.end.yaw) <= self.goal_yaw_th:
+            yaw_diff = self.node_list[i].yaw - self.end.yaw
+            yaw_error = math.atan2(math.sin(yaw_diff), math.cos(yaw_diff))
+            if abs(yaw_error) <= self.goal_yaw_th:
                 final_goal_indexes.append(i)
 
         print("final_goal_indexes:", len(final_goal_indexes))
