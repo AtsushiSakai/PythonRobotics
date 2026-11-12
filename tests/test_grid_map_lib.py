@@ -36,5 +36,29 @@ def test_xy_and_grid_index_conversion():
             assert y_ind == y_ind_2
 
 
+def test_world_position_boundaries():
+    grid = GridMap(3, 2, 1.0, 1.5, 1.0, init_val=0)
+    for x, y in [(0.5, 0.5), (0.5, 1.5), (2.5, 0.5)]:
+        assert grid.set_value_from_xy_pos(x, y, 1) is True
+    assert grid.data == [1, 0, 1, 1, 0, 0]
+    for x, y in [(3, 0.5), (0.5, 2), (-1, 0.5), (1.5, -1)]:
+        assert grid.calc_grid_index_from_xy_pos(x, y) is None
+        assert grid.set_value_from_xy_pos(x, y, 2) is False
+    assert grid.set_value_from_xy_index(None, 0, 2) is False
+    assert grid.data == [1, 0, 1, 1, 0, 0]
+
+
+def test_open_and_closed_polygons_fill_the_same_cells():
+    x, y = [0, 0, 3], [0, 3, 3]
+    for convert in (list, np.array):
+        grid = GridMap(3, 3, 1.0, 1.5, 1.5, init_val=0)
+        grid.set_value_from_polygon(convert(x), convert(y), 1)
+        closed = GridMap(3, 3, 1.0, 1.5, 1.5, init_val=0)
+        closed.set_value_from_polygon(x + x[:1], y + y[:1], 1)
+        assert grid.data == closed.data
+        assert grid.get_value_from_xy_index(0, 2) == 1
+        assert grid.get_value_from_xy_index(2, 0) == 0
+
+
 if __name__ == '__main__':
     conftest.run_this_test(__file__)
