@@ -62,7 +62,8 @@ class GridMap:
     def get_value_from_xy_index(self, x_ind, y_ind):
         """get_value_from_xy_index
 
-        when the index is out of grid map area, return None
+        Return None if either index is outside the grid map area.
+        Valid indices satisfy 0 <= x_ind < width and 0 <= y_ind < height.
 
         :param x_ind: x index
         :param y_ind: y index
@@ -70,7 +71,8 @@ class GridMap:
 
         grid_ind = self.calc_grid_index_from_xy_index(x_ind, y_ind)
 
-        if 0 <= grid_ind < self.n_data:
+        if (0 <= x_ind < self.width and 0 <= y_ind < self.height
+                and 0 <= grid_ind < self.n_data):
             return self.data[grid_ind]
         else:
             return None
@@ -111,6 +113,8 @@ class GridMap:
         """set_value_from_xy_index
 
         return bool flag, which means setting value is succeeded or not
+        Return False without changing the map if either index is
+        outside 0 <= x_ind < width and 0 <= y_ind < height.
 
         :param x_ind: x index
         :param y_ind: y index
@@ -122,7 +126,9 @@ class GridMap:
 
         grid_ind = int(y_ind * self.width + x_ind)
 
-        if 0 <= grid_ind < self.n_data and isinstance(val, self.data_type):
+        if (0 <= x_ind < self.width and 0 <= y_ind < self.height
+                and 0 <= grid_ind < self.n_data
+                and isinstance(val, self.data_type)):
             self.data[grid_ind] = val
             return True  # OK
         else:
