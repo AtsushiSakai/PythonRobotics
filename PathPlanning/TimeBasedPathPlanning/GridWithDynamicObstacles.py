@@ -200,6 +200,10 @@ class Grid:
         if not self.inside_grid_bounds(position):
             return False
 
+        # Times outside the simulation window are not valid
+        if t < 0 or t >= self.time_limit:
+            return False
+
         # Check if position is not occupied at time t
         return self.reservation_matrix[position.x, position.y, t] == 0
 
