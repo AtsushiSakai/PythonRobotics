@@ -16,12 +16,12 @@ class DijkstraPlanner:
 
     def __init__(self, ox, oy, resolution, robot_radius):
         """
-        Initialize map for a star planning
+        Initialize grid map for Dijkstra planning
 
         ox: x position list of Obstacles [m]
         oy: y position list of Obstacles [m]
         resolution: grid resolution [m]
-        rr: robot radius[m]
+        robot_radius: robot radius [m]
         """
 
         self.min_x = None
