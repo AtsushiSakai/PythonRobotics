@@ -18,16 +18,16 @@ from PathPlanning.TimeBasedPathPlanning.Node import Node, NodePath
 import heapq
 from collections.abc import Generator
 import time
-from PathPlanning.TimeBasedPathPlanning.BaseClasses import SingleAgentPlanner
+from PathPlanning.TimeBasedPathPlanning.BaseClasses import SingleAgentPlanner, StartAndGoal
 from PathPlanning.TimeBasedPathPlanning.Plotting import PlotNodePath
 
 class SpaceTimeAStar(SingleAgentPlanner):
 
     @staticmethod
-    def plan(grid: Grid, start: Position, goal: Position, verbose: bool = False) -> NodePath:
+    def plan(grid: Grid, start_and_goal: StartAndGoal, verbose: bool = False) -> NodePath:
         open_set: list[Node] = []
         heapq.heappush(
-            open_set, Node(start, 0, SpaceTimeAStar.calculate_heuristic(start, goal), -1)
+            open_set, Node(start_and_goal.start, 0, SpaceTimeAStar.calculate_heuristic(start_and_goal.start, start_and_goal.goal), -1)
         )
 
         expanded_list: list[Node] = []
@@ -42,7 +42,7 @@ class SpaceTimeAStar(SingleAgentPlanner):
                     print(f"\tSkipping node that is past time limit: {expanded_node}")
                 continue
 
-            if expanded_node.position == goal:
+            if expanded_node.position == start_and_goal.goal:
                 if verbose:
                     print(f"Found path to goal after {len(expanded_list)} expansions")
 
@@ -62,7 +62,7 @@ class SpaceTimeAStar(SingleAgentPlanner):
             expanded_list.append(expanded_node)
             expanded_set.add(expanded_node)
 
-            for child in SpaceTimeAStar.generate_successors(grid, goal, expanded_node, expanded_idx, verbose, expanded_set):
+            for child in SpaceTimeAStar.generate_successors(grid, start_and_goal.goal, expanded_node, expanded_idx, start_and_goal.agent_id, verbose, expanded_set):
                 heapq.heappush(open_set, child)
 
         raise Exception("No path found")
@@ -72,8 +72,8 @@ class SpaceTimeAStar(SingleAgentPlanner):
     """
     @staticmethod
     def generate_successors(
-        grid: Grid, goal: Position, parent_node: Node, parent_node_idx: int, verbose: bool, expanded_set: set[Node]
-    ) -> Generator[Node, None, None]:
+        grid: Grid, goal: Position, parent_node: Node, parent_node_idx: int, agent_index: int, verbose: bool, expanded_set: set[Node]
+    ) -> Generator[Node]:
         diffs = [
             Position(0, 0),
             Position(1, 0),
@@ -94,7 +94,7 @@ class SpaceTimeAStar(SingleAgentPlanner):
                 continue
 
             # Check if the new node is valid for the next 2 time steps - one step to enter, and another to leave
-            if all([grid.valid_position(new_pos, parent_node.time + dt) for dt in [1, 2]]):
+            if all([grid.valid_position(new_pos, parent_node.time + dt, agent_index) for dt in [1, 2]]):
                 if verbose:
                     print("\tNew successor node: ", new_node)
                 yield new_node

@@ -4,6 +4,7 @@ from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
     Grid,
     Position,
 )
+from PathPlanning.TimeBasedPathPlanning.ConstraintTree import AgentId
 from PathPlanning.TimeBasedPathPlanning.Node import NodePath
 import random
 import numpy.random as numpy_random
@@ -13,20 +14,11 @@ RANDOM_SEED = 50
 random.seed(RANDOM_SEED)
 numpy_random.seed(RANDOM_SEED)
 
-class SingleAgentPlanner(ABC):
-    """
-    Base class for single agent planners
-    """
-    
-    @staticmethod
-    @abstractmethod
-    def plan(grid: Grid, start: Position, goal: Position, verbose: bool = False) -> NodePath:
-        pass
 
 @dataclass
 class StartAndGoal:
     # Index of this agent
-    index: int
+    agent_id: AgentId
     # Start position of the robot
     start: Position
     # Goal position of the robot
@@ -35,15 +27,25 @@ class StartAndGoal:
     def distance_start_to_goal(self) -> float:
         return pow(self.goal.x - self.start.x, 2) + pow(self.goal.y - self.start.y, 2)
 
+class SingleAgentPlanner(ABC):
+    """
+    Base class for single agent planners
+    """
+
+    @staticmethod
+    @abstractmethod
+    def plan(grid: Grid, start_and_goal: StartAndGoal, verbose: bool = False) -> NodePath:
+        pass
+
 class MultiAgentPlanner(ABC):
     """
     Base class for multi-agent planners
-    """       
-    
+    """
+
     @staticmethod
     @abstractmethod
-    def plan(grid: Grid, start_and_goal_positions: list[StartAndGoal], single_agent_planner_class: SingleAgentPlanner, verbose: bool = False) -> tuple[list[StartAndGoal], list[NodePath]]:
+    def plan(grid: Grid, start_and_goal_positions: list[StartAndGoal], single_agent_planner_class: SingleAgentPlanner, verbose: bool = False) -> dict[AgentId, NodePath]:
         """
-        Plan for all agents. Returned paths are in order corresponding to the returned list of `StartAndGoal` objects
+        Plan for all agents. Returned paths found for each agent
         """
         pass
