@@ -155,32 +155,28 @@ class BidirectionalBreadthFirstSearchPlanner:
                     node_B.parent = current_B
                     open_set_B[n_id_B] = node_B
 
-        rx, ry = self.calc_final_path_bidir(
-            meet_point_A, meet_point_B, closed_set_A, closed_set_B)
-        return rx, ry
+        if meet_point_A is None:
+            return [], []
 
-    # takes both set and meeting nodes and calculate optimal path
-    def calc_final_path_bidir(self, n1, n2, setA, setB):
-        rxA, ryA = self.calc_final_path(n1, setA)
-        rxB, ryB = self.calc_final_path(n2, setB)
+        return self.calc_final_path_bidir(meet_point_A, meet_point_B)
+
+    def calc_final_path_bidir(self, n1, n2):
+        rxA, ryA = self.calc_final_path(n1)
+        rxB, ryB = self.calc_final_path(n2)
 
         rxA.reverse()
         ryA.reverse()
 
-        rx = rxA + rxB
-        ry = ryA + ryB
+        # Both halves contain the meeting cell; include it only once.
+        return rxA + rxB[1:], ryA + ryB[1:]
 
-        return rx, ry
-
-    def calc_final_path(self, goal_node, closed_set):
-        # generate final course
-        rx, ry = [self.calc_grid_position(goal_node.x, self.min_x)], [
-            self.calc_grid_position(goal_node.y, self.min_y)]
-        n = closed_set[goal_node.parent_index]
-        while n is not None:
-            rx.append(self.calc_grid_position(n.x, self.min_x))
-            ry.append(self.calc_grid_position(n.y, self.min_y))
-            n = n.parent
+    def calc_final_path(self, goal_node):
+        rx, ry = [], []
+        node = goal_node
+        while node is not None:
+            rx.append(self.calc_grid_position(node.x, self.min_x))
+            ry.append(self.calc_grid_position(node.y, self.min_y))
+            node = node.parent
 
         return rx, ry
 
