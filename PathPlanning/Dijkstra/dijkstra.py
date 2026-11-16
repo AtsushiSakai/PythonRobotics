@@ -72,6 +72,10 @@ class DijkstraPlanner:
         open_set[self.calc_index(start_node)] = start_node
 
         while True:
+            if len(open_set) == 0:
+                print("Open set is empty..")
+                return [], []
+
             c_id = min(open_set, key=lambda o: open_set[o].cost)
             current = open_set[c_id]
 
