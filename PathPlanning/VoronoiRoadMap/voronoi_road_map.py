@@ -42,32 +42,33 @@ class VoronoiRoadMapPlanner:
         return rx, ry
 
     def is_collision(self, sx, sy, gx, gy, rr, obstacle_kd_tree):
-        x = sx
-        y = sy
         dx = gx - sx
         dy = gy - sy
-        yaw = math.atan2(gy - sy, gx - sx)
         d = math.hypot(dx, dy)
 
         if d >= self.MAX_EDGE_LEN:
             return True
 
-        D = rr
-        n_step = round(d / D)
+        if d == 0.0:
+            dist, _ = obstacle_kd_tree.query([sx, sy])
+            return dist <= rr
 
-        for i in range(n_step):
-            dist, _ = obstacle_kd_tree.query([x, y])
-            if dist <= rr:
-                return True  # collision
-            x += D * math.cos(yaw)
-            y += D * math.sin(yaw)
+        start = np.array([sx, sy])
+        direction = np.array([dx, dy])
 
-        # goal point check
-        dist, _ = obstacle_kd_tree.query([gx, gy])
-        if dist <= rr:
-            return True  # collision
+        # The swept edge lies within this ball around its midpoint.
+        midpoint = start + direction / 2.0
+        nearby = obstacle_kd_tree.query_ball_point(midpoint, d / 2.0 + rr)
+        if not nearby:
+            return False
 
-        return False  # OK
+        obstacles = obstacle_kd_tree.data[nearby]
+        fraction = np.clip((obstacles - start) @ direction / (d * d),
+                           0.0, 1.0)
+        closest = start + fraction[:, None] * direction
+        clearance_sq = np.sum((obstacles - closest) ** 2, axis=1)
+
+        return bool(np.any(clearance_sq <= rr ** 2))
 
     def generate_road_map_info(self, node_x, node_y, rr, obstacle_tree):
         """
