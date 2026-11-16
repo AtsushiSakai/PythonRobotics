@@ -76,8 +76,9 @@ class LQRPlanner:
         X, Xn = Q, Q
 
         for i in range(self.MAX_ITER):
-            Xn = A.T * X * A - A.T * X * B * \
-                 la.inv(R + B.T * X * B) * B.T * X * A + Q
+            Xn = (A.T @ X @ A
+                  - A.T @ X @ B @ la.solve(
+                      R + B.T @ X @ B, B.T @ X @ A) + Q)
             if (abs(Xn - X)).max() < self.EPS:
                 break
             X = Xn
