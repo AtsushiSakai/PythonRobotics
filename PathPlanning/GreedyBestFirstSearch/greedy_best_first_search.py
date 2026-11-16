@@ -99,9 +99,7 @@ class BestFirstSearchPlanner:
 
             if current.x == ngoal.x and current.y == ngoal.y:
                 print("Found goal")
-                ngoal.pind = current.pind
-                ngoal.cost = current.cost
-                break
+                return self.calc_final_path(current)
 
             # expand_grid search grid based on motion model
             for i, _ in enumerate(self.motion):
@@ -124,19 +122,16 @@ class BestFirstSearchPlanner:
                 else:
                     if open_set[n_id].cost > node.cost:
                         open_set[n_id] = node
-        closed_set[ngoal.pind] = current
-        rx, ry = self.calc_final_path(ngoal, closed_set)
-        return rx, ry
+        return [], []
 
-    def calc_final_path(self, ngoal, closedset):
-        # generate final course
-        rx, ry = [self.calc_grid_position(ngoal.x, self.minx)], [
-            self.calc_grid_position(ngoal.y, self.miny)]
-        n = closedset[ngoal.pind]
-        while n is not None:
-            rx.append(self.calc_grid_position(n.x, self.minx))
-            ry.append(self.calc_grid_position(n.y, self.miny))
-            n = n.parent
+    def calc_final_path(self, goal_node):
+        # Follow parent pointers directly, from goal back to start.
+        rx, ry = [], []
+        node = goal_node
+        while node is not None:
+            rx.append(self.calc_grid_position(node.x, self.minx))
+            ry.append(self.calc_grid_position(node.y, self.miny))
+            node = node.parent
 
         return rx, ry
 
