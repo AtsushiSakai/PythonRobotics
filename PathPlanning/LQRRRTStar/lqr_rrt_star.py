@@ -190,7 +190,7 @@ class LQRRRTStar(RRTStar):
 
         px, py, course_lens = self.sample_path(wx, wy, self.step_size)
 
-        if px is None:
+        if not px:
             return None
 
         newNode = copy.deepcopy(from_node)
