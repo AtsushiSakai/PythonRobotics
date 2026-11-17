@@ -9,6 +9,10 @@ Space-time A* Algorithm
 """
 
 import numpy as np
+import sys
+import pathlib
+
+sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 from PathPlanning.TimeBasedPathPlanning.GridWithDynamicObstacles import (
     Grid,
     ObstacleArrangement,

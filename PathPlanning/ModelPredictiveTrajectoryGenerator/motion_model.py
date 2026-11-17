@@ -1,6 +1,10 @@
 import math
 import numpy as np
 from scipy.interpolate import interp1d
+import sys
+import pathlib
+
+sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 from utils.angle import angle_mod
 
 # motion parameter
