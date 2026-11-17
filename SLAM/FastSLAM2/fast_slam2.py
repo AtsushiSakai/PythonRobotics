@@ -10,6 +10,10 @@ import math
 
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
+import pathlib
+
+sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 from utils.angle import angle_mod
 
 # Fast SLAM covariance

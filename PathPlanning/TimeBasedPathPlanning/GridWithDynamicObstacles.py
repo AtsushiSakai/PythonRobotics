@@ -7,6 +7,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from enum import Enum
 from dataclasses import dataclass
+import sys
+import pathlib
+
+sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 from PathPlanning.TimeBasedPathPlanning.Node import NodePath, Position
 
 @dataclass
