@@ -167,7 +167,7 @@ def calculate_acceleration(c, t):
     return 20 * c[0] * t**3 + 12 * c[1] * t**2 + 6 * c[2] * t + 2 * c[3]
 
 
-def rotation_matrix(roll_array, pitch_array, yaw):
+def rotation_matrix(roll, pitch, yaw):
     """
     Calculates the ZYX rotation matrix.
 
@@ -179,8 +179,6 @@ def rotation_matrix(roll_array, pitch_array, yaw):
     Returns
         3x3 rotation matrix as NumPy array
     """
-    roll = roll_array[0]
-    pitch = pitch_array[0]
     return np.array(
         [[cos(yaw) * cos(pitch), -sin(yaw) * cos(roll) + cos(yaw) * sin(pitch) * sin(roll), sin(yaw) * sin(roll) + cos(yaw) * sin(pitch) * cos(roll)],
          [sin(yaw) * cos(pitch), cos(yaw) * cos(roll) + sin(yaw) * sin(pitch) *
@@ -202,9 +200,11 @@ def main():
     for i in range(4):
         traj = TrajectoryGenerator(waypoints[i], waypoints[(i + 1) % 4], T)
         traj.solve()
-        x_coeffs[i] = traj.x_c
-        y_coeffs[i] = traj.y_c
-        z_coeffs[i] = traj.z_c
+        # solve() returns 6x1 column vectors. Flatten them so that the
+        # simulated states, and the angles drawn by Quadrotor, are scalars.
+        x_coeffs[i] = traj.x_c.flatten()
+        y_coeffs[i] = traj.y_c.flatten()
+        z_coeffs[i] = traj.z_c.flatten()
 
     quad_sim(x_coeffs, y_coeffs, z_coeffs)
 
