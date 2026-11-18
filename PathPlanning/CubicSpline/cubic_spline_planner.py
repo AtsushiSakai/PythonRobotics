@@ -181,7 +181,7 @@ class CubicSpline1D:
         """
         search data segment index
         """
-        return bisect.bisect(self.x, x) - 1
+        return min(bisect.bisect(self.x, x) - 1, self.nx - 2)
 
     def __calc_A(self, h):
         """
