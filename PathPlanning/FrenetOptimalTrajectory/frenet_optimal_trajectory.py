@@ -126,61 +126,26 @@ class LateralMovementStrategy:
         """
         raise NotImplementedError("calc_lateral_trajectory not implemented")
 
-    def calc_cartesian_parameters(self, fp, csp):
-        """
-        Calculate the cartesian parameters (x, y, yaw, curvature, v, a)
-        """
-        raise NotImplementedError("calc_cartesian_parameters not implemented")
-
-
-class HighSpeedLateralMovementStrategy(LateralMovementStrategy):
-    def calc_lateral_trajectory(self, fp, di, c_d, c_d_d, c_d_dd, Ti):
-        tp = copy.deepcopy(fp)
-        s0_d = fp.s_d[0]
-        s0_dd = fp.s_dd[0]
-        # d'(t) = d'(s) * s'(t)
-        # d''(t) = d''(s) * s'(t)^2 + d'(s) * s''(t)
-        lat_qp = QuinticPolynomial(
-            c_d, c_d_d * s0_d, c_d_dd * s0_d**2 + c_d_d * s0_dd, di, 0.0, 0.0, Ti
-        )
-
-        tp.d = []
-        tp.d_d = []
-        tp.d_dd = []
-        tp.d_ddd = []
-
-        # Calculate all derivatives in a single loop to reduce iterations
-        for i in range(len(fp.t)):
-            t = fp.t[i]
-            s_d = fp.s_d[i]
-            s_dd = fp.s_dd[i]
-
-            s_d_inv = 1.0 / (s_d + 1e-6) + 1e-6  # Avoid division by zero
-            s_d_inv_sq = s_d_inv * s_d_inv  # Square of inverse
-
-            d = lat_qp.calc_point(t)
-            d_d = lat_qp.calc_first_derivative(t)
-            d_dd = lat_qp.calc_second_derivative(t)
-            d_ddd = lat_qp.calc_third_derivative(t)
-
-            tp.d.append(d)
-            # d'(s) = d'(t) / s'(t)
-            tp.d_d.append(d_d * s_d_inv)
-            # d''(s) = (d''(t) - d'(s) * s''(t)) / s'(t)^2
-            tp.d_dd.append((d_dd - tp.d_d[i] * s_dd) * s_d_inv_sq)
-            tp.d_ddd.append(d_ddd)
-
-        return tp
-
-    def calc_cartesian_parameters(self, fp, csp):
+    def calc_cartesian_parameters(self, fp, csp, reference_points=None):
+        # Reference geometry depends only on s, not the lateral candidate.
+        if reference_points is None:
+            reference_points = {}
         # calc global positions
         for i in range(len(fp.s)):
-            ix, iy = csp.calc_position(fp.s[i])
-            if ix is None:
+            s = fp.s[i]
+            if s not in reference_points:
+                ix, iy = csp.calc_position(s)
+                if ix is None:
+                    reference_points[s] = None
+                else:
+                    reference_points[s] = (
+                        ix, iy, csp.calc_yaw(s), csp.calc_curvature(s),
+                        csp.calc_curvature_rate(s),
+                    )
+            reference = reference_points[s]
+            if reference is None:
                 break
-            i_yaw = csp.calc_yaw(fp.s[i])
-            i_kappa = csp.calc_curvature(fp.s[i])
-            i_dkappa = csp.calc_curvature_rate(fp.s[i])
+            ix, iy, i_yaw, i_kappa, i_dkappa = reference
             s_condition = [fp.s[i], fp.s_d[i], fp.s_dd[i]]
             d_condition = [
                 fp.d[i],
@@ -199,6 +164,34 @@ class HighSpeedLateralMovementStrategy(LateralMovementStrategy):
         return fp
 
 
+class HighSpeedLateralMovementStrategy(LateralMovementStrategy):
+    def calc_lateral_trajectory(self, fp, di, c_d, c_d_d, c_d_dd, Ti):
+        tp = copy.deepcopy(fp)
+        s0_d = fp.s_d[0]
+        s0_dd = fp.s_dd[0]
+        # d'(t) = d'(s) * s'(t)
+        # d''(t) = d''(s) * s'(t)^2 + d'(s) * s''(t)
+        lat_qp = QuinticPolynomial(
+            c_d, c_d_d * s0_d, c_d_dd * s0_d**2 + c_d_d * s0_dd, di, 0.0, 0.0, Ti
+        )
+
+        t = np.asarray(fp.t)
+        s_d = np.asarray(fp.s_d)
+        s_dd = np.asarray(fp.s_dd)
+        s_d_inv = 1.0 / (s_d + 1e-6) + 1e-6  # Avoid division by zero
+        d_d = lat_qp.calc_first_derivative(t) * s_d_inv
+
+        tp.d = lat_qp.calc_point(t).tolist()
+        # d'(s) = d'(t) / s'(t)
+        tp.d_d = d_d.tolist()
+        # d''(s) = (d''(t) - d'(s) * s''(t)) / s'(t)^2
+        tp.d_dd = ((lat_qp.calc_second_derivative(t) - d_d * s_dd)
+                   * (s_d_inv * s_d_inv)).tolist()
+        tp.d_ddd = lat_qp.calc_third_derivative(t).tolist()
+
+        return tp
+
+
 class LowSpeedLateralMovementStrategy(LateralMovementStrategy):
     def calc_lateral_trajectory(self, fp, di, c_d, c_d_d, c_d_dd, Ti):
         s0 = fp.s[0]
@@ -208,33 +201,12 @@ class LowSpeedLateralMovementStrategy(LateralMovementStrategy):
         # * shift s range from [s0, s1] to [0, s1 - s0]
         lat_qp = QuinticPolynomial(c_d, c_d_d, c_d_dd, di, 0.0, 0.0, s1 - s0)
 
-        tp.d = [lat_qp.calc_point(s - s0) for s in fp.s]
-        tp.d_d = [lat_qp.calc_first_derivative(s - s0) for s in fp.s]
-        tp.d_dd = [lat_qp.calc_second_derivative(s - s0) for s in fp.s]
-        tp.d_ddd = [lat_qp.calc_third_derivative(s - s0) for s in fp.s]
+        s = np.asarray(fp.s) - s0
+        tp.d = lat_qp.calc_point(s).tolist()
+        tp.d_d = lat_qp.calc_first_derivative(s).tolist()
+        tp.d_dd = lat_qp.calc_second_derivative(s).tolist()
+        tp.d_ddd = lat_qp.calc_third_derivative(s).tolist()
         return tp
-
-    def calc_cartesian_parameters(self, fp, csp):
-        # calc global positions
-        for i in range(len(fp.s)):
-            ix, iy = csp.calc_position(fp.s[i])
-            if ix is None:
-                break
-            i_yaw = csp.calc_yaw(fp.s[i])
-            i_kappa = csp.calc_curvature(fp.s[i])
-            i_dkappa = csp.calc_curvature_rate(fp.s[i])
-            s_condition = [fp.s[i], fp.s_d[i], fp.s_dd[i]]
-            d_condition = [fp.d[i], fp.d_d[i], fp.d_dd[i]]
-            x, y, theta, kappa, v, a = CartesianFrenetConverter.frenet_to_cartesian(
-                fp.s[i], ix, iy, i_yaw, i_kappa, i_dkappa, s_condition, d_condition
-            )
-            fp.x.append(x)
-            fp.y.append(y)
-            fp.yaw.append(theta)
-            fp.c.append(kappa)
-            fp.v.append(v)
-            fp.a.append(a)
-        return fp
 
 
 class LongitudinalMovementStrategy:
@@ -265,11 +237,12 @@ class VelocityKeepingLongitudinalMovementStrategy(LongitudinalMovementStrategy):
         ):
             fp = FrenetPath()
             lon_qp = QuarticPolynomial(s0, c_speed, c_accel, tv, 0.0, Ti)
-            fp.t = [t for t in np.arange(0.0, Ti, DT)]
-            fp.s = [lon_qp.calc_point(t) for t in fp.t]
-            fp.s_d = [lon_qp.calc_first_derivative(t) for t in fp.t]
-            fp.s_dd = [lon_qp.calc_second_derivative(t) for t in fp.t]
-            fp.s_ddd = [lon_qp.calc_third_derivative(t) for t in fp.t]
+            t = np.arange(0.0, Ti, DT)
+            fp.t = t.tolist()
+            fp.s = lon_qp.calc_point(t).tolist()
+            fp.s_d = lon_qp.calc_first_derivative(t).tolist()
+            fp.s_dd = lon_qp.calc_second_derivative(t).tolist()
+            fp.s_ddd = lon_qp.calc_third_derivative(t).tolist()
             fplist.append(fp)
         return fplist
 
@@ -291,11 +264,12 @@ class MergingAndStoppingLongitudinalMovementStrategy(LongitudinalMovementStrateg
         ):
             fp = FrenetPath()
             lon_qp = QuinticPolynomial(s0, c_speed, c_accel, s, 0.0, 0.0, Ti)
-            fp.t = [t for t in np.arange(0.0, Ti, DT)]
-            fp.s = [lon_qp.calc_point(t) for t in fp.t]
-            fp.s_d = [lon_qp.calc_first_derivative(t) for t in fp.t]
-            fp.s_dd = [lon_qp.calc_second_derivative(t) for t in fp.t]
-            fp.s_ddd = [lon_qp.calc_third_derivative(t) for t in fp.t]
+            t = np.arange(0.0, Ti, DT)
+            fp.t = t.tolist()
+            fp.s = lon_qp.calc_point(t).tolist()
+            fp.s_d = lon_qp.calc_first_derivative(t).tolist()
+            fp.s_dd = lon_qp.calc_second_derivative(t).tolist()
+            fp.s_ddd = lon_qp.calc_third_derivative(t).tolist()
             fplist.append(fp)
         return fplist
 
@@ -427,8 +401,11 @@ def calc_frenet_paths(c_s_d, c_s_dd, c_d, c_d_d, c_d_dd, s0):
 
 
 def calc_global_paths(fplist, csp):
+    # Share spline evaluations across candidates for this planning step only.
+    reference_points = {}
     return [
-        LATERAL_MOVEMENT_STRATEGY.calc_cartesian_parameters(fp, csp) for fp in fplist
+        LATERAL_MOVEMENT_STRATEGY.calc_cartesian_parameters(fp, csp, reference_points)
+        for fp in fplist
     ]
 
 
