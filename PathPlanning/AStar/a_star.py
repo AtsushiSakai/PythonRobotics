@@ -73,7 +73,7 @@ class AStarPlanner:
         open_set[self.calc_grid_index(start_node)] = start_node
 
         while True:
-            if len(open_set) == 0:
+            if not open_set:
                 print("Open set is empty..")
                 return [], []
 
