@@ -3,6 +3,9 @@ Object shape recognition using circle fitting
 
 This is an object shape recognition using circle fitting.
 
+Each range observation supplies a pair of coordinates. The two input lists
+must have equal lengths so each point contributes once to the fit.
+
 .. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/Mapping/circle_fitting/animation.gif
 
 The blue circle is the true object shape.
