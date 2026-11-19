@@ -15,10 +15,16 @@ Reference: https://arxiv.org/abs/1405.5848
 """
 
 import math
+import pathlib
 import random
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
+
+from utils.plot import plot_circle
 
 show_animation = True
 
@@ -579,7 +585,7 @@ class BITStar:
             plt.plot([start[0], start[1]], [end[0], end[1]], "-g")
 
         for (ox, oy, size) in self.obstacleList:
-            plt.plot(ox, oy, "ok", ms=30 * size)
+            plot_circle(ox, oy, size)
 
         plt.plot(self.start[0], self.start[1], "xr")
         plt.plot(self.goal[0], self.goal[1], "xr")
