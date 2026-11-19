@@ -95,7 +95,7 @@ def generate_ray_casting_grid_map(ox, oy, xyreso, yawreso):
         iy = int(round((y - miny) / xyreso))
 
         for grid in gridlist:
-            if grid.d > d:
+            if grid.d > d and pmap[grid.ix][grid.iy] != 1.0:
                 pmap[grid.ix][grid.iy] = 0.5
 
         pmap[ix][iy] = 1.0
