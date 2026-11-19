@@ -165,7 +165,7 @@ class AStarPlanner:
         return round((position - min_pos) / self.resolution)
 
     def calc_grid_index(self, node):
-        return (node.y - self.min_y) * self.x_width + (node.x - self.min_x)
+        return node.y * self.x_width + node.x
 
     def verify_node(self, node):
         px = self.calc_grid_position(node.x, self.min_x)

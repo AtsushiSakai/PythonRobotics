@@ -48,7 +48,7 @@ class ThetaStarPlanner:
             return str(self.x) + "," + str(self.y) + "," + str(
                 self.cost) + "," + str(self.parent_index)
 
-    def planning(self, sx, sy, gx, gy): 
+    def planning(self, sx, sy, gx, gy):
         """
         Theta star path search
 
@@ -155,7 +155,7 @@ class ThetaStarPlanner:
                 else:
                     if open_set[n_id].cost > node.cost:
                         # This path is the best until now. record it
-                        open_set[n_id] = node 
+                        open_set[n_id] = node
 
 
         rx, ry = self.calc_final_path(goal_node, closed_set)
@@ -196,7 +196,7 @@ class ThetaStarPlanner:
         return round((position - min_pos) / self.resolution)
 
     def calc_grid_index(self, node):
-        return (node.y - self.min_y) * self.x_width + (node.x - self.min_x)
+        return node.y * self.x_width + node.x
 
     def line_of_sight(self, node1, node2):
         """
