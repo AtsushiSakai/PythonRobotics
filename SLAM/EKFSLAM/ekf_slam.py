@@ -31,7 +31,7 @@ def ekf_slam(xEst, PEst, u, z):
     # Predict
     G, Fx = jacob_motion(xEst, u)
     xEst[0:STATE_SIZE] = motion_model(xEst[0:STATE_SIZE], u)
-    PEst = G.T @ PEst @ G + Fx.T @ Cx @ Fx
+    PEst = G @ PEst @ G.T + Fx.T @ Cx @ Fx
     initP = np.eye(2)
 
     # Update

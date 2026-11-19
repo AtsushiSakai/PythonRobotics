@@ -161,14 +161,15 @@ The implementation of the motion model prediction code is shown in
 uses (or doesn’t use) the process noise ``Rsim`` to the find the ground
 truth and dead reckoning estimates of the pose.
 
-**Predict covariance:** Add the state covariance to the the current
-uncertainty of the EKF. At each time step, the uncertainty in the system
-grows by the covariance of the pose, :math:`Cx`.
+**Predict covariance:** Propagate the covariance through the motion model
+using its state Jacobian :math:`G`, then add process noise to the pose.
+Here :math:`F_x` selects the pose from the full pose-and-landmark state.
 
-:math:`P = G^TPG + Cx`
+:math:`P = G P G^T + F_x^T Cx F_x`
 
-Notice this uncertainty is only growing with respect to the pose, not
-the landmarks.
+This propagates heading uncertainty into position uncertainty and updates
+the pose-landmark cross-covariances. The landmark-landmark covariance is
+unchanged because the landmarks are stationary.
 
 .. code:: ipython3
 
@@ -183,9 +184,8 @@ the landmarks.
         """
         G, Fx = jacob_motion(xEst, u)
         xEst[0:STATE_SIZE] = motion_model(xEst[0:STATE_SIZE], u)
-        # Fx is an an identity matrix of size (STATE_SIZE)
-        # sigma = G*sigma*G.T + Noise
-        PEst = G.T @ PEst @ G + Fx.T @ Cx @ Fx
+        # Fx selects the pose from the full state
+        PEst = G @ PEst @ G.T + Fx.T @ Cx @ Fx
         return xEst, PEst
 
 .. code:: ipython3
