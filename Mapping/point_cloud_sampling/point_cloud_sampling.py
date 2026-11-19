@@ -5,6 +5,8 @@ Point cloud sampling example codes. This code supports
 - Poisson disk sampling
 
 """
+import operator
+
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
@@ -48,16 +50,28 @@ def farthest_point_sampling(orig_points: npt.NDArray,
     ----------
     orig_points :  (M, N) N-dimensional points for sampling.
                     The number of points is M.
-    n_points : number of points for sampling
+    n_points : integer number of points for sampling, from 0 to M inclusive.
     seed : random seed number
 
     Returns
     -------
-    sampled points (n_points, N)
+    sampled points (n_points, N), with the input dtype.
+
+    Raises
+    ------
+    TypeError
+        If n_points is not an integer.
+    ValueError
+        If n_points is negative or exceeds the number of input rows.
 
     """
-    rng = np.random.default_rng(seed)
+    n_points = operator.index(n_points)
     n_orig_points = orig_points.shape[0]
+    if not 0 <= n_points <= n_orig_points:
+        raise ValueError("n_points must be between 0 and the number of input rows")
+    if n_points == 0:
+        return orig_points[:0].copy()
+    rng = np.random.default_rng(seed)
     first_point_id = rng.choice(range(n_orig_points))
     min_distances = np.ones(n_orig_points) * float("inf")
     selected_ids = [first_point_id]
