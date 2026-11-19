@@ -133,14 +133,30 @@ def sigma(x, p):
 
 
 def cubature_prediction(x_pred, p_pred):
+    """Predict one CTRV step using the same points for both weighted moments.
+
+    Parameters
+    ----------
+    x_pred : numpy.ndarray
+        Prior state [x, y, yaw, velocity, yaw rate]^T (5 x 1), in metres,
+        radians, metres per second and radians per second.
+    p_pred : numpy.ndarray
+        Prior state covariance (5 x 5).
+
+    Returns
+    -------
+    x_pred, p_pred : numpy.ndarray
+        Predicted state mean and covariance, including process noise ``q``.
+    """
     n = np.shape(x_pred)[0]
     [SP, W] = sigma(x_pred, p_pred)
     x_pred = np.zeros((n, 1))
     p_pred = q
+    # f updates each sigma point in place; reuse these one-step predictions.
     for i in range(2*n):
         x_pred = x_pred + (f(SP[:, i]).reshape((n, 1)) * W[0, i])
     for i in range(2*n):
-        p_step = (f(SP[:, i]).reshape((n, 1)) - x_pred)
+        p_step = (SP[:, i].reshape((n, 1)) - x_pred)
         p_pred = p_pred + (p_step @ p_step.T * W[0, i])
     return x_pred, p_pred
 
