@@ -5,7 +5,42 @@ from MissionPlanning.BehaviorTree.behavior_tree import (
     BehaviorTreeFactory,
     Status,
     ActionNode,
+    InverterNode,
 )
+
+
+@pytest.mark.parametrize("child_status, expected_status", [
+    (Status.SUCCESS, Status.FAILURE),
+    (Status.FAILURE, Status.SUCCESS),
+    (Status.RUNNING, Status.RUNNING),
+])
+def test_inverter_node_status(child_status, expected_status):
+    class FixedStatusNode(ActionNode):
+        def tick(self):
+            return child_status
+
+    inverter = InverterNode("inverter")
+    inverter.child = FixedStatusNode("child")
+    assert inverter.tick_and_set_status() == expected_status
+    assert inverter.status == expected_status
+    assert inverter.child.status == child_status
+
+
+def test_inverter_waits_for_sleep(monkeypatch):
+    now = 0.0
+    monkeypatch.setattr(
+        "MissionPlanning.BehaviorTree.behavior_tree.time.time", lambda: now
+    )
+    tree = BehaviorTreeFactory().build_tree(
+        '<Inverter><Sleep sec="1.5" /></Inverter>'
+    )
+    tree.tick()
+    assert tree.root.status == Status.RUNNING
+    assert tree.root.child.status == Status.RUNNING
+    now = 2.0
+    tree.tick()
+    assert tree.root.status == Status.FAILURE
+    assert tree.root.child.status == Status.SUCCESS
 
 
 def test_sequence_node1():

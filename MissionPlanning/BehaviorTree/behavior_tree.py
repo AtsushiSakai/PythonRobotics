@@ -331,6 +331,8 @@ class InverterNode(DecoratorNode):
     def tick(self) -> Status:
         self.not_set_child_raise_error()
         status = self.child.tick_and_set_status()
+        if status == Status.RUNNING:
+            return Status.RUNNING
         return Status.SUCCESS if status == Status.FAILURE else Status.FAILURE
 
 
