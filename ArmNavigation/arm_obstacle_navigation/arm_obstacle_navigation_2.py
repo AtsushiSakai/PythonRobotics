@@ -275,8 +275,10 @@ class NLinkArm:
 
         self.end_effector = np.array(self.points[self.n_links]).T
 
-    def plot_arm(self, myplt, obstacles=[]):  # pragma: no cover
+    def plot_arm(self, myplt, obstacles=None):  # pragma: no cover
         myplt.cla()
+        if obstacles is None:
+            obstacles = []
 
         for obstacle in obstacles:
             circle = myplt.Circle(
@@ -284,7 +286,7 @@ class NLinkArm:
             myplt.gca().add_patch(circle)
 
         for i in range(self.n_links + 1):
-            if i is not self.n_links:
+            if i != self.n_links:
                 myplt.plot([self.points[i][0], self.points[i + 1][0]],
                            [self.points[i][1], self.points[i + 1][1]], 'r-')
             myplt.plot(self.points[i][0], self.points[i][1], 'k.')
