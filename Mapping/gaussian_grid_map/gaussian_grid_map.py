@@ -35,8 +35,7 @@ def generate_gaussian_grid_map(ox, oy, xyreso, std):
                 if mindis >= d:
                     mindis = d
 
-            pdf = (1.0 - norm.cdf(mindis, 0.0, std))
-            gmap[ix][iy] = pdf
+            gmap[ix][iy] = norm.sf(mindis, scale=std)
 
     return gmap, minx, maxx, miny, maxy
 
