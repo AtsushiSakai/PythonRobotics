@@ -72,3 +72,7 @@ Code Link
 
 .. autofunction:: Mapping.normal_vector_estimation.normal_vector_estimation.ransac_normal_vector_estimation
 
+The perpendicular distance is the absolute projection of the point offset
+onto a unit normal. Scaling or reversing a nonzero plane normal leaves
+this distance unchanged.
+
