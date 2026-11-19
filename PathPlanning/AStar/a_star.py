@@ -61,6 +61,7 @@ class AStarPlanner:
         output:
             rx: x position list of the final path
             ry: y position list of the final path
+            Both lists are empty when the goal cannot be reached.
         """
 
         start_node = self.Node(self.calc_xy_index(sx, self.min_x),
@@ -72,9 +73,9 @@ class AStarPlanner:
         open_set[self.calc_grid_index(start_node)] = start_node
 
         while True:
-            if len(open_set) == 0:
+            if not open_set:
                 print("Open set is empty..")
-                break
+                return [], []
 
             c_id = min(
                 open_set,
