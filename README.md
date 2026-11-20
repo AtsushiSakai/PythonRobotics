@@ -19,6 +19,7 @@ Python codes and [textbook](https://atsushisakai.github.io/PythonRobotics/index.
       * [GPS/IMU Fusion Localization with Bias Estimation](#gpsimu-fusion-localization-with-bias-estimation)
       * [Particle filter localization](#particle-filter-localization)
       * [Histogram filter localization](#histogram-filter-localization)
+      * [Probabilistic motion models](#probabilistic-motion-models)
    * [Mapping](#mapping)
       * [Gaussian grid map](#gaussian-grid-map)
       * [Ray casting grid map](#ray-casting-grid-map)
@@ -223,6 +224,27 @@ In this simulation, x,y are unknown, yaw is known.
 The filter integrates speed input and range observations from RFID for localization.
 
 Initial position is not needed.
+
+Reference
+
+- [PROBABILISTIC ROBOTICS](http://www.probabilistic-robotics.org/)
+
+## Probabilistic motion models
+
+![probabilistic motion models](docs/modules/2_localization/probabilistic_motion_model_localization/probabilistic_motion_model.png)
+
+This example implements the velocity motion model and the odometry motion
+model of chapter 5 of *Probabilistic Robotics* by Thrun, Burgard and Fox.
+Each model comes with a closed-form function that evaluates the density
+p(x_t | u_t, x_{t-1}) at a hypothesised pose and a sampler that draws a pose
+from the same distribution, the prediction step of Monte Carlo localization.
+
+The example also documents two details of the book's algorithms: the radius
+of the turning circle is signed, and the densities are densities over the
+noise variables rather than over the pose.
+
+- [documentation](https://atsushisakai.github.io/PythonRobotics/modules/2_localization/probabilistic_motion_model_localization/probabilistic_motion_model_localization.html)
+- [sample code](Localization/probabilistic_motion_model/probabilistic_motion_model.py)
 
 Reference
 
