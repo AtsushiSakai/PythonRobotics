@@ -75,9 +75,9 @@ def test_velocity_angle_wrapping():
     assert x[2] == math.atan2(math.sin(3.5), math.cos(3.5))
 
     expected = max_density([
-        ALPHA_VELOCITY[0] * 0.5 + ALPHA_VELOCITY[1] * 0.5,
-        ALPHA_VELOCITY[2] * 0.5 + ALPHA_VELOCITY[3] * 0.5,
-        ALPHA_VELOCITY[4] * 0.5 + ALPHA_VELOCITY[5] * 0.5])
+        ALPHA_VELOCITY[0] * 0.25 + ALPHA_VELOCITY[1] * 0.25,
+        ALPHA_VELOCITY[2] * 0.25 + ALPHA_VELOCITY[3] * 0.25,
+        ALPHA_VELOCITY[4] * 0.25 + ALPHA_VELOCITY[5] * 0.25])
     density = m.velocity_motion_model(u, x_prev, x, ALPHA_VELOCITY, DT)
     assert density == pytest.approx(expected, rel=1e-9)
 
@@ -92,9 +92,9 @@ def test_forward_right_turn():
 
     # The true pose is the mode of the density when the signed radius is used.
     expected = max_density([
-        ALPHA_VELOCITY[0] * 1.0 + ALPHA_VELOCITY[1] * 0.35,
-        ALPHA_VELOCITY[2] * 1.0 + ALPHA_VELOCITY[3] * 0.35,
-        ALPHA_VELOCITY[4] * 1.0 + ALPHA_VELOCITY[5] * 0.35])
+        ALPHA_VELOCITY[0] * 1.0 + ALPHA_VELOCITY[1] * 0.35 * 0.35,
+        ALPHA_VELOCITY[2] * 1.0 + ALPHA_VELOCITY[3] * 0.35 * 0.35,
+        ALPHA_VELOCITY[4] * 1.0 + ALPHA_VELOCITY[5] * 0.35 * 0.35])
     density = m.velocity_motion_model(u, x_prev, x_true, ALPHA_VELOCITY, dt)
     assert density == pytest.approx(expected, rel=1e-9)
 
@@ -121,9 +121,9 @@ def test_velocity_signed_radius_all_turn_directions():
         density = m.velocity_motion_model(u, x_prev, x_true, ALPHA_VELOCITY,
                                           dt)
         expected = max_density([
-            ALPHA_VELOCITY[0] * abs(v) + ALPHA_VELOCITY[1] * abs(omega),
-            ALPHA_VELOCITY[2] * abs(v) + ALPHA_VELOCITY[3] * abs(omega),
-            ALPHA_VELOCITY[4] * abs(v) + ALPHA_VELOCITY[5] * abs(omega)])
+            ALPHA_VELOCITY[0] * v * v + ALPHA_VELOCITY[1] * omega * omega,
+            ALPHA_VELOCITY[2] * v * v + ALPHA_VELOCITY[3] * omega * omega,
+            ALPHA_VELOCITY[4] * v * v + ALPHA_VELOCITY[5] * omega * omega])
         assert density == pytest.approx(expected, rel=1e-9)
 
 
@@ -135,9 +135,9 @@ def test_velocity_frame_invariance():
     for omega in (0.4, -0.4, 1.0, 2.0):
         u = (1.0, omega)
         expected = max_density([
-            ALPHA_VELOCITY[0] * 1.0 + ALPHA_VELOCITY[1] * abs(omega),
-            ALPHA_VELOCITY[2] * 1.0 + ALPHA_VELOCITY[3] * abs(omega),
-            ALPHA_VELOCITY[4] * 1.0 + ALPHA_VELOCITY[5] * abs(omega)])
+            ALPHA_VELOCITY[0] * 1.0 + ALPHA_VELOCITY[1] * omega * omega,
+            ALPHA_VELOCITY[2] * 1.0 + ALPHA_VELOCITY[3] * omega * omega,
+            ALPHA_VELOCITY[4] * 1.0 + ALPHA_VELOCITY[5] * omega * omega])
         for theta0 in np.linspace(-math.pi, math.pi, 37)[:-1]:
             x_prev = np.array([0.0, 0.0, float(theta0)])
             x_true = m.sample_velocity_motion_model(
@@ -198,9 +198,9 @@ def test_velocity_sampler_matches_density():
     # The density is a zero-centered normal in these same errors, so the
     # empirical variances must be the variances it uses.
     variances = [
-        ALPHA_VELOCITY[0] * abs(u[0]) + ALPHA_VELOCITY[1] * abs(u[1]),
-        ALPHA_VELOCITY[2] * abs(u[0]) + ALPHA_VELOCITY[3] * abs(u[1]),
-        ALPHA_VELOCITY[4] * abs(u[0]) + ALPHA_VELOCITY[5] * abs(u[1]),
+        ALPHA_VELOCITY[0] * u[0] * u[0] + ALPHA_VELOCITY[1] * u[1] * u[1],
+        ALPHA_VELOCITY[2] * u[0] * u[0] + ALPHA_VELOCITY[3] * u[1] * u[1],
+        ALPHA_VELOCITY[4] * u[0] * u[0] + ALPHA_VELOCITY[5] * u[1] * u[1],
     ]
     np.testing.assert_allclose(np.var(errors, axis=0), variances, rtol=0.1,
                                atol=0.0)
@@ -260,12 +260,13 @@ def test_odometry_angle_wrapping():
     density = m.odometry_motion_model((u_prev, u_curr), x_prev, x,
                                       ALPHA_ODOMETRY)
     variances = [
-        ALPHA_ODOMETRY[0] * abs(delta_rot1)
-        + ALPHA_ODOMETRY[1] * abs(delta_trans),
-        ALPHA_ODOMETRY[2] * abs(delta_trans)
-        + ALPHA_ODOMETRY[3] * abs(delta_rot1 + delta_rot2),
-        ALPHA_ODOMETRY[0] * abs(delta_rot2)
-        + ALPHA_ODOMETRY[1] * abs(delta_trans),
+        ALPHA_ODOMETRY[0] * delta_rot1 * delta_rot1
+        + ALPHA_ODOMETRY[1] * delta_trans * delta_trans,
+        ALPHA_ODOMETRY[2] * delta_trans * delta_trans
+        + ALPHA_ODOMETRY[3] * delta_rot1 * delta_rot1
+        + ALPHA_ODOMETRY[3] * delta_rot2 * delta_rot2,
+        ALPHA_ODOMETRY[0] * delta_rot2 * delta_rot2
+        + ALPHA_ODOMETRY[1] * delta_trans * delta_trans,
     ]
     assert density == pytest.approx(max_density(variances), rel=1e-9)
 
@@ -278,8 +279,8 @@ def test_odometry_zero_translation():
     x = np.array([0.0, 0.0, rotation])
     # The variances are 0, alpha_4*rotation and alpha_1*rotation, so the
     # density is the product of two normal densities and a point mass.
-    var_trans = ALPHA_ODOMETRY[3] * abs(rotation)
-    var_rot2 = ALPHA_ODOMETRY[0] * abs(rotation)
+    var_trans = ALPHA_ODOMETRY[3] * rotation * rotation
+    var_rot2 = ALPHA_ODOMETRY[0] * rotation * rotation
     expected = (1.0 / math.sqrt(2.0 * math.pi * var_trans)
                 * 1.0 / math.sqrt(2.0 * math.pi * var_rot2))
     for theta0 in (0.0, 1.0, -2.0):
@@ -335,12 +336,13 @@ def test_odometry_density_peak():
 
     delta_rot1, delta_trans, delta_rot2 = m._odometry_motion_parameters(*u)
     variances = [
-        ALPHA_ODOMETRY[0] * abs(delta_rot1)
-        + ALPHA_ODOMETRY[1] * abs(delta_trans),
-        ALPHA_ODOMETRY[2] * abs(delta_trans)
-        + ALPHA_ODOMETRY[3] * abs(delta_rot1 + delta_rot2),
-        ALPHA_ODOMETRY[0] * abs(delta_rot2)
-        + ALPHA_ODOMETRY[1] * abs(delta_trans),
+        ALPHA_ODOMETRY[0] * delta_rot1 * delta_rot1
+        + ALPHA_ODOMETRY[1] * delta_trans * delta_trans,
+        ALPHA_ODOMETRY[2] * delta_trans * delta_trans
+        + ALPHA_ODOMETRY[3] * delta_rot1 * delta_rot1
+        + ALPHA_ODOMETRY[3] * delta_rot2 * delta_rot2,
+        ALPHA_ODOMETRY[0] * delta_rot2 * delta_rot2
+        + ALPHA_ODOMETRY[1] * delta_trans * delta_trans,
     ]
     density = m.odometry_motion_model(u, x_prev, x_true, ALPHA_ODOMETRY)
     assert density == pytest.approx(max_density(variances), rel=1e-9)
@@ -374,12 +376,13 @@ def test_odometry_sampler_matches_density():
                      m.normalize_angle(delta_rot2 - rot2_hat))
 
     variances = [
-        ALPHA_ODOMETRY[0] * abs(delta_rot1)
-        + ALPHA_ODOMETRY[1] * abs(delta_trans),
-        ALPHA_ODOMETRY[2] * abs(delta_trans)
-        + ALPHA_ODOMETRY[3] * abs(delta_rot1 + delta_rot2),
-        ALPHA_ODOMETRY[0] * abs(delta_rot2)
-        + ALPHA_ODOMETRY[1] * abs(delta_trans),
+        ALPHA_ODOMETRY[0] * delta_rot1 * delta_rot1
+        + ALPHA_ODOMETRY[1] * delta_trans * delta_trans,
+        ALPHA_ODOMETRY[2] * delta_trans * delta_trans
+        + ALPHA_ODOMETRY[3] * delta_rot1 * delta_rot1
+        + ALPHA_ODOMETRY[3] * delta_rot2 * delta_rot2,
+        ALPHA_ODOMETRY[0] * delta_rot2 * delta_rot2
+        + ALPHA_ODOMETRY[1] * delta_trans * delta_trans,
     ]
     np.testing.assert_allclose(np.var(errors, axis=0), variances, rtol=0.1,
                                atol=0.0)

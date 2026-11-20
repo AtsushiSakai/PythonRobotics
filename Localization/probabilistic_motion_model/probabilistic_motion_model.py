@@ -226,8 +226,8 @@ def velocity_motion_model(u, x_prev, x, alpha, dt, signed_radius=True):
         Hypothesised pose (x', y', theta') [m, m, rad].
     alpha : array_like, shape (6,)
         Noise parameters alpha_1 ... alpha_6.
-        The variances are alpha_1|v| + alpha_2|omega|,
-        alpha_3|v| + alpha_4|omega| and alpha_5|v| + alpha_6|omega|.
+        The variances are alpha_1 v^2 + alpha_2 omega^2,
+        alpha_3 v^2 + alpha_4 omega^2 and alpha_5 v^2 + alpha_6 omega^2.
     dt : float
         Time between the two poses [s].
     signed_radius : bool, optional
@@ -245,9 +245,9 @@ def velocity_motion_model(u, x_prev, x, alpha, dt, signed_radius=True):
         x_prev, x, dt, signed_radius)
 
     # Line 10: densities of the individual errors.
-    var_v = alpha[0] * abs(v) + alpha[1] * abs(omega)
-    var_omega = alpha[2] * abs(v) + alpha[3] * abs(omega)
-    var_gamma = alpha[4] * abs(v) + alpha[5] * abs(omega)
+    var_v = alpha[0] * v * v + alpha[1] * omega * omega
+    var_omega = alpha[2] * v * v + alpha[3] * omega * omega
+    var_gamma = alpha[4] * v * v + alpha[5] * omega * omega
 
     return (prob_normal_distribution(v - v_hat, var_v)
             * prob_normal_distribution(omega - omega_hat, var_omega)
@@ -281,9 +281,9 @@ def sample_velocity_motion_model(u, x_prev, alpha, dt):
     x, y, theta = x_prev
 
     # Lines 2-4: perturb the commanded control.
-    var_v = alpha[0] * abs(v) + alpha[1] * abs(omega)
-    var_omega = alpha[2] * abs(v) + alpha[3] * abs(omega)
-    var_gamma = alpha[4] * abs(v) + alpha[5] * abs(omega)
+    var_v = alpha[0] * v * v + alpha[1] * omega * omega
+    var_omega = alpha[2] * v * v + alpha[3] * omega * omega
+    var_gamma = alpha[4] * v * v + alpha[5] * omega * omega
     v_hat = v + sample_normal_distribution(var_v)
     omega_hat = omega + sample_normal_distribution(var_omega)
     gamma_hat = sample_normal_distribution(var_gamma)
@@ -386,10 +386,13 @@ def odometry_motion_model(u, x_prev, x, alpha):
         _odometry_motion_parameters(x_prev, x))
 
     # Lines 8-10 of Table 5.5 with the variances of (5.44)-(5.46).
-    var_rot1 = alpha[0] * abs(delta_rot1) + alpha[1] * abs(delta_trans)
-    var_trans = (alpha[2] * abs(delta_trans)
-                 + alpha[3] * abs(delta_rot1 + delta_rot2))
-    var_rot2 = alpha[0] * abs(delta_rot2) + alpha[1] * abs(delta_trans)
+    var_rot1 = (alpha[0] * delta_rot1 * delta_rot1
+                + alpha[1] * delta_trans * delta_trans)
+    var_trans = (alpha[2] * delta_trans * delta_trans
+                 + alpha[3] * delta_rot1 * delta_rot1
+                 + alpha[3] * delta_rot2 * delta_rot2)
+    var_rot2 = (alpha[0] * delta_rot2 * delta_rot2
+                + alpha[1] * delta_trans * delta_trans)
 
     p1 = prob_normal_distribution(
         normalize_angle(delta_rot1 - delta_rot1_hat), var_rot1)
@@ -427,10 +430,13 @@ def sample_odometry_motion_model(u, x_prev, alpha):
         u_prev, u_curr)
 
     # Lines 5-7: perturb the three motion parameters.
-    var_rot1 = alpha[0] * abs(delta_rot1) + alpha[1] * abs(delta_trans)
-    var_trans = (alpha[2] * abs(delta_trans)
-                 + alpha[3] * abs(delta_rot1 + delta_rot2))
-    var_rot2 = alpha[0] * abs(delta_rot2) + alpha[1] * abs(delta_trans)
+    var_rot1 = (alpha[0] * delta_rot1 * delta_rot1
+                + alpha[1] * delta_trans * delta_trans)
+    var_trans = (alpha[2] * delta_trans * delta_trans
+                 + alpha[3] * delta_rot1 * delta_rot1
+                 + alpha[3] * delta_rot2 * delta_rot2)
+    var_rot2 = (alpha[0] * delta_rot2 * delta_rot2
+                + alpha[1] * delta_trans * delta_trans)
 
     delta_rot1_hat = delta_rot1 - sample_normal_distribution(var_rot1)
     delta_trans_hat = delta_trans - sample_normal_distribution(var_trans)
