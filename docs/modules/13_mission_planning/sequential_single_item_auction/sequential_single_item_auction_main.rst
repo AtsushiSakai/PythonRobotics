@@ -12,7 +12,7 @@ or delivery points.
 The animation first shows the MiniSum auction and then the MiniMax auction on
 the same map. Triangles are robot start positions, gray crosses are targets
 that are not assigned yet, and colored lines are each robot's current route.
-Routes follow A* paths around the walls (black dots).
+Routes follow shortest grid paths around the walls (black dots).
 
 Problem
 ~~~~~~~
@@ -28,8 +28,8 @@ order:
    c(R_i) = d(s_i, r_1) + \sum_{k=1}^{|R_i|-1} d(r_k, r_{k+1})
 
 where :math:`d(a, b)` is the travel distance between two points. In this
-example, :math:`d` is the length of an A* path on an occupancy grid, so the
-costs respect obstacles.
+example, :math:`d` is the length of the shortest path on an occupancy grid,
+so the costs respect obstacles.
 
 Two common team objectives are:
 
@@ -59,8 +59,15 @@ The auction assigns one target per round until every target is assigned:
    inserted into the winning robot's route at the chosen position.
 
 With :math:`m` robots and :math:`n` targets, each round evaluates at most
-:math:`m \cdot n` bids, so the auction is fast even for large teams. The
-travel distances are cached, so each A* path is computed only once.
+:math:`m \cdot n` bids, so the auction is fast even for large teams.
+
+The bids need travel distances between many pairs of points: every robot
+start and target to every target. Instead of planning a path for each pair,
+the example runs one Dijkstra search from each robot start and each target
+over the whole grid, which gives the distance to every other point at once.
+That is :math:`m + n` searches for the whole auction. With 5 robots and 40
+targets on a 100 m map, this takes 45 searches, where one A* search per pair
+of points would need 980.
 
 Results
 ~~~~~~~
