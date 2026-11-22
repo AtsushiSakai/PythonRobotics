@@ -8,8 +8,10 @@ A team of robots (e.g. drones) must visit a set of target locations. The
 auction assigns targets one at a time: in every round, each robot bids on each
 unassigned target, and the target with the single lowest bid goes to the robot
 that made it. A robot's bid is the extra travel cost of inserting the target
-into its current route at the best position. Travel costs are A* path lengths
-on an occupancy grid, so obstacles are taken into account.
+into its current route at the best position. Travel costs are shortest path
+lengths on an occupancy grid, so obstacles are taken into account. They are
+computed with one Dijkstra search per robot start and target, which gives the
+cost from that point to every other point at once.
 
 Two team objectives are supported:
 
@@ -31,6 +33,7 @@ References:
 
 """
 import contextlib
+import heapq
 import io
 import math
 import pathlib
@@ -40,7 +43,7 @@ import matplotlib.pyplot as plt
 
 sys.path.append(str(pathlib.Path(__file__).parent.parent.parent))
 
-from PathPlanning.AStar import a_star  # noqa: E402
+from PathPlanning.Dijkstra import dijkstra  # noqa: E402
 
 show_animation = True
 
@@ -50,10 +53,13 @@ MINIMAX = "minimax"
 
 class TravelCostMap:
     """
-    Obstacle-aware travel costs between points, computed with A* and cached.
+    Obstacle-aware travel costs between points on an occupancy grid.
 
-    The A* grid only contains discrete cells, so every point is snapped to its
-    nearest grid cell before planning.
+    The grid is built with the Dijkstra planner from PathPlanning. Every point
+    is snapped to its nearest grid cell. The first time a point is used as a
+    start, one Dijkstra search from it over the whole grid gives the shortest
+    path to every reachable cell, so an auction with N robots and targets runs
+    N searches in total, whatever the number of rounds and bids.
     """
 
     def __init__(self, obstacle_x, obstacle_y, grid_resolution, robot_radius):
@@ -63,11 +69,45 @@ class TravelCostMap:
         grid_resolution: grid cell size [m]
         robot_radius: robot radius used to inflate obstacles [m]
         """
-        a_star.show_animation = False
-        with contextlib.redirect_stdout(io.StringIO()):  # silence A* logs
-            self.planner = a_star.AStarPlanner(obstacle_x, obstacle_y,
-                                               grid_resolution, robot_radius)
-        self.paths = {}  # (start, goal) -> (path_x, path_y, length)
+        with contextlib.redirect_stdout(io.StringIO()):  # silence map logs
+            self.grid = dijkstra.DijkstraPlanner(obstacle_x, obstacle_y,
+                                                 grid_resolution, robot_radius)
+        self.searches = {}  # start cell -> (cost, parent) for every cell
+
+    def to_cell(self, position):
+        """Grid cell (x index, y index) nearest to an (x, y) position [m]."""
+        return (self.grid.calc_xy_index(position[0], self.grid.min_x),
+                self.grid.calc_xy_index(position[1], self.grid.min_y))
+
+    def is_free(self, cell):
+        """True if the cell is inside the map and not blocked."""
+        return self.grid.verify_node(self.grid.Node(cell[0], cell[1], 0, -1))
+
+    def search_from(self, start_cell):
+        """
+        Dijkstra search from one cell to every reachable cell.
+
+        start_cell: (x index, y index) of the start
+        returns: (cost, parent) dicts keyed by cell, with cost in grid units
+        """
+        if start_cell not in self.searches:
+            cost = {start_cell: 0.0}
+            parent = {start_cell: None}
+            queue = [(0.0, start_cell)]
+            while queue:
+                current_cost, cell = heapq.heappop(queue)
+                if current_cost > cost[cell]:
+                    continue  # an outdated queue entry
+                for dx, dy, step_cost in self.grid.motion:
+                    neighbor = (cell[0] + dx, cell[1] + dy)
+                    new_cost = current_cost + step_cost
+                    if (new_cost < cost.get(neighbor, math.inf)
+                            and self.is_free(neighbor)):
+                        cost[neighbor] = new_cost
+                        parent[neighbor] = cell
+                        heapq.heappush(queue, (new_cost, neighbor))
+            self.searches[start_cell] = (cost, parent)
+        return self.searches[start_cell]
 
     def path(self, start, goal):
         """
@@ -77,17 +117,21 @@ class TravelCostMap:
         goal: (x, y) goal position [m]
         returns: (path_x, path_y, length) with positions and length in [m]
         """
-        key = (start, goal)
-        if key not in self.paths:
-            with contextlib.redirect_stdout(io.StringIO()):  # silence A* logs
-                path_x, path_y = self.planner.planning(start[0], start[1],
-                                                       goal[0], goal[1])
-            path_x, path_y = path_x[::-1], path_y[::-1]  # A* returns goal first
-            length = sum(math.hypot(x1 - x0, y1 - y0) for x0, y0, x1, y1 in
-                         zip(path_x, path_y, path_x[1:], path_y[1:]))
-            self.paths[key] = (path_x, path_y, length)
-            self.paths[(goal, start)] = (path_x[::-1], path_y[::-1], length)
-        return self.paths[key]
+        start_cell, goal_cell = self.to_cell(start), self.to_cell(goal)
+        _, parent = self.search_from(start_cell)
+        if goal_cell not in parent:
+            raise ValueError(f"No path from {start} to {goal}")
+        cells = [goal_cell]
+        while parent[cells[-1]] is not None:
+            cells.append(parent[cells[-1]])
+        cells.reverse()  # start first
+        path_x = [self.grid.calc_position(ix, self.grid.min_x)
+                  for ix, _ in cells]
+        path_y = [self.grid.calc_position(iy, self.grid.min_y)
+                  for _, iy in cells]
+        length = sum(math.hypot(x1 - x0, y1 - y0) for x0, y0, x1, y1 in
+                     zip(path_x, path_y, path_x[1:], path_y[1:]))
+        return path_x, path_y, length
 
     def cost(self, start, goal):
         """Travel distance from start to goal [m]."""
@@ -227,12 +271,15 @@ def build_map(size, walls):
     size: side length of the square area [m]
     walls: list of ((x0, y0), (x1, y1)) axis-aligned wall segments [m]
     returns: (obstacle_x, obstacle_y) lists [m]
+
+    Each segment is sampled with points at most 1 m apart, and always
+    includes both of its end points, so short segments work too.
     """
     obstacle_x, obstacle_y = [], []
     border = [((0, 0), (size, 0)), ((size, 0), (size, size)),
               ((0, size), (size, size)), ((0, 0), (0, size))]
     for (x0, y0), (x1, y1) in border + walls:
-        steps = int(max(abs(x1 - x0), abs(y1 - y0)))
+        steps = max(1, math.ceil(max(abs(x1 - x0), abs(y1 - y0))))
         for i in range(steps + 1):
             obstacle_x.append(x0 + (x1 - x0) * i / steps)
             obstacle_y.append(y0 + (y1 - y0) * i / steps)
