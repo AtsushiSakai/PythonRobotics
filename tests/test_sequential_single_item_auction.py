@@ -5,6 +5,8 @@ import pytest
 import conftest
 from MissionPlanning.SequentialSingleItemAuction import \
     sequential_single_item_auction as m
+from PathPlanning.AStar import a_star
+from PathPlanning.Dijkstra import dijkstra
 
 
 def make_cost_map(walls=(), size=40.0):
@@ -72,6 +74,63 @@ def test_minisum_and_minimax_trade_off_in_main_scenario():
     _, minimax_costs = m.main(m.MINIMAX)
     assert sum(minisum_costs) < sum(minimax_costs)
     assert max(minimax_costs) < max(minisum_costs)
+
+
+@pytest.mark.parametrize("wall", [((10.0, 10.0), (10.5, 10.0)),
+                                  ((10.0, 10.0), (10.0, 10.0)),
+                                  ((10.0, 10.0), (12.5, 10.0))])
+def test_build_map_samples_short_and_fractional_walls(wall):
+    border_x, _ = m.build_map(40.0, [])
+    obstacle_x, obstacle_y = m.build_map(40.0, [wall])
+    wall_points = list(zip(obstacle_x, obstacle_y))[len(border_x):]
+    assert wall_points[0] == wall[0]
+    assert wall_points[-1] == wall[1]
+    assert all(math.dist(a, b) <= 1.0
+               for a, b in zip(wall_points, wall_points[1:]))
+
+
+def test_cost_map_leaves_planner_animation_settings_alone(monkeypatch):
+    monkeypatch.setattr(a_star, "show_animation", True)
+    monkeypatch.setattr(dijkstra, "show_animation", True)
+    cost_map = make_cost_map()
+    cost_map.cost((4.0, 4.0), (30.0, 30.0))
+    assert a_star.show_animation is True
+    assert dijkstra.show_animation is True
+
+
+def test_one_search_per_robot_start_and_target():
+    cost_map = make_cost_map(walls=[((20, 0), (20, 34))])
+    robot_starts = [(4.0, 4.0), (36.0, 36.0)]
+    targets = [(10.0, 10.0), (30.0, 30.0), (10.0, 30.0), (30.0, 10.0),
+               (24.0, 4.0)]
+    m.sequential_single_item_auction(robot_starts, targets, cost_map)
+    assert len(cost_map.searches) == len(robot_starts) + len(targets)
+
+
+def test_path_lengths_match_a_star(monkeypatch):
+    walls = [((20, 0), (20, 34))]
+    cost_map = make_cost_map(walls=walls)
+    obstacle_x, obstacle_y = m.build_map(40.0, walls)
+    monkeypatch.setattr(a_star, "show_animation", False)
+    planner = a_star.AStarPlanner(obstacle_x, obstacle_y, 2.0, 1.0)
+    for start, goal in [((4.0, 4.0), (30.0, 4.0)), ((16.0, 4.0), (24.0, 4.0)),
+                        ((36.0, 36.0), (10.0, 10.0))]:
+        path_x, path_y = planner.planning(*start, *goal)
+        a_star_length = sum(math.hypot(x1 - x0, y1 - y0) for x0, y0, x1, y1
+                            in zip(path_x, path_y, path_x[1:], path_y[1:]))
+        path_x, path_y, length = cost_map.path(start, goal)
+        assert length == pytest.approx(a_star_length)
+        assert (path_x[0], path_y[0]) == start
+        assert (path_x[-1], path_y[-1]) == goal
+
+
+def test_unreachable_target_raises():
+    # a closed box around (30, 30)
+    walls = [((24, 24), (36, 24)), ((36, 24), (36, 36)),
+             ((24, 36), (36, 36)), ((24, 24), (24, 36))]
+    cost_map = make_cost_map(walls=walls)
+    with pytest.raises(ValueError):
+        cost_map.cost((4.0, 4.0), (30.0, 30.0))
 
 
 def test_unknown_objective_raises():
