@@ -67,6 +67,56 @@ Code Link
 .. autofunction:: PathPlanning.AStar.a_star.AStarPlanner
 
 
+.. _jump-point-search-algorithm:
+
+Jump Point Search algorithm
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is a 2D grid based shortest path planning with the Jump Point Search (JPS)
+algorithm.
+
+.. image:: https://github.com/AtsushiSakai/PythonRoboticsGifs/raw/master/PathPlanning/JumpPointSearch/animation.gif
+
+In the animation, cyan points are the searched jump points.
+
+Jump Point Search is an optimization of the A star algorithm for uniform-cost
+grid maps. On such a grid, many paths with the same length are just reorderings
+of the same moves, and ordinary A star wastes time expanding all of them. JPS
+removes this symmetry with two ideas:
+
+- **Neighbor pruning.** When a node is reached from a given direction, most of
+  its neighbors can only be reached optimally through the node's predecessor,
+  so they are discarded. Only the *natural* neighbors (the straight-ahead
+  continuation, and for a diagonal move its two component directions) are kept.
+
+- **Forced neighbors.** An obstacle beside the current node can block the
+  alternative shortest path that would otherwise bypass the node. The neighbor
+  on the far side of that obstacle then becomes *forced*: it must be reached
+  through the current node, so it is kept.
+
+Instead of stepping one cell at a time, JPS "jumps" along a direction until it
+reaches the goal, a node with a forced neighbor, or (for a diagonal jump) a node
+from which a horizontal or vertical jump finds such a node. These stopping cells
+are the *jump points*, and only they are placed on the open list. The search
+therefore expands far fewer nodes than A star while returning a path with the
+**same optimal cost**, because it explores exactly the same eight-connected grid
+(diagonal moves cost :math:`\sqrt{2}` and are allowed whenever the target cell is
+free, as in the A star example above).
+
+Its heuristic is the 2D Euclidean distance, the same as the A star example.
+
+Reference
+++++++++++++
+
+-  `Online Graph Pruning for Pathfinding on Grid Maps (Harabor and Grastien, AAAI 2011) <https://ojs.aaai.org/index.php/AAAI/article/view/7994>`__
+-  `Jump point search - Wikipedia <https://en.wikipedia.org/wiki/Jump_point_search>`__
+
+Code Link
++++++++++++++
+
+.. autofunction:: PathPlanning.JumpPointSearch.jump_point_search.JumpPointSearchPlanner
+
+
 Bidirectional A\* algorithm
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
