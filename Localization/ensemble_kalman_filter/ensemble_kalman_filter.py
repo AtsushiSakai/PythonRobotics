@@ -98,9 +98,9 @@ def calc_covariance(xEst, px):
     cov = np.zeros((3, 3))
 
     for i in range(px.shape[1]):
-        dx = (px[:, i] - xEst)[0:3]
-        cov += dx.dot(dx.T)
-    cov /= NP
+        dx = (px[0:3, i] - xEst[0:3, 0]).reshape(3, 1)
+        cov += dx @ dx.T
+    cov /= px.shape[1]
 
     return cov
 
